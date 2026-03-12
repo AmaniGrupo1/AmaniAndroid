@@ -1,0 +1,166 @@
+package org.ies.tierno.applicationamani.presentation.ui.screen
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun RegisterScreen() {
+
+    var name by remember { mutableStateOf("") }
+    var surname by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    val backgroundColor = Color(0xFFCCC0E4)
+    val colorButton = android.graphics.Color.parseColor("#6750A4")
+
+    Scaffold(
+        containerColor = backgroundColor
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = "Crear cuenta",
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            espaciado(40)
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                value = name,
+                onValueChange = { name = it },
+                placeholder = { Text("Nombre") },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
+                )
+            )
+            espaciado(30)
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                value = surname,
+                onValueChange = { surname = it },
+                placeholder = { Text("Surname") },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
+                )
+            )
+
+            espaciado(30)
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                value = email,
+                onValueChange = { email = it },
+                placeholder = { Text("Email") },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
+                )
+            )
+
+            espaciado(30)
+            var existe by remember { mutableStateOf(true) }
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
+                value = password,
+                onValueChange = { password = it },
+                placeholder = { Text("Password") },
+                visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
+                trailingIcon = {
+                    var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(onClick = {existe=!existe}) {
+                        Image(
+                            image, contentDescription = "Ver contraseña"
+                        )
+                    }
+                },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
+                )
+            )
+
+            espaciado(30)
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(50.dp),
+                border = BorderStroke(2.dp, Color.Black),
+                onClick = {
+
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color(colorButton)
+                )
+            ) {
+                Text(
+                    "Registrarse",
+                    fontSize = 16.sp
+                )
+            }
+
+            espaciado(30)
+
+            TextButton(onClick = { }) {
+                Text("Ya tengo cuenta. Iniciar sesión")
+            }
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    RegisterScreen()
+}

@@ -5,6 +5,7 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 val retrofitModule = module {
     // API retrofit
     single {

@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.core:core-ktx:1.10.1") //Fuente de texto
+
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.play.services)
