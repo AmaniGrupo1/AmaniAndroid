@@ -22,7 +22,7 @@ fun MenuPrincipal(navController: NavController) {
 
     var expanded by remember { mutableStateOf(false) }
 
-    val primaryBlue = Color(android.graphics.Color.parseColor("#0029a1"))
+    val primaryBlue = Color(android.graphics.Color.parseColor("#CCC0E4"))
     val white = Color.White
 
     TopAppBar(
