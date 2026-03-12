@@ -42,17 +42,17 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.10.1") //Fuente de texto
 
+    //Librerias de Compose
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.play.services)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation("androidx.navigation:navigation-compose:2.8.0-alpha02")
+
     // Opcional: Para navegación segura con tipos
+    implementation("androidx.navigation:navigation-compose:2.8.0-alpha02")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation(libs.androidx.core.ktx)
