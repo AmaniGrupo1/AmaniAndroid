@@ -66,7 +66,7 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
                 modifier = Modifier.padding(16.dp),
                 fontSize = 25.sp
             )
-            espaciado(15)
+            Espaciado(15)
             Text(
                 question.title,
                 fontFamily = roboto,
