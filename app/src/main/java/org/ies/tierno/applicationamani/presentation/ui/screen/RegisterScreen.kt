@@ -31,7 +31,7 @@ fun RegisterScreen() {
     var password by remember { mutableStateOf("") }
 
     val backgroundColor = Color(0xFFCCC0E4)
-    val colorButton = android.graphics.Color.parseColor("#6750A4")
+    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
 
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght)

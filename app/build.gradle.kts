@@ -51,7 +51,9 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
+    implementation("androidx.navigation:navigation-compose:2.8.0-alpha02")
+    // Opcional: Para navegación segura con tipos
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
