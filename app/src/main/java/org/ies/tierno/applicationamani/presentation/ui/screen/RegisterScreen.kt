@@ -20,10 +20,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(navController: NavController) {
 
     var name by remember { mutableStateOf("") }
     var surname by remember { mutableStateOf("") }
@@ -59,7 +61,7 @@ fun RegisterScreen() {
                 fontSize = 30.sp
             )
 
-            espaciado(40)
+            Espaciado(40)
 
             TextField(
                 modifier = Modifier
@@ -77,7 +79,7 @@ fun RegisterScreen() {
                     cursorColor = Color.Black
                 )
             )
-            espaciado(30)
+            Espaciado(30)
 
             TextField(
                 modifier = Modifier
@@ -96,7 +98,7 @@ fun RegisterScreen() {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             TextField(
                 modifier = Modifier
@@ -115,7 +117,7 @@ fun RegisterScreen() {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
             var existe by remember { mutableStateOf(true) }
             TextField(
                 modifier = Modifier
@@ -143,7 +145,7 @@ fun RegisterScreen() {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             Button(
                 modifier = Modifier
@@ -166,7 +168,7 @@ fun RegisterScreen() {
                 )
             }
 
-            espaciado(30)
+            Espaciado(30)
 
             TextButton(onClick = { }) {
                 Text("Ya tengo cuenta. Iniciar sesión",
@@ -180,5 +182,5 @@ fun RegisterScreen() {
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen()
+    RegisterScreen(rememberNavController())
 }

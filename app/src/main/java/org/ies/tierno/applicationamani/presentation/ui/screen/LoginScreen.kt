@@ -23,11 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
 
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
@@ -56,7 +58,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 alpha = 1f
             )
 
-            espaciado(40)
+            Espaciado(40)
 
             TextField(
                 modifier = Modifier
@@ -76,7 +78,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             var existe by remember { mutableStateOf(true) }
             TextField(
@@ -107,7 +109,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             Button(
                 modifier = Modifier
@@ -131,7 +133,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 )
             }
 
-            espaciado(12)
+            Espaciado(12)
 
             TextButton(onClick = { }) {
                 Text("No tengo cuenta. Quiero registrame",
@@ -142,12 +144,12 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
 }
 
 @Composable
-fun espaciado(espacio : Int){
+fun Espaciado(espacio : Int){
     Spacer(modifier = Modifier.height(espacio.dp))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    LoginScreen(rememberNavController())
 }
