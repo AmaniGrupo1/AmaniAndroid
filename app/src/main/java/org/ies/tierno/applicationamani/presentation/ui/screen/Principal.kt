@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,14 +58,20 @@ fun Principal(navController: NavController) {
             Text(
                 "Aquí comienza tu camino de autoconocimiento,bienestar y paz interior",
                 fontFamily = roboto,
-                modifier = Modifier.padding(16.dp),
-                fontSize = 20.sp
+                modifier = Modifier.padding(16.dp)
+                    .fillMaxWidth(),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 26.sp
             )
             Text(
                 "Cada paso que das hacia tu bienestar, por pequeño que parezca, es un acto de valentía y amor propio.",
                 fontFamily = roboto,
-                modifier = Modifier.padding(16.dp),
-                fontSize = 20.sp
+                modifier = Modifier.padding(16.dp)
+                    .fillMaxWidth(),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 26.sp
             )
 
             Button(
