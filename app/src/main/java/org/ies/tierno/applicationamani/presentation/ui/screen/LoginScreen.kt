@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,7 +35,9 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
     val backgroundColor = Color(0xFFCCC0E4)
     val colorButton = android.graphics.Color.parseColor("#6750A4")
 
-
+    val roboto = FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght)
+    )
     Scaffold(
         containerColor = backgroundColor
     ) { padding ->
@@ -62,7 +66,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 onValueChange = {
                     loginViewModel.setUsername(it)
                 },
-                label = { Text("Usuario") },
+                label = { Text("Usuario",
+                    fontFamily = roboto) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
@@ -82,7 +87,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 onValueChange = {
                     loginViewModel.setPassword(it)
                 },
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña",
+                    fontFamily = roboto) },
                 visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
                     var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
@@ -120,14 +126,16 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
             ) {
                 Text(
                     "Iniciar sesión",
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    fontFamily = roboto
                 )
             }
 
             espaciado(12)
 
             TextButton(onClick = { }) {
-                Text("No tengo cuenta. Quiero registrame")
+                Text("No tengo cuenta. Quiero registrame",
+                    fontFamily = roboto)
             }
         }
     }

@@ -13,11 +13,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.ies.tierno.applicationamani.R
 
 @Composable
 fun RegisterScreen() {
@@ -29,6 +32,13 @@ fun RegisterScreen() {
 
     val backgroundColor = Color(0xFFCCC0E4)
     val colorButton = android.graphics.Color.parseColor("#6750A4")
+
+    val roboto = FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght)
+    )
+    val balow = FontFamily(
+        Font(R.font.barlow_condensed_black)
+    )
 
     Scaffold(
         containerColor = backgroundColor
@@ -44,7 +54,9 @@ fun RegisterScreen() {
 
             Text(
                 text = "Crear cuenta",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                fontFamily = balow,
+                fontSize = 30.sp
             )
 
             espaciado(40)
@@ -55,7 +67,8 @@ fun RegisterScreen() {
                     .background(Color.White),
                 value = name,
                 onValueChange = { name = it },
-                placeholder = { Text("Nombre") },
+                placeholder = { Text("Nombre",
+                    fontFamily = roboto) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -72,7 +85,8 @@ fun RegisterScreen() {
                     .background(Color.White),
                 value = surname,
                 onValueChange = { surname = it },
-                placeholder = { Text("Surname") },
+                placeholder = { Text("Surname",
+                    fontFamily = roboto) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -90,7 +104,8 @@ fun RegisterScreen() {
                     .background(Color.White),
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Email") },
+                placeholder = { Text("Email",
+                    fontFamily = roboto) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -108,7 +123,8 @@ fun RegisterScreen() {
                     .background(Color.White),
                 value = password,
                 onValueChange = { password = it },
-                placeholder = { Text("Password") },
+                placeholder = { Text("Password",
+                    fontFamily = roboto) },
                 visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
                     var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
@@ -145,6 +161,7 @@ fun RegisterScreen() {
             ) {
                 Text(
                     "Registrarse",
+                    fontFamily = roboto,
                     fontSize = 16.sp
                 )
             }
@@ -152,7 +169,8 @@ fun RegisterScreen() {
             espaciado(30)
 
             TextButton(onClick = { }) {
-                Text("Ya tengo cuenta. Iniciar sesión")
+                Text("Ya tengo cuenta. Iniciar sesión",
+                    fontFamily = roboto)
             }
 
         }
