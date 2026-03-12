@@ -58,7 +58,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 alpha = 1f
             )
 
-            espaciado(40)
+            Espaciado(40)
 
             TextField(
                 modifier = Modifier
@@ -78,7 +78,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             var existe by remember { mutableStateOf(true) }
             TextField(
@@ -109,7 +109,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             Button(
                 modifier = Modifier
@@ -133,7 +133,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 )
             }
 
-            espaciado(12)
+            Espaciado(12)
 
             TextButton(onClick = { }) {
                 Text("No tengo cuenta. Quiero registrame",
@@ -144,7 +144,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
 }
 
 @Composable
-fun espaciado(espacio : Int){
+fun Espaciado(espacio : Int){
     Spacer(modifier = Modifier.height(espacio.dp))
 }
 

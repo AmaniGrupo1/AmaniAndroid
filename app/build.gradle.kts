@@ -40,8 +40,6 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.10.1") //Fuente de texto
-
     //Librerias de Compose
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -52,9 +50,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Opcional: Para navegación segura con tipos
-    implementation("androidx.navigation:navigation-compose:2.8.0-alpha02")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
+    // Dependencias comunes
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
