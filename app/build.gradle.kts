@@ -49,9 +49,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Opcional: Para navegación segura con tipos
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.serialization.json)
+   //Navegación
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 
     // Dependencias comunes
     implementation(libs.androidx.core.ktx)

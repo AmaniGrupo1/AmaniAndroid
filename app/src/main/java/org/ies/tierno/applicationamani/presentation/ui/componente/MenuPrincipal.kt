@@ -91,27 +91,27 @@ fun MenuPrincipal(navController: NavController) {
                     }
                 )
 
-                DropdownMenuItem(
-                    text = { Text("Más Info",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
-                    onClick = {
-                        expanded = false
-                        navController.navigate("info")
-                    }
-                )
+//                DropdownMenuItem(
+//                    text = { Text("Más Info",
+//                        fontFamily = roboto,
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 16.sp) },
+//                    onClick = {
+//                        expanded = false
+//                        navController.navigate("info")
+//                    }
+//                )
 
-                DropdownMenuItem(
-                    text = { Text("Política de privacidad",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
-                    onClick = {
-                        expanded = false
-                        navController.navigate("privacidad")
-                    }
-                )
+//                DropdownMenuItem(
+//                    text = { Text("Política de privacidad",
+//                        fontFamily = roboto,
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 16.sp) },
+//                    onClick = {
+//                        expanded = false
+//                        navController.navigate("privacidad")
+//                    }
+//                )
 
                 DropdownMenuItem(
                     text = { Text("Volver a la principal",
