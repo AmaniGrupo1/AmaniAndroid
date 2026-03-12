@@ -59,7 +59,7 @@ fun RegisterScreen() {
                 fontSize = 30.sp
             )
 
-            espaciado(40)
+            Espaciado(40)
 
             TextField(
                 modifier = Modifier
@@ -77,7 +77,7 @@ fun RegisterScreen() {
                     cursorColor = Color.Black
                 )
             )
-            espaciado(30)
+            Espaciado(30)
 
             TextField(
                 modifier = Modifier
@@ -96,7 +96,7 @@ fun RegisterScreen() {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             TextField(
                 modifier = Modifier
@@ -115,7 +115,7 @@ fun RegisterScreen() {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
             var existe by remember { mutableStateOf(true) }
             TextField(
                 modifier = Modifier
@@ -143,7 +143,7 @@ fun RegisterScreen() {
                 )
             )
 
-            espaciado(30)
+            Espaciado(30)
 
             Button(
                 modifier = Modifier
@@ -166,7 +166,7 @@ fun RegisterScreen() {
                 )
             }
 
-            espaciado(30)
+            Espaciado(30)
 
             TextButton(onClick = { }) {
                 Text("Ya tengo cuenta. Iniciar sesión",

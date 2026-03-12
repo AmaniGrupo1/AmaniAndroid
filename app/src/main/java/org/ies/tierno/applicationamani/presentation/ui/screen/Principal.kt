@@ -88,7 +88,7 @@ fun Principal(navController: NavController) {
                     fontFamily = roboto
                 )
             }
-            espaciado(15)
+            Espaciado(15)
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
