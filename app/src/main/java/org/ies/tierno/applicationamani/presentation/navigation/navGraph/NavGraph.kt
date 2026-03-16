@@ -8,6 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
+import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.RegisterScreen
 
 @Composable
@@ -22,6 +24,12 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.registro.route){
             RegisterScreen(navController)
+        }
+        composable(Screens.questionnaire.route){
+            QuestionnaireScreen(navController)
+        }
+        composable(Screens.principalCliente.route){
+            PrincipalClienteScreen(navController)
         }
     }
 }

@@ -1,8 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,21 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +28,7 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireViewModel
 
 @Composable
-fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireViewModel = viewModel()) {
+fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireViewModel = viewModel()) {
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght)
     )
@@ -56,9 +47,14 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
             verticalArrangement = Arrangement.Center
         ) {
             LinearProgressIndicator(
-                progress =
-                    (viewModel.actualQuestion + 1).toFloat() /
-                            viewModel.questions.size
+            progress = {
+                (viewModel.actualQuestion + 1).toFloat() /
+                                        viewModel.questions.size
+            },
+            modifier = Modifier,
+            color = ProgressIndicatorDefaults.linearColor,
+            trackColor = ProgressIndicatorDefaults.linearTrackColor,
+            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
             Text(
                 "Intenta marcar las respuestas o frases que encajen contigo, te asignaremos un psicólogo en base a ellas.",
@@ -98,7 +94,6 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
                     )
                     Text(answer)
                 }
-
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -127,6 +122,6 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
 
 @Preview(showBackground = true)
 @Composable
-fun Questionnaire1Preview() {
-    Questionnaire1Screen(rememberNavController())
+fun QuestionnairePreview() {
+    QuestionnaireScreen(rememberNavController())
 }
