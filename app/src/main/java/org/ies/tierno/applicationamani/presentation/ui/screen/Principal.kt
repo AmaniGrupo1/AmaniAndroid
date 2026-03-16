@@ -149,9 +149,3 @@ fun Principal(navController: NavController) {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PrincipalPreview() {
-    Principal(rememberNavController())
-}

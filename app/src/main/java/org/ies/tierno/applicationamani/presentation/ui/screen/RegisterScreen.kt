@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,9 +24,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel = koinViewModel()) {
 
     var name by remember { mutableStateOf("") }
     var surname by remember { mutableStateOf("") }
@@ -69,8 +72,12 @@ fun RegisterScreen(navController: NavController) {
                     .background(Color.White),
                 value = name,
                 onValueChange = { name = it },
-                placeholder = { Text("Nombre",
-                    fontFamily = roboto) },
+                placeholder = {
+                    Text(
+                        "Nombre",
+                        fontFamily = roboto
+                    )
+                },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -87,8 +94,12 @@ fun RegisterScreen(navController: NavController) {
                     .background(Color.White),
                 value = surname,
                 onValueChange = { surname = it },
-                placeholder = { Text("Surname",
-                    fontFamily = roboto) },
+                placeholder = {
+                    Text(
+                        "Apellido",
+                        fontFamily = roboto
+                    )
+                },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -97,17 +108,19 @@ fun RegisterScreen(navController: NavController) {
                     cursorColor = Color.Black
                 )
             )
-
             Espaciado(30)
-
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White),
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Email",
-                    fontFamily = roboto) },
+                placeholder = {
+                    Text(
+                        "Email",
+                        fontFamily = roboto
+                    )
+                },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -116,7 +129,6 @@ fun RegisterScreen(navController: NavController) {
                     cursorColor = Color.Black
                 )
             )
-
             Espaciado(30)
             var existe by remember { mutableStateOf(true) }
             TextField(
@@ -125,12 +137,17 @@ fun RegisterScreen(navController: NavController) {
                     .background(Color.White),
                 value = password,
                 onValueChange = { password = it },
-                placeholder = { Text("Password",
-                    fontFamily = roboto) },
+                placeholder = {
+                    Text(
+                        "Password",
+                        fontFamily = roboto
+                    )
+                },
                 visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
-                    var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                    IconButton(onClick = {existe=!existe}) {
+                    var image =
+                        if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(onClick = { existe = !existe }) {
                         Image(
                             image, contentDescription = "Ver contraseña"
                         )
@@ -144,9 +161,7 @@ fun RegisterScreen(navController: NavController) {
                     cursorColor = Color.Black
                 )
             )
-
             Espaciado(30)
-
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +169,12 @@ fun RegisterScreen(navController: NavController) {
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, Color.Black),
                 onClick = {
-
+                    loginViewModel.registrarPaciente(
+                        nombre = name,
+                        apellido = surname,
+                        email = email,
+                        password = password
+                    )
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
@@ -164,23 +184,18 @@ fun RegisterScreen(navController: NavController) {
                 Text(
                     "Registrarse",
                     fontFamily = roboto,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
             }
-
             Espaciado(30)
 
             TextButton(onClick = { }) {
-                Text("Ya tengo cuenta. Iniciar sesión",
-                    fontFamily = roboto)
+                Text(
+                    "Ya tengo cuenta. Iniciar sesión",
+                    fontFamily = roboto
+                )
             }
-
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RegisterScreenPreview() {
-    RegisterScreen(rememberNavController())
 }
