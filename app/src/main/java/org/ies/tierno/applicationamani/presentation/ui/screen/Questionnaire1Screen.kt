@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +43,7 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
     )
     val colorButton = android.graphics.Color.parseColor("#CCC0E4")
 
-    val question = viewModel.questions[0]
+    val question = viewModel.questions[viewModel.actualQuestion]
     Scaffold(
 
     ) {
@@ -54,6 +55,11 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
+            LinearProgressIndicator(
+                progress =
+                    (viewModel.actualQuestion + 1).toFloat() /
+                            viewModel.questions.size
+            )
             Text(
                 "Intenta marcar las respuestas o frases que encajen contigo, te asignaremos un psicólogo en base a ellas.",
                 fontFamily = roboto,
@@ -66,61 +72,54 @@ fun Questionnaire1Screen(navController: NavController, viewModel: QuestionnaireV
                 modifier = Modifier.padding(16.dp),
                 fontSize = 25.sp
             )
-            Espaciado(15)
+            Spacer(modifier = Modifier.height(15.dp))
+
             Text(
-                question.title,
+                text = question.title,
                 fontFamily = roboto,
                 modifier = Modifier.padding(16.dp),
-                fontSize = 25.sp
+                fontSize = 20.sp
             )
-            question.answers.forEachIndexed { index, respuesta ->
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            question.answers.forEachIndexed { index, answer ->
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = viewModel.selectedAnswers[index],
+                        checked = viewModel.selectedAnswers
+                            [viewModel.actualQuestion][index],
+
                         onCheckedChange = {
                             viewModel.changeAnswer(index, it)
                         }
                     )
-
-                    Text(
-                        text = respuesta,
-                        modifier = Modifier.padding(20.dp),
-                        fontFamily = roboto
-                    )
+                    Text(answer)
                 }
 
             }
+
             Spacer(modifier = Modifier.weight(1f))
+
             Button(
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(50.dp)
-                    .align(Alignment.End),
-                shape = RoundedCornerShape(50.dp),
+                modifier = Modifier.align(Alignment.End),
                 onClick = {
-                     val answers = viewModel.selectedAnswers
 
-                     println(answers)
+                    if (viewModel.actualQuestion <
+                        viewModel.questions.size - 1
+                    ) {
+                        viewModel.nextQuestion() // Pasa a la siguiente pregunta
+                    } else {
 
-                     navController.navigate("Questionnaire2Screen")
+                        // Cuestionario terminado
+                        // navController.navigate()
+                    }
 
-                    //En principio, esto lo guardaría en la base de datos
-                },
-                border = BorderStroke(2.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(colorButton),
-                    contentColor = Color.Black,
-
-                    )
+                }
             ) {
-                Text(
-                    "Continuar",
-                    fontSize = 16.sp,
-                    fontFamily = roboto
-                )
+                Text("Continuar")
             }
         }
     }
