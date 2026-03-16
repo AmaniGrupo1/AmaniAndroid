@@ -28,12 +28,17 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,6 +66,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val especialidades = viewModel.especialidades
+    var selectedItem by remember { mutableStateOf(0) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -121,32 +127,71 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Home, null) },
                         label = { Text("Inicio") },
-                        selected = true,
-                        onClick = { }
+                        selected = selectedItem == 0,
+                        onClick = {
+                            selectedItem = 0
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            indicatorColor = purple
+                        )
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.AutoMirrored.Filled.Chat, null) },
                         label = { Text("Chat") },
-                        selected = false,
-                        onClick = { }
+                        selected = selectedItem == 1,
+                        onClick = {
+                            selectedItem = 1
+                            // navController.navigate("Ventana del chat")
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            indicatorColor = purple
+                        )
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.DateRange, null) },
                         label = { Text("Citas") },
-                        selected = false,
-                        onClick = { }
+                        selected = selectedItem == 2,
+                        onClick = {
+                            selectedItem = 2
+                            // navController.navigate("Ventana de citas")
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            indicatorColor = purple
+                        )
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Book, null) },
                         label = { Text("Diario") },
-                        selected = false,
-                        onClick = { }
+                        selected = selectedItem == 3,
+                        onClick = {
+                            selectedItem = 3
+                            // navController.navigate("Ventana del diario")
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            indicatorColor = purple
+                        )
                     )
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Settings, null) },
                         label = { Text("Ajustes") },
-                        selected = false,
-                        onClick = { }
+                        selected = selectedItem == 3,
+                        onClick = {
+                            selectedItem = 3
+                            // navController.navigate("Ventana de ajustes")
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            indicatorColor = purple
+                        )
                     )
                 }
             }
