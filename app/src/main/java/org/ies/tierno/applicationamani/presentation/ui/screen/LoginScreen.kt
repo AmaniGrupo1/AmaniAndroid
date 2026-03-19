@@ -1,8 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,32 +15,50 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(navController: NavController,
+                loginViewModel: LoginViewModel = koinViewModel()) {
 
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
+    val loginResult by loginViewModel.loginResult.collectAsState()
+
+    var passwordVisible by remember { mutableStateOf(false) }
 
     val backgroundColor = Color(0xFFCCC0E4)
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
+    val colorButton = Color(0xFFCCC0E4)
 
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght)
     )
-    Scaffold(
-        containerColor = backgroundColor
-    ) { padding ->
+
+    // Manejo del login
+    loginResult?.let { result ->
+        result.onSuccess { user ->
+            // Navegar según rol
+            when(user.rol.lowercase()) {
+                "admin" -> navController.navigate(Screens.adminHome.route)
+                "psicologo" -> navController.navigate(Screens.psicologoHome.route)
+                "paciente" -> navController.navigate(Screens.pacienteHome.route)
+            }
+        }.onFailure {
+            // Aquí puedes mostrar un snackbar o mensaje de error
+            println("Error al iniciar sesión: ${it.message}")
+        }
+    }
+
+    Scaffold(containerColor = backgroundColor) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -50,7 +66,6 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
@@ -61,95 +76,69 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
             Espaciado(40)
 
             TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
                 value = username,
-                onValueChange = {
-                    loginViewModel.setUsername(it)
-                },
-                label = { Text("Usuario",
-                    fontFamily = roboto) },
+                onValueChange = loginViewModel::setUsername,
+                label = { Text("Usuario", fontFamily = roboto) },
+                modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    unfocusedContainerColor = Color.White
                 )
             )
 
             Espaciado(30)
 
-            var existe by remember { mutableStateOf(true) }
             TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
                 value = password,
-                onValueChange = {
-                    loginViewModel.setPassword(it)
-                },
-                label = { Text("Contraseña",
-                    fontFamily = roboto) },
-                visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
+                onValueChange = loginViewModel::setPassword,
+                label = { Text("Contraseña", fontFamily = roboto) },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                            IconButton(onClick = {existe=!existe}) {
-                        Image(
-                            image, contentDescription = "Ver contraseña"
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "Ver contraseña"
                         )
                     }
                 },
-                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    unfocusedContainerColor = Color.White
                 )
             )
 
             Espaciado(30)
 
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                onClick = { loginViewModel.login() },
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(50.dp),
-                onClick = {
-
-                },
-                border = BorderStroke(2.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
-                    contentColor = Color(colorButton),
-
-                    )
+                    contentColor = colorButton
+                )
             ) {
                 Text(
                     "Iniciar sesión",
-                    fontSize = 16.sp,
-                    fontFamily = roboto
+                    fontFamily = roboto,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
             }
 
             Espaciado(12)
 
-            TextButton(onClick = { }) {
-                Text("No tengo cuenta. Quiero registrame",
-                    fontFamily = roboto)
+            TextButton(onClick = { navController.navigate("registro") }) {
+                Text("No tengo cuenta. Quiero registrarme", fontFamily = roboto)
             }
         }
     }
 }
+
 
 @Composable
 fun Espaciado(espacio : Int){
     Spacer(modifier = Modifier.height(espacio.dp))
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(rememberNavController())
-}

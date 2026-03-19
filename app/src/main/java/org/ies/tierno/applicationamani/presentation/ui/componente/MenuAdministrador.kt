@@ -1,30 +1,26 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuPrincipal(navController: NavController) {
+fun MenuAdministrador(title: String, navController: NavController) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -33,6 +29,8 @@ fun MenuPrincipal(navController: NavController) {
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght)
     )
+
+    val balow = FontFamily(Font(R.font.barlow_condensed_black))
 
     TopAppBar(
         modifier = Modifier.shadow(elevation = 8.dp),
@@ -43,24 +41,31 @@ fun MenuPrincipal(navController: NavController) {
         ),
 
         // LOGO A LA IZQUIERDA
-        navigationIcon = {
-            Image(
-                painter = painterResource(id = R.drawable.logo_original),
-                contentDescription = "Logo",
-                modifier = Modifier.size(40.dp)
-            )
-        },
+//        navigationIcon = {
+//            Image(
+//                painter = painterResource(id = R.drawable.logo_original),
+//                contentDescription = "Logo",
+//                modifier = Modifier.size(40.dp)
+//            )
+//        },
 
-        title = { }, // vacío porque usamos solo el logo
+        title = {
+            Text(
+                title,
+                fontFamily = balow,
+                style = MaterialTheme.typography.headlineSmall,
+                fontSize = 30.sp,
+            )
+        }, // vacío porque usamos solo el logo
 
         actions = {
 
             IconButton(
                 onClick = { expanded = !expanded }
             ) {
-                val imagen = if (expanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
                 Icon(
-                    imagen, contentDescription = "Desplegue", tint = Color.Black
+                    Icons.Default.Menu,
+                    contentDescription = "Menu"
                 )
             }
 
@@ -70,24 +75,17 @@ fun MenuPrincipal(navController: NavController) {
             ) {
 
                 DropdownMenuItem(
-                    text = { Text("Inicia sesión",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
+                    text = {
+                        Text(
+                            "Registrar psicologo",
+                            fontFamily = roboto,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    },
                     onClick = {
                         expanded = false
-                        navController.navigate(Screens.login.route)
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = { Text("Regístrate",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
-                    onClick = {
-                        expanded = false
-                        navController.navigate(Screens.registro.route)
+                        navController.navigate(Screens.agregarPsicologo.route)
                     }
                 )
 
@@ -103,13 +101,29 @@ fun MenuPrincipal(navController: NavController) {
                 )
 
                 DropdownMenuItem(
-                    text = { Text("Volver a la principal",
+                    text = { Text("Listar Pacientes",
                         fontFamily = roboto,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp) },
                     onClick = {
                         expanded = false
-                        navController.navigate(Screens.principal.route)
+                        navController.navigate(Screens.pacientes.route)
+                    }
+                )
+
+
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            "Regístrar administrador",
+                            fontFamily = roboto,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        navController.navigate(Screens.agregarAdmin.route)
                     }
                 )
             }
@@ -117,9 +131,4 @@ fun MenuPrincipal(navController: NavController) {
     )
 }
 
-@Composable
-@Preview(showBackground = true)
-fun MenuPrincipalPreview() {
-    MenuPrincipal(rememberNavController())
-}
 
