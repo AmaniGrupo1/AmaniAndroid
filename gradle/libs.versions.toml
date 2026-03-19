@@ -21,6 +21,7 @@ navigationRuntimeKtx = "2.9.7"
 googleGmsGoogleServices = "4.4.4"
 firebaseFirestore = "26.1.1"
 runtime = "1.10.5"
+foundationLayout = "1.10.5"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -49,6 +50,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

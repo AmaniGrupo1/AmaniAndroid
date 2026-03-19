@@ -1,4 +1,3 @@
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,36 +24,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
-import org.ies.tierno.applicationamani.presentation.viewmodels.TestScreenViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TestScreen(
     navController: NavController,
-    testScreenViewModel: TestScreenViewModel = koinViewModel()
+    crearPreguntaViewModel: CrearPreguntaViewModel = koinViewModel()
 ) {
-
-    val pregunta by testScreenViewModel.pregunta.collectAsState()
-    val opcion1 by testScreenViewModel.opcion1.collectAsState()
-    val opcion2 by testScreenViewModel.opcion2.collectAsState()
-    val opcion3 by testScreenViewModel.opcion3.collectAsState()
-    val opcion4 by testScreenViewModel.opcion4.collectAsState()
-
     val colorButton = android.graphics.Color.parseColor("#CCC0E4")
-
+    val request = crearPreguntaViewModel.request.collectAsState()
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght)
     )
 
     val snackbarHostState = remember { SnackbarHostState() }
-
+    val guardadoExitoso by crearPreguntaViewModel.guardadoExitoso.collectAsState()
+    if (guardadoExitoso) {
+        LaunchedEffect(guardadoExitoso) {
+            snackbarHostState.showSnackbar("Pregunta guardada correctamente")
+            navController.popBackStack()
+            crearPreguntaViewModel.limpiarEstadoGuardado()
+        }
+    }
     Scaffold(
         containerColor = Color(colorButton),
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -88,45 +86,53 @@ fun TestScreen(
             ) {
 
                 CampoPregunta(
-                    value = pregunta,
+                    value = request.value.texto?:"",
                     placeholder = "Pregunta",
-                    onChange = { testScreenViewModel.setPregunta(it) },
+                    onChange = { crearPreguntaViewModel.setTexto(it) },
+                    roboto = roboto
+                )
+                Espaciado(15)
+
+                CampoPregunta(
+                    value = request.value.tipo?:"",
+                    placeholder = "Tipo de pregunta",
+                    onChange = { crearPreguntaViewModel.setTipo(it) },
                     roboto = roboto
                 )
 
                 Espaciado(15)
 
                 CampoPregunta(
-                    value = opcion1,
+                    value = request.value.opciones?.getOrNull(0) ?: "",
                     placeholder = "Opción 1",
-                    onChange = { testScreenViewModel.setOpcion1(it) },
+                    onChange = { crearPreguntaViewModel.setOpcion1(it) },
                     roboto = roboto
                 )
 
                 Espaciado(15)
 
                 CampoPregunta(
-                    value = opcion2,
+                    value = request.value.opciones?.getOrNull(1) ?: "",
                     placeholder = "Opción 2",
-                    onChange = { testScreenViewModel.setOpcion2(it) },
+                    onChange = { crearPreguntaViewModel.setOpcion2(it) },
                     roboto = roboto
                 )
 
                 Espaciado(15)
 
                 CampoPregunta(
-                    value = opcion3,
+                    value = request.value.opciones?.getOrNull(2) ?: "",
                     placeholder = "Opción 3",
-                    onChange = { testScreenViewModel.setOpcion3(it) },
+                    onChange = { crearPreguntaViewModel.setOpcion3(it) },
                     roboto = roboto
                 )
 
                 Espaciado(15)
 
                 CampoPregunta(
-                    value = opcion4,
+                    value = request.value.opciones?.getOrNull(3) ?: "",
                     placeholder = "Opción 4",
-                    onChange = { testScreenViewModel.setOpcion4(it) },
+                    onChange = { crearPreguntaViewModel.setOpcion4(it) },
                     roboto = roboto
                 )
 
@@ -138,7 +144,7 @@ fun TestScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(40.dp),
                     onClick = {
-                        testScreenViewModel.guardarPregunta(snackbarHostState, navController)
+                        crearPreguntaViewModel.guardarPregunta()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(colorButton),

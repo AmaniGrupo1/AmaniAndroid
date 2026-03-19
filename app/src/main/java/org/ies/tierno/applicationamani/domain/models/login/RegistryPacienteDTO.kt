@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.domain.models
+package org.ies.tierno.applicationamani.domain.models.login
 
 data class RegistryPacienteDTO(
     val nombre: String,

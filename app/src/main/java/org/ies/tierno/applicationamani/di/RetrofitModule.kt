@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.di
 
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.CustomerClient
+import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -16,4 +17,5 @@ val retrofitModule = module {
             .build()
     }
     single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
+    single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
 }

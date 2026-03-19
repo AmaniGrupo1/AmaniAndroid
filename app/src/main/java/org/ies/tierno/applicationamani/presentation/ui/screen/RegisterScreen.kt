@@ -1,8 +1,5 @@
-package org.ies.tierno.applicationamani.presentation.ui.screen
+package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,192 +7,129 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel = koinViewModel()) {
-
-    var name by remember { mutableStateOf("") }
-    var surname by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
+fun RegisterScreen(
+    navController: NavController,
+    loginViewModel: LoginViewModel
+) {
     val backgroundColor = Color(0xFFCCC0E4)
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
+    val primaryColor = Color(0xFF6C63FF)
 
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
-    val balow = FontFamily(
-        Font(R.font.barlow_condensed_black)
-    )
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
+    // Campos del ViewModel
+    val nombre by loginViewModel.nombre.collectAsState()
+    val apellido by loginViewModel.apellido.collectAsState()
+    val email by loginViewModel.email.collectAsState()
+    val password by loginViewModel.regPassword.collectAsState()
+
+    // Campos locales
+    var telefono by remember { mutableStateOf("") }
+    var genero by remember { mutableStateOf("") }
+    var fechaNacimiento by remember { mutableStateOf("") }
+
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = backgroundColor
+        containerColor = backgroundColor,
+        topBar = {
+            MenuAdministrador("Registrar Psicólogo", navController)
+        }
     ) { padding ->
 
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            Text(
-                text = "Crear cuenta",
-                style = MaterialTheme.typography.headlineSmall,
-                fontFamily = balow,
-                fontSize = 30.sp
-            )
-
-            Espaciado(40)
-
+            CustomTextField(nombre, "Nombre") { loginViewModel.setNombre(it) }
+            CustomTextField(apellido, "Apellido") { loginViewModel.setApellido(it) }
+            CustomTextField(email, "Email") { loginViewModel.setEmail(it) }
+            CustomTextField(telefono, "Teléfono") { telefono = it }
+            CustomTextField(genero, "Género (M/F)") { genero = it }
+            CustomTextField(fechaNacimiento, "Fecha nacimiento (YYYY-MM-DD)") { fechaNacimiento = it }
+            // Password
             TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
-                value = name,
-                onValueChange = { name = it },
-                placeholder = {
-                    Text(
-                        "Nombre",
-                        fontFamily = roboto
-                    )
-                },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
-                )
-            )
-            Espaciado(30)
-
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
-                value = surname,
-                onValueChange = { surname = it },
-                placeholder = {
-                    Text(
-                        "Apellido",
-                        fontFamily = roboto
-                    )
-                },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
-                )
-            )
-            Espaciado(30)
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
-                value = email,
-                onValueChange = { email = it },
-                placeholder = {
-                    Text(
-                        "Email",
-                        fontFamily = roboto
-                    )
-                },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
-                )
-            )
-            Espaciado(30)
-            var existe by remember { mutableStateOf(true) }
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
                 value = password,
-                onValueChange = { password = it },
-                placeholder = {
-                    Text(
-                        "Password",
-                        fontFamily = roboto
-                    )
-                },
-                visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
+                onValueChange = { loginViewModel.setRegPassword(it) },
+                placeholder = { Text("Contraseña", fontFamily = roboto) },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    var image =
-                        if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                    IconButton(onClick = { existe = !existe }) {
-                        Image(
-                            image, contentDescription = "Ver contraseña"
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "Ver contraseña"
                         )
                     }
                 },
-                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    unfocusedContainerColor = Color.White
                 )
             )
-            Espaciado(30)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Botón Registrar
             Button(
+                onClick = {
+                    loginViewModel.setTelefono(telefono)
+                    loginViewModel.setGenero(genero)
+                    loginViewModel.setFechaNacimiento(fechaNacimiento)
+                    loginViewModel.registrarPaciente()
+                    navController.popBackStack()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(2.dp, Color.Black),
-                onClick = {
-                    loginViewModel.registrarPaciente(
-                        nombre = name,
-                        apellido = surname,
-                        email = email,
-                        password = password
-                    )
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(colorButton)
-                )
+                    .height(55.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
             ) {
-                Text(
-                    "Registrarse",
-                    fontFamily = roboto,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                Text("Registrar", color = Color.White, fontFamily = roboto)
             }
-            Espaciado(30)
 
-            TextButton(onClick = { }) {
-                Text(
-                    "Ya tengo cuenta. Iniciar sesión",
-                    fontFamily = roboto
-                )
+            // Botón Cancelar
+            OutlinedButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text("Cancelar", fontFamily = roboto)
             }
         }
     }
+}
+
+@Composable
+fun CustomTextField(value: String, placeholder: String, onChange: (String) -> Unit) {
+    TextField(
+        value = value,
+        onValueChange = onChange,
+        placeholder = { Text(placeholder) },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White
+        )
+    )
 }

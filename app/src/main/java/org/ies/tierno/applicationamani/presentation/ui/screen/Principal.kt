@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPrincipal
 
 @Composable
@@ -48,10 +49,10 @@ fun Principal(navController: NavController) {
         topBar = {
             MenuPrincipal(navController)
         }
-    ) {
-        innerPadding ->
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
                 .padding(16.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,7 +67,8 @@ fun Principal(navController: NavController) {
             Text(
                 "Aquí comienza tu camino de autoconocimiento,bienestar y paz interior",
                 fontFamily = roboto,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
                     .fillMaxWidth(),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
@@ -75,7 +77,8 @@ fun Principal(navController: NavController) {
             Text(
                 "Cada paso que das hacia tu bienestar, por pequeño que parezca, es un acto de valentía y amor propio.",
                 fontFamily = roboto,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
                     .fillMaxWidth(),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
@@ -88,7 +91,7 @@ fun Principal(navController: NavController) {
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 onClick = {
-
+                    navController.navigate(Screens.cuestionario.route)
                 },
                 border = BorderStroke(2.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(
@@ -118,7 +121,8 @@ fun Principal(navController: NavController) {
                     Text(
                         "Consejo",
                         fontFamily = roboto,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier
+                            .padding(16.dp)
                             .fillMaxWidth(),
                         fontSize = 16.sp,
                     )
