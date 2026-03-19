@@ -11,7 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -19,42 +24,66 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.components.BottomBar
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
+
+/**
+ * Pantalla principal del cliente autenticado.
+ *
+ * Presenta la información del psicólogo asignado (imagen, nombre, biografía
+ * y especialidades) obtenida de [PrincipalClienteViewModel].
+ *
+ * Incluye:
+ * - **Cajón de navegación lateral** con opciones de perfil, citas y cierre
+ *   de sesión.
+ * - **Barra de navegación inferior** con cinco secciones: Inicio, Chat,
+ *   Citas, Diario y Ajustes.
+ * - **Tarjetas** con el color primario del tema para la imagen y los datos
+ *   del profesional.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que provee los datos del psicólogo y sus especialidades.
+ *
+ * @see PrincipalClienteViewModel
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalClienteViewModel = viewModel()) {
-    val minu = FontFamily(
-        Font(R.font.nunito_variablefont_wght)
-    )
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
-    val purple = Color(0xFFCCC0E4)
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val especialidades = viewModel.especialidades
+    var selectedItem by remember { mutableStateOf(0) }
+
+    val navBarItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = colors.onPrimary,
+        selectedTextColor = colors.onPrimary,
+        indicatorColor = colors.primary
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -63,11 +92,12 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 Text(
                     text = "Menú",
                     modifier = Modifier.padding(16.dp),
-                    fontSize = 20.sp
+                    style = typography.titleMedium
                 )
                 HorizontalDivider()
                 Text(
                     text = "Perfil",
+                    style = typography.bodyLarge,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { }
@@ -75,6 +105,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 )
                 Text(
                     text = "Mis citas",
+                    style = typography.bodyLarge,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { }
@@ -82,6 +113,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 )
                 Text(
                     text = "Cerrar sesión",
+                    style = typography.bodyLarge,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { }
@@ -111,7 +143,43 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 )
             },
             bottomBar = {
-                BottomBar(navController)
+                NavigationBar {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Home, null) },
+                        label = { Text("Inicio") },
+                        selected = selectedItem == 0,
+                        onClick = { selectedItem = 0 },
+                        colors = navBarItemColors
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.AutoMirrored.Filled.Chat, null) },
+                        label = { Text("Chat") },
+                        selected = selectedItem == 1,
+                        onClick = { selectedItem = 1 },
+                        colors = navBarItemColors
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.DateRange, null) },
+                        label = { Text("Citas") },
+                        selected = selectedItem == 2,
+                        onClick = { selectedItem = 2 },
+                        colors = navBarItemColors
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Book, null) },
+                        label = { Text("Diario") },
+                        selected = selectedItem == 3,
+                        onClick = { selectedItem = 3 },
+                        colors = navBarItemColors
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Settings, null) },
+                        label = { Text("Ajustes") },
+                        selected = selectedItem == 4,
+                        onClick = { selectedItem = 4 },
+                        colors = navBarItemColors
+                    )
+                }
             }
         ) { paddingValues ->
             Column(
@@ -126,7 +194,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         .fillMaxWidth()
                         .height(200.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = purple
+                        containerColor = colors.primary
                     )
                 ) {
                     Box(
@@ -140,7 +208,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = purple
+                        containerColor = colors.primary
                     )
                 ) {
                     Column(
@@ -148,17 +216,15 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                     ) {
                         Text(
                             text = "N. Psico",
-                            fontFamily = minu,
+                            style = typography.titleLarge,
                             modifier = Modifier.padding(16.dp),
-                            fontSize = 25.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
                             "Biografía",
-                            fontFamily = roboto,
+                            style = typography.titleMedium,
                             modifier = Modifier.padding(16.dp),
-                            fontSize = 20.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -168,9 +234,8 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                             ) {
                                 Text(
                                     especialidad,
-                                    fontFamily = roboto,
+                                    style = typography.titleMedium,
                                     modifier = Modifier.padding(16.dp),
-                                    fontSize = 20.sp
                                 )
                             }
                         }
@@ -181,6 +246,9 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
     }
 }
 
+/**
+ * Vista previa de [PrincipalClienteScreen] para el panel de diseño de Android Studio.
+ */
 @Preview(showBackground = true)
 @Composable
 fun PrincipalClienteScreenPreview() {

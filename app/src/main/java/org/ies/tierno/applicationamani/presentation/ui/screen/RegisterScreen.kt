@@ -12,18 +12,28 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
+/**
+ * Pantalla de registro de nuevos usuarios en la aplicación Amani.
+ *
+ * Presenta un formulario con campos de nombre, apellido, email y contraseña,
+ * un botón de «Registrarse» y un enlace para volver al inicio de sesión.
+ *
+ * El fondo, los campos de texto y los botones obtienen sus colores desde
+ * [MaterialTheme.colorScheme] y [LocalAmaniColors], y la tipografía desde
+ * [MaterialTheme.typography].
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ *
+ * @see LoginScreen
+ */
 @Composable
 fun RegisterScreen(navController: NavController) {
 
@@ -32,18 +42,12 @@ fun RegisterScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val backgroundColor = Color(0xFFCCC0E4)
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
-
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
-    val balow = FontFamily(
-        Font(R.font.barlow_condensed_black)
-    )
+    val colors = MaterialTheme.colorScheme
+    val amaniColors = LocalAmaniColors.current
+    val typography = MaterialTheme.typography
 
     Scaffold(
-        containerColor = backgroundColor
+        containerColor = amaniColors.screenBackground
     ) { padding ->
 
         Column(
@@ -56,9 +60,7 @@ fun RegisterScreen(navController: NavController) {
 
             Text(
                 text = "Crear cuenta",
-                style = MaterialTheme.typography.headlineSmall,
-                fontFamily = balow,
-                fontSize = 30.sp
+                style = typography.headlineMedium
             )
 
             Espaciado(40)
@@ -66,17 +68,17 @@ fun RegisterScreen(navController: NavController) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(amaniColors.textFieldContainer),
                 value = name,
                 onValueChange = { name = it },
                 placeholder = { Text("Nombre",
-                    fontFamily = roboto) },
+                    style = typography.bodyLarge) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = amaniColors.textFieldContainer,
+                    unfocusedContainerColor = amaniColors.textFieldContainer,
+                    focusedIndicatorColor = colors.onSurface,
+                    cursorColor = colors.onSurface
                 )
             )
             Espaciado(30)
@@ -84,17 +86,17 @@ fun RegisterScreen(navController: NavController) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(amaniColors.textFieldContainer),
                 value = surname,
                 onValueChange = { surname = it },
                 placeholder = { Text("Surname",
-                    fontFamily = roboto) },
+                    style = typography.bodyLarge) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = amaniColors.textFieldContainer,
+                    unfocusedContainerColor = amaniColors.textFieldContainer,
+                    focusedIndicatorColor = colors.onSurface,
+                    cursorColor = colors.onSurface
                 )
             )
 
@@ -103,17 +105,17 @@ fun RegisterScreen(navController: NavController) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(amaniColors.textFieldContainer),
                 value = email,
                 onValueChange = { email = it },
                 placeholder = { Text("Email",
-                    fontFamily = roboto) },
+                    style = typography.bodyLarge) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = amaniColors.textFieldContainer,
+                    unfocusedContainerColor = amaniColors.textFieldContainer,
+                    focusedIndicatorColor = colors.onSurface,
+                    cursorColor = colors.onSurface
                 )
             )
 
@@ -122,15 +124,15 @@ fun RegisterScreen(navController: NavController) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(amaniColors.textFieldContainer),
                 value = password,
                 onValueChange = { password = it },
                 placeholder = { Text("Password",
-                    fontFamily = roboto) },
+                    style = typography.bodyLarge) },
                 visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
-                    var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                    IconButton(onClick = {existe=!existe}) {
+                    val image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(onClick = { existe = !existe }) {
                         Image(
                             image, contentDescription = "Ver contraseña"
                         )
@@ -138,10 +140,10 @@ fun RegisterScreen(navController: NavController) {
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = amaniColors.textFieldContainer,
+                    unfocusedContainerColor = amaniColors.textFieldContainer,
+                    focusedIndicatorColor = colors.onSurface,
+                    cursorColor = colors.onSurface
                 )
             )
 
@@ -152,20 +154,19 @@ fun RegisterScreen(navController: NavController) {
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(2.dp, Color.Black),
+                border = BorderStroke(2.dp, amaniColors.buttonBorder),
                 onClick = {
                     // check de si se ha hecho el cuestionario o no
                     // navController.navigate()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(colorButton)
+                    containerColor = amaniColors.textFieldContainer,
+                    contentColor = colors.primary
                 )
             ) {
                 Text(
                     "Registrarse",
-                    fontFamily = roboto,
-                    fontSize = 16.sp
+                    style = typography.labelLarge
                 )
             }
 
@@ -173,13 +174,16 @@ fun RegisterScreen(navController: NavController) {
 
             TextButton(onClick = { }) {
                 Text("Ya tengo cuenta. Iniciar sesión",
-                    fontFamily = roboto)
+                    style = typography.bodyLarge)
             }
 
         }
     }
 }
 
+/**
+ * Vista previa de [RegisterScreen] para el panel de diseño de Android Studio.
+ */
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {

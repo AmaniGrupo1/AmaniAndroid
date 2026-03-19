@@ -32,6 +32,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -42,6 +43,7 @@ android {
 
 dependencies {
     //Librerias de Compose
+    coreLibraryDesugaring(libs.desugar.jdk.libs)//Libreria para usar  APIs modernas de Java
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.play.services)
@@ -50,7 +52,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-   //Navegación
+    //Navegación
     implementation("androidx.navigation:navigation-compose:2.9.6")
 
     // Dependencias comunes

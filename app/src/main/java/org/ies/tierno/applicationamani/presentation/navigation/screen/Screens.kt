@@ -1,27 +1,31 @@
 package org.ies.tierno.applicationamani.presentation.navigation.screen
 
+/**
+ * Clase sellada que define todas las rutas de navegación de la aplicación.
+ *
+ * Cada objeto hijo representa una pantalla accesible a través del
+ * [org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph]. El uso de una clase sellada garantiza que las rutas
+ * se gestionan de forma segura en tiempo de compilación.
+ *
+ * @property route Cadena identificadora única de la ruta de navegación.
+ *
+ * @see org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
+ */
+sealed class Screens(val route: String) {
 
-sealed class Screens (val route: String){
-    object login: Screens("login")
-    object registro: Screens("registro")
-    object principal: Screens("principal")
+    /** Pantalla de inicio de sesión. */
+    object login : Screens("login")
 
-    object test: Screens("test")
+    /** Pantalla de registro de nuevo usuario. */
+    object registro : Screens("registro")
 
-    //Login
-    object adminHome: Screens("admin_home")
-    object psicologoHome: Screens("psicologo_home")
-    object pacienteHome: Screens("paciente_home")
+    /** Pantalla principal para usuarios no autenticados. */
+    object principal : Screens("principal")
 
-    //Agregar Psicologo
-    object agregarPsicologo: Screens("agregar_psicologo")
+    /** Pantalla del cuestionario de evaluación inicial. */
+    object questionnaire : Screens("questionnaire")
 
-    object agregarAdmin: Screens("agregar_admin")
-
-    object cuestionario : Screens("cuestionario")
-
-    object pacientes : Screens("pacientes")
-
-    object agregarPacienteAdmin : Screens("agregar_paciente_admin")
+    /** Pantalla principal del cliente autenticado con su psicólogo asignado. */
+    object principalCliente : Screens("principalCliente")
 }
 
