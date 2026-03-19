@@ -4,6 +4,6 @@ data class LoginResponseDTO(
 
     val idUsuario: Long,
     val nombre: String,
-    val rol: String
-
+    val rol: String,
+    val token : String
 )

@@ -41,6 +41,9 @@ android {
 }
 
 dependencies {
+
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
     //Librerias de Compose
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

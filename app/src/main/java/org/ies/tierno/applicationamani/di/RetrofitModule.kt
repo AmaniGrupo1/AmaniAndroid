@@ -1,18 +1,35 @@
 package org.ies.tierno.applicationamani.di
 
+import okhttp3.OkHttpClient
+import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
-import org.ies.tierno.applicationamani.data.remoto.CustomerClient
+import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.TestApi
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 val retrofitModule = module {
     // API retrofit
+    single { TokenDataStore(androidContext()) }
+
+    single { AuthInterceptor(get()) }
+
+    single {
+        OkHttpClient.Builder()
+            .addInterceptor(get<AuthInterceptor>())
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+    // Retrofit usando OkHttpClient con interceptor
     single {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080")
+            .baseUrl("http://10.0.2.2:8080") // localhost del emulador Android
+            .client(get<OkHttpClient>())       // ← CORRECTO: inyectamos el cliente con interceptor
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

@@ -30,7 +30,7 @@ val appModule = module {
     factory { DarBajaPacienteUseCase(get()) }
     factory { TodosLosPacientesUseCase(get()) }
 
-    viewModel { LoginViewModel(get()) }
+    viewModel { LoginViewModel(get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { CuestionarioViewModel(get()) }

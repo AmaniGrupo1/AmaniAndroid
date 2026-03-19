@@ -27,9 +27,11 @@ fun RegisterScreen(
     val backgroundColor = Color(0xFFCCC0E4)
     val primaryColor = Color(0xFF6C63FF)
 
+    val snackbarHostState = remember { SnackbarHostState() }
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
     // Campos del ViewModel
+    val registry by loginViewModel.registerResult.collectAsState()
     val nombre by loginViewModel.nombre.collectAsState()
     val apellido by loginViewModel.apellido.collectAsState()
     val email by loginViewModel.email.collectAsState()
@@ -41,6 +43,13 @@ fun RegisterScreen(
     var fechaNacimiento by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(registry) {
+        registry?.onSuccess {
+            navController.popBackStack()
+        }?.onFailure {
+            snackbarHostState.showSnackbar("Error al registrar")
+        }
+    }
 
     Scaffold(
         containerColor = backgroundColor,
@@ -62,7 +71,9 @@ fun RegisterScreen(
             CustomTextField(email, "Email") { loginViewModel.setEmail(it) }
             CustomTextField(telefono, "Teléfono") { telefono = it }
             CustomTextField(genero, "Género (M/F)") { genero = it }
-            CustomTextField(fechaNacimiento, "Fecha nacimiento (YYYY-MM-DD)") { fechaNacimiento = it }
+            CustomTextField(fechaNacimiento, "Fecha nacimiento (YYYY-MM-DD)") {
+                fechaNacimiento = it
+            }
             // Password
             TextField(
                 value = password,
@@ -94,7 +105,6 @@ fun RegisterScreen(
                     loginViewModel.setGenero(genero)
                     loginViewModel.setFechaNacimiento(fechaNacimiento)
                     loginViewModel.registrarPaciente()
-                    navController.popBackStack()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
