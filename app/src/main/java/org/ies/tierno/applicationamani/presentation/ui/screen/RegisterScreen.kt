@@ -154,7 +154,8 @@ fun RegisterScreen(navController: NavController) {
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, Color.Black),
                 onClick = {
-
+                    // check de si se ha hecho el cuestionario o no
+                    // navController.navigate()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
