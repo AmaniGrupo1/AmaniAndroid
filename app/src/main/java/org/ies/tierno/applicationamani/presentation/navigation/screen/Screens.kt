@@ -7,5 +7,6 @@ sealed class Screens (val route: String){
     object principal: Screens("principal")
     object questionnaire: Screens("questionnaire")
     object principalCliente: Screens("principalCliente")
+    object settingsCliente: Screens("settingsCliente")
 }
 
