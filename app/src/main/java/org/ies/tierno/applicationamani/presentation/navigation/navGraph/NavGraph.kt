@@ -10,6 +10,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.RegisterScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 
 /**
  * Grafo de navegación principal de la aplicación Amani.
@@ -47,6 +48,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.principalCliente.route){
             PrincipalClienteScreen(navController)
+        }
+        composable(Screens.settingsCliente.route){
+            SettingsClienteScreen(navController)
         }
     }
 }
