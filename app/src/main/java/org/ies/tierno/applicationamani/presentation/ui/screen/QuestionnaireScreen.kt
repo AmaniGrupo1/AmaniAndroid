@@ -10,29 +10,46 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireViewModel
 
+/**
+ * Pantalla del cuestionario de evaluación inicial.
+ *
+ * Guía al usuario a través de una serie de preguntas con respuestas
+ * seleccionables (checkboxes) cuyo resultado se utilizará para asignarle
+ * un psicólogo adecuado.
+ *
+ * Características:
+ * - **Barra de progreso** lineal que indica la pregunta actual sobre el total.
+ * - **Instrucciones** explicativas al inicio del cuestionario.
+ * - **Lista de respuestas** con checkboxes gestionados por [QuestionnaireViewModel].
+ * - **Botón «Continuar»** que avanza a la siguiente pregunta o finaliza
+ *   el cuestionario.
+ *
+ * El estado (pregunta actual, respuestas seleccionadas) se mantiene en
+ * [QuestionnaireViewModel] y sobrevive a cambios de configuración.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que contiene las preguntas y gestiona el progreso.
+ *
+ * @see QuestionnaireViewModel
+ * @see org.ies.tierno.applicationamani.domain.models.Question
+ */
 @Composable
 fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireViewModel = viewModel()) {
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
+    val typography = MaterialTheme.typography
 
     val question = viewModel.questions[viewModel.actualQuestion]
     Scaffold(
@@ -58,23 +75,20 @@ fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireVi
             )
             Text(
                 "Intenta marcar las respuestas o frases que encajen contigo, te asignaremos un psicólogo en base a ellas.",
-                fontFamily = roboto,
+                style = typography.headlineSmall,
                 modifier = Modifier.padding(16.dp),
-                fontSize = 25.sp
             )
             Text(
                 "No te preocupes si no encajais, puedes cambiar de profesional sin problema más adelante.",
-                fontFamily = roboto,
+                style = typography.headlineSmall,
                 modifier = Modifier.padding(16.dp),
-                fontSize = 25.sp
             )
             Spacer(modifier = Modifier.height(15.dp))
 
             Text(
                 text = question.title,
-                fontFamily = roboto,
+                style = typography.titleMedium,
                 modifier = Modifier.padding(16.dp),
-                fontSize = 20.sp
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -120,6 +134,9 @@ fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireVi
     }
 }
 
+/**
+ * Vista previa de [QuestionnaireScreen] para el panel de diseño de Android Studio.
+ */
 @Preview(showBackground = true)
 @Composable
 fun QuestionnairePreview() {

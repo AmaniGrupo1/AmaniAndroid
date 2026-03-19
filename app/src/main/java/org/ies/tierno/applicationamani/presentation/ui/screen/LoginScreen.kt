@@ -13,35 +13,48 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
+/**
+ * Pantalla de inicio de sesión de la aplicación Amani.
+ *
+ * Muestra el logotipo de la app, campos de texto para usuario y contraseña,
+ * un botón de «Iniciar sesión» y un enlace a la pantalla de registro.
+ *
+ * El estado de los campos se gestiona a través de [LoginViewModel], que
+ * expone [StateFlow]s observados con `collectAsState`.
+ *
+ * Utiliza los colores del tema ([MaterialTheme.colorScheme]) y los colores
+ * extra de Amani ([LocalAmaniColors]) para mantener coherencia visual.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel que mantiene el estado del formulario.
+ *
+ * @see LoginViewModel
+ * @see RegisterScreen
+ */
 @Composable
 fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
 
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
 
-    val backgroundColor = Color(0xFFCCC0E4)
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
+    val colors = MaterialTheme.colorScheme
+    val amaniColors = LocalAmaniColors.current
+    val typography = MaterialTheme.typography
 
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
     Scaffold(
-        containerColor = backgroundColor
+        containerColor = amaniColors.screenBackground
     ) { padding ->
         Column(
             modifier = Modifier
@@ -63,18 +76,18 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(amaniColors.textFieldContainer),
                 value = username,
                 onValueChange = {
                     loginViewModel.setUsername(it)
                 },
                 label = { Text("Usuario",
-                    fontFamily = roboto) },
+                    style = typography.bodyLarge) },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = amaniColors.textFieldContainer,
+                    unfocusedContainerColor = amaniColors.textFieldContainer,
+                    focusedIndicatorColor = colors.onSurface,
+                    cursorColor = colors.onSurface
                 )
             )
 
@@ -84,17 +97,17 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(amaniColors.textFieldContainer),
                 value = password,
                 onValueChange = {
                     loginViewModel.setPassword(it)
                 },
                 label = { Text("Contraseña",
-                    fontFamily = roboto) },
+                    style = typography.bodyLarge) },
                 visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
-                    var image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                            IconButton(onClick = {existe=!existe}) {
+                    val image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(onClick = { existe = !existe }) {
                         Image(
                             image, contentDescription = "Ver contraseña"
                         )
@@ -102,10 +115,10 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = amaniColors.textFieldContainer,
+                    unfocusedContainerColor = amaniColors.textFieldContainer,
+                    focusedIndicatorColor = colors.onSurface,
+                    cursorColor = colors.onSurface
                 )
             )
 
@@ -119,17 +132,15 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 onClick = {
 
                 },
-                border = BorderStroke(2.dp, Color.Black),
+                border = BorderStroke(2.dp, amaniColors.buttonBorder),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(colorButton),
-
-                    )
+                    containerColor = amaniColors.textFieldContainer,
+                    contentColor = colors.primary,
+                )
             ) {
                 Text(
                     "Iniciar sesión",
-                    fontSize = 16.sp,
-                    fontFamily = roboto
+                    style = typography.labelLarge
                 )
             }
 
@@ -137,17 +148,28 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
 
             TextButton(onClick = { }) {
                 Text("No tengo cuenta. Quiero registrame",
-                    fontFamily = roboto)
+                    style = typography.bodyLarge)
             }
         }
     }
 }
 
+/**
+ * Composable utilitario que inserta un [Spacer] vertical.
+ *
+ * Facilita la creación de separaciones verticales sin repetir
+ * `Spacer(modifier = Modifier.height(...))` en cada pantalla.
+ *
+ * @param espacio Altura del espaciado en dp.
+ */
 @Composable
 fun Espaciado(espacio : Int){
     Spacer(modifier = Modifier.height(espacio.dp))
 }
 
+/**
+ * Vista previa de [LoginScreen] para el panel de diseño de Android Studio.
+ */
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {

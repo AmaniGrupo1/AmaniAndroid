@@ -9,37 +9,46 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Barra superior (TopAppBar) principal de la aplicación Amani.
+ *
+ * Muestra el logotipo de la marca a la izquierda y un icono desplegable
+ * a la derecha que permite al usuario navegar a las pantallas de inicio
+ * de sesión, registro o volver a la pantalla principal.
+ *
+ * Utiliza los colores del tema ([MaterialTheme.colorScheme]) para el
+ * fondo y los iconos, y [MaterialTheme.typography] para los textos del
+ * menú desplegable.
+ *
+ * @param navController Controlador de navegación utilizado para cambiar
+ *   de pantalla al seleccionar una opción del menú.
+ *
+ * @see Screens
+ * @see Principal
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuPrincipal(navController: NavController) {
 
     var expanded by remember { mutableStateOf(false) }
 
-    val primaryBlue = Color(android.graphics.Color.parseColor("#CCC0E4"))
-    val white = Color.White
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
 
     TopAppBar(
         modifier = Modifier.shadow(elevation = 8.dp),
 
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = primaryBlue,
-            titleContentColor = white
+            containerColor = colors.primary,
+            titleContentColor = colors.onPrimary
         ),
 
         // LOGO A LA IZQUIERDA
@@ -60,7 +69,7 @@ fun MenuPrincipal(navController: NavController) {
             ) {
                 val imagen = if (expanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
                 Icon(
-                    imagen, contentDescription = "Desplegue", tint = Color.Black
+                    imagen, contentDescription = "Desplegue", tint = colors.onPrimary
                 )
             }
 
@@ -71,9 +80,7 @@ fun MenuPrincipal(navController: NavController) {
 
                 DropdownMenuItem(
                     text = { Text("Inicia sesión",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
+                        style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.login.route)
@@ -82,9 +89,7 @@ fun MenuPrincipal(navController: NavController) {
 
                 DropdownMenuItem(
                     text = { Text("Regístrate",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
+                        style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.registro.route)
@@ -93,9 +98,7 @@ fun MenuPrincipal(navController: NavController) {
 
 //                DropdownMenuItem(
 //                    text = { Text("Más Info",
-//                        fontFamily = roboto,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 16.sp) },
+//                        style = typography.labelLarge) },
 //                    onClick = {
 //                        expanded = false
 //                        navController.navigate("info")
@@ -104,9 +107,7 @@ fun MenuPrincipal(navController: NavController) {
 
 //                DropdownMenuItem(
 //                    text = { Text("Política de privacidad",
-//                        fontFamily = roboto,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 16.sp) },
+//                        style = typography.labelLarge) },
 //                    onClick = {
 //                        expanded = false
 //                        navController.navigate("privacidad")
@@ -115,9 +116,7 @@ fun MenuPrincipal(navController: NavController) {
 
                 DropdownMenuItem(
                     text = { Text("Volver a la principal",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp) },
+                        style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.principal.route)
@@ -128,9 +127,11 @@ fun MenuPrincipal(navController: NavController) {
     )
 }
 
+/**
+ * Vista previa de [MenuPrincipal] para el panel de diseño de Android Studio.
+ */
 @Composable
 @Preview(showBackground = true)
 fun MenuPrincipalPreview() {
     MenuPrincipal(rememberNavController())
 }
-
