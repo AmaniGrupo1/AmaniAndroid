@@ -52,6 +52,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.components.BottomBar
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +68,6 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val especialidades = viewModel.especialidades
-    var selectedItem by remember { mutableStateOf(0) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -123,77 +124,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 )
             },
             bottomBar = {
-                NavigationBar {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, null) },
-                        label = { Text("Inicio") },
-                        selected = selectedItem == 0,
-                        onClick = {
-                            selectedItem = 0
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black,
-                            selectedTextColor = Color.Black,
-                            indicatorColor = purple
-                        )
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.AutoMirrored.Filled.Chat, null) },
-                        label = { Text("Chat") },
-                        selected = selectedItem == 1,
-                        onClick = {
-                            selectedItem = 1
-                            // navController.navigate("Ventana del chat")
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black,
-                            selectedTextColor = Color.Black,
-                            indicatorColor = purple
-                        )
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.DateRange, null) },
-                        label = { Text("Citas") },
-                        selected = selectedItem == 2,
-                        onClick = {
-                            selectedItem = 2
-                            // navController.navigate("Ventana de citas")
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black,
-                            selectedTextColor = Color.Black,
-                            indicatorColor = purple
-                        )
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Book, null) },
-                        label = { Text("Diario") },
-                        selected = selectedItem == 3,
-                        onClick = {
-                            selectedItem = 3
-                            // navController.navigate("Ventana del diario")
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black,
-                            selectedTextColor = Color.Black,
-                            indicatorColor = purple
-                        )
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Settings, null) },
-                        label = { Text("Ajustes") },
-                        selected = selectedItem == 3,
-                        onClick = {
-                            selectedItem = 3
-                            // navController.navigate("Ventana de ajustes")
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black,
-                            selectedTextColor = Color.Black,
-                            indicatorColor = purple
-                        )
-                    )
-                }
+                BottomBar(navController)
             }
         ) { paddingValues ->
             Column(
