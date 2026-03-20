@@ -9,19 +9,25 @@ sealed class Screens (val route: String){
     object test: Screens("test")
 
     //Login
-    object adminHome: Screens("admin_home")
-    object psicologoHome: Screens("psicologo_home")
-    object pacienteHome: Screens("paciente_home")
+    object adminHome: Screens("adminHome")
+    object psicologoHome: Screens("psicologoHome")
+    object pacienteHome: Screens("pacienteHome")
 
     //Agregar Psicologo
-    object agregarPsicologo: Screens("agregar_psicologo")
+    object agregarPsicologo: Screens("agregarPsicologo")
 
-    object agregarAdmin: Screens("agregar_admin")
+    object agregarAdmin: Screens("agregarAdmin")
 
     object cuestionario : Screens("cuestionario")
 
     object pacientes : Screens("pacientes")
 
-    object agregarPacienteAdmin : Screens("agregar_paciente_admin")
+    object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
+
+    object testPaciente : Screens("testPaciente")
+
+    object settings : Screens("settings")
+
+    object vistaPrincipalPaciente : Screens("vistaPrincipalPaciente")
 }
 

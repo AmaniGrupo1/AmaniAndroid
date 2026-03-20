@@ -55,9 +55,11 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.components.BottomBar
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
+import org.koin.androidx.compose.koinViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalClienteViewModel = viewModel()) {
+fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalClienteViewModel = koinViewModel()) {
     val minu = FontFamily(
         Font(R.font.nunito_variablefont_wght)
     )
@@ -192,10 +194,4 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrincipalClienteScreenPreview() {
-    PrincipalClienteScreen(rememberNavController())
 }

@@ -15,8 +15,11 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.Register
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
+import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.TestPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
@@ -69,6 +72,15 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.agregarPacienteAdmin.route) {
             RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
+        }
+        composable(Screens.testPaciente.route) {
+            TestPacienteScreen(navController)
+        }
+        composable(Screens.settings.route) {
+            SettingsClienteScreen(navController)
+        }
+        composable(Screens.vistaPrincipalPaciente.route) {
+            PrincipalClienteScreen(navController)
         }
     }
 }
