@@ -34,3 +34,15 @@ val AmaniSurface      = Color(0xFFFFFBFE)
 
 /** Color de texto sobre superficies generales. */
 val AmaniOnSurface    = Color(0xFF1C1B1F)
+
+// ── Colores semánticos de citas ────────────────────────────────
+
+/** Verde para franjas horarias libres. */
+val AmaniCitaLibre    = Color(0xFF4CAF50)
+
+/** Rojo suave para franjas horarias ocupadas. */
+val AmaniCitaOcupada  = Color(0xFFE57373)
+
+/** Fondo de una tarjeta de franja ocupada. */
+val AmaniCitaOcupadaBg = Color(0xFFFCE4EC)
+

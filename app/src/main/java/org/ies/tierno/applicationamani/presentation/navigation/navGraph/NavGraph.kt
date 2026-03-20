@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,6 +13,16 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteSc
 import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologo
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
+import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
+import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
+import TestScreen
 
 /**
  * Grafo de navegación principal de la aplicación Amani.
@@ -30,27 +42,54 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScr
  *
  * @see Screens
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(startDestination: String = Screens.principal.route) {
     val navController = rememberNavController()
+    val loginViewModel: LoginViewModel = koinViewModel()
+
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screens.principal.route){
+        composable(Screens.principal.route) {
             Principal(navController)
         }
-        composable(Screens.login.route){
-            LoginScreen(navController)
+        composable(Screens.login.route) {
+            LoginScreen(navController, loginViewModel)
         }
-        composable(Screens.registro.route){
+        composable(Screens.registro.route) {
             RegisterScreen(navController)
         }
-        composable(Screens.questionnaire.route){
+        composable(Screens.questionnaire.route) {
             QuestionnaireScreen(navController)
         }
-        composable(Screens.principalCliente.route){
+        composable(Screens.principalCliente.route) {
             PrincipalClienteScreen(navController)
         }
-        composable(Screens.settingsCliente.route){
+        composable(Screens.settingsCliente.route) {
             SettingsClienteScreen(navController)
+        }
+        composable(Screens.agregarPsicologo.route) {
+            AgregaPsicologo(navController, loginViewModel)
+        }
+        composable(Screens.test.route) {
+            TestScreen(navController)
+        }
+        composable(Screens.pacientes.route) {
+            ListadoPacientesScreen(navController)
+        }
+        composable(Screens.agregarAdmin.route) {
+            AgregarAdministrador(navController, loginViewModel)
+        }
+        composable(Screens.agregarPacienteAdmin.route) {
+            RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
+        }
+        composable(Screens.adminPrincipal.route) {
+            ViewAdminPrincipal(navController)
+        }
+        composable(Screens.cuestionario.route) {
+            Cuestionario(navController, loginViewModel)
+        }
+        composable(Screens.citas.route) {
+            CitasScreen(navController)
         }
     }
 }

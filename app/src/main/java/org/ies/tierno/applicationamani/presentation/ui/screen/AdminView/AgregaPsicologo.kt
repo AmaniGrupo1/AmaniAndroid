@@ -28,6 +28,16 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de registro de un nuevo psicólogo desde el panel de administración.
+ *
+ * Muestra un formulario con campos de nombre, apellido, email y contraseña.
+ * Al pulsar «Registrarse psicólogo» se invoca [LoginViewModel.registrarPsicologo]
+ * y se vuelve a la pantalla anterior.
+ *
+ * @param navController Controlador de navegación.
+ * @param loginViewModel ViewModel compartido que gestiona los campos y la acción de registro.
+ */
 @Composable
 fun AgregaPsicologo(
     navController: NavController,

@@ -18,6 +18,16 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Barra superior de la vista de administración con menú desplegable.
+ *
+ * Muestra el título de la sección actual y un menú hamburguesa con
+ * opciones de navegación: registrar psicólogo, test, listar pacientes
+ * y registrar administrador.
+ *
+ * @param title Título a mostrar en la barra superior.
+ * @param navController Controlador de navegación para dirigir al usuario a otras pantallas.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuAdministrador(title: String, navController: NavController) {
@@ -130,5 +140,3 @@ fun MenuAdministrador(title: String, navController: NavController) {
         }
     )
 }
-
-

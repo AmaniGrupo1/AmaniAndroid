@@ -20,6 +20,16 @@
     import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
     import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 
+    /**
+     * Pantalla de registro de un paciente desde el panel de administración.
+     *
+     * Muestra un formulario con campos de nombre, apellido, email, teléfono,
+     * género, fecha de nacimiento y contraseña. Al pulsar «Registrar» se
+     * invoca [LoginViewModel.registrarPacienteAdmin] y se vuelve atrás.
+     *
+     * @param navController Controlador de navegación.
+     * @param loginViewModel ViewModel compartido que gestiona los campos y la acción de registro.
+     */
     @Composable
     fun RegistrarPacienteDesdeAdminScreen(
         navController: NavController,
@@ -120,6 +130,15 @@
         }
     }
 
+    /**
+     * Campo de texto personalizado reutilizable.
+     *
+     * Muestra un [TextField] con esquinas redondeadas y fondo blanco.
+     *
+     * @param value Valor actual del campo.
+     * @param placeholder Texto indicativo cuando el campo está vacío.
+     * @param onChange Callback invocado al cambiar el texto.
+     */
     @Composable
     fun CustomTextFields(value: String, placeholder: String, onChange: (String) -> Unit) {
         TextField(

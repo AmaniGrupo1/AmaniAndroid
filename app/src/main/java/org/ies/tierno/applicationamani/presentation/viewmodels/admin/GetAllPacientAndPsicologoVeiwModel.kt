@@ -8,10 +8,21 @@ import kotlinx.coroutines.flow.stateIn
 import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetAllClientAndPsicologoUseCase
 
+/**
+ * ViewModel que expone la lista de pacientes con su psicólogo asignado.
+ *
+ * Recopila los datos del caso de uso [GetAllClientAndPsicologoUseCase] como un
+ * [StateFlow] para que la UI los observe de forma reactiva.
+ *
+ * @param getAllPacientAndPsicologoUseCase Caso de uso que obtiene la relación paciente-psicólogo.
+ *
+ * @see org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetAllClientAndPsicologoUseCase
+ */
 class GetAllPacientAndPsicologoVeiwModel(
     private val getAllPacientAndPsicologoUseCase: GetAllClientAndPsicologoUseCase
 ) : ViewModel() {
 
+    /** Flujo interno con la lista de pacientes y psicólogos. */
     val _pacientes: StateFlow<List<ListaPacientesAndPsicologo>> =
         getAllPacientAndPsicologoUseCase()
             .stateIn(
@@ -20,5 +31,6 @@ class GetAllPacientAndPsicologoVeiwModel(
                 initialValue = emptyList()
             )
 
+    /** Lista observable de pacientes con su psicólogo asignado. */
     val paciente : StateFlow<List<ListaPacientesAndPsicologo>> = _pacientes
 }

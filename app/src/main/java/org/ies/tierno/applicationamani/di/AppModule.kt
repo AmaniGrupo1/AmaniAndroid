@@ -9,7 +9,6 @@
  */
 package org.ies.tierno.applicationamani.di
 
-import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase

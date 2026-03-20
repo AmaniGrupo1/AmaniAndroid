@@ -41,6 +41,18 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Calendario mensual interactivo.
+ *
+ * Muestra un mes completo con cabecera de navegación, fila de días de la semana
+ * y una cuadrícula de celdas. Permite seleccionar un día y resaltar fechas
+ * con eventos (citas).
+ *
+ * @param modifier Modificador de diseño.
+ * @param fechaSeleccionada Fecha actualmente seleccionada, o `null` si ninguna.
+ * @param fechasDestacadas Conjunto de fechas que muestran un indicador de evento.
+ * @param onFechaSeleccionada Callback invocado cuando el usuario pulsa una fecha.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarioView(
@@ -67,6 +79,13 @@ fun CalendarioView(
     }
 }
 
+/**
+ * Cabecera del calendario con el nombre del mes y flechas de navegación.
+ *
+ * @param mesActual Mes y año mostrados actualmente.
+ * @param onMesAnterior Callback para retroceder un mes.
+ * @param onMesSiguiente Callback para avanzar un mes.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun CalendarioHeader(
@@ -97,6 +116,9 @@ private fun CalendarioHeader(
     }
 }
 
+/**
+ * Fila con las iniciales de los días de la semana (L, M, X, J, V, S, D).
+ */
 @Composable
 private fun CalendarioDiasSemana() {
     val dias = listOf("L", "M", "X", "J", "V", "S", "D")
@@ -113,6 +135,17 @@ private fun CalendarioDiasSemana() {
     }
 }
 
+/**
+ * Cuadrícula de celdas que representa los días del mes.
+ *
+ * Calcula el desplazamiento del primer día y rellena las celdas
+ * con los días correspondientes.
+ *
+ * @param mes Mes y año a representar.
+ * @param fechaSeleccionada Fecha seleccionada, o `null`.
+ * @param fechasDestacadas Conjunto de fechas con evento.
+ * @param onFechaSeleccionada Callback al pulsar una fecha.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun CalendarioGrid(
@@ -154,6 +187,20 @@ private fun CalendarioGrid(
     }
 }
 
+/**
+ * Celda individual que representa un día del calendario.
+ *
+ * Muestra el número del día y un punto indicador si la fecha está
+ * destacada. Cambia su fondo y color de texto según su estado.
+ *
+ * @param fecha Fecha representada, o `null` si la celda es un espacio vacío.
+ * @param esSeleccionada `true` si esta celda es la fecha seleccionada.
+ * @param esDestacada `true` si la fecha tiene un evento asociado.
+ * @param esHoy `true` si la fecha corresponde al día actual.
+ * @param modifier Modificador de diseño.
+ * @param onClick Acción al pulsar la celda.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun CeldaDia(
     fecha: LocalDate?,
@@ -204,7 +251,9 @@ private fun CeldaDia(
     }
 }
 
-
+/**
+ * Vista previa del calendario con una fecha seleccionada y fechas destacadas.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @Preview(showBackground = true)

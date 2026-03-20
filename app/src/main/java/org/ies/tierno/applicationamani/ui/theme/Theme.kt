@@ -78,6 +78,9 @@ data class AmaniExtraColors(
     val screenBackground: Color = AmaniBackground,
     val textFieldContainer: Color = AmaniWhite,
     val buttonBorder: Color = AmaniBlack,
+    val citaLibre: Color = AmaniCitaLibre,
+    val citaOcupada: Color = AmaniCitaOcupada,
+    val citaOcupadaBg: Color = AmaniCitaOcupadaBg,
 )
 
 /**

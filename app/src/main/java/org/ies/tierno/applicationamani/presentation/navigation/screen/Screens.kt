@@ -27,5 +27,32 @@ sealed class Screens(val route: String) {
 
     /** Pantalla principal del cliente autenticado con su psicólogo asignado. */
     object principalCliente : Screens("principalCliente")
+
+    /** Pantalla de ajustes del cliente. */
+    object settingsCliente : Screens("settingsCliente")
+
+    /** Pantalla para agregar un psicólogo (vista de administrador). */
+    object agregarPsicologo : Screens("agregarPsicologo")
+
+    /** Pantalla de creación de preguntas de test (vista de administrador). */
+    object test : Screens("test")
+
+    /** Pantalla de listado de pacientes (vista de administrador). */
+    object pacientes : Screens("pacientes")
+
+    /** Pantalla para agregar un administrador. */
+    object agregarAdmin : Screens("agregarAdmin")
+
+    /** Pantalla para registrar un paciente desde la vista de administrador. */
+    object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
+
+    /** Pantalla principal del administrador. */
+    object adminPrincipal : Screens("adminPrincipal")
+
+    /** Pantalla del cuestionario. */
+    object cuestionario : Screens("cuestionario")
+
+    /** Pantalla de citas del paciente con calendario y horas libres. */
+    object citas : Screens("citas")
 }
 

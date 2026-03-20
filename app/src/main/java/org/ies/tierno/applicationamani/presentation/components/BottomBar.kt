@@ -16,13 +16,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
+/**
+ * Constantes con las rutas de navegación del paciente.
+ *
+ * Se utilizan en [BottomBar] para identificar la sección activa
+ * y navegar entre pantallas.
+ */
 object Routes {
+    /** Ruta de la pantalla de inicio. */
     const val HOME = "home"
+    /** Ruta de la pantalla de chat. */
     const val CHAT = "chat"
+    /** Ruta de la pantalla de citas. */
     const val CITAS = "citas"
+    /** Ruta de la pantalla de diario. */
     const val DIARIO = "diario"
+    /** Ruta de la pantalla de ajustes. */
     const val SETTINGS = "settings"
 }
+
+/**
+ * Barra de navegación inferior para la vista del paciente.
+ *
+ * Utiliza [NavigationBar] de Material 3 con cinco secciones:
+ * Inicio, Chat, Citas, Diario y Ajustes. Resalta la sección
+ * activa según la ruta actual del [navController].
+ *
+ * @param navController Controlador de navegación para cambiar de pantalla.
+ */
 @Composable
 fun BottomBar(navController: NavController) {
     val purple = Color(0xFFCCC0E4)

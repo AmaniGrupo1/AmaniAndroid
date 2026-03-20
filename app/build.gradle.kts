@@ -1,16 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.gms.google.services)
+    // alias(libs.plugins.google.gms.google.services)
 }
 
 android {
     namespace = "org.ies.tierno.applicationamani"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "org.ies.tierno.applicationamani"
@@ -53,7 +50,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     //Navegación
-    implementation("androidx.navigation:navigation-compose:2.9.6")
+    implementation(libs.androidx.navigation.compose)
 
     // Dependencias comunes
     implementation(libs.androidx.core.ktx)
@@ -76,3 +73,12 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+dokka {
+    moduleName.set("Amani Android")
+    dokkaSourceSets.register("main") {
+        sourceRoots.from(file("src/main/java"))
+        includes.from("MODULE.md")
+    }
+}
+

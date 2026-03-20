@@ -28,6 +28,15 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de registro de un nuevo administrador.
+ *
+ * Muestra un formulario con campos de nombre, apellido, email y contraseña.
+ * Al pulsar «Registrarse administrador» se invoca [LoginViewModel.registrarAdmin].
+ *
+ * @param navController Controlador de navegación.
+ * @param loginViewModel ViewModel compartido que gestiona los campos y la acción de registro.
+ */
 @Composable
 fun AgregarAdministrador(
     navController: NavController,

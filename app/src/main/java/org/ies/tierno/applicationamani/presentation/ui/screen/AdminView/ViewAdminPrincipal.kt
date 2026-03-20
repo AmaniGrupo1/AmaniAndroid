@@ -31,6 +31,17 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla principal del panel de administración.
+ *
+ * Muestra una lista de tarjetas con la relación paciente-psicólogo
+ * obtenida del [GetAllPacientAndPsicologoVeiwModel]. Incluye la barra
+ * superior de administración ([MenuAdministrador]) y la barra inferior
+ * de navegación ([BottomBar]).
+ *
+ * @param navController Controlador de navegación.
+ * @param viewModel ViewModel que provee la lista de pacientes con psicólogos.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -60,6 +71,14 @@ fun ViewAdminPrincipal(
     }
 }
 
+/**
+ * Tarjeta que muestra la información resumida de un paciente y su psicólogo.
+ *
+ * Incluye nombre del psicólogo, nombre del paciente, email y fecha
+ * de última actualización formateada en `dd/MM/yyyy HH:mm`.
+ *
+ * @param paciente Datos de la relación paciente-psicólogo.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PacienteCard(paciente: ListaPacientesAndPsicologo) {

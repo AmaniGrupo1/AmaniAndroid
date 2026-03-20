@@ -10,6 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+/**
+ * Pantalla principal de la vista del psicólogo (placeholder).
+ *
+ * Muestra un texto identificativo «Psicologo». Pendiente de implementar
+ * el contenido real (agenda, pacientes asignados, etc.).
+ *
+ * @param navController Controlador de navegación.
+ */
 @Composable
 fun ViewPsicologoPrincipal(navController: NavController) {
     Scaffold() {

@@ -26,6 +26,12 @@ import org.ies.tierno.applicationamani.domain.models.test.Opcion
 import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de test del paciente (placeholder).
+ *
+ * Actualmente muestra una estructura vacía con [Scaffold] y [Column].
+ * Pendiente de implementar la lógica de visualización de test asignados.
+ */
 @Composable
 fun TestPacienteScreen(
 

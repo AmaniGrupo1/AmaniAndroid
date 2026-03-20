@@ -38,6 +38,17 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.components.BottomBar
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 
+/**
+ * Pantalla de ajustes del perfil del cliente (paciente).
+ *
+ * Permite visualizar y editar los datos personales del usuario: nombre,
+ * apellidos, género, dirección, teléfono y código postal. También ofrece
+ * botones para subir documentos (consentimiento informado y protección
+ * de datos), guardar cambios y eliminar la cuenta.
+ *
+ * @param navController Controlador de navegación.
+ * @param viewModel ViewModel que gestiona el estado del formulario de perfil.
+ */
 @Composable
 fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClienteViewModel = viewModel()) {
     val purple = Color(0xFFCCC0E4)
@@ -202,6 +213,15 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
 
 }
 
+/**
+ * Campo de texto personalizado con etiqueta superior.
+ *
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor actual del campo.
+ * @param onValueChange Callback invocado al cambiar el texto.
+ * @param color Color de fondo del campo de texto.
+ * @param modifier Modificador de diseño.
+ */
 @Composable
 fun TextFieldCustom(
     label: String,
@@ -232,6 +252,9 @@ fun TextFieldCustom(
     }
 }
 
+/**
+ * Vista previa de la pantalla de ajustes del cliente.
+ */
 @Preview(showBackground = true)
 @Composable
 fun SettingsClienteScreenPreview() {
