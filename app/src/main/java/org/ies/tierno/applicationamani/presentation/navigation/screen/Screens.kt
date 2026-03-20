@@ -54,5 +54,8 @@ sealed class Screens(val route: String) {
 
     /** Pantalla de citas del paciente con calendario y horas libres. */
     object citas : Screens("citas")
+
+    /** Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles). */
+    object psicologoAgenda : Screens("psicologoAgenda")
 }
 

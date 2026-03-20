@@ -1,33 +1,32 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 /**
- * Pantalla principal de la vista del psicólogo (placeholder).
+ * Pantalla principal de la vista del psicólogo.
  *
- * Muestra un texto identificativo «Psicologo». Pendiente de implementar
- * el contenido real (agenda, pacientes asignados, etc.).
+ * Redirige automáticamente a [PsicologoAgendaScreen] donde la psicóloga
+ * puede gestionar su horario, ver pacientes por día y marcar días
+ * como no disponibles.
  *
  * @param navController Controlador de navegación.
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ViewPsicologoPrincipal(navController: NavController) {
-    Scaffold() {
-        innerPaddding ->
-        Column(modifier = Modifier.padding(innerPaddding)
-            .fillMaxSize()){
-            Text(
-                text = "Psicologo",
-                fontSize = 54.sp
-            )
+    // Navegar directamente a la agenda de la psicóloga
+    LaunchedEffect(Unit) {
+        navController.navigate(Screens.psicologoAgenda.route) {
+            // Evitar que el usuario vuelva a este placeholder al pulsar "Atrás"
+            popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) {
+                inclusive = true
+            }
+            launchSingleTop = true
         }
     }
 }

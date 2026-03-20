@@ -19,6 +19,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.Registra
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -90,6 +91,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.citas.route) {
             CitasScreen(navController)
+        }
+        composable(Screens.psicologoAgenda.route) {
+            PsicologoAgendaScreen(navController)
         }
     }
 }
