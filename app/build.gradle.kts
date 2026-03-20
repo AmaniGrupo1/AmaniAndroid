@@ -38,7 +38,7 @@ android {
 dependencies {
 
     // DataStore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation(libs.androidx.datastore.preferences)
     //Librerias de Compose
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
    //Navegación
-    implementation("androidx.navigation:navigation-compose:2.9.6")
+    implementation(libs.androidx.navigation.compose.v296)
 
     // Dependencias comunes
     implementation(libs.androidx.core.ktx)
