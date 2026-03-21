@@ -1,21 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
     namespace = "org.ies.tierno.applicationamani"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "org.ies.tierno.applicationamani"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -43,7 +38,7 @@ android {
 dependencies {
 
     // DataStore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation(libs.androidx.datastore.preferences)
     //Librerias de Compose
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -54,7 +49,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
    //Navegación
-    implementation("androidx.navigation:navigation-compose:2.9.6")
+    implementation(libs.androidx.navigation.compose.v296)
 
     // Dependencias comunes
     implementation(libs.androidx.core.ktx)
