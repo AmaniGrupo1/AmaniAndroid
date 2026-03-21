@@ -9,8 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologo
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
@@ -25,7 +26,6 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.View
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
-import kotlin.math.log
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -58,7 +58,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
 
         composable(Screens.agregarPsicologo.route) {
-            AgregaPsicologo(navController, loginViewModel)
+            AgregaPsicologoScreen(navController, loginViewModel)
         }
         composable(Screens.agregarAdmin.route) {
             AgregarAdministrador(navController, loginViewModel)
@@ -81,6 +81,16 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.vistaPrincipalPaciente.route) {
             PrincipalClienteScreen(navController)
+        }
+        composable(Screens.agregarPsicologoAdmin.route) {
+            AgregaPsicologoScreen(navController, loginViewModel)
+        }
+
+        composable(Screens.asignarPsicologo.route) { backStackEntry ->
+            val pacienteId = backStackEntry.arguments?.getString("pacienteId")
+            if (pacienteId != null) {
+                ListadoPsicologosScreen(navController, pacienteId, loginViewModel)
+            }
         }
     }
 }

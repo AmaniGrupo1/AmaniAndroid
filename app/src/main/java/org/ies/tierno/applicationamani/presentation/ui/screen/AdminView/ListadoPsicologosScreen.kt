@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.screen.admin
+package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,22 +16,25 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
+import org.ies.tierno.applicationamani.domain.models.admin.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
-import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListadoPacientesScreen(
+fun ListadoPsicologosScreen(
     navController: NavController,
-    viewModel: ListarPacientesViewModel = koinViewModel()
+    pacienteId: String,
+    loginViewModel: LoginViewModel,
+    viewModel: ListarPsicologosAdminViewModel = koinViewModel()
 ) {
-    val pacientes by viewModel.paciente.collectAsState()
+    val psicologos by viewModel.psicologos.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var pacienteSeleccionado by remember { mutableStateOf<DatosPacienteAdminDTO?>(null) }
+    var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
 
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
@@ -40,20 +43,19 @@ fun ListadoPacientesScreen(
     val backgroundColor = Color(0xFFF5F5F5)
     val cardColor = Color.White
     val primaryColor = Color(0xFF6C63FF)
+    val deleteColor = Color(0xFFD32F2F)
 
     Scaffold(
         containerColor = backgroundColor,
-        topBar = {
-            MenuAdministrador("Listado de pacientes", navController)
-        },
+        topBar = { MenuAdministrador("Listado de psicólogos", navController) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screens.agregarPacienteAdmin.route) },
+                onClick = { navController.navigate(Screens.agregarPsicologoAdmin.route) },
                 containerColor = primaryColor,
                 shape = RoundedCornerShape(50.dp)
-            ){
-                Icon(Icons.Default.Person, contentDescription = "Paciente", tint = Color.White)
+            ) {
+                Icon(Icons.Default.Person, contentDescription = "Psicólogo", tint = Color.White)
             }
         }
     ) { padding ->
@@ -65,8 +67,7 @@ fun ListadoPacientesScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(pacientes) { paciente ->
-
+            items(psicologos) { psicologo ->
                 Card(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -74,20 +75,25 @@ fun ListadoPacientesScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            "Nombre: ${paciente.nombreUsuario} ${paciente.apellidoUsuario}",
+                            "Nombre: ${psicologo.nombre} ${psicologo.apellido}",
                             color = Color.Black,
                             fontFamily = roboto
                         )
                         Text(
-                            "Email: ${paciente.emailUsuario}",
+                            "Especialidad: ${psicologo.especialidad}",
                             color = Color.Black,
                             fontFamily = roboto
                         )
-                        Text("Fecha Nacimiento: ${paciente.fechaNacimiento}", fontFamily = roboto)
-                        Text("Género: ${paciente.genero}", fontFamily = roboto)
-                        Text("Teléfono: ${paciente.telefono}", fontFamily = roboto)
-                        Text("Creado: ${paciente.createdAt}", fontFamily = roboto)
-                        Text("Actualizado: ${paciente.updatedAt}", fontFamily = roboto)
+                        Text(
+                            "Descripción: ${psicologo.descripcion ?: "-"}",
+                            color = Color.DarkGray,
+                            fontFamily = roboto
+                        )
+                        Text(
+                            "Licencia: ${psicologo.licencia ?: "-"}",
+                            color = Color.DarkGray,
+                            fontFamily = roboto
+                        )
 
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -95,54 +101,65 @@ fun ListadoPacientesScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            // Botón Dar de baja
                             Button(
                                 onClick = {
-                                    pacienteSeleccionado = paciente
+                                    psicologoSeleccionado = psicologo
                                     mostrarDialogoBaja = true
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                                colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Dar de baja", color = Color.White, fontFamily = roboto)
                             }
 
-                            // Botón Editar
                             Button(
                                 onClick = {
-                                    // navController.navigate("editarPaciente/${paciente.idUsuario}")
+                                    // Aquí podrías navegar a editar psicólogo si agregas id
+                                    // navController.navigate("editarPsicologo/${psicologo.idPsicologo}")
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Editar", color = Color.White, fontFamily = roboto)
                             }
+                        }
 
-                            // Nuevo botón Asignar Psicólogo
-                            Button(
-                                onClick = {
-                                    // Navega a la pantalla de psicólogos pasando el id del paciente
-                                    navController.navigate(Screens.asignarPsicologo.createRoute(paciente.idPaciente))
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C63FF)),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("Asignar Psicólogo", color = Color.White, fontFamily = roboto)
-                            }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    loginViewModel.asignarPacienteAlPsicologo(
+                                        pacienteId.toLong(),
+                                        psicologo.idPsicologo
+                                    )
+                                    val resultMsg = loginViewModel.asignarPsicologoResult.value
+                                    if (resultMsg == "ok" || resultMsg == null) {
+                                        snackbarHostState.showSnackbar("Psicólogo asignado correctamente")
+                                        navController.navigate(Screens.adminHome.route)
+                                    } else {
+                                        snackbarHostState.showSnackbar("Error: $resultMsg")
+                                    }
+                                    loginViewModel.clearAsignarPsicologoResult()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Asignar a paciente", color = Color.White, fontFamily = roboto)
                         }
                     }
                 }
             }
         }
 
-        // Dialogo Dar de baja
-        if (mostrarDialogoBaja && pacienteSeleccionado != null) {
+        if (mostrarDialogoBaja && psicologoSeleccionado != null) {
             AlertDialog(
                 onDismissRequest = { mostrarDialogoBaja = false },
                 title = { Text("Confirmar baja", fontFamily = balow) },
                 text = {
                     Text(
-                        "¿Seguro que deseas dar de baja a ${pacienteSeleccionado!!.nombreUsuario}?",
+                        "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre}?",
                         fontFamily = roboto
                     )
                 },
@@ -150,16 +167,9 @@ fun ListadoPacientesScreen(
                     Button(
                         onClick = {
                             scope.launch {
-                                pacienteSeleccionado?.let { paciente ->
-                                    val result = viewModel.darBajaPaciente(paciente.idPaciente)
-                                    if (result.isSuccess) {
-                                        viewModel.actualizarPacienteBaja(paciente.idPaciente)
-                                        snackbarHostState.showSnackbar("Paciente dado de baja correctamente")
-                                    } else {
-                                        snackbarHostState.showSnackbar("Error al dar de baja al paciente")
-                                    }
-                                }
+                                // viewModel.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                                 mostrarDialogoBaja = false
+                                snackbarHostState.showSnackbar("Psicólogo dado de baja")
                             }
                         }
                     ) {

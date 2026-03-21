@@ -1,6 +1,8 @@
 package org.ies.tierno.applicationamani.domain.usecases.login
 
 import org.ies.tierno.applicationamani.data.AuthRepository
+import org.ies.tierno.applicationamani.domain.models.admin.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
@@ -23,8 +25,7 @@ class LoginUseCase(private val repository: AuthRepository) {
         return repository.registerAdmin(request)
     }
 
-    suspend fun registrarPsicologo(request: RegistryPacienteDTO): Result<LoginResponseDTO> {
-        return repository.registerPsicologo(request)
+    suspend fun crearPsicologo(request: RegistrarPsicologoAdminDTO): Result<PsicologoSelfResponseDTO> {
+        return repository.crearPsicologo(request)
     }
-
 }

@@ -6,16 +6,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
 
 class LoginViewModel(
     private val authUseCase: LoginUseCase,
-    private val tokenDataStore: TokenDataStore
+    private val tokenDataStore: TokenDataStore,
+    val asignarUseCase: AsignarPacienteAlPsicologoUseCase
 ) : ViewModel() {
 
     // --- Campos para Login ---
@@ -50,39 +53,87 @@ class LoginViewModel(
     private val _fechaNacimiento = MutableStateFlow("")
     val fechaNacimiento: StateFlow<String> = _fechaNacimiento
 
+    // --- Estados de UI para registro ---
+    private val _isRegistering = MutableStateFlow(false)
+    val isRegistering: StateFlow<Boolean> = _isRegistering
+
+    private val _registerError = MutableStateFlow<String?>(null)
+    val registerError: StateFlow<String?> = _registerError
+
+    private val _registerSuccess = MutableStateFlow(false)
+    val registerSuccess: StateFlow<Boolean> = _registerSuccess
+
     // --- Result Flows ---
     private val _loginResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
     val loginResult: StateFlow<Result<LoginResponseDTO>?> = _loginResult
 
-    private val _registerResult = MutableStateFlow<Result<RegistryPacienteDTO>?>(null)
-    val registerResult: StateFlow<Result<RegistryPacienteDTO>?> = _registerResult
+    private val _registerResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
+    val registerResult: StateFlow<Result<LoginResponseDTO>?> = _registerResult
+
+    // En LoginViewModel
+    private val _registroEspecialidad = MutableStateFlow("")
+    val registroEspecialidad: StateFlow<String> = _registroEspecialidad
+    fun setRegistroEspecialidad(value: String) {
+        _registroEspecialidad.value = value
+    }
+
+    private val _registroExperiencia = MutableStateFlow<Int?>(null)
+    val registroExperiencia: StateFlow<Int?> = _registroExperiencia
+    fun setRegistroExperiencia(value: Int?) {
+        _registroExperiencia.value = value
+    }
+
+    private val _registroDescripcion = MutableStateFlow<String?>(null)
+    val registroDescripcion: StateFlow<String?> = _registroDescripcion
+    fun setRegistroDescripcion(value: String?) {
+        _registroDescripcion.value = value
+    }
+
+    private val _registroLicencia = MutableStateFlow<String?>(null)
+    val registroLicencia: StateFlow<String?> = _registroLicencia
+    fun setRegistroLicencia(value: String?) {
+        _registroLicencia.value = value
+    }
 
     // --- Setters ---
-    fun setUsername(value: String) { _username.value = value }
-    fun setPassword(value: String) { _password.value = value }
-    fun setNombre(value: String) { _nombre.value = value }
-    fun setApellido(value: String) { _apellido.value = value }
-    fun setEmail(value: String) { _email.value = value }
-    fun setRegPassword(value: String) { _regPassword.value = value }
-    fun setTelefono(value: String) { _telefono.value = value }
-    fun setGenero(value: String) { _genero.value = value }
-    fun setFechaNacimiento(value: String) { _fechaNacimiento.value = value }
-    fun setLoggedIn(value: Boolean) { _isLoggedIn.value = value }
+    fun setUsername(value: String) {
+        _username.value = value
+    }
 
-    // ----------------------------
-    // Método genérico de registro
-    // ----------------------------
-    private fun <T> registrar(
-        action: suspend () -> Result<T>,
-        resultFlow: MutableStateFlow<Result<T>?>
-    ) {
-        viewModelScope.launch {
-            val result = action()
-            // Guardar token si es LoginResponseDTO
-            val token = (result.getOrNull() as? LoginResponseDTO)?.token
-            token?.let { tokenDataStore.saveToken(it) }
-            resultFlow.value = result
-        }
+    fun setPassword(value: String) {
+        _password.value = value
+    }
+
+    fun setNombre(value: String) {
+        _nombre.value = value
+    }
+
+    fun setApellido(value: String) {
+        _apellido.value = value
+    }
+
+    fun setEmail(value: String) {
+        _email.value = value
+    }
+
+    fun setRegPassword(value: String) {
+        _regPassword.value = value
+    }
+
+    fun setTelefono(value: String) {
+        _telefono.value = value
+    }
+
+    fun setGenero(value: String) {
+        _genero.value = value
+    }
+
+    fun setFechaNacimiento(value: String) {
+        _fechaNacimiento.value = value
+    }
+
+    fun setLoggedIn(value: Boolean) {
+        _isLoggedIn.value = value
     }
 
     // ----------------------------
@@ -109,58 +160,189 @@ class LoginViewModel(
     }
 
     // ----------------------------
-    // Registro usando registrar()
+    // Registro de Paciente (desde Admin)
     // ----------------------------
-    fun registrarPaciente() {
-        val request = PacienteRequest(
-            fechaNacimiento = _fechaNacimiento.value,
-            genero = _genero.value,
-            telefono = _telefono.value,
-            usuario = UsuarioRequest(
-                nombre = _nombre.value,
-                apellido = _apellido.value,
-                email = _email.value,
-                password = _regPassword.value,
-                rol = "paciente"
-            )
-        )
-        registrar({ authUseCase.registerPaciente(request) }, _loginResult)
+    fun registrarPacienteAdmin(onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isRegistering.value = true
+            _registerError.value = null
+            _registerSuccess.value = false
+
+            try {
+                // Validar campos
+                val request = PacienteRequest(
+                    fechaNacimiento = _fechaNacimiento.value,
+                    genero = _genero.value,
+                    telefono = _telefono.value,
+                    usuario = UsuarioRequest(
+                        nombre = _nombre.value,
+                        apellido = _apellido.value,
+                        email = _email.value,
+                        password = _regPassword.value,
+                        rol = "paciente"
+                    )
+                )
+
+                val result = authUseCase.registerPacienteAdmin(request)
+
+                result.onSuccess { response ->
+                    _registerResult.value = Result.success(response)
+                    _registerSuccess.value = true
+                    clearRegistrationFields() // Limpiar campos después del éxito
+                    onResult(true)
+                }.onFailure { error ->
+                    _registerResult.value = Result.failure(error)
+                    _registerError.value = error.message ?: "Error al registrar paciente"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                _registerResult.value = Result.failure(e)
+                _registerError.value = e.message ?: "Error inesperado"
+                onResult(false)
+            } finally {
+                _isRegistering.value = false
+            }
+        }
     }
 
-    fun registrarPacienteAdmin() {
-        val request = PacienteRequest(
-            fechaNacimiento = _fechaNacimiento.value,
-            genero = _genero.value,
-            telefono = _telefono.value,
-            usuario = UsuarioRequest(
-                nombre = _nombre.value,
-                apellido = _apellido.value,
-                email = _email.value,
-                password = _regPassword.value,
-                rol = "paciente"
-            )
-        )
-        registrar({ authUseCase.registerPacienteAdmin(request) }, _loginResult)
+    // ----------------------------
+    // Registro de Paciente Normal
+    // ----------------------------
+    fun registrarPaciente(onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isRegistering.value = true
+            _registerError.value = null
+            _registerSuccess.value = false
+
+            try {
+                val request = PacienteRequest(
+                    fechaNacimiento = _fechaNacimiento.value,
+                    genero = _genero.value,
+                    telefono = _telefono.value,
+                    usuario = UsuarioRequest(
+                        nombre = _nombre.value,
+                        apellido = _apellido.value,
+                        email = _email.value,
+                        password = _regPassword.value,
+                        rol = "paciente"
+                    )
+                )
+
+                val result = authUseCase.registerPaciente(request)
+
+                result.onSuccess { response ->
+                    _registerResult.value = Result.success(response)
+                    _registerSuccess.value = true
+                    clearRegistrationFields()
+                    onResult(true)
+                }.onFailure { error ->
+                    _registerResult.value = Result.failure(error)
+                    _registerError.value = error.message ?: "Error al registrar paciente"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                _registerResult.value = Result.failure(e)
+                _registerError.value = e.message ?: "Error inesperado"
+                onResult(false)
+            } finally {
+                _isRegistering.value = false
+            }
+        }
     }
 
-    fun registrarAdmin() {
-        val request = RegistryPacienteDTO(
-            nombre = _nombre.value,
-            apellido = _apellido.value,
-            email = _email.value,
-            password = _regPassword.value
-        )
-        registrar({ authUseCase.registrarAdmin(request) }, _loginResult)
+
+    // Registro de Admin
+// ----------------------------
+    fun registrarAdmin(onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isRegistering.value = true
+            _registerError.value = null
+            _registerSuccess.value = false
+
+            try {
+                // Validar campos mínimos
+                if (_nombre.value.isBlank() || _apellido.value.isBlank() ||
+                    _email.value.isBlank() || _regPassword.value.isBlank()
+                ) {
+                    _registerError.value = "Por favor complete todos los campos"
+                    onResult(false)
+                    return@launch
+                }
+
+                if (_regPassword.value.length < 4) {
+                    _registerError.value = "La contraseña debe tener al menos 4 caracteres"
+                    onResult(false)
+                    return@launch
+                }
+
+                val request = RegistryPacienteDTO(
+                    nombre = _nombre.value,
+                    apellido = _apellido.value,
+                    email = _email.value,
+                    password = _regPassword.value
+                )
+
+                val result = authUseCase.registrarAdmin(request)
+
+                result.onSuccess { response ->
+                    _registerResult.value = Result.success(response)
+                    _registerSuccess.value = true
+                    clearRegistrationFields() //  Limpiar campos después del éxito
+                    onResult(true)
+                }.onFailure { error ->
+                    _registerResult.value = Result.failure(error)
+                    _registerError.value = error.message ?: "Error al registrar administrador"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                _registerResult.value = Result.failure(e)
+                _registerError.value = e.message ?: "Error inesperado"
+                onResult(false)
+            } finally {
+                _isRegistering.value = false
+            }
+        }
     }
 
-    fun registrarPsicologo() {
-        val request = RegistryPacienteDTO(
-            nombre = _nombre.value,
-            apellido = _apellido.value,
-            email = _email.value,
-            password = _regPassword.value
-        )
-        registrar({ authUseCase.registrarPsicologo(request) }, _loginResult)
+    // ----------------------------
+    // Registro de Psicólogo
+    // ----------------------------
+    fun registrarPsicologo(onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isRegistering.value = true
+            _registerError.value = null
+            _registerSuccess.value = false
+
+            try {
+                val request = RegistrarPsicologoAdminDTO(
+                    nombrePsicologo = _nombre.value,
+                    apellidoPsicologo = _apellido.value,
+                    email = _email.value,
+                    password = _regPassword.value,
+                    especialidad = _registroEspecialidad.value,
+                    experiencia = _registroExperiencia.value,
+                    descripcion = _registroDescripcion.value,
+                    licencia = _registroLicencia.value
+                )
+
+                val result = authUseCase.crearPsicologo(request)
+
+                result.onSuccess {
+                    _registerSuccess.value = true
+                    clearRegistrationFields()
+                    onResult(true)
+                }.onFailure { error ->
+                    _registerError.value = error.message ?: "Error al registrar psicólogo"
+                    onResult(false)
+                }
+
+            } catch (e: Exception) {
+                _registerError.value = e.message ?: "Error inesperado"
+                onResult(false)
+            } finally {
+                _isRegistering.value = false
+            }
+        }
     }
 
     // ----------------------------
@@ -174,10 +356,48 @@ class LoginViewModel(
         _telefono.value = ""
         _genero.value = ""
         _fechaNacimiento.value = ""
+        _registroEspecialidad.value = ""
+        _registroExperiencia.value = null
+        _registroDescripcion.value = null
+        _registroLicencia.value = null
     }
 
     fun clearLoginFields() {
         _username.value = ""
         _password.value = ""
+    }
+
+    // ----------------------------
+    // Resetear estado de registro
+    // ----------------------------
+    fun resetRegisterState() {
+        _isRegistering.value = false
+        _registerError.value = null
+        _registerSuccess.value = false
+        _registerResult.value = null
+    }
+
+    // ----------------------------
+// Estado para asignar paciente a psicólogo
+// ----------------------------
+    private val _asignarPsicologoResult = MutableStateFlow<String?>(null)
+    val asignarPsicologoResult: StateFlow<String?> = _asignarPsicologoResult
+
+    fun asignarPacienteAlPsicologo(pacienteId: Long, psicologoId: Long) {
+        viewModelScope.launch {
+            try {
+                val request = org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO(
+                    idPaciente = pacienteId,
+                    idPsicologo = psicologoId
+                )
+                val result = asignarUseCase.invoke(request)
+                _asignarPsicologoResult.value = result.getOrElse { it.message ?: "Error al asignar psicólogo" }
+            } catch (e: Exception) {
+                _asignarPsicologoResult.value = e.message ?: "Error inesperado"
+            }
+        }
+    }
+    fun clearAsignarPsicologoResult() {
+        _asignarPsicologoResult.value = null
     }
 }

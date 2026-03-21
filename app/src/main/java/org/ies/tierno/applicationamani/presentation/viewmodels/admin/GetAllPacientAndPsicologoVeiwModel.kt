@@ -7,12 +7,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetAllClientAndPsicologoUseCase
+import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
 
 class GetAllPacientAndPsicologoVeiwModel(
     private val getAllPacientAndPsicologoUseCase: GetAllClientAndPsicologoUseCase
 ) : ViewModel() {
 
-    val _pacientes: StateFlow<List<ListaPacientesAndPsicologo>> =
+    val _pacientes: StateFlow<List<PsicologoConPacientesDTO>> =
         getAllPacientAndPsicologoUseCase()
             .stateIn(
                 scope = viewModelScope,
@@ -20,5 +21,5 @@ class GetAllPacientAndPsicologoVeiwModel(
                 initialValue = emptyList()
             )
 
-    val paciente : StateFlow<List<ListaPacientesAndPsicologo>> = _pacientes
+    val paciente : StateFlow<List<PsicologoConPacientesDTO>> = _pacientes
 }
