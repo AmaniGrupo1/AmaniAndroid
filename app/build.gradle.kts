@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.compose)
     // alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -40,7 +42,7 @@ android {
 
 dependencies {
     //Librerias de Compose
-    coreLibraryDesugaring(libs.desugar.jdk.libs)//Libreria para usar  APIs modernas de Java
+    coreLibraryDesugaring(libs.desugar.jdk.libs)//Libreria para usar APIs modernas de Java
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.play.services)
@@ -79,6 +81,36 @@ dokka {
     dokkaSourceSets.register("main") {
         sourceRoots.from(file("src/main/java"))
         includes.from("MODULE.md")
+    }
+}
+
+// ── Detekt: Análisis estático para Kotlin (reemplaza SpotBugs + PMD) ──
+detekt {
+    // Fichero de configuración personalizado (se genera con: ./gradlew detektGenerateConfig)
+    config.setFrom(files("${rootProject.projectDir}/config/detekt/detekt.yml"))
+    // Analizar también los ficheros de build scripts
+    buildUponDefaultConfig = true
+    // No falla el build por defecto (como tenías failOnViolation=false en PMD)
+    ignoreFailures = true
+    // Directorio de fuentes
+    source.setFrom(files("src/main/java", "src/main/kotlin"))
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)   // Para SonarQube
+        sarif.required.set(true) // Para GitHub/IDE integrations
+    }
+}
+
+// ── Ktlint: Convenciones de estilo para Kotlin (reemplaza Checkstyle) ──
+ktlint {
+    android.set(true)
+    ignoreFailures.set(true) // Como tenías failsOnError=false en Checkstyle
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.HTML)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE) // Formato compatible con SonarQube
     }
 }
 

@@ -17,8 +17,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,7 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
 import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -62,6 +66,8 @@ fun CitasScreen(navController: NavController) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val amaniColors = LocalAmaniColors.current
+
+    val context = LocalContext.current
 
     // ── Estado ──
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
@@ -144,9 +150,21 @@ fun CitasScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         onFranjaSeleccionada = { franja ->
                             scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    "Reservar cita a las ${franja.hora} el $fecha"
+                                val result = snackbarHostState.showSnackbar(
+                                    message = "Reservar cita a las ${franja.hora} el $fecha",
+                                    actionLabel = "📅 Calendario",
+                                    duration = SnackbarDuration.Long
                                 )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    enviarCitaAlCalendario(
+                                        context = context,
+                                        fecha = fecha,
+                                        hora = franja.hora,
+                                        duracionMinutos = 60,
+                                        titulo = "Cita – Amani",
+                                        descripcion = "Cita reservada el $fecha a las ${franja.hora}"
+                                    )
+                                }
                             }
                         }
                     )

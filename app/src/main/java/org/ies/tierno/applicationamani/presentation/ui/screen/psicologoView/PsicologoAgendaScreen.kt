@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.Person
@@ -40,6 +41,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -59,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,6 +73,7 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -279,7 +283,11 @@ fun PsicologoAgendaScreen(navController: NavController) {
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             citasDelDia.forEach { cita ->
-                                TarjetaCitaPsicologa(cita)
+                                TarjetaCitaPsicologa(
+                                    cita = cita,
+                                    fecha = fecha,
+                                    duracionMinutos = duracionSesion
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
 
@@ -602,10 +610,21 @@ private fun DiaNoDisponibleCard() {
 
 /**
  * Tarjeta que muestra la información de una cita con un paciente.
+ *
+ * Incluye un botón para exportar la cita al calendario del sistema.
+ *
+ * @param cita Datos de la cita.
+ * @param fecha Fecha de la cita (necesaria para la exportación al calendario).
+ * @param duracionMinutos Duración de la sesión en minutos.
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun TarjetaCitaPsicologa(cita: CitaPsicologa) {
+private fun TarjetaCitaPsicologa(
+    cita: CitaPsicologa,
+    fecha: LocalDate,
+    duracionMinutos: Int = 60
+) {
+    val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
     val amani = LocalAmaniColors.current
     val typography = MaterialTheme.typography
@@ -659,6 +678,26 @@ private fun TarjetaCitaPsicologa(cita: CitaPsicologa) {
                     text = cita.motivo,
                     style = typography.bodySmall,
                     color = colors.onSurfaceVariant
+                )
+            }
+
+            // Botón para enviar la cita al calendario del sistema
+            IconButton(
+                onClick = {
+                    enviarCitaAlCalendario(
+                        context = context,
+                        fecha = fecha,
+                        hora = cita.hora,
+                        duracionMinutos = duracionMinutos,
+                        titulo = "Cita con ${cita.paciente}",
+                        descripcion = cita.motivo
+                    )
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = "Añadir al calendario",
+                    tint = colors.primary
                 )
             }
         }
