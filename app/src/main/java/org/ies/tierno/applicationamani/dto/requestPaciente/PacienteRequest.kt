@@ -9,5 +9,7 @@ data class PacienteRequest(
     val direcciones: List<DireccionRequest>? = null,
     val citas: List<CitaRequest>? = null,
     val historiales: List<HistorialClinicoRequest>? = null,
-    val respuestas: List<RespuestasRequest>? = null
+    val respuestas: List<RespuestasRequest>? = null,
+    val aceptaVideo : Boolean,
+    val aceptaComunicacion : Boolean
 )

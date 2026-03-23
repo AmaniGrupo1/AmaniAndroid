@@ -24,7 +24,9 @@ sealed class Screens (val route: String){
 
     object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
 
-    object testPaciente : Screens("testPaciente")
+    object testPaciente: Screens("testPaciente/{pacienteId}") {
+        fun createRoute(pacienteId: Long) = "testPaciente/$pacienteId"
+    }
 
     object settings : Screens("settings")
 
@@ -35,5 +37,9 @@ sealed class Screens (val route: String){
     object asignarPsicologo : Screens("asignarPsicologo/{pacienteId}") {
         fun createRoute(pacienteId: Long) = "asignarPsicologo/$pacienteId"
     }
+
+    object consentimiento : Screens("consentimiento")
+
+    object registroConsentimiento : Screens("registroConsentimiento")
 }
 

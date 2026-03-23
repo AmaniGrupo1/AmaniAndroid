@@ -11,6 +11,7 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicol
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
+import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ResponderTestUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
@@ -36,11 +37,12 @@ val appModule = module {
     factory { TodosLosPacientesUseCase(get()) }
     factory { ListarPsicologoAdminUseCase(get()) }
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
+    factory { ResponderTestUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
-    viewModel { CuestionarioViewModel(get()) }
+    viewModel { CuestionarioViewModel(get(), get()) }
     viewModel { ListarPacientesViewModel(get(), get()) }
     viewModel { ListarPsicologosAdminViewModel(get()) }
     viewModel { PrincipalClienteViewModel() }

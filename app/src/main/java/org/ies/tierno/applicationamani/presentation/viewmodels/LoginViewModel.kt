@@ -180,7 +180,9 @@ class LoginViewModel(
                         email = _email.value,
                         password = _regPassword.value,
                         rol = "paciente"
-                    )
+                    ),
+                    aceptaVideo = _aceptaVideo.value,           // agregado
+                    aceptaComunicacion = _aceptaComunicacion.value // agregado
                 )
 
                 val result = authUseCase.registerPacienteAdmin(request)
@@ -204,6 +206,26 @@ class LoginViewModel(
             }
         }
     }
+    // Consentimiento
+    private val _aceptaVideo = MutableStateFlow(false)
+    val aceptaVideo: StateFlow<Boolean> = _aceptaVideo
+
+    private val _aceptaComunicacion = MutableStateFlow(false)
+    val aceptaComunicacion: StateFlow<Boolean> = _aceptaComunicacion
+
+    private val _puntuacionTest = MutableStateFlow(0)
+    val puntuacionTest: StateFlow<Int> = _puntuacionTest
+
+    fun setAceptaVideo(value: Boolean) {
+        _aceptaVideo.value = value
+    }
+    fun setAceptaComunicacion(value: Boolean) {
+        _aceptaComunicacion.value = value
+    }
+
+    fun setPuntuacionTest(value: Int) {
+        _puntuacionTest.value = value
+    }
 
     // ----------------------------
     // Registro de Paciente Normal
@@ -215,6 +237,13 @@ class LoginViewModel(
             _registerSuccess.value = false
 
             try {
+                // Validar que el paciente haya aceptado al menos un consentimiento
+                if (!_aceptaVideo.value && !_aceptaComunicacion.value) {
+                    _registerError.value = "Debe aceptar el consentimiento informado"
+                    onResult(false)
+                    return@launch
+                }
+
                 val request = PacienteRequest(
                     fechaNacimiento = _fechaNacimiento.value,
                     genero = _genero.value,
@@ -225,7 +254,9 @@ class LoginViewModel(
                         email = _email.value,
                         password = _regPassword.value,
                         rol = "paciente"
-                    )
+                    ),
+                    aceptaVideo = _aceptaVideo.value,
+                    aceptaComunicacion = _aceptaComunicacion.value
                 )
 
                 val result = authUseCase.registerPaciente(request)
@@ -400,4 +431,7 @@ class LoginViewModel(
     fun clearAsignarPsicologoResult() {
         _asignarPsicologoResult.value = null
     }
+
+
+
 }

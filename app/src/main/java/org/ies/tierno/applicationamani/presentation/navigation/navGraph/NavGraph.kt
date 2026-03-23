@@ -5,9 +5,11 @@ import TestScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
@@ -19,6 +21,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.ConsentimientoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.RegistroExitosoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.TestPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipal
@@ -73,8 +77,12 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.agregarPacienteAdmin.route) {
             RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
         }
-        composable(Screens.testPaciente.route) {
-            TestPacienteScreen(navController)
+        composable(
+            route = Screens.testPaciente.route,
+            arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+            TestPacienteScreen(navController, idPaciente = pacienteId)
         }
         composable(Screens.settings.route) {
             SettingsClienteScreen(navController)
@@ -91,6 +99,14 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             if (pacienteId != null) {
                 ListadoPsicologosScreen(navController, pacienteId, loginViewModel)
             }
+        }
+
+        //CONSENTIMIENTO
+        composable(Screens.consentimiento.route) {
+            ConsentimientoScreen(navController, loginViewModel)
+        }
+        composable(Screens.registroConsentimiento.route) {
+            RegistroExitosoScreen(navController)
         }
     }
 }

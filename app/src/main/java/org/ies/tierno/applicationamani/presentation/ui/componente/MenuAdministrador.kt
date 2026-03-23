@@ -122,6 +122,18 @@ fun MenuAdministrador(title: String, navController: NavController) {
                     }
                 )
 
+                DropdownMenuItem(
+                    text = { Text("Crear preguntas test",
+                        fontFamily = roboto,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp) },
+                    onClick = {
+                        expanded = false
+                        navController.navigate(Screens.test.route)
+                    }
+                )
+
+
 
                 DropdownMenuItem(
                     text = {

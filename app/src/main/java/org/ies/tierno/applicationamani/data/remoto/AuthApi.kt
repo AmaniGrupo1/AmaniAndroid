@@ -39,11 +39,6 @@ interface AuthApi {
         @Body request: RegistryPacienteDTO
     ): Response<LoginResponseDTO>
 
-    @POST("/auth/register-psicologo")
-    suspend fun registerPsicologo(
-        @Body request: RegistryPacienteDTO
-    ): Response<LoginResponseDTO>
-
     //Listo los pacientes con su psicologo
     @GET("api/admin/psicologos/pacientes")
     suspend fun getPacientesConPsicologo(): Response<List<PsicologoConPacientesDTO>>
