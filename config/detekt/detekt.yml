@@ -1,0 +1,183 @@
+# Configuración de Detekt para Amani Android
+# Equivalente a SpotBugs (detección de bugs) + PMD (code smells y malas prácticas)
+#
+# Reglas incluidas:
+#   - complexity → Complejidad ciclomática, funciones largas, etc.
+#   - coroutines → Uso correcto de coroutines
+#   - empty-blocks → Bloques vacíos
+#   - exceptions → Manejo de excepciones
+#   - naming → Convenciones de nombres
+#   - performance → Problemas de rendimiento
+#   - potential-bugs → Bugs potenciales (equivalente a SpotBugs)
+#   - style → Code smells y estilo (equivalente a PMD bestpractices + codestyle)
+#
+# Documentación: https://detekt.dev/docs/rules/
+
+build:
+  maxIssues: 0 # Reporta todos los issues (ignoreFailures=true evita que falle)
+  weights:
+    complexity: 2
+    style: 1
+    potential-bugs: 3
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 7
+    ignoreDefaultParameters: true
+    ignoreDataClasses: true
+    ignoreAnnotatedParameter: []
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 20
+    thresholdInClasses: 15
+    thresholdInInterfaces: 10
+    thresholdInObjects: 10
+    thresholdInEnums: 5
+  NestedBlockDepth:
+    active: true
+    threshold: 4
+  LargeClass:
+    active: true
+    threshold: 600
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: true
+  SuspendFunWithCoroutineScopeReceiver:
+    active: true
+
+empty-blocks:
+  active: true
+  EmptyCatchBlock:
+    active: true
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  EmptyFunctionBlock:
+    active: true
+    ignoreOverridden: true
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - 'ArrayIndexOutOfBoundsException'
+      - 'Error'
+      - 'IllegalMonitorStateException'
+      - 'NullPointerException'
+      - 'IndexOutOfBoundsException'
+      - 'RuntimeException'
+      - 'Throwable'
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  SwallowedException:
+    active: true
+    ignoredExceptionTypes:
+      - 'InterruptedException'
+      - 'MalformedURLException'
+      - 'NumberFormatException'
+      - 'ParseException'
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: true
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    # Permite nombres con @ para Composables (ej: @Composable fun MyScreen())
+    functionPattern: '([a-z][a-zA-Z0-9]*)|(`.*`)'
+    ignoreAnnotated:
+      - 'Composable'
+  TopLevelPropertyNaming:
+    active: true
+    constantPattern: '[A-Z][_A-Z0-9]*'
+    propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
+  VariableNaming:
+    active: true
+    variablePattern: '[a-z][A-Za-z0-9]*'
+
+performance:
+  active: true
+  SpreadOperator:
+    active: false # Muy común en Android/Compose, genera muchos falsos positivos
+  CouldBeSequence:
+    active: true
+    threshold: 3
+
+potential-bugs:
+  active: true
+  CastToNullableType:
+    active: true
+  Deprecation:
+    active: true
+  DoubleMutabilityForCollection:
+    active: true
+  EqualsAlwaysReturnsTrueOrFalse:
+    active: true
+  ExitOutsideMain:
+    active: true
+  ImplicitDefaultLocale:
+    active: true
+  NullableToStringCall:
+    active: true
+  UnconditionalJumpStatementInLoop:
+    active: true
+  UnnecessaryNotNullOperator:
+    active: true
+  UnnecessarySafeCall:
+    active: true
+  UselessPostfixExpression:
+    active: true
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+      - '100'
+    ignoreHashCodeFunction: true
+    ignorePropertyDeclaration: true
+    ignoreLocalVariableDeclaration: true
+    ignoreConstantDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreNamedArgument: true
+    ignoreEnums: true
+    ignoreAnnotated:
+      - 'Composable'
+      - 'Preview'
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+    excludeCommentStatements: true
+  ReturnCount:
+    active: true
+    max: 3
+    excludeGuardClauses: true
+  WildcardImport:
+    active: false # Compose usa muchos wildcards
+  UnusedImports:
+    active: true
+  UnusedPrivateMember:
+    active: true
+    allowedNames: '(_|ignored|expected|serialVersionUID)'
+  UnnecessaryAbstractClass:
+    active: true
+  UseCheckOrError:
+    active: true
+  UseRequire:
+    active: true
+
+

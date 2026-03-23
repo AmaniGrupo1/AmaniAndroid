@@ -1,11 +1,48 @@
+/**
+ * Definición de la paleta de colores personalizada de la aplicación Amani.
+ *
+ * Contiene todos los tokens de color utilizados en los esquemas de color
+ * claro y oscuro de Material 3, así como en los colores extra de la app.
+ * Ninguna pantalla debe declarar colores directamente; en su lugar, debe
+ * consumirlos a través de [MaterialTheme.colorScheme] o [LocalAmaniColors].
+ *
+ * @see org.ies.tierno.applicationamani.ui.theme.Theme
+ */
 package org.ies.tierno.applicationamani.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// ── Paleta principal de Amani ──────────────────────────────────
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+/** Color marca principal de Amani (lila claro). */
+val AmaniPurple       = Color(0xFFCCC0E4)
+
+/** Variante oscura de la marca, utilizada en el tema oscuro. */
+val AmaniPurpleDark   = Color(0xFF9B8CBF)
+
+/** Negro de la app — textos e iconos sobre fondos claros. */
+val AmaniBlack        = Color(0xFF1C1B1F)
+
+/** Blanco de la app — superficies, campos de texto y botones. */
+val AmaniWhite        = Color(0xFFFFFFFF)
+
+/** Fondo de las pantallas de autenticación (login / registro). */
+val AmaniBackground   = Color(0xFFCCC0E4)
+
+/** Superficie general (cards, scaffolds). */
+val AmaniSurface      = Color(0xFFFFFBFE)
+
+/** Color de texto sobre superficies generales. */
+val AmaniOnSurface    = Color(0xFF1C1B1F)
+
+// ── Colores semánticos de citas ────────────────────────────────
+
+/** Verde para franjas horarias libres. */
+val AmaniCitaLibre    = Color(0xFF4CAF50)
+
+/** Rojo suave para franjas horarias ocupadas. */
+val AmaniCitaOcupada  = Color(0xFFE57373)
+
+/** Fondo de una tarjeta de franja ocupada. */
+val AmaniCitaOcupadaBg = Color(0xFFFCE4EC)
+

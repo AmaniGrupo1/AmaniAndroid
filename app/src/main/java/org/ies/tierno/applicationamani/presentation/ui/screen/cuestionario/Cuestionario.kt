@@ -22,6 +22,17 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla del cuestionario para el paciente.
+ *
+ * Muestra una lista de preguntas con opciones de respuesta tipo radio button.
+ * El usuario debe responder todas las preguntas antes de enviar. Si no ha
+ * iniciado sesión, se redirige a la pantalla de login.
+ *
+ * @param navController Controlador de navegación.
+ * @param loginViewModel ViewModel compartido para verificar el estado de sesión.
+ * @param viewModel ViewModel que provee las preguntas del cuestionario.
+ */
 @Composable
 fun Cuestionario(
     navController: NavController,
@@ -40,6 +51,7 @@ fun Cuestionario(
     val listaPreguntas = preguntas ?: emptyList()
     val respuestasSeleccionadas = remember { mutableStateMapOf<Int, String>() }
     val snackbarHostState = remember { SnackbarHostState() }
+    val usuarioLogueado by loginViewModel.isLoggedIn.collectAsState()
 
     Scaffold(
         containerColor = backgroundColor,
@@ -106,7 +118,6 @@ fun Cuestionario(
                     }
                 }
             }
-            var usuarioLogueado = loginViewModel.isLoggedIn.value
             // Botón para enviar respuestas
             item {
                 Spacer(modifier = Modifier.height(24.dp))

@@ -32,6 +32,16 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de creación de preguntas de test.
+ *
+ * Permite al administrador escribir el enunciado, tipo y hasta cuatro opciones
+ * de respuesta. Al pulsar «Guardar pregunta» se persiste en el backend
+ * mediante [CrearPreguntaViewModel].
+ *
+ * @param navController Controlador de navegación.
+ * @param crearPreguntaViewModel ViewModel que gestiona el formulario y la acción de guardado.
+ */
 @Composable
 fun TestScreen(
     navController: NavController,
@@ -162,6 +172,14 @@ fun TestScreen(
     }
 }
 
+/**
+ * Campo de texto reutilizable para el formulario de creación de preguntas.
+ *
+ * @param value Valor actual del campo.
+ * @param placeholder Texto indicativo cuando el campo está vacío.
+ * @param onChange Callback invocado al cambiar el texto.
+ * @param roboto Familia tipográfica Roboto utilizada en el placeholder.
+ */
 @Composable
 fun CampoPregunta(
     value: String,
