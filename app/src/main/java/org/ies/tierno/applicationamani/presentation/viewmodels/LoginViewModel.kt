@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSession
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
@@ -18,6 +20,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
 class LoginViewModel(
     private val authUseCase: LoginUseCase,
     private val tokenDataStore: TokenDataStore,
+    private val userSessionDataStore: UserSessionDataStore,
     val asignarUseCase: AsignarPacienteAlPsicologoUseCase
 ) : ViewModel() {
 
@@ -146,6 +149,13 @@ class LoginViewModel(
                 val result = authUseCase.login(request)
                 result.onSuccess { response ->
                     tokenDataStore.saveToken(response.token)
+                    userSessionDataStore.saveSession(
+                        UserSession(
+                            idUsuario = response.idUsuario,
+                            nombre = response.nombre,
+                            rol = response.rol
+                        )
+                    )
                     _loginResult.value = Result.success(response)
                     setLoggedIn(true)
                 }.onFailure { error ->
@@ -430,6 +440,15 @@ class LoginViewModel(
     }
     fun clearAsignarPsicologoResult() {
         _asignarPsicologoResult.value = null
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            tokenDataStore.clearToken()
+            userSessionDataStore.clearSession()
+            _loginResult.value = null
+            _isLoggedIn.value = false
+        }
     }
 
 

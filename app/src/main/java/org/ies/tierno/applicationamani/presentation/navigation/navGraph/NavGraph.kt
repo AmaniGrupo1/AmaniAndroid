@@ -12,16 +12,15 @@ import androidx.navigation.navArgument
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.ConsentimientoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.RegistroExitosoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
@@ -30,6 +29,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.TestP
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.ViewPsicologoPrincipal
+import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 

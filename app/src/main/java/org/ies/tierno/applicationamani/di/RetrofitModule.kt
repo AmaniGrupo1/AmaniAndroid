@@ -2,8 +2,10 @@ package org.ies.tierno.applicationamani.di
 
 import okhttp3.OkHttpClient
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
+import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit
 val retrofitModule = module {
     // API retrofit
     single { TokenDataStore(androidContext()) }
+    single { UserSessionDataStore(androidContext()) }
 
     single { AuthInterceptor(get()) }
 
@@ -35,4 +38,5 @@ val retrofitModule = module {
     }
     single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
     single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
+    single<CitasApi> { get<Retrofit>().create(CitasApi::class.java) }
 }

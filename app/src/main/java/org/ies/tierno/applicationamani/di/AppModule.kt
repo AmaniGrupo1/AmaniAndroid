@@ -10,6 +10,7 @@
 package org.ies.tierno.applicationamani.di
 
 import org.ies.tierno.applicationamani.data.AuthRepository
+import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
@@ -20,8 +21,10 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPaci
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ResponderTestUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
@@ -44,6 +47,7 @@ import org.koin.dsl.module
 val appModule = module {
     single { AuthRepository(get()) }
     single { TestRepositoryApi(get()) }
+    single { CitasRepository(get()) }
 
     factory { LoginUseCase(get()) }
     factory { GetAllClientAndPsicologoUseCase(get()) }
@@ -55,7 +59,9 @@ val appModule = module {
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get(), get()) }
+    viewModel { CitasViewModel(get(), get()) }
+    viewModel { PsicologoAgendaViewModel(get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { CuestionarioViewModel(get(), get()) }

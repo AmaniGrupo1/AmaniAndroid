@@ -57,21 +57,21 @@ import java.util.Locale
 @Composable
 fun CalendarioView(
     modifier: Modifier = Modifier,
+    mesVisible: YearMonth = YearMonth.now(),
     fechaSeleccionada: LocalDate? = null,
     fechasDestacadas: Set<LocalDate> = emptySet(),
+    onMesVisibleChange: (YearMonth) -> Unit = {},
     onFechaSeleccionada: (LocalDate) -> Unit = {}
 ) {
-    var mesActual by remember { mutableStateOf(YearMonth.now()) }
-
     Column(modifier = modifier) {
         CalendarioHeader(
-            mesActual = mesActual,
-            onMesAnterior = { mesActual = mesActual.minusMonths(1) },
-            onMesSiguiente = { mesActual = mesActual.plusMonths(1) }
+            mesActual = mesVisible,
+            onMesAnterior = { onMesVisibleChange(mesVisible.minusMonths(1)) },
+            onMesSiguiente = { onMesVisibleChange(mesVisible.plusMonths(1)) }
         )
         CalendarioDiasSemana()
         CalendarioGrid(
-            mes = mesActual,
+            mes = mesVisible,
             fechaSeleccionada = fechaSeleccionada,
             fechasDestacadas = fechasDestacadas,
             onFechaSeleccionada = onFechaSeleccionada
