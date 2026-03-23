@@ -1,6 +1,9 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import android.Manifest
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -74,6 +77,7 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
+import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -379,7 +383,7 @@ fun PsicologoAgendaScreen(navController: NavController) {
     }
 }
 
-// ─── Modelo de cita para la psicóloga ──────────────────────────
+// ─── Modelo de cita para la psicóloga ──—───────────────────────
 
 /**
  * Representa una cita desde la perspectiva de la psicóloga.
@@ -962,8 +966,3 @@ private fun DialogoNoDisponible(
 fun PsicologoAgendaScreenPreview() {
     PsicologoAgendaScreen(navController = rememberNavController())
 }
-
-
-
-
-

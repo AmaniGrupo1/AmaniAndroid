@@ -67,6 +67,10 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.foundation.layout)
+
+    // WorkManager para notificaciones programadas que sobreviven reinicios
+    implementation(libs.androidx.work.runtime.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -113,4 +117,3 @@ ktlint {
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE) // Formato compatible con SonarQube
     }
 }
-

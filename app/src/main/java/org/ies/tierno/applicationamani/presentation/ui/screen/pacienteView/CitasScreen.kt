@@ -1,6 +1,9 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import android.Manifest
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -43,6 +46,7 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHor
 import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
+import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -52,7 +56,8 @@ import java.time.LocalTime
  * Muestra un calendario mensual ([CalendarioView]). Al pulsar sobre un día,
  * se despliega debajo la vista diaria ([VistaDiariaHoras]) con las franjas
  * horarias libres y ocupadas de ese día. Al pulsar una franja libre el
- * usuario puede iniciar la reserva de una cita.
+ * usuario puede iniciar la reserva de una cita y programar un recordatorio
+ * local 30 minutos antes mediante [programarRecordatorioCita].
  *
  * Colores obtenidos de [LocalAmaniColors] y [MaterialTheme.colorScheme].
  * Tipografías obtenidas de [MaterialTheme.typography].
@@ -73,6 +78,50 @@ fun CitasScreen(navController: NavController) {
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    // ── Estado pendiente para programar recordatorio tras obtener permiso ──
+    var pendingRecordatorio by remember {
+        mutableStateOf<Pair<LocalDate, LocalTime>?>(null)
+    }
+
+    // ── Launcher para pedir permiso POST_NOTIFICATIONS (Android 13+) ──
+    val notifPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            pendingRecordatorio?.let { (fecha, hora) ->
+                programarRecordatorioCita(
+                    context = context,
+                    fecha = fecha,
+                    hora = hora,
+                    minutosAntes = 30,
+                    titulo = "Cita en Amani",
+                    mensaje = "Tu cita es a las $hora — ¡no olvides!"
+                )
+            }
+        }
+        pendingRecordatorio = null
+    }
+
+    /**
+     * Programa el recordatorio pidiendo permiso si es necesario (Android 13+).
+     * En Android 8–12 no se necesita pedir permiso en runtime.
+     */
+    fun programarConPermiso(fecha: LocalDate, hora: LocalTime) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pendingRecordatorio = fecha to hora
+            notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            programarRecordatorioCita(
+                context = context,
+                fecha = fecha,
+                hora = hora,
+                minutosAntes = 30,
+                titulo = "Cita en Amani",
+                mensaje = "Tu cita es a las $hora — ¡no olvides!"
+            )
+        }
+    }
 
     // ── Datos de ejemplo: fechas con citas y horas ocupadas por día ──
     // TODO: reemplazar por datos reales del ViewModel / repositorio
@@ -149,9 +198,12 @@ fun CitasScreen(navController: NavController) {
                         franjas = franjasDelDia,
                         modifier = Modifier.fillMaxWidth(),
                         onFranjaSeleccionada = { franja ->
+                            // Programar recordatorio 30 min antes de la cita
+                            programarConPermiso(fecha, franja.hora)
+
                             scope.launch {
                                 val result = snackbarHostState.showSnackbar(
-                                    message = "Reservar cita a las ${franja.hora} el $fecha",
+                                    message = "Cita reservada a las ${franja.hora} · Recordatorio activado 🔔",
                                     actionLabel = "📅 Calendario",
                                     duration = SnackbarDuration.Long
                                 )
