@@ -43,9 +43,14 @@ class PsicologoAgendaViewModel(
 
     fun cargarAgendaMensual(month: YearMonth) {
         val session = _userSession.value ?: return
+        val psychologistId = session.idPsicologo
+        if (psychologistId == null) {
+            _errorMessage.value = "No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar."
+            return
+        }
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.getAgendaPsicologo(session.idUsuario, month.toString())
+            citasRepository.getAgendaPsicologo(psychologistId, month.toString())
                 .onSuccess { agenda ->
                     _agendaMensual.value = agenda
                     _errorMessage.value = null
@@ -64,9 +69,13 @@ class PsicologoAgendaViewModel(
     ): Result<Unit> {
         val session = _userSession.value
             ?: return Result.failure(IllegalStateException("No hay sesión de psicólogo"))
+        val psychologistId = session.idPsicologo
+            ?: return Result.failure(
+                IllegalStateException("No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar.")
+            )
 
         return citasRepository.actualizarHorario(
-            session.idUsuario,
+            psychologistId,
             HorarioPsicologoRequest(horaInicio, horaFin, duracionSesion)
         ).map { agenda ->
             _agendaMensual.value = agenda
@@ -79,9 +88,13 @@ class PsicologoAgendaViewModel(
     ): Result<Unit> {
         val session = _userSession.value
             ?: return Result.failure(IllegalStateException("No hay sesión de psicólogo"))
+        val psychologistId = session.idPsicologo
+            ?: return Result.failure(
+                IllegalStateException("No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar.")
+            )
 
         return citasRepository.alternarDiaNoDisponible(
-            idPsicologo = session.idUsuario,
+            idPsicologo = psychologistId,
             fecha = fecha.toString(),
             yaNoDisponible = yaNoDisponible
         ).map { agenda ->

@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
@@ -48,13 +49,39 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
 
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
+    val loginResult by loginViewModel.loginResult.collectAsState()
+    val isLoggingIn by loginViewModel.isLoggingIn.collectAsState()
 
     val colors = MaterialTheme.colorScheme
     val amaniColors = LocalAmaniColors.current
     val typography = MaterialTheme.typography
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(loginResult) {
+        val result = loginResult ?: return@LaunchedEffect
+        result.onSuccess { response ->
+            val destination = when (response.rol.lowercase()) {
+                "admin" -> Screens.adminHome.route
+                "psicologo" -> Screens.psicologoHome.route
+                else -> Screens.pacienteHome.route
+            }
+            loginViewModel.clearLoginFields()
+            loginViewModel.resetLoginState()
+            navController.navigate(destination) {
+                popUpTo(Screens.login.route) { inclusive = true }
+                launchSingleTop = true
+            }
+        }.onFailure { error ->
+            snackbarHostState.showSnackbar(
+                message = error.message ?: "No se pudo iniciar sesion"
+            )
+            loginViewModel.resetLoginState()
+        }
+    }
 
     Scaffold(
-        containerColor = amaniColors.screenBackground
+        containerColor = amaniColors.screenBackground,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -130,23 +157,32 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 onClick = {
-
+                    loginViewModel.login()
                 },
+                enabled = !isLoggingIn && username.isNotBlank() && password.isNotBlank(),
                 border = BorderStroke(2.dp, amaniColors.buttonBorder),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = amaniColors.textFieldContainer,
                     contentColor = colors.primary,
                 )
             ) {
-                Text(
-                    "Iniciar sesión",
-                    style = typography.labelLarge
-                )
+                if (isLoggingIn) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = colors.primary
+                    )
+                } else {
+                    Text(
+                        "Iniciar sesión",
+                        style = typography.labelLarge
+                    )
+                }
             }
 
             Espaciado(12)
 
-            TextButton(onClick = { }) {
+            TextButton(onClick = { navController.navigate(Screens.registro.route) }) {
                 Text("No tengo cuenta. Quiero registrame",
                     style = typography.bodyLarge)
             }

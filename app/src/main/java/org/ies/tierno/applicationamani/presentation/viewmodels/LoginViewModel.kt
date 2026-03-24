@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
+import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacie
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
+import org.json.JSONObject
 
 class LoginViewModel(
     private val authUseCase: LoginUseCase,
@@ -33,6 +35,9 @@ class LoginViewModel(
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+
+    private val _isLoggingIn = MutableStateFlow(false)
+    val isLoggingIn: StateFlow<Boolean> = _isLoggingIn
 
     // --- Campos para Registro ---
     private val _nombre = MutableStateFlow("")
@@ -144,6 +149,7 @@ class LoginViewModel(
     // ----------------------------
     fun login() {
         viewModelScope.launch {
+            _isLoggingIn.value = true
             try {
                 val request = LoginRequestDTO(email = _username.value, password = _password.value)
                 val result = authUseCase.login(request)
@@ -153,7 +159,8 @@ class LoginViewModel(
                         UserSession(
                             idUsuario = response.idUsuario,
                             nombre = response.nombre,
-                            rol = response.rol
+                            rol = response.rol,
+                            idPsicologo = response.idPsicologo ?: extractPsychologistId(response.token)
                         )
                     )
                     _loginResult.value = Result.success(response)
@@ -165,6 +172,8 @@ class LoginViewModel(
             } catch (e: Exception) {
                 _loginResult.value = Result.failure(e)
                 setLoggedIn(false)
+            } finally {
+                _isLoggingIn.value = false
             }
         }
     }
@@ -408,6 +417,11 @@ class LoginViewModel(
         _password.value = ""
     }
 
+    fun resetLoginState() {
+        _loginResult.value = null
+        _isLoggingIn.value = false
+    }
+
     // ----------------------------
     // Resetear estado de registro
     // ----------------------------
@@ -449,6 +463,25 @@ class LoginViewModel(
             _loginResult.value = null
             _isLoggedIn.value = false
         }
+    }
+
+    private fun extractPsychologistId(token: String): Long? {
+        return runCatching {
+            val parts = token.split(".")
+            if (parts.size < 2) return null
+
+            val normalizedPayload = parts[1].replace('-', '+').replace('_', '/').let { payload ->
+                payload.padEnd(((payload.length + 3) / 4) * 4, '=')
+            }
+            val payloadJson = String(Base64.decode(normalizedPayload, Base64.DEFAULT))
+            val json = JSONObject(payloadJson)
+
+            when {
+                json.has("idPsicologo") -> json.optLong("idPsicologo").takeIf { it != 0L }
+                json.has("id_psicologo") -> json.optLong("id_psicologo").takeIf { it != 0L }
+                else -> null
+            }
+        }.getOrNull()
     }
 
 
