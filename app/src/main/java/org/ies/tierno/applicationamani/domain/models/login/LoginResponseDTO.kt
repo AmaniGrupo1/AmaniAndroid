@@ -17,7 +17,6 @@ data class LoginResponseDTO(
     val idUsuario: Long,
     val nombre: String,
     val rol: String,
-    val token: String,
-    @com.google.gson.annotations.SerializedName("id_psicologo")
+    val token : String,
     val idPsicologo: Long? = null
 )
