@@ -274,8 +274,8 @@ class LoginViewModel(
                         password = _regPassword.value,
                         rol = "paciente"
                     ),
-                    aceptaVideo = _aceptaVideo.value,
-                    aceptaComunicacion = _aceptaComunicacion.value
+//                    aceptaVideo = _aceptaVideo.value,
+//                    aceptaComunicacion = _aceptaComunicacion.value
                 )
 
                 val result = authUseCase.registerPaciente(request)
