@@ -1,6 +1,8 @@
 package org.ies.tierno.applicationamani.dto.requestPaciente
 
-data class DatosPacienteAdminDTO (
+import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
+
+data class DatosPacienteAdminDTO(
     val idPaciente: Long,
     val nombreUsuario: String,
     val apellidoUsuario: String,
@@ -10,6 +12,9 @@ data class DatosPacienteAdminDTO (
     val telefono: String,
     val createdAt: String,
     val updatedAt: String,
-    val activo : Boolean
+    val activo: Boolean,
+    val estadoPago: String,
+    val metodoPago: String,
+    val situaciones: List<SituacionDTO>
 )
 

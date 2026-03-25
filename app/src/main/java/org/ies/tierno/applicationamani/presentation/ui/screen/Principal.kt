@@ -17,6 +17,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +36,13 @@ import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPrincipal
+import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 
 @Composable
-fun Principal(navController: NavController) {
+fun Principal(navController: NavController,
+              loginViewModel: LoginViewModel
+) {
+    val idPaciente by loginViewModel.idUsuario.collectAsState()
     val minu = FontFamily(
         Font(R.font.nunito_variablefont_wght)
     )
@@ -91,13 +96,24 @@ fun Principal(navController: NavController) {
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 onClick = {
-                    navController.navigate(Screens.cuestionario.route)
+                    val id = idPaciente
+
+                    if (id != null) {
+
+                        navController.navigate(
+                            Screens.testPaciente.route
+                        )
+
+                    } else {
+
+                        println("ID PACIENTE ES NULL")
+
+                    }
                 },
                 border = BorderStroke(2.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(colorButton),
                     contentColor = Color.Black,
-
                     )
             ) {
                 Text(

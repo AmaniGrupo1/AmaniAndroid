@@ -1,6 +1,7 @@
     package org.ies.tierno.applicationamani.dto.requestPaciente
 
     data class UsuarioRequest(
+        val id: Long? = null,
         val nombre: String,
         val apellido: String,
         val email: String,

@@ -40,6 +40,10 @@ sealed class Screens (val route: String){
 
     object consentimiento : Screens("consentimiento")
 
-    object registroConsentimiento : Screens("registroConsentimiento")
+    object consentimientoExitoso : Screens("consentimientoExitoso")
+
+    object opcionPago : Screens("opcionPago") {
+        fun createRoute(pacienteId: Long) = "opcionPago/$pacienteId"
+    }
 }
 

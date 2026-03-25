@@ -183,7 +183,7 @@ fun RegistrarPacienteDesdeAdminScreen(
                         password.length < 4 -> validationMessage = "La contraseña debe tener al menos 4 caracteres"
                         else -> {
                             // Todos los campos válidos, proceder con registro
-                            loginViewModel.registrarPacienteAdmin()
+                            loginViewModel.registrarPaciente()
                         }
                     }
                 },

@@ -22,9 +22,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteSc
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.ConsentimientoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.OpcionPagoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.RegistroExitosoScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
-import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.TestPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
@@ -38,7 +37,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
     val loginViewModel: LoginViewModel = koinViewModel()
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screens.principal.route) {
-            Principal(navController)
+            Principal(navController, loginViewModel)
         }
         composable(Screens.login.route) {
             LoginScreen(navController)
@@ -67,9 +66,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.agregarAdmin.route) {
             AgregarAdministrador(navController, loginViewModel)
         }
-        composable(Screens.cuestionario.route) {
-            Cuestionario(navController, loginViewModel)
-        }
+//        composable(Screens.cuestionario.route) {
+//            Cuestionario(navController, loginViewModel)
+//        }
 
         composable(Screens.pacientes.route) {
             ListadoPacientesScreen(navController)
@@ -77,13 +76,13 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.agregarPacienteAdmin.route) {
             RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
         }
-        composable(
-            route = Screens.testPaciente.route,
-            arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
-        ) { backStackEntry ->
-            val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-            TestPacienteScreen(navController, idPaciente = pacienteId)
-        }
+//        composable(
+//            route = Screens.testPaciente.route,
+//            arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
+//        ) { backStackEntry ->
+//            val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+//            TestPacienteScreen(navController, idPaciente = pacienteId)
+//        }
         composable(Screens.settings.route) {
             SettingsClienteScreen(navController)
         }
@@ -102,10 +101,25 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
 
         //CONSENTIMIENTO
-        composable(Screens.consentimiento.route) {
-            ConsentimientoScreen(navController, loginViewModel)
+        composable(
+           Screens.consentimiento.route,
+        ) {
+            ConsentimientoScreen(
+                navController,
+                loginViewModel,
+            )
+
         }
-        composable(Screens.registroConsentimiento.route) {
+
+        composable(
+            route = Screens.opcionPago.route
+        ) { backStackEntry ->
+            OpcionPagoScreen(
+                navController
+            )
+        }
+
+        composable(Screens.consentimientoExitoso.route) {
             RegistroExitosoScreen(navController)
         }
     }

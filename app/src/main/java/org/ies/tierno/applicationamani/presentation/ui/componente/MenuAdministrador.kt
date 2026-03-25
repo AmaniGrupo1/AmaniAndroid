@@ -149,6 +149,21 @@ fun MenuAdministrador(title: String, navController: NavController) {
                         navController.navigate(Screens.agregarAdmin.route)
                     }
                 )
+
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            "Login",
+                            fontFamily = roboto,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        navController.navigate(Screens.login.route)
+                    }
+                )
             }
         }
     )
