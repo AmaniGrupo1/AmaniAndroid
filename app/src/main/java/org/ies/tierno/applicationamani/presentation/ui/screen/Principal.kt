@@ -42,7 +42,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 fun Principal(navController: NavController,
               loginViewModel: LoginViewModel
 ) {
-    val idPaciente by loginViewModel.idUsuario.collectAsState()
+   // val idPaciente by loginViewModel.idUsuario.collectAsState()
     val minu = FontFamily(
         Font(R.font.nunito_variablefont_wght)
     )
@@ -96,19 +96,19 @@ fun Principal(navController: NavController,
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 onClick = {
-                    val id = idPaciente
+//                    val id = idPaciente
+//
+//                    if (id != null) {
+//
+//                        navController.navigate(
+//                            Screens.testPaciente.route
+//                        )
 
-                    if (id != null) {
-
-                        navController.navigate(
-                            Screens.testPaciente.route
-                        )
-
-                    } else {
-
-                        println("ID PACIENTE ES NULL")
-
-                    }
+//                    } else {
+//
+//                        println("ID PACIENTE ES NULL")
+//
+//                    }
                 },
                 border = BorderStroke(2.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(

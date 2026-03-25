@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
@@ -61,11 +63,11 @@ class LoginViewModel(
     private val _fechaNacimiento = MutableStateFlow("")
     val fechaNacimiento: StateFlow<String> = _fechaNacimiento
 
-    private val _estadoPago = MutableStateFlow("PENDIENTE")
-    val estadoPago: StateFlow<String> = _estadoPago
+    private val _metodoPago = MutableStateFlow<MetodoPago?>(null)
+    val metodoPago: StateFlow<MetodoPago?> = _metodoPago
 
-    private val _metodoPago = MutableStateFlow("")
-    val metodoPago: StateFlow<String> = _metodoPago
+    private val _estadoPago = MutableStateFlow<EstadoPago>(EstadoPago.PENDIENTE)
+    val estadoPago: StateFlow<EstadoPago> = _estadoPago
 
     private val _idSituacion = MutableStateFlow<Long?>(null)
     val idSituacion: StateFlow<Long?> = _idSituacion
@@ -74,10 +76,25 @@ class LoginViewModel(
     private val _passwordVisible = MutableStateFlow(false)
     val passwordVisible: StateFlow<Boolean> = _passwordVisible
 
-    private val _situacionSeleccionada = MutableStateFlow<Pair<Long, String>?>(null)
-    val situacionSeleccionada: StateFlow<Pair<Long, String>?> = _situacionSeleccionada
+    // ================================
+    // NUEVO: Selección múltiple de situaciones
+    // ================================
+    private val _situacionesSeleccionadas = MutableStateFlow<List<Pair<Long, String>>>(emptyList())
+    val situacionesSeleccionadas: StateFlow<List<Pair<Long, String>>> = _situacionesSeleccionadas
 
+    fun toggleSituacion(situacion: Pair<Long, String>) {
+        val current = _situacionesSeleccionadas.value.toMutableList()
+        if (current.any { it.first == situacion.first }) {
+            current.removeAll { it.first == situacion.first }
+        } else {
+            current.add(situacion)
+        }
+        _situacionesSeleccionadas.value = current
+    }
+
+    // ================================
     // Estados para pago online
+    // ================================
     private val _pagoRealizado = MutableStateFlow(false)
     val pagoRealizado: StateFlow<Boolean> = _pagoRealizado
 
@@ -149,17 +166,15 @@ class LoginViewModel(
     fun setTelefono(value: String) { _telefono.value = value }
     fun setGenero(value: String) { _genero.value = value }
     fun setFechaNacimiento(value: String) { _fechaNacimiento.value = value }
-    fun setEstadoPago(value: String) { _estadoPago.value = value }
-    fun setMetodoPago(value: String) {
+    fun setEstadoPago(value: EstadoPago) { _estadoPago.value = value }
+    fun setMetodoPago(value: MetodoPago?) {
         _metodoPago.value = value
         _pagoRealizado.value = false
-        if (value == "ONLINE") {
-            _mostrarDialogoPago.value = true
-        }
+        _mostrarDialogoPago.value = (value == MetodoPago.ONLINE)
     }
     fun setIdSituacion(value: Long?) { _idSituacion.value = value }
     fun setPasswordVisible(value: Boolean) { _passwordVisible.value = value }
-    fun setSituacionSeleccionada(value: Pair<Long, String>?) { _situacionSeleccionada.value = value }
+    fun setSituacionesSeleccionadas(value: List<Pair<Long, String>>) { _situacionesSeleccionadas.value = value }
     fun setPagoRealizado(value: Boolean) { _pagoRealizado.value = value }
     fun setMostrarDialogoPago(value: Boolean) { _mostrarDialogoPago.value = value }
     fun setPagoOnlineCompletado(value: Boolean) { _pagoOnlineCompletado.value = value }
@@ -179,7 +194,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _procesandoPago.value = true
             try {
-                delay(1000) // Simular proceso de pago
+                delay(1000)
                 _pagoOnlineCompletado.value = true
                 _pagoRealizado.value = true
                 _mostrarDialogoPago.value = false
@@ -227,31 +242,25 @@ class LoginViewModel(
     }
 
     // ================================
-    // 12. REGISTRO DE PACIENTE (CON VALIDACIÓN)
+    // 12. REGISTRO DE PACIENTE
     // ================================
     fun registrarPaciente(onResult: (Boolean) -> Unit = {}) {
-        // Validar método de pago
-        if (_metodoPago.value.isBlank()) {
+        val metodo = _metodoPago.value
+        if (metodo == null) {
             _registerError.value = "Seleccione un método de pago"
             onResult(false)
             return
         }
-
-        // Si es ONLINE, verificar que se haya realizado el pago
-        if (_metodoPago.value == "ONLINE" && !_pagoRealizado.value) {
+        if (metodo == MetodoPago.ONLINE && !_pagoRealizado.value) {
             _registerError.value = "Debe realizar el pago online para continuar"
             onResult(false)
             return
         }
-
-        // Validar situación
-        if (_situacionSeleccionada.value == null) {
+        if (_situacionesSeleccionadas.value.isEmpty()) {
             _registerError.value = "Seleccione una situación"
             onResult(false)
             return
         }
-
-        // Validar campos obligatorios
         if (_nombre.value.isBlank() || _apellido.value.isBlank() || _email.value.isBlank() ||
             _regPassword.value.isBlank() || _telefono.value.isBlank() || _genero.value.isBlank() ||
             _fechaNacimiento.value.isBlank()
@@ -260,22 +269,19 @@ class LoginViewModel(
             onResult(false)
             return
         }
-
-        // Validar formato de fecha
         if (!_fechaNacimiento.value.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
             _registerError.value = "Formato de fecha inválido. Use YYYY-MM-DD"
             onResult(false)
             return
         }
 
-        // Construir el request
         val pacienteRequest = PacienteRequest(
             fechaNacimiento = _fechaNacimiento.value,
             genero = _genero.value,
             telefono = _telefono.value,
-            estadoPago = if (_metodoPago.value == "ONLINE" && _pagoRealizado.value) "PAGADO" else "PENDIENTE",
-            metodoPago = _metodoPago.value,
-            idSituacion = _situacionSeleccionada.value!!.first,
+            estadoPago = if (metodo == MetodoPago.ONLINE && _pagoRealizado.value) EstadoPago.PAGADO.name else EstadoPago.PENDIENTE.name,
+            metodoPago = metodo.name,
+            situacionesIds = _situacionesSeleccionadas.value.map { it.first },
             usuario = UsuarioRequest(
                 nombre = _nombre.value,
                 apellido = _apellido.value,
@@ -284,12 +290,13 @@ class LoginViewModel(
                 rol = "paciente"
             )
         )
-
-        // Llamar al método de registro
         registrarPacienteRequest(pacienteRequest, onResult)
     }
 
-    private fun registrarPacienteRequest(pacienteRequest: PacienteRequest, onResult: (Boolean) -> Unit) {
+    private fun registrarPacienteRequest(
+        pacienteRequest: PacienteRequest,
+        onResult: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             _isRegistering.value = true
             _registerError.value = null
@@ -316,11 +323,8 @@ class LoginViewModel(
         }
     }
 
-    fun registrarPacienteConPago(
-        pacienteRequest: PacienteRequest,
-        onResult: (Boolean) -> Unit = {}
-    ) {
-        if (pacienteRequest.metodoPago == "ONLINE" && pacienteRequest.estadoPago != "PAGADO") {
+    fun registrarPacienteConPago(pacienteRequest: PacienteRequest, onResult: (Boolean) -> Unit = {}) {
+        if (pacienteRequest.metodoPago == MetodoPago.ONLINE.name && pacienteRequest.estadoPago != EstadoPago.PAGADO.name) {
             _registerError.value = "Debe completar el pago online para registrarse"
             onResult(false)
             return
@@ -337,9 +341,7 @@ class LoginViewModel(
             _registerError.value = null
             _registerSuccess.value = false
             try {
-                if (_nombre.value.isBlank() || _apellido.value.isBlank() ||
-                    _email.value.isBlank() || _regPassword.value.isBlank()
-                ) {
+                if (_nombre.value.isBlank() || _apellido.value.isBlank() || _email.value.isBlank() || _regPassword.value.isBlank()) {
                     _registerError.value = "Por favor complete todos los campos"
                     onResult(false)
                     return@launch
@@ -349,7 +351,6 @@ class LoginViewModel(
                     onResult(false)
                     return@launch
                 }
-
                 val request = RegistryPacienteDTO(
                     nombre = _nombre.value,
                     apellido = _apellido.value,
@@ -367,7 +368,6 @@ class LoginViewModel(
                     _registerError.value = error.message ?: "Error al registrar administrador"
                     onResult(false)
                 }
-
             } catch (e: Exception) {
                 _registerResult.value = Result.failure(e)
                 _registerError.value = e.message ?: "Error inesperado"
@@ -406,7 +406,6 @@ class LoginViewModel(
                     _registerError.value = error.message ?: "Error al registrar psicólogo"
                     onResult(false)
                 }
-
             } catch (e: Exception) {
                 _registerError.value = e.message ?: "Error inesperado"
                 onResult(false)
@@ -451,10 +450,10 @@ class LoginViewModel(
         _registroExperiencia.value = null
         _registroDescripcion.value = null
         _registroLicencia.value = null
-        _estadoPago.value = "PENDIENTE"
-        _metodoPago.value = ""
+        _estadoPago.value = EstadoPago.PENDIENTE
+        _metodoPago.value = null
         _idSituacion.value = null
-        _situacionSeleccionada.value = null
+        _situacionesSeleccionadas.value = emptyList()
         _passwordVisible.value = false
         resetPagoOnline()
     }
@@ -473,5 +472,8 @@ class LoginViewModel(
         _registerSuccess.value = false
         _registerResult.value = null
         _procesandoPago.value = false
+        _pagoRealizado.value = false
+        _mostrarDialogoPago.value = false
+        _pagoOnlineCompletado.value = false
     }
 }
