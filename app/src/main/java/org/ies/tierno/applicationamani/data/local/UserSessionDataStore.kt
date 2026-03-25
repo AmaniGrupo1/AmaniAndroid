@@ -37,12 +37,19 @@ class UserSessionDataStore(private val context: Context) {
         val rol = preferences[USER_ROLE_KEY]
         val idPsicologo = preferences[PSYCHOLOGIST_ID_KEY]
 
+        // Normalizar valores: si el id del psicólogo existe pero es 0 -> tratar como null
+        val normalizedPsychologistId = when (idPsicologo) {
+            null -> null
+            0L -> null
+            else -> idPsicologo
+        }
+
         if (idUsuario != null && nombre != null && rol != null) {
             UserSession(
                 idUsuario = idUsuario,
                 nombre = nombre,
                 rol = rol,
-                idPsicologo = idPsicologo
+                idPsicologo = normalizedPsychologistId
             )
         } else {
             null
@@ -54,7 +61,12 @@ class UserSessionDataStore(private val context: Context) {
             preferences[USER_ID_KEY] = session.idUsuario
             preferences[USER_NAME_KEY] = session.nombre
             preferences[USER_ROLE_KEY] = session.rol
-            session.idPsicologo?.let { preferences[PSYCHOLOGIST_ID_KEY] = it }
+            // Si el psicólogo es null, eliminamos la clave para evitar valores obsoletos
+            if (session.idPsicologo != null) {
+                preferences[PSYCHOLOGIST_ID_KEY] = session.idPsicologo
+            } else {
+                preferences.remove(PSYCHOLOGIST_ID_KEY)
+            }
         }
     }
 

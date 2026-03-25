@@ -37,8 +37,11 @@ class CitasViewModel(
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     init {
+        // Observar cambios en la sesión de usuario para que los viewmodels reaccionen
         viewModelScope.launch {
-            _userSession.value = userSessionDataStore.getSession()
+            userSessionDataStore.sessionFlow.collect { session ->
+                _userSession.value = session
+            }
         }
     }
 
