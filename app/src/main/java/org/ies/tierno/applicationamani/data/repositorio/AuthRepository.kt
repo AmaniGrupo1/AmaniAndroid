@@ -16,6 +16,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsic
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
+import timber.log.Timber
 
 class AuthRepository(private val api: AuthApi) {
 
@@ -153,9 +154,11 @@ class AuthRepository(private val api: AuthApi) {
             if (response.isSuccessful) {
                 emit(response.body() ?: emptyList())
             } else {
+                Timber.e("Error al obtener psicólogos [code=${response.code()}]")
                 emit(emptyList())
             }
         } catch (e: Exception) {
+            Timber.e(e, "Excepción al obtener psicólogos")
             emit(emptyList())
         }
     }
@@ -163,16 +166,15 @@ class AuthRepository(private val api: AuthApi) {
     fun getPacientesConPsicologo(): Flow<List<PsicologoConPacientesDTO>> = flow {
         try {
             val response = api.getPacientesConPsicologo()
-            println("STATUS: ${response.code()}")
             if (response.isSuccessful) {
                 val body = response.body()
                 emit(body ?: emptyList())
             } else {
-                println("ERROR: ${response.errorBody()?.string()}")
+                Timber.e("Error al obtener pacientes con psicólogo [code=${response.code()}]")
                 emit(emptyList())
             }
         } catch (e: Exception) {
-            println("EXCEPTION: ${e.message}")
+            Timber.e(e, "Excepción al obtener pacientes con psicólogo")
             emit(emptyList())
         }
     }

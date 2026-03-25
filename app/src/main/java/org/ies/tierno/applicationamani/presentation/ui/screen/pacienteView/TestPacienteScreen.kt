@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import timber.log.Timber
 import org.ies.tierno.applicationamani.domain.models.test.RespuestasRequestDTO
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
@@ -138,7 +139,7 @@ fun TestPacienteScreen(
                         }
 
                     } else {
-                        println("Debe responder todas las preguntas")
+                        Timber.d("Debe responder todas las preguntas [respondidas=${respuestasSeleccionadas.size} totales=${preguntas?.size}]")
                     }
                 },
                 modifier = Modifier

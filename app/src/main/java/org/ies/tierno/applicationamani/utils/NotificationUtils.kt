@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
+import timber.log.Timber
 
 /**
  * Programa una notificación local de recordatorio usando [WorkManager].
@@ -45,7 +46,10 @@ fun programarRecordatorioCita(
     val now = System.currentTimeMillis()
 
     // No programar si la hora del recordatorio ya pasó
-    if (triggerMillis <= now) return
+    if (triggerMillis <= now) {
+        Timber.w("Recordatorio ignorado: fecha pasada [fecha=$fecha hora=$hora]")
+        return
+    }
 
     val delayMillis = triggerMillis - now
 
@@ -66,10 +70,20 @@ fun programarRecordatorioCita(
     val workManager = WorkManager.getInstance(context)
 
     // Si ya existía un recordatorio para esta cita, lo cancela primero
-    workManager.cancelAllWorkByTag(tag)
+    runCatching {
+        workManager.cancelAllWorkByTag(tag)
+    }.onFailure { e ->
+        Timber.e(e, "Error al cancelar WorkManager anterior [tag=$tag]")
+    }
 
     // Encola el nuevo recordatorio
-    workManager.enqueue(workRequest)
+    runCatching {
+        workManager.enqueue(workRequest)
+    }.onSuccess {
+        Timber.d("Recordatorio programado ✓ [tag=$tag delay=${delayMillis}ms]")
+    }.onFailure { e ->
+        Timber.e(e, "Error al encolar WorkManager [tag=$tag]")
+    }
 }
 
 /**
@@ -86,7 +100,12 @@ fun cancelarRecordatorioCita(
     hora: LocalTime
 ) {
     val tag = "cita_${fecha}_${hora}"
-    WorkManager.getInstance(context)
-        .cancelAllWorkByTag(tag)
+    runCatching {
+        WorkManager.getInstance(context).cancelAllWorkByTag(tag)
+    }.onSuccess {
+        Timber.d("Recordatorio cancelado ✓ [tag=$tag]")
+    }.onFailure { e ->
+        Timber.e(e, "Error al cancelar WorkManager [tag=$tag]")
+    }
 }
 

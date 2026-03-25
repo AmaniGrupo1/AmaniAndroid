@@ -12,6 +12,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import org.ies.tierno.applicationamani.MainActivity
 import org.ies.tierno.applicationamani.R
+import timber.log.Timber
 
 /**
  * Worker que muestra una notificación local de recordatorio de cita.
@@ -40,7 +41,10 @@ class CitaNotificationWorker(
                 applicationContext,
                 android.Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
-            if (!granted) return Result.failure()
+            if (!granted) {
+                Timber.e("Permiso POST_NOTIFICATIONS no concedido, no se puede mostrar notificación")
+                return Result.failure()
+            }
         }
 
         // Intent que abre la app al pulsar la notificación

@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -73,6 +74,9 @@ dependencies {
 
     // WorkManager para notificaciones programadas que sobreviven reinicios
     implementation(libs.androidx.work.runtime.ktx)
+
+    // Timber: logging estructurado en lugar de android.util.Log
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
