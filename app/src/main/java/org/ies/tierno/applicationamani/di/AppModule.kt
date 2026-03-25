@@ -1,6 +1,14 @@
+/**
+ * Módulo Koin de la capa de aplicación.
+ *
+ * Registra los repositorios, casos de uso y ViewModels como
+ * dependencias inyectables. Actualmente vacío a la espera de que
+ * se definan las implementaciones concretas.
+ *
+ * @see retrofitModule
+ */
 package org.ies.tierno.applicationamani.di
 
-import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
@@ -27,6 +35,14 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewMode
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
+/**
+ * Módulo Koin para dependencias generales de la aplicación.
+ *
+ * Aquí se deben registrar:
+ * - `single { ... }` para repositorios y servicios.
+ * - `factory { ... }` para casos de uso.
+ * - `viewModel { ... }` para ViewModels con dependencias inyectadas.
+ */
 val appModule = module {
     single { AuthRepository(get()) }
     single { TestRepositoryApi(get()) }

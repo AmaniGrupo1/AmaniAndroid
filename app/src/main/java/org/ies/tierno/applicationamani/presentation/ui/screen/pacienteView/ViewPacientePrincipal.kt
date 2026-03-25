@@ -10,6 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+/**
+ * Pantalla principal de la vista del paciente (placeholder).
+ *
+ * Muestra un texto identificativo «Paciente». Pendiente de implementar
+ * el contenido real (resumen de citas, estado emocional, etc.).
+ *
+ * @param navController Controlador de navegación.
+ */
 @Composable
 fun ViewPacientePrincipal(navController: NavController) {
     Scaffold() {

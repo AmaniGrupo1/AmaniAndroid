@@ -1,0 +1,127 @@
+[33mcommit 5e20f4a14f8b87bd077d230826cbd4ddf1ef9eab[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Thu Mar 19 09:33:59 2026 +0100
+
+    PrincipalCliente, SettingsCLiente/ViewModel, BottomBar
+
+[33mcommit eb4e768514415658bfbdfb0190bdea428953fcce[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Mon Mar 16 14:33:36 2026 +0100
+
+    PrincipalCliente
+
+[33mcommit 3884d5182644be25b9591edcec1b085c4ef4e612[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Mon Mar 16 14:10:09 2026 +0100
+
+    PrincipalCliente
+
+[33mcommit fad0f2a4728b755796cddd87436bbb50646d7644[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Mon Mar 16 08:09:47 2026 +0100
+
+    Questionnaire
+
+[33mcommit db06bdd4c29c81c229d6c8cdcc05ab67e80d5019[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Thu Mar 12 14:50:54 2026 +0100
+
+    Questionnaire
+
+[33mcommit a2729aec9525ef65a69b70cda0e5f70f460ef7e2[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Thu Mar 12 14:49:28 2026 +0100
+
+    Questionnaire
+
+[33mcommit 731ab6202103dc0269444365f8a025d6e3f676bf[m
+Merge: c50bae5 6baf95c
+Author: Alex <algkanouka@gmail.com>
+Date:   Thu Mar 12 14:49:22 2026 +0100
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit c50bae5d7cdc6c53418f06d644b365251866bea7[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Thu Mar 12 14:49:10 2026 +0100
+
+    Questionnaire
+
+[33mcommit 6baf95cf38e6a69fc022bf960f5b0406cf9e816b[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 12:55:12 2026 +0100
+
+    jajsjsdd
+
+[33mcommit 053266bb11b74612f9b972ba91d74107211739db[m
+Merge: 89e535e 1a5d00f
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 12:26:38 2026 +0100
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit 89e535e8cf19c01ef5fa2cfb87bdf2d171d7db68[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 12:26:21 2026 +0100
+
+    He creado la navegación entre vista
+
+[33mcommit 1a5d00f3f86bb03378c50d5e9bb4bb671a077863[m
+Author: Ivan <ivanrilopa22@gmail.com>
+Date:   Thu Mar 12 12:09:42 2026 +0100
+
+    build: actualizar dependencias y mejorar la estructura del código
+
+[33mcommit 07be49ee8477ef2b6b4610c78314c6e76765323d[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 11:44:54 2026 +0100
+
+    cambie el color del menu principal
+
+[33mcommit f15570dda8ef766535c0fc9dae75f87064ee2e20[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 11:43:34 2026 +0100
+
+    Cambie las dependencias
+
+[33mcommit 65ec4c91f49d8838b8b3e45958f9b5f538de3857[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 11:36:46 2026 +0100
+
+    Cree el menu principal
+
+[33mcommit 1d4d93b2db9d4226976179e19c2540f147d5d6de[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 10:09:52 2026 +0100
+
+    Inserte varias fuentes
+
+[33mcommit e95583f15497de84749ee68867f74c6fadbabbac[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Thu Mar 12 09:17:49 2026 +0100
+
+    cree el login y el registro
+
+[33mcommit 5c6ed77f0149673ff2f3a0b1f452cf1e5d2b7c82[m
+Author: Alex <algkanouka@gmail.com>
+Date:   Wed Mar 11 14:48:33 2026 +0100
+
+    Login
+
+[33mcommit 2145c5869c76ebc928f33f3ad58ceeb93670859a[m
+Author: Ivan <ivanrilopa22@gmail.com>
+Date:   Wed Mar 11 12:07:43 2026 +0100
+
+    build: actualizar dependencias a través de libs.versions.toml
+
+[33mcommit c6a8af9f35c05833f93288293534aa97a5802130[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Wed Mar 11 10:29:08 2026 +0100
+
+    realización de las carpetas
+
+[33mcommit 3e3456546aa0711db3d6b7a2c79e7573fea2c8ad[m
+Author: Felix <felixppenafielb@gmail.com>
+Date:   Wed Mar 11 10:03:18 2026 +0100
+
+    sdfds

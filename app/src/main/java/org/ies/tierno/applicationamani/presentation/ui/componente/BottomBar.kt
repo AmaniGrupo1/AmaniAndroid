@@ -27,6 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+/**
+ * Barra de navegación inferior para la vista de administración.
+ *
+ * Muestra iconos para las secciones Pacientes, Chat, Calendario,
+ * Gráfica y Ajustes. Resalta la sección activa según [currentRoute].
+ *
+ * @param navController Controlador de navegación para cambiar de pantalla.
+ * @param currentRoute Ruta actual utilizada para resaltar el icono seleccionado.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomBar( navController: NavController, currentRoute: String) {
@@ -107,6 +116,17 @@ fun BottomBar( navController: NavController, currentRoute: String) {
     }
 }
 
+/**
+ * Icono individual de la barra de navegación inferior.
+ *
+ * Muestra un icono vectorial con su etiqueta de texto debajo.
+ * Cambia de color según si está seleccionado.
+ *
+ * @param icon Icono vectorial a mostrar.
+ * @param label Texto descriptivo debajo del icono.
+ * @param isSelected `true` si esta sección está seleccionada.
+ * @param onClick Acción al pulsar el icono.
+ */
 @Composable
 fun BottomBarIcon(
     icon: ImageVector,

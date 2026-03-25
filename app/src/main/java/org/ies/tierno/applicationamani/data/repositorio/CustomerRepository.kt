@@ -10,6 +10,18 @@ import kotlinx.coroutines.flow.flowOn
 import org.ies.tierno.applicationamani.data.remoto.CustomerClient
 
 
+/**
+ * Repositorio de datos de clientes/usuarios.
+ *
+ * Actúa como capa intermedia entre los ViewModels y el servicio remoto
+ * ([CustomerClient]). Contiene la lógica genérica de observación
+ * continua de datos mediante [Flow].
+ *
+ * @property customerClient Cliente Retrofit para la comunicación con el backend.
+ * @constructor Crea un repositorio con el cliente de red proporcionado.
+ *
+ * @see CustomerClient
+ */
 class CustomerRepository(val customerClient: CustomerClient) {
 //
 //    fun listAll(): Flow<List<CustomerDTO>> =
@@ -30,7 +42,17 @@ class CustomerRepository(val customerClient: CustomerClient) {
 //            .update(id,customer)
 
     /**
-     * Esta funcion sirve para hacer consultas a un servicio de manera continua
+     * Observa los resultados de una consulta de forma continua mediante polling.
+     *
+     * Ejecuta [query] periódicamente en el dispatcher [Dispatchers.IO] y emite
+     * un nuevo valor solo cuando el resultado difiere del anterior, evitando
+     * recomposiciones innecesarias.
+     *
+     * @param T Tipo de los elementos de la lista devuelta por la consulta.
+     * @param retryTime Intervalo en milisegundos entre consultas consecutivas.
+     *   Por defecto es 5 000 ms (5 segundos).
+     * @param query Función suspendida que realiza la consulta al servicio remoto.
+     * @return [Flow] que emite listas actualizadas cada vez que cambian.
      */
     fun <T> observeQuery(retryTime: Long = 5000, query: suspend () -> List<T>): Flow<List<T>> =
         flow {

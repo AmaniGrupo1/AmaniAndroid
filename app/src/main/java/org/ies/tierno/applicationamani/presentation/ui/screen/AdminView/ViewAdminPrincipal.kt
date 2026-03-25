@@ -1,20 +1,21 @@
 package org.ies.tierno.applicationamani.presentation.ui.screens.admin
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,26 +23,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
-import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
+import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla principal del panel de administración.
+ *
+ * Muestra una lista de tarjetas con la relación paciente-psicólogo
+ * obtenida del [GetAllPacientAndPsicologoVeiwModel]. Incluye la barra
+ * superior de administración ([MenuAdministrador]) y la barra inferior
+ * de navegación ([BottomBar]).
+ *
+ * @param navController Controlador de navegación.
+ * @param viewModel ViewModel que provee la lista de pacientes con psicólogos.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ViewAdminPrincipal(
     navController: NavController,
     viewModel: GetAllPacientAndPsicologoVeiwModel = koinViewModel()
 ) {
     var admin by remember { mutableStateOf("pacientes") }
-    val psicologos by viewModel.paciente.collectAsState() // StateFlow<List<PsicologoConPacientesDTO>>
+    val pacientes by viewModel.paciente.collectAsState()
 
     Scaffold(
-        topBar = { MenuAdministrador(title = "Psicólogos y Pacientes", navController = navController) },
+        topBar = { MenuAdministrador(title = "Pacientes", navController = navController) },
         bottomBar = { BottomBar(navController = navController, admin) },
-        containerColor = Color(0xFFF5F6FA)
+        containerColor = Color(0xFFF5F6FA) // fondo general suave
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -50,95 +64,93 @@ fun ViewAdminPrincipal(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(psicologos) { psicologo ->
-                PsicologoCard(psicologo)
+            items(pacientes) { paciente ->
+                PacienteCard(paciente)
             }
         }
     }
 }
 
+/**
+ * Tarjeta que muestra la información resumida de un paciente y su psicólogo.
+ *
+ * Incluye nombre del psicólogo, nombre del paciente, email y fecha
+ * de última actualización formateada en `dd/MM/yyyy HH:mm`.
+ *
+ * @param paciente Datos de la relación paciente-psicólogo.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PsicologoCard(psicologo: PsicologoConPacientesDTO) {
-    var expanded by remember { mutableStateOf(false) }
-
+fun PacienteCard(paciente: ListaPacientesAndPsicologo) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize(), // anima la expansión
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // Header psicólogo
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "${psicologo.nombrePsicologo} ${psicologo.apellidoPsicologo}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A)
-                    )
-                    Text(
-                        text = "Especialidad: ${psicologo.especialidad}",
-                        fontSize = 14.sp,
-                        color = Color(0xFF374151)
-                    )
-                }
+            // Psicólogo
+            Text(
+                text = "${paciente.nombrePsicologo ?: ""} ${paciente.apellidoPsicologo ?: ""}",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1E3A8A) // azul corporativo
+            )
+            Spacer(modifier = Modifier.height(4.dp))
 
+            // Paciente
+            Text(
+                text = "${paciente.nombreUsuario ?: ""} ${paciente.apellidoUsuario ?: ""}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF374151) // gris oscuro
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Email
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = "Expandir pacientes",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clickable { expanded = !expanded },
-                    tint = Color(0xFF1E3A8A)
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Email",
+                    tint = Color(0xFF6B7280),
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = paciente.emailUsuario ?: "",
+                    fontSize = 14.sp,
+                    color = Color(0xFF6B7280)
                 )
             }
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Lista de pacientes desplegable
-            if (expanded) {
-                psicologo.pacientes.forEach { paciente ->
-                    PacienteRow(paciente)
-                    Divider(color = Color(0xFFE5E7EB), thickness = 1.dp)
+            val fechaFormateada = paciente.updatedAt?.let { fechaStr ->
+                try {
+                    val date = LocalDateTime.parse(fechaStr, DateTimeFormatter.ISO_DATE_TIME)
+                    val formatterOutput = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                    date.format(formatterOutput)
+                } catch (e: Exception) {
+                    "Fecha inválida"
                 }
             }
-        }
-    }
-}
 
-@Composable
-fun PacienteRow(paciente: PacientesAsignadoDTO) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFF9FAFB))
-            .padding(12.dp)
-    ) {
-        Text(
-            text = "${paciente.nombre} ${paciente.apellido}",
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
-            color = Color(0xFF111827)
-        )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.Email,
-                contentDescription = "Email",
-                tint = Color(0xFF6B7280),
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = paciente.email,
-                fontSize = 14.sp,
-                color = Color(0xFF6B7280)
-            )
+            fechaFormateada?.let { fecha ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = "Fecha actualización",
+                        tint = Color(0xFF6B7280),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = fecha,
+                        fontSize = 14.sp,
+                        color = Color(0xFF6B7280)
+                    )
+                }
+            }
         }
     }
 }
