@@ -57,11 +57,16 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = k
     LaunchedEffect(loginResult) {
         val result = loginResult ?: return@LaunchedEffect
         result.onSuccess { response ->
-            val destination = when (response.rol.lowercase()) {
-                "admin" -> Screens.adminHome.route
-                "psicologo" -> Screens.psicologoHome.route
+            val rolNormalizado = response.rol?.lowercase()?.trim()
+                ?.replace("ó", "o")
+                ?.replace("á", "a")
+                
+            val destination = when (rolNormalizado) {
+                "admin", "administrador" -> Screens.adminHome.route
+                "psicologo", "psicologa" -> Screens.psicologoHome.route
                 else -> Screens.pacienteHome.route
             }
+
             loginViewModel.clearLoginFields()
             loginViewModel.resetLoginState()
             navController.navigate(destination) {

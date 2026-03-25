@@ -154,17 +154,23 @@ class LoginViewModel(
                 val request = LoginRequestDTO(email = _username.value, password = _password.value)
                 val result = authUseCase.login(request)
                 result.onSuccess { response ->
-                    tokenDataStore.saveToken(response.token)
-                    userSessionDataStore.saveSession(
-                        UserSession(
-                            idUsuario = response.idUsuario,
-                            nombre = response.nombre,
-                            rol = response.rol,
-                            idPsicologo = response.idPsicologo ?: extractPsychologistId(response.token)
+                    val token = response.token
+                    if (token != null) {
+                        tokenDataStore.saveToken(token)
+                        userSessionDataStore.saveSession(
+                            UserSession(
+                                idUsuario = response.idUsuario ?: 0L,
+                                nombre = response.nombre,
+                                rol = response.rol ?: "unknown",
+                                idPsicologo = response.idPsicologo ?: extractPsychologistId(token)
+                            )
                         )
-                    )
-                    _loginResult.value = Result.success(response)
-                    setLoggedIn(true)
+                        _loginResult.value = Result.success(response)
+                        setLoggedIn(true)
+                    } else {
+                        _loginResult.value = Result.failure(Exception("Token not found in response"))
+                        setLoggedIn(false)
+                    }
                 }.onFailure { error ->
                     _loginResult.value = Result.failure(error)
                     setLoggedIn(false)

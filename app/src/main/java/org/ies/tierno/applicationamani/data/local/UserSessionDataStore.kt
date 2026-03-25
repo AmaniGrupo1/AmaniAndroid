@@ -17,7 +17,7 @@ private val Context.userSessionDataStore: DataStore<Preferences> by preferencesD
 
 data class UserSession(
     val idUsuario: Long,
-    val nombre: String,
+    val nombre: String?, // Permitimos nulo aquí también
     val rol: String,
     val idPsicologo: Long? = null
 )
@@ -44,7 +44,8 @@ class UserSessionDataStore(private val context: Context) {
             else -> idPsicologo
         }
 
-        if (idUsuario != null && nombre != null && rol != null) {
+        // Permitimos que nombre sea nulo al recuperar la sesión si idUsuario y rol existen
+        if (idUsuario != null && rol != null) {
             UserSession(
                 idUsuario = idUsuario,
                 nombre = nombre,
@@ -59,7 +60,11 @@ class UserSessionDataStore(private val context: Context) {
     suspend fun saveSession(session: UserSession) {
         context.userSessionDataStore.edit { preferences ->
             preferences[USER_ID_KEY] = session.idUsuario
-            preferences[USER_NAME_KEY] = session.nombre
+            if (session.nombre != null) {
+                preferences[USER_NAME_KEY] = session.nombre
+            } else {
+                preferences.remove(USER_NAME_KEY)
+            }
             preferences[USER_ROLE_KEY] = session.rol
             // Si el psicólogo es null, eliminamos la clave para evitar valores obsoletos
             if (session.idPsicologo != null) {
