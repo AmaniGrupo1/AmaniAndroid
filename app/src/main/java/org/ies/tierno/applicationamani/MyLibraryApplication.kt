@@ -1,21 +1,74 @@
 package org.ies.tierno.applicationamani
 
-
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import org.ies.tierno.applicationamani.di.appModule
 import org.ies.tierno.applicationamani.di.retrofitModule
+import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
+import timber.log.Timber
+import org.ies.tierno.applicationamani.utils.FileLoggingTree
 
+/**
+ * Clase [Application] personalizada para la aplicación Amani.
+ *
+ * Inicializa el framework de inyección de dependencias **Koin** al
+ * arrancar la aplicación, registrando los módulos [appModule] y
+ * [retrofitModule]. También crea el canal de notificaciones para
+ * los recordatorios de citas.
+ *
+ * Debe declararse en el `AndroidManifest.xml` como atributo
+ * `android:name` de la etiqueta `<application>`.
+ *
+ * @see appModule
+ * @see retrofitModule
+ */
 class MyLibraryApplication : Application() {
+    /**
+     * Se ejecuta antes que cualquier actividad, servicio o receptor.
+     *
+     * Arranca Koin con el contexto de la aplicación y los módulos
+     * de dependencias definidos en el paquete `di`.
+     * Crea el canal de notificaciones para recordatorios de citas.
+     */
     override fun onCreate() {
         super.onCreate()
+
+        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        Timber.plant(FileLoggingTree(this))
+
+        crearCanalNotificaciones()
+
         startKoin {
             androidContext(this@MyLibraryApplication)
             modules(
                 appModule,
                 retrofitModule
             )
+        }
+    }
+
+    /**
+     * Crea el canal de notificaciones para recordatorios de citas.
+     *
+     * Desde Android 8 (API 26) los canales son obligatorios.
+     * La llamada es idempotente: si el canal ya existe no se modifica.
+     * Se protege con comprobación de versión porque minSdk es 24.
+     */
+    private fun crearCanalNotificaciones() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CitaNotificationWorker.CANAL_CITAS_ID,
+                "Recordatorio de citas",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notificaciones de recordatorio de tus citas en Amani"
+            }
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
         }
     }
 }

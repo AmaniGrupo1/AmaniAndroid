@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
-
 import TestScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -19,12 +18,16 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.Registra
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.ConsentimientoScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.OpcionPagoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento.RegistroExitosoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.TestPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipal
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
@@ -35,91 +38,64 @@ import org.koin.androidx.compose.koinViewModel
 fun NavGraph(startDestination: String = Screens.principal.route) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = koinViewModel()
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screens.principal.route) {
-            Principal(navController, loginViewModel)
-        }
-        composable(Screens.login.route) {
-            LoginScreen(navController)
-        }
-        composable(Screens.registro.route) {
-            RegisterScreen(navController, loginViewModel)
-        }
-        composable(Screens.test.route) {
-            TestScreen(navController)
-        }
 
-        //lOGIN
-        composable(Screens.adminHome.route) {
-            ViewAdminPrincipal(navController)
-        }
-        composable(Screens.psicologoHome.route) {
-            ViewPsicologoPrincipal(navController)
-        }
-        composable(Screens.pacienteHome.route) {
-            ViewPacientePrincipal(navController)
-        }
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(Screens.principal.route) { Principal(navController) }
+        composable(Screens.login.route) { LoginScreen(navController, loginViewModel) }
+        composable(Screens.registro.route) { RegisterScreen(navController, loginViewModel) }
+        composable(Screens.questionnaire.route) { QuestionnaireScreen(navController) }
+        composable(Screens.principalCliente.route) { PrincipalClienteScreen(navController) }
+        composable(Screens.settingsCliente.route) { SettingsClienteScreen(navController) }
+
+        composable(Screens.adminHome.route) { ViewAdminPrincipal(navController) }
+        composable(Screens.adminPrincipal.route) { ViewAdminPrincipal(navController) }
+        composable(Screens.psicologoHome.route) { ViewPsicologoPrincipal(navController) }
+        composable(Screens.pacienteHome.route) { ViewPacientePrincipal(navController) }
+        composable(Screens.vistaPrincipalPaciente.route) { PrincipalClienteScreen(navController) }
+        composable(Screens.settings.route) { SettingsClienteScreen(navController) }
 
         composable(Screens.agregarPsicologo.route) {
+            AgregaPsicologoScreen(navController, loginViewModel)
+        }
+        composable(Screens.agregarPsicologoAdmin.route) {
             AgregaPsicologoScreen(navController, loginViewModel)
         }
         composable(Screens.agregarAdmin.route) {
             AgregarAdministrador(navController, loginViewModel)
         }
-//        composable(Screens.cuestionario.route) {
-//            Cuestionario(navController, loginViewModel)
-//        }
-
-        composable(Screens.pacientes.route) {
-            ListadoPacientesScreen(navController)
-        }
+        composable(Screens.pacientes.route) { ListadoPacientesScreen(navController) }
         composable(Screens.agregarPacienteAdmin.route) {
             RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
         }
-//        composable(
-//            route = Screens.testPaciente.route,
-//            arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
-//        ) { backStackEntry ->
-//            val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-//            TestPacienteScreen(navController, idPaciente = pacienteId)
-//        }
-        composable(Screens.settings.route) {
-            SettingsClienteScreen(navController)
+        composable(Screens.listaPsicologos.route) {
+            ListadoPsicologosScreen(navController, "", loginViewModel)
         }
-        composable(Screens.vistaPrincipalPaciente.route) {
-            PrincipalClienteScreen(navController)
-        }
-        composable(Screens.agregarPsicologoAdmin.route) {
-            AgregaPsicologoScreen(navController, loginViewModel)
-        }
-
-        composable(Screens.asignarPsicologo.route) { backStackEntry ->
-            val pacienteId = backStackEntry.arguments?.getString("pacienteId")
-            if (pacienteId != null) {
+        composable(
+            route = Screens.asignarPsicologo.route,
+            arguments = listOf(navArgument("pacienteId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("pacienteId")?.let { pacienteId ->
                 ListadoPsicologosScreen(navController, pacienteId, loginViewModel)
             }
         }
 
-        //CONSENTIMIENTO
+        composable(Screens.test.route) { TestScreen(navController) }
+        composable(Screens.cuestionario.route) { Cuestionario(navController, loginViewModel) }
         composable(
-           Screens.consentimiento.route,
-        ) {
-            ConsentimientoScreen(
-                navController,
-                loginViewModel,
-            )
-
-        }
-
-        composable(
-            route = Screens.opcionPago.route
+            route = Screens.testPaciente.route,
+            arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
         ) { backStackEntry ->
-            OpcionPagoScreen(
-                navController
-            )
+            val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+            TestPacienteScreen(navController, idPaciente = pacienteId)
         }
 
-        composable(Screens.consentimientoExitoso.route) {
+        composable(Screens.citas.route) { CitasScreen(navController) }
+        composable(Screens.psicologoAgenda.route) { PsicologoAgendaScreen(navController) }
+
+        composable(Screens.consentimiento.route) {
+            ConsentimientoScreen(navController, loginViewModel)
+        }
+        composable(Screens.registroConsentimiento.route) {
             RegistroExitosoScreen(navController)
         }
     }

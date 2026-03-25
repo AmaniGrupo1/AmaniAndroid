@@ -35,12 +35,11 @@ fun ViewAdminPrincipal(
     navController: NavController,
     viewModel: GetAllPacientAndPsicologoVeiwModel = koinViewModel()
 ) {
-    var admin by remember { mutableStateOf("pacientes") }
     val psicologos by viewModel.paciente.collectAsState() // StateFlow<List<PsicologoConPacientesDTO>>
 
     Scaffold(
         topBar = { MenuAdministrador(title = "Psicólogos y Pacientes", navController = navController) },
-        bottomBar = { BottomBar(navController = navController, admin) },
+        bottomBar = { BottomBar(navController = navController) },
         containerColor = Color(0xFFF5F6FA)
     ) { innerPadding ->
         LazyColumn(

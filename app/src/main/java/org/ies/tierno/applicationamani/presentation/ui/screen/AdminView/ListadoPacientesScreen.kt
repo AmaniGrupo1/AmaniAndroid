@@ -25,6 +25,16 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministra
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de listado de pacientes con opciones de gestión.
+ *
+ * Muestra una lista desplazable de tarjetas con los datos de cada paciente.
+ * Permite dar de baja a un paciente mediante un diálogo de confirmación
+ * y navegar a la pantalla de registro de paciente desde el FAB.
+ *
+ * @param navController Controlador de navegación.
+ * @param viewModel ViewModel que provee la lista de pacientes y la acción de baja.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPacientesScreen(

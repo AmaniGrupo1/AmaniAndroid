@@ -1,0 +1,62 @@
+package org.ies.tierno.applicationamani.data.remoto
+
+import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
+import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
+import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
+import org.ies.tierno.applicationamani.dto.citas.DiaNoDisponibleRequest
+import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
+import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+interface CitasApi {
+
+    @GET("/api/citas/paciente/{idPaciente}/agenda")
+    suspend fun getAgendaPaciente(
+        @Path("idPaciente") idPaciente: Long,
+        @Query("month") month: String
+    ): AgendaPacienteResponse
+
+    @GET("/api/citas/psicologo/{idPsicologo}/agenda")
+    suspend fun getAgendaPsicologo(
+        @Path("idPsicologo") idPsicologo: Long,
+        @Query("month") month: String
+    ): AgendaPsicologoResponse
+
+    @GET("/api/citas/psicologo/{idPsicologo}/disponibilidad")
+    suspend fun getDisponibilidadDia(
+        @Path("idPsicologo") idPsicologo: Long,
+        @Query("fecha") fecha: String
+    ): DisponibilidadDiaResponse
+
+    @POST("/api/citas")
+    suspend fun crearCita(@Body request: CitaRequest): CitaDetalleResponse
+
+    @PATCH("/api/citas/{id}/cancelar")
+    suspend fun cancelarCita(@Path("id") idCita: Long): CitaDetalleResponse
+
+    @PUT("/api/citas/psicologo/{idPsicologo}/horario")
+    suspend fun actualizarHorario(
+        @Path("idPsicologo") idPsicologo: Long,
+        @Body request: HorarioPsicologoRequest
+    ): AgendaPsicologoResponse
+
+    @POST("/api/citas/psicologo/{idPsicologo}/dias-no-disponibles")
+    suspend fun marcarDiaNoDisponible(
+        @Path("idPsicologo") idPsicologo: Long,
+        @Body request: DiaNoDisponibleRequest
+    ): AgendaPsicologoResponse
+
+    @DELETE("/api/citas/psicologo/{idPsicologo}/dias-no-disponibles/{fecha}")
+    suspend fun eliminarDiaNoDisponible(
+        @Path("idPsicologo") idPsicologo: Long,
+        @Path("fecha") fecha: String
+    ): AgendaPsicologoResponse
+}

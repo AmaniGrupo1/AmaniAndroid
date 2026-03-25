@@ -1,15 +1,15 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
+import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSession
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
-import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
-import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
@@ -17,31 +17,29 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacie
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
+import org.json.JSONObject
 
 class LoginViewModel(
     private val authUseCase: LoginUseCase,
     private val tokenDataStore: TokenDataStore,
+    private val userSessionDataStore: UserSessionDataStore,
     val asignarUseCase: AsignarPacienteAlPsicologoUseCase
 ) : ViewModel() {
 
-    // ================================
-    // 1. CAMPOS PARA LOGIN
-    // ================================
+    // --- Campos para Login ---
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
-    private val _idUsuario = MutableStateFlow<Long?>(null)
-    val idUsuario: StateFlow<Long?> = _idUsuario
-
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
 
-    // ================================
-    // 2. CAMPOS PARA REGISTRO DE PACIENTE
-    // ================================
+    private val _isLoggingIn = MutableStateFlow(false)
+    val isLoggingIn: StateFlow<Boolean> = _isLoggingIn
+
+    // --- Campos para Registro ---
     private val _nombre = MutableStateFlow("")
     val nombre: StateFlow<String> = _nombre
 
@@ -63,53 +61,7 @@ class LoginViewModel(
     private val _fechaNacimiento = MutableStateFlow("")
     val fechaNacimiento: StateFlow<String> = _fechaNacimiento
 
-    private val _metodoPago = MutableStateFlow<MetodoPago?>(null)
-    val metodoPago: StateFlow<MetodoPago?> = _metodoPago
-
-    private val _estadoPago = MutableStateFlow<EstadoPago>(EstadoPago.PENDIENTE)
-    val estadoPago: StateFlow<EstadoPago> = _estadoPago
-
-    private val _idSituacion = MutableStateFlow<Long?>(null)
-    val idSituacion: StateFlow<Long?> = _idSituacion
-
-    // Estados adicionales para UI
-    private val _passwordVisible = MutableStateFlow(false)
-    val passwordVisible: StateFlow<Boolean> = _passwordVisible
-
-    // ================================
-    // NUEVO: Selección múltiple de situaciones
-    // ================================
-    private val _situacionesSeleccionadas = MutableStateFlow<List<Pair<Long, String>>>(emptyList())
-    val situacionesSeleccionadas: StateFlow<List<Pair<Long, String>>> = _situacionesSeleccionadas
-
-    fun toggleSituacion(situacion: Pair<Long, String>) {
-        val current = _situacionesSeleccionadas.value.toMutableList()
-        if (current.any { it.first == situacion.first }) {
-            current.removeAll { it.first == situacion.first }
-        } else {
-            current.add(situacion)
-        }
-        _situacionesSeleccionadas.value = current
-    }
-
-    // ================================
-    // Estados para pago online
-    // ================================
-    private val _pagoRealizado = MutableStateFlow(false)
-    val pagoRealizado: StateFlow<Boolean> = _pagoRealizado
-
-    private val _mostrarDialogoPago = MutableStateFlow(false)
-    val mostrarDialogoPago: StateFlow<Boolean> = _mostrarDialogoPago
-
-    private val _pagoOnlineCompletado = MutableStateFlow(false)
-    val pagoOnlineCompletado: StateFlow<Boolean> = _pagoOnlineCompletado
-
-    private val _procesandoPago = MutableStateFlow(false)
-    val procesandoPago: StateFlow<Boolean> = _procesandoPago
-
-    // ================================
-    // 3. ESTADOS DE UI PARA REGISTRO
-    // ================================
+    // --- Estados de UI para registro ---
     private val _isRegistering = MutableStateFlow(false)
     val isRegistering: StateFlow<Boolean> = _isRegistering
 
@@ -119,190 +71,215 @@ class LoginViewModel(
     private val _registerSuccess = MutableStateFlow(false)
     val registerSuccess: StateFlow<Boolean> = _registerSuccess
 
-    // ================================
-    // 4. RESULT FLOWS
-    // ================================
+    // --- Result Flows ---
     private val _loginResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
     val loginResult: StateFlow<Result<LoginResponseDTO>?> = _loginResult
 
     private val _registerResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
     val registerResult: StateFlow<Result<LoginResponseDTO>?> = _registerResult
 
-    // ================================
-    // 5. CAMPOS PARA PSICÓLOGO
-    // ================================
+    // En LoginViewModel
     private val _registroEspecialidad = MutableStateFlow("")
     val registroEspecialidad: StateFlow<String> = _registroEspecialidad
+    fun setRegistroEspecialidad(value: String) {
+        _registroEspecialidad.value = value
+    }
 
     private val _registroExperiencia = MutableStateFlow<Int?>(null)
     val registroExperiencia: StateFlow<Int?> = _registroExperiencia
+    fun setRegistroExperiencia(value: Int?) {
+        _registroExperiencia.value = value
+    }
 
     private val _registroDescripcion = MutableStateFlow<String?>(null)
     val registroDescripcion: StateFlow<String?> = _registroDescripcion
+    fun setRegistroDescripcion(value: String?) {
+        _registroDescripcion.value = value
+    }
 
     private val _registroLicencia = MutableStateFlow<String?>(null)
     val registroLicencia: StateFlow<String?> = _registroLicencia
-
-    // ================================
-    // 6. ASIGNAR PACIENTE A PSICÓLOGO
-    // ================================
-    private val _asignarPsicologoResult = MutableStateFlow<String?>(null)
-    val asignarPsicologoResult: StateFlow<String?> = _asignarPsicologoResult
-
-    // ================================
-    // 7. SETTERS - LOGIN
-    // ================================
-    fun setUsername(value: String) { _username.value = value }
-    fun setPassword(value: String) { _password.value = value }
-    fun setLoggedIn(value: Boolean) { _isLoggedIn.value = value }
-
-    // ================================
-    // 8. SETTERS - REGISTRO PACIENTE
-    // ================================
-    fun setNombre(value: String) { _nombre.value = value }
-    fun setApellido(value: String) { _apellido.value = value }
-    fun setEmail(value: String) { _email.value = value }
-    fun setRegPassword(value: String) { _regPassword.value = value }
-    fun setTelefono(value: String) { _telefono.value = value }
-    fun setGenero(value: String) { _genero.value = value }
-    fun setFechaNacimiento(value: String) { _fechaNacimiento.value = value }
-    fun setEstadoPago(value: EstadoPago) { _estadoPago.value = value }
-    fun setMetodoPago(value: MetodoPago?) {
-        _metodoPago.value = value
-        _pagoRealizado.value = false
-        _mostrarDialogoPago.value = (value == MetodoPago.ONLINE)
-    }
-    fun setIdSituacion(value: Long?) { _idSituacion.value = value }
-    fun setPasswordVisible(value: Boolean) { _passwordVisible.value = value }
-    fun setSituacionesSeleccionadas(value: List<Pair<Long, String>>) { _situacionesSeleccionadas.value = value }
-    fun setPagoRealizado(value: Boolean) { _pagoRealizado.value = value }
-    fun setMostrarDialogoPago(value: Boolean) { _mostrarDialogoPago.value = value }
-    fun setPagoOnlineCompletado(value: Boolean) { _pagoOnlineCompletado.value = value }
-
-    // ================================
-    // 9. SETTERS - PSICÓLOGO
-    // ================================
-    fun setRegistroEspecialidad(value: String) { _registroEspecialidad.value = value }
-    fun setRegistroExperiencia(value: Int?) { _registroExperiencia.value = value }
-    fun setRegistroDescripcion(value: String?) { _registroDescripcion.value = value }
-    fun setRegistroLicencia(value: String?) { _registroLicencia.value = value }
-
-    // ================================
-    // 10. MÉTODOS DE PAGO ONLINE
-    // ================================
-    fun simularPagoOnline(onResult: (Boolean) -> Unit = {}) {
-        viewModelScope.launch {
-            _procesandoPago.value = true
-            try {
-                delay(1000)
-                _pagoOnlineCompletado.value = true
-                _pagoRealizado.value = true
-                _mostrarDialogoPago.value = false
-                onResult(true)
-            } catch (e: Exception) {
-                _registerError.value = "Error en el pago: ${e.message}"
-                onResult(false)
-            } finally {
-                _procesandoPago.value = false
-            }
-        }
+    fun setRegistroLicencia(value: String?) {
+        _registroLicencia.value = value
     }
 
-    private fun resetPagoOnline() {
-        _pagoRealizado.value = false
-        _procesandoPago.value = false
-        _mostrarDialogoPago.value = false
-        _pagoOnlineCompletado.value = false
+    // --- Setters ---
+    fun setUsername(value: String) {
+        _username.value = value
     }
 
-    // ================================
-    // 11. LOGIN
-    // ================================
+    fun setPassword(value: String) {
+        _password.value = value
+    }
+
+    fun setNombre(value: String) {
+        _nombre.value = value
+    }
+
+    fun setApellido(value: String) {
+        _apellido.value = value
+    }
+
+    fun setEmail(value: String) {
+        _email.value = value
+    }
+
+    fun setRegPassword(value: String) {
+        _regPassword.value = value
+    }
+
+    fun setTelefono(value: String) {
+        _telefono.value = value
+    }
+
+    fun setGenero(value: String) {
+        _genero.value = value
+    }
+
+    fun setFechaNacimiento(value: String) {
+        _fechaNacimiento.value = value
+    }
+
+    fun setLoggedIn(value: Boolean) {
+        _isLoggedIn.value = value
+    }
+
+    // ----------------------------
+    // Login
+    // ----------------------------
     fun login() {
         viewModelScope.launch {
+            _isLoggingIn.value = true
             try {
                 val request = LoginRequestDTO(email = _username.value, password = _password.value)
                 val result = authUseCase.login(request)
                 result.onSuccess { response ->
                     tokenDataStore.saveToken(response.token)
-                    _idUsuario.value = response.idUsuario
+                    userSessionDataStore.saveSession(
+                        UserSession(
+                            idUsuario = response.idUsuario,
+                            nombre = response.nombre,
+                            rol = response.rol,
+                            idPsicologo = response.idPsicologo ?: extractPsychologistId(response.token)
+                        )
+                    )
                     _loginResult.value = Result.success(response)
                     setLoggedIn(true)
                 }.onFailure { error ->
                     _loginResult.value = Result.failure(error)
                     setLoggedIn(false)
-                    _registerError.value = error.message ?: "Error al iniciar sesión"
                 }
             } catch (e: Exception) {
                 _loginResult.value = Result.failure(e)
                 setLoggedIn(false)
-                _registerError.value = e.message ?: "Error inesperado"
+            } finally {
+                _isLoggingIn.value = false
             }
         }
     }
 
-    // ================================
-    // 12. REGISTRO DE PACIENTE
-    // ================================
-    fun registrarPaciente(onResult: (Boolean) -> Unit = {}) {
-        val metodo = _metodoPago.value
-        if (metodo == null) {
-            _registerError.value = "Seleccione un método de pago"
-            onResult(false)
-            return
-        }
-        if (metodo == MetodoPago.ONLINE && !_pagoRealizado.value) {
-            _registerError.value = "Debe realizar el pago online para continuar"
-            onResult(false)
-            return
-        }
-        if (_situacionesSeleccionadas.value.isEmpty()) {
-            _registerError.value = "Seleccione una situación"
-            onResult(false)
-            return
-        }
-        if (_nombre.value.isBlank() || _apellido.value.isBlank() || _email.value.isBlank() ||
-            _regPassword.value.isBlank() || _telefono.value.isBlank() || _genero.value.isBlank() ||
-            _fechaNacimiento.value.isBlank()
-        ) {
-            _registerError.value = "Complete todos los campos"
-            onResult(false)
-            return
-        }
-        if (!_fechaNacimiento.value.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
-            _registerError.value = "Formato de fecha inválido. Use YYYY-MM-DD"
-            onResult(false)
-            return
-        }
-
-        val pacienteRequest = PacienteRequest(
-            fechaNacimiento = _fechaNacimiento.value,
-            genero = _genero.value,
-            telefono = _telefono.value,
-            estadoPago = if (metodo == MetodoPago.ONLINE && _pagoRealizado.value) EstadoPago.PAGADO.name else EstadoPago.PENDIENTE.name,
-            metodoPago = metodo.name,
-            situacionesIds = _situacionesSeleccionadas.value.map { it.first },
-            usuario = UsuarioRequest(
-                nombre = _nombre.value,
-                apellido = _apellido.value,
-                email = _email.value,
-                password = _regPassword.value,
-                rol = "paciente"
-            )
-        )
-        registrarPacienteRequest(pacienteRequest, onResult)
-    }
-
-    private fun registrarPacienteRequest(
-        pacienteRequest: PacienteRequest,
-        onResult: (Boolean) -> Unit
-    ) {
+    // ----------------------------
+    // Registro de Paciente (desde Admin)
+    // ----------------------------
+    fun registrarPacienteAdmin(onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _isRegistering.value = true
             _registerError.value = null
             _registerSuccess.value = false
+
             try {
-                val result = authUseCase.registerPaciente(pacienteRequest)
+                // Validar campos
+                val request = PacienteRequest(
+                    fechaNacimiento = _fechaNacimiento.value,
+                    genero = _genero.value,
+                    telefono = _telefono.value,
+                    usuario = UsuarioRequest(
+                        nombre = _nombre.value,
+                        apellido = _apellido.value,
+                        email = _email.value,
+                        password = _regPassword.value,
+                        rol = "paciente"
+                    ),
+                    aceptaVideo = _aceptaVideo.value,           // agregado
+                    aceptaComunicacion = _aceptaComunicacion.value // agregado
+                )
+
+                val result = authUseCase.registerPacienteAdmin(request)
+
+                result.onSuccess { response ->
+                    _registerResult.value = Result.success(response)
+                    _registerSuccess.value = true
+                    clearRegistrationFields() // Limpiar campos después del éxito
+                    onResult(true)
+                }.onFailure { error ->
+                    _registerResult.value = Result.failure(error)
+                    _registerError.value = error.message ?: "Error al registrar paciente"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                _registerResult.value = Result.failure(e)
+                _registerError.value = e.message ?: "Error inesperado"
+                onResult(false)
+            } finally {
+                _isRegistering.value = false
+            }
+        }
+    }
+    // Consentimiento
+    private val _aceptaVideo = MutableStateFlow(false)
+    val aceptaVideo: StateFlow<Boolean> = _aceptaVideo
+
+    private val _aceptaComunicacion = MutableStateFlow(false)
+    val aceptaComunicacion: StateFlow<Boolean> = _aceptaComunicacion
+
+    private val _puntuacionTest = MutableStateFlow(0)
+    val puntuacionTest: StateFlow<Int> = _puntuacionTest
+
+    fun setAceptaVideo(value: Boolean) {
+        _aceptaVideo.value = value
+    }
+    fun setAceptaComunicacion(value: Boolean) {
+        _aceptaComunicacion.value = value
+    }
+
+    fun setPuntuacionTest(value: Int) {
+        _puntuacionTest.value = value
+    }
+
+    // ----------------------------
+    // Registro de Paciente Normal
+    // ----------------------------
+    fun registrarPaciente(onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _isRegistering.value = true
+            _registerError.value = null
+            _registerSuccess.value = false
+
+            try {
+                // Validar que el paciente haya aceptado al menos un consentimiento
+                if (!_aceptaVideo.value && !_aceptaComunicacion.value) {
+                    _registerError.value = "Debe aceptar el consentimiento informado"
+                    onResult(false)
+                    return@launch
+                }
+
+                val request = PacienteRequest(
+                    fechaNacimiento = _fechaNacimiento.value,
+                    genero = _genero.value,
+                    telefono = _telefono.value,
+                    usuario = UsuarioRequest(
+                        nombre = _nombre.value,
+                        apellido = _apellido.value,
+                        email = _email.value,
+                        password = _regPassword.value,
+                        rol = "paciente"
+                    ),
+                    aceptaVideo = _aceptaVideo.value,
+                    aceptaComunicacion = _aceptaComunicacion.value
+                )
+
+                val result = authUseCase.registerPaciente(request)
+
                 result.onSuccess { response ->
                     _registerResult.value = Result.success(response)
                     _registerSuccess.value = true
@@ -323,45 +300,44 @@ class LoginViewModel(
         }
     }
 
-    fun registrarPacienteConPago(pacienteRequest: PacienteRequest, onResult: (Boolean) -> Unit = {}) {
-        if (pacienteRequest.metodoPago == MetodoPago.ONLINE.name && pacienteRequest.estadoPago != EstadoPago.PAGADO.name) {
-            _registerError.value = "Debe completar el pago online para registrarse"
-            onResult(false)
-            return
-        }
-        registrarPacienteRequest(pacienteRequest, onResult)
-    }
 
-    // ================================
-    // 13. REGISTRO DE ADMIN
-    // ================================
+    // Registro de Admin
+// ----------------------------
     fun registrarAdmin(onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _isRegistering.value = true
             _registerError.value = null
             _registerSuccess.value = false
+
             try {
-                if (_nombre.value.isBlank() || _apellido.value.isBlank() || _email.value.isBlank() || _regPassword.value.isBlank()) {
+                // Validar campos mínimos
+                if (_nombre.value.isBlank() || _apellido.value.isBlank() ||
+                    _email.value.isBlank() || _regPassword.value.isBlank()
+                ) {
                     _registerError.value = "Por favor complete todos los campos"
                     onResult(false)
                     return@launch
                 }
+
                 if (_regPassword.value.length < 4) {
                     _registerError.value = "La contraseña debe tener al menos 4 caracteres"
                     onResult(false)
                     return@launch
                 }
+
                 val request = RegistryPacienteDTO(
                     nombre = _nombre.value,
                     apellido = _apellido.value,
                     email = _email.value,
                     password = _regPassword.value
                 )
+
                 val result = authUseCase.registrarAdmin(request)
+
                 result.onSuccess { response ->
                     _registerResult.value = Result.success(response)
                     _registerSuccess.value = true
-                    clearRegistrationFields()
+                    clearRegistrationFields() //  Limpiar campos después del éxito
                     onResult(true)
                 }.onFailure { error ->
                     _registerResult.value = Result.failure(error)
@@ -378,14 +354,15 @@ class LoginViewModel(
         }
     }
 
-    // ================================
-    // 14. REGISTRO DE PSICÓLOGO
-    // ================================
+    // ----------------------------
+    // Registro de Psicólogo
+    // ----------------------------
     fun registrarPsicologo(onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _isRegistering.value = true
             _registerError.value = null
             _registerSuccess.value = false
+
             try {
                 val request = RegistrarPsicologoAdminDTO(
                     nombrePsicologo = _nombre.value,
@@ -397,7 +374,9 @@ class LoginViewModel(
                     descripcion = _registroDescripcion.value,
                     licencia = _registroLicencia.value
                 )
+
                 val result = authUseCase.crearPsicologo(request)
+
                 result.onSuccess {
                     _registerSuccess.value = true
                     clearRegistrationFields()
@@ -406,6 +385,7 @@ class LoginViewModel(
                     _registerError.value = error.message ?: "Error al registrar psicólogo"
                     onResult(false)
                 }
+
             } catch (e: Exception) {
                 _registerError.value = e.message ?: "Error inesperado"
                 onResult(false)
@@ -415,9 +395,49 @@ class LoginViewModel(
         }
     }
 
-    // ================================
-    // 15. ASIGNAR PACIENTE A PSICÓLOGO
-    // ================================
+    // ----------------------------
+    // Limpiar campos
+    // ----------------------------
+    fun clearRegistrationFields() {
+        _nombre.value = ""
+        _apellido.value = ""
+        _email.value = ""
+        _regPassword.value = ""
+        _telefono.value = ""
+        _genero.value = ""
+        _fechaNacimiento.value = ""
+        _registroEspecialidad.value = ""
+        _registroExperiencia.value = null
+        _registroDescripcion.value = null
+        _registroLicencia.value = null
+    }
+
+    fun clearLoginFields() {
+        _username.value = ""
+        _password.value = ""
+    }
+
+    fun resetLoginState() {
+        _loginResult.value = null
+        _isLoggingIn.value = false
+    }
+
+    // ----------------------------
+    // Resetear estado de registro
+    // ----------------------------
+    fun resetRegisterState() {
+        _isRegistering.value = false
+        _registerError.value = null
+        _registerSuccess.value = false
+        _registerResult.value = null
+    }
+
+    // ----------------------------
+// Estado para asignar paciente a psicólogo
+// ----------------------------
+    private val _asignarPsicologoResult = MutableStateFlow<String?>(null)
+    val asignarPsicologoResult: StateFlow<String?> = _asignarPsicologoResult
+
     fun asignarPacienteAlPsicologo(pacienteId: Long, psicologoId: Long) {
         viewModelScope.launch {
             try {
@@ -432,48 +452,38 @@ class LoginViewModel(
             }
         }
     }
-
-    fun clearAsignarPsicologoResult() { _asignarPsicologoResult.value = null }
-
-    // ================================
-    // 16. LIMPIAR CAMPOS
-    // ================================
-    fun clearRegistrationFields() {
-        _nombre.value = ""
-        _apellido.value = ""
-        _email.value = ""
-        _regPassword.value = ""
-        _telefono.value = ""
-        _genero.value = ""
-        _fechaNacimiento.value = ""
-        _registroEspecialidad.value = ""
-        _registroExperiencia.value = null
-        _registroDescripcion.value = null
-        _registroLicencia.value = null
-        _estadoPago.value = EstadoPago.PENDIENTE
-        _metodoPago.value = null
-        _idSituacion.value = null
-        _situacionesSeleccionadas.value = emptyList()
-        _passwordVisible.value = false
-        resetPagoOnline()
+    fun clearAsignarPsicologoResult() {
+        _asignarPsicologoResult.value = null
     }
 
-    fun clearLoginFields() {
-        _username.value = ""
-        _password.value = ""
+    fun logout() {
+        viewModelScope.launch {
+            tokenDataStore.clearToken()
+            userSessionDataStore.clearSession()
+            _loginResult.value = null
+            _isLoggedIn.value = false
+        }
     }
 
-    // ================================
-    // 17. RESETEAR ESTADO DE REGISTRO
-    // ================================
-    fun resetRegisterState() {
-        _isRegistering.value = false
-        _registerError.value = null
-        _registerSuccess.value = false
-        _registerResult.value = null
-        _procesandoPago.value = false
-        _pagoRealizado.value = false
-        _mostrarDialogoPago.value = false
-        _pagoOnlineCompletado.value = false
+    private fun extractPsychologistId(token: String): Long? {
+        return runCatching {
+            val parts = token.split(".")
+            if (parts.size < 2) return null
+
+            val normalizedPayload = parts[1].replace('-', '+').replace('_', '/').let { payload ->
+                payload.padEnd(((payload.length + 3) / 4) * 4, '=')
+            }
+            val payloadJson = String(Base64.decode(normalizedPayload, Base64.DEFAULT))
+            val json = JSONObject(payloadJson)
+
+            when {
+                json.has("idPsicologo") -> json.optLong("idPsicologo").takeIf { it != 0L }
+                json.has("id_psicologo") -> json.optLong("id_psicologo").takeIf { it != 0L }
+                else -> null
+            }
+        }.getOrNull()
     }
+
+
+
 }

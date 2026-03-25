@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.compose)
+    // alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -27,11 +31,13 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -40,6 +46,7 @@ dependencies {
     // DataStore Preferences
     implementation(libs.androidx.datastore.preferences)
     //Librerias de Compose
+    coreLibraryDesugaring(libs.desugar.jdk.libs)//Libreria para usar APIs modernas de Java
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.play.services)
@@ -48,8 +55,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-   //Navegación
-    implementation(libs.androidx.navigation.compose.v296)
+    //Navegación
+    implementation(libs.androidx.navigation.compose)
 
     // Dependencias comunes
     implementation(libs.androidx.core.ktx)
@@ -64,6 +71,13 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.foundation.layout)
+
+    // WorkManager para notificaciones programadas que sobreviven reinicios
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Timber: logging estructurado en lugar de android.util.Log
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,4 +85,42 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+dokka {
+    moduleName.set("Amani Android")
+    dokkaSourceSets.register("main") {
+        sourceRoots.from(file("src/main/java"))
+        includes.from("MODULE.md")
+    }
+}
+
+// ── Detekt: Análisis estático para Kotlin (reemplaza SpotBugs + PMD) ──
+detekt {
+    // Fichero de configuración personalizado (se genera con: ./gradlew detektGenerateConfig)
+    config.setFrom(files("${rootProject.projectDir}/config/detekt/detekt.yml"))
+    // Analizar también los ficheros de build scripts
+    buildUponDefaultConfig = true
+    // No falla el build por defecto (como tenías failOnViolation=false en PMD)
+    ignoreFailures = true
+    // Directorio de fuentes
+    source.setFrom(files("src/main/java", "src/main/kotlin"))
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)   // Para SonarQube
+        sarif.required.set(true) // Para GitHub/IDE integrations
+    }
+}
+
+// ── Ktlint: Convenciones de estilo para Kotlin (reemplaza Checkstyle) ──
+ktlint {
+    android.set(true)
+    ignoreFailures.set(true) // Como tenías failsOnError=false en Checkstyle
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.HTML)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE) // Formato compatible con SonarQube
+    }
 }
