@@ -1,6 +1,9 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import android.Manifest
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -51,6 +54,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -69,13 +74,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
 import org.ies.tierno.applicationamani.presentation.ui.componente.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
+import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
+import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -98,13 +108,19 @@ import java.util.Locale
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PsicologoAgendaScreen(navController: NavController) {
+fun PsicologoAgendaScreen(
+    navController: NavController,
+    viewModel: PsicologoAgendaViewModel = koinViewModel()
+) {
 
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+    val agendaMensual by viewModel.agendaMensual.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     // ── Estado ──
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
+    var mesVisible by remember { mutableStateOf(YearMonth.now()) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -112,38 +128,34 @@ fun PsicologoAgendaScreen(navController: NavController) {
     var mostrarDialogoHorario by remember { mutableStateOf(false) }
     var mostrarDialogoNoDisponible by remember { mutableStateOf(false) }
 
-    // ── Configuración de horario ──
-    // TODO: obtener del ViewModel / repositorio
-    var horaInicio by remember { mutableStateOf(8) }
-    var horaFin by remember { mutableStateOf(20) }
-    var duracionSesion by remember { mutableStateOf(60) } // minutos
+    LaunchedEffect(mesVisible) {
+        viewModel.cargarAgendaMensual(mesVisible)
+    }
 
-    // ── Días no disponibles ──
-    // TODO: obtener del ViewModel / repositorio
-    var diasNoDisponibles by remember { mutableStateOf(setOf<LocalDate>()) }
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
 
-    // ── Citas con pacientes (datos de ejemplo) ──
-    // TODO: reemplazar por datos reales del ViewModel / repositorio
-    val citasPorDia: Map<LocalDate, List<CitaPsicologa>> = remember {
-        mapOf(
-            LocalDate.now() to listOf(
-                CitaPsicologa(LocalTime.of(9, 0), "María García", "Sesión individual"),
-                CitaPsicologa(LocalTime.of(11, 0), "Carlos López", "Seguimiento"),
-                CitaPsicologa(LocalTime.of(15, 0), "Ana Martínez", "Terapia grupal")
-            ),
-            LocalDate.now().plusDays(1) to listOf(
-                CitaPsicologa(LocalTime.of(10, 0), "Pedro Sánchez", "Evaluación inicial"),
-                CitaPsicologa(LocalTime.of(12, 0), "Laura Fernández", "Sesión individual")
-            ),
-            LocalDate.now().plusDays(3) to listOf(
-                CitaPsicologa(LocalTime.of(9, 0), "Sofía Ruiz", "Seguimiento"),
-                CitaPsicologa(LocalTime.of(16, 0), "Diego Torres", "Sesión individual"),
-                CitaPsicologa(LocalTime.of(17, 0), "Elena Navarro", "Terapia de pareja")
-            ),
-            LocalDate.now().plusDays(5) to listOf(
-                CitaPsicologa(LocalTime.of(14, 0), "Marta Jiménez", "Sesión individual")
+    val horaInicio = agendaMensual.horaInicio
+    val horaFin = agendaMensual.horaFin
+    val duracionSesion = agendaMensual.duracionSesion
+
+    val diasNoDisponibles = remember(agendaMensual.diasNoDisponibles) {
+        agendaMensual.diasNoDisponibles.mapNotNull { fecha ->
+            runCatching { LocalDate.parse(fecha) }.getOrNull()
+        }.toSet()
+    }
+
+    val citasPorDia: Map<LocalDate, List<CitaPsicologa>> = remember(agendaMensual.citas) {
+        agendaMensual.citas
+            .mapNotNull(::toCitaPsicologa)
+            .groupBy(
+                keySelector = { it.first },
+                valueTransform = { it.second }
             )
-        )
     }
 
     // Fechas que tienen citas
@@ -248,8 +260,10 @@ fun PsicologoAgendaScreen(navController: NavController) {
             // ── Calendario mensual ──
             CalendarioView(
                 modifier = Modifier.fillMaxWidth(),
+                mesVisible = mesVisible,
                 fechaSeleccionada = fechaSeleccionada,
                 fechasDestacadas = fechasDestacadas,
+                onMesVisibleChange = { mesVisible = it },
                 onFechaSeleccionada = { fecha ->
                     fechaSeleccionada = if (fechaSeleccionada == fecha) null else fecha
                 }
@@ -338,13 +352,15 @@ fun PsicologoAgendaScreen(navController: NavController) {
             horaFinActual = horaFin,
             duracionActual = duracionSesion,
             onConfirmar = { nuevoInicio, nuevoFin, nuevaDuracion ->
-                horaInicio = nuevoInicio
-                horaFin = nuevoFin
-                duracionSesion = nuevaDuracion
-                mostrarDialogoHorario = false
                 scope.launch {
+                    val result = viewModel.actualizarHorario(nuevoInicio, nuevoFin, nuevaDuracion)
+                    mostrarDialogoHorario = false
                     snackbarHostState.showSnackbar(
-                        "Horario actualizado: $nuevoInicio:00 – $nuevoFin:00 ($nuevaDuracion min)"
+                        if (result.isSuccess) {
+                            "Horario actualizado: $nuevoInicio:00 – $nuevoFin:00 ($nuevaDuracion min)"
+                        } else {
+                            result.exceptionOrNull()?.message ?: "No se pudo actualizar el horario"
+                        }
                     )
                 }
             },
@@ -360,17 +376,18 @@ fun PsicologoAgendaScreen(navController: NavController) {
             fecha = fecha,
             yaNoDisponible = yaNoDisponible,
             onConfirmar = {
-                diasNoDisponibles = if (yaNoDisponible) {
-                    diasNoDisponibles - fecha
-                } else {
-                    diasNoDisponibles + fecha
-                }
-                mostrarDialogoNoDisponible = false
                 scope.launch {
-                    val msg = if (!yaNoDisponible)
-                        "Día $fecha marcado como no disponible"
-                    else
-                        "Día $fecha vuelve a estar disponible"
+                    val result = viewModel.alternarDiaNoDisponible(fecha, yaNoDisponible)
+                    mostrarDialogoNoDisponible = false
+                    val msg = if (result.isSuccess) {
+                        if (!yaNoDisponible) {
+                            "Día $fecha marcado como no disponible"
+                        } else {
+                            "Día $fecha vuelve a estar disponible"
+                        }
+                    } else {
+                        result.exceptionOrNull()?.message ?: "No se pudo actualizar el día"
+                    }
                     snackbarHostState.showSnackbar(msg)
                 }
             },
@@ -379,7 +396,7 @@ fun PsicologoAgendaScreen(navController: NavController) {
     }
 }
 
-// ─── Modelo de cita para la psicóloga ──────────────────────────
+// ─── Modelo de cita para la psicóloga ──—───────────────────────
 
 /**
  * Representa una cita desde la perspectiva de la psicóloga.
@@ -393,6 +410,17 @@ data class CitaPsicologa(
     val paciente: String,
     val motivo: String
 )
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun toCitaPsicologa(cita: CitaDetalleResponse): Pair<LocalDate, CitaPsicologa>? {
+    val fecha = runCatching { LocalDate.parse(cita.fecha) }.getOrNull() ?: return null
+    val hora = runCatching { LocalTime.parse(cita.hora) }.getOrNull() ?: return null
+    return fecha to CitaPsicologa(
+        hora = hora,
+        paciente = cita.pacienteNombre ?: "Paciente",
+        motivo = cita.motivo ?: "Sesión"
+    )
+}
 
 // ─── Componentes auxiliares ────────────────────────────────────
 
@@ -962,8 +990,3 @@ private fun DialogoNoDisponible(
 fun PsicologoAgendaScreenPreview() {
     PsicologoAgendaScreen(navController = rememberNavController())
 }
-
-
-
-
-

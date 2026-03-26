@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import timber.log.Timber
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
@@ -136,7 +137,7 @@ fun Cuestionario(
                                 )
                             }
                         } else {
-                            println("Respuestas enviadas: $respuestasSeleccionadas")
+                            Timber.d("Respuestas enviadas: $respuestasSeleccionadas")
                             scope.launch {
                                 snackbarHostState.showSnackbar(
                                     "Cuestionario enviado correctamente"

@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -67,6 +68,13 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.foundation.layout)
+
+    // WorkManager para notificaciones programadas que sobreviven reinicios
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Timber: logging estructurado en lugar de android.util.Log
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -113,4 +121,3 @@ ktlint {
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE) // Formato compatible con SonarQube
     }
 }
-

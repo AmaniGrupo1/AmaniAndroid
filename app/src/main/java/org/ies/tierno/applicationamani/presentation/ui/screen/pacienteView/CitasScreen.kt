@@ -1,6 +1,9 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import android.Manifest
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -23,6 +26,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,65 +45,108 @@ import org.ies.tierno.applicationamani.presentation.components.BottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
-import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
+import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.YearMonth
 
-/**
- * Pantalla de citas del paciente.
- *
- * Muestra un calendario mensual ([CalendarioView]). Al pulsar sobre un día,
- * se despliega debajo la vista diaria ([VistaDiariaHoras]) con las franjas
- * horarias libres y ocupadas de ese día. Al pulsar una franja libre el
- * usuario puede iniciar la reserva de una cita.
- *
- * Colores obtenidos de [LocalAmaniColors] y [MaterialTheme.colorScheme].
- * Tipografías obtenidas de [MaterialTheme.typography].
- *
- * @param navController Controlador de navegación.
- */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CitasScreen(navController: NavController) {
-
+fun CitasScreen(
+    navController: NavController,
+    viewModel: CitasViewModel = koinViewModel()
+) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
-    val amaniColors = LocalAmaniColors.current
-
     val context = LocalContext.current
 
-    // ── Estado ──
+    val agendaMensual by viewModel.agendaMensual.collectAsState()
+    val disponibilidadDia by viewModel.disponibilidadDia.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
+    var mesVisible by remember { mutableStateOf(YearMonth.now()) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // ── Datos de ejemplo: fechas con citas y horas ocupadas por día ──
-    // TODO: reemplazar por datos reales del ViewModel / repositorio
-    val citasPorDia: Map<LocalDate, Map<LocalTime, String>> = remember {
-        mapOf(
-            LocalDate.now() to mapOf(
-                LocalTime.of(9, 0) to "Sesión con Dra. López",
-                LocalTime.of(15, 0) to "Terapia grupal"
-            ),
-            LocalDate.now().plusDays(2) to mapOf(
-                LocalTime.of(10, 0) to "Seguimiento telefónico",
-                LocalTime.of(12, 0) to "Evaluación inicial"
-            ),
-            LocalDate.now().plusDays(5) to mapOf(
-                LocalTime.of(16, 0) to "Sesión con Dr. García"
-            )
-        )
+    var pendingRecordatorio by remember { mutableStateOf<Pair<LocalDate, LocalTime>?>(null) }
+
+    val notifPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            pendingRecordatorio?.let { (fecha, hora) ->
+                programarRecordatorioCita(
+                    context = context,
+                    fecha = fecha,
+                    hora = hora,
+                    minutosAntes = 30,
+                    titulo = "Cita en Amani",
+                    mensaje = "Tu cita es a las $hora"
+                )
+            }
+        }
+        pendingRecordatorio = null
     }
+
+    fun programarConPermiso(fecha: LocalDate, hora: LocalTime) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pendingRecordatorio = fecha to hora
+            notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            programarRecordatorioCita(
+                context = context,
+                fecha = fecha,
+                hora = hora,
+                minutosAntes = 30,
+                titulo = "Cita en Amani",
+                mensaje = "Tu cita es a las $hora"
+            )
+        }
+    }
+
+    LaunchedEffect(mesVisible) {
+        viewModel.cargarAgendaMensual(mesVisible)
+    }
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
+    val citasPorDia = remember(agendaMensual) {
+        agendaMensual?.citas
+            ?.mapNotNull { cita ->
+                runCatching {
+                    val fecha = LocalDate.parse(cita.fecha)
+                    val hora = LocalTime.parse(cita.hora)
+                    fecha to (hora to (cita.motivo ?: cita.psicologoNombre ?: "Cita"))
+                }.getOrNull()
+            }
+            ?.groupBy(
+                keySelector = { it.first },
+                valueTransform = { it.second }
+            )
+            ?.mapValues { (_, items) -> items.toMap() }
+            ?: emptyMap()
+    }
+
     val fechasDestacadas = citasPorDia.keys
 
-    // Franjas del día seleccionado
-    val franjasDelDia: List<FranjaHoraria> = remember(fechaSeleccionada) {
-        fechaSeleccionada?.let { fecha ->
-            generarFranjasDia(
-                citasOcupadas = citasPorDia[fecha] ?: emptyMap()
-            )
+    val franjasDelDia = remember(disponibilidadDia) {
+        disponibilidadDia?.franjas?.mapNotNull { franja ->
+            runCatching {
+                FranjaHoraria(
+                    hora = LocalTime.parse(franja.hora),
+                    libre = !franja.ocupada,
+                    motivo = franja.descripcion
+                )
+            }.getOrNull()
         } ?: emptyList()
     }
 
@@ -107,7 +155,6 @@ fun CitasScreen(navController: NavController) {
         bottomBar = { BottomBar(navController) },
         containerColor = colors.background
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -115,7 +162,6 @@ fun CitasScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // ── Título ──
             Text(
                 text = "Mis citas",
                 style = typography.headlineMedium,
@@ -124,20 +170,22 @@ fun CitasScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // ── Calendario mensual ──
             CalendarioView(
                 modifier = Modifier.fillMaxWidth(),
+                mesVisible = mesVisible,
                 fechaSeleccionada = fechaSeleccionada,
                 fechasDestacadas = fechasDestacadas,
+                onMesVisibleChange = { mesVisible = it },
                 onFechaSeleccionada = { fecha ->
-                    // Toggle: pulsar el mismo día lo deselecciona
                     fechaSeleccionada = if (fechaSeleccionada == fecha) null else fecha
+                    if (fechaSeleccionada != null) {
+                        viewModel.cargarDisponibilidad(fecha)
+                    }
                 }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ── Vista diaria (aparece con animación al seleccionar un día) ──
             AnimatedVisibility(
                 visible = fechaSeleccionada != null,
                 enter = fadeIn() + expandVertically(),
@@ -150,19 +198,29 @@ fun CitasScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         onFranjaSeleccionada = { franja ->
                             scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message = "Reservar cita a las ${franja.hora} el $fecha",
-                                    actionLabel = "📅 Calendario",
-                                    duration = SnackbarDuration.Long
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    enviarCitaAlCalendario(
-                                        context = context,
-                                        fecha = fecha,
-                                        hora = franja.hora,
-                                        duracionMinutos = 60,
-                                        titulo = "Cita – Amani",
-                                        descripcion = "Cita reservada el $fecha a las ${franja.hora}"
+                                val result = viewModel.reservarCita(fecha, franja.hora)
+                                if (result.isSuccess) {
+                                    programarConPermiso(fecha, franja.hora)
+
+                                    val actionResult = snackbarHostState.showSnackbar(
+                                        message = "Cita reservada a las ${franja.hora}",
+                                        actionLabel = "Calendario",
+                                        duration = SnackbarDuration.Long
+                                    )
+                                    if (actionResult == SnackbarResult.ActionPerformed) {
+                                        enviarCitaAlCalendario(
+                                            context = context,
+                                            fecha = fecha,
+                                            hora = franja.hora,
+                                            duracionMinutos = 60,
+                                            titulo = "Cita - Amani",
+                                            descripcion = "Cita reservada el $fecha a las ${franja.hora}"
+                                        )
+                                    }
+                                } else {
+                                    snackbarHostState.showSnackbar(
+                                        result.exceptionOrNull()?.message
+                                            ?: "No se pudo reservar la cita"
                                     )
                                 }
                             }

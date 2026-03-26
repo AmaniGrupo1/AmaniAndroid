@@ -2,12 +2,11 @@ package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -24,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
@@ -42,7 +42,7 @@ fun RegisterScreen(
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val scope = rememberCoroutineScope()
 
-    // --- Observando estados del LoginViewModel ---
+    // --- Estados del LoginViewModel ---
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
     val apellido by loginViewModel.apellido.collectAsStateWithLifecycle()
     val email by loginViewModel.email.collectAsStateWithLifecycle()
@@ -51,18 +51,18 @@ fun RegisterScreen(
     val genero by loginViewModel.genero.collectAsStateWithLifecycle()
     val fechaNacimiento by loginViewModel.fechaNacimiento.collectAsStateWithLifecycle()
     val metodoPago by loginViewModel.metodoPago.collectAsStateWithLifecycle()
-    val situacionSeleccionada by loginViewModel.situacionSeleccionada.collectAsStateWithLifecycle()
     val passwordVisible by loginViewModel.passwordVisible.collectAsStateWithLifecycle()
     val pagoRealizado by loginViewModel.pagoRealizado.collectAsStateWithLifecycle()
     val mostrarDialogoPago by loginViewModel.mostrarDialogoPago.collectAsStateWithLifecycle()
     val isRegistering by loginViewModel.isRegistering.collectAsStateWithLifecycle()
     val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
     val procesandoPago by loginViewModel.procesandoPago.collectAsStateWithLifecycle()
+    val situacionesSeleccionadas by loginViewModel.situacionesSeleccionadas.collectAsStateWithLifecycle()
 
-    // --- Observando estados del SituacionViewModel ---
+    // --- Estados del SituacionViewModel ---
     val listaSituaciones by situacionViewModel.situaciones.collectAsStateWithLifecycle(emptyList())
 
-    val listaMetodosPago = listOf("PRESENCIAL", "ONLINE")
+    val listaMetodosPago = listOf(MetodoPago.PRESENCIAL, MetodoPago.ONLINE)
 
     // Mostrar errores
     LaunchedEffect(registerError) {
@@ -90,9 +90,9 @@ fun RegisterScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ------------------ Campos de Usuario ------------------
             val textFieldShape = RoundedCornerShape(12.dp)
 
+            // -------- Campos de Usuario --------
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { loginViewModel.setNombre(it) },
@@ -166,41 +166,84 @@ fun RegisterScreen(
                 enabled = !isRegistering
             )
 
-            // ------------------ Dropdown Método de Pago ------------------
+            // -------- Dropdown Método de Pago (Versión mejorada) --------
             var expandedMetodo by remember { mutableStateOf(false) }
-            Column {
-                Text("Método de Pago", fontFamily = roboto, color = Color.Gray)
-                Box {
-                    OutlinedTextField(
-                        value = metodoPago,
-                        onValueChange = {},
-                        readOnly = true,
-                        placeholder = { Text("Seleccione método de pago", fontFamily = roboto) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { if (!isRegistering) expandedMetodo = true },
-                        shape = textFieldShape,
-                        enabled = !isRegistering
-                    )
-                    DropdownMenu(
-                        expanded = expandedMetodo,
-                        onDismissRequest = { expandedMetodo = false },
-                        modifier = Modifier.fillMaxWidth(0.9f)
-                    ) {
-                        listaMetodosPago.forEach { metodo ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    loginViewModel.setMetodoPago(metodo)
-                                    expandedMetodo = false
-                                },
-                                text = { Text(metodo, fontFamily = roboto) }
-                            )
+
+            // Usar ExposedDropdownMenuBox para mejor compatibilidad
+            ExposedDropdownMenuBox(
+                expanded = expandedMetodo,
+                onExpandedChange = {
+                    if (!isRegistering) {
+                        expandedMetodo = it
+                    }
+                }
+            ) {
+                OutlinedTextField(
+                    value = metodoPago?.let {
+                        when(it) {
+                            MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
+                            MetodoPago.ONLINE -> "💳 Pago Online"
                         }
+                    } ?: "",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Método de Pago", fontFamily = roboto) },
+                    placeholder = {
+                        Text(
+                            "Seleccione método de pago",
+                            fontFamily = roboto
+                        )
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMetodo)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    shape = textFieldShape,
+                    enabled = !isRegistering,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = Color.Gray
+                    )
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedMetodo,
+                    onDismissRequest = { expandedMetodo = false },
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                ) {
+                    listaMetodosPago.forEach { metodo ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    when(metodo) {
+                                        MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
+                                        MetodoPago.ONLINE -> "💳 Pago Online"
+                                    },
+                                    fontFamily = roboto
+                                )
+                            },
+                            onClick = {
+                                loginViewModel.setMetodoPago(metodo)
+                                expandedMetodo = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = when(metodo) {
+                                        MetodoPago.PRESENCIAL -> Icons.Default.ArrowDropDown
+                                        MetodoPago.ONLINE -> Icons.Default.ArrowDropDown
+                                    },
+                                    contentDescription = null
+                                )
+                            }
+                        )
                     }
                 }
             }
 
-            if (metodoPago == "ONLINE" && !pagoRealizado && !isRegistering) {
+            // Mensaje de advertencia para pago online
+            if (metodoPago == MetodoPago.ONLINE && !pagoRealizado && !isRegistering) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
@@ -215,34 +258,67 @@ fun RegisterScreen(
                 }
             }
 
-            // ------------------ Dropdown Situación ------------------
+            // -------- Dropdown Situaciones (Múltiple) --------
             var expandedSituacion by remember { mutableStateOf(false) }
-            Column {
-                Text("Situación", fontFamily = roboto, color = Color.Gray)
-                Box {
-                    OutlinedTextField(
-                        value = situacionSeleccionada?.second ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        placeholder = { Text("Seleccione una situación", fontFamily = roboto) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { if (!isRegistering) expandedSituacion = true },
-                        shape = textFieldShape,
-                        enabled = !isRegistering
-                    )
-                    DropdownMenu(
-                        expanded = expandedSituacion,
-                        onDismissRequest = { expandedSituacion = false },
-                        modifier = Modifier.fillMaxWidth(0.9f)
-                    ) {
+
+            ExposedDropdownMenuBox(
+                expanded = expandedSituacion,
+                onExpandedChange = { expandedSituacion = it }
+            ) {
+                OutlinedTextField(
+                    value = if (situacionesSeleccionadas.isEmpty()) ""
+                    else situacionesSeleccionadas.joinToString { it.second },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Situaciones (seleccione una o más)", fontFamily = roboto) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSituacion) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    shape = textFieldShape,
+                    enabled = !isRegistering
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedSituacion,
+                    onDismissRequest = { expandedSituacion = false },
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .heightIn(max = 400.dp)
+                ) {
+                    if (listaSituaciones.isEmpty()) {
+                        DropdownMenuItem(
+                            text = { Text("No hay situaciones disponibles", fontFamily = roboto) },
+                            onClick = { expandedSituacion = false },
+                            enabled = false
+                        )
+                    } else {
                         listaSituaciones.forEach { situacion ->
+                            val isSelected = situacionesSeleccionadas.any { it.first == situacion.idSituacion }
                             DropdownMenuItem(
-                                onClick = {
-                                    loginViewModel.setSituacionSeleccionada(situacion.idSituacion to situacion.nombre)
-                                    expandedSituacion = false
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Checkbox(
+                                            checked = isSelected,
+                                            onCheckedChange = {
+                                                loginViewModel.toggleSituacion(situacion.idSituacion to situacion.nombre)
+                                            },
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(
+                                            situacion.nombre,
+                                            fontFamily = roboto,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
                                 },
-                                text = { Text(situacion.nombre, fontFamily = roboto) }
+                                onClick = {
+                                    loginViewModel.toggleSituacion(situacion.idSituacion to situacion.nombre)
+                                }
                             )
                         }
                     }
@@ -251,13 +327,19 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ------------------ Botón Registrar ------------------
+            // -------- Botón Registrar --------
             Button(
                 onClick = {
-                    loginViewModel.registrarPaciente { success ->
-                        if (success) {
-                            navController.navigate(Screens.adminHome.route) {
-                                popUpTo(Screens.registro.route) { inclusive = true }
+                    if (metodoPago == MetodoPago.ONLINE && !pagoRealizado) {
+                        // Mostrar diálogo de pago
+                        loginViewModel.setMostrarDialogoPago(true)
+                    } else {
+                        // Registrar directamente
+                        loginViewModel.registrarPaciente { success ->
+                            if (success) {
+                                navController.navigate(Screens.login.route) {
+                                    popUpTo(Screens.registro.route) { inclusive = true }
+                                }
                             }
                         }
                     }
@@ -267,76 +349,166 @@ fun RegisterScreen(
                     .height(55.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                enabled = !isRegistering && !(metodoPago == "ONLINE" && !pagoRealizado)
+                enabled = !isRegistering && metodoPago != null
             ) {
                 if (isRegistering) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                 } else {
                     Text(
-                        text = if (metodoPago == "ONLINE" && !pagoRealizado) "Pagar para registrar" else "Registrar",
+                        text = when {
+                            metodoPago == null -> "Seleccione método de pago"
+                            metodoPago == MetodoPago.ONLINE && !pagoRealizado -> "💳 Pagar y Registrar"
+                            else -> "📝 Registrar Paciente"
+                        },
                         color = Color.White,
                         fontFamily = roboto
                     )
                 }
             }
-        }
-    }
 
-    // ------------------ Diálogo de Pago Online ------------------
-    if (mostrarDialogoPago && !pagoRealizado) {
-        AlertDialog(
-            onDismissRequest = {
-                loginViewModel.setMostrarDialogoPago(false)
-                if (!pagoRealizado) loginViewModel.setMetodoPago("")
-            },
-            title = { Text("Pago Online", fontFamily = roboto) },
-            text = {
-                Column {
-                    Text("Complete el pago para continuar con el registro", fontFamily = roboto)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("💰 Total: 50€", fontFamily = roboto, color = primaryColor)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    if (procesandoPago) {
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+            // -------- Diálogo Pago Online (Mejorado) --------
+            if (mostrarDialogoPago && !pagoRealizado && metodoPago == MetodoPago.ONLINE) {
+                AlertDialog(
+                    onDismissRequest = {
+                        if (!procesandoPago) {
+                            loginViewModel.setMostrarDialogoPago(false)
                         }
-                    } else {
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = {},
-                            label = { Text("Número de tarjeta", fontFamily = roboto) },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = false,
-                            placeholder = { Text("**** **** **** 1234", fontFamily = roboto) }
+                    },
+                    title = {
+                        Text(
+                            "Pago Online",
+                            fontFamily = roboto,
+                            color = primaryColor
                         )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        loginViewModel.simularPagoOnline { success ->
-                            if (!success) scope.launch {
-                                snackbarHostState.showSnackbar("Error en el pago. Intente nuevamente")
+                    },
+                    text = {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                "Complete el pago para continuar con el registro",
+                                fontFamily = roboto
+                            )
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        "💰 Total a pagar: 50€",
+                                        fontFamily = roboto,
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                        color = primaryColor
+                                    )
+                                    Text(
+                                        "Primera consulta",
+                                        fontFamily = roboto,
+                                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
+
+                            if (procesandoPago) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        CircularProgressIndicator(color = primaryColor)
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            "Procesando pago...",
+                                            fontFamily = roboto,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
+                            } else {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            "💳 Datos de pago de prueba",
+                                            fontFamily = roboto,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            "• Tarjeta: **** **** **** 1234",
+                                            fontFamily = roboto,
+                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                        )
+                                        Text(
+                                            "• Titular: Cliente Test",
+                                            fontFamily = roboto,
+                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                        )
+                                        Text(
+                                            "• Caducidad: 12/25",
+                                            fontFamily = roboto,
+                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                        )
+                                    }
+                                }
                             }
                         }
                     },
-                    enabled = !procesandoPago
-                ) {
-                    Text(if (procesandoPago) "Procesando..." else "Pagar ahora", color = primaryColor)
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        loginViewModel.setMostrarDialogoPago(false)
-                        loginViewModel.setMetodoPago("")
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                if (!procesandoPago) {
+                                    loginViewModel.simularPagoOnline { success ->
+                                        if (success) {
+                                            // Pago exitoso, proceder con el registro
+                                            loginViewModel.registrarPaciente { registroSuccess ->
+                                                if (registroSuccess) {
+                                                    navController.navigate(Screens.adminHome.route) {
+                                                        popUpTo(Screens.registro.route) { inclusive = true }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Error en el pago. Intente nuevamente")
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            enabled = !procesandoPago
+                        ) {
+                            Text(
+                                if (procesandoPago) "Procesando..." else "Pagar 50€",
+                                color = primaryColor,
+                                fontFamily = roboto
+                            )
+                        }
                     },
-                    enabled = !procesandoPago
-                ) {
-                    Text("Cancelar")
-                }
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                if (!procesandoPago) {
+                                    loginViewModel.setMostrarDialogoPago(false)
+                                }
+                            },
+                            enabled = !procesandoPago
+                        ) {
+                            Text("Cancelar", fontFamily = roboto)
+                        }
+                    }
+                )
             }
-        )
+        }
     }
 }
