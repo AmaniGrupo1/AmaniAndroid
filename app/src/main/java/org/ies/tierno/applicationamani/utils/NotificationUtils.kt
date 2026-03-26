@@ -6,11 +6,11 @@ import androidx.annotation.RequiresApi
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
-import timber.log.Timber
 
 /**
  * Programa una notificación local de recordatorio usando [WorkManager].

@@ -19,25 +19,17 @@ class PsicologoAgendaViewModel(
     private val userSessionDataStore: UserSessionDataStore
 ) : ViewModel() {
 
-    // Estado de la agenda
     private val _agendaMensual = MutableStateFlow(AgendaPsicologoResponse())
     val agendaMensual: StateFlow<AgendaPsicologoResponse> = _agendaMensual.asStateFlow()
 
-    // Mes actual visible (para recargar después de cambios)
     private val _mesVisible = MutableStateFlow(YearMonth.now())
     val mesVisible: StateFlow<YearMonth> = _mesVisible.asStateFlow()
 
-    // Mensajes de error
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    // Formato para la API: yyyy-MM
     private val monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
 
-    /**
-     * Carga la agenda mensual del psicólogo usando el id de la sesión activa.
-     * @param month Mes a cargar (YearMonth)
-     */
     fun cargarAgendaMensual(month: YearMonth = _mesVisible.value) {
         viewModelScope.launch {
             _mesVisible.value = month
@@ -63,17 +55,7 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    /**
-     * Actualiza el horario de trabajo del psicólogo.
-     * @param horaInicio Hora de inicio (0-23)
-     * @param horaFin Hora de fin (0-23)
-     * @param duracionSesion Duración de cada sesión en minutos
-     */
-    suspend fun actualizarHorario(
-        horaInicio: Int,
-        horaFin: Int,
-        duracionSesion: Int
-    ): Result<AgendaPsicologoResponse> {
+    suspend fun actualizarHorario(horaInicio: Int, horaFin: Int, duracionSesion: Int): Result<AgendaPsicologoResponse> {
         val session = userSessionDataStore.getSession()
             ?: return Result.failure(Exception("No hay sesión activa"))
         val idPsicologo = session.idPsicologo
@@ -86,23 +68,12 @@ class PsicologoAgendaViewModel(
         )
 
         return citasRepository.actualizarHorario(idPsicologo, request).also { result ->
-            if (result.isSuccess) {
-                cargarAgendaMensual(_mesVisible.value)
-            } else {
-                _errorMessage.value = result.exceptionOrNull()?.message ?: "Error al actualizar horario"
-            }
+            if (result.isSuccess) cargarAgendaMensual(_mesVisible.value)
+            else _errorMessage.value = result.exceptionOrNull()?.message ?: "Error al actualizar horario"
         }
     }
 
-    /**
-     * Marca o desmarca un día como no disponible.
-     * @param fecha Fecha a modificar
-     * @param yaNoDisponible true si ya estaba marcado (se elimina), false si se quiere marcar
-     */
-    suspend fun alternarDiaNoDisponible(
-        fecha: LocalDate,
-        yaNoDisponible: Boolean
-    ): Result<AgendaPsicologoResponse> {
+    suspend fun alternarDiaNoDisponible(fecha: LocalDate, yaNoDisponible: Boolean): Result<AgendaPsicologoResponse> {
         val session = userSessionDataStore.getSession()
             ?: return Result.failure(Exception("No hay sesión activa"))
         val idPsicologo = session.idPsicologo
@@ -113,11 +84,8 @@ class PsicologoAgendaViewModel(
             fecha = fecha.toString(),
             yaNoDisponible = yaNoDisponible
         ).also { result ->
-            if (result.isSuccess) {
-                cargarAgendaMensual(_mesVisible.value)
-            } else {
-                _errorMessage.value = result.exceptionOrNull()?.message ?: "Error al modificar disponibilidad"
-            }
+            if (result.isSuccess) cargarAgendaMensual(_mesVisible.value)
+            else _errorMessage.value = result.exceptionOrNull()?.message ?: "Error al modificar disponibilidad"
         }
     }
 

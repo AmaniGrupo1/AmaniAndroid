@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.data.remoto
 
-import okhttp3.Response
 import org.ies.tierno.applicationamani.domain.models.test.RespuestasRequestDTO
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.PreguntaRequest

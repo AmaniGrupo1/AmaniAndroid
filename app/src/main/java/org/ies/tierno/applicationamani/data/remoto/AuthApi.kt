@@ -1,16 +1,15 @@
 package org.ies.tierno.applicationamani.data.remoto
 
-import retrofit2.Response
+import org.ies.tierno.applicationamani.domain.models.admin.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
-import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
-import org.ies.tierno.applicationamani.domain.models.admin.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
 import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

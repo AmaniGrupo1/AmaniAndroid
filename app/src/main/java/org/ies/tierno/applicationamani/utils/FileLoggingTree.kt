@@ -2,7 +2,6 @@ package org.ies.tierno.applicationamani.utils
 
 import android.content.Context
 import android.util.Log
-import androidx.annotation.RequiresApi
 import timber.log.Timber
 import java.io.File
 import java.time.LocalDateTime

@@ -12,6 +12,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import org.ies.tierno.applicationamani.MainActivity
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.utils.CitaNotificationWorker.Companion.CANAL_CITAS_ID
 import timber.log.Timber
 
 /**

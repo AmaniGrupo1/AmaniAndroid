@@ -7,10 +7,10 @@ import android.os.Build
 import org.ies.tierno.applicationamani.di.appModule
 import org.ies.tierno.applicationamani.di.retrofitModule
 import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
+import org.ies.tierno.applicationamani.utils.FileLoggingTree
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 import timber.log.Timber
-import org.ies.tierno.applicationamani.utils.FileLoggingTree
 
 /**
  * Clase [Application] personalizada para la aplicación Amani.

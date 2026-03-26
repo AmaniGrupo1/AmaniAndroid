@@ -1,9 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-import android.Manifest
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -30,9 +27,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.Person
@@ -75,14 +72,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.generarFranjasDia
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBar
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
-import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -165,22 +161,23 @@ fun PsicologoAgendaScreen(
     val fechasDestacadas = fechasConCitas + diasNoDisponibles
 
     // Franjas del día seleccionado
-    val franjasDelDia: List<FranjaHoraria> = remember(fechaSeleccionada, horaInicio, horaFin, duracionSesion) {
-        fechaSeleccionada?.let { fecha ->
-            if (fecha in diasNoDisponibles) emptyList()
-            else {
-                val ocupadas = citasPorDia[fecha]
-                    ?.associate { it.hora to "${it.paciente} — ${it.motivo}" }
-                    ?: emptyMap()
-                generarFranjasDia(
-                    horaInicio = horaInicio,
-                    horaFin = horaFin,
-                    intervaloMinutos = duracionSesion,
-                    citasOcupadas = ocupadas
-                )
-            }
-        } ?: emptyList()
-    }
+    val franjasDelDia: List<FranjaHoraria> =
+        remember(fechaSeleccionada, horaInicio, horaFin, duracionSesion) {
+            fechaSeleccionada?.let { fecha ->
+                if (fecha in diasNoDisponibles) emptyList()
+                else {
+                    val ocupadas = citasPorDia[fecha]
+                        ?.associate { it.hora to "${it.paciente} — ${it.motivo}" }
+                        ?: emptyMap()
+                    generarFranjasDia(
+                        horaInicio = horaInicio,
+                        horaFin = horaFin,
+                        intervaloMinutos = duracionSesion,
+                        citasOcupadas = ocupadas
+                    )
+                }
+            } ?: emptyList()
+        }
 
     // Citas del día seleccionado
     val citasDelDia = fechaSeleccionada?.let { citasPorDia[it] } ?: emptyList()
@@ -503,7 +500,13 @@ private fun HorarioActualBanner(
                     color = colors.onSecondaryContainer
                 )
                 Text(
-                    text = "${String.format(Locale.ROOT, "%02d", horaInicio)}:00 – ${String.format(Locale.ROOT, "%02d", horaFin)}:00  ·  Sesiones de $duracionSesion min",
+                    text = "${String.format(Locale.ROOT, "%02d", horaInicio)}:00 – ${
+                        String.format(
+                            Locale.ROOT,
+                            "%02d",
+                            horaFin
+                        )
+                    }:00  ·  Sesiones de $duracionSesion min",
                     style = typography.bodySmall,
                     color = colors.onSecondaryContainer.copy(alpha = 0.8f)
                 )
