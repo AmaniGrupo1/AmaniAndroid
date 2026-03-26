@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
 import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -77,11 +79,19 @@ class PsicologoAgendaViewModel(
                 IllegalStateException("No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar.")
             )
 
+        // En el ViewModel, antes de llamar a la API:
+        Log.d("HORARIO_DEBUG", "idPsicologo: $psychologistId")
+        Log.d("HORARIO_DEBUG", "franjas a enviar: horaInicio=$horaInicio, horaFin=$horaFin, duracionSesion=$duracionSesion")
+
         return citasRepository.actualizarHorario(
             psychologistId,
             HorarioPsicologoRequest(horaInicio, horaFin, duracionSesion)
         ).map { agenda ->
+            // En el callback de Retrofit:
+            Timber.tag("HORARIO_DEBUG").d("✅ Horario actualizado correctamente")
             _agendaMensual.value = agenda
+        }.onFailure { error ->
+            Timber.tag("HORARIO_DEBUG").e(error, "❌ Error: ${error.message}")
         }
     }
 

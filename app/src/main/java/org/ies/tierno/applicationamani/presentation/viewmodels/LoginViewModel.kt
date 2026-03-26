@@ -155,20 +155,26 @@ class LoginViewModel(
                 val result = authUseCase.login(request)
                 result.onSuccess { response ->
                     val token = response.token
-                    if (token != null) {
+                    val user = response.usuario
+
+                    if (token != null && user != null) {
                         tokenDataStore.saveToken(token)
+
+                        // Usar el rol del objeto usuario. Como fallback, intentar extraerlo del token.
+                        val finalRol = user.rol ?: extractRoleFromToken(token) ?: "unknown"
+
                         userSessionDataStore.saveSession(
                             UserSession(
-                                idUsuario = response.idUsuario ?: 0L,
-                                nombre = response.nombre,
-                                rol = response.rol ?: "unknown",
+                                idUsuario = user.id ?: 0L,
+                                nombre = user.nombre,
+                                rol = finalRol,
                                 idPsicologo = response.idPsicologo ?: extractPsychologistId(token)
                             )
                         )
                         _loginResult.value = Result.success(response)
                         setLoggedIn(true)
                     } else {
-                        _loginResult.value = Result.failure(Exception("Token not found in response"))
+                        _loginResult.value = Result.failure(Exception("Respuesta de login inválida"))
                         setLoggedIn(false)
                     }
                 }.onFailure { error ->
@@ -490,6 +496,24 @@ class LoginViewModel(
         }.getOrNull()
     }
 
+    private fun extractRoleFromToken(token: String): String? {
+        return runCatching {
+            val parts = token.split(".")
+            if (parts.size < 2) return null
 
+            val normalizedPayload = parts[1].replace('-', '+').replace('_', '/').let { payload ->
+                payload.padEnd(((payload.length + 3) / 4) * 4, '=')
+            }
+            val payloadJson = String(Base64.decode(normalizedPayload, Base64.DEFAULT))
+            val json = JSONObject(payloadJson)
 
+            // Buscar el rol bajo claves comunes
+            when {
+                json.has("rol") -> json.optString("rol").takeIf { it.isNotEmpty() }
+                json.has("role") -> json.optString("role").takeIf { it.isNotEmpty() }
+                json.has("authorities") -> json.optString("authorities").takeIf { it.isNotEmpty() } // A veces viene como una lista
+                else -> null
+            }
+        }.getOrNull()
+    }
 }
