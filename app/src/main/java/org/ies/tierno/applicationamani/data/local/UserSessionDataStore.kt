@@ -72,10 +72,7 @@ class UserSessionDataStore(private val context: Context) {
 
     suspend fun clearSession() {
         context.userSessionDataStore.edit { preferences ->
-            preferences.remove(USER_ID_KEY)
-            preferences.remove(USER_NAME_KEY)
-            preferences.remove(USER_ROLE_KEY)
-            preferences.remove(PSYCHOLOGIST_ID_KEY)
+            preferences.clear()
         }
     }
 

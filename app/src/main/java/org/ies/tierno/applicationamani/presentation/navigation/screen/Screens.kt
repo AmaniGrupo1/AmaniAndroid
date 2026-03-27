@@ -22,6 +22,8 @@ sealed class Screens(val route: String) {
     /** Pantalla principal para usuarios no autenticados. */
     object principal : Screens("principal")
 
+
+
     /** Pantalla del cuestionario de evaluación inicial. */
     object questionnaire : Screens("questionnaire")
 

@@ -4,6 +4,8 @@ import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 
 /**
@@ -19,13 +21,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
  */
 class LoginUseCase(private val repository: AuthRepository) {
 
-    /**
-     * Autentica a un usuario con sus credenciales.
-     *
-     * @param request Credenciales del usuario (email y contraseña).
-     * @return [Result.success] con [LoginResponseDTO] si el login es correcto,
-     *         o [Result.failure] con la excepción correspondiente.
-     */
+
     suspend fun login(request: LoginRequestDTO): Result<LoginResponseDTO> {
         return repository.login(request)
     }
@@ -70,7 +66,7 @@ class LoginUseCase(private val repository: AuthRepository) {
      * @return [Result.success] con [LoginResponseDTO] del psicólogo creado,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend fun registrarPsicologo(request: RegistryPacienteDTO): Result<LoginResponseDTO> {
+    suspend fun registrarPsicologo(request: PsicologoRequestDTO): Result<PsicologoSelfResponseDTO> {
         return repository.registerPsicologo(request)
     }
 

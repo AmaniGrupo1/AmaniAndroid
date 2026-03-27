@@ -6,9 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,33 +40,57 @@ fun RegisterScreen(
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val scope = rememberCoroutineScope()
 
-    // --- Estados del LoginViewModel ---
+    // Estados del LoginViewModel - CORREGIDO: Todos usando collectAsStateWithLifecycle correctamente
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
     val apellido by loginViewModel.apellido.collectAsStateWithLifecycle()
+    val dni by loginViewModel.dni.collectAsStateWithLifecycle()
     val email by loginViewModel.email.collectAsStateWithLifecycle()
     val regPassword by loginViewModel.regPassword.collectAsStateWithLifecycle()
     val telefono by loginViewModel.telefono.collectAsStateWithLifecycle()
     val genero by loginViewModel.genero.collectAsStateWithLifecycle()
     val fechaNacimiento by loginViewModel.fechaNacimiento.collectAsStateWithLifecycle()
+    val aceptaTerminos by loginViewModel.aceptaTerminos.collectAsStateWithLifecycle()
+    val aceptaVideoconferencia by loginViewModel.aceptaVideoconferencia.collectAsStateWithLifecycle()
+    val aceptaComunicacion by loginViewModel.aceptaComunicacion.collectAsStateWithLifecycle()
     val metodoPago by loginViewModel.metodoPago.collectAsStateWithLifecycle()
-    val passwordVisible by loginViewModel.passwordVisible.collectAsStateWithLifecycle()
-    val pagoRealizado by loginViewModel.pagoRealizado.collectAsStateWithLifecycle()
-    val mostrarDialogoPago by loginViewModel.mostrarDialogoPago.collectAsStateWithLifecycle()
-    val isRegistering by loginViewModel.isRegistering.collectAsStateWithLifecycle()
-    val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
-    val procesandoPago by loginViewModel.procesandoPago.collectAsStateWithLifecycle()
-    val situacionesSeleccionadas by loginViewModel.situacionesSeleccionadas.collectAsStateWithLifecycle()
+    val esMenor by loginViewModel.esMenor.collectAsStateWithLifecycle()
+    val formularioCompletoValido by loginViewModel.formularioCompletoValido.collectAsStateWithLifecycle()
 
-    // --- Estados del SituacionViewModel ---
+    // Estados del tutor
+    val tutorNombre by loginViewModel.tutorNombre.collectAsStateWithLifecycle()
+    val tutorTelefono by loginViewModel.tutorTelefono.collectAsStateWithLifecycle()
+    val tutorEmail by loginViewModel.tutorEmail.collectAsStateWithLifecycle()
+    val tutorDni by loginViewModel.tutorDni.collectAsStateWithLifecycle()
+    val tutorTipo by loginViewModel.tutorTipo.collectAsStateWithLifecycle()
+
+    // Estados de dirección
+    val calle by loginViewModel.calle.collectAsStateWithLifecycle()
+    val ciudad by loginViewModel.ciudad.collectAsStateWithLifecycle()
+    val provincia by loginViewModel.provincia.collectAsStateWithLifecycle()
+    val codigoPostal by loginViewModel.codigoPostal.collectAsStateWithLifecycle()
+    val pais by loginViewModel.pais.collectAsStateWithLifecycle()
+
+    // Estados de situaciones
+    val situacionesIds by loginViewModel.situacionesIds.collectAsStateWithLifecycle()
+
+    // Estados del SituacionViewModel
     val listaSituaciones by situacionViewModel.situaciones.collectAsStateWithLifecycle(emptyList())
 
-    val listaMetodosPago = listOf(MetodoPago.PRESENCIAL, MetodoPago.ONLINE)
+    // Estados para UI local
+    var expandedGenero by remember { mutableStateOf(false) }
+    var expandedMetodo by remember { mutableStateOf(false) }
+    var expandedSituacion by remember { mutableStateOf(false) }
+    var expandedTipoTutor by remember { mutableStateOf(false) }
 
-    // Mostrar errores
-    LaunchedEffect(registerError) {
-        registerError?.let {
-            snackbarHostState.showSnackbar(it)
-            loginViewModel.resetRegisterState()
+    val listaGeneros = listOf("MASCULINO", "FEMENINO", "OTRO", "PREFIERO_NO_DECIR")
+    val listaMetodosPago = listOf(MetodoPago.PRESENCIAL, MetodoPago.ONLINE)
+    val listaTiposTutor = listOf("PADRE", "MADRE", "TUTOR LEGAL", "ABUELO", "OTRO")
+
+    // Función para obtener texto del método de pago
+    fun getMetodoPagoText(metodo: MetodoPago): String {
+        return when(metodo) {
+            MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
+            MetodoPago.ONLINE -> "💳 Pago Online"
         }
     }
 
@@ -78,7 +100,12 @@ fun RegisterScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Registrar Paciente", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                    }
+                }
             )
         }
     ) { padding ->
@@ -88,425 +115,664 @@ fun RegisterScreen(
                 .fillMaxSize()
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val textFieldShape = RoundedCornerShape(12.dp)
 
-            // -------- Campos de Usuario --------
-            OutlinedTextField(
-                value = nombre,
-                onValueChange = { loginViewModel.setNombre(it) },
-                label = { Text("Nombre", fontFamily = roboto) },
+            // ==================== SECCIÓN 1: DATOS PERSONALES ====================
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            OutlinedTextField(
-                value = apellido,
-                onValueChange = { loginViewModel.setApellido(it) },
-                label = { Text("Apellido", fontFamily = roboto) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { loginViewModel.setEmail(it) },
-                label = { Text("Email", fontFamily = roboto) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            OutlinedTextField(
-                value = regPassword,
-                onValueChange = { loginViewModel.setRegPassword(it) },
-                label = { Text("Contraseña", fontFamily = roboto) },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = { loginViewModel.setPasswordVisible(!passwordVisible) }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = "Ver contraseña"
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            OutlinedTextField(
-                value = telefono,
-                onValueChange = { loginViewModel.setTelefono(it) },
-                label = { Text("Teléfono", fontFamily = roboto) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            OutlinedTextField(
-                value = genero,
-                onValueChange = { loginViewModel.setGenero(it) },
-                label = { Text("Género (M/F)", fontFamily = roboto) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            OutlinedTextField(
-                value = fechaNacimiento,
-                onValueChange = { loginViewModel.setFechaNacimiento(it) },
-                label = { Text("Fecha nacimiento (YYYY-MM-DD)", fontFamily = roboto) },
-                placeholder = { Text("Ej: 1990-05-15", fontFamily = roboto) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = textFieldShape,
-                enabled = !isRegistering
-            )
-
-            // -------- Dropdown Método de Pago (Versión mejorada) --------
-            var expandedMetodo by remember { mutableStateOf(false) }
-
-            // Usar ExposedDropdownMenuBox para mejor compatibilidad
-            ExposedDropdownMenuBox(
-                expanded = expandedMetodo,
-                onExpandedChange = {
-                    if (!isRegistering) {
-                        expandedMetodo = it
-                    }
-                }
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                OutlinedTextField(
-                    value = metodoPago?.let {
-                        when(it) {
-                            MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
-                            MetodoPago.ONLINE -> "💳 Pago Online"
-                        }
-                    } ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Método de Pago", fontFamily = roboto) },
-                    placeholder = {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Seleccione método de pago",
+                            "Datos Personales",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = primaryColor,
                             fontFamily = roboto
                         )
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMetodo)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    shape = textFieldShape,
-                    enabled = !isRegistering,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        unfocusedBorderColor = Color.Gray
-                    )
-                )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                ExposedDropdownMenu(
-                    expanded = expandedMetodo,
-                    onDismissRequest = { expandedMetodo = false },
-                    modifier = Modifier.fillMaxWidth(0.9f)
-                ) {
-                    listaMetodosPago.forEach { metodo ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    when(metodo) {
-                                        MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
-                                        MetodoPago.ONLINE -> "💳 Pago Online"
-                                    },
-                                    fontFamily = roboto
-                                )
-                            },
-                            onClick = {
-                                loginViewModel.setMetodoPago(metodo)
-                                expandedMetodo = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = when(metodo) {
-                                        MetodoPago.PRESENCIAL -> Icons.Default.ArrowDropDown
-                                        MetodoPago.ONLINE -> Icons.Default.ArrowDropDown
-                                    },
-                                    contentDescription = null
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { loginViewModel.setNombre(it) }, // CORREGIDO
+                        label = { Text("Nombre *", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = apellido,
+                        onValueChange = { loginViewModel.setApellido(it) }, // CORREGIDO
+                        label = { Text("Apellido *", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = dni,
+                        onValueChange = { loginViewModel.setDni(it.uppercase()) }, // CORREGIDO
+                        label = { Text("DNI *", fontFamily = roboto) },
+                        placeholder = { Text("12345678A", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        isError = dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
+                        supportingText = {
+                            if (dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
+                                Text("Formato inválido (8 números + 1 letra)", color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { loginViewModel.setEmail(it) }, // CORREGIDO
+                        label = { Text("Email *", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = regPassword,
+                        onValueChange = { loginViewModel.setRegPassword(it) }, // CORREGIDO
+                        label = { Text("Contraseña *", fontFamily = roboto) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = telefono,
+                        onValueChange = { loginViewModel.setTelefono(it) }, // CORREGIDO
+                        label = { Text("Teléfono *", fontFamily = roboto) },
+                        placeholder = { Text("123456789", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        isError = telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
+                        supportingText = {
+                            if (telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) {
+                                Text("Debe tener 9 dígitos", color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    // Dropdown Género
+                    ExposedDropdownMenuBox(
+                        expanded = expandedGenero,
+                        onExpandedChange = { expandedGenero = it }
+                    ) {
+                        OutlinedTextField(
+                            value = genero,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Género *", fontFamily = roboto) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedGenero,
+                            onDismissRequest = { expandedGenero = false }
+                        ) {
+                            listaGeneros.forEach { opcion ->
+                                DropdownMenuItem(
+                                    text = { Text(opcion, fontFamily = roboto) },
+                                    onClick = {
+                                        loginViewModel.setGenero(opcion) // CORREGIDO
+                                        expandedGenero = false
+                                    }
                                 )
                             }
-                        )
+                        }
                     }
+
+                    OutlinedTextField(
+                        value = fechaNacimiento,
+                        onValueChange = { loginViewModel.setFechaNacimiento(it) }, // CORREGIDO
+                        label = { Text("Fecha nacimiento *", fontFamily = roboto) },
+                        placeholder = { Text("1990-05-15", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
+                        supportingText = {
+                            if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
+                                Text("Formato inválido (YYYY-MM-DD)", color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
                 }
             }
 
-            // Mensaje de advertencia para pago online
-            if (metodoPago == MetodoPago.ONLINE && !pagoRealizado && !isRegistering) {
+            // ==================== SECCIÓN 2: DATOS DEL TUTOR (SOLO SI ES MENOR) ====================
+            if (esMenor && fechaNacimiento.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
-                    shape = textFieldShape
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Text(
-                        text = "⚠️ Debes realizar el pago online para completar el registro",
-                        modifier = Modifier.padding(12.dp),
-                        color = Color(0xFFE67E22),
-                        fontFamily = roboto
-                    )
-                }
-            }
-
-            // -------- Dropdown Situaciones (Múltiple) --------
-            var expandedSituacion by remember { mutableStateOf(false) }
-
-            ExposedDropdownMenuBox(
-                expanded = expandedSituacion,
-                onExpandedChange = { expandedSituacion = it }
-            ) {
-                OutlinedTextField(
-                    value = if (situacionesSeleccionadas.isEmpty()) ""
-                    else situacionesSeleccionadas.joinToString { it.second },
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Situaciones (seleccione una o más)", fontFamily = roboto) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSituacion) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    shape = textFieldShape,
-                    enabled = !isRegistering
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedSituacion,
-                    onDismissRequest = { expandedSituacion = false },
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .heightIn(max = 400.dp)
-                ) {
-                    if (listaSituaciones.isEmpty()) {
-                        DropdownMenuItem(
-                            text = { Text("No hay situaciones disponibles", fontFamily = roboto) },
-                            onClick = { expandedSituacion = false },
-                            enabled = false
-                        )
-                    } else {
-                        listaSituaciones.forEach { situacion ->
-                            val isSelected = situacionesSeleccionadas.any { it.first == situacion.idSituacion }
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Checkbox(
-                                            checked = isSelected,
-                                            onCheckedChange = {
-                                                loginViewModel.toggleSituacion(situacion.idSituacion to situacion.nombre)
-                                            },
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Text(
-                                            situacion.nombre,
-                                            fontFamily = roboto,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    loginViewModel.toggleSituacion(situacion.idSituacion to situacion.nombre)
-                                }
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.People, contentDescription = null, tint = Color(0xFFE67E22))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Datos del Tutor",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Color(0xFFE67E22),
+                                fontFamily = roboto
                             )
+                        }
+                        Text(
+                            "Obligatorio por ser menor de edad",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFE67E22),
+                            fontFamily = roboto
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = tutorNombre,
+                            onValueChange = { loginViewModel.setTutorNombre(it) }, // CORREGIDO
+                            label = { Text("Nombre completo *", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFFE67E22),
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+
+                        OutlinedTextField(
+                            value = tutorTelefono,
+                            onValueChange = { loginViewModel.setTutorTelefono(it) }, // CORREGIDO
+                            label = { Text("Teléfono *", fontFamily = roboto) },
+                            placeholder = { Text("123456789", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            isError = tutorTelefono.isNotBlank() &&
+                                    !tutorTelefono.matches(Regex("^[0-9]{9}$")),
+                            supportingText = {
+                                if (tutorTelefono.isNotBlank() &&
+                                    !tutorTelefono.matches(Regex("^[0-9]{9}$"))) {
+                                    Text("Debe tener 9 dígitos", color = MaterialTheme.colorScheme.error)
+                                }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFFE67E22),
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+
+                        OutlinedTextField(
+                            value = tutorEmail,
+                            onValueChange = { loginViewModel.setTutorEmail(it) }, // CORREGIDO
+                            label = { Text("Email *", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            isError = tutorEmail.isNotBlank() &&
+                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
+                            supportingText = {
+                                if (tutorEmail.isNotBlank() &&
+                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
+                                    Text("Formato de email inválido", color = MaterialTheme.colorScheme.error)
+                                }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFFE67E22),
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+
+                        OutlinedTextField(
+                            value = tutorDni,
+                            onValueChange = { loginViewModel.setTutorDni(it.uppercase()) }, // CORREGIDO
+                            label = { Text("DNI *", fontFamily = roboto) },
+                            placeholder = { Text("12345678A", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            isError = tutorDni.isNotBlank() &&
+                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
+                            supportingText = {
+                                if (tutorDni.isNotBlank() &&
+                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
+                                    Text("Formato inválido (8 números + 1 letra)", color = MaterialTheme.colorScheme.error)
+                                }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFFE67E22),
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+
+                        // Dropdown Tipo de Tutor
+                        ExposedDropdownMenuBox(
+                            expanded = expandedTipoTutor,
+                            onExpandedChange = { expandedTipoTutor = it }
+                        ) {
+                            OutlinedTextField(
+                                value = tutorTipo,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Parentesco *", fontFamily = roboto) },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                shape = textFieldShape,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFFE67E22),
+                                    unfocusedBorderColor = Color.Gray
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedTipoTutor,
+                                onDismissRequest = { expandedTipoTutor = false }
+                            ) {
+                                listaTiposTutor.forEach { tipo ->
+                                    DropdownMenuItem(
+                                        text = { Text(tipo, fontFamily = roboto) },
+                                        onClick = {
+                                            loginViewModel.setTutorTipo(tipo) // CORREGIDO
+                                            expandedTipoTutor = false
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // ==================== SECCIÓN 3: DIRECCIÓN ====================
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = primaryColor)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Dirección",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = primaryColor,
+                            fontFamily = roboto
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            // -------- Botón Registrar --------
-            Button(
-                onClick = {
-                    if (metodoPago == MetodoPago.ONLINE && !pagoRealizado) {
-                        // Mostrar diálogo de pago
-                        loginViewModel.setMostrarDialogoPago(true)
-                    } else {
-                        // Registrar directamente
-                        loginViewModel.registrarPaciente { success ->
-                            if (success) {
-                                navController.navigate(Screens.login.route) {
-                                    popUpTo(Screens.registro.route) { inclusive = true }
+                    OutlinedTextField(
+                        value = calle,
+                        onValueChange = { loginViewModel.setCalle(it) }, // CORREGIDO
+                        label = { Text("Calle y número *", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = textFieldShape,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = ciudad,
+                            onValueChange = { loginViewModel.setCiudad(it) }, // CORREGIDO
+                            label = { Text("Ciudad", fontFamily = roboto) },
+                            modifier = Modifier.weight(1f),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+                        OutlinedTextField(
+                            value = provincia,
+                            onValueChange = { loginViewModel.setProvincia(it) }, // CORREGIDO
+                            label = { Text("Provincia", fontFamily = roboto) },
+                            modifier = Modifier.weight(1f),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = codigoPostal,
+                            onValueChange = { loginViewModel.setCodigoPostal(it) }, // CORREGIDO
+                            label = { Text("Código Postal", fontFamily = roboto) },
+                            modifier = Modifier.weight(1f),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+                        OutlinedTextField(
+                            value = pais,
+                            onValueChange = { loginViewModel.setPais(it) }, // CORREGIDO
+                            label = { Text("País", fontFamily = roboto) },
+                            modifier = Modifier.weight(1f),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+                    }
+                }
+            }
+
+            // ==================== SECCIÓN 4: MÉTODO DE PAGO ====================
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Payment, contentDescription = null, tint = primaryColor)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Método de Pago",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = primaryColor,
+                            fontFamily = roboto
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandedMetodo,
+                        onExpandedChange = { expandedMetodo = it }
+                    ) {
+                        OutlinedTextField(
+                            value = getMetodoPagoText(metodoPago),
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Seleccione método de pago *", fontFamily = roboto) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMetodo) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedMetodo,
+                            onDismissRequest = { expandedMetodo = false }
+                        ) {
+                            listaMetodosPago.forEach { metodo ->
+                                DropdownMenuItem(
+                                    text = { Text(getMetodoPagoText(metodo), fontFamily = roboto) },
+                                    onClick = {
+                                        loginViewModel.metodoPago.value = metodo
+                                        expandedMetodo = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ==================== SECCIÓN 5: SITUACIONES ====================
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Situaciones",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = primaryColor,
+                            fontFamily = roboto
+                        )
+                    }
+                    Text(
+                        "Seleccione una o más situaciones *",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontFamily = roboto,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandedSituacion,
+                        onExpandedChange = { expandedSituacion = it }
+                    ) {
+                        OutlinedTextField(
+                            value = if (situacionesIds.isEmpty())
+                                "Seleccione situaciones"
+                            else "${situacionesIds.size} situación(es) seleccionada(s)",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSituacion) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            shape = textFieldShape,
+                            isError = situacionesIds.isEmpty(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = if (situacionesIds.isEmpty()) Color.Red else Color.Gray
+                            )
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expandedSituacion,
+                            onDismissRequest = { expandedSituacion = false },
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .heightIn(max = 400.dp)
+                        ) {
+                            if (listaSituaciones.isEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("No hay situaciones disponibles", fontFamily = roboto) },
+                                    onClick = { expandedSituacion = false },
+                                    enabled = false
+                                )
+                            } else {
+                                listaSituaciones.forEach { situacion ->
+                                    val isSelected = situacionesIds.contains(situacion.idSituacion)
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Checkbox(
+                                                    checked = isSelected,
+                                                    onCheckedChange = { checked ->
+                                                        val currentIds = situacionesIds.toMutableList()
+                                                        if (checked) {
+                                                            currentIds.add(situacion.idSituacion)
+                                                        } else {
+                                                            currentIds.remove(situacion.idSituacion)
+                                                        }
+                                                        loginViewModel.situacionesIds.value = currentIds
+                                                    },
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(12.dp))
+                                                Text(
+                                                    situacion.nombre,
+                                                    fontFamily = roboto,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                            }
+                                        },
+                                        onClick = {
+                                            val currentIds = situacionesIds.toMutableList()
+                                            if (isSelected) {
+                                                currentIds.remove(situacion.idSituacion)
+                                            } else {
+                                                currentIds.add(situacion.idSituacion)
+                                            }
+                                            loginViewModel.situacionesIds.value = currentIds
+                                        }
+                                    )
                                 }
                             }
                         }
+                    }
+
+                    if (situacionesIds.isEmpty()) {
+                        Text(
+                            "Debe seleccionar al menos una situación",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            // ==================== SECCIÓN 6: CONSENTIMIENTOS ====================
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.DocumentScanner, contentDescription = null, tint = primaryColor)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Consentimientos",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = primaryColor,
+                            fontFamily = roboto
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = aceptaTerminos,
+                            onCheckedChange = { loginViewModel.aceptaTerminos.value = it },
+                            colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                        )
+                        Text(
+                            "Acepto los términos y condiciones *",
+                            fontFamily = roboto,
+                            modifier = Modifier.clickable { loginViewModel.aceptaTerminos.value = !aceptaTerminos }
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = aceptaVideoconferencia,
+                            onCheckedChange = { loginViewModel.aceptaVideoconferencia.value = it },
+                            colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                        )
+                        Text(
+                            "Acepto videoconferencia",
+                            fontFamily = roboto,
+                            modifier = Modifier.clickable { loginViewModel.aceptaVideoconferencia.value = !aceptaVideoconferencia }
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = aceptaComunicacion,
+                            onCheckedChange = { loginViewModel.aceptaComunicacion.value = it },
+                            colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                        )
+                        Text(
+                            "Acepto comunicaciones",
+                            fontFamily = roboto,
+                            modifier = Modifier.clickable { loginViewModel.aceptaComunicacion.value = !aceptaComunicacion }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ==================== BOTÓN REGISTRAR ====================
+            Button(
+                onClick = {
+                    loginViewModel.registrarPaciente()
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Registrando paciente...")
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(55.dp),
+                    .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                enabled = !isRegistering && metodoPago != null
+                enabled = formularioCompletoValido
             ) {
-                if (isRegistering) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-                } else {
-                    Text(
-                        text = when {
-                            metodoPago == null -> "Seleccione método de pago"
-                            metodoPago == MetodoPago.ONLINE && !pagoRealizado -> "💳 Pagar y Registrar"
-                            else -> "📝 Registrar Paciente"
-                        },
-                        color = Color.White,
-                        fontFamily = roboto
-                    )
-                }
-            }
-
-            // -------- Diálogo Pago Online (Mejorado) --------
-            if (mostrarDialogoPago && !pagoRealizado && metodoPago == MetodoPago.ONLINE) {
-                AlertDialog(
-                    onDismissRequest = {
-                        if (!procesandoPago) {
-                            loginViewModel.setMostrarDialogoPago(false)
-                        }
-                    },
-                    title = {
-                        Text(
-                            "Pago Online",
-                            fontFamily = roboto,
-                            color = primaryColor
-                        )
-                    },
-                    text = {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                "Complete el pago para continuar con el registro",
-                                fontFamily = roboto
-                            )
-
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(12.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        "💰 Total a pagar: 50€",
-                                        fontFamily = roboto,
-                                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                        color = primaryColor
-                                    )
-                                    Text(
-                                        "Primera consulta",
-                                        fontFamily = roboto,
-                                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                                        color = Color.Gray
-                                    )
-                                }
-                            }
-
-                            if (procesandoPago) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        CircularProgressIndicator(color = primaryColor)
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            "Procesando pago...",
-                                            fontFamily = roboto,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                }
-                            } else {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            "💳 Datos de pago de prueba",
-                                            fontFamily = roboto,
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            "• Tarjeta: **** **** **** 1234",
-                                            fontFamily = roboto,
-                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                        )
-                                        Text(
-                                            "• Titular: Cliente Test",
-                                            fontFamily = roboto,
-                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                        )
-                                        Text(
-                                            "• Caducidad: 12/25",
-                                            fontFamily = roboto,
-                                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                if (!procesandoPago) {
-                                    loginViewModel.simularPagoOnline { success ->
-                                        if (success) {
-                                            // Pago exitoso, proceder con el registro
-                                            loginViewModel.registrarPaciente { registroSuccess ->
-                                                if (registroSuccess) {
-                                                    navController.navigate(Screens.adminHome.route) {
-                                                        popUpTo(Screens.registro.route) { inclusive = true }
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar("Error en el pago. Intente nuevamente")
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            enabled = !procesandoPago
-                        ) {
-                            Text(
-                                if (procesandoPago) "Procesando..." else "Pagar 50€",
-                                color = primaryColor,
-                                fontFamily = roboto
-                            )
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                if (!procesandoPago) {
-                                    loginViewModel.setMostrarDialogoPago(false)
-                                }
-                            },
-                            enabled = !procesandoPago
-                        ) {
-                            Text("Cancelar", fontFamily = roboto)
-                        }
-                    }
+                Text(
+                    text = "📝 Registrar Paciente",
+                    color = Color.White,
+                    fontFamily = roboto,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize
                 )
             }
         }

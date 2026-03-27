@@ -42,6 +42,16 @@ android {
 }
 
 dependencies {
+    //notificación
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Kotlin Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     //Librerias de Compose
     coreLibraryDesugaring(libs.desugar.jdk.libs)//Libreria para usar APIs modernas de Java
     implementation(libs.retrofit)
@@ -69,8 +79,6 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.foundation.layout)
 
-    // WorkManager para notificaciones programadas que sobreviven reinicios
-    implementation(libs.androidx.work.runtime.ktx)
 
     // Timber: logging estructurado en lugar de android.util.Log
     implementation("com.jakewharton.timber:timber:5.0.1")

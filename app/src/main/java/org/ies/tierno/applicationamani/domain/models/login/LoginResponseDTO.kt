@@ -13,10 +13,8 @@ package org.ies.tierno.applicationamani.domain.models.login
  * @see LoginRequestDTO
  */
 data class LoginResponseDTO(
-
     val idUsuario: Long,
     val nombre: String,
     val rol: String,
-    val token : String,
-    val idPsicologo: Long? = null
+    val token : String
 )

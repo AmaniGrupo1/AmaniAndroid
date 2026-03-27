@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.di
 import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
+import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
@@ -27,13 +28,16 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacie
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.koin.android.ext.koin.androidContext
 
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single { AuthRepository(get()) }
+    single{ TokenDataStore(androidContext()) }
+
+    single { AuthRepository(get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
@@ -49,7 +53,7 @@ val appModule = module {
     factory { ResponderTestUseCase(get()) }
     factory { ListarSituacionUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get(), get()) }
+    viewModel { LoginViewModel(get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     //viewModel { CuestionarioViewModel(get(), get()) }
@@ -61,5 +65,5 @@ val appModule = module {
     viewModel { CitasViewModel(get(), get()) }
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(),get()) }
-    viewModel { CuestionarioViewModel(get(),get()) }
+    viewModel { CuestionarioViewModel(get()) }
 }

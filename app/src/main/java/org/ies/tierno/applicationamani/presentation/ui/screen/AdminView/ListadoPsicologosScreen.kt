@@ -51,7 +51,9 @@ fun ListadoPsicologosScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screens.agregarPsicologoAdmin.route) },
+                onClick = {
+                    //navController.navigate(Screens.agregarPsicologoAdmin.route)
+                    },
                 containerColor = primaryColor,
                 shape = RoundedCornerShape(50.dp)
             ) {
@@ -128,20 +130,20 @@ fun ListadoPsicologosScreen(
 
                         Button(
                             onClick = {
-                                scope.launch {
-                                    loginViewModel.asignarPacienteAlPsicologo(
-                                        pacienteId.toLong(),
-                                        psicologo.idPsicologo
-                                    )
-                                    val resultMsg = loginViewModel.asignarPsicologoResult.value
-                                    if (resultMsg == "ok" || resultMsg == null) {
-                                        snackbarHostState.showSnackbar("Psicólogo asignado correctamente")
-                                        navController.navigate(Screens.adminHome.route)
-                                    } else {
-                                        snackbarHostState.showSnackbar("Error: $resultMsg")
-                                    }
-                                    loginViewModel.clearAsignarPsicologoResult()
-                                }
+//                                scope.launch {
+////                                    loginViewModel.asignarPacienteAlPsicologo(
+////                                        pacienteId.toLong(),
+////                                        psicologo.idPsicologo
+////                                    )
+//                                    //val resultMsg = loginViewModel.asignarPsicologoResult.value
+//                                    if (resultMsg == "ok" || resultMsg == null) {
+//                                        snackbarHostState.showSnackbar("Psicólogo asignado correctamente")
+//                                        navController.navigate(Screens.adminHome.route)
+//                                    } else {
+//                                        snackbarHostState.showSnackbar("Error: $resultMsg")
+//                                    }
+//                                    loginViewModel.clearAsignarPsicologoResult()
+//                                }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                             modifier = Modifier.fillMaxWidth()
