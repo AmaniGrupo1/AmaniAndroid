@@ -49,7 +49,7 @@ sealed class Screens(val route: String) {
     object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
 
     /** Pantalla principal del administrador. */
-    object adminPrincipal : Screens("adminPrincipal")
+    object adminHome : Screens("home")
 
     /** Pantalla del cuestionario. */
     object cuestionario : Screens("cuestionario")
@@ -59,5 +59,9 @@ sealed class Screens(val route: String) {
 
     /** Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles). */
     object psicologoAgenda : Screens("psicologoAgenda")
+
+    object psicologoHome : Screens("psicologoHome")
+    object pacienteHome : Screens("pacienteHome")
+
 }
 

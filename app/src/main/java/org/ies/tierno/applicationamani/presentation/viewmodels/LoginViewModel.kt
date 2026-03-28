@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
+import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
@@ -30,8 +32,108 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
+    private val _loginResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
+    val loginResult: StateFlow<Result<LoginResponseDTO>?> = _loginResult
+
+    private val _isLoggingIn = MutableStateFlow(false)
+    val isLoggingIn: StateFlow<Boolean> = _isLoggingIn
+
+    private val _loginError = MutableStateFlow<String?>(null)
+    val loginError: StateFlow<String?> = _loginError
+
     fun setUsername(username: String) { _username.value = username }
     fun setPassword(password: String) { _password.value = password }
+
+    /**
+     * Ejecuta el proceso de inicio de sesión.
+     * Valida los campos antes de realizar la llamada al caso de uso.
+     */
+    fun login() {
+        // Validaciones previas
+        val usernameValue = _username.value
+        val passwordValue = _password.value
+
+        when {
+            usernameValue.isBlank() -> {
+                _loginError.value = "El correo electrónico es obligatorio"
+                return
+            }
+            !usernameValue.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                _loginError.value = "Introduce un correo electrónico válido"
+                return
+            }
+            passwordValue.isBlank() -> {
+                _loginError.value = "La contraseña es obligatoria"
+                return
+            }
+            passwordValue.length < 6 -> {
+                _loginError.value = "La contraseña debe tener al menos 6 caracteres"
+                return
+            }
+        }
+
+        _isLoggingIn.value = true
+        _loginError.value = null
+        _loginResult.value = null
+
+        viewModelScope.launch {
+            try {
+                val request = LoginRequestDTO(
+                    email = usernameValue,
+                    password = passwordValue
+                )
+
+                val result = loginUseCase.login(request)
+
+                _loginResult.value = result
+
+                if (result.isFailure) {
+                    _loginError.value = when (val exception = result.exceptionOrNull()) {
+                        is retrofit2.HttpException -> {
+                            when (exception.code()) {
+                                401 -> "Credenciales incorrectas"
+                                404 -> "Usuario no encontrado"
+                                else -> "Error de conexión: ${exception.message()}"
+                            }
+                        }
+                        else -> exception?.message ?: "Error al iniciar sesión"
+                    }
+                }
+            } catch (e: Exception) {
+                _loginError.value = e.message ?: "Error inesperado al iniciar sesión"
+                _loginResult.value = Result.failure(e)
+            } finally {
+                _isLoggingIn.value = false
+            }
+        }
+    }
+
+    /**
+     * Limpia los campos de usuario y contraseña.
+     */
+    fun clearLoginFields() {
+        _username.value = ""
+        _password.value = ""
+    }
+
+    /**
+     * Resetea el estado del login (resultado y errores).
+     */
+    fun resetLoginState() {
+        _loginResult.value = null
+        _loginError.value = null
+        _isLoggingIn.value = false
+    }
+
+    /**
+     * Valida si el formulario de login es válido para habilitar el botón.
+     */
+    fun isLoginFormValid(): Boolean {
+        return _username.value.isNotBlank() &&
+                _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
+                _password.value.isNotBlank() &&
+                _password.value.length >= 6
+    }
 
     // ── Campos registro básico ──
     val nombre = MutableStateFlow("")
@@ -178,7 +280,6 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // ── Acciones de registro ──
-    // ── Acciones de registro ──
     fun registrarPsicologo() {
         if (nombre.value.isBlank() || apellido.value.isBlank() ||
             email.value.isBlank() || regPassword.value.isBlank() ||
@@ -209,8 +310,6 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
                 result.onSuccess { response ->
                     _registerSuccess.value = true
                     _registerError.value = null
-                    // Opcional: limpiar formulario después de registro exitoso
-                    // limpiarFormularioPsicologo()
                 }.onFailure { error ->
                     _registerError.value = error.message ?: "Error al registrar psicólogo"
                     _registerSuccess.value = false
@@ -265,7 +364,6 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
             }
         }
     }
-
 
     fun registrarPaciente() {
         if (!formularioCompletoValido.value) {
@@ -328,7 +426,6 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
                 result.onSuccess { response ->
                     _registerSuccess.value = true
                     _registerError.value = null
-                    // Aquí podrías guardar el token si es necesario
                 }.onFailure { error ->
                     _registerError.value = error.message ?: "Error al registrar paciente"
                     _registerSuccess.value = false

@@ -1,5 +1,9 @@
 package org.ies.tierno.applicationamani.dto.requestPaciente
 
+import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
+import org.ies.tierno.applicationamani.dto.tutor.TutorRequestDTO
+import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
+
 /**
  * DTO con los datos de un paciente para la vista de administración.
  *
@@ -27,5 +31,9 @@ data class DatosPacienteAdminDTO (
     val telefono: String,
     val createdAt: String,
     val updatedAt: String,
-    val activo : Boolean
+    val activo : Boolean,
+    val metodoPago : String,
+    val estadoPago : String,
+    val situaciones : List<SituacionDTO>,
+    val tutores : List<TutorResponseDTO>
 )

@@ -24,6 +24,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import TestScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 
 /**
  * Grafo de navegación principal de la aplicación Amani.
@@ -57,7 +59,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             LoginScreen(navController, loginViewModel)
         }
         composable(Screens.registro.route) {
-            RegisterScreen(navController)
+            RegisterScreen(navController, loginViewModel)
         }
         composable(Screens.questionnaire.route) {
             QuestionnaireScreen(navController)
@@ -69,7 +71,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             SettingsClienteScreen(navController)
         }
         composable(Screens.agregarPsicologo.route) {
-            AgregaPsicologo(navController, loginViewModel)
+            AgregaPsicologoScreen(navController, loginViewModel)
         }
         composable(Screens.test.route) {
             TestScreen(navController)
@@ -83,7 +85,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.agregarPacienteAdmin.route) {
             RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
         }
-        composable(Screens.adminPrincipal.route) {
+        composable(Screens.adminHome.route) {
             ViewAdminPrincipal(navController)
         }
         composable(Screens.cuestionario.route) {

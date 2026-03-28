@@ -124,7 +124,7 @@ fun ListadoPacientesScreen(
                             navController.navigate("editarPaciente/${paciente.idPaciente}")
                         },
                         onAsignarPsicologo = {
-                            navController.navigate(Screens.asignarPsicologo.createRoute(paciente.idPaciente))
+                            // navController.navigate(Screens.asignarPsicologo.createRoute(paciente.idPaciente))
                         },
                         primaryColor = primaryColor,
                         pendingColor = pendingColor,
@@ -199,40 +199,43 @@ fun PacienteCard(
     inactiveColor: Color,
     roboto: FontFamily
 ) {
+    // 🔥 CORRECCIÓN: Manejar correctamente método de pago como String
+    val metodoPagoStr = paciente.metodoPago ?: "PRESENCIAL"
+    val estadoPagoStr = paciente.estadoPago ?: "PENDIENTE"
+
     // Determinar estado de pago según método y estado real
-// ✅ CORRECTO: Usar Triple para tres valores
     val estadoPagoInfo = when {
         !paciente.activo -> Triple(
             "INACTIVO",
             inactiveColor,
             Icons.Default.Error
         )
-        paciente.metodoPago.uppercase() == "ONLINE" && paciente.estadoPago.uppercase() == "PAGADO" ->
+        metodoPagoStr.uppercase() == "ONLINE" && estadoPagoStr.uppercase() == "PAGADO" ->
             Triple(
                 "PAGADO (Online)",
                 paidColor,
                 Icons.Default.CreditCard
             )
-        paciente.metodoPago.uppercase() == "ONLINE" && paciente.estadoPago.uppercase() == "PENDIENTE" ->
+        metodoPagoStr.uppercase() == "ONLINE" && estadoPagoStr.uppercase() == "PENDIENTE" ->
             Triple(
                 "PENDIENTE (Online)",
                 pendingColor,
                 Icons.Default.CreditCard
             )
-        paciente.metodoPago.uppercase() == "PRESENCIAL" && paciente.estadoPago.uppercase() == "PENDIENTE" ->
+        metodoPagoStr.uppercase() == "PRESENCIAL" && estadoPagoStr.uppercase() == "PENDIENTE" ->
             Triple(
                 "PENDIENTE (Presencial)",
                 pendingColor,
                 Icons.Default.AttachMoney
             )
-        paciente.metodoPago.uppercase() == "PRESENCIAL" && paciente.estadoPago.uppercase() == "PAGADO" ->
+        metodoPagoStr.uppercase() == "PRESENCIAL" && estadoPagoStr.uppercase() == "PAGADO" ->
             Triple(
                 "PAGADO (Presencial)",
                 paidColor,
                 Icons.Default.AttachMoney
             )
         else -> Triple(
-            paciente.estadoPago,
+            estadoPagoStr,
             Color.Gray,
             Icons.Default.Info
         )
@@ -241,10 +244,10 @@ fun PacienteCard(
     val (estadoTexto, estadoColor, metodoIcon) = estadoPagoInfo
 
     // Determinar ícono y texto del método de pago
-    val metodoPagoInfo = when (paciente.metodoPago.uppercase()) {
+    val metodoPagoInfo = when (metodoPagoStr.uppercase()) {
         "ONLINE" -> Pair(Icons.Default.Payment, "Pago Online")
         "PRESENCIAL" -> Pair(Icons.Default.AttachMoney, "Pago Presencial")
-        else -> Pair(Icons.Default.Info, paciente.metodoPago)
+        else -> Pair(Icons.Default.Info, metodoPagoStr)
     }
     val (metodoIcono, metodoTexto) = metodoPagoInfo
 
@@ -358,7 +361,7 @@ fun PacienteCard(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = when (paciente.metodoPago.uppercase()) {
+                    containerColor = when (metodoPagoStr.uppercase()) {
                         "ONLINE" -> Color(0xFFE3F2FD)
                         "PRESENCIAL" -> Color(0xFFFFF3E0)
                         else -> Color(0xFFF5F5F5)
@@ -375,7 +378,7 @@ fun PacienteCard(
                     Icon(
                         imageVector = metodoIcono,
                         contentDescription = "Método de pago",
-                        tint = when (paciente.metodoPago.uppercase()) {
+                        tint = when (metodoPagoStr.uppercase()) {
                             "ONLINE" -> Color(0xFF1976D2)
                             "PRESENCIAL" -> Color(0xFFE67E22)
                             else -> Color.Gray
@@ -392,7 +395,7 @@ fun PacienteCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = metodoTexto,
-                        color = when (paciente.metodoPago.uppercase()) {
+                        color = when (metodoPagoStr.uppercase()) {
                             "ONLINE" -> Color(0xFF1976D2)
                             "PRESENCIAL" -> Color(0xFFE67E22)
                             else -> Color.Black
@@ -406,7 +409,7 @@ fun PacienteCard(
 
                     // Indicador de estado de pago
                     when {
-                        paciente.metodoPago.uppercase() == "ONLINE" && paciente.estadoPago.uppercase() == "PAGADO" -> {
+                        metodoPagoStr.uppercase() == "ONLINE" && estadoPagoStr.uppercase() == "PAGADO" -> {
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
                                 color = paidColor.copy(alpha = 0.2f)
@@ -431,7 +434,7 @@ fun PacienteCard(
                                 }
                             }
                         }
-                        paciente.metodoPago.uppercase() == "PRESENCIAL" && paciente.estadoPago.uppercase() == "PENDIENTE" -> {
+                        metodoPagoStr.uppercase() == "PRESENCIAL" && estadoPagoStr.uppercase() == "PENDIENTE" -> {
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
                                 color = pendingColor.copy(alpha = 0.2f)
