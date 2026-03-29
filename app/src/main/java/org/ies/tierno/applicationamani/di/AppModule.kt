@@ -1,9 +1,9 @@
 package org.ies.tierno.applicationamani.di
 
-import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
@@ -36,6 +36,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single{ TokenDataStore(androidContext()) }
+    single { UserSessionDataStore(get()) }
 
     single { AuthRepository(get(), get(), get()) }
     single { TestRepositoryApi(get()) }

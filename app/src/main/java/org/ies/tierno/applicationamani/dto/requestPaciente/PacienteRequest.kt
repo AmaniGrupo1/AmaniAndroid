@@ -14,7 +14,7 @@
         val  aceptaVideoconferencia : Boolean?,
         val  aceptaComunicacion : Boolean?,
 
-        val situacionesIds: List<Long>,
+        val idSituaciones: List<Long>,
         val tutores: List<TutorRequestDTO>,
         val direccion: List<DireccionRequest>
     )

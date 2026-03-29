@@ -88,7 +88,7 @@ fun RegisterScreen(
 
     // Función para obtener texto del método de pago
     fun getMetodoPagoText(metodo: MetodoPago): String {
-        return when(metodo) {
+        return when (metodo) {
             MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
             MetodoPago.ONLINE -> "💳 Pago Online"
         }
@@ -103,7 +103,11 @@ fun RegisterScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 }
             )
@@ -173,7 +177,10 @@ fun RegisterScreen(
                         isError = dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                         supportingText = {
                             if (dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
-                                Text("Formato inválido (8 números + 1 letra)", color = MaterialTheme.colorScheme.error)
+                                Text(
+                                    "Formato inválido (8 números + 1 letra)",
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
@@ -217,7 +224,10 @@ fun RegisterScreen(
                         isError = telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
                         supportingText = {
                             if (telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) {
-                                Text("Debe tener 9 dígitos", color = MaterialTheme.colorScheme.error)
+                                Text(
+                                    "Debe tener 9 dígitos",
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
@@ -272,7 +282,10 @@ fun RegisterScreen(
                         isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
                         supportingText = {
                             if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
-                                Text("Formato inválido (YYYY-MM-DD)", color = MaterialTheme.colorScheme.error)
+                                Text(
+                                    "Formato inválido (YYYY-MM-DD)",
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
@@ -293,7 +306,11 @@ fun RegisterScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.People, contentDescription = null, tint = Color(0xFFE67E22))
+                            Icon(
+                                Icons.Default.People,
+                                contentDescription = null,
+                                tint = Color(0xFFE67E22)
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 "Datos del Tutor",
@@ -333,8 +350,12 @@ fun RegisterScreen(
                                     !tutorTelefono.matches(Regex("^[0-9]{9}$")),
                             supportingText = {
                                 if (tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$"))) {
-                                    Text("Debe tener 9 dígitos", color = MaterialTheme.colorScheme.error)
+                                    !tutorTelefono.matches(Regex("^[0-9]{9}$"))
+                                ) {
+                                    Text(
+                                        "Debe tener 9 dígitos",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
@@ -353,8 +374,12 @@ fun RegisterScreen(
                                     !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                             supportingText = {
                                 if (tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
-                                    Text("Formato de email inválido", color = MaterialTheme.colorScheme.error)
+                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))
+                                ) {
+                                    Text(
+                                        "Formato de email inválido",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
@@ -374,8 +399,12 @@ fun RegisterScreen(
                                     !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                             supportingText = {
                                 if (tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
-                                    Text("Formato inválido (8 números + 1 letra)", color = MaterialTheme.colorScheme.error)
+                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))
+                                ) {
+                                    Text(
+                                        "Formato inválido (8 números + 1 letra)",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
@@ -432,7 +461,11 @@ fun RegisterScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = primaryColor)
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = primaryColor
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Dirección",
@@ -455,7 +488,10 @@ fun RegisterScreen(
                         )
                     )
 
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         OutlinedTextField(
                             value = ciudad,
                             onValueChange = { loginViewModel.setCiudad(it) }, // CORREGIDO
@@ -480,7 +516,10 @@ fun RegisterScreen(
                         )
                     }
 
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         OutlinedTextField(
                             value = codigoPostal,
                             onValueChange = { loginViewModel.setCodigoPostal(it) }, // CORREGIDO
@@ -621,7 +660,12 @@ fun RegisterScreen(
                         ) {
                             if (listaSituaciones.isEmpty()) {
                                 DropdownMenuItem(
-                                    text = { Text("No hay situaciones disponibles", fontFamily = roboto) },
+                                    text = {
+                                        Text(
+                                            "No hay situaciones disponibles",
+                                            fontFamily = roboto
+                                        )
+                                    },
                                     onClick = { expandedSituacion = false },
                                     enabled = false
                                 )
@@ -637,13 +681,15 @@ fun RegisterScreen(
                                                 Checkbox(
                                                     checked = isSelected,
                                                     onCheckedChange = { checked ->
-                                                        val currentIds = situacionesIds.toMutableList()
+                                                        val currentIds =
+                                                            situacionesIds.toMutableList()
                                                         if (checked) {
                                                             currentIds.add(situacion.idSituacion)
                                                         } else {
                                                             currentIds.remove(situacion.idSituacion)
                                                         }
-                                                        loginViewModel.situacionesIds.value = currentIds
+                                                        loginViewModel.situacionesIds.value =
+                                                            currentIds
                                                     },
                                                     modifier = Modifier.size(24.dp)
                                                 )
@@ -690,7 +736,11 @@ fun RegisterScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.DocumentScanner, contentDescription = null, tint = primaryColor)
+                        Icon(
+                            Icons.Default.DocumentScanner,
+                            contentDescription = null,
+                            tint = primaryColor
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Consentimientos",
@@ -713,7 +763,9 @@ fun RegisterScreen(
                         Text(
                             "Acepto los términos y condiciones *",
                             fontFamily = roboto,
-                            modifier = Modifier.clickable { loginViewModel.aceptaTerminos.value = !aceptaTerminos }
+                            modifier = Modifier.clickable {
+                                loginViewModel.aceptaTerminos.value = !aceptaTerminos
+                            }
                         )
                     }
 
@@ -729,7 +781,10 @@ fun RegisterScreen(
                         Text(
                             "Acepto videoconferencia",
                             fontFamily = roboto,
-                            modifier = Modifier.clickable { loginViewModel.aceptaVideoconferencia.value = !aceptaVideoconferencia }
+                            modifier = Modifier.clickable {
+                                loginViewModel.aceptaVideoconferencia.value =
+                                    !aceptaVideoconferencia
+                            }
                         )
                     }
 
@@ -745,7 +800,9 @@ fun RegisterScreen(
                         Text(
                             "Acepto comunicaciones",
                             fontFamily = roboto,
-                            modifier = Modifier.clickable { loginViewModel.aceptaComunicacion.value = !aceptaComunicacion }
+                            modifier = Modifier.clickable {
+                                loginViewModel.aceptaComunicacion.value = !aceptaComunicacion
+                            }
                         )
                     }
                 }
@@ -754,12 +811,12 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ==================== BOTÓN REGISTRAR ====================
+            val registerSuccess by loginViewModel.registerSuccess.collectAsStateWithLifecycle()
+            val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
+
             Button(
                 onClick = {
-                    loginViewModel.registrarPaciente()
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Registrando paciente...")
-                    }
+                    loginViewModel.registrarPaciente() // solo llamamos a la función
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -774,6 +831,16 @@ fun RegisterScreen(
                     fontFamily = roboto,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize
                 )
+            }
+            // Mostramos snackbar según el estado
+            LaunchedEffect(registerSuccess, registerError) {
+                if (registerSuccess) {
+                    snackbarHostState.showSnackbar("Paciente registrado correctamente", withDismissAction = true)
+                    loginViewModel.resetRegisterState() // reset para no mostrar de nuevo
+                } else if (!registerError.isNullOrBlank()) {
+                    snackbarHostState.showSnackbar("Error: $registerError", withDismissAction = true)
+                    loginViewModel.resetRegisterState()
+                }
             }
         }
     }

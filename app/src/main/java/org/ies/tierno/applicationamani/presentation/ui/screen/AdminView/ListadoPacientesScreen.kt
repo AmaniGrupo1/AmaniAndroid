@@ -51,7 +51,6 @@ fun ListadoPacientesScreen(
     val balow = FontFamily(Font(R.font.barlow_condensed_black))
 
     val backgroundColor = Color(0xFFF5F5F5)
-    val cardColor = Color.White
     val primaryColor = Color(0xFF6C63FF)
     val pendingColor = Color(0xFFFF9800)
     val paidColor = Color(0xFF4CAF50)
@@ -239,6 +238,27 @@ fun PacienteCard(
             Color.Gray,
             Icons.Default.Info
         )
+    }
+
+    if (paciente.situaciones.isNotEmpty()) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Situaciones:",
+            fontFamily = roboto,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            color = Color.Black
+        )
+        Column(modifier = Modifier.padding(start = 8.dp, top = 4.dp)) {
+            paciente.situaciones.forEach { situacion ->
+                Text(
+                    text = "- ${situacion.descripcion}",
+                    fontFamily = roboto,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
+        }
     }
 
     val (estadoTexto, estadoColor, metodoIcon) = estadoPagoInfo

@@ -96,18 +96,6 @@ class AuthRepository(
                     val body = response.body()
 
                     if (body != null) {
-
-                        // 🔥 OPCIONAL: guardar sesión tras registro
-                        tokenDataStore.saveToken(body.token)
-
-                        userSessionDataStore.saveSession(
-                            UserSession(
-                                idUsuario = body.idUsuario,
-                                nombre = body.nombre,
-                                rol = body.rol,
-                            )
-                        )
-
                         Result.success(body)
                     } else {
                         Result.failure(Exception("Response body is null"))

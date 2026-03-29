@@ -67,10 +67,10 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
                 _loginError.value = "La contraseña es obligatoria"
                 return
             }
-            passwordValue.length < 6 -> {
-                _loginError.value = "La contraseña debe tener al menos 6 caracteres"
-                return
-            }
+//            passwordValue.length < 6 -> {
+//                _loginError.value = "La contraseña debe tener al menos 6 caracteres"
+//                return
+//            }
         }
 
         _isLoggingIn.value = true
@@ -132,8 +132,8 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
     fun isLoginFormValid(): Boolean {
         return _username.value.isNotBlank() &&
                 _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
-                _password.value.isNotBlank() &&
-                _password.value.length >= 6
+                _password.value.isNotBlank()
+               // _password.value.length >= 6
     }
 
     // ── Campos registro básico ──
@@ -366,6 +366,9 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
         }
     }
 
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage
+
     fun registrarPaciente() {
         if (!formularioCompletoValido.value) {
             _registerError.value = "Complete todos los campos obligatorios"
@@ -427,6 +430,8 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
                 result.onSuccess { response ->
                     _registerSuccess.value = true
                     _registerError.value = null
+                    _successMessage.value = "¡Paciente registrado correctamente!"
+                    limpiarFormulario()
                 }.onFailure { error ->
                     _registerError.value = error.message ?: "Error al registrar paciente"
                     _registerSuccess.value = false
