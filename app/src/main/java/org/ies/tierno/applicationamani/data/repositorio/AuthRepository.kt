@@ -206,6 +206,15 @@ class AuthRepository(
         }
     }
 
+    fun getPsicologos(): Flow<List<PsicologoSelfResponseDTO>> = flow {
+        try {
+            val response = api.getPsicologos()
+            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+    }
+
     suspend fun darBajaPaciente(id: Long): Result<String> {
         return withContext(Dispatchers.IO) {
             try {

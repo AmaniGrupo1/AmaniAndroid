@@ -20,6 +20,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import TestScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
@@ -74,8 +76,22 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.test.route) {
             TestScreen(navController)
         }
-        composable(Screens.listarPsicologo.route) {
-            ListadoPsicologosScreen(navController)
+        composable(
+            route = Screens.listarPsicologo.route,
+            arguments = listOf(
+                navArgument("pacienteId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val idPaciente = backStackEntry.arguments?.getString("pacienteId") ?: ""
+
+            ListadoPsicologosScreen(
+                navController = navController,
+                loginViewModel = loginViewModel,
+                pacienteId = idPaciente
+            )
         }
         composable(Screens.pacientes.route) {
             ListadoPacientesScreen(navController)

@@ -64,4 +64,7 @@ interface AuthApi {
     suspend fun asignarPsicologo(
         @Body request: AsignarPacienteAlPsicologoRequestDTO
     ): Response<String>
+
+    @GET("/api/admin/psicologos")
+    suspend fun getPsicologos(): Response<List<PsicologoSelfResponseDTO>>
 }
