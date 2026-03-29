@@ -65,9 +65,9 @@ fun OpcionPagoScreen(
 
                         // aquí podrías guardar el método de pago si quieres
 
-                        navController.navigate(
-                            Screens.opcionPago.route
-                        )
+//                        navController.navigate(
+//                        //    Screens.opcionPago.route
+//                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth()

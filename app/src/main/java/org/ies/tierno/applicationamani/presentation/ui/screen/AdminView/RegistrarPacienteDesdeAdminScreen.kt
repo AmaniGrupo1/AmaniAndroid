@@ -104,7 +104,7 @@
                         loginViewModel.setTelefono(telefono)
                         loginViewModel.setGenero(genero)
                         loginViewModel.setFechaNacimiento(fechaNacimiento)
-                        loginViewModel.registrarPacienteAdmin()
+                       // loginViewModel.registrarPacienteAdmin()
                         navController.popBackStack()
                     },
                     modifier = Modifier

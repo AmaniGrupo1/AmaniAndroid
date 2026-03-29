@@ -14,6 +14,7 @@ import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
@@ -60,6 +61,32 @@ class AuthRepository(
         }
     }
 
+    suspend fun asignarPsicologo(idPaciente: Long, idPsicologo: Long): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = AsignarPacienteAlPsicologoRequestDTO(
+                    idPaciente = idPaciente,
+                    idPsicologo = idPsicologo
+                )
+
+                val response = api.asignarPsicologo(request)
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        Result.success(body)
+                    } else {
+                        Result.failure(Exception("Response body is null"))
+                    }
+                } else {
+                    Result.failure(HttpException(response))
+                }
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
     suspend fun registerPaciente(request: PacienteRequest): Result<LoginResponseDTO> {
         return withContext(Dispatchers.IO) {
             try {

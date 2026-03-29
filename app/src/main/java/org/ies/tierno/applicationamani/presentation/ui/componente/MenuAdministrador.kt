@@ -78,7 +78,7 @@ fun MenuAdministrador(
             MenuAdministrador(
                 title = "Crear preguntas",
                 icon = Icons.Default.Edit,
-                route = Screens.crearPreguntas.route,
+                route = Screens.test.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
@@ -89,7 +89,7 @@ fun MenuAdministrador(
             MenuAdministrador(
                 title = "Listar psicólogos",
                 icon = Icons.Default.Psychology,
-                route = Screens.listaPsicologos.route,
+                route = Screens.listarPsicologo.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
@@ -381,9 +381,9 @@ fun MenuLateralAdministrador(
     val menuItems = listOf(
         Triple(Icons.Default.Home, "Inicio", Screens.adminHome.route),
         Triple(Icons.Default.People, "Pacientes", Screens.pacientes.route),
-        Triple(Icons.Default.Psychology, "Psicólogos", Screens.listaPsicologos.route),
+        Triple(Icons.Default.Psychology, "Psicólogos", Screens.listarPsicologo.route),
         Triple(Icons.Default.Quiz, "Tests", Screens.test.route),
-        Triple(Icons.Default.Edit, "Crear preguntas", Screens.crearPreguntas.route),
+        Triple(Icons.Default.Edit, "Crear preguntas", Screens.test.route),
         Triple(Icons.Default.AdminPanelSettings, "Registrar admin", Screens.agregarAdmin.route),
         Triple(Icons.Default.Logout, "Cerrar sesión", Screens.login.route)
     )
@@ -391,7 +391,7 @@ fun MenuLateralAdministrador(
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet(
-                drawerShape = RoundedCornerShape(end = 16.dp)
+                drawerContainerColor = MaterialTheme.colorScheme.primaryContainer
             ) {
                 // Header del drawer
                 Box(

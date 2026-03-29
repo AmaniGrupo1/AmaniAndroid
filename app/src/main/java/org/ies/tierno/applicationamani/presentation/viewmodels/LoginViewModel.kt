@@ -14,6 +14,7 @@ import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
@@ -471,5 +472,45 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
         registroDescripcion.value = null
         registroLicencia.value = null
         resetRegisterState()
+    }
+
+    // ── Asignar paciente a psicólogo ──
+    private val _asignarPacienteSuccess = MutableStateFlow(false)
+    val asignarPacienteSuccess: StateFlow<Boolean> = _asignarPacienteSuccess
+
+    private val _asignarPacienteError = MutableStateFlow<String?>(null)
+    val asignarPacienteError: StateFlow<String?> = _asignarPacienteError
+
+    private val _isAsignandoPaciente = MutableStateFlow(false)
+    val isAsignandoPaciente: StateFlow<Boolean> = _isAsignandoPaciente
+
+    fun asignarPaciente(idPaciente: Long, idPsicologo: Long, useCase: AsignarPacienteAlPsicologoUseCase) {
+        _isAsignandoPaciente.value = true
+        _asignarPacienteError.value = null
+        _asignarPacienteSuccess.value = false
+
+        viewModelScope.launch {
+            try {
+                val result = useCase(idPaciente, idPsicologo)
+
+                result.onSuccess {
+                    _asignarPacienteSuccess.value = true
+                    _asignarPacienteError.value = null
+                }.onFailure { error ->
+                    _asignarPacienteError.value = error.message ?: "Error al asignar paciente"
+                    _asignarPacienteSuccess.value = false
+                }
+
+            } catch (e: Exception) {
+                _asignarPacienteError.value = e.message ?: "Error inesperado al asignar paciente"
+                _asignarPacienteSuccess.value = false
+            } finally {
+                _isAsignandoPaciente.value = false
+            }
+        }
+    }
+    fun clearAsignarPsicologoResult() {
+        _asignarPacienteSuccess.value = false
+        _asignarPacienteError.value = null
     }
 }

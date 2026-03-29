@@ -37,7 +37,7 @@ import org.koin.dsl.module
 val appModule = module {
     single{ TokenDataStore(androidContext()) }
 
-    single { AuthRepository(get(), get()) }
+    single { AuthRepository(get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }

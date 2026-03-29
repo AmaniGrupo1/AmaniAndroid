@@ -11,13 +11,9 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.RegisterScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologo
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario.Cuestionario
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
@@ -25,7 +21,9 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import TestScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 
 /**
  * Grafo de navegación principal de la aplicación Amani.
@@ -76,6 +74,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.test.route) {
             TestScreen(navController)
         }
+        composable(Screens.listarPsicologo.route) {
+            ListadoPsicologosScreen(navController)
+        }
         composable(Screens.pacientes.route) {
             ListadoPacientesScreen(navController)
         }
@@ -88,9 +89,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.adminHome.route) {
             ViewAdminPrincipal(navController)
         }
-        composable(Screens.cuestionario.route) {
-            Cuestionario(navController, loginViewModel)
-        }
+//        composable(Screens.cuestionario.route) {
+//            Cuestionario(navController, loginViewModel)
+//        }
         composable(Screens.citas.route) {
             CitasScreen(navController)
         }

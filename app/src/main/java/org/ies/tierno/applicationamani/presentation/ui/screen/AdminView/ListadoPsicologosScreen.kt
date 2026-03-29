@@ -17,6 +17,8 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.admin.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
@@ -27,8 +29,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ListadoPsicologosScreen(
     navController: NavController,
-    pacienteId: String,
     loginViewModel: LoginViewModel,
+    pacienteId: String,
     viewModel: ListarPsicologosAdminViewModel = koinViewModel()
 ) {
     val psicologos by viewModel.psicologos.collectAsState()
@@ -128,27 +130,37 @@ fun ListadoPsicologosScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
+                        val asignarSuccess by loginViewModel.asignarPacienteSuccess.collectAsState()
+                        val asignarError by loginViewModel.asignarPacienteError.collectAsState()
+                        val asignarPacienteUseCase: AsignarPacienteAlPsicologoUseCase = koinViewModel()
                         Button(
                             onClick = {
-//                                scope.launch {
-////                                    loginViewModel.asignarPacienteAlPsicologo(
-////                                        pacienteId.toLong(),
-////                                        psicologo.idPsicologo
-////                                    )
-//                                    //val resultMsg = loginViewModel.asignarPsicologoResult.value
-//                                    if (resultMsg == "ok" || resultMsg == null) {
-//                                        snackbarHostState.showSnackbar("Psicólogo asignado correctamente")
-//                                        navController.navigate(Screens.adminHome.route)
-//                                    } else {
-//                                        snackbarHostState.showSnackbar("Error: $resultMsg")
-//                                    }
-//                                    loginViewModel.clearAsignarPsicologoResult()
-//                                }
+                                scope.launch {
+                                    val pacienteIdLong = pacienteId.toLongOrNull()
+                                    if (pacienteIdLong != null) {
+                                        loginViewModel.asignarPaciente(pacienteIdLong, psicologo.idPsicologo,asignarPacienteUseCase )
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("ID del paciente no válido")
+                                        }
+                                    }
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Asignar a paciente", color = Color.White, fontFamily = roboto)
+                        }
+
+// Observa cambios y muestra Snackbar automáticamente
+                        LaunchedEffect(asignarSuccess, asignarError) {
+                            if (asignarSuccess == true) {
+                                snackbarHostState.showSnackbar("Psicólogo asignado correctamente")
+                                loginViewModel.clearAsignarPsicologoResult() // limpia los flujos
+                            } else if (asignarError != null) {
+                                snackbarHostState.showSnackbar("Error: $asignarError")
+                                loginViewModel.clearAsignarPsicologoResult()
+                            }
                         }
                     }
                 }

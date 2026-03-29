@@ -2,7 +2,6 @@ package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,9 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
-import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
-import org.koin.androidx.compose.koinViewModel
+
 
 /**
  * Pantalla de registro de un nuevo administrador.
@@ -74,7 +72,7 @@ fun AgregarAdministrador(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Espaciado(40)
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Nombre
             TextField(
@@ -93,7 +91,7 @@ fun AgregarAdministrador(
                 )
             )
 
-            Espaciado(30)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Apellido
             TextField(
@@ -112,7 +110,7 @@ fun AgregarAdministrador(
                 )
             )
 
-            Espaciado(30)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Email
             TextField(
@@ -131,8 +129,7 @@ fun AgregarAdministrador(
                 )
             )
 
-            Espaciado(30)
-
+            Spacer(modifier = Modifier.height(30.dp))
             // Password
             TextField(
                 modifier = Modifier
@@ -157,7 +154,7 @@ fun AgregarAdministrador(
                 )
             )
 
-            Espaciado(30)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Botón Registrar
             Button(
@@ -180,7 +177,7 @@ fun AgregarAdministrador(
                 )
             }
 
-            Espaciado(30)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Botón Cancelar
             Button(

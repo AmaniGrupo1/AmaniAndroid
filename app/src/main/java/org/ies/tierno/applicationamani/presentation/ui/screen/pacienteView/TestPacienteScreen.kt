@@ -14,17 +14,9 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import org.ies.tierno.applicationamani.domain.models.test.Opcion
-import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
-import org.koin.androidx.compose.koinViewModel
+
 
 /**
  * Pantalla de test del paciente (placeholder).

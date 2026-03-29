@@ -7,6 +7,7 @@ import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.http.Body
@@ -56,5 +57,11 @@ interface AuthApi {
     @PUT("/auth/pacientes/{id}/baja")
     suspend fun darBajaPaciente(
         @Path("id") id: Long
+    ): Response<String>
+
+
+    @POST("/api/admin/psicologos/asignar-psicologo")
+    suspend fun asignarPsicologo(
+        @Body request: AsignarPacienteAlPsicologoRequestDTO
     ): Response<String>
 }
