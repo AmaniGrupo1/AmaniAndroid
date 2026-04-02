@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.data.repositorio
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
 import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
+import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
@@ -33,7 +34,7 @@ class CitasRepository(
         citasApi.getDisponibilidadDia(idPsicologo, fecha)
     }
 
-    suspend fun crearCita(request: CitaRequest): Result<CitaDetalleResponse> = runCatching {
+    suspend fun crearCita(request: CitaRequest): Result<CitaAdminResponseDTO> = runCatching {
         citasApi.crearCita(request)
     }
 

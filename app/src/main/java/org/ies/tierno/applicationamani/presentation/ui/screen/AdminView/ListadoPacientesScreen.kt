@@ -27,13 +27,6 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * Pantalla de listado de pacientes con opciones de gestión.
- *
- * Muestra una lista desplazable de tarjetas con los datos de cada paciente.
- * Permite dar de baja a un paciente mediante un diálogo de confirmación
- * y navegar a la pantalla de registro de paciente desde el FAB.
- *
- * @param navController Controlador de navegación.
- * @param viewModel ViewModel que provee la lista de pacientes y la acción de baja.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,13 +64,14 @@ fun ListadoPacientesScreen(
                 Icon(Icons.Default.PersonAdd, contentDescription = "Agregar paciente", tint = Color.White)
             }
         }
-    ) { padding ->
+    ) { paddingValues ->
 
+        // Contenido principal
         if (pacientes.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -107,9 +101,10 @@ fun ListadoPacientesScreen(
         } else {
             LazyColumn(
                 modifier = Modifier
-                    .padding(padding)
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(pacientes) { paciente ->
@@ -153,7 +148,7 @@ fun ListadoPacientesScreen(
                     )
                 },
                 confirmButton = {
-                    Button(
+                    TextButton(
                         onClick = {
                             scope.launch {
                                 pacienteSeleccionado?.let { paciente ->
@@ -168,15 +163,15 @@ fun ListadoPacientesScreen(
                                 mostrarDialogoBaja = false
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                     ) {
-                        Text("Dar de baja", fontFamily = roboto, color = Color.White)
+                        Text("Dar de baja", fontFamily = roboto)
                     }
                 },
                 dismissButton = {
-                    OutlinedButton(
+                    TextButton(
                         onClick = { mostrarDialogoBaja = false },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryColor)
+                        colors = ButtonDefaults.textButtonColors(contentColor = primaryColor)
                     ) {
                         Text("Cancelar", fontFamily = roboto)
                     }
@@ -198,87 +193,36 @@ fun PacienteCard(
     inactiveColor: Color,
     roboto: FontFamily
 ) {
-    // 🔥 CORRECCIÓN: Manejar correctamente método de pago como String
-    val metodoPagoStr = paciente.metodoPago ?: "PRESENCIAL"
-    val estadoPagoStr = paciente.estadoPago ?: "PENDIENTE"
+    val metodoPagoStr = paciente.metodoPago?.uppercase() ?: ""
+    val estadoPagoStr = paciente.estadoPago?.uppercase() ?: ""
 
-    // Determinar estado de pago según método y estado real
-    val estadoPagoInfo = when {
-        !paciente.activo -> Triple(
-            "INACTIVO",
-            inactiveColor,
-            Icons.Default.Error
-        )
-        metodoPagoStr.uppercase() == "ONLINE" && estadoPagoStr.uppercase() == "PAGADO" ->
-            Triple(
-                "PAGADO (Online)",
-                paidColor,
-                Icons.Default.CreditCard
-            )
-        metodoPagoStr.uppercase() == "ONLINE" && estadoPagoStr.uppercase() == "PENDIENTE" ->
-            Triple(
-                "PENDIENTE (Online)",
-                pendingColor,
-                Icons.Default.CreditCard
-            )
-        metodoPagoStr.uppercase() == "PRESENCIAL" && estadoPagoStr.uppercase() == "PENDIENTE" ->
-            Triple(
-                "PENDIENTE (Presencial)",
-                pendingColor,
-                Icons.Default.AttachMoney
-            )
-        metodoPagoStr.uppercase() == "PRESENCIAL" && estadoPagoStr.uppercase() == "PAGADO" ->
-            Triple(
-                "PAGADO (Presencial)",
-                paidColor,
-                Icons.Default.AttachMoney
-            )
-        else -> Triple(
-            estadoPagoStr,
-            Color.Gray,
-            Icons.Default.Info
-        )
+    val (estadoTexto, estadoColor, metodoIcon) = when {
+        !paciente.activo -> Triple("INACTIVO", inactiveColor, Icons.Default.Error)
+        metodoPagoStr == "ONLINE" && estadoPagoStr == "PAGADO" -> Triple("PAGADO (Online)", paidColor, Icons.Default.CreditCard)
+        metodoPagoStr == "ONLINE" && estadoPagoStr == "PENDIENTE" -> Triple("PENDIENTE (Online)", pendingColor, Icons.Default.CreditCard)
+        metodoPagoStr == "PRESENCIAL" && estadoPagoStr == "PENDIENTE" -> Triple("PENDIENTE (Presencial)", pendingColor, Icons.Default.AttachMoney)
+        metodoPagoStr == "PRESENCIAL" && estadoPagoStr == "PAGADO" -> Triple("PAGADO (Presencial)", paidColor, Icons.Default.AttachMoney)
+        else -> Triple(estadoPagoStr, Color.Gray, Icons.Default.Info)
     }
 
-    if (paciente.situaciones.isNotEmpty()) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Situaciones:",
-            fontFamily = roboto,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            color = Color.Black
-        )
-        Column(modifier = Modifier.padding(start = 8.dp, top = 4.dp)) {
-            paciente.situaciones.forEach { situacion ->
-                Text(
-                    text = "- ${situacion.descripcion}",
-                    fontFamily = roboto,
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-            }
-        }
-    }
-
-    val (estadoTexto, estadoColor, metodoIcon) = estadoPagoInfo
-
-    // Determinar ícono y texto del método de pago
-    val metodoPagoInfo = when (metodoPagoStr.uppercase()) {
+    val (metodoIcono, metodoTexto) = when (metodoPagoStr) {
         "ONLINE" -> Pair(Icons.Default.Payment, "Pago Online")
         "PRESENCIAL" -> Pair(Icons.Default.AttachMoney, "Pago Presencial")
         else -> Pair(Icons.Default.Info, metodoPagoStr)
     }
-    val (metodoIcono, metodoTexto) = metodoPagoInfo
 
     Card(
-        shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header con nombre y estado
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -304,11 +248,9 @@ fun PacienteCard(
                     )
                 }
 
-                // Badge de estado de pago
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = estadoColor.copy(alpha = 0.2f),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    color = estadoColor.copy(alpha = 0.2f)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -375,19 +317,156 @@ fun PacienteCard(
                 )
             }
 
-            // Método de pago (destacado)
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = when (metodoPagoStr.uppercase()) {
-                        "ONLINE" -> Color(0xFFE3F2FD)
-                        "PRESENCIAL" -> Color(0xFFFFF3E0)
-                        else -> Color(0xFFF5F5F5)
+            // Direcciones
+            if (!paciente.direccion.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Direcciones:",
+                    fontFamily = roboto,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                paciente.direccion?.forEach { direccion ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color(0xFFF8F9FA)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                text = direccion.calle,
+                                fontFamily = roboto,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                            if (direccion.ciudad != null || direccion.provincia != null) {
+                                Text(
+                                    text = listOfNotNull(direccion.ciudad, direccion.provincia).joinToString(", "),
+                                    fontFamily = roboto,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                            if (direccion.codigoPostal != null || direccion.pais != null) {
+                                Text(
+                                    text = listOfNotNull(direccion.codigoPostal, direccion.pais).joinToString(" - "),
+                                    fontFamily = roboto,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
                     }
-                ),
-                shape = RoundedCornerShape(8.dp)
+                }
+            }
+
+            // Tutores
+            if (!paciente.tutores.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Tutores:",
+                    fontFamily = roboto,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                paciente.tutores.forEach { tutor ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color(0xFFF8F9FA)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                text = "${tutor.nombre} (${tutor.tipo})",
+                                fontFamily = roboto,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = "Tel: ${tutor.telefono}",
+                                fontFamily = roboto,
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = "Email: ${tutor.email}",
+                                fontFamily = roboto,
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                            if (tutor.dni.isNotBlank()) {
+                                Text(
+                                    text = "DNI: ${tutor.dni}",
+                                    fontFamily = roboto,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Situaciones
+            if (!paciente.situaciones.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Situaciones:",
+                    fontFamily = roboto,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    paciente.situaciones.forEach { situacion ->
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color(0xFFE3F2FD)
+                        ) {
+                            Text(
+                                text = situacion.descripcion ?: situacion.nombre,
+                                fontFamily = roboto,
+                                fontSize = 12.sp,
+                                color = Color(0xFF1976D2),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Método de pago
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                color = when (metodoPagoStr) {
+                    "ONLINE" -> Color(0xFFE3F2FD)
+                    "PRESENCIAL" -> Color(0xFFFFF3E0)
+                    else -> Color(0xFFF5F5F5)
+                }
             ) {
                 Row(
                     modifier = Modifier
@@ -398,7 +477,7 @@ fun PacienteCard(
                     Icon(
                         imageVector = metodoIcono,
                         contentDescription = "Método de pago",
-                        tint = when (metodoPagoStr.uppercase()) {
+                        tint = when (metodoPagoStr) {
                             "ONLINE" -> Color(0xFF1976D2)
                             "PRESENCIAL" -> Color(0xFFE67E22)
                             else -> Color.Gray
@@ -415,7 +494,7 @@ fun PacienteCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = metodoTexto,
-                        color = when (metodoPagoStr.uppercase()) {
+                        color = when (metodoPagoStr) {
                             "ONLINE" -> Color(0xFF1976D2)
                             "PRESENCIAL" -> Color(0xFFE67E22)
                             else -> Color.Black
@@ -424,69 +503,13 @@ fun PacienteCard(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Indicador de estado de pago
-                    when {
-                        metodoPagoStr.uppercase() == "ONLINE" && estadoPagoStr.uppercase() == "PAGADO" -> {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = paidColor.copy(alpha = 0.2f)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Pagado",
-                                        modifier = Modifier.size(14.dp),
-                                        tint = paidColor
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Pago realizado",
-                                        color = paidColor,
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto
-                                    )
-                                }
-                            }
-                        }
-                        metodoPagoStr.uppercase() == "PRESENCIAL" && estadoPagoStr.uppercase() == "PENDIENTE" -> {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = pendingColor.copy(alpha = 0.2f)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Schedule,
-                                        contentDescription = "Pendiente",
-                                        modifier = Modifier.size(14.dp),
-                                        tint = pendingColor
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "Pago pendiente",
-                                        color = pendingColor,
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto
-                                    )
-                                }
-                            }
-                        }
-                    }
                 }
             }
 
-            // Fechas de auditoría
+            // Fechas
             if (paciente.createdAt.isNotBlank()) {
                 Divider(
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 12.dp),
                     color = Color(0xFFE0E0E0)
                 )
 
@@ -513,12 +536,11 @@ fun PacienteCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Botones de acción
+            // Botones
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Botón Dar de baja (solo si está activo)
                 if (paciente.activo) {
                     Button(
                         onClick = onDarBaja,
@@ -526,64 +548,41 @@ fun PacienteCard(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Dar de baja",
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.Delete, contentDescription = "Dar de baja", modifier = Modifier.size(18.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Baja", color = Color.White, fontFamily = roboto)
                     }
                 } else {
-                    // Botón para reactivar
                     Button(
-                        onClick = { /* Lógica para reactivar */ },
+                        onClick = { },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Restore,
-                            contentDescription = "Reactivar",
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.Restore, contentDescription = "Reactivar", modifier = Modifier.size(18.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Reactivar", color = Color.White, fontFamily = roboto)
                     }
                 }
 
-                // Botón Editar
                 Button(
                     onClick = onEditar,
                     colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.White
-                    )
+                    Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(18.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Editar", color = Color.White, fontFamily = roboto)
                 }
 
-                // Botón Asignar Psicólogo
                 Button(
                     onClick = onAsignarPsicologo,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Psychology,
-                        contentDescription = "Asignar psicólogo",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.White
-                    )
+                    Icon(Icons.Default.Psychology, contentDescription = "Asignar psicólogo", modifier = Modifier.size(18.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Asignar", color = Color.White, fontFamily = roboto)
                 }
@@ -601,9 +600,7 @@ fun InfoRow(
     roboto: FontFamily
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -641,7 +638,7 @@ fun InfoRowCompact(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(vertical = 2.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

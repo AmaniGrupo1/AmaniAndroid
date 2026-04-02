@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.dto.requestPaciente
 
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
-import org.ies.tierno.applicationamani.dto.tutor.TutorRequestDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 
 /**
@@ -35,5 +34,6 @@ data class DatosPacienteAdminDTO (
     val metodoPago : String,
     val estadoPago : String,
     val situaciones : List<SituacionDTO>,
-    val tutores : List<TutorResponseDTO>
+    val tutores : List<TutorResponseDTO>,
+    val direccion : List<DireccionResponseDTO>
 )

@@ -251,16 +251,3 @@ private fun CeldaDia(
     }
 }
 
-/**
- * Vista previa del calendario con una fecha seleccionada y fechas destacadas.
- */
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-@Preview(showBackground = true)
-fun CalendarioViewPreview() {
-       CalendarioView(
-        fechaSeleccionada = LocalDate.now(),
-        fechasDestacadas = setOf(LocalDate.now().plusDays(2), LocalDate.now().plusDays(5)),
-        onFechaSeleccionada = { /* Acción al seleccionar fecha */ }
-    )
-}

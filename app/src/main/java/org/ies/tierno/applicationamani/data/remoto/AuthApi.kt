@@ -16,8 +16,8 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-interface AuthApi {
 
+interface AuthApi {
 
     @POST("auth/login")
     suspend fun login(

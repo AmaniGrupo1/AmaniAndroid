@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 enum class AdminNavItem {
     DOCUMENTOS,
@@ -50,7 +51,10 @@ fun BarraNavegationInferiorAdmin(
         ItemIcon(
             icon = Icons.Outlined.CalendarToday,
             selected = selectedItem == AdminNavItem.CALENDARIO
-        ) { onItemSelected(AdminNavItem.CALENDARIO) }
+        ) {
+            onItemSelected(AdminNavItem.CALENDARIO)
+            navController.navigate(Screens.psicologoAgenda.route)
+        }
 
         ItemIcon(
             icon = Icons.AutoMirrored.Outlined.ShowChart,

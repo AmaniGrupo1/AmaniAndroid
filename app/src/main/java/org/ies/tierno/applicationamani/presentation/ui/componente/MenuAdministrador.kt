@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -385,7 +386,7 @@ fun MenuLateralAdministrador(
         Triple(Icons.Default.Quiz, "Tests", Screens.test.route),
         Triple(Icons.Default.Edit, "Crear preguntas", Screens.test.route),
         Triple(Icons.Default.AdminPanelSettings, "Registrar admin", Screens.agregarAdmin.route),
-        Triple(Icons.Default.Logout, "Cerrar sesión", Screens.login.route)
+        Triple(Icons.AutoMirrored.Filled.Logout, "Cerrar sesión", Screens.login.route)
     )
 
     ModalNavigationDrawer(

@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.data.remoto
 
 import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
 import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
+import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
 import org.ies.tierno.applicationamani.dto.citas.DiaNoDisponibleRequest
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
@@ -36,8 +37,8 @@ interface CitasApi {
         @Query("fecha") fecha: String
     ): DisponibilidadDiaResponse
 
-    @POST("/api/citas")
-    suspend fun crearCita(@Body request: CitaRequest): CitaDetalleResponse
+    @POST("/api/citas/admin")
+    suspend fun crearCita(@Body request: CitaRequest): CitaAdminResponseDTO
 
     @PATCH("/api/citas/{id}/cancelar")
     suspend fun cancelarCita(@Path("id") idCita: Long): CitaDetalleResponse

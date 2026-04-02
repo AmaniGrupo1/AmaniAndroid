@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.dto.requestPaciente
 
+import org.ies.tierno.applicationamani.domain.models.enumm.Rol
+
 
 data class UsuarioRequest(
     val id: Long? = null,
@@ -8,6 +10,6 @@ data class UsuarioRequest(
     val apellido: String,
     val email: String,
     val password: String,
-    val rol: String,      // "paciente", "admin", "psicologo"
+    val rol: Rol,      // "paciente", "admin", "psicologo"
     val activo: Boolean? = true
 )

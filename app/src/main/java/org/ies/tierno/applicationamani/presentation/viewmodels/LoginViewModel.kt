@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
@@ -21,6 +22,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionRequest
 import org.ies.tierno.applicationamani.dto.tutor.TutorRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import java.time.LocalDate
 import java.time.Period
 
@@ -47,7 +49,7 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
 
     /**
      * Ejecuta el proceso de inicio de sesión.
-     * Valida los campos antes de realizar la llamada al caso de uso.
+     * Válida los campos antes de realizar la llamada al caso de uso.
      */
     fun login() {
         // Validaciones previas
@@ -127,7 +129,7 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
     }
 
     /**
-     * Valida si el formulario de login es válido para habilitar el botón.
+     * Válida si el formulario de login es válido para habilitar el botón.
      */
     fun isLoginFormValid(): Boolean {
         return _username.value.isNotBlank() &&
@@ -396,6 +398,7 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
                 }
 
                 val direccion = DireccionRequest(
+                    idPaciente = null,
                     calle = calle.value,
                     ciudad = ciudad.value.ifBlank { null },
                     provincia = provincia.value.ifBlank { null },
@@ -414,13 +417,13 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
                         apellido = apellido.value,
                         email = email.value,
                         password = regPassword.value,
-                        rol = "paciente",
+                        rol = Rol.paciente,
                         dni = dni.value
                     ),
                     aceptaTerminos = aceptaTerminos.value,
                     aceptaVideoconferencia = aceptaVideoconferencia.value,
                     aceptaComunicacion = aceptaComunicacion.value,
-                    situacionesIds = situacionesIds.value,
+                    idSituaciones = situacionesIds.value,
                     tutores = tutoresList,
                     direccion = listOf(direccion)
                 )
