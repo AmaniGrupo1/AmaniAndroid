@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,6 +98,18 @@ fun MenuAdministrador(
                 title = "Registrar administrador",
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.agregarAdmin.route,
+                dividerAfter = true
+            ),
+            MenuAdministrador(
+                title = "Citas",
+                icon = Icons.Default.AdminPanelSettings,
+                route = Screens.citas.route,
+                dividerAfter = true
+            ),
+            MenuAdministrador(
+                title = "Calendario",
+                icon = Icons.Default.AdminPanelSettings,
+                route = Screens.psicologoAgenda.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
@@ -238,11 +251,15 @@ fun MenuAdministrador(
                         .clip(RoundedCornerShape(8.dp))
                 )
 
-                Divider()
+                HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 
                 menuItems.forEach { item ->
                     if (item.dividerBefore) {
-                        Divider()
+                        HorizontalDivider(
+                            Modifier,
+                            DividerDefaults.Thickness,
+                            DividerDefaults.color
+                        )
                     }
 
                     DropdownMenuItem(

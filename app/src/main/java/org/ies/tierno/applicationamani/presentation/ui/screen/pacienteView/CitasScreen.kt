@@ -5,45 +5,22 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.presentation.components.BottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
 import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
@@ -52,6 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -66,6 +44,7 @@ fun CitasScreen(
     val agendaMensual by viewModel.agendaMensual.collectAsState()
     val disponibilidadDia by viewModel.disponibilidadDia.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     var mesVisible by remember { mutableStateOf(YearMonth.now()) }
@@ -85,7 +64,7 @@ fun CitasScreen(
                     hora = hora,
                     minutosAntes = 30,
                     titulo = "Cita en Amani",
-                    mensaje = "Tu cita es a las $hora"
+                    mensaje = "Tu cita es a las ${hora.format(DateTimeFormatter.ofPattern("HH:mm"))}"
                 )
             }
         }
@@ -103,7 +82,7 @@ fun CitasScreen(
                 hora = hora,
                 minutosAntes = 30,
                 titulo = "Cita en Amani",
-                mensaje = "Tu cita es a las $hora"
+                mensaje = "Tu cita es a las ${hora.format(DateTimeFormatter.ofPattern("HH:mm"))}"
             )
         }
     }
@@ -114,39 +93,32 @@ fun CitasScreen(
 
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.clearError()
+            scope.launch {
+                snackbarHostState.showSnackbar(it)
+                viewModel.clearError()
+            }
         }
     }
 
-    val citasPorDia = remember(agendaMensual) {
-        agendaMensual?.citas
-            ?.mapNotNull { cita ->
-                runCatching {
-                    val fecha = LocalDate.parse(cita.fecha)
-                    val hora = LocalTime.parse(cita.hora)
-                    fecha to (hora to (cita.motivo ?: cita.psicologoNombre ?: "Cita"))
-                }.getOrNull()
-            }
-            ?.groupBy(
-                keySelector = { it.first },
-                valueTransform = { it.second }
-            )
-            ?.mapValues { (_, items) -> items.toMap() }
-            ?: emptyMap()
+    // agendaMensual es List<AgendaItemDTO?> - cada elemento es UNA cita del paciente
+    // Extraer las fechas donde hay citas
+    val fechasConCitas = remember(agendaMensual) {
+        agendaMensual.mapNotNull { it?.fecha }.toSet()
     }
 
-    val fechasDestacadas = citasPorDia.keys
-
-    val franjasDelDia = remember(disponibilidadDia) {
-        disponibilidadDia?.franjas?.mapNotNull { franja ->
-            runCatching {
-                FranjaHoraria(
-                    hora = LocalTime.parse(franja.hora),
-                    libre = !franja.ocupada,
-                    motivo = franja.descripcion
-                )
-            }.getOrNull()
+    // Convertir franjas de disponibilidad al formato que espera VistaDiariaHoras
+    // VistaDiariaHoras espera List<FranjaHoraria>? - necesito ver ese componente
+    val franjasParaVista = remember(disponibilidadDia) {
+        disponibilidadDia?.franjas?.map { franja ->
+            // Crear objeto que VistaDiariaHoras espera
+            // Como no tengo la definición de FranjaHoraria, asumo que tiene estas propiedades
+            FranjaHoraria(
+                diaSemana = disponibilidadDia!!.fecha.dayOfWeek.value.toShort(),
+                horaInicio = franja.hora.format(DateTimeFormatter.ofPattern("HH:mm")),
+                horaFin = franja.hora.plusMinutes(60).format(DateTimeFormatter.ofPattern("HH:mm")),
+                activo = !franja.ocupada,
+                motivo = franja.descripcion
+            )
         } ?: emptyList()
     }
 
@@ -155,86 +127,136 @@ fun CitasScreen(
         bottomBar = { BottomBar(navController) },
         containerColor = colors.background
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            Text(
-                text = "Mis citas",
-                style = typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = colors.onBackground,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text = "Mis citas",
+                    style = typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.onBackground,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
 
-            CalendarioView(
-                modifier = Modifier.fillMaxWidth(),
-                mesVisible = mesVisible,
-                fechaSeleccionada = fechaSeleccionada,
-                fechasDestacadas = fechasDestacadas,
-                onMesVisibleChange = { mesVisible = it },
-                onFechaSeleccionada = { fecha ->
-                    fechaSeleccionada = if (fechaSeleccionada == fecha) null else fecha
-                    if (fechaSeleccionada != null) {
-                        viewModel.cargarDisponibilidad(fecha)
+                CalendarioView(
+                    modifier = Modifier.fillMaxWidth(),
+                    mesVisible = mesVisible,
+                    fechaSeleccionada = fechaSeleccionada,
+                    fechasDestacadas = fechasConCitas,
+                    onMesVisibleChange = { mesVisible = it },
+                    onFechaSeleccionada = { fecha ->
+                        fechaSeleccionada = if (fechaSeleccionada == fecha) null else fecha
+                        if (fechaSeleccionada != null) {
+                            viewModel.cargarDisponibilidad(fecha)
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AnimatedVisibility(
+                    visible = fechaSeleccionada != null && !isLoading,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    fechaSeleccionada?.let { fecha ->
+                        if (disponibilidadDia?.diaCompleto == true) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = MaterialTheme.shapes.medium,
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            ) {
+                                Text(
+                                    text = "No hay disponibilidad para este día",
+                                    style = typography.bodyMedium,
+                                    modifier = Modifier.padding(16.dp),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+                        } else if (franjasParaVista.isEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = MaterialTheme.shapes.medium,
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            ) {
+                                Text(
+                                    text = "No hay franjas horarias disponibles",
+                                    style = typography.bodyMedium,
+                                    modifier = Modifier.padding(16.dp),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+                        } else {
+                            VistaDiariaHoras(
+                                fecha = fecha,
+                                franjas = franjasParaVista,
+                                modifier = Modifier.fillMaxWidth(),
+                                onFranjaSeleccionada = { franja ->
+                                    scope.launch {
+                                        val hora = LocalTime.parse(franja.horaInicio)
+                                        val result = viewModel.reservarCita(
+                                            fecha = fecha,
+                                            hora = hora,
+                                            motivo = "Cita psicológica",
+                                            duracionMinutos = 60
+                                        )
+                                        if (result.isSuccess) {
+                                            programarConPermiso(fecha, hora)
+
+                                            val actionResult = snackbarHostState.showSnackbar(
+                                                message = "Cita reservada a las ${franja.horaInicio}",
+                                                actionLabel = "Calendario",
+                                                duration = SnackbarDuration.Long
+                                            )
+                                            if (actionResult == SnackbarResult.ActionPerformed) {
+                                                enviarCitaAlCalendario(
+                                                    context = context,
+                                                    fecha = fecha,
+                                                    hora = hora,
+                                                    duracionMinutos = 60,
+                                                    titulo = "Cita - Amani",
+                                                    descripcion = "Cita reservada el $fecha a las ${franja.horaInicio}"
+                                                )
+                                            }
+
+                                            // Recargar agenda y disponibilidad
+                                            viewModel.cargarAgendaMensual(mesVisible)
+                                            viewModel.cargarDisponibilidad(fecha)
+                                        } else {
+                                            snackbarHostState.showSnackbar(
+                                                result.exceptionOrNull()?.message
+                                                    ?: "No se pudo reservar la cita"
+                                            )
+                                        }
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AnimatedVisibility(
-                visible = fechaSeleccionada != null,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                fechaSeleccionada?.let { fecha ->
-                    VistaDiariaHoras(
-                        fecha = fecha,
-                        franjas = franjasDelDia,
+                if (isLoading) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
                         modifier = Modifier.fillMaxWidth(),
-                        onFranjaSeleccionada = { franja ->
-                            scope.launch {
-                                val result = viewModel.reservarCita(fecha, franja.hora)
-                                if (result.isSuccess) {
-                                    programarConPermiso(fecha, franja.hora)
-
-                                    val actionResult = snackbarHostState.showSnackbar(
-                                        message = "Cita reservada a las ${franja.hora}",
-                                        actionLabel = "Calendario",
-                                        duration = SnackbarDuration.Long
-                                    )
-                                    if (actionResult == SnackbarResult.ActionPerformed) {
-                                        enviarCitaAlCalendario(
-                                            context = context,
-                                            fecha = fecha,
-                                            hora = franja.hora,
-                                            duracionMinutos = 60,
-                                            titulo = "Cita - Amani",
-                                            descripcion = "Cita reservada el $fecha a las ${franja.hora}"
-                                        )
-                                    }
-                                } else {
-                                    snackbarHostState.showSnackbar(
-                                        result.exceptionOrNull()?.message
-                                            ?: "No se pudo reservar la cita"
-                                    )
-                                }
-                            }
-                        }
-                    )
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun CitasScreenPreview() {
-    CitasScreen(navController = rememberNavController())
 }

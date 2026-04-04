@@ -56,6 +56,7 @@ kotlin {
 
 dependencies {
 
+    implementation("io.insert-koin:koin-androidx-compose:4.1.1")
     // 🚨 IMPORTANTE: eliminado Spring (NO compatible con Android)
 
     // Networking

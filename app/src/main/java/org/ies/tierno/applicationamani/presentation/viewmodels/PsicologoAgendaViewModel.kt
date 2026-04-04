@@ -9,8 +9,9 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
-import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
+import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -22,8 +23,8 @@ class PsicologoAgendaViewModel(
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
-    private val _agendaMensual = MutableStateFlow(AgendaPsicologoResponse())
-    val agendaMensual: StateFlow<AgendaPsicologoResponse> = _agendaMensual.asStateFlow()
+    private val _agendaMensual = MutableStateFlow<List<AgendaItemDTO>>(emptyList())
+    val agendaMensual: StateFlow<List<AgendaItemDTO>> = _agendaMensual.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -32,7 +33,7 @@ class PsicologoAgendaViewModel(
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     init {
-        // Observar cambios en la sesión de usuario para que los viewmodels reaccionen
+        // Observar cambios en la sesión de usuario
         viewModelScope.launch {
             userSessionDataStore.sessionFlow.collect { session ->
                 _userSession.value = session
@@ -44,13 +45,18 @@ class PsicologoAgendaViewModel(
         _errorMessage.value = null
     }
 
+    // --------------------------
+    // Cargar agenda mensual
+    // --------------------------
     fun cargarAgendaMensual(month: YearMonth) {
-        val session = _userSession.value ?: return
-        val psychologistId = session.idPsicologo
+        val session = _userSession.value
+        val psychologistId = session?.idPsicologo
         if (psychologistId == null) {
-            _errorMessage.value = "No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar."
+            _errorMessage.value = "No hay sesión de psicólogo o id nulo."
+            _agendaMensual.value = emptyList()
             return
         }
+
         viewModelScope.launch {
             _isLoading.value = true
             citasRepository.getAgendaPsicologo(psychologistId, month.toString())
@@ -59,49 +65,72 @@ class PsicologoAgendaViewModel(
                     _errorMessage.value = null
                 }
                 .onFailure { error ->
-                    _errorMessage.value = error.message ?: "No se pudo cargar la agenda del psicólogo"
+                    _errorMessage.value = error.message ?: "No se pudo cargar la agenda"
+                    _agendaMensual.value = emptyList()
                 }
             _isLoading.value = false
         }
     }
 
-    suspend fun actualizarHorario(
-        horaInicio: Int,
-        horaFin: Int,
-        duracionSesion: Int
-    ): Result<Unit> {
-        val session = _userSession.value
-            ?: return Result.failure(IllegalStateException("No hay sesión de psicólogo"))
-        val psychologistId = session.idPsicologo
-            ?: return Result.failure(
-                IllegalStateException("No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar.")
-            )
+    // --------------------------
+    // Actualizar horario (con lista de franjas)
+    // --------------------------
+    fun actualizarHorario(franjas: List<FranjaHorarioDTO>) {
+        val session = _userSession.value ?: run {
+            _errorMessage.value = "No hay sesión de psicólogo"
+            return
+        }
 
-        return citasRepository.actualizarHorario(
-            psychologistId,
-            HorarioPsicologoRequest(horaInicio, horaFin, duracionSesion)
-        ).map { agenda ->
-            _agendaMensual.value = agenda
+        val psychologistId = session.idPsicologo ?: run {
+            _errorMessage.value = "idPsicologo nulo"
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val request = HorarioRequestDTO(franjas = franjas)
+                citasRepository.actualizarHorario(psychologistId, request)
+                // Recargamos agenda para reflejar los cambios
+                cargarAgendaMensual(YearMonth.now())
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Error al actualizar el horario"
+            }
+            _isLoading.value = false
         }
     }
 
-    suspend fun alternarDiaNoDisponible(
+    // --------------------------
+    // Alternar día no disponible
+    // --------------------------
+    fun alternarDiaNoDisponible(
         fecha: LocalDate,
         yaNoDisponible: Boolean
-    ): Result<Unit> {
-        val session = _userSession.value
-            ?: return Result.failure(IllegalStateException("No hay sesión de psicólogo"))
-        val psychologistId = session.idPsicologo
-            ?: return Result.failure(
-                IllegalStateException("No se pudo resolver el id del psicólogo. Cierra sesión y vuelve a entrar.")
-            )
+    ) {
+        val session = _userSession.value ?: run {
+            _errorMessage.value = "No hay sesión de psicólogo"
+            return
+        }
 
-        return citasRepository.alternarDiaNoDisponible(
-            idPsicologo = psychologistId,
-            fecha = fecha.toString(),
-            yaNoDisponible = yaNoDisponible
-        ).map { agenda ->
-            _agendaMensual.value = agenda
+        val psychologistId = session.idPsicologo ?: run {
+            _errorMessage.value = "idPsicologo nulo"
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                citasRepository.alternarDiaNoDisponible(
+                    idPsicologo = psychologistId,
+                    fecha = fecha.toString(),
+                    yaNoDisponible = yaNoDisponible
+                )
+                // Recargamos agenda para reflejar los cambios
+                cargarAgendaMensual(YearMonth.now())
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Error al alternar día no disponible"
+            }
+            _isLoading.value = false
         }
     }
 }

@@ -11,7 +11,6 @@ import java.time.LocalDateTime
  */
 
 data class CitaAdminResponseDTO(
-
     val nombrePaciente: String? = null,
     val apellidoPaciente: String? = null,
     val idPsicologo: Long? = null,

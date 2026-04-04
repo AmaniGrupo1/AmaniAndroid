@@ -15,41 +15,32 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarA
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import TestScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologo.PsicologoAgendaScreen
+import org.koin.java.KoinJavaComponent.getKoin
+import org.koin.core.parameter.parametersOf
 
-/**
- * Grafo de navegación principal de la aplicación Amani.
- *
- * Define todas las rutas y las asocia a sus composables de pantalla
- * correspondientes mediante Jetpack Navigation Compose.
- *
- * El flujo de navegación es:
- * 1. [Principal] → pantalla de bienvenida (destino inicial).
- * 2. [LoginScreen] → inicio de sesión.
- * 3. [RegisterScreen] → registro de nuevo usuario.
- * 4. [QuestionnaireScreen] → cuestionario de evaluación.
- * 5. [PrincipalClienteScreen] → pantalla principal del cliente autenticado.
- *
- * @param startDestination Ruta de la pantalla inicial. Por defecto es
- *   [Screens.principal].
- *
- * @see Screens
- */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(startDestination: String = Screens.principal.route) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = koinViewModel()
+
+    // ✅ CORRECTO: Obtener repositorios de Koin directamente
+    val citasRepository = getKoin().get<CitasRepository>()
+    val userSessionDataStore = getKoin().get<UserSessionDataStore>()
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screens.principal.route) {
@@ -84,9 +75,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 }
             )
         ) { backStackEntry ->
-
             val idPaciente = backStackEntry.arguments?.getString("pacienteId") ?: ""
-
             ListadoPsicologosScreen(
                 navController = navController,
                 loginViewModel = loginViewModel,
@@ -105,14 +94,14 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.adminHome.route) {
             ViewAdminPrincipal(navController)
         }
-//        composable(Screens.cuestionario.route) {
-//            Cuestionario(navController, loginViewModel)
-//        }
         composable(Screens.citas.route) {
             CitasScreen(navController)
         }
         composable(Screens.psicologoAgenda.route) {
-            PsicologoAgendaScreen(navController)
+            PsicologoAgendaScreen(navController, citasRepository, userSessionDataStore)
+        }
+        composable(Screens.calendario.route) {
+            CalendarioView()
         }
     }
 }
