@@ -54,7 +54,7 @@ val appModule = module {
     factory { ResponderTestUseCase(get()) }
     factory { ListarSituacionUseCase(get()) }
 
-    viewModel { LoginViewModel(get()) }
+    viewModel { LoginViewModel(get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { ListarPacientesViewModel(get(), get()) }

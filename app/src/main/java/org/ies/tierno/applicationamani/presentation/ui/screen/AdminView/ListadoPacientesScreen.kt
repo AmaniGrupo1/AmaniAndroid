@@ -109,6 +109,7 @@ fun ListadoPacientesScreen(
             ) {
                 items(pacientes) { paciente ->
                     PacienteCard(
+                        navController,
                         paciente = paciente,
                         onDarBaja = {
                             pacienteSeleccionado = paciente
@@ -183,6 +184,7 @@ fun ListadoPacientesScreen(
 
 @Composable
 fun PacienteCard(
+    navController: NavController,
     paciente: DatosPacienteAdminDTO,
     onDarBaja: () -> Unit,
     onEditar: () -> Unit,
@@ -576,8 +578,10 @@ fun PacienteCard(
                     Text("Editar", color = Color.White, fontFamily = roboto)
                 }
 
+                //-------------------------------------------------------------------------------------------------------
+
                 Button(
-                    onClick = onAsignarPsicologo,
+                    onClick = {navController.navigate(Screens.listarPsicologo.createRoute(paciente.idPaciente))},
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp)

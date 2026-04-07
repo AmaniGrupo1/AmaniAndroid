@@ -76,11 +76,11 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             route = Screens.listarPsicologo.route,
             arguments = listOf(
                 navArgument("pacienteId") {
-                    type = NavType.StringType
+                    type = NavType.LongType
                 }
             )
         ) { backStackEntry ->
-            val idPaciente = backStackEntry.arguments?.getString("pacienteId") ?: ""
+            val idPaciente = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
             ListadoPsicologosScreen(
                 navController = navController,
                 loginViewModel = loginViewModel,
