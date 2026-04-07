@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
+import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
 import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
 import java.time.LocalDate
 import java.time.YearMonth
@@ -46,8 +47,20 @@ class PsicologoAgendaViewModel(
             val monthFormatted = month.format(monthFormatter)
 
             val result = citasRepository.getAgendaPsicologo(idPsicologo, monthFormatted)
-            result.onSuccess { response ->
-                _agendaMensual.value = response
+            result.onSuccess { items ->
+                val citas = items.map { item ->
+                    CitaDetalleResponse(
+                        id = item.id,
+                        fecha = item.fecha.toString(),
+                        hora = item.horaInicio.toString(),
+                        pacienteNombre = item.nombrePaciente,
+                        psicologoNombre = item.nombrePsicologo,
+                        motivo = item.motivo,
+                        estado = item.estado,
+                        durationMinutes = item.duracionMinutos
+                    )
+                }
+                _agendaMensual.value = _agendaMensual.value.copy(citas = citas)
                 _errorMessage.value = null
             }.onFailure { exception ->
                 _errorMessage.value = exception.message ?: "Error al cargar la agenda"

@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
+import org.ies.tierno.applicationamani.dto.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
 import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
 import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
@@ -15,14 +16,14 @@ class CitasRepository(
     suspend fun getAgendaPaciente(
         idPaciente: Long,
         month: String
-    ): Result<AgendaPacienteResponse> = runCatching {
+    ): Result<List<AgendaItemDTO>> = runCatching {
         citasApi.getAgendaPaciente(idPaciente, month)
     }
 
     suspend fun getAgendaPsicologo(
         idPsicologo: Long,
         month: String
-    ): Result<AgendaPsicologoResponse> = runCatching {
+    ): Result<List<AgendaItemDTO>> = runCatching {
         citasApi.getAgendaPsicologo(idPsicologo, month)
     }
 

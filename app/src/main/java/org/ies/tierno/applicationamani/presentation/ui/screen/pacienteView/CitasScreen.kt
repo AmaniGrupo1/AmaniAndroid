@@ -120,20 +120,17 @@ fun CitasScreen(
     }
 
     val citasPorDia = remember(agendaMensual) {
-        agendaMensual?.citas
-            ?.mapNotNull { cita ->
-                runCatching {
-                    val fecha = LocalDate.parse(cita.fecha)
-                    val hora = LocalTime.parse(cita.hora)
-                    fecha to (hora to (cita.motivo ?: cita.psicologoNombre ?: "Cita"))
-                }.getOrNull()
+        agendaMensual
+            .mapNotNull { cita ->
+                cita?.let {
+                    it.fecha to (it.horaInicio to (it.motivo ?: it.nombrePsicologo))
+                }
             }
-            ?.groupBy(
+            .groupBy(
                 keySelector = { it.first },
                 valueTransform = { it.second }
             )
-            ?.mapValues { (_, items) -> items.toMap() }
-            ?: emptyMap()
+            .mapValues { (_, items) -> items.toMap() }
     }
 
     val fechasDestacadas = citasPorDia.keys

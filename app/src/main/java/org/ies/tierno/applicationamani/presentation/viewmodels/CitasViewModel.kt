@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.dto.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
@@ -24,8 +25,8 @@ class CitasViewModel(
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
-    private val _agendaMensual = MutableStateFlow<AgendaPacienteResponse?>(null)
-    val agendaMensual: StateFlow<AgendaPacienteResponse?> = _agendaMensual.asStateFlow()
+    private val _agendaMensual = MutableStateFlow<List<AgendaItemDTO?>>(emptyList())
+    val agendaMensual: StateFlow<List<AgendaItemDTO?>> = _agendaMensual.asStateFlow()
 
     private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
     val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()
@@ -51,31 +52,38 @@ class CitasViewModel(
 
     fun cargarAgendaMensual(month: YearMonth) {
         val session = _userSession.value ?: return
+
         viewModelScope.launch {
             _isLoading.value = true
+
             citasRepository.getAgendaPaciente(session.idUsuario, month.toString())
                 .onSuccess { agenda ->
                     _agendaMensual.value = agenda
                     _errorMessage.value = null
                 }
                 .onFailure { error ->
-                    _errorMessage.value = error.message ?: "No se pudo cargar la agenda del paciente"
+                    _errorMessage.value = error.message ?: "Error cargando agenda"
+                    _agendaMensual.value = emptyList()
                 }
+
             _isLoading.value = false
         }
     }
 
     fun cargarDisponibilidad(fecha: LocalDate) {
-        val idPsicologo = _agendaMensual.value?.idPsicologoAsignado ?: return
+        val idPsicologo = _userSession.value?.idPsicologo ?: return
+
         viewModelScope.launch {
+            _isLoading.value = true
             citasRepository.getDisponibilidadDia(idPsicologo, fecha.toString())
-                .onSuccess { disponibilidad ->
-                    _disponibilidadDia.value = disponibilidad
+                .onSuccess {
+                    _disponibilidadDia.value = it
                     _errorMessage.value = null
                 }
-                .onFailure { error ->
-                    _errorMessage.value = error.message ?: "No se pudo cargar la disponibilidad"
+                .onFailure {
+                    _errorMessage.value = it.message ?: "Error disponibilidad"
                 }
+            _isLoading.value = false
         }
     }
 
@@ -85,17 +93,19 @@ class CitasViewModel(
         motivo: String = "Cita psicológica",
         duracionMinutos: Int = 60
     ): Result<Unit> {
+
         val session = _userSession.value
-            ?: return Result.failure(IllegalStateException("No hay sesión de usuario"))
-        val idPsicologo = _agendaMensual.value?.idPsicologoAsignado
-            ?: return Result.failure(IllegalStateException("El paciente no tiene psicólogo asignado"))
+            ?: return Result.failure(Exception("No hay sesión"))
+
+        val idPsicologo = session.idPsicologo
+            ?: return Result.failure(Exception("No hay psicólogo asignado"))
 
         val request = CitaRequest(
             idPaciente = session.idUsuario,
             idPsicologo = idPsicologo,
-            startDatetime = "$fecha" + "T" + hora.toString(),
+            startDatetime = "${fecha}T${hora}",
             durationMinutes = duracionMinutos,
-            estado = "pendiente",
+            estado = EstadoCita.pendiente.name,  // ← Usando el enum
             motivo = motivo
         )
 
@@ -104,5 +114,11 @@ class CitasViewModel(
                 cargarAgendaMensual(YearMonth.from(fecha))
                 cargarDisponibilidad(fecha)
             }
+    }
+
+     enum class EstadoCita {
+        pendiente,
+        confirmada,
+        cancelada
     }
 }

@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.data.remoto
 
-import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
+import org.ies.tierno.applicationamani.dto.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
 import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
 import org.ies.tierno.applicationamani.dto.citas.DiaNoDisponibleRequest
@@ -22,13 +22,13 @@ interface CitasApi {
     suspend fun getAgendaPaciente(
         @Path("idPaciente") idPaciente: Long,
         @Query("month") month: String
-    ): AgendaPacienteResponse
+    ): List<AgendaItemDTO>
 
     @GET("/api/citas/psicologo/{idPsicologo}/agenda")
     suspend fun getAgendaPsicologo(
         @Path("idPsicologo") idPsicologo: Long,
         @Query("month") month: String
-    ): AgendaPsicologoResponse
+    ): List<AgendaItemDTO>
 
     @GET("/api/citas/psicologo/{idPsicologo}/disponibilidad")
     suspend fun getDisponibilidadDia(
