@@ -29,6 +29,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoP
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologo.PsicologoAgendaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.ViewPsicologoPrincipal
 import org.koin.java.KoinJavaComponent.getKoin
 import org.koin.core.parameter.parametersOf
 
@@ -48,6 +49,10 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.login.route) {
             LoginScreen(navController, loginViewModel)
+        }
+
+        composable (Screens.psicologoHome.route){
+            ViewPsicologoPrincipal(navController)
         }
         composable(Screens.registro.route) {
             RegisterScreen(navController, loginViewModel)
@@ -98,7 +103,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             CitasScreen(navController)
         }
         composable(Screens.psicologoAgenda.route) {
-            PsicologoAgendaScreen(navController, citasRepository, userSessionDataStore)
+            PsicologoAgendaScreen(navController)
         }
         composable(Screens.calendario.route) {
             CalendarioView()
