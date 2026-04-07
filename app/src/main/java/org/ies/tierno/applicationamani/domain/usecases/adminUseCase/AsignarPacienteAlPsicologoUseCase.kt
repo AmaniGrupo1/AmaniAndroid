@@ -5,7 +5,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsic
 
 class AsignarPacienteAlPsicologoUseCase(private val repository: AuthRepository) {
 
-    suspend operator fun invoke(idPaciente : Long, idPsicologo : Long): Result<String> {
+    suspend operator fun invoke(idPaciente : Long, idPsicologo : Long): Result<Boolean> {
         return repository.asignarPsicologo(idPaciente, idPsicologo)
     }
 }
