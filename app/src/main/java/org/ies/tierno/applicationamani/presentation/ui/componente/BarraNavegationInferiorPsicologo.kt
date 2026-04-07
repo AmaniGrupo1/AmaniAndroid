@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.presentation.ui.componente
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,9 +15,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.AmaniPsicologoColors
 
 enum class PsicologoNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
@@ -70,19 +69,19 @@ fun MenuPsicologo(
     title: String,
     navController: NavController,
     showBackButton: Boolean = true,
-    actions: @Composable () -> Unit = {}
-) {
+    actions: @Composable RowScope.() -> Unit = {}
+){
     // Implementa tu TopBar aquí
     TopAppBar(
         title = { Text(title) },
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                 }
             }
         },
-        actions = actions as @Composable (RowScope.() -> Unit),
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = AmaniPsicologoColors.Primary,
             titleContentColor = Color.White,

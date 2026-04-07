@@ -16,6 +16,7 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPaci
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ResponderTestUseCase
+import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
@@ -27,6 +28,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacie
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.koin.android.ext.koin.androidContext
 
@@ -53,6 +55,7 @@ val appModule = module {
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
     factory { ListarSituacionUseCase(get()) }
+    factory { ListarPacientesByPsicologo(get()) }
 
     viewModel { LoginViewModel(get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -66,4 +69,5 @@ val appModule = module {
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(),get()) }
     viewModel { CuestionarioViewModel(get()) }
+    viewModel { ListarPacientesByPsicologoViewModel(get()) }
 }

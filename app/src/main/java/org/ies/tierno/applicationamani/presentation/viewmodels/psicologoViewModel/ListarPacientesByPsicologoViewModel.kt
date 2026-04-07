@@ -9,7 +9,9 @@ import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarP
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 
 
-class ListarPacientesViewModel(val listarPacientesByPsicologo: ListarPacientesByPsicologo) : ViewModel(){
+class ListarPacientesByPsicologoViewModel(
+    val listarPacientesByPsicologo: ListarPacientesByPsicologo
+) : ViewModel() {
 
     private val _paciente = MutableStateFlow<List<PacientePsicologoResponseDTO>>(emptyList())
     val paciente: StateFlow<List<PacientePsicologoResponseDTO>> = _paciente

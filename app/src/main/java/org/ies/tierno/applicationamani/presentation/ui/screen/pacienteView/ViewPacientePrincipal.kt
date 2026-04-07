@@ -20,7 +20,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -32,13 +31,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.BarraNavegationInferiorPsicologo
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPsicologo
 import org.ies.tierno.applicationamani.presentation.ui.componente.PsicologoNavItem
-import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -64,9 +62,9 @@ object AmaniPsicologoColors {
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ViewPsicologoPacientes(
+fun ViewPacientePrincipal(
     navController: NavController,
-    viewModel: ListarPacientesViewModel = koinViewModel()
+    viewModel: ListarPacientesByPsicologoViewModel = koinViewModel()
 ) {
     var selectedItem by remember { mutableStateOf(PsicologoNavItem.MIS_PACIENTES) }
     val pacientes by viewModel.paciente.collectAsState()
@@ -80,6 +78,7 @@ fun ViewPsicologoPacientes(
     val listState = rememberLazyListState()
     val isScrolled by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
     val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             MenuPsicologo(
@@ -93,7 +92,6 @@ fun ViewPsicologoPacientes(
                             delay(300)
                             showLoading = false
                         }
-
                     }) {
                         Icon(
                             Icons.Default.Refresh,
@@ -292,14 +290,12 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
                 .fillMaxWidth()
                 .padding(0.dp)
         ) {
-            // Header de la card (siempre visible)
             PacienteHeader(
                 paciente = paciente,
                 expanded = expanded,
                 onExpandClick = { expanded = !expanded }
             )
 
-            // Contenido expandible
             AnimatedVisibility(
                 visible = expanded,
                 enter = expandVertically(
@@ -342,12 +338,10 @@ fun PacienteHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                // Avatar + Info
                 Row(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Avatar del paciente
                     Box(
                         modifier = Modifier
                             .size(56.dp)
@@ -370,7 +364,6 @@ fun PacienteHeader(
                         )
                     }
 
-                    // Información del paciente
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
@@ -421,12 +414,10 @@ fun PacienteHeader(
                     }
                 }
 
-                // Estado de pago y botón expandir
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Badge de estado de pago
                     Surface(
                         shape = RoundedCornerShape(20.dp),
                         color = if (isPagoPendiente)
@@ -455,7 +446,6 @@ fun PacienteHeader(
                         }
                     }
 
-                    // Botón expandir
                     IconButton(
                         onClick = onExpandClick,
                         modifier = Modifier.size(32.dp)
@@ -469,7 +459,6 @@ fun PacienteHeader(
                 }
             }
 
-            // Divider decorativo
             if (!expanded) {
                 Divider(
                     color = AmaniPsicologoColors.Accent,
@@ -479,7 +468,6 @@ fun PacienteHeader(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Resumen de información básica
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -509,7 +497,7 @@ fun PacienteHeader(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Edad: ${calcularEdad(paciente.fechaNacimiento)} años",
+                            text = "Edad: ${calcularEdadDesdeString(paciente.fechaNacimiento)} años",
                             fontSize = 11.sp,
                             color = AmaniPsicologoColors.TextSecondary
                         )
@@ -545,7 +533,6 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
             .background(AmaniPsicologoColors.Accent)
             .padding(16.dp)
     ) {
-        // Título de la sección de información detallada
         Text(
             text = "📋 Información Detallada",
             fontSize = 14.sp,
@@ -554,26 +541,23 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        // Grid de información
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Información Personal
             InfoSection(
                 title = "Datos Personales",
                 icon = Icons.Default.Person,
                 items = listOf(
                     "Nombre completo" to "${paciente.nombre ?: "N/A"} ${paciente.apellido ?: ""}".trim(),
                     "DNI" to (paciente.dni ?: "No registrado"),
-                    "Fecha de nacimiento" to formatearFecha(paciente.fechaNacimiento),
-                    "Edad" to "${calcularEdad(paciente.fechaNacimiento)} años",
+                    "Fecha de nacimiento" to formatearFechaDesdeString(paciente.fechaNacimiento),
+                    "Edad" to "${calcularEdadDesdeString(paciente.fechaNacimiento)} años",
                     "Género" to (paciente.genero ?: "No especificado"),
                     "Email" to (paciente.email ?: "No disponible"),
                     "Teléfono" to (paciente.telefono ?: "No disponible")
                 )
             )
 
-            // Información de Dirección
             paciente.direccion?.let { direccion ->
                 InfoSection(
                     title = "📍 Dirección",
@@ -588,30 +572,23 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
                 )
             }
 
-            // Información de Pago
             InfoSection(
                 title = "💰 Estado de Pago",
                 icon = Icons.Default.Payment,
                 items = listOf(
                     "Estado actual" to (paciente.estadoPago?.name ?: "PENDIENTE"),
-                    "Método de pago" to "Por definir" // Si tienes este campo en el DTO
+                    "Método de pago" to "Por definir"
                 )
             )
 
-            // Horario de sesiones (si existe)
-            if (paciente.horaInicio != null && paciente.horaFin != null) {
+            if (!paciente.horaInicio.isNullOrEmpty() && !paciente.horaFin.isNullOrEmpty()) {
                 InfoSection(
                     title = "⏰ Horario de Sesiones",
                     icon = Icons.Default.Schedule,
                     items = listOf(
-                        "Hora de inicio" to formatearHora(paciente.horaInicio),
-                        "Hora de fin" to formatearHora(paciente.horaFin),
-                        "Duración" to "${
-                            calcularDuracion(
-                                paciente.horaInicio,
-                                paciente.horaFin
-                            )
-                        } minutos"
+                        "Hora de inicio" to formatearHoraDesdeString(paciente.horaInicio),
+                        "Hora de fin" to formatearHoraDesdeString(paciente.horaFin),
+                        "Duración" to "${calcularDuracionDesdeStrings(paciente.horaInicio, paciente.horaFin)} minutos"
                     )
                 )
             }
@@ -619,7 +596,6 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botones de acción
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -671,8 +647,8 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
             }
         }
 
-        // Botón de contacto
         Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedButton(
             onClick = { /* Abrir chat */ },
             modifier = Modifier.fillMaxWidth(),
@@ -733,7 +709,7 @@ fun InfoSection(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            items.forEach { (label, value) ->
+            items.forEachIndexed { index, (label, value) ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -750,7 +726,7 @@ fun InfoSection(
                         fontWeight = FontWeight.Medium,
                         color = AmaniPsicologoColors.TextPrimary
                     )
-                    if (label != items.last().first) {
+                    if (index != items.size - 1) {
                         Divider(
                             color = AmaniPsicologoColors.Accent,
                             thickness = 0.5.dp,
@@ -763,30 +739,54 @@ fun InfoSection(
     }
 }
 
-// Funciones de utilidad
+// Funciones de utilidad adaptadas para String
 @RequiresApi(Build.VERSION_CODES.O)
-private fun calcularEdad(fechaNacimiento: LocalDate?): Int {
-    if (fechaNacimiento == null) return 0
-    val hoy = LocalDate.now()
-    return hoy.year - fechaNacimiento.year -
-            if (hoy.dayOfYear < fechaNacimiento.dayOfYear) 1 else 0
+private fun calcularEdadDesdeString(fechaNacimientoStr: String?): Int {
+    if (fechaNacimientoStr.isNullOrEmpty()) return 0
+    return try {
+        val fechaNacimiento = LocalDate.parse(fechaNacimientoStr)
+        val hoy = LocalDate.now()
+        hoy.year - fechaNacimiento.year -
+                if (hoy.dayOfYear < fechaNacimiento.dayOfYear) 1 else 0
+    } catch (e: Exception) {
+        0
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun formatearFecha(fecha: LocalDate?): String {
-    if (fecha == null) return "No disponible"
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    return fecha.format(formatter)
+private fun formatearFechaDesdeString(fechaStr: String?): String {
+    if (fechaStr.isNullOrEmpty()) return "No disponible"
+    return try {
+        val formatterInput = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val fecha = LocalDate.parse(fechaStr, formatterInput)
+        val formatterOutput = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        fecha.format(formatterOutput)
+    } catch (e: Exception) {
+        fechaStr
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun formatearHora(hora: LocalTime?): String {
-    if (hora == null) return "No disponible"
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    return hora.format(formatter)
+private fun formatearHoraDesdeString(horaStr: String?): String {
+    if (horaStr.isNullOrEmpty()) return "No disponible"
+    return try {
+        val formatterInput = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val hora = LocalTime.parse(horaStr, formatterInput)
+        val formatterOutput = DateTimeFormatter.ofPattern("HH:mm")
+        hora.format(formatterOutput)
+    } catch (e: Exception) {
+        horaStr
+    }
 }
 
-private fun calcularDuracion(inicio: LocalTime?, fin: LocalTime?): Int {
-    if (inicio == null || fin == null) return 0
-    return (fin.hour - inicio.hour) * 60 + (fin.minute - inicio.minute)
+private fun calcularDuracionDesdeStrings(inicioStr: String?, finStr: String?): Int {
+    if (inicioStr.isNullOrEmpty() || finStr.isNullOrEmpty()) return 0
+    return try {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val inicio = LocalTime.parse(inicioStr, formatter)
+        val fin = LocalTime.parse(finStr, formatter)
+        (fin.hour - inicio.hour) * 60 + (fin.minute - inicio.minute)
+    } catch (e: Exception) {
+        0
+    }
 }

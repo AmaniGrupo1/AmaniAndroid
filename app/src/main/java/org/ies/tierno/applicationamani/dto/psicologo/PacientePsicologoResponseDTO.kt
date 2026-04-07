@@ -15,7 +15,7 @@ data class PacientePsicologoResponseDTO(
 
     val dni: String? = null,
 
-    val fechaNacimiento: LocalDate? = null,
+    val fechaNacimiento: String? = null,
 
     val email: String? = null,
 
@@ -27,7 +27,7 @@ data class PacientePsicologoResponseDTO(
 
     val estadoPago: EstadoPago? = null,
 
-    val horaInicio: LocalTime? = null,
+    val horaInicio: String? = null,
 
-    val horaFin: LocalTime? = null
+    val horaFin: String? = null
 )
