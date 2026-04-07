@@ -72,6 +72,9 @@ private val DarkColorScheme = darkColorScheme(
  * @property screenBackground Color de fondo para pantallas de autenticación.
  * @property textFieldContainer Color del contenedor de los campos de texto.
  * @property buttonBorder Color del borde de los botones con contorno.
+ * @property citaConfirmada Color verde para citas confirmadas.
+ * @property citaPendiente Color naranja para citas pendientes.
+ * @property citaCancelada Color rojo para citas canceladas.
  */
 @Immutable
 data class AmaniExtraColors(
@@ -81,6 +84,10 @@ data class AmaniExtraColors(
     val citaLibre: Color = AmaniCitaLibre,
     val citaOcupada: Color = AmaniCitaOcupada,
     val citaOcupadaBg: Color = AmaniCitaOcupadaBg,
+    val citaConfirmada: Color = AmaniCitaConfirmada,
+    val citaPendiente: Color = AmaniCitaPendiente,
+    val citaCancelada: Color = AmaniCitaCancelada,
+    val calendarioBg: Color = AmaniCalendarioBg,
 )
 
 /**

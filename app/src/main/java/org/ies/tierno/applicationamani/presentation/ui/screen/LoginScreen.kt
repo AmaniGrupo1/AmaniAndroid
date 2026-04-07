@@ -3,13 +3,16 @@ package org.ies.tierno.applicationamani.presentation.ui.screen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -18,15 +21,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,17 +84,14 @@ fun LoginScreen(
     val loginError by loginViewModel.loginError.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var showErrorSnackbar by remember { mutableStateOf(false) }
 
     // Efecto para mostrar errores de login en Snackbar
     LaunchedEffect(loginError) {
-        if (!loginError.isNullOrBlank() && !showErrorSnackbar) {
-            showErrorSnackbar = true
+        if (!loginError.isNullOrBlank()) {
             snackbarHostState.showSnackbar(
                 message = loginError ?: "Error al iniciar sesión",
                 duration = SnackbarDuration.Short
             )
-            showErrorSnackbar = false
         }
     }
 
@@ -96,11 +99,11 @@ fun LoginScreen(
     LaunchedEffect(loginResult) {
         val result = loginResult ?: return@LaunchedEffect
         result.onSuccess { response ->
-            val rol = response.usuario?.rol
-            val rolNormalizado = rol?.lowercase()?.trim()
-                ?.replace("ó", "o")
-                ?.replace("á", "a")
-                
+            val rol = response.rol
+            val rolNormalizado = rol.lowercase().trim()
+                .replace("ó", "o")
+                .replace("á", "a")
+
             val destination = when (rolNormalizado) {
                 "admin", "administrador" -> Screens.adminHome.route
                 "psicologo", "psicologa" -> Screens.psicologoHome.route

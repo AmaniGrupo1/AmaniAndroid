@@ -230,8 +230,6 @@ private fun TarjetaFranja(
         label = "containerColor"
     )
 
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -251,7 +249,7 @@ private fun TarjetaFranja(
         ) {
             // ── Hora ──
             Text(
-                text = franja.horaInicio.format(formatter),
+                text = franja.horaInicio, // ya está en formato "HH:mm"
                 style = typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = if (franja.activo) colors.onSurface else colors.onSurfaceVariant,

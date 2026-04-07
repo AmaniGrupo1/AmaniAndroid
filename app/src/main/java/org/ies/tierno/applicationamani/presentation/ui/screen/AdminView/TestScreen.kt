@@ -1,3 +1,5 @@
+package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

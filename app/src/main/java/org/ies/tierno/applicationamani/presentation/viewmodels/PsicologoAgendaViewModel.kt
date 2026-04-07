@@ -10,7 +10,8 @@ import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
-import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -72,25 +73,27 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    fun actualizarHorario(horaInicio: Int, horaFin: Int, duracionSesion: Int) {
+    /**
+     * Convierte las franjas del diálogo al DTO que espera Spring Boot.
+     * Envía la estructura correcta: { franjas: [{ diaSemana, horaInicio, horaFin, activo }] }
+     */
+    fun actualizarHorario(franjas: List<FranjaHorarioDTO>) {
+        if (franjas.isEmpty()) {
+            _errorMessage.value = "No hay franjas configuradas"
+            return
+        }
         val session = _userSession.value ?: run {
             _errorMessage.value = "No hay sesión de psicólogo"
             return
         }
-
         val psychologistId = session.idPsicologo ?: run {
             _errorMessage.value = "idPsicologo nulo"
             return
         }
-
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val request = HorarioPsicologoRequest(
-                    horaInicio = horaInicio,
-                    horaFin = horaFin,
-                    duracionSesion = duracionSesion
-                )
+                val request = HorarioRequestDTO(franjas = franjas)
                 citasRepository.actualizarHorario(psychologistId, request)
                 cargarAgendaMensual(_mesVisible.value)
             } catch (e: Exception) {
@@ -100,9 +103,16 @@ class PsicologoAgendaViewModel(
         }
     }
 
+    /**
+     * Bloquea un día completo (envía null en horaInicio/horaFin).
+     * Para bloquear solo un rango horario, usar sobrecarga con esos parámetros.
+     */
     fun alternarDiaNoDisponible(
         fecha: LocalDate,
-        yaNoDisponible: Boolean
+        yaNoDisponible: Boolean,
+        horaInicio: String? = null,
+        horaFin: String? = null,
+        motivo: String? = null
     ) {
         val session = _userSession.value ?: run {
             _errorMessage.value = "No hay sesión de psicólogo"
@@ -120,7 +130,10 @@ class PsicologoAgendaViewModel(
                 citasRepository.alternarDiaNoDisponible(
                     idPsicologo = psychologistId,
                     fecha = fecha.toString(),
-                    yaNoDisponible = yaNoDisponible
+                    yaNoDisponible = yaNoDisponible,
+                    horaInicio = horaInicio,
+                    horaFin = horaFin,
+                    motivo = motivo
                 )
                 cargarAgendaMensual(_mesVisible.value)
             } catch (e: Exception) {

@@ -1,19 +1,15 @@
 package org.ies.tierno.applicationamani.data.remoto
 
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.TokenHolder
 
 // data/remote/AuthInterceptor.kt
-class AuthInterceptor(private val tokenDataStore: TokenDataStore) : Interceptor {
+class AuthInterceptor(private val tokenHolder: TokenHolder) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        // Leemos el token de forma síncrona (estamos ya en un hilo IO)
-        val token = runBlocking {
-            tokenDataStore.tokenFlow.firstOrNull()
-        }
+        // Lectura no-bloqueante desde caché en memoria
+        val token = tokenHolder.getToken()
 
         val originalRequest = chain.request()
 

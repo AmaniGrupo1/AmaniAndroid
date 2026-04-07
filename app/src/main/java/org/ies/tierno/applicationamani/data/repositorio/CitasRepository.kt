@@ -2,10 +2,10 @@ package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 
 class CitasRepository(
@@ -39,7 +39,7 @@ class CitasRepository(
 
     suspend fun actualizarHorario(
         idPsicologo: Long,
-        request: HorarioPsicologoRequest
+        request: HorarioRequestDTO
     ) {
         citasApi.actualizarHorario(idPsicologo, request)
     }
@@ -47,17 +47,20 @@ class CitasRepository(
     suspend fun alternarDiaNoDisponible(
         idPsicologo: Long,
         fecha: String,
-        yaNoDisponible: Boolean
+        yaNoDisponible: Boolean,
+        horaInicio: String? = null,
+        horaFin: String? = null,
+        motivo: String? = null
     ) {
-        val request = BloqueoRequestDTO(
-            fecha = fecha,
-            horaInicio = "00:00",
-            horaFin = "23:59",
-            motivo = "No disponible"
-        )
         if (yaNoDisponible) {
             citasApi.eliminarDiaNoDisponible(idPsicologo, fecha)
         } else {
+            val request = BloqueoRequestDTO(
+                fecha = fecha,
+                horaInicio = horaInicio,
+                horaFin = horaFin,
+                motivo = motivo ?: "No disponible"
+            )
             citasApi.marcarDiaNoDisponible(idPsicologo, request)
         }
     }

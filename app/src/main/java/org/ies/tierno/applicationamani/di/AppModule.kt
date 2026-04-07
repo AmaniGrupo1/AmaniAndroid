@@ -2,7 +2,9 @@ package org.ies.tierno.applicationamani.di
 
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
+import org.ies.tierno.applicationamani.data.local.AuthEventChannel
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
@@ -36,6 +38,8 @@ import org.koin.dsl.module
 
 val appModule = module {
     single{ TokenDataStore(androidContext()) }
+    single { TokenHolder(get()) }
+    single { AuthEventChannel() }
     single { UserSessionDataStore(get()) }
 
     single { AuthRepository(get(), get(), get()) }

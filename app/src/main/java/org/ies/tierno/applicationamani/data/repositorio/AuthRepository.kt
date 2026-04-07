@@ -44,6 +44,7 @@ class AuthRepository(
                                 idUsuario = body.idUsuario,
                                 nombre = body.nombre,
                                 rol = body.rol,
+                                idPsicologo = body.idPsicologo
                             )
                         )
 
@@ -179,7 +180,19 @@ class AuthRepository(
     fun getPacientesConPsicologo(): Flow<List<ListaPacientesAndPsicologo>> = flow {
         try {
             val response = api.getPacientesConPsicologo()
-            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                // No ocultar errores 401 - dejar que el interceptor los maneje
+                if (response.code() == 401) {
+                    throw HttpException(response)
+                }
+                emit(emptyList())
+            }
+        } catch (e: HttpException) {
+            // Re-lanzar excepciones HTTP para que el interceptor las maneje
+            if (e.code() == 401) throw e
+            emit(emptyList())
         } catch (e: Exception) {
             emit(emptyList())
         }
@@ -188,7 +201,19 @@ class AuthRepository(
     fun getPaciente(): Flow<List<DatosPacienteAdminDTO>> = flow {
         try {
             val response = api.getPacientes()
-            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                // No ocultar errores 401 - dejar que el interceptor los maneje
+                if (response.code() == 401) {
+                    throw HttpException(response)
+                }
+                emit(emptyList())
+            }
+        } catch (e: HttpException) {
+            // Re-lanzar excepciones HTTP 401 para que el interceptor las maneje
+            if (e.code() == 401) throw e
+            emit(emptyList())
         } catch (e: Exception) {
             emit(emptyList())
         }
@@ -197,8 +222,20 @@ class AuthRepository(
     fun getPsicologos(): Flow<List<PsicologoSelfResponseDTO>> = flow {
         try {
             val response = api.getPsicologos()
-            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
-        } catch (e: Exception) {
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                // No ocultar errores 401 - dejar que el interceptor los maneje
+                if (response.code() == 401) {
+                    throw HttpException(response)
+                }
+                emit(emptyList())
+            }
+        } catch (e: HttpException) {
+            // Re-lanzar excepciones HTTP 401 para que el interceptor las maneje
+            if (e.code() == 401) throw e
+            emit(emptyList())
+        } catch (_: Exception) {
             emit(emptyList())
         }
     }

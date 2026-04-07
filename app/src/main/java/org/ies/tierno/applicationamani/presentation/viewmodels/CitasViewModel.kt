@@ -25,8 +25,8 @@ class CitasViewModel(
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
-    private val _agendaMensual = MutableStateFlow<List<AgendaItemDTO?>>(emptyList())
-    val agendaMensual: StateFlow<List<AgendaItemDTO?>> = _agendaMensual.asStateFlow()
+    private val _agendaMensual = MutableStateFlow<List<AgendaItemDTO>>(emptyList())
+    val agendaMensual: StateFlow<List<AgendaItemDTO>> = _agendaMensual.asStateFlow()
 
     private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
     val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()

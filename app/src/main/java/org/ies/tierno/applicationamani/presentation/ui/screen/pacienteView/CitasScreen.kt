@@ -18,7 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.presentation.components.BottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
@@ -100,10 +101,10 @@ fun CitasScreen(
         }
     }
 
-    // agendaMensual es List<AgendaItemDTO?> - cada elemento es UNA cita del paciente
+    // agendaMensual es List<AgendaItemDTO> - cada elemento es UNA cita del paciente
     // Extraer las fechas donde hay citas
     val fechasConCitas = remember(agendaMensual) {
-        agendaMensual.mapNotNull { it?.fecha }.toSet()
+        agendaMensual.map { it.fecha }.toSet()
     }
 
     // Convertir franjas de disponibilidad al formato que espera VistaDiariaHoras
@@ -124,7 +125,7 @@ fun CitasScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { BottomBar(navController) },
+        bottomBar = { AmaniBottomBar(navController, BottomBarConfig.Paciente) },
         containerColor = colors.background
     ) { innerPadding ->
         Box(

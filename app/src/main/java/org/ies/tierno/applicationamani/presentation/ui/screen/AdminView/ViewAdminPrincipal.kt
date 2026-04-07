@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screens.admin
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
@@ -24,8 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
-import org.ies.tierno.applicationamani.presentation.ui.componente.BarraNavegationInferiorAdmin
-import org.ies.tierno.applicationamani.presentation.ui.componente.AdminNavItem
+import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.koin.androidx.compose.koinViewModel
@@ -35,15 +34,12 @@ import java.time.format.DateTimeParseException
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ViewAdminPrincipal(
     navController: NavController,
     viewModel: GetAllPacientAndPsicologoVeiwModel = koinViewModel()
 ) {
-    var selectedItem by remember { mutableStateOf(AdminNavItem.DOCUMENTOS) }
     val pacientes by viewModel.paciente.collectAsState()
-    val isLoading by remember { derivedStateOf { pacientes.isEmpty() } }
 
     // Estado para controlar la visibilidad del loading
     var showLoading by remember { mutableStateOf(true) }
@@ -73,9 +69,7 @@ fun ViewAdminPrincipal(
                     // Botón de refresh opcional
                     IconButton(
                         onClick = {
-                            // Recargar datos si es necesario
-                            showLoading = true
-                            // viewModel.refresh() // Si tienes método de refresh
+                            // viewModel.refresh() — refrescar datos
                         }
                     ) {
                         Icon(
@@ -87,11 +81,7 @@ fun ViewAdminPrincipal(
             )
         },
         bottomBar = {
-            BarraNavegationInferiorAdmin(
-                navController = navController,
-                selectedItem = selectedItem,
-                onItemSelected = { selectedItem = it }
-            )
+            AmaniBottomBar(navController, BottomBarConfig.Admin)
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
@@ -116,8 +106,7 @@ fun ViewAdminPrincipal(
                 else -> {
                     PacientesList(
                         pacientes = pacientes,
-                        listState = listState,
-                        isScrolled = isScrolled
+                        listState = listState
                     )
                 }
             }
@@ -155,8 +144,7 @@ fun ViewAdminPrincipal(
 @Composable
 private fun PacientesList(
     pacientes: List<ListaPacientesAndPsicologo>,
-    listState: androidx.compose.foundation.lazy.LazyListState,
-    isScrolled: Boolean
+    listState: androidx.compose.foundation.lazy.LazyListState
 ) {
     LazyColumn(
         state = listState,
@@ -274,8 +262,8 @@ private fun EmptyState() {
 @Composable
 fun PacienteCard(
     paciente: ListaPacientesAndPsicologo,
-    onClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -371,7 +359,7 @@ fun PacienteCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Divider
-            Divider(
+            HorizontalDivider(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 thickness = 1.dp
             )
@@ -420,11 +408,11 @@ private fun formatFecha(fechaString: String): String {
         val dateTime = LocalDateTime.parse(fechaString, formatter)
         val formatterOutput = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         dateTime.format(formatterOutput)
-    } catch (e: DateTimeParseException) {
+    } catch (_: DateTimeParseException) {
         // Si falla, intentar con formato simple
         try {
             fechaString.substring(0, minOf(10, fechaString.length))
-        } catch (e2: Exception) {
+        } catch (_: Exception) {
             "Fecha no disponible"
         }
     }

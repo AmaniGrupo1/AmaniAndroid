@@ -1,10 +1,10 @@
 package org.ies.tierno.applicationamani.data.remoto
 
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -48,7 +48,7 @@ interface CitasApi {
     @PUT("/api/citas/psicologo/{idPsicologo}/horario")
     suspend fun actualizarHorario(
         @Path("idPsicologo") idPsicologo: Long,
-        @Body request: HorarioPsicologoRequest
+        @Body request: HorarioRequestDTO
     ): Unit
 
     @POST("/api/citas/psicologo/{idPsicologo}/dias-no-disponibles")
