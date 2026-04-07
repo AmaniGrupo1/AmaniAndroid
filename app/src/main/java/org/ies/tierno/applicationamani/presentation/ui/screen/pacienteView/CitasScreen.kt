@@ -110,14 +110,14 @@ fun CitasScreen(
     // Convertir franjas de disponibilidad al formato que espera VistaDiariaHoras
     // VistaDiariaHoras espera List<FranjaHoraria>? - necesito ver ese componente
     val franjasParaVista = remember(disponibilidadDia) {
-        disponibilidadDia?.franjas?.map { franja ->
+        disponibilidadDia?.slotsLibres?.map { franja ->
             // Crear objeto que VistaDiariaHoras espera
             // Como no tengo la definición de FranjaHoraria, asumo que tiene estas propiedades
             FranjaHoraria(
                 diaSemana = disponibilidadDia!!.fecha.dayOfWeek.value.toShort(),
                 horaInicio = franja.hora.format(DateTimeFormatter.ofPattern("HH:mm")),
-                horaFin = franja.hora.plusMinutes(60).format(DateTimeFormatter.ofPattern("HH:mm")),
-                activo = !franja.ocupada,
+                horaFin = (franja.horaFin ?: franja.hora.plusMinutes(60)).format(DateTimeFormatter.ofPattern("HH:mm")),
+                activo = !franja.ocupado,
                 motivo = franja.descripcion
             )
         } ?: emptyList()

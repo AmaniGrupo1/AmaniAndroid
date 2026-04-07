@@ -92,13 +92,14 @@ class PsicologoAgendaViewModel(
         }
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                val request = HorarioRequestDTO(franjas = franjas)
-                citasRepository.actualizarHorario(psychologistId, request)
-                cargarAgendaMensual(_mesVisible.value)
-            } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al actualizar el horario"
-            }
+            val request = HorarioRequestDTO(franjas = franjas)
+            citasRepository.actualizarHorario(psychologistId, request)
+                .onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al actualizar el horario"
+                }
             _isLoading.value = false
         }
     }
@@ -126,19 +127,20 @@ class PsicologoAgendaViewModel(
 
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                citasRepository.alternarDiaNoDisponible(
-                    idPsicologo = psychologistId,
-                    fecha = fecha.toString(),
-                    yaNoDisponible = yaNoDisponible,
-                    horaInicio = horaInicio,
-                    horaFin = horaFin,
-                    motivo = motivo
-                )
-                cargarAgendaMensual(_mesVisible.value)
-            } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al alternar día no disponible"
-            }
+            citasRepository.alternarDiaNoDisponible(
+                idPsicologo = psychologistId,
+                fecha = fecha.toString(),
+                yaNoDisponible = yaNoDisponible,
+                horaInicio = horaInicio,
+                horaFin = horaFin,
+                motivo = motivo
+            )
+                .onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al alternar día no disponible"
+                }
             _isLoading.value = false
         }
     }

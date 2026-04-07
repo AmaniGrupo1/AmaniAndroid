@@ -78,8 +78,12 @@ fun PsicologoAgendaScreen(
     val citasDelDia = fechaSeleccionada?.let { citasPorDia[it] } ?: emptyList()
     val esDiaNoDisponible = fechaSeleccionada in diasNoDisponibles
 
-    LaunchedEffect(mesVisible) {
-        viewModel.cargarAgendaMensual(mesVisible)
+    val userSession by viewModel.userSession.collectAsStateWithLifecycle()
+
+    LaunchedEffect(mesVisible, userSession) {
+        if (userSession?.idPsicologo != null) {
+            viewModel.cargarAgendaMensual(mesVisible)
+        }
     }
 
     LaunchedEffect(errorMessage) {
@@ -510,7 +514,7 @@ fun TarjetaCitaPsicologa(
                 // Información del paciente
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = cita.nombrePaciente,
+                        text = cita.nombrePaciente ?: "Bloqueo de agenda",
                         style = typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface
@@ -566,11 +570,11 @@ fun TarjetaCitaPsicologa(
                         onClick = {
                             enviarCitaAlCalendario(
                                 context = context,
-                                titulo = "Cita con ${cita.nombrePaciente}",
+                                titulo = "Cita con ${cita.nombrePaciente ?: "paciente"}",
                                 descripcion = cita.motivo ?: "Cita psicológica",
                                 fecha = cita.fecha,
                                 hora = cita.horaInicio,
-                                duracionMinutos = cita.duracionMinutos
+                                duracionMinutos = cita.duracionMinutos ?: 60
                             )
                         },
                         modifier = Modifier.size(36.dp)
@@ -808,7 +812,7 @@ fun DialogoModificarHorario(
                 val franjas = diasSemana.indices.flatMap { i ->
                     if (activo[i]) listOf(
                         FranjaHorarioDTO(
-                            diaSemana = (i + 1).toShort(),
+                            diaSemana = i.toShort(),
                             horaInicio = "${horariosInicio[i].toString().padStart(2, '0')}:00",
                             horaFin = "${horariosFin[i].toString().padStart(2, '0')}:00",
                             activo = true,

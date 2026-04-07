@@ -9,9 +9,9 @@ data class AgendaItemDTO(
     val horaInicio: LocalTime,
     val horaFin: LocalTime,
     val tipo: String,
-    val estado: String,
+    val estado: String?,          // nullable
     val motivo: String?,
-    val duracionMinutos: Int,
-    val nombrePaciente: String,
-    val nombrePsicologo: String
+    val duracionMinutos: Int?,    // nullable
+    val nombrePaciente: String?,  // nullable
+    val nombrePsicologo: String?
 )

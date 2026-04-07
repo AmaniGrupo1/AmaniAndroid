@@ -40,7 +40,7 @@ class CitasRepository(
     suspend fun actualizarHorario(
         idPsicologo: Long,
         request: HorarioRequestDTO
-    ) {
+    ): Result<Unit> = runCatching {
         citasApi.actualizarHorario(idPsicologo, request)
     }
 
@@ -51,7 +51,7 @@ class CitasRepository(
         horaInicio: String? = null,
         horaFin: String? = null,
         motivo: String? = null
-    ) {
+    ): Result<Unit> = runCatching {
         if (yaNoDisponible) {
             citasApi.eliminarDiaNoDisponible(idPsicologo, fecha)
         } else {
