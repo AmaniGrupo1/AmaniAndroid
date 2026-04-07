@@ -20,6 +20,5 @@ data class DireccionRequest(
     val ciudad: String? = null,
     val provincia: String? = null,
     val codigoPostal: String? = null,
-    val pais: String? = null,
-    val descripcion: String? = null
+    val pais: String? = null
 )

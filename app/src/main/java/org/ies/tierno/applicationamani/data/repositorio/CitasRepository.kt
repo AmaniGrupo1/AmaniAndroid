@@ -1,10 +1,9 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
-import org.ies.tierno.applicationamani.dto.citas.AgendaItemDTO
-import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
-import org.ies.tierno.applicationamani.dto.citas.AgendaPsicologoResponse
-import org.ies.tierno.applicationamani.dto.citas.CitaDetalleResponse
+import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
+import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.HorarioPsicologoRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
@@ -34,14 +33,14 @@ class CitasRepository(
         citasApi.getDisponibilidadDia(idPsicologo, fecha)
     }
 
-    suspend fun crearCita(request: CitaRequest): Result<CitaDetalleResponse> = runCatching {
+    suspend fun crearCita(request: CitaRequest): Result<CitaAdminResponseDTO> = runCatching {
         citasApi.crearCita(request)
     }
 
     suspend fun actualizarHorario(
         idPsicologo: Long,
         request: HorarioPsicologoRequest
-    ): Result<AgendaPsicologoResponse> = runCatching {
+    ) {
         citasApi.actualizarHorario(idPsicologo, request)
     }
 
@@ -49,14 +48,17 @@ class CitasRepository(
         idPsicologo: Long,
         fecha: String,
         yaNoDisponible: Boolean
-    ): Result<AgendaPsicologoResponse> = runCatching {
+    ) {
+        val request = BloqueoRequestDTO(
+            fecha = fecha,
+            horaInicio = "00:00",
+            horaFin = "23:59",
+            motivo = "No disponible"
+        )
         if (yaNoDisponible) {
             citasApi.eliminarDiaNoDisponible(idPsicologo, fecha)
         } else {
-            citasApi.marcarDiaNoDisponible(
-                idPsicologo,
-                org.ies.tierno.applicationamani.dto.citas.DiaNoDisponibleRequest(fecha)
-            )
+            citasApi.marcarDiaNoDisponible(idPsicologo, request)
         }
     }
 }

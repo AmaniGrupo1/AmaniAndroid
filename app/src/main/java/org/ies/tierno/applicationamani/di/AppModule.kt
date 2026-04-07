@@ -1,17 +1,12 @@
-/**
- * Módulo Koin de la capa de aplicación.
- *
- * Registra los repositorios, casos de uso y ViewModels como
- * dependencias inyectables. Actualmente vacío a la espera de que
- * se definan las implementaciones concretas.
- *
- * @see retrofitModule
- */
 package org.ies.tierno.applicationamani.di
 
 import org.ies.tierno.applicationamani.data.AuthRepository
+import org.ies.tierno.applicationamani.data.SituacionRepository
+import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
+import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
@@ -25,28 +20,27 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.koin.android.ext.koin.androidContext
 
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-/**
- * Módulo Koin para dependencias generales de la aplicación.
- *
- * Aquí se deben registrar:
- * - `single { ... }` para repositorios y servicios.
- * - `factory { ... }` para casos de uso.
- * - `viewModel { ... }` para ViewModels con dependencias inyectadas.
- */
 val appModule = module {
-    single { AuthRepository(get()) }
+    single{ TokenDataStore(androidContext()) }
+    single { UserSessionDataStore(get()) }
+
+    single { AuthRepository(get(), get(), get()) }
     single { TestRepositoryApi(get()) }
+    single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
 
     factory { LoginUseCase(get()) }
@@ -58,15 +52,18 @@ val appModule = module {
     factory { ListarPsicologoAdminUseCase(get()) }
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
+    factory { ListarSituacionUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get(), get()) }
-    viewModel { CitasViewModel(get(), get()) }
-    viewModel { PsicologoAgendaViewModel(get(), get()) }
+    viewModel { LoginViewModel(get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
-    viewModel { CuestionarioViewModel(get(), get()) }
     viewModel { ListarPacientesViewModel(get(), get()) }
     viewModel { ListarPsicologosAdminViewModel(get()) }
     viewModel { PrincipalClienteViewModel() }
     viewModel { SettingsClienteViewModel() }
+    viewModel { SituacionViewModel(get()) }
+    viewModel { CitasViewModel(get(), get()) }
+    viewModel { QuestionnaireViewModel() }
+    viewModel { PsicologoAgendaViewModel(get(),get()) }
+    viewModel { CuestionarioViewModel(get()) }
 }

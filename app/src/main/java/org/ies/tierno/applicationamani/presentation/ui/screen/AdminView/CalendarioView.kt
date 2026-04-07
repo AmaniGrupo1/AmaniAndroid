@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.componente
+package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -29,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.YearMonth
@@ -246,16 +245,3 @@ private fun CeldaDia(
     }
 }
 
-/**
- * Vista previa del calendario con una fecha seleccionada y fechas destacadas.
- */
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-@Preview(showBackground = true)
-fun CalendarioViewPreview() {
-       CalendarioView(
-        fechaSeleccionada = LocalDate.now(),
-        fechasDestacadas = setOf(LocalDate.now().plusDays(2), LocalDate.now().plusDays(5)),
-        onFechaSeleccionada = { /* Acción al seleccionar fecha */ }
-    )
-}

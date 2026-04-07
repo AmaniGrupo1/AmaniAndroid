@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,190 +43,140 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
-import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+/**
+ * Pantalla de registro de un nuevo administrador.
+ *
+ * Muestra un formulario con campos de nombre, apellido, email y contraseña.
+ * Al pulsar «Registrarse administrador» se invoca [LoginViewModel.registrarAdmin].
+ *
+ * @param navController Controlador de navegación.
+ * @param loginViewModel ViewModel compartido que gestiona los campos y la acción de registro.
+ */
 @Composable
 fun AgregarAdministrador(
     navController: NavController,
     loginViewModel: LoginViewModel
 ) {
+
+    var currentRoute by remember { mutableStateOf("pacientes") }
+
     val backgroundColor = Color(0xFFCCC0E4)
     val colorButton = android.graphics.Color.parseColor("#CCC0E4")
+
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val balow = FontFamily(Font(R.font.barlow_condensed_black))
 
-    // --- Estados del ViewModel ---
+    // --- Recoger los estados del ViewModel ---
     val name by loginViewModel.nombre.collectAsState()
     val surname by loginViewModel.apellido.collectAsState()
     val email by loginViewModel.email.collectAsState()
     val password by loginViewModel.regPassword.collectAsState()
 
-    // --- Estados de UI ---
-    val isRegistering by loginViewModel.isRegistering.collectAsState()
-    val registerError by loginViewModel.registerError.collectAsState()
-    val registerSuccess by loginViewModel.registerSuccess.collectAsState()
-
-    var passwordVisible by remember { mutableStateOf(false) }
-
-    // Snackbar para mensajes
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // Estado local para mensajes de validación
-    var validationMessage by remember { mutableStateOf<String?>(null) }
-
-    // CoroutineScope para lanzar corutinas
-    val coroutineScope = rememberCoroutineScope()
-
-    // Manejar mensajes de validación
-    LaunchedEffect(validationMessage) {
-        validationMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            validationMessage = null
-        }
-    }
-
-    // Manejar éxito de registro
-    LaunchedEffect(registerSuccess) {
-        if (registerSuccess) {
-            snackbarHostState.showSnackbar("Administrador registrado exitosamente")
-            delay(1500) // Pequeña pausa para mostrar el mensaje
-            loginViewModel.resetRegisterState()
-            navController.popBackStack() // Volver a la pantalla anterior
-        }
-    }
-
-    // Manejar errores del servidor
-    LaunchedEffect(registerError) {
-        registerError?.let { error ->
-            snackbarHostState.showSnackbar(error)
-        }
-    }
+    var existe by remember { mutableStateOf(true) } // visibilidad password sigue en UI
 
     Scaffold(
         containerColor = backgroundColor,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            MenuAdministrador("Agregar administrador", navController)
+            MenuAdministrador( "Agregar administrador",navController)
         }
-    ) { paddingValues ->
+    ) { padding ->
 
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(padding)
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Espaciado(40)
 
-            // Título
-            Text(
-                text = "Nuevo Administrador",
-                fontFamily = balow,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Nombre
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
                 value = name,
                 onValueChange = { loginViewModel.setNombre(it) },
-                placeholder = { Text("Nombre *", fontFamily = roboto) },
+                placeholder = { Text("Nombre", fontFamily = roboto) },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Gray,
+                colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
                 )
             )
 
-            Espaciado(20)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Apellido
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
                 value = surname,
                 onValueChange = { loginViewModel.setApellido(it) },
-                placeholder = { Text("Apellido *", fontFamily = roboto) },
+                placeholder = { Text("Apellido", fontFamily = roboto) },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Gray,
+                colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
                 )
             )
 
-            Espaciado(20)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Email
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
                 value = email,
                 onValueChange = { loginViewModel.setEmail(it) },
-                placeholder = { Text("Email *", fontFamily = roboto) },
+                placeholder = { Text("Email", fontFamily = roboto) },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Gray,
+                colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
                 )
             )
 
-            Espaciado(20)
-
+            Spacer(modifier = Modifier.height(30.dp))
             // Password
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White),
                 value = password,
                 onValueChange = { loginViewModel.setRegPassword(it) },
-                placeholder = { Text("Contraseña *", fontFamily = roboto) },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                placeholder = { Text("Password", fontFamily = roboto) },
+                visualTransformation = if (existe) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                        )
+                    val image = if (existe) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(onClick = { existe = !existe }) {
+                        Icon(imageVector = image, contentDescription = "Ver contraseña")
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Gray,
+                colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black
                 )
             )
 
-            // Mensaje de ayuda para contraseña
-            if (password.isNotBlank() && password.length < 4) {
-                Text(
-                    text = "La contraseña debe tener al menos 4 caracteres",
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    fontFamily = roboto,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, top = 4.dp)
-                )
-            }
-
-            Espaciado(30)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Botón Registrar
             Button(
@@ -234,43 +185,21 @@ fun AgregarAdministrador(
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, Color.Black),
-                onClick = {
-                    // Validar campos
-                    when {
-                        name.isBlank() -> validationMessage = "Por favor ingrese el nombre"
-                        surname.isBlank() -> validationMessage = "Por favor ingrese el apellido"
-                        email.isBlank() -> validationMessage = "Por favor ingrese el email"
-                        password.isBlank() -> validationMessage = "Por favor ingrese la contraseña"
-                        password.length < 4 -> validationMessage = "La contraseña debe tener al menos 4 caracteres"
-                        else -> {
-                            // Todos los campos válidos, proceder con registro
-                            loginViewModel.registrarAdmin()
-                        }
-                    }
-                },
-                enabled = !isRegistering,
+                onClick = { loginViewModel.registrarAdmin() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(colorButton)
                 )
             ) {
-                if (isRegistering) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.Black,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        "Registrar Administrador",
-                        fontFamily = roboto,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
+                Text(
+                    "Registrarse administrador",
+                    fontFamily = roboto,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
             }
 
-            Espaciado(20)
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Botón Cancelar
             Button(
@@ -279,10 +208,7 @@ fun AgregarAdministrador(
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, Color.Black),
-                onClick = {
-                    loginViewModel.resetRegisterState()
-                    navController.popBackStack()
-                },
+                onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(colorButton)

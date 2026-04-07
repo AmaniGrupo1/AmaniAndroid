@@ -6,13 +6,14 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetAllClientAndPsicologoUseCase
-import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
+
 
 class GetAllPacientAndPsicologoVeiwModel(
     private val getAllPacientAndPsicologoUseCase: GetAllClientAndPsicologoUseCase
 ) : ViewModel() {
 
-    val _pacientes: StateFlow<List<PsicologoConPacientesDTO>> =
+    /** Flujo interno con la lista de pacientes y psicólogos. */
+    val _pacientes: StateFlow<List<ListaPacientesAndPsicologo>> =
         getAllPacientAndPsicologoUseCase()
             .stateIn(
                 scope = viewModelScope,
@@ -20,5 +21,6 @@ class GetAllPacientAndPsicologoVeiwModel(
                 initialValue = emptyList()
             )
 
-    val paciente : StateFlow<List<PsicologoConPacientesDTO>> = _pacientes
+    /** Lista observable de pacientes con su psicólogo asignado. */
+    val paciente : StateFlow<List<ListaPacientesAndPsicologo>> = _pacientes
 }

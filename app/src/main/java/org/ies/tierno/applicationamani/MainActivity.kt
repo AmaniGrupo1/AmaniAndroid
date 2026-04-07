@@ -21,6 +21,12 @@ import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
  * @see NavGraph
  */
 class MainActivity : ComponentActivity() {
+    /**
+     * Callback del ciclo de vida invocado cuando se crea la actividad.
+     *
+     * @param savedInstanceState Estado previamente guardado, o `null`
+     *   si la actividad se crea por primera vez.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

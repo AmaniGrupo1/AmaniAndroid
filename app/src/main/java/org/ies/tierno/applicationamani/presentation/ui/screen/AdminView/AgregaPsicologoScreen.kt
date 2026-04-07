@@ -1,31 +1,11 @@
     package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-    import androidx.compose.foundation.layout.Column
-    import androidx.compose.foundation.layout.fillMaxSize
-    import androidx.compose.foundation.layout.fillMaxWidth
-    import androidx.compose.foundation.layout.height
-    import androidx.compose.foundation.layout.padding
-    import androidx.compose.foundation.layout.size
+    import androidx.compose.foundation.layout.*
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.filled.Visibility
     import androidx.compose.material.icons.filled.VisibilityOff
-    import androidx.compose.material3.Button
-    import androidx.compose.material3.CircularProgressIndicator
-    import androidx.compose.material3.ExperimentalMaterial3Api
-    import androidx.compose.material3.Icon
-    import androidx.compose.material3.IconButton
-    import androidx.compose.material3.OutlinedTextField
-    import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.SnackbarHost
-    import androidx.compose.material3.SnackbarHostState
-    import androidx.compose.material3.Text
-    import androidx.compose.runtime.Composable
-    import androidx.compose.runtime.LaunchedEffect
-    import androidx.compose.runtime.collectAsState
-    import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.mutableStateOf
-    import androidx.compose.runtime.remember
-    import androidx.compose.runtime.setValue
+    import androidx.compose.material3.*
+    import androidx.compose.runtime.*
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.graphics.Color
@@ -34,7 +14,6 @@
     import androidx.compose.ui.unit.dp
     import androidx.navigation.NavController
     import kotlinx.coroutines.delay
-    import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
     import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +74,7 @@
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Espaciado(20)
+                Spacer(modifier = Modifier.height(20.dp))
 
                 OutlinedTextField(
                     value = name,
@@ -103,7 +82,7 @@
                     placeholder = { Text("Nombre *") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = surname,
@@ -111,7 +90,7 @@
                     placeholder = { Text("Apellido *") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = email,
@@ -119,7 +98,7 @@
                     placeholder = { Text("Email *") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = password,
@@ -136,7 +115,7 @@
                         }
                     }
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = especialidad,
@@ -144,7 +123,7 @@
                     placeholder = { Text("Especialidad *") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = experiencia?.toString() ?: "",
@@ -152,7 +131,7 @@
                     placeholder = { Text("Experiencia (años)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = descripcion ?: "",
@@ -160,7 +139,7 @@
                     placeholder = { Text("Descripción") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(12)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = licencia ?: "",
@@ -168,7 +147,7 @@
                     placeholder = { Text("Licencia") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Espaciado(20)
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = {

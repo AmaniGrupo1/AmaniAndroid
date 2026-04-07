@@ -4,28 +4,49 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSession
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
-import org.ies.tierno.applicationamani.domain.models.admin.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.domain.models.admin.RegistrarPsicologoAdminDTO
+import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
-import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
-import timber.log.Timber
 
-class AuthRepository(private val api: AuthApi) {
+class AuthRepository(
+    private val api: AuthApi,
+    private val tokenDataStore: TokenDataStore,
+    private val userSessionDataStore: UserSessionDataStore
+) {
 
     suspend fun login(request: LoginRequestDTO): Result<LoginResponseDTO> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.login(request)
+
                 if (response.isSuccessful) {
                     val body = response.body()
+
                     if (body != null) {
+
+                        // 🔥 GUARDAR TOKEN
+                        tokenDataStore.saveToken(body.token)
+
+                        // 🔥 GUARDAR SESIÓN
+                        userSessionDataStore.saveSession(
+                            UserSession(
+                                idUsuario = body.idUsuario,
+                                nombre = body.nombre,
+                                rol = body.rol,
+                            )
+                        )
+
                         Result.success(body)
                     } else {
                         Result.failure(Exception("Response body is null"))
@@ -33,16 +54,23 @@ class AuthRepository(private val api: AuthApi) {
                 } else {
                     Result.failure(HttpException(response))
                 }
+
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
     }
 
-    suspend fun registerPaciente(request: PacienteRequest): Result<LoginResponseDTO> {
+    suspend fun asignarPsicologo(idPaciente: Long, idPsicologo: Long): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = api.registerPaciente(request)
+                val request = AsignarPacienteAlPsicologoRequestDTO(
+                    idPaciente = idPaciente,
+                    idPsicologo = idPsicologo
+                )
+
+                val response = api.asignarPsicologo(request)
+
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {
@@ -53,6 +81,29 @@ class AuthRepository(private val api: AuthApi) {
                 } else {
                     Result.failure(HttpException(response))
                 }
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+    suspend fun registerPaciente(request: PacienteRequest): Result<LoginResponseDTO> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.registerPaciente(request)
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+
+                    if (body != null) {
+                        Result.success(body)
+                    } else {
+                        Result.failure(Exception("Response body is null"))
+                    }
+                } else {
+                    Result.failure(HttpException(response))
+                }
+
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -63,6 +114,7 @@ class AuthRepository(private val api: AuthApi) {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.registerPacienteAdmin(request)
+
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {
@@ -73,43 +125,18 @@ class AuthRepository(private val api: AuthApi) {
                 } else {
                     Result.failure(HttpException(response))
                 }
+
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
     }
 
-    //Asignamos paciente al psicologo
-    suspend fun asignarPacienteAlPsicologo(request: AsignarPacienteAlPsicologoRequestDTO): Result<String> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = api.asignarPacienteAlPsicologo(request)
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        Result.success(body)
-                    } else {
-                        Result.failure(Exception("Response body is null"))
-                    }
-                } else {
-                    Result.failure(HttpException(response))
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
     suspend fun registerAdmin(request: RegistryPacienteDTO): Result<LoginResponseDTO> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = api.registerAdmin(
-                    RegistryPacienteDTO(
-                        nombre = request.nombre,
-                        apellido = request.apellido,
-                        email = request.email,
-                        password = request.password
-                    )
-                )
+                val response = api.registerAdmin(request)
+
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {
@@ -120,16 +147,17 @@ class AuthRepository(private val api: AuthApi) {
                 } else {
                     Result.failure(HttpException(response))
                 }
+
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
     }
 
-    suspend fun crearPsicologo(request: RegistrarPsicologoAdminDTO): Result<PsicologoSelfResponseDTO> {
+    suspend fun registerPsicologo(request: PsicologoRequestDTO): Result<PsicologoSelfResponseDTO> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = api.crearPsicologo(request)
+                val response = api.registerPsicologo(request)
 
                 if (response.isSuccessful) {
                     val body = response.body()
@@ -141,39 +169,18 @@ class AuthRepository(private val api: AuthApi) {
                 } else {
                     Result.failure(HttpException(response))
                 }
+
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
     }
 
-    fun getPsicologos(): Flow<List<PsicologoSelfResponseDTO>> = flow {
-        try {
-            val response = api.getPsicologos()
-            if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
-            } else {
-                Timber.e("Error al obtener psicólogos [code=${response.code()}]")
-                emit(emptyList())
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Excepción al obtener psicólogos")
-            emit(emptyList())
-        }
-    }
-
-    fun getPacientesConPsicologo(): Flow<List<PsicologoConPacientesDTO>> = flow {
+    fun getPacientesConPsicologo(): Flow<List<ListaPacientesAndPsicologo>> = flow {
         try {
             val response = api.getPacientesConPsicologo()
-            if (response.isSuccessful) {
-                val body = response.body()
-                emit(body ?: emptyList())
-            } else {
-                Timber.e("Error al obtener pacientes con psicólogo [code=${response.code()}]")
-                emit(emptyList())
-            }
+            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
         } catch (e: Exception) {
-            Timber.e(e, "Excepción al obtener pacientes con psicólogo")
             emit(emptyList())
         }
     }
@@ -181,12 +188,16 @@ class AuthRepository(private val api: AuthApi) {
     fun getPaciente(): Flow<List<DatosPacienteAdminDTO>> = flow {
         try {
             val response = api.getPacientes()
-            if (response.isSuccessful) {
-                val body = response.body()
-                emit(body ?: emptyList())
-            } else {
-                emit(emptyList())
-            }
+            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+    }
+
+    fun getPsicologos(): Flow<List<PsicologoSelfResponseDTO>> = flow {
+        try {
+            val response = api.getPsicologos()
+            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
         } catch (e: Exception) {
             emit(emptyList())
         }
@@ -196,6 +207,7 @@ class AuthRepository(private val api: AuthApi) {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.darBajaPaciente(id)
+
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {
@@ -206,9 +218,16 @@ class AuthRepository(private val api: AuthApi) {
                 } else {
                     Result.failure(HttpException(response))
                 }
+
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
+    }
+
+    // LOGOUT COMPLETO
+    suspend fun logout() {
+        tokenDataStore.clearToken()
+        userSessionDataStore.clearSession()
     }
 }

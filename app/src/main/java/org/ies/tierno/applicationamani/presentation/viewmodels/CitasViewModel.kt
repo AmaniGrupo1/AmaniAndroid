@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.dto.citas.AgendaItemDTO
-import org.ies.tierno.applicationamani.dto.citas.AgendaPacienteResponse
+import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate
@@ -38,7 +38,6 @@ class CitasViewModel(
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     init {
-        // Observar cambios en la sesión de usuario para que los viewmodels reaccionen
         viewModelScope.launch {
             userSessionDataStore.sessionFlow.collect { session ->
                 _userSession.value = session
@@ -114,11 +113,5 @@ class CitasViewModel(
                 cargarAgendaMensual(YearMonth.from(fecha))
                 cargarDisponibilidad(fecha)
             }
-    }
-
-     enum class EstadoCita {
-        pendiente,
-        confirmada,
-        cancelada
     }
 }

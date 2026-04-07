@@ -1,41 +1,73 @@
 package org.ies.tierno.applicationamani.presentation.navigation.screen
 
+/**
+ * Clase sellada que define todas las rutas de navegación de la aplicación.
+ *
+ * Cada objeto hijo representa una pantalla accesible a través del
+ * [org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph]. El uso de una clase sellada garantiza que las rutas
+ * se gestionan de forma segura en tiempo de compilación.
+ *
+ * @property route Cadena identificadora única de la ruta de navegación.
+ *
+ * @see org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
+ */
 sealed class Screens(val route: String) {
+
+    /** Pantalla de inicio de sesión. */
     object login : Screens("login")
+
+    /** Pantalla de registro de nuevo usuario. */
     object registro : Screens("registro")
+
+    /** Pantalla principal para usuarios no autenticados. */
     object principal : Screens("principal")
 
-    object adminHome : Screens("adminHome")
+
+
+    /** Pantalla del cuestionario de evaluación inicial. */
+    object questionnaire : Screens("questionnaire")
+
+    /** Pantalla principal del cliente autenticado con su psicólogo asignado. */
+    object principalCliente : Screens("principalCliente")
+
+    /** Pantalla de ajustes del cliente. */
+    object settingsCliente : Screens("settingsCliente")
+
+    /** Pantalla para agregar un psicólogo (vista de administrador). */
+    object agregarPsicologo : Screens("agregarPsicologo")
+
+    /** Pantalla de creación de preguntas de test (vista de administrador). */
+    object test : Screens("test")
+
+    /** Pantalla de listado de pacientes (vista de administrador). */
+    object pacientes : Screens("pacientes")
+
+    /** Pantalla para agregar un administrador. */
+    object agregarAdmin : Screens("agregarAdmin")
+
+    /** Pantalla para registrar un paciente desde la vista de administrador. */
+    object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
+
+    /** Pantalla principal del administrador. */
+    object adminHome : Screens("home")
+
+    /** Pantalla del cuestionario. */
+    object cuestionario : Screens("cuestionario")
+
+    /** Pantalla de citas del paciente con calendario y horas libres. */
+    object citas : Screens("citas")
+
+    /** Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles). */
+    object psicologoAgenda : Screens("psicologoAgenda")
+
     object psicologoHome : Screens("psicologoHome")
     object pacienteHome : Screens("pacienteHome")
 
-    object principalCliente : Screens("principalCliente")
-    object questionnaire : Screens("questionnaire")
-    object settingsCliente : Screens("settingsCliente")
-
-    object agregarPsicologo : Screens("agregarPsicologo")
-    object agregarAdmin : Screens("agregarAdmin")
-    object test : Screens("test")
-    object pacientes : Screens("pacientes")
-    object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
-    object adminPrincipal : Screens("adminPrincipal")
-    object cuestionario : Screens("cuestionario")
-    object citas : Screens("citas")
-    object psicologoAgenda : Screens("psicologoAgenda")
-
-    object testPaciente : Screens("testPaciente/{pacienteId}") {
-        fun createRoute(pacienteId: Long) = "testPaciente/$pacienteId"
+    object listarPsicologo : Screens("listarPsicologo/{pacienteId}"){
+        fun createRoute(pacienteId: String) = "listarPsicologo/$pacienteId"
     }
 
-    object settings : Screens("settings")
-    object vistaPrincipalPaciente : Screens("vistaPrincipalPaciente")
-    object agregarPsicologoAdmin : Screens("agregarPsicologoAdmin")
-    object listaPsicologos : Screens("listaPsicologos")
+    object calendario : Screens("calendario")
 
-    object asignarPsicologo : Screens("asignarPsicologo/{pacienteId}") {
-        fun createRoute(pacienteId: Long) = "asignarPsicologo/$pacienteId"
-    }
-
-    object consentimiento : Screens("consentimiento")
-    object registroConsentimiento : Screens("registroConsentimiento")
 }
+

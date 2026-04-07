@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -83,7 +82,7 @@ fun TestScreen(
                 color = Color.Black
             )
 
-            Espaciado(30)
+
 
             Column(
                 modifier = Modifier
@@ -101,7 +100,6 @@ fun TestScreen(
                     onChange = { crearPreguntaViewModel.setTexto(it) },
                     roboto = roboto
                 )
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.tipo?:"",
@@ -110,7 +108,6 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(0) ?: "",
@@ -119,16 +116,12 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(15)
-
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(1) ?: "",
                     placeholder = "Opción 2",
                     onChange = { crearPreguntaViewModel.setOpcion2(it) },
                     roboto = roboto
                 )
-
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(2) ?: "",
@@ -137,7 +130,6 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(3) ?: "",
@@ -146,7 +138,6 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(25)
 
                 Button(
                     modifier = Modifier

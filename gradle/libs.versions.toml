@@ -3,7 +3,6 @@
 agp = "9.0.1"
 converterGson = "3.0.0"
 coreKtx = "1.17.0"
-datastorePreferences = "1.2.1"
 desugar_jdk_libs = "2.1.5"
 dokka = "2.0.0"
 desugaring = "2.1.4"
@@ -20,7 +19,6 @@ kotlin = "2.2.10"
 composeBom = "2024.09.00"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.7"
-navigationComposeVersion = "2.9.6"
 retrofit = "3.0.0"
 navigationRuntimeKtx = "2.9.7"
 googleGmsGoogleServices = "4.4.4"
@@ -30,15 +28,12 @@ foundationLayout = "1.10.5"
 detekt = "1.23.8"
 ktlint = "14.2.0"
 sonarqube = "7.2.3.7755"
-workRuntime = "2.10.1"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-androidx-navigation-compose-v296 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 desugaring = { module = "com.android.tools.build:desugaring", version.ref = "desugaring" }
@@ -64,7 +59,6 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
-androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -75,3 +69,4 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+

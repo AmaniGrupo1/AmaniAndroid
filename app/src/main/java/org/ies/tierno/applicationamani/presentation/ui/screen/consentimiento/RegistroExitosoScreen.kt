@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 @Composable
 fun RegistroExitosoScreen(
@@ -42,7 +43,7 @@ fun RegistroExitosoScreen(
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
-                    navController.navigate("login")
+                    navController.navigate(Screens.login.route)
                 }
             ) {
                 Text("Ir al login")
