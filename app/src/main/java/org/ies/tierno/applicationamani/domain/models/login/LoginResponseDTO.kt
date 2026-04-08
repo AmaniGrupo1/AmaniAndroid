@@ -17,5 +17,6 @@ data class LoginResponseDTO(
     val nombre: String,
     val rol: String,
     val token : String,
-    val idPsicologo : Long?
+    val idPsicologo : Long?,
+    val idPaciente : Long?
 )

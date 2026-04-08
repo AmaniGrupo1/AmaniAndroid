@@ -22,6 +22,8 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.data.local.UserSession
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
@@ -46,6 +48,7 @@ import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 @Composable
 fun LoginScreen(
     navController: NavController,
+    userSessionDataStore: UserSessionDataStore,
     loginViewModel: LoginViewModel = koinViewModel()
 ) {
     val username by loginViewModel.username.collectAsState()
@@ -72,11 +75,23 @@ fun LoginScreen(
     // Efecto para reaccionar al resultado del login y navegar cuando sea correcto
     LaunchedEffect(loginResult) {
         val result = loginResult ?: return@LaunchedEffect
+
         result.onSuccess { response ->
+            // 🔥 GUARDAR ID PACIENTE
+            userSessionDataStore.saveSession(
+                UserSession(
+                    idUsuario = response.idUsuario,
+                    nombre = response.nombre,
+                    rol = response.rol,
+                    idPaciente = response.idPaciente,   // 👈 CLAVE
+                    idPsicologo = response.idPsicologo
+                )
+            )
+
             val destination = when (response.rol.lowercase()) {
                 "admin" -> Screens.adminHome.route
                 "psicologo" -> Screens.psicologoHome.route
-                else -> Screens.pacienteHome.route
+                else -> Screens.pacienteHome.createRoute(response.idPaciente ?: 0L) // Usar ID de paciente para navegación
             }
             loginViewModel.clearLoginFields()
             loginViewModel.resetLoginState()

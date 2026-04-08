@@ -24,4 +24,13 @@ class ProfileRepository(private val api: ProfileApi){
             Result.failure(e)
         }
     }
+
+    suspend fun obtenerPsicologoAsignado(idPaciente: Long): Result<PsicologoProfileResponseDTO> {
+        return try {
+            val response = api.obtenerPsicologoAsignado(idPaciente)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

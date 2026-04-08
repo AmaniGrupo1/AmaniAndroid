@@ -29,6 +29,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPs
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologo.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.koin.java.KoinJavaComponent.getKoin
@@ -48,7 +49,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             Principal(navController)
         }
         composable(Screens.login.route) {
-            LoginScreen(navController, loginViewModel)
+            LoginScreen(navController, userSessionDataStore,loginViewModel)
         }
 
         composable (Screens.psicologoHome.route){
@@ -121,5 +122,17 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             PsicologoProfileScreen(idPsicologo, navController)
         }
 
+
+        composable(
+            route = Screens.pacienteHome.route,
+            arguments = listOf(
+                navArgument("idPaciente") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+            val idPsicologo = backStackEntry.arguments?.getLong("idPaciente") ?: 0L
+            ViewPacientePrincipalScreen(navController,idPsicologo)
+        }
     }
 }

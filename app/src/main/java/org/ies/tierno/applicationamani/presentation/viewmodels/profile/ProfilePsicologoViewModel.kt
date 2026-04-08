@@ -10,6 +10,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
+import org.ies.tierno.applicationamani.dto.perfil.PacienteProfeleResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
 import java.io.File
 
@@ -19,6 +20,9 @@ class ProfilePsicologoViewModel(
 
     private val _perfil = MutableStateFlow<PsicologoProfileResponseDTO?>(null)
     val perfil: StateFlow<PsicologoProfileResponseDTO?> get() = _perfil
+
+    private val _pacientesProfile = MutableStateFlow<PacienteProfeleResponseDTO?>(null)
+    val pacientesProfile: StateFlow<PacienteProfeleResponseDTO?> get() = _pacientesProfile
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -49,7 +53,8 @@ class ProfilePsicologoViewModel(
 
                 // Crear MultipartBody.Part
                 val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                val multipartBody = MultipartBody.Part.createFormData("file", file.name, requestBody)
+                val multipartBody =
+                    MultipartBody.Part.createFormData("file", file.name, requestBody)
 
                 val result = profileUseCaseGeneral.uploadPerfil(id, multipartBody)
                 result.onSuccess {
@@ -64,4 +69,5 @@ class ProfilePsicologoViewModel(
             _isLoading.value = false
         }
     }
+
 }

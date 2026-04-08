@@ -30,6 +30,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacie
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
@@ -76,4 +77,5 @@ val appModule = module {
     viewModel { CuestionarioViewModel(get()) }
     viewModel { ListarPacientesByPsicologoViewModel(get()) }
     viewModel { ProfilePsicologoViewModel(get()) }
+    viewModel { PacienteViewModel(get()) }
 }

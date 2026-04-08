@@ -19,5 +19,9 @@ class ProfileUseCaseGeneral(val repository: ProfileRepository) {
         return repository.uploadFoto(id, file)
     }
 
+    suspend fun obtenerPsicologoAsignado(idPaciente: Long): Result<PsicologoProfileResponseDTO> {
+        return repository.obtenerPsicologoAsignado(idPaciente)
+    }
+
 }
 

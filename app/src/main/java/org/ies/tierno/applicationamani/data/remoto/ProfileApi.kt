@@ -22,4 +22,9 @@ interface ProfileApi {
     suspend fun getProfilePsicologo(
         @Path("id") id: Long
     ): PsicologoProfileResponseDTO
+
+    @GET("/api/psicologo/pacientes/{idPaciente}/psicologo")
+    suspend fun obtenerPsicologoAsignado(
+        @Path("idPaciente") idPaciente: Long
+    ): PsicologoProfileResponseDTO
 }
