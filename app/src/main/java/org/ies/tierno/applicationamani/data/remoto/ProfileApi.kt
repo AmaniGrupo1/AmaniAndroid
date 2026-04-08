@@ -22,5 +22,4 @@ interface ProfileApi {
     suspend fun getProfilePsicologo(
         @Path("id") id: Long
     ): PsicologoProfileResponseDTO
-
 }
