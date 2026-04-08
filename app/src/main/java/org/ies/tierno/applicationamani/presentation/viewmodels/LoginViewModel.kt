@@ -26,7 +26,10 @@ import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import java.time.LocalDate
 import java.time.Period
 
-class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
+class LoginViewModel(
+    private val loginUseCase: LoginUseCase,
+    private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase
+) : ViewModel() {
 
     // ── Login ──
     private val _username = MutableStateFlow("")
@@ -492,14 +495,14 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
     private val _isAsignandoPaciente = MutableStateFlow(false)
     val isAsignandoPaciente: StateFlow<Boolean> = _isAsignandoPaciente
 
-    fun asignarPaciente(idPaciente: Long, idPsicologo: Long, useCase: AsignarPacienteAlPsicologoUseCase) {
+    fun asignarPaciente(idPaciente: Long, idPsicologo: Long) {
         _isAsignandoPaciente.value = true
         _asignarPacienteError.value = null
         _asignarPacienteSuccess.value = false
 
         viewModelScope.launch {
             try {
-                val result = useCase(idPaciente, idPsicologo)
+                val result = asignarPacienteAlPsicologoUseCase(idPaciente, idPsicologo)
 
                 result.onSuccess {
                     _asignarPacienteSuccess.value = true

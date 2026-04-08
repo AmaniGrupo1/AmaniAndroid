@@ -29,6 +29,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoP
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPacientePrincipal
 import org.koin.java.KoinJavaComponent.getKoin
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -47,6 +48,10 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.login.route) {
             LoginScreen(navController, loginViewModel)
+        }
+
+        composable (Screens.psicologoHome.route){
+            ViewPacientePrincipal(navController)
         }
         composable(Screens.registro.route) {
             RegisterScreen(navController, loginViewModel)
@@ -70,11 +75,11 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             route = Screens.listarPsicologo.route,
             arguments = listOf(
                 navArgument("pacienteId") {
-                    type = NavType.StringType
+                    type = NavType.LongType
                 }
             )
         ) { backStackEntry ->
-            val idPaciente = backStackEntry.arguments?.getString("pacienteId") ?: ""
+            val idPaciente = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
             ListadoPsicologosScreen(
                 navController = navController,
                 loginViewModel = loginViewModel,
@@ -103,7 +108,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             CitasScreen(navController)
         }
         composable(Screens.psicologoAgenda.route) {
-            PsicologoAgendaScreen(navController, citasRepository, userSessionDataStore)
+            PsicologoAgendaScreen(navController)
         }
         composable(Screens.calendario.route) {
             CalendarioView()

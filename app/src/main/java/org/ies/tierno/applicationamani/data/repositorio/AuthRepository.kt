@@ -8,10 +8,11 @@ import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
-import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
+import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO
@@ -62,7 +63,7 @@ class AuthRepository(
         }
     }
 
-    suspend fun asignarPsicologo(idPaciente: Long, idPsicologo: Long): Result<String> {
+    suspend fun asignarPsicologo(idPaciente: Long, idPsicologo: Long): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
                 val request = AsignarPacienteAlPsicologoRequestDTO(
@@ -239,6 +240,16 @@ class AuthRepository(
             emit(emptyList())
         }
     }
+
+    fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> = flow {
+        try {
+            val response = api.getPacientesByPsicologo()
+            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+    }
+
 
     suspend fun darBajaPaciente(id: Long): Result<String> {
         return withContext(Dispatchers.IO) {

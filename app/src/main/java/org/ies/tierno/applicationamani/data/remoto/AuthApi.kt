@@ -4,6 +4,8 @@ import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsic
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
+import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsicologoRequestDTO
@@ -63,8 +65,11 @@ interface AuthApi {
     @POST("/api/admin/psicologos/asignar-psicologo")
     suspend fun asignarPsicologo(
         @Body request: AsignarPacienteAlPsicologoRequestDTO
-    ): Response<String>
+    ): Response<Boolean>
 
     @GET("/api/admin/psicologos")
     suspend fun getPsicologos(): Response<List<PsicologoSelfResponseDTO>>
+
+    @GET("/api/psicologo/pacientes/getAll")
+    suspend fun getPacientesByPsicologo() : Response<List<PacientePsicologoResponseDTO>>
 }

@@ -64,7 +64,6 @@ class CitasViewModel(
                     _errorMessage.value = error.message ?: "Error cargando agenda"
                     _agendaMensual.value = emptyList()
                 }
-
             _isLoading.value = false
         }
     }

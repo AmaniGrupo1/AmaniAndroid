@@ -49,7 +49,6 @@ class PsicologoAgendaViewModel(
         viewModelScope.launch {
             userSessionDataStore.sessionFlow.collect { session ->
                 _userSession.value = session
-                // Cargar pacientes asignados cuando la sesión esté disponible
                 if (session?.idPsicologo != null && _pacientesAsignados.value.isEmpty()) {
                     cargarPacientesAsignados()
                 }
@@ -87,10 +86,6 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    /**
-     * Convierte las franjas del diálogo al DTO que espera Spring Boot.
-     * Envía la estructura correcta: { franjas: [{ diaSemana, horaInicio, horaFin, activo }] }
-     */
     fun actualizarHorario(franjas: List<FranjaHorarioDTO>) {
         if (franjas.isEmpty()) {
             _errorMessage.value = "No hay franjas configuradas"
@@ -118,10 +113,6 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    /**
-     * Bloquea un día completo (envía null en horaInicio/horaFin).
-     * Para bloquear solo un rango horario, usar sobrecarga con esos parámetros.
-     */
     fun alternarDiaNoDisponible(
         fecha: LocalDate,
         yaNoDisponible: Boolean,
@@ -159,8 +150,6 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    // ── Cargar pacientes asignados ──
-
     fun cargarPacientesAsignados() {
         val psychologistId = _userSession.value?.idPsicologo ?: return
         viewModelScope.launch {
@@ -171,8 +160,6 @@ class PsicologoAgendaViewModel(
                 }
         }
     }
-
-    // ── Cargar disponibilidad de un día ──
 
     fun cargarDisponibilidadDia(fecha: LocalDate) {
         val psychologistId = _userSession.value?.idPsicologo ?: return
@@ -188,8 +175,6 @@ class PsicologoAgendaViewModel(
     fun limpiarDisponibilidad() {
         _disponibilidadDia.value = null
     }
-
-    // ── Crear cita ──
 
     fun crearCita(
         idPaciente: Long,
@@ -223,8 +208,6 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    // ── Editar cita ──
-
     fun editarCita(
         idCita: Long,
         idPaciente: Long,
@@ -257,8 +240,6 @@ class PsicologoAgendaViewModel(
             _isLoading.value = false
         }
     }
-
-    // ── Cancelar cita ──
 
     fun cancelarCita(idCita: Long) {
         viewModelScope.launch {

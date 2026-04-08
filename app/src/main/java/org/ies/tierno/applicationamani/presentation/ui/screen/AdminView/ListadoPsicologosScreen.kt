@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 
@@ -49,13 +50,14 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministra
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.java.KoinJavaComponent.getKoin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
-    pacienteId: String,
+    pacienteId: Long,
     viewModel: ListarPsicologosAdminViewModel = koinViewModel()
 ) {
     val psicologos by viewModel.psicologos.collectAsState()
@@ -157,18 +159,11 @@ fun ListadoPsicologosScreen(
 
                         val asignarSuccess by loginViewModel.asignarPacienteSuccess.collectAsState()
                         val asignarError by loginViewModel.asignarPacienteError.collectAsState()
-                        val asignarPacienteUseCase: AsignarPacienteAlPsicologoUseCase = koinViewModel()
+
                         Button(
                             onClick = {
                                 scope.launch {
-                                    val pacienteIdLong = pacienteId.toLongOrNull()
-                                    if (pacienteIdLong != null) {
-                                        loginViewModel.asignarPaciente(pacienteIdLong, psicologo.idPsicologo,asignarPacienteUseCase )
-                                    } else {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("ID del paciente no válido")
-                                        }
-                                    }
+                                        loginViewModel.asignarPaciente(pacienteId, psicologo.idPsicologo)
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
