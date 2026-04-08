@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.data.remoto
 
-import org.ies.tierno.applicationamani.domain.models.admin.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO

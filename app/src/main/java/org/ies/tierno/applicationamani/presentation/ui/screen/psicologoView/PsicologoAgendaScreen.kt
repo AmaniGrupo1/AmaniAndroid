@@ -41,6 +41,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaVi
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*

@@ -12,3 +12,6 @@ data class ListaPacientesAndPsicologo(
     val fechaDadoAlta: String,
     val pacientes: List<PacientesAsignadoDTO>
 )
+
+@Deprecated("Use ListaPacientesAndPsicologo instead", ReplaceWith("ListaPacientesAndPsicologo"))
+typealias PsicologoConPacientesDTO = ListaPacientesAndPsicologo

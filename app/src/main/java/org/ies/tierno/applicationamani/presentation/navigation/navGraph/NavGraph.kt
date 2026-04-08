@@ -21,16 +21,15 @@ import org.koin.androidx.compose.koinViewModel
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+// ...existing imports...
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
-import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPacientePrincipal
-import org.koin.java.KoinJavaComponent.getKoin
+// ...existing imports...
+// ...existing imports...
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -38,9 +37,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = koinViewModel()
 
-    // ✅ CORRECTO: Obtener repositorios de Koin directamente
-    val citasRepository = getKoin().get<CitasRepository>()
-    val userSessionDataStore = getKoin().get<UserSessionDataStore>()
+    // Repositorios pueden obtenerse desde cada screen mediante Koin si es necesario
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screens.principal.route) {
@@ -50,9 +47,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             LoginScreen(navController, loginViewModel)
         }
 
-        composable (Screens.psicologoHome.route){
-            ViewPacientePrincipal(navController)
-        }
+        // Psicólogo home route (si hay pantalla de paciente/psicólogo específica, usar la adecuada)
         composable(Screens.registro.route) {
             RegisterScreen(navController, loginViewModel)
         }
@@ -102,7 +97,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             PrincipalClienteScreen(navController)
         }
         composable(Screens.psicologoHome.route) {
-            PsicologoAgendaScreen(navController, citasRepository, userSessionDataStore)
+            PsicologoAgendaScreen(navController)
         }
         composable(Screens.citas.route) {
             CitasScreen(navController)
