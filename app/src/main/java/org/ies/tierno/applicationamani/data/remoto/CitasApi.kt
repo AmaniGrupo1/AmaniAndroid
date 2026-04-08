@@ -5,6 +5,7 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -44,6 +45,15 @@ interface CitasApi {
     suspend fun cancelarCita(
         @Path("id") idCita: Long
     ): AgendaItemDTO
+
+    @PUT("/api/citas/{id}")
+    suspend fun editarCita(
+        @Path("id") idCita: Long,
+        @Body request: CitaRequest
+    ): AgendaItemDTO
+
+    @GET("/api/admin/psicologos/pacientes")
+    suspend fun getPsicologosConPacientes(): List<PsicologoConPacientesDTO>
 
     @PUT("/api/citas/psicologo/{idPsicologo}/horario")
     suspend fun actualizarHorario(

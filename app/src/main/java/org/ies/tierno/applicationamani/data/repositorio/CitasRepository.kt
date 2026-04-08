@@ -6,6 +6,7 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 
 class CitasRepository(
@@ -35,6 +36,22 @@ class CitasRepository(
 
     suspend fun crearCita(request: CitaRequest): Result<CitaAdminResponseDTO> = runCatching {
         citasApi.crearCita(request)
+    }
+
+    suspend fun cancelarCita(idCita: Long): Result<AgendaItemDTO> = runCatching {
+        citasApi.cancelarCita(idCita)
+    }
+
+    suspend fun editarCita(idCita: Long, request: CitaRequest): Result<AgendaItemDTO> = runCatching {
+        citasApi.editarCita(idCita, request)
+    }
+
+    suspend fun getPacientesDelPsicologo(idPsicologo: Long): Result<List<PacientesAsignadoDTO>> = runCatching {
+        val todosLosPsicologos = citasApi.getPsicologosConPacientes()
+        todosLosPsicologos
+            .firstOrNull { it.idPsicologo == idPsicologo }
+            ?.pacientes
+            ?: emptyList()
     }
 
     suspend fun actualizarHorario(

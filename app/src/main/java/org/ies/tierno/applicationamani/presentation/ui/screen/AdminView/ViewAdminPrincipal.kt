@@ -8,7 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -166,13 +166,13 @@ private fun PacientesList(
             }
         }
 
-        items(
+        itemsIndexed(
             items = pacientes,
-            key = { paciente ->
-                // Usar combinación de email y nombre como key única
-                "${paciente.emailUsuario}_${paciente.nombreUsuario}_${paciente.nombrePsicologo}"
+            key = { index, paciente ->
+                // El índice garantiza unicidad incluso cuando los campos nullable coinciden
+                "${index}_${paciente.emailUsuario}_${paciente.nombreUsuario}_${paciente.nombrePsicologo}"
             }
-        ) { paciente ->
+        ) { _, paciente ->
             PacienteCard(
                 paciente = paciente,
                 onClick = {

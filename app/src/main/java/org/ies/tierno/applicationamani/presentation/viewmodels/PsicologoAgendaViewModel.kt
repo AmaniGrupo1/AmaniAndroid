@@ -12,7 +12,11 @@ import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
+import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 
 class PsicologoAgendaViewModel(
@@ -35,10 +39,20 @@ class PsicologoAgendaViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _pacientesAsignados = MutableStateFlow<List<PacientesAsignadoDTO>>(emptyList())
+    val pacientesAsignados: StateFlow<List<PacientesAsignadoDTO>> = _pacientesAsignados.asStateFlow()
+
+    private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
+    val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()
+
     init {
         viewModelScope.launch {
             userSessionDataStore.sessionFlow.collect { session ->
                 _userSession.value = session
+                // Cargar pacientes asignados cuando la sesión esté disponible
+                if (session?.idPsicologo != null && _pacientesAsignados.value.isEmpty()) {
+                    cargarPacientesAsignados()
+                }
             }
         }
     }
@@ -140,6 +154,121 @@ class PsicologoAgendaViewModel(
                 }
                 .onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al alternar día no disponible"
+                }
+            _isLoading.value = false
+        }
+    }
+
+    // ── Cargar pacientes asignados ──
+
+    fun cargarPacientesAsignados() {
+        val psychologistId = _userSession.value?.idPsicologo ?: return
+        viewModelScope.launch {
+            citasRepository.getPacientesDelPsicologo(psychologistId)
+                .onSuccess { _pacientesAsignados.value = it }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al cargar pacientes"
+                }
+        }
+    }
+
+    // ── Cargar disponibilidad de un día ──
+
+    fun cargarDisponibilidadDia(fecha: LocalDate) {
+        val psychologistId = _userSession.value?.idPsicologo ?: return
+        viewModelScope.launch {
+            citasRepository.getDisponibilidadDia(psychologistId, fecha.toString())
+                .onSuccess { _disponibilidadDia.value = it }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al cargar disponibilidad"
+                }
+        }
+    }
+
+    fun limpiarDisponibilidad() {
+        _disponibilidadDia.value = null
+    }
+
+    // ── Crear cita ──
+
+    fun crearCita(
+        idPaciente: Long,
+        fecha: LocalDate,
+        hora: LocalTime,
+        duracionMinutos: Int,
+        motivo: String
+    ) {
+        val psychologistId = _userSession.value?.idPsicologo ?: run {
+            _errorMessage.value = "No hay sesión de psicólogo"
+            return
+        }
+        viewModelScope.launch {
+            _isLoading.value = true
+            val request = CitaRequest(
+                idPaciente = idPaciente,
+                idPsicologo = psychologistId,
+                startDatetime = "${fecha}T${hora}",
+                durationMinutes = duracionMinutos,
+                estado = "pendiente",
+                motivo = motivo
+            )
+            citasRepository.crearCita(request)
+                .onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al crear la cita"
+                }
+            _isLoading.value = false
+        }
+    }
+
+    // ── Editar cita ──
+
+    fun editarCita(
+        idCita: Long,
+        idPaciente: Long,
+        fecha: LocalDate,
+        hora: LocalTime,
+        duracionMinutos: Int,
+        motivo: String
+    ) {
+        val psychologistId = _userSession.value?.idPsicologo ?: run {
+            _errorMessage.value = "No hay sesión de psicólogo"
+            return
+        }
+        viewModelScope.launch {
+            _isLoading.value = true
+            val request = CitaRequest(
+                idPaciente = idPaciente,
+                idPsicologo = psychologistId,
+                startDatetime = "${fecha}T${hora}",
+                durationMinutes = duracionMinutos,
+                estado = "pendiente",
+                motivo = motivo
+            )
+            citasRepository.editarCita(idCita, request)
+                .onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al editar la cita"
+                }
+            _isLoading.value = false
+        }
+    }
+
+    // ── Cancelar cita ──
+
+    fun cancelarCita(idCita: Long) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            citasRepository.cancelarCita(idCita)
+                .onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al cancelar la cita"
                 }
             _isLoading.value = false
         }
