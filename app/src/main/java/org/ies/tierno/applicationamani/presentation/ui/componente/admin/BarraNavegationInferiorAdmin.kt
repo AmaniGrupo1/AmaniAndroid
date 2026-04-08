@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.componente
+package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
@@ -70,7 +71,7 @@ fun BarraNavegationInferiorAdmin(
 
 @Composable
 fun ItemIcon(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     selected: Boolean,
     onClick: () -> Unit
 ) {

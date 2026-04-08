@@ -4,6 +4,7 @@ import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.data.remoto.CustomerClient
+import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.koin.dsl.module
@@ -44,4 +45,5 @@ val retrofitModule = module {
     single<CitasApi> { get<Retrofit>().create(CitasApi::class.java) }
     single<SituacionApi> { get<Retrofit>().create(SituacionApi::class.java) }
     single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
+    single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
 }

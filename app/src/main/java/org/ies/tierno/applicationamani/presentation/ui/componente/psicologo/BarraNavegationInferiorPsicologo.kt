@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.componente
+package org.ies.tierno.applicationamani.presentation.ui.componente.psicologo
 
 
 import androidx.compose.foundation.layout.RowScope
@@ -16,21 +16,22 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.AmaniPsicologoColors
 
 enum class PsicologoNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
     MIS_PACIENTES(
-        route = "psicologo_pacientes",
+        route = Screens.psicologoHome.route,
         icon = { Icon(Icons.Default.People, contentDescription = "Mis Pacientes") },
         label = "Pacientes"
     ),
     AGENDA(
-        route = "psicologo_agenda",
+        route = Screens.psicologoAgenda.route,
         icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Agenda") },
         label = "Agenda"
     ),
     PERFIL(
-        route = "psicologo_perfil",
+        route = Screens.perfilPsicologo.route,
         icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
         label = "Perfil"
     )
