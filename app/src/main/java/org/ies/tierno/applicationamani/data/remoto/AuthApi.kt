@@ -60,15 +60,19 @@ interface AuthApi {
         @Path("id") id: Long
     ): Response<String>
 
-
+    //ASIGNAMOS UN PSICÓLOGO
     @POST("/api/admin/psicologos/asignar-psicologo")
     suspend fun asignarPsicologo(
         @Body request: AsignarPacienteAlPsicologoRequestDTO
     ): Response<Boolean>
 
+    //LISTAMOS LOS PSICÓLOGOS
     @GET("/api/admin/psicologos")
     suspend fun getPsicologos(): Response<List<PsicologoSelfResponseDTO>>
 
+    //LISTAMOS LOS PACIENTES POR PSICÓLOGO
     @GET("/api/psicologo/pacientes/getAll")
-    suspend fun getPacientesByPsicologo() : Response<List<PacientePsicologoResponseDTO>>
+    suspend fun getPacientesByPsicologo(): Response<List<PacientePsicologoResponseDTO>>
+
+
 }

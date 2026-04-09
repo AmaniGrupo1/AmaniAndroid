@@ -19,7 +19,8 @@ data class UserSession(
     val idUsuario: Long,
     val nombre: String?, // Permitimos nulo aquí también
     val rol: String,
-    val idPsicologo: Long? = null
+    val idPsicologo: Long? = null,
+    val idPaciente: Long? = null
 )
 
 class UserSessionDataStore(private val context: Context) {
@@ -29,6 +30,8 @@ class UserSessionDataStore(private val context: Context) {
         val USER_NAME_KEY = stringPreferencesKey("user_name")
         val USER_ROLE_KEY = stringPreferencesKey("user_role")
         val PSYCHOLOGIST_ID_KEY = longPreferencesKey("psychologist_id")
+
+        val PATIENT_ID_KEY = longPreferencesKey("patient_id")
     }
 
     val sessionFlow: Flow<UserSession?> = context.userSessionDataStore.data.map { preferences ->
@@ -36,6 +39,7 @@ class UserSessionDataStore(private val context: Context) {
         val nombre = preferences[USER_NAME_KEY]
         val rol = preferences[USER_ROLE_KEY]
         val idPsicologo = preferences[PSYCHOLOGIST_ID_KEY]
+        val idPaciente = preferences[PATIENT_ID_KEY]
 
         // Normalizar valores: si el id del psicólogo existe pero es 0 -> tratar como null
         val normalizedPsychologistId = when (idPsicologo) {
@@ -50,7 +54,8 @@ class UserSessionDataStore(private val context: Context) {
                 idUsuario = idUsuario,
                 nombre = nombre,
                 rol = rol,
-                idPsicologo = normalizedPsychologistId
+                idPsicologo = normalizedPsychologistId,
+                idPaciente = idPaciente
             )
         } else {
             null
@@ -71,6 +76,12 @@ class UserSessionDataStore(private val context: Context) {
                 preferences[PSYCHOLOGIST_ID_KEY] = session.idPsicologo
             } else {
                 preferences.remove(PSYCHOLOGIST_ID_KEY)
+            }
+
+            if (session.idPaciente != null) {
+                preferences[PATIENT_ID_KEY] = session.idPaciente
+            } else {
+                preferences.remove(PATIENT_ID_KEY)
             }
         }
     }

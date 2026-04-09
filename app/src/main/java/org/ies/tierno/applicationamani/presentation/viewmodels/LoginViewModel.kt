@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.local.UserSession
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
@@ -28,7 +30,8 @@ import java.time.Period
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
-    private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase
+    private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase,
+    private val userSessionDataStore: UserSessionDataStore
 ) : ViewModel() {
 
     // ── Login ──
@@ -54,6 +57,10 @@ class LoginViewModel(
      * Ejecuta el proceso de inicio de sesión.
      * Válida los campos antes de realizar la llamada al caso de uso.
      */
+    /**
+     * Ejecuta el proceso de inicio de sesión.
+     * Válida los campos antes de realizar la llamada al caso de uso.
+     */
     fun login() {
         // Validaciones previas
         val usernameValue = _username.value
@@ -72,10 +79,6 @@ class LoginViewModel(
                 _loginError.value = "La contraseña es obligatoria"
                 return
             }
-//            passwordValue.length < 6 -> {
-//                _loginError.value = "La contraseña debe tener al menos 6 caracteres"
-//                return
-//            }
         }
 
         _isLoggingIn.value = true
@@ -91,18 +94,22 @@ class LoginViewModel(
 
                 val result = loginUseCase.login(request)
 
-                _loginResult.value = result
-
-                if (result.isFailure) {
-                    _loginError.value = when (val exception = result.exceptionOrNull()) {
+                result.onSuccess { loginResponse ->
+                    // ✅ GUARDAR LA SESIÓN INMEDIATAMENTE DESPUÉS DEL LOGIN EXITOSO
+                    saveUserSession(loginResponse)
+                    _loginResult.value = Result.success(loginResponse)
+                    _loginError.value = null
+                }.onFailure { error ->
+                    _loginResult.value = Result.failure(error)
+                    _loginError.value = when (error) {
                         is retrofit2.HttpException -> {
-                            when (exception.code()) {
+                            when (error.code()) {
                                 401 -> "Credenciales incorrectas"
                                 404 -> "Usuario no encontrado"
-                                else -> "Error de conexión: ${exception.message()}"
+                                else -> "Error de conexión: ${error.message()}"
                             }
                         }
-                        else -> exception?.message ?: "Error al iniciar sesión"
+                        else -> error.message ?: "Error al iniciar sesión"
                     }
                 }
             } catch (e: Exception) {
@@ -111,6 +118,32 @@ class LoginViewModel(
             } finally {
                 _isLoggingIn.value = false
             }
+        }
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Guarda la sesión del usuario en DataStore
+     */
+    private suspend fun saveUserSession(loginResponse: LoginResponseDTO) {
+        try {
+            val session = UserSession(
+                idUsuario = loginResponse.idUsuario,
+                nombre = loginResponse.nombre,
+                rol = loginResponse.rol,
+                idPsicologo = loginResponse.idPsicologo  // Este campo viene del backend
+            )
+
+            userSessionDataStore.saveSession(session)
+
+            // Debug: verificar que se guardó correctamente
+            val savedSession = userSessionDataStore.getSession()
+            println("=== SESIÓN GUARDADA ===")
+            println("ID Usuario: ${savedSession?.idUsuario}")
+            println("Nombre: ${savedSession?.nombre}")
+            println("Rol: ${savedSession?.rol}")
+            println("ID Psicólogo: ${savedSession?.idPsicologo}")
+        } catch (e: Exception) {
+            println("Error al guardar la sesión: ${e.message}")
         }
     }
 
@@ -138,9 +171,7 @@ class LoginViewModel(
         return _username.value.isNotBlank() &&
                 _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
                 _password.value.isNotBlank()
-               // _password.value.length >= 6
     }
-
     // ── Campos registro básico ──
     val nombre = MutableStateFlow("")
     val apellido = MutableStateFlow("")

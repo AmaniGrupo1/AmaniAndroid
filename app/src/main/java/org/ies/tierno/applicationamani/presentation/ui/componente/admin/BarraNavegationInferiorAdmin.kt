@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.componente
+package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
@@ -19,16 +19,6 @@ enum class AdminNavItem {
     CONFIGURACION
 }
 
-/**
- * Barra de navegación inferior del administrador migrada a [NavigationBar] de Material 3.
- *
- * Usa el tema Amani (indicador `primaryContainer`) y muestra etiquetas.
- * Para implementaciones nuevas usa [AmaniBottomBar] con [BottomBarConfig.Admin].
- *
- * @param navController Controlador de navegación.
- * @param selectedItem Ítem actualmente seleccionado.
- * @param onItemSelected Callback al pulsar un ítem.
- */
 @Composable
 fun BarraNavegationInferiorAdmin(
     navController: NavController,

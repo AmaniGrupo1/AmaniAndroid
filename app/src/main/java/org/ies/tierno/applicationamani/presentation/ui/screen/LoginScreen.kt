@@ -50,6 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.data.local.UserSession
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
@@ -75,6 +77,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreen(
     navController: NavController,
+    userSessionDataStore: UserSessionDataStore,
     loginViewModel: LoginViewModel = koinViewModel()
 ) {
     val username by loginViewModel.username.collectAsState()
@@ -98,7 +101,18 @@ fun LoginScreen(
     // Efecto para reaccionar al resultado del login y navegar cuando sea correcto
     LaunchedEffect(loginResult) {
         val result = loginResult ?: return@LaunchedEffect
+
         result.onSuccess { response ->
+            userSessionDataStore.saveSession(
+                UserSession(
+                    idUsuario = response.idUsuario,
+                    nombre = response.nombre,
+                    rol = response.rol,
+                    idPaciente = response.idPaciente,
+                    idPsicologo = response.idPsicologo
+                )
+            )
+
             val rol = response.rol
             val rolNormalizado = rol.lowercase().trim()
                 .replace("ó", "o")
@@ -107,7 +121,7 @@ fun LoginScreen(
             val destination = when (rolNormalizado) {
                 "admin", "administrador" -> Screens.adminHome.route
                 "psicologo", "psicologa" -> Screens.psicologoHome.route
-                else -> Screens.pacienteHome.route
+                else -> Screens.pacienteHome.createRoute(response.idPaciente ?: 0L)
             }
             
             loginViewModel.clearLoginFields()

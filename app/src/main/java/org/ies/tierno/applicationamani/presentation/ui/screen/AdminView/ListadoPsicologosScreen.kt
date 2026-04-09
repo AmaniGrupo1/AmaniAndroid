@@ -42,15 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 
-import org.ies.tierno.applicationamani.presentation.ui.componente.MenuAdministrador
+import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.java.KoinJavaComponent.getKoin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

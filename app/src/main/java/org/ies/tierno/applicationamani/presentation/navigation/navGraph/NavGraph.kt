@@ -21,15 +21,26 @@ import org.koin.androidx.compose.koinViewModel
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-// ...existing imports...
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.presentation.screens.profile.PsicologoProfileScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
-// ...existing imports...
-// ...existing imports...
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologo.PsicologoAgendaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
+import org.koin.java.KoinJavaComponent.getKoin
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -44,10 +55,12 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             Principal(navController)
         }
         composable(Screens.login.route) {
-            LoginScreen(navController, loginViewModel)
+            LoginScreen(navController, userSessionDataStore,loginViewModel)
         }
 
-        // Psicólogo home route (si hay pantalla de paciente/psicólogo específica, usar la adecuada)
+        composable (Screens.psicologoHome.route){
+            ViewPsicologoPrincipal(userSessionDataStore,navController)
+        }
         composable(Screens.registro.route) {
             RegisterScreen(navController, loginViewModel)
         }
@@ -107,6 +120,31 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
         composable(Screens.calendario.route) {
             CalendarioView()
+        }
+        // PERFIL PSICOLOGO
+        composable(
+            route = Screens.perfilPsicologo.route,
+            arguments = listOf(
+                navArgument("psicologoId") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+            val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
+            PsicologoProfileScreen(idPsicologo, navController)
+        }
+
+
+        composable(
+            route = Screens.pacienteHome.route,
+            arguments = listOf(
+                navArgument("idPaciente") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+            val idPsicologo = backStackEntry.arguments?.getLong("idPaciente") ?: 0L
+            ViewPacientePrincipalScreen(navController,idPsicologo)
         }
     }
 }

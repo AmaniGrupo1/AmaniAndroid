@@ -55,6 +55,7 @@ kotlin {
 }
 
 dependencies {
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     implementation("io.insert-koin:koin-androidx-compose:4.1.1")
     // 🚨 IMPORTANTE: eliminado Spring (NO compatible con Android)
