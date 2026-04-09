@@ -20,6 +20,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Type
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 /**
@@ -62,6 +63,12 @@ val retrofitModule = module {
                     JsonPrimitive(src.toString())
                 override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalTime =
                     LocalTime.parse(json.asString)
+            })
+            .registerTypeAdapter(LocalDateTime::class.java, object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+                override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
+                    JsonPrimitive(src.toString())
+                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime =
+                    LocalDateTime.parse(json.asString)
             })
             .create()
 

@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
-import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import org.koin.androidx.compose.koinViewModel
@@ -71,6 +71,7 @@ fun PsicologoAgendaScreen(
     var citaParaCancelar by remember { mutableStateOf<AgendaItemDTO?>(null) }
 
     val pacientesAsignados by viewModel.pacientesAsignados.collectAsStateWithLifecycle()
+    val pacientesError by viewModel.pacientesError.collectAsStateWithLifecycle()
     val disponibilidadDia by viewModel.disponibilidadDia.collectAsStateWithLifecycle()
 
     val citasPorDia: Map<LocalDate, List<AgendaItemDTO>> = remember(agendaMensual) {
@@ -341,6 +342,8 @@ fun PsicologoAgendaScreen(
             citaAEditar = citaParaEditar,
             fechaInicial = fechaSeleccionada ?: LocalDate.now(),
             pacientes = pacientesAsignados,
+            pacientesError = pacientesError,
+            onRecargarPacientes = { viewModel.reintentarCargarPacientes() },
             slotsLibres = disponibilidadDia?.slotsLibres ?: emptyList(),
             onFechaChange = { viewModel.cargarDisponibilidadDia(it) },
             onConfirmar = { idPaciente, fecha, hora, duracion, motivo ->
@@ -859,7 +862,9 @@ fun DialogoNoDisponible(
 fun DialogoCrearEditarCita(
     citaAEditar: AgendaItemDTO?,
     fechaInicial: LocalDate,
-    pacientes: List<PacientesAsignadoDTO>,
+    pacientes: List<PacientePsicologoResponseDTO>,
+    pacientesError: String?,
+    onRecargarPacientes: () -> Unit,
     slotsLibres: List<FranjaDisponibilidadResponse>,
     onFechaChange: (LocalDate) -> Unit,
     onConfirmar: (idPaciente: Long, fecha: LocalDate, hora: LocalTime, duracion: Int, motivo: String) -> Unit,
@@ -921,19 +926,35 @@ fun DialogoCrearEditarCita(
                         singleLine = true
                     )
                     ExposedDropdownMenu(expanded = pacienteDropdownExpanded, onDismissRequest = { pacienteDropdownExpanded = false }) {
-                        if (pacientes.isEmpty()) {
-                            DropdownMenuItem(text = { Text("No hay pacientes asignados") }, onClick = { pacienteDropdownExpanded = false }, enabled = false)
-                        } else {
-                            pacientes.forEach { paciente ->
+                        when {
+                            pacientesError != null -> {
                                 DropdownMenuItem(
                                     text = {
                                         Column {
-                                            Text("${paciente.nombre} ${paciente.apellido}", fontWeight = FontWeight.Medium)
-                                            Text(paciente.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text("Error al cargar pacientes", color = MaterialTheme.colorScheme.error)
+                                            Text(pacientesError, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     },
-                                    onClick = { pacienteSeleccionado = paciente; pacienteDropdownExpanded = false }
+                                    onClick = { onRecargarPacientes() },
+                                    leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reintentar") },
+                                    trailingIcon = { Text("Reintentar", color = MaterialTheme.colorScheme.primary) }
                                 )
+                            }
+                            pacientes.isEmpty() -> {
+                                DropdownMenuItem(text = { Text("No hay pacientes asignados") }, onClick = { pacienteDropdownExpanded = false }, enabled = false)
+                            }
+                            else -> {
+                                pacientes.forEach { paciente ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Column {
+                                                Text("${paciente.nombre ?: ""} ${paciente.apellido ?: ""}", fontWeight = FontWeight.Medium)
+                                                Text(paciente.email ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            }
+                                        },
+                                        onClick = { pacienteSeleccionado = paciente; pacienteDropdownExpanded = false }
+                                    )
+                                }
                             }
                         }
                     }
@@ -1022,11 +1043,12 @@ fun DialogoCrearEditarCita(
             }
         },
         confirmButton = {
-            val habilitado = pacienteSeleccionado != null && horaSeleccionada != null
+            val habilitado = pacienteSeleccionado?.idPaciente != null && horaSeleccionada != null
             Button(
                 onClick = {
-                    if (pacienteSeleccionado != null && horaSeleccionada != null) {
-                        onConfirmar(pacienteSeleccionado!!.idPaciente, fechaSeleccionada, horaSeleccionada!!, duracionMinutos, motivo.ifBlank { "Cita psicológica" })
+                    val idPaciente = pacienteSeleccionado?.idPaciente
+                    if (idPaciente != null && horaSeleccionada != null) {
+                        onConfirmar(idPaciente, fechaSeleccionada, horaSeleccionada!!, duracionMinutos, motivo.ifBlank { "Cita psicológica" })
                     }
                 },
                 enabled = habilitado

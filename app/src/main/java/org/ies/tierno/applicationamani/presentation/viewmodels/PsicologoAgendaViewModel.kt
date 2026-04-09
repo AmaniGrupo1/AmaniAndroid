@@ -9,11 +9,13 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate
 import java.time.LocalTime
@@ -21,6 +23,7 @@ import java.time.YearMonth
 
 class PsicologoAgendaViewModel(
     private val citasRepository: CitasRepository,
+    private val authRepository: AuthRepository,
     private val userSessionDataStore: UserSessionDataStore
 ) : ViewModel() {
 
@@ -39,8 +42,11 @@ class PsicologoAgendaViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    private val _pacientesAsignados = MutableStateFlow<List<PacientesAsignadoDTO>>(emptyList())
-    val pacientesAsignados: StateFlow<List<PacientesAsignadoDTO>> = _pacientesAsignados.asStateFlow()
+    private val _pacientesAsignados = MutableStateFlow<List<PacientePsicologoResponseDTO>>(emptyList())
+    val pacientesAsignados: StateFlow<List<PacientePsicologoResponseDTO>> = _pacientesAsignados.asStateFlow()
+
+    private val _pacientesError = MutableStateFlow<String?>(null)
+    val pacientesError: StateFlow<String?> = _pacientesError.asStateFlow()
 
     private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
     val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()
@@ -151,14 +157,19 @@ class PsicologoAgendaViewModel(
     }
 
     fun cargarPacientesAsignados() {
-        val psychologistId = _userSession.value?.idPsicologo ?: return
         viewModelScope.launch {
-            citasRepository.getPacientesDelPsicologo(psychologistId)
-                .onSuccess { _pacientesAsignados.value = it }
-                .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al cargar pacientes"
+            _pacientesError.value = null
+            authRepository.getPacientesByPsicologo().collect { pacientes ->
+                _pacientesAsignados.value = pacientes
+                if (pacientes.isEmpty()) {
+                    _pacientesError.value = "No hay pacientes asignados"
                 }
+            }
         }
+    }
+
+    fun reintentarCargarPacientes() {
+        cargarPacientesAsignados()
     }
 
     fun cargarDisponibilidadDia(fecha: LocalDate) {
