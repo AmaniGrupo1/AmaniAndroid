@@ -97,7 +97,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         composable(Screens.adminHome.route) {
             ViewAdminPrincipal(navController)
         }
-        composable(Screens.psicologoHome.route) {
+        composable(Screens.psicologoAgenda.route) {
             PsicologoAgendaScreen(navController)
         }
         composable(Screens.citas.route) {
