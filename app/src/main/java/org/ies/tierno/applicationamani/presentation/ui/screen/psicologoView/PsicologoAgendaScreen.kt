@@ -235,7 +235,10 @@ fun PsicologoAgendaScreen(
                                                 Text(
                                                     text = "${citasDelDia.size}",
                                                     color = colors.onPrimary,
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                                    modifier = Modifier.padding(
+                                                        horizontal = 8.dp,
+                                                        vertical = 2.dp
+                                                    )
                                                 )
                                             }
                                         }
@@ -255,14 +258,21 @@ fun PsicologoAgendaScreen(
                                             }
                                         }
                                     }
+
                                     else -> {
                                         Card(
                                             modifier = Modifier.fillMaxWidth(),
                                             shape = RoundedCornerShape(16.dp),
-                                            colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.5f))
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = colors.surfaceVariant.copy(
+                                                    alpha = 0.5f
+                                                )
+                                            )
                                         ) {
                                             Column(
-                                                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(32.dp),
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Icon(
@@ -272,8 +282,16 @@ fun PsicologoAgendaScreen(
                                                     tint = colors.onSurfaceVariant.copy(alpha = 0.6f)
                                                 )
                                                 Spacer(modifier = Modifier.height(12.dp))
-                                                Text(text = "No hay citas programadas", style = typography.bodyLarge, color = colors.onSurfaceVariant)
-                                                Text(text = "Este día está disponible para nuevas citas", style = typography.bodySmall, color = colors.onSurfaceVariant.copy(alpha = 0.7f))
+                                                Text(
+                                                    text = "No hay citas programadas",
+                                                    style = typography.bodyLarge,
+                                                    color = colors.onSurfaceVariant
+                                                )
+                                                Text(
+                                                    text = "Este día está disponible para nuevas citas",
+                                                    style = typography.bodySmall,
+                                                    color = colors.onSurfaceVariant.copy(alpha = 0.7f)
+                                                )
                                             }
                                         }
                                     }
@@ -293,8 +311,14 @@ fun PsicologoAgendaScreen(
                         .clickable(enabled = false) { },
                     contentAlignment = Alignment.Center
                 ) {
-                    Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = colors.surface)) {
-                        Column(modifier = Modifier.padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = colors.surface)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             CircularProgressIndicator(color = colors.primary)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text("Cargando agenda...", style = typography.bodyMedium)
@@ -348,10 +372,23 @@ fun PsicologoAgendaScreen(
             onFechaChange = { viewModel.cargarDisponibilidadDia(it) },
             onConfirmar = { idPaciente, fecha, hora, duracion, motivo ->
                 if (citaParaEditar != null) {
-                    viewModel.editarCita(idCita = citaParaEditar!!.id, idPaciente = idPaciente, fecha = fecha, hora = hora, duracionMinutos = duracion, motivo = motivo)
+                    viewModel.editarCita(
+                        idCita = citaParaEditar!!.id,
+                        idPaciente = idPaciente,
+                        fecha = fecha,
+                        hora = hora,
+                        duracionMinutos = duracion,
+                        motivo = motivo
+                    )
                     scope.launch { snackbarHostState.showSnackbar("Cita actualizada correctamente") }
                 } else {
-                    viewModel.crearCita(idPaciente = idPaciente, fecha = fecha, hora = hora, duracionMinutos = duracion, motivo = motivo)
+                    viewModel.crearCita(
+                        idPaciente = idPaciente,
+                        fecha = fecha,
+                        hora = hora,
+                        duracionMinutos = duracion,
+                        motivo = motivo
+                    )
                     scope.launch { snackbarHostState.showSnackbar("Cita creada correctamente") }
                 }
                 mostrarDialogoCrearEditar = false
@@ -396,40 +433,64 @@ fun CalendarioView(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                alpha = 0.5f
+            )
+        )
     ) {
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = { onMesChange(mesVisible.minusMonths(1)) },
-                    modifier = Modifier.clip(CircleShape).background(colors.surfaceVariant.copy(alpha = 0.5f))
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
                 ) {
                     Icon(Icons.Default.ChevronLeft, contentDescription = "Mes anterior")
                 }
                 Text(
-                    text = mesVisible.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                    text = mesVisible.format(
+                        DateTimeFormatter.ofPattern(
+                            "MMMM yyyy",
+                            Locale("es", "ES")
+                        )
+                    ).replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.primary
                 )
                 IconButton(
                     onClick = { onMesChange(mesVisible.plusMonths(1)) },
-                    modifier = Modifier.clip(CircleShape).background(colors.surfaceVariant.copy(alpha = 0.5f))
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(colors.surfaceVariant.copy(alpha = 0.5f))
                 ) {
                     Icon(Icons.Default.ChevronRight, contentDescription = "Mes siguiente")
                 }
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 listOf("LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM").forEach { dia ->
-                    Text(text = dia, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = colors.primary.copy(alpha = 0.7f))
+                    Text(
+                        text = dia,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.primary.copy(alpha = 0.7f)
+                    )
                 }
             }
 
@@ -449,7 +510,9 @@ fun CalendarioView(
                         val filaPadded = fila + List(7 - fila.size) { null }
                         filaPadded.forEach { fecha ->
                             if (fecha == null) {
-                                Box(modifier = Modifier.weight(1f).aspectRatio(1f))
+                                Box(modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(1f))
                             } else {
                                 DiaCalendario(
                                     fecha = fecha,
@@ -514,15 +577,23 @@ fun DiaCalendario(
                     else -> FontWeight.Normal
                 }
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.height(7.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.height(7.dp)
+            ) {
                 if (tieneCitas) {
-                    Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(if (isSelected) colors.onPrimary else colors.primary))
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+                            .clip(CircleShape)
+                            .background(if (isSelected) colors.onPrimary else colors.primary)
+                    )
                 }
                 if (esNoDisponible && !isSelected) {
-                    Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(colors.error))
-                }
-                if (!tieneCitas && !esNoDisponible) {
-                    Spacer(modifier = Modifier.size(5.dp))
+                    Box(modifier = Modifier
+                        .size(5.dp)
+                        .clip(CircleShape)
+                        .background(colors.error))
                 }
             }
         }
@@ -554,23 +625,53 @@ fun TarjetaCitaPsicologa(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = colors.surface)
     ) {
-        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)) {
             Box(
-                modifier = Modifier.width(5.dp).fillMaxHeight().clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)).background(estadoColor)
+                modifier = Modifier
+                    .width(5.dp)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+                    .background(estadoColor)
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.width(60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = cita.horaInicio.format(formatterTime), style = typography.titleSmall, fontWeight = FontWeight.Bold, color = estadoColor)
-                    Text(text = cita.horaFin.format(formatterTime), style = typography.bodySmall, color = colors.onSurfaceVariant)
+                Column(
+                    modifier = Modifier.width(60.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = cita.horaInicio.format(formatterTime),
+                        style = typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = estadoColor
+                    )
+                    Text(
+                        text = cita.horaFin.format(formatterTime),
+                        style = typography.bodySmall,
+                        color = colors.onSurfaceVariant
+                    )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = cita.nombrePaciente ?: "Bloqueo de agenda", style = typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = colors.onSurface)
+                    Text(
+                        text = cita.nombrePaciente ?: "Bloqueo de agenda",
+                        style = typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.onSurface
+                    )
                     if (!cita.motivo.isNullOrBlank()) {
-                        Text(text = cita.motivo, style = typography.bodySmall, color = colors.onSurfaceVariant, maxLines = 1)
+                        Text(
+                            text = cita.motivo,
+                            style = typography.bodySmall,
+                            color = colors.onSurfaceVariant,
+                            maxLines = 1
+                        )
                     }
                     Surface(
                         shape = RoundedCornerShape(4.dp),
@@ -578,7 +679,8 @@ fun TarjetaCitaPsicologa(
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
                         Text(
-                            text = cita.estado.orEmpty().replaceFirstChar { it.uppercase() }.ifEmpty { "Pendiente" },
+                            text = cita.estado.orEmpty().replaceFirstChar { it.uppercase() }
+                                .ifEmpty { "Pendiente" },
                             style = typography.labelSmall,
                             color = estadoColor,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -587,10 +689,20 @@ fun TarjetaCitaPsicologa(
                 }
                 Column {
                     IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = colors.primary, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Editar",
+                            tint = colors.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                     IconButton(onClick = onCancel, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Cancelar", tint = colors.error, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Cancelar",
+                            tint = colors.error,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                     IconButton(
                         onClick = {
@@ -605,7 +717,12 @@ fun TarjetaCitaPsicologa(
                         },
                         modifier = Modifier.size(36.dp)
                     ) {
-                        Icon(Icons.Default.CalendarMonth, contentDescription = "Añadir a calendario", tint = colors.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.CalendarMonth,
+                            contentDescription = "Añadir a calendario",
+                            tint = colors.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             }
@@ -614,7 +731,13 @@ fun TarjetaCitaPsicologa(
 }
 
 @Composable
-fun BotonAccionRapida(icono: ImageVector, texto: String, subtitulo: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun BotonAccionRapida(
+    icono: ImageVector,
+    texto: String,
+    subtitulo: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     val colors = MaterialTheme.colorScheme
     Card(
         modifier = modifier.shadow(2.dp, RoundedCornerShape(16.dp)),
@@ -623,19 +746,38 @@ fun BotonAccionRapida(icono: ImageVector, texto: String, subtitulo: String, modi
         colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(48.dp).clip(CircleShape).background(colors.primary.copy(alpha = 0.15f)),
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(colors.primary.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icono, contentDescription = texto, modifier = Modifier.size(24.dp), tint = colors.primary)
+                Icon(
+                    icono,
+                    contentDescription = texto,
+                    modifier = Modifier.size(24.dp),
+                    tint = colors.primary
+                )
             }
             Column {
-                Text(text = texto, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.onPrimaryContainer)
-                Text(text = subtitulo, style = MaterialTheme.typography.bodySmall, color = colors.onPrimaryContainer.copy(alpha = 0.7f))
+                Text(
+                    text = texto,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.onPrimaryContainer
+                )
+                Text(
+                    text = subtitulo,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onPrimaryContainer.copy(alpha = 0.7f)
+                )
             }
         }
     }
@@ -650,7 +792,9 @@ fun LeyendaPsicologa() {
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.5f))
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             LeyendaItem(colors.primary, "Con citas")
@@ -663,18 +807,30 @@ fun LeyendaPsicologa() {
 @Composable
 fun LeyendaItem(color: Color, texto: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
+        Box(modifier = Modifier
+            .size(10.dp)
+            .clip(CircleShape)
+            .background(color))
         Spacer(modifier = Modifier.width(6.dp))
-        Text(text = texto, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = texto,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
 @Composable
 fun CabeceraDiaPsicologa(fecha: LocalDate, esDiaNoDisponible: Boolean) {
     val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-ES"))
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
-            text = fecha.format(formatter).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.forLanguageTag("es-ES")) else it.toString() },
+            text = fecha.format(formatter)
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.forLanguageTag("es-ES")) else it.toString() },
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -691,15 +847,31 @@ fun DiaNoDisponibleCard() {
         colors = CardDefaults.cardColors(containerColor = colors.errorContainer)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.EventBusy, contentDescription = "No disponible", modifier = Modifier.size(32.dp), tint = colors.error)
+            Icon(
+                Icons.Default.EventBusy,
+                contentDescription = "No disponible",
+                modifier = Modifier.size(32.dp),
+                tint = colors.error
+            )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text("Día no disponible", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.onErrorContainer)
-                Text("No se pueden agendar citas en esta fecha", style = MaterialTheme.typography.bodySmall, color = colors.onErrorContainer.copy(alpha = 0.8f))
+                Text(
+                    "Día no disponible",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.onErrorContainer
+                )
+                Text(
+                    "No se pueden agendar citas en esta fecha",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onErrorContainer.copy(alpha = 0.8f)
+                )
             }
         }
     }
@@ -711,7 +883,8 @@ fun DialogoModificarHorario(
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    val diasSemana = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+    val diasSemana =
+        listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
     val horariosInicio = remember { mutableStateListOf(*Array(7) { 9 }) }
     val horariosFin = remember { mutableStateListOf(*Array(7) { 17 }) }
     val activo = remember { mutableStateListOf(*Array(7) { it < 5 }) }
@@ -721,26 +894,52 @@ fun DialogoModificarHorario(
         containerColor = colors.surface,
         title = {
             Column {
-                Text("Configurar horario", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Define tu disponibilidad semanal", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                Text(
+                    "Configurar horario",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Define tu disponibilidad semanal",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant
+                )
             }
         },
         text = {
-            Column(modifier = Modifier.heightIn(max = 450.dp).verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 450.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 diasSemana.forEachIndexed { index, dia ->
                     Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.5f))
+                        colors = CardDefaults.cardColors(
+                            containerColor = colors.surfaceVariant.copy(
+                                alpha = 0.5f
+                            )
+                        )
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                                 Checkbox(
                                     checked = activo[index],
                                     onCheckedChange = { activo[index] = it },
                                     colors = CheckboxDefaults.colors(checkedColor = colors.primary)
                                 )
-                                Text(dia, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                                Text(
+                                    dia,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.weight(1f)
+                                )
                                 if (activo[index]) {
                                     Text(
                                         text = "${horariosInicio[index]}:00 - ${horariosFin[index]}:00",
@@ -756,7 +955,10 @@ fun DialogoModificarHorario(
                                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text("Hora inicio", style = MaterialTheme.typography.labelSmall)
+                                        Text(
+                                            "Hora inicio",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
                                         Slider(
                                             value = horariosInicio[index].toFloat(),
                                             onValueChange = { horariosInicio[index] = it.toInt() },
@@ -764,10 +966,17 @@ fun DialogoModificarHorario(
                                             steps = 23,
                                             colors = SliderDefaults.colors(thumbColor = colors.primary)
                                         )
-                                        Text("${horariosInicio[index]}:00", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            "${horariosInicio[index]}:00",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     }
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text("Hora fin", style = MaterialTheme.typography.labelSmall)
+                                        Text(
+                                            "Hora fin",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
                                         Slider(
                                             value = horariosFin[index].toFloat(),
                                             onValueChange = { horariosFin[index] = it.toInt() },
@@ -775,7 +984,11 @@ fun DialogoModificarHorario(
                                             steps = 23 - horariosInicio[index],
                                             colors = SliderDefaults.colors(thumbColor = colors.primary)
                                         )
-                                        Text("${horariosFin[index]}:00", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            "${horariosFin[index]}:00",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     }
                                 }
                             }
@@ -792,7 +1005,9 @@ fun DialogoModificarHorario(
                             listOf(
                                 FranjaHorarioDTO(
                                     diaSemana = (i + 1).toShort(),
-                                    horaInicio = "${horariosInicio[i].toString().padStart(2, '0')}:00",
+                                    horaInicio = "${
+                                        horariosInicio[i].toString().padStart(2, '0')
+                                    }:00",
                                     horaFin = "${horariosFin[i].toString().padStart(2, '0')}:00",
                                     activo = true,
                                     motivo = null
@@ -820,21 +1035,41 @@ fun DialogoNoDisponible(
 ) {
     val colors = MaterialTheme.colorScheme
     val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
-    val fechaFormateada = fecha.format(formatter).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es", "ES")) else it.toString() }
+    val fechaFormateada = fecha.format(formatter).replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            Locale(
+                "es",
+                "ES"
+            )
+        ) else it.toString()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(if (yaNoDisponible) Icons.Default.CheckCircle else Icons.Default.Warning, contentDescription = null, tint = if (yaNoDisponible) colors.primary else colors.error)
+                Icon(
+                    if (yaNoDisponible) Icons.Default.CheckCircle else Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = if (yaNoDisponible) colors.primary else colors.error
+                )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(if (yaNoDisponible) "Habilitar día" else "Marcar como no disponible", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(
+                    if (yaNoDisponible) "Habilitar día" else "Marcar como no disponible",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
             }
         },
         text = {
             Column {
-                Text(fechaFormateada, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.primary)
+                Text(
+                    fechaFormateada,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.primary
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     if (yaNoDisponible) "¿Deseas habilitar este día para recibir citas?"
@@ -892,7 +1127,11 @@ fun DialogoCrearEditarCita(
             libres.sorted()
         }
     }
-    var horaSeleccionada by remember { mutableStateOf(citaAEditar?.horaInicio ?: horasDisponibles.firstOrNull()) }
+    var horaSeleccionada by remember {
+        mutableStateOf(
+            citaAEditar?.horaInicio ?: horasDisponibles.firstOrNull()
+        )
+    }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
     val duracionOpciones = listOf(30, 45, 60, 90, 120)
@@ -907,52 +1146,101 @@ fun DialogoCrearEditarCita(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = if (esEdicion) "Editar cita" else "Nueva cita", style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = if (esEdicion) "Editar cita" else "Nueva cita",
+                style = MaterialTheme.typography.titleLarge
+            )
         },
         text = {
             Column(
-                modifier = Modifier.fillMaxWidth().heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 480.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Paciente", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                ExposedDropdownMenuBox(expanded = pacienteDropdownExpanded, onExpandedChange = { pacienteDropdownExpanded = it }) {
+                Text(
+                    "Paciente",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = pacienteDropdownExpanded,
+                    onExpandedChange = { pacienteDropdownExpanded = it }) {
                     OutlinedTextField(
                         value = pacienteSeleccionado?.let { "${it.nombre} ${it.apellido}" } ?: "",
                         onValueChange = {},
                         readOnly = true,
                         placeholder = { Text("Selecciona un paciente") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = pacienteDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
                         singleLine = true
                     )
-                    ExposedDropdownMenu(expanded = pacienteDropdownExpanded, onDismissRequest = { pacienteDropdownExpanded = false }) {
+                    ExposedDropdownMenu(
+                        expanded = pacienteDropdownExpanded,
+                        onDismissRequest = { pacienteDropdownExpanded = false }) {
                         when {
                             pacientesError != null -> {
                                 DropdownMenuItem(
                                     text = {
                                         Column {
-                                            Text("Error al cargar pacientes", color = MaterialTheme.colorScheme.error)
-                                            Text(pacientesError, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(
+                                                "Error al cargar pacientes",
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                            Text(
+                                                pacientesError,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
                                         }
                                     },
                                     onClick = { onRecargarPacientes() },
-                                    leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reintentar") },
-                                    trailingIcon = { Text("Reintentar", color = MaterialTheme.colorScheme.primary) }
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Refresh,
+                                            contentDescription = "Reintentar"
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        Text(
+                                            "Reintentar",
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
                                 )
                             }
+
                             pacientes.isEmpty() -> {
-                                DropdownMenuItem(text = { Text("No hay pacientes asignados") }, onClick = { pacienteDropdownExpanded = false }, enabled = false)
+                                DropdownMenuItem(
+                                    text = { Text("No hay pacientes asignados") },
+                                    onClick = { pacienteDropdownExpanded = false },
+                                    enabled = false
+                                )
                             }
+
                             else -> {
                                 pacientes.forEach { paciente ->
                                     DropdownMenuItem(
                                         text = {
                                             Column {
-                                                Text("${paciente.nombre ?: ""} ${paciente.apellido ?: ""}", fontWeight = FontWeight.Medium)
-                                                Text(paciente.email ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(
+                                                    "${paciente.nombre ?: ""} ${paciente.apellido ?: ""}",
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                                Text(
+                                                    paciente.email ?: "",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
                                             }
                                         },
-                                        onClick = { pacienteSeleccionado = paciente; pacienteDropdownExpanded = false }
+                                        onClick = {
+                                            pacienteSeleccionado =
+                                                paciente; pacienteDropdownExpanded = false
+                                        }
                                     )
                                 }
                             }
@@ -960,7 +1248,11 @@ fun DialogoCrearEditarCita(
                     }
                 }
 
-                Text("Fecha", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Fecha",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
                 OutlinedTextField(
                     value = fechaSeleccionada.format(formatterFecha),
                     onValueChange = {},
@@ -974,64 +1266,118 @@ fun DialogoCrearEditarCita(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { fechaSeleccionada = fechaSeleccionada.minusDays(1); onFechaChange(fechaSeleccionada) }) {
+                    IconButton(onClick = {
+                        fechaSeleccionada = fechaSeleccionada.minusDays(1); onFechaChange(
+                        fechaSeleccionada
+                    )
+                    }) {
                         Icon(Icons.Default.ChevronLeft, contentDescription = "Día anterior")
                     }
                     Text(
-                        text = fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("es-ES"))).replaceFirstChar { it.uppercase() },
+                        text = fechaSeleccionada.format(
+                            DateTimeFormatter.ofPattern(
+                                "EEEE",
+                                Locale.forLanguageTag("es-ES")
+                            )
+                        ).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold
                     )
-                    IconButton(onClick = { fechaSeleccionada = fechaSeleccionada.plusDays(1); onFechaChange(fechaSeleccionada) }) {
+                    IconButton(onClick = {
+                        fechaSeleccionada = fechaSeleccionada.plusDays(1); onFechaChange(
+                        fechaSeleccionada
+                    )
+                    }) {
                         Icon(Icons.Default.ChevronRight, contentDescription = "Día siguiente")
                     }
                 }
 
-                Text("Hora de inicio", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                ExposedDropdownMenuBox(expanded = horaDropdownExpanded, onExpandedChange = { horaDropdownExpanded = it }) {
+                Text(
+                    "Hora de inicio",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = horaDropdownExpanded,
+                    onExpandedChange = { horaDropdownExpanded = it }) {
                     OutlinedTextField(
-                        value = horaSeleccionada?.format(formatterHora) ?: "Sin horarios disponibles",
+                        value = horaSeleccionada?.format(formatterHora)
+                            ?: "Sin horarios disponibles",
                         onValueChange = {},
                         readOnly = true,
                         leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = horaDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
                         singleLine = true
                     )
-                    ExposedDropdownMenu(expanded = horaDropdownExpanded, onDismissRequest = { horaDropdownExpanded = false }) {
+                    ExposedDropdownMenu(
+                        expanded = horaDropdownExpanded,
+                        onDismissRequest = { horaDropdownExpanded = false }) {
                         if (horasDisponibles.isEmpty()) {
-                            DropdownMenuItem(text = { Text("No hay horarios libres para este día") }, onClick = { horaDropdownExpanded = false }, enabled = false)
+                            DropdownMenuItem(
+                                text = { Text("No hay horarios libres para este día") },
+                                onClick = { horaDropdownExpanded = false },
+                                enabled = false
+                            )
                         } else {
                             horasDisponibles.forEach { hora ->
                                 DropdownMenuItem(
                                     text = { Text(hora.format(formatterHora)) },
-                                    onClick = { horaSeleccionada = hora; horaDropdownExpanded = false },
-                                    leadingIcon = { Icon(Icons.Default.AccessTime, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                    onClick = {
+                                        horaSeleccionada = hora; horaDropdownExpanded = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.AccessTime,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
                                 )
                             }
                         }
                     }
                 }
 
-                Text("Duración", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                ExposedDropdownMenuBox(expanded = duracionDropdownExpanded, onExpandedChange = { duracionDropdownExpanded = it }) {
+                Text(
+                    "Duración",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = duracionDropdownExpanded,
+                    onExpandedChange = { duracionDropdownExpanded = it }) {
                     OutlinedTextField(
                         value = "$duracionMinutos min",
                         onValueChange = {},
                         readOnly = true,
                         leadingIcon = { Icon(Icons.Default.Timer, contentDescription = null) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = duracionDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
                         singleLine = true
                     )
-                    ExposedDropdownMenu(expanded = duracionDropdownExpanded, onDismissRequest = { duracionDropdownExpanded = false }) {
+                    ExposedDropdownMenu(
+                        expanded = duracionDropdownExpanded,
+                        onDismissRequest = { duracionDropdownExpanded = false }) {
                         duracionOpciones.forEach { min ->
-                            DropdownMenuItem(text = { Text("$min minutos") }, onClick = { duracionMinutos = min; duracionDropdownExpanded = false })
+                            DropdownMenuItem(
+                                text = { Text("$min minutos") },
+                                onClick = {
+                                    duracionMinutos = min; duracionDropdownExpanded = false
+                                })
                         }
                     }
                 }
 
-                Text("Motivo", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Motivo",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
                 OutlinedTextField(
                     value = motivo,
                     onValueChange = { motivo = it },
@@ -1048,7 +1394,12 @@ fun DialogoCrearEditarCita(
                 onClick = {
                     val idPaciente = pacienteSeleccionado?.idPaciente
                     if (idPaciente != null && horaSeleccionada != null) {
-                        onConfirmar(idPaciente, fechaSeleccionada, horaSeleccionada!!, duracionMinutos, motivo.ifBlank { "Cita psicológica" })
+                        onConfirmar(
+                            idPaciente,
+                            fechaSeleccionada,
+                            horaSeleccionada!!,
+                            duracionMinutos,
+                            motivo.ifBlank { "Cita psicológica" })
                     }
                 },
                 enabled = habilitado
@@ -1079,21 +1430,48 @@ fun DialogoConfirmarCancelacion(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f))
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(
+                            alpha = 0.3f
+                        )
+                    )
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text(text = cita.nombrePaciente ?: "Paciente", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge)
-                        Text(text = "${cita.fecha.format(formatterFecha)} • ${cita.horaInicio.format(formatterHora)} - ${cita.horaFin.format(formatterHora)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            text = cita.nombrePaciente ?: "Paciente",
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "${cita.fecha.format(formatterFecha)} • ${
+                                cita.horaInicio.format(
+                                    formatterHora
+                                )
+                            } - ${cita.horaFin.format(formatterHora)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         if (!cita.motivo.isNullOrBlank()) {
-                            Text(text = cita.motivo, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                text = cita.motivo,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
-                Text("Esta acción no se puede deshacer.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                Text(
+                    "Esta acción no se puede deshacer.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         },
         confirmButton = {
-            Button(onClick = onConfirmar, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) {
+            Button(
+                onClick = onConfirmar,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
                 Text("Cancelar cita")
             }
         },

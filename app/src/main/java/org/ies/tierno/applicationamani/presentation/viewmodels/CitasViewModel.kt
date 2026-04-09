@@ -10,6 +10,7 @@ import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
+import org.ies.tierno.applicationamani.domain.events.HorarioEvents
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
@@ -50,6 +51,15 @@ class CitasViewModel(
                     _psicologoId.value = session.idPsicologo
                 } else if (session?.idPaciente != null) {
                     cargarPsicologoAsignado(session.idPaciente)
+                }
+            }
+        }
+        // Re-fetcha disponibilidad si el psicólogo actualiza su horario
+        // mientras el paciente tiene una fecha seleccionada en pantalla
+        viewModelScope.launch {
+            HorarioEvents.horarioActualizado.collect {
+                _disponibilidadDia.value?.fecha?.let { fecha ->
+                    cargarDisponibilidad(fecha)
                 }
             }
         }
