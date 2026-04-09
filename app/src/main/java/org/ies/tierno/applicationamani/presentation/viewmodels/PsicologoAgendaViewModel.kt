@@ -6,16 +6,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.domain.events.HorarioEvents
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate

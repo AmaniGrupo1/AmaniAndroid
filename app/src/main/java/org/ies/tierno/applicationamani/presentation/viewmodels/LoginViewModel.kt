@@ -19,12 +19,11 @@ import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
-import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionRequest
 import org.ies.tierno.applicationamani.dto.tutor.TutorRequestDTO
-import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
-import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import java.time.LocalDate
 import java.time.Period
 
