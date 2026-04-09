@@ -75,7 +75,7 @@ val appModule = module {
     viewModel { PrincipalClienteViewModel() }
     viewModel { SettingsClienteViewModel() }
     viewModel { SituacionViewModel(get()) }
-    viewModel { CitasViewModel(get(), get()) }
+    viewModel { CitasViewModel(get(), get(), get()) }
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(),get(),get()) }
     viewModel { CuestionarioViewModel(get()) }
