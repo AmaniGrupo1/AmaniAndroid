@@ -8,6 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.screens.profile.PsicologoProfileScreen
@@ -29,9 +32,14 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewP
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.java.KoinJavaComponent.getKoin
+import org.koin.core.parameter.parametersOf
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -131,6 +139,41 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         ) { backStackEntry ->
             val idPaciente = backStackEntry.arguments?.getLong("idPaciente") ?: 0L
             ViewPacientePrincipalScreen(navController,idPaciente)
+        }
+
+        composable(Screens.chatList.route) {
+            val viewModel: ChatListViewModel = koinViewModel()
+            ChatListScreen(navController = navController, viewModel = viewModel)
+        }
+
+        composable(
+            route = Screens.chat.route,
+            arguments = listOf(
+                navArgument("currentUserId") {
+                    type = NavType.LongType
+                },
+                navArgument("otherUserId") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+            val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
+            val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
+            
+            val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
+            
+            val session = runBlocking { userSessionDataStore.getSession() }
+            val currentUserRol = session?.rol ?: ""
+            val otherUserName = if (currentUserRol == "paciente") "Psicólogo" else "Paciente"
+            
+            ChatScreen(
+                currentUserId = currentUserId,
+                otherUserId = otherUserId,
+                viewModel = viewModel,
+                currentUserRol = currentUserRol,
+                otherUserName = otherUserName,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -74,7 +74,9 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)

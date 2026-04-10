@@ -79,7 +79,7 @@ private fun pacienteItems() = listOf(
         unselectedIcon = Icons.Outlined.DateRange
     ),
     AmaniBottomBarItem(
-        route = null,
+        route = Screens.chatList.route,
         label = "Chat",
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
@@ -143,7 +143,7 @@ private fun psicologoItems() = listOf(
         unselectedIcon = Icons.Outlined.People
     ),
     AmaniBottomBarItem(
-        route = null,
+        route = Screens.chatList.route,
         label = "Chat",
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),

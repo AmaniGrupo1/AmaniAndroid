@@ -29,6 +29,7 @@ detekt = "1.23.8"
 ktlint = "14.2.0"
 sonarqube = "7.2.3.7755"
 firebaseDatabase = "22.0.1"
+firebaseStorage = "21.0.1"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -61,6 +62,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
