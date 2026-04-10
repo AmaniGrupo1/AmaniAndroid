@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,17 +27,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.components.BottomBar
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
+import org.ies.tierno.applicationamani.ui.theme.Roboto
 
 /**
  * Pantalla de ajustes del perfil del cliente (paciente).
@@ -52,9 +50,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteVi
 @Composable
 fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClienteViewModel = viewModel()) {
     val purple = Color(0xFFCCC0E4)
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
     val consentimientoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -74,11 +69,7 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
         viewModel.cargarUsuario()
     }
 
-    Scaffold(
-        bottomBar = {
-            BottomBar(navController)
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -96,7 +87,7 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                 Text("Foto cliente")
             }
 
-            Text("General", fontSize = 22.sp, fontFamily = roboto)
+            Text("General", fontSize = 22.sp, fontFamily = Roboto)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -230,13 +221,8 @@ fun TextFieldCustom(
     color: Color,
     modifier: Modifier = Modifier
 ) {
-
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
-
     Column(modifier = modifier) {
-        Text(label, fontFamily = roboto)
+        Text(label, style = MaterialTheme.typography.bodyLarge, fontFamily = Roboto)
 
         Spacer(modifier = Modifier.height(4.dp))
 

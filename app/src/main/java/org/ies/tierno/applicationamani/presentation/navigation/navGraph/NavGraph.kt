@@ -2,7 +2,12 @@ package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.padding
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,6 +39,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
+import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
@@ -47,37 +54,60 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
+    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screens.principal.route) {
-            Principal(navController)
-        }
-        composable(Screens.login.route) {
-            LoginScreen(navController, userSessionDataStore,loginViewModel)
-        }
+    val bottomBarConfig = when (session?.rol?.lowercase()?.trim()) {
+        "admin", "administrador" -> BottomBarConfig.Admin
+        "psicologo", "psicóloga", "psicologa" -> BottomBarConfig.Psicologo
+        else -> BottomBarConfig.Paciente
+    }
 
-        composable (Screens.psicologoHome.route){
-            ViewPsicologoPrincipal(userSessionDataStore,navController)
+    Scaffold(
+        bottomBar = {
+            val currentRoute = currentBackStackEntry?.destination?.route
+            val hideBottomBar = currentRoute == Screens.login.route ||
+                                currentRoute == Screens.registro.route ||
+                                currentRoute == Screens.principal.route
+            if (!hideBottomBar) {
+                AmaniBottomBar(navController, bottomBarConfig)
+            }
         }
-        composable(Screens.registro.route) {
-            RegisterScreen(navController, loginViewModel)
-        }
-        composable(Screens.questionnaire.route) {
-            QuestionnaireScreen(navController)
-        }
-        composable(Screens.principalCliente.route) {
-            PrincipalClienteScreen(navController)
-        }
-        composable(Screens.settingsCliente.route) {
-            SettingsClienteScreen(navController)
-        }
-        composable(Screens.agregarPsicologo.route) {
-            AgregaPsicologoScreen(navController, loginViewModel)
-        }
-        composable(Screens.test.route) {
-            TestScreen(navController)
-        }
-        composable(
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screens.principal.route) {
+                Principal(navController)
+            }
+            composable(Screens.login.route) {
+                LoginScreen(navController, userSessionDataStore,loginViewModel)
+            }
+
+            composable (Screens.psicologoHome.route){
+                ViewPsicologoPrincipal(userSessionDataStore,navController)
+            }
+            composable(Screens.registro.route) {
+                RegisterScreen(navController, loginViewModel)
+            }
+            composable(Screens.questionnaire.route) {
+                QuestionnaireScreen(navController)
+            }
+            composable(Screens.principalCliente.route) {
+                PrincipalClienteScreen(navController)
+            }
+            composable(Screens.settingsCliente.route) {
+                SettingsClienteScreen(navController)
+            }
+            composable(Screens.agregarPsicologo.route) {
+                AgregaPsicologoScreen(navController, loginViewModel)
+            }
+            composable(Screens.test.route) {
+                TestScreen(navController)
+            }
+            composable(
             route = Screens.listarPsicologo.route,
             arguments = listOf(
                 navArgument("pacienteId") {
@@ -92,31 +122,31 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 pacienteId = idPaciente
             )
         }
-        composable(Screens.pacientes.route) {
-            ListadoPacientesScreen(navController)
-        }
-        composable(Screens.agregarAdmin.route) {
-            AgregarAdministrador(navController, loginViewModel)
-        }
-        composable(Screens.agregarPacienteAdmin.route) {
-            RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
-        }
-        composable(Screens.adminHome.route) {
-            ViewAdminPrincipal(navController)
-        }
-        composable(Screens.psicologoAgenda.route) {
-            PsicologoAgendaScreen(navController)
-        }
-        composable(Screens.citas.route) {
-            CitasScreen(navController)
-        }
-        composable(Screens.psicologoAgenda.route) {
-            PsicologoAgendaScreen(navController)
-        }
-        composable(Screens.calendario.route) {
-            CalendarioView()
-        }
-        composable(
+            composable(Screens.pacientes.route) {
+                ListadoPacientesScreen(navController)
+            }
+            composable(Screens.agregarAdmin.route) {
+                AgregarAdministrador(navController, loginViewModel)
+            }
+            composable(Screens.agregarPacienteAdmin.route) {
+                RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
+            }
+            composable(Screens.adminHome.route) {
+                ViewAdminPrincipal(navController)
+            }
+            composable(Screens.psicologoAgenda.route) {
+                PsicologoAgendaScreen(navController)
+            }
+            composable(Screens.citas.route) {
+                CitasScreen(navController)
+            }
+            composable(Screens.psicologoAgenda.route) {
+                PsicologoAgendaScreen(navController)
+            }
+            composable(Screens.calendario.route) {
+                CalendarioView()
+            }
+            composable(
             route = Screens.perfilPsicologo.route,
             arguments = listOf(
                 navArgument("psicologoId") {
@@ -129,7 +159,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
 
 
-        composable(
+            composable(
             route = Screens.pacienteHome.route,
             arguments = listOf(
                 navArgument("idPaciente") {
@@ -141,12 +171,12 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             ViewPacientePrincipalScreen(navController,idPaciente)
         }
 
-        composable(Screens.chatList.route) {
-            val viewModel: ChatListViewModel = koinViewModel()
-            ChatListScreen(navController = navController, viewModel = viewModel)
-        }
+            composable(Screens.chatList.route) {
+                val viewModel: ChatListViewModel = koinViewModel()
+                ChatListScreen(navController = navController, viewModel = viewModel)
+            }
 
-        composable(
+            composable(
             route = Screens.chat.route,
             arguments = listOf(
                 navArgument("currentUserId") {
@@ -156,24 +186,25 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                     type = NavType.LongType
                 }
             )
-        ) { backStackEntry ->
-            val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
-            val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
-            
-            val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
-            
-            val session = runBlocking { userSessionDataStore.getSession() }
-            val currentUserRol = session?.rol ?: ""
-            val otherUserName = if (currentUserRol == "paciente") "Psicólogo" else "Paciente"
-            
-            ChatScreen(
-                currentUserId = currentUserId,
-                otherUserId = otherUserId,
-                viewModel = viewModel,
-                currentUserRol = currentUserRol,
-                otherUserName = otherUserName,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            ) { backStackEntry ->
+                val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
+                val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
+
+                val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
+
+                val currentSession = runBlocking { userSessionDataStore.getSession() }
+                val currentUserRol = currentSession?.rol ?: ""
+                val otherUserName = if (currentUserRol == "paciente") "Psicólogo" else "Paciente"
+
+                ChatScreen(
+                    currentUserId = currentUserId,
+                    otherUserId = otherUserId,
+                    viewModel = viewModel,
+                    currentUserRol = currentUserRol,
+                    otherUserName = otherUserName,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

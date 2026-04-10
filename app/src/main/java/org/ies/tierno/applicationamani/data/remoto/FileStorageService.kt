@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storageMetadata
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -77,13 +78,21 @@ class FileStorageService(
 
     suspend fun uploadVoiceNote(audioFile: File, conversationId: String): UploadResult = withContext(Dispatchers.IO) {
         try {
+            if (!audioFile.exists() || audioFile.length() <= 0L) {
+                return@withContext UploadResult.Error("La nota de voz está vacía o no se encontró")
+            }
+
             val fileName = "voice_${UUID.randomUUID()}.m4a"
             val path = "amani-chat/attachments/$conversationId/$fileName"
             val fileRef = storageRef.child(path)
+            val metadata = storageMetadata {
+                contentType = "audio/mp4"
+            }
 
-            val inputStream = audioFile.inputStream()
-            val uploadTask: UploadTask = fileRef.putStream(inputStream)
-            val taskSnapshot = uploadTask.await()
+            val taskSnapshot = audioFile.inputStream().use { inputStream ->
+                val uploadTask: UploadTask = fileRef.putStream(inputStream, metadata)
+                uploadTask.await()
+            }
 
             if (taskSnapshot.task.isSuccessful) {
                 val downloadUrl = fileRef.downloadUrl.await().toString()

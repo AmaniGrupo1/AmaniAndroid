@@ -129,7 +129,8 @@ class LoginViewModel(
                 idUsuario = loginResponse.idUsuario,
                 nombre = loginResponse.nombre,
                 rol = loginResponse.rol,
-                idPsicologo = loginResponse.idPsicologo  // Este campo viene del backend
+                idPsicologo = loginResponse.idPsicologo,
+                idPaciente = loginResponse.idPaciente
             )
 
             userSessionDataStore.saveSession(session)

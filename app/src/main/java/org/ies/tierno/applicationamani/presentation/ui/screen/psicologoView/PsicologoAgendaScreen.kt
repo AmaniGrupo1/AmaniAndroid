@@ -96,8 +96,6 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
@@ -166,7 +164,6 @@ fun PsicologoAgendaScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = colors.background,
-        bottomBar = { AmaniBottomBar(navController, BottomBarConfig.Psicologo) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {

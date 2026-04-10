@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,6 +49,7 @@ fun ChatListScreen(
 ) {
     val currentUserId by viewModel.currentUserId.collectAsState()
     val currentUserRol by viewModel.currentUserRol.collectAsState()
+    val normalizedRol = currentUserRol.lowercase().trim().replace("ó", "o").replace("á", "a")
     val partnerId by viewModel.partnerId.collectAsState()
     val partnerNombre by viewModel.partnerNombre.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -79,8 +79,19 @@ fun ChatListScreen(
                 .padding(paddingValues)
         ) {
             when {
-                isLoading || currentUserId == null || partnerId == null -> {
+                isLoading || currentUserId == null -> {
                     CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                partnerId == null -> {
+                    Text(
+                        text = if (normalizedRol == "psicologo" || normalizedRol == "psicologa") {
+                            "No tienes pacientes asignados aún"
+                        } else {
+                            "No tienes psicólogo asignado aún"
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

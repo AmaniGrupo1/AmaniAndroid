@@ -4,8 +4,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 
 object FirebaseInstance {
+    private const val RTDB_URL = "https://amani-160bf-default-rtdb.europe-west1.firebasedatabase.app"
+
     private val databaseInstance: FirebaseDatabase by lazy {
-        FirebaseDatabase.getInstance()
+        FirebaseDatabase.getInstance(RTDB_URL)
     }
 
     private val storageInstance: FirebaseStorage by lazy {

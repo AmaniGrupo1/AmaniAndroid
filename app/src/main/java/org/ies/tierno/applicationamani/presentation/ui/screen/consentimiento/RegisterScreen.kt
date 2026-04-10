@@ -54,16 +54,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.ies.tierno.applicationamani.ui.theme.Roboto
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +74,7 @@ fun RegisterScreen(
     val primaryColor = Color(0xFF6C63FF)
     val backgroundColor = Color(0xFFCCC0E4)
     val snackbarHostState = remember { SnackbarHostState() }
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+    val roboto = Roboto
     val scope = rememberCoroutineScope()
 
     // Estados del LoginViewModel - CORREGIDO: Todos usando collectAsStateWithLifecycle correctamente

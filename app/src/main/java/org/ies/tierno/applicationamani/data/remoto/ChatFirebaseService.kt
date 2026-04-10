@@ -110,7 +110,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             val snapshot = messagesRef.get().await()
             
             for (child in snapshot.children) {
-                val receiverIdValue = child.child("receiverId").getValue(String::class.java)?.toLongOrNull()
+                val receiverIdValue = child.child("idReceiver").getValue(Long::class.java) ?: 0L
                 val leido = child.child("leido").getValue(Boolean::class.java) ?: false
                 
                 if (receiverIdValue == senderId && !leido) {

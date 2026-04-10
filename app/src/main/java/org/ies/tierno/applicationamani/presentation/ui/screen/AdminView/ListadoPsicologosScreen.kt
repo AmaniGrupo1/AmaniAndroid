@@ -36,17 +36,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
+import org.ies.tierno.applicationamani.ui.theme.BarlowCondensed
+import org.ies.tierno.applicationamani.ui.theme.Roboto
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,8 +62,8 @@ fun ListadoPsicologosScreen(
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
 
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val balow = FontFamily(Font(R.font.barlow_condensed_black))
+    val roboto = Roboto
+    val balow = BarlowCondensed
 
     val backgroundColor = Color(0xFFF5F5F5)
     val cardColor = Color.White

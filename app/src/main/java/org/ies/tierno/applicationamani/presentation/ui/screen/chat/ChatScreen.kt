@@ -4,9 +4,13 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +33,8 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import org.ies.tierno.applicationamani.domain.models.AttachmentType
 import org.ies.tierno.applicationamani.domain.models.Message
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackStatus
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -46,13 +52,28 @@ fun ChatScreen(
     val messages by viewModel.messages.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isSending by viewModel.isSending.collectAsState()
+    val audioUiState by viewModel.audioUiState.collectAsState()
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    val error by viewModel.error.collectAsState()
 
     var messageText by remember { mutableStateOf("") }
-    var playingMessageId by remember { mutableStateOf<String?>(null) }
     val isRecording by viewModel.isRecording.collectAsState()
     val audioHandler = remember { AudioHandler(context) }
+
+    // Mostrar errores
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.releaseAudioPlayer()
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -76,7 +97,7 @@ fun ChatScreen(
         if (isGranted) {
             val file = audioHandler.startRecording()
             if (file != null) {
-                viewModel.startRecording(file)
+                viewModel.startRecording()
             } else {
                 Toast.makeText(context, "Error al iniciar la grabación", Toast.LENGTH_SHORT).show()
             }
@@ -135,21 +156,18 @@ fun ChatScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(messages) { message ->
+                            val isPlayingThisMessage =
+                                audioUiState.activeMessageId == message.id &&
+                                    audioUiState.status == AudioPlaybackStatus.PLAYING
+
                             MessageBubble(
                                 message = message,
                                 isCurrentUser = message.senderId == currentUserId.toString(),
-                                isPlaying = playingMessageId == message.id,
+                                isPlaying = isPlayingThisMessage,
+                                audioUiState = audioUiState,
                                 onPlayClick = {
-                                    if (playingMessageId == message.id) {
-                                        audioHandler.stop()
-                                        playingMessageId = null
-                                    } else {
-                                        message.attachmentUrl?.let { url ->
-                                            audioHandler.play(url) {
-                                                playingMessageId = null
-                                            }
-                                            playingMessageId = message.id
-                                        }
+                                    message.attachmentUrl?.let { url ->
+                                        viewModel.toggleAudioPlayback(message.id, url)
                                     }
                                 }
                             )
@@ -171,8 +189,13 @@ fun ChatScreen(
                 onAttachFile = { documentPickerLauncher.launch("*/*") },
                 onRecordVoice = {
                     if (isRecording) {
-                        audioHandler.stopRecording()
-                        viewModel.stopRecordingAndSend()
+                        // Detener y obtener el archivo antes de subir
+                        val file = audioHandler.stopRecording()
+                        if (file != null) {
+                            viewModel.stopRecordingAndSend(file)
+                        } else {
+                            Toast.makeText(context, "Error al detener la grabación", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         if (ContextCompat.checkSelfPermission(
                                 context,
@@ -181,7 +204,7 @@ fun ChatScreen(
                         ) {
                             val file = audioHandler.startRecording()
                             if (file != null) {
-                                viewModel.startRecording(file)
+                                viewModel.startRecording()
                             } else {
                                 Toast.makeText(
                                     context,
@@ -206,6 +229,7 @@ private fun MessageBubble(
     message: Message,
     isCurrentUser: Boolean,
     isPlaying: Boolean,
+    audioUiState: AudioPlaybackUiState,
     onPlayClick: () -> Unit
 ) {
     val bubbleColor = if (isCurrentUser) {
@@ -227,12 +251,13 @@ private fun MessageBubble(
         Card(
             modifier = Modifier.widthIn(max = 280.dp),
             shape = RoundedCornerShape(
-                topStart = 16.dp,
-                topEnd = 16.dp,
-                bottomStart = if (isCurrentUser) 16.dp else 4.dp,
-                bottomEnd = if (isCurrentUser) 4.dp else 16.dp
+                topStart = 18.dp,
+                topEnd = 18.dp,
+                bottomStart = if (isCurrentUser) 18.dp else 4.dp,
+                bottomEnd = if (isCurrentUser) 4.dp else 18.dp
             ),
-            colors = CardDefaults.cardColors(containerColor = bubbleColor)
+            colors = CardDefaults.cardColors(containerColor = bubbleColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
                 modifier = Modifier.padding(12.dp)
@@ -240,7 +265,8 @@ private fun MessageBubble(
                 if (message.content.isNotBlank()) {
                     Text(
                         text = message.content,
-                        color = textColor
+                        color = textColor,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
@@ -255,7 +281,7 @@ private fun MessageBubble(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(12.dp))
                                     .clickable {
                                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                         context.startActivity(intent)
@@ -263,38 +289,65 @@ private fun MessageBubble(
                             )
                         }
                         AttachmentType.AUDIO -> {
+                            val isActiveAudio = audioUiState.activeMessageId == message.id
+                            val progress = if (
+                                isActiveAudio && audioUiState.durationMs > 0
+                            ) {
+                                audioUiState.positionMs.toFloat() / audioUiState.durationMs.toFloat()
+                            } else {
+                                0f
+                            }
+
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(12.dp))
                                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
                                     .clickable { onPlayClick() }
-                                    .padding(8.dp)
+                                    .padding(12.dp)
                             ) {
                                 Icon(
                                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                    contentDescription = "Reproducir",
+                                    contentDescription = if (isPlaying) "Pausar" else "Reproducir",
                                     tint = textColor,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(32.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = if (isPlaying) "Reproduciendo..." else "Nota de voz",
-                                    color = textColor
-                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = when {
+                                            isPlaying -> "Reproduciendo..."
+                                            isActiveAudio && audioUiState.status == AudioPlaybackStatus.LOADING -> "Cargando audio..."
+                                            isActiveAudio && audioUiState.status == AudioPlaybackStatus.ERROR -> "Error al reproducir"
+                                            else -> "Nota de voz"
+                                        },
+                                        color = textColor,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    LinearProgressIndicator(
+                                        progress = { progress.coerceIn(0f, 1f) },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(4.dp)
+                                            .clip(RoundedCornerShape(2.dp)),
+                                        color = textColor,
+                                        trackColor = textColor.copy(alpha = 0.3f)
+                                    )
+                                }
                             }
                         }
                         AttachmentType.DOCUMENT -> {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(12.dp))
                                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
                                     .clickable {
                                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                         context.startActivity(intent)
                                     }
-                                    .padding(8.dp)
+                                    .padding(12.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AttachFile,
@@ -305,7 +358,8 @@ private fun MessageBubble(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = message.attachmentName ?: "Documento",
-                                    color = textColor
+                                    color = textColor,
+                                    style = MaterialTheme.typography.bodySmall
                                 )
                             }
                         }
@@ -313,12 +367,17 @@ private fun MessageBubble(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = formatTime(message.timestamp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = textColor.copy(alpha = 0.7f)
-                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = formatTime(message.timestamp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = textColor.copy(alpha = 0.7f)
+                    )
+                }
             }
         }
     }
@@ -335,62 +394,116 @@ private fun MessageInput(
     isRecording: Boolean,
     isSending: Boolean
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 8.dp
     ) {
-        IconButton(onClick = onAttachImage) {
-            Icon(
-                imageVector = Icons.Default.Image,
-                contentDescription = "Adjuntar imagen",
-                tint = MaterialTheme.colorScheme.primary
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onAttachImage) {
+                Icon(
+                    imageVector = Icons.Default.Image,
+                    contentDescription = "Adjuntar imagen",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            IconButton(onClick = onAttachFile) {
+                Icon(
+                    imageVector = Icons.Default.AttachFile,
+                    contentDescription = "Adjuntar archivo",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            OutlinedTextField(
+                value = text,
+                onValueChange = onTextChange,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Escribe un mensaje...") },
+                shape = RoundedCornerShape(24.dp),
+                maxLines = 4,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                )
             )
-        }
 
-        IconButton(onClick = onAttachFile) {
-            Icon(
-                imageVector = Icons.Default.AttachFile,
-                contentDescription = "Adjuntar archivo",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
+            Spacer(modifier = Modifier.width(8.dp))
 
-        OutlinedTextField(
-            value = text,
-            onValueChange = onTextChange,
-            modifier = Modifier.weight(1f),
-            placeholder = { Text("Escribe un mensaje...") },
-            shape = RoundedCornerShape(24.dp),
-            maxLines = 4
-        )
+            AnimatedVisibility(
+                visible = isRecording,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                IconButton(
+                    onClick = onRecordVoice,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Stop,
+                        contentDescription = "Detener grabación",
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
 
-        Spacer(modifier = Modifier.width(8.dp))
+            AnimatedVisibility(
+                visible = !isRecording && !isSending,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                IconButton(
+                    onClick = onRecordVoice,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(
+                            if (isRecording)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                MaterialTheme.colorScheme.secondaryContainer
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = "Grabar nota de voz",
+                        tint = if (isRecording)
+                            MaterialTheme.colorScheme.onErrorContainer
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
 
-        IconButton(onClick = onRecordVoice) {
-            Icon(
-                imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                contentDescription = if (isRecording) "Detener grabación" else "Grabar nota de voz",
-                tint = MaterialTheme.colorScheme.error
-            )
-        }
+            if (isSending) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
 
-        if (isSending) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                strokeWidth = 2.dp
-            )
-        } else {
             IconButton(
                 onClick = onSend,
-                enabled = text.isNotBlank()
+                enabled = text.isNotBlank() && !isSending
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Enviar",
-                    tint = if (text.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = if (text.isNotBlank() && !isSending)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

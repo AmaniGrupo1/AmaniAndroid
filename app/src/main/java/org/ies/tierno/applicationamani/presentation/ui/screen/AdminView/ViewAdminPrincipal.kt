@@ -77,8 +77,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.koin.androidx.compose.koinViewModel
@@ -136,9 +134,6 @@ fun ViewAdminPrincipal(
                     }
                 }
             )
-        },
-        bottomBar = {
-            AmaniBottomBar(navController, BottomBarConfig.Admin)
         },
         containerColor = AmaniColors.Background
     ) { innerPadding ->

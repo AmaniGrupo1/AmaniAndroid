@@ -109,7 +109,8 @@ viewModel { (currentUserId: Long, otherUserId: Long) ->
             sendMessageUseCase = get(),
             getMessagesUseCase = get(),
             markMessagesAsReadUseCase = get(),
-            fileStorageService = get()
+            fileStorageService = get(),
+            appContext = androidContext()
         )
     }
 }

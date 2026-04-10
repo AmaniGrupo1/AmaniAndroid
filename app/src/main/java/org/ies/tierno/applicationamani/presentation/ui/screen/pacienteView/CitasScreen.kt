@@ -68,8 +68,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.CabeceraDiaPsicologa
@@ -152,8 +150,7 @@ fun CitasScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = colors.background,
-        bottomBar = { AmaniBottomBar(navController, BottomBarConfig.Paciente) }
+        containerColor = colors.background
     ) { innerPadding ->
         Box(
             modifier = Modifier

@@ -29,15 +29,13 @@
     import androidx.compose.runtime.setValue
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.graphics.Color
-    import androidx.compose.ui.text.font.Font
-    import androidx.compose.ui.text.font.FontFamily
     import androidx.compose.ui.text.input.PasswordVisualTransformation
     import androidx.compose.ui.text.input.VisualTransformation
     import androidx.compose.ui.unit.dp
     import androidx.navigation.NavController
-    import org.ies.tierno.applicationamani.R
     import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
     import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+    import org.ies.tierno.applicationamani.ui.theme.Roboto
 
     /**
      * Pantalla de registro de un paciente desde el panel de administración.
@@ -57,7 +55,7 @@
         val backgroundColor = Color(0xFFCCC0E4)
         val primaryColor = Color(0xFF6C63FF)
 
-        val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+        val roboto = Roboto
 
         // Campos del ViewModel
         val nombre by loginViewModel.nombre.collectAsState()

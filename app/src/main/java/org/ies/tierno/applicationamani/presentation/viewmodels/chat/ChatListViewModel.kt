@@ -2,12 +2,13 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
+import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 
 data class ChatPartner(
@@ -18,8 +19,8 @@ data class ChatPartner(
 
 class ChatListViewModel(
     private val userSessionDataStore: UserSessionDataStore,
-    private val chatRepository: ChatRepository,
-    private val profileUseCaseGeneral: ProfileUseCaseGeneral
+    private val profileUseCaseGeneral: ProfileUseCaseGeneral,
+    private val listarPacientesByPsicologo: ListarPacientesByPsicologo
 ) : ViewModel() {
 
     private val _currentUserId = MutableStateFlow<Long?>(null)
@@ -41,20 +42,63 @@ class ChatListViewModel(
         loadCurrentUser()
     }
 
+    private fun normalizeRole(role: String): String {
+        return role.lowercase().trim()
+            .replace("ó", "o")
+            .replace("á", "a")
+    }
+
     private fun loadCurrentUser() {
         viewModelScope.launch {
+            _isLoading.value = true
             val session = userSessionDataStore.getSession()
             if (session != null) {
                 _currentUserId.value = session.idUsuario
                 _currentUserRol.value = session.rol
-                
-                if (session.rol == "paciente" && session.idPsicologo != null) {
-                    _partnerId.value = session.idPsicologo
-                    loadPartnerNombre(session.idPsicologo)
-                } else if (session.rol == "psicologo" && session.idPaciente != null) {
-                    _partnerId.value = session.idPaciente
-                    loadPartnerNombre(session.idPaciente)
+
+                when (normalizeRole(session.rol)) {
+                    "paciente" -> {
+                        if (session.idPsicologo != null) {
+                            _partnerId.value = session.idPsicologo
+                            loadPartnerNombre(session.idPsicologo)
+                        } else {
+                            _isLoading.value = false
+                        }
+                    }
+
+                    "psicologo", "psicologa" -> {
+                        if (session.idPaciente != null) {
+                            _partnerId.value = session.idPaciente
+                            loadPartnerNombre(session.idPaciente)
+                        } else {
+                            loadFirstAssignedPatient()
+                        }
+                    }
+
+                    else -> {
+                        _isLoading.value = false
+                    }
                 }
+            } else {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun loadFirstAssignedPatient() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val pacientes = listarPacientesByPsicologo().first()
+                val first = pacientes.firstOrNull()
+                if (first?.idPaciente != null) {
+                    _partnerId.value = first.idPaciente
+                    loadPartnerNombre(first.idPaciente)
+                } else {
+                    _isLoading.value = false
+                }
+            } catch (_: Exception) {
+                _isLoading.value = false
             }
         }
     }
@@ -64,7 +108,8 @@ class ChatListViewModel(
             _isLoading.value = true
             try {
                 val session = userSessionDataStore.getSession()
-                if (session?.rol == "paciente") {
+                val normalizedRol = session?.rol?.let { normalizeRole(it) }
+                if (normalizedRol == "paciente") {
                     val result = profileUseCaseGeneral.getPsicologoById(partnerId)
                     result.onSuccess { profile ->
                         val nombre = buildString {

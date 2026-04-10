@@ -36,8 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 
 /**
@@ -124,9 +122,6 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         }
                     }
                 )
-            },
-            bottomBar = {
-                AmaniBottomBar(navController, BottomBarConfig.Paciente)
             }
         ) { paddingValues ->
             Column(
