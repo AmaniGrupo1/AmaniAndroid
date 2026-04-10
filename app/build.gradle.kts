@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "org.ies.tierno.applicationamani"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -73,6 +73,7 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.androidx.compose.navigation)
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)

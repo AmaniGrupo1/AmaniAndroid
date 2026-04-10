@@ -73,7 +73,7 @@ class CitasViewModel(
 
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.getDisponibilidadDia(idPsicologo, fecha.toString())
+            citasRepository.getDisponibilidadDia(idPsicologo, fecha.toString(), 60)
                 .onSuccess {
                     _disponibilidadDia.value = it
                     _errorMessage.value = null

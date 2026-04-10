@@ -18,6 +18,7 @@ import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 
@@ -42,6 +43,9 @@ class PsicologoAgendaViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
+
     private val _pacientesAsignados = MutableStateFlow<List<PacientePsicologoResponseDTO>>(emptyList())
     val pacientesAsignados: StateFlow<List<PacientePsicologoResponseDTO>> = _pacientesAsignados.asStateFlow()
 
@@ -51,12 +55,18 @@ class PsicologoAgendaViewModel(
     private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
     val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()
 
+    private val _duracionCita = MutableStateFlow(60)
+    val duracionCita: StateFlow<Int> = _duracionCita.asStateFlow()
+
     init {
         viewModelScope.launch {
             userSessionDataStore.sessionFlow.collect { session ->
                 _userSession.value = session
-                if (session?.idPsicologo != null && _pacientesAsignados.value.isEmpty()) {
-                    cargarPacientesAsignados()
+                if (session?.idPsicologo != null) {
+                    if (_pacientesAsignados.value.isEmpty()) {
+                        cargarPacientesAsignados()
+                    }
+                    cargarDuracionCita()
                 }
             }
         }
@@ -64,6 +74,10 @@ class PsicologoAgendaViewModel(
 
     fun clearError() {
         _errorMessage.value = null
+    }
+
+    fun clearSuccess() {
+        _successMessage.value = null
     }
 
     fun cargarAgendaMensual(month: YearMonth) {
@@ -105,12 +119,14 @@ class PsicologoAgendaViewModel(
             _errorMessage.value = "idPsicologo nulo"
             return
         }
+
         viewModelScope.launch {
             _isLoading.value = true
             val request = HorarioRequestDTO(franjas = franjas)
             citasRepository.actualizarHorario(psychologistId, request)
                 .onSuccess {
                     cargarAgendaMensual(_mesVisible.value)
+                    _successMessage.value = "Horario actualizado correctamente"
                 }
                 .onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al actualizar el horario"
@@ -172,10 +188,10 @@ class PsicologoAgendaViewModel(
         cargarPacientesAsignados()
     }
 
-    fun cargarDisponibilidadDia(fecha: LocalDate) {
+    fun cargarDisponibilidadDia(fecha: LocalDate, durationMinutes: Int = _duracionCita.value) {
         val psychologistId = _userSession.value?.idPsicologo ?: return
         viewModelScope.launch {
-            citasRepository.getDisponibilidadDia(psychologistId, fecha.toString())
+            citasRepository.getDisponibilidadDia(psychologistId, fecha.toString(), durationMinutes)
                 .onSuccess { _disponibilidadDia.value = it }
                 .onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al cargar disponibilidad"
@@ -187,6 +203,51 @@ class PsicologoAgendaViewModel(
         _disponibilidadDia.value = null
     }
 
+    // ✅ Función para cargar la duración actual de las citas del psicólogo
+    fun cargarDuracionCita() {
+        val psychologistId = _userSession.value?.idPsicologo ?: return
+        viewModelScope.launch {
+            citasRepository.getDuracion(psychologistId)
+                .onSuccess { duracion ->
+                    _duracionCita.value = duracion
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al cargar la duración de las citas"
+                }
+        }
+    }
+
+    // ✅ Función para actualizar la duración de las citas del psicólogo
+    // En PsicologoAgendaViewModel.kt
+
+    fun actualizarDuracionCita(nuevaDuracion: Int) {
+        val psychologistId = _userSession.value?.idPsicologo ?: run {
+            _errorMessage.value = "No hay sesión de psicólogo"
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            citasRepository.actualizarDuracion(psychologistId, nuevaDuracion)
+                .onSuccess {
+                    _duracionCita.value = nuevaDuracion
+                    _successMessage.value = "Duración de citas actualizada a ${nuevaDuracion} minutos"
+
+                    // ✅ IMPORTANTE: Recargar disponibilidad si hay una fecha seleccionada
+                    val fechaActual = _disponibilidadDia.value?.fecha
+                    if (fechaActual != null) {
+                        // Recargar con la nueva duración
+                        cargarDisponibilidadDia(fechaActual, nuevaDuracion)
+                    }
+                }
+                .onFailure { e ->
+                    _errorMessage.value = e.message ?: "Error al actualizar la duración de las citas"
+                }
+            _isLoading.value = false
+        }
+    }
+
+    // ✅ MÉTODO CORREGIDO: Crear cita usando el endpoint de psicólogo
     fun crearCita(
         idPaciente: Long,
         fecha: LocalDate,
@@ -198,27 +259,28 @@ class PsicologoAgendaViewModel(
             _errorMessage.value = "No hay sesión de psicólogo"
             return
         }
+
         viewModelScope.launch {
             _isLoading.value = true
-            val request = CitaRequest(
-                idPaciente = idPaciente,
+
+            citasRepository.crearCitaPsicologo(
                 idPsicologo = psychologistId,
-                startDatetime = "${fecha}T${hora}",
-                durationMinutes = duracionMinutos,
-                estado = "pendiente",
+                idPaciente = idPaciente,
+                fecha = fecha,
+                hora = hora,
+                duracionMinutos = duracionMinutos,
                 motivo = motivo
-            )
-            citasRepository.crearCita(request)
-                .onSuccess {
-                    cargarAgendaMensual(_mesVisible.value)
-                }
-                .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al crear la cita"
-                }
+            ).onSuccess { nuevaCita ->
+                cargarAgendaMensual(_mesVisible.value)
+                _successMessage.value = "Cita creada correctamente"
+            }.onFailure { e ->
+                _errorMessage.value = e.message ?: "Error al crear la cita"
+            }
             _isLoading.value = false
         }
     }
 
+    // Método para editar cita (usando el endpoint existente)
     fun editarCita(
         idCita: Long,
         idPaciente: Long,
@@ -233,10 +295,11 @@ class PsicologoAgendaViewModel(
         }
         viewModelScope.launch {
             _isLoading.value = true
+            val startDatetime = LocalDateTime.of(fecha, hora)
             val request = CitaRequest(
                 idPaciente = idPaciente,
                 idPsicologo = psychologistId,
-                startDatetime = "${fecha}T${hora}",
+                startDatetime = startDatetime.toString(),
                 durationMinutes = duracionMinutos,
                 estado = "pendiente",
                 motivo = motivo
@@ -244,6 +307,7 @@ class PsicologoAgendaViewModel(
             citasRepository.editarCita(idCita, request)
                 .onSuccess {
                     cargarAgendaMensual(_mesVisible.value)
+                    _successMessage.value = "Cita editada correctamente"
                 }
                 .onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al editar la cita"
@@ -258,6 +322,7 @@ class PsicologoAgendaViewModel(
             citasRepository.cancelarCita(idCita)
                 .onSuccess {
                     cargarAgendaMensual(_mesVisible.value)
+                    _successMessage.value = "Cita cancelada correctamente"
                 }
                 .onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al cancelar la cita"

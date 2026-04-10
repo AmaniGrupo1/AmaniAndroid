@@ -2,12 +2,17 @@ package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
+import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class CitasRepository(
     private val citasApi: CitasApi
@@ -27,15 +32,50 @@ class CitasRepository(
         citasApi.getAgendaPsicologo(idPsicologo, month)
     }
 
-    suspend fun getDisponibilidadDia(
-        idPsicologo: Long,
-        fecha: String
-    ): Result<DisponibilidadDiaResponse> = runCatching {
-        citasApi.getDisponibilidadDia(idPsicologo, fecha)
+    // ✅ MÉTODO GET DURACION
+    suspend fun getDuracion(
+        idPsicologo: Long
+    ): Result<Int> = runCatching {
+        citasApi.getDuracion(idPsicologo)
     }
 
+    suspend fun getDisponibilidadDia(
+        idPsicologo: Long,
+        fecha: String,
+        duracionMinutos: Int
+    ): Result<DisponibilidadDiaResponse> = runCatching {
+        citasApi.getDisponibilidadDia(
+            idPsicologo = idPsicologo,
+            fecha = fecha,
+            duracion = duracionMinutos
+        )
+    }
+
+    // Método original para admin (lo mantienes)
     suspend fun crearCita(request: CitaRequest): Result<CitaAdminResponseDTO> = runCatching {
         citasApi.crearCita(request)
+    }
+
+    // NUEVO MÉTODO: Crear cita desde psicólogo
+      suspend fun crearCitaPsicologo(
+        idPsicologo: Long,
+        idPaciente: Long,
+        fecha: LocalDate,
+        hora: LocalTime,
+        duracionMinutos: Int,
+        motivo: String
+    ): Result<AgendaItemDTO> = runCatching {
+
+        val request = CrearCitaRequestDTO(
+            idPaciente = idPaciente,
+            idPsicologo = idPsicologo,
+            startDatetime = LocalDateTime.of(fecha, hora),
+            durationMinutes = duracionMinutos,
+            motivo = motivo,
+            estado = EstadoCita.pendiente  // ← EXPLÍCITAMENTE PENDIENTE
+        )
+
+        citasApi.crearCitaPsicologo(request)
     }
 
     suspend fun cancelarCita(idCita: Long): Result<AgendaItemDTO> = runCatching {
@@ -59,6 +99,16 @@ class CitasRepository(
         request: HorarioRequestDTO
     ): Result<Unit> = runCatching {
         citasApi.actualizarHorario(idPsicologo, request)
+    }
+
+    suspend fun actualizarDuracion(
+        idPsicologo: Long,
+        duracion: Int
+    ): Result<Unit> = runCatching {
+        citasApi.actualizarDuracion(
+            idPsicologo = idPsicologo,
+            duracion = duracion
+        )
     }
 
     suspend fun alternarDiaNoDisponible(

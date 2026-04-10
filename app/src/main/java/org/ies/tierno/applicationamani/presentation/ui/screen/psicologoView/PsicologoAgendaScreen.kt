@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
 import android.os.Build
@@ -58,6 +60,7 @@ fun PsicologoAgendaScreen(
     val agendaMensual by viewModel.agendaMensual.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
 
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     var mesVisible by remember { mutableStateOf(YearMonth.now()) }
@@ -101,6 +104,15 @@ fun PsicologoAgendaScreen(
         }
     }
 
+    LaunchedEffect(successMessage) {
+        successMessage?.let { message ->
+            scope.launch {
+                snackbarHostState.showSnackbar(message)
+                viewModel.clearSuccess()
+            }
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = colors.background,
@@ -110,7 +122,7 @@ fun PsicologoAgendaScreen(
                 onClick = {
                     citaParaEditar = null
                     mostrarDialogoCrearEditar = true
-                    fechaSeleccionada?.let { viewModel.cargarDisponibilidadDia(it) }
+                    fechaSeleccionada?.let { viewModel.cargarDisponibilidadDia(it,60 ) }
                 },
                 containerColor = colors.primary,
                 contentColor = colors.onPrimary
@@ -246,7 +258,7 @@ fun PsicologoAgendaScreen(
                                                 onEdit = {
                                                     citaParaEditar = cita
                                                     mostrarDialogoCrearEditar = true
-                                                    viewModel.cargarDisponibilidadDia(cita.fecha)
+                                                    viewModel.cargarDisponibilidadDia(cita.fecha,cita.duracionMinutos ?: 60)
                                                 },
                                                 onCancel = { citaParaCancelar = cita }
                                             )
@@ -306,6 +318,8 @@ fun PsicologoAgendaScreen(
     }
 
     if (mostrarDialogoHorario) {
+        val duracionActual by viewModel.duracionCita.collectAsStateWithLifecycle()
+
         DialogoModificarHorario(
             onConfirmar = { franjas ->
                 scope.launch {
@@ -313,9 +327,16 @@ fun PsicologoAgendaScreen(
                     mostrarDialogoHorario = false
                 }
             },
+            onConfirmarDuracion = { nuevaDuracion ->
+                scope.launch {
+                    viewModel.actualizarDuracionCita(nuevaDuracion)
+                }
+            },
+            duracionActual = duracionActual,
             onDismiss = { mostrarDialogoHorario = false }
         )
     }
+
 
     if (mostrarDialogoNoDisponible && fechaSeleccionada != null) {
         val fecha = fechaSeleccionada!!
@@ -345,14 +366,37 @@ fun PsicologoAgendaScreen(
             pacientesError = pacientesError,
             onRecargarPacientes = { viewModel.reintentarCargarPacientes() },
             slotsLibres = disponibilidadDia?.slotsLibres ?: emptyList(),
-            onFechaChange = { viewModel.cargarDisponibilidadDia(it) },
+            onFechaChange = { viewModel.cargarDisponibilidadDia(it,  60) },
             onConfirmar = { idPaciente, fecha, hora, duracion, motivo ->
                 if (citaParaEditar != null) {
-                    viewModel.editarCita(idCita = citaParaEditar!!.id, idPaciente = idPaciente, fecha = fecha, hora = hora, duracionMinutos = duracion, motivo = motivo)
-                    scope.launch { snackbarHostState.showSnackbar("Cita actualizada correctamente") }
+                    viewModel.editarCita(
+                        idCita = citaParaEditar!!.id,
+                        idPaciente = idPaciente,
+                        fecha = fecha,
+                        hora = hora,
+                        duracionMinutos = duracion,
+                        motivo = motivo
+                    )
+                    scope.launch {
+                        val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
+                        snackbarHostState.showSnackbar(
+                            "Cita editada: ${paciente?.nombre} ${paciente?.apellido} - ${fecha} a las $hora"
+                        )
+                    }
                 } else {
-                    viewModel.crearCita(idPaciente = idPaciente, fecha = fecha, hora = hora, duracionMinutos = duracion, motivo = motivo)
-                    scope.launch { snackbarHostState.showSnackbar("Cita creada correctamente") }
+                    viewModel.crearCita(
+                        idPaciente = idPaciente,
+                        fecha = fecha,
+                        hora = hora,
+                        duracionMinutos = duracion,
+                        motivo = motivo
+                    )
+                    scope.launch {
+                        val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
+                        snackbarHostState.showSnackbar(
+                            "✅ Cita creada: ${paciente?.nombre} ${paciente?.apellido} - ${fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} a las $hora"
+                        )
+                    }
                 }
                 mostrarDialogoCrearEditar = false
                 citaParaEditar = null
@@ -371,7 +415,9 @@ fun PsicologoAgendaScreen(
             cita = citaParaCancelar!!,
             onConfirmar = {
                 viewModel.cancelarCita(citaParaCancelar!!.id)
-                scope.launch { snackbarHostState.showSnackbar("Cita cancelada correctamente") }
+                scope.launch {
+                    snackbarHostState.showSnackbar("Cita cancelada correctamente")
+                }
                 citaParaCancelar = null
             },
             onDismiss = { citaParaCancelar = null }
@@ -705,9 +751,12 @@ fun DiaNoDisponibleCard() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogoModificarHorario(
     onConfirmar: (List<FranjaHorarioDTO>) -> Unit,
+    onConfirmarDuracion: (Int) -> Unit,
+    duracionActual: Int,
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -716,17 +765,90 @@ fun DialogoModificarHorario(
     val horariosFin = remember { mutableStateListOf(*Array(7) { 17 }) }
     val activo = remember { mutableStateListOf(*Array(7) { it < 5 }) }
 
+    var duracionSeleccionada by remember { mutableIntStateOf(duracionActual) }
+    val duracionOpciones = listOf(30, 45, 60, 90, 120)
+    var duracionDropdownExpanded by remember { mutableStateOf(false) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
         title = {
             Column {
                 Text("Configurar horario", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Define tu disponibilidad semanal", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                Text("Define tu disponibilidad semanal y duración de citas", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
             }
         },
         text = {
-            Column(modifier = Modifier.heightIn(max = 450.dp).verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.heightIn(max = 550.dp).verticalScroll(rememberScrollState())) {
+
+                // Sección de Duración de Citas
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.primaryContainer.copy(alpha = 0.3f))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "⏱️ Duración de las citas",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.primary
+                        )
+                        Text(
+                            text = "Esta duración se aplicará a todas las nuevas citas",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        ExposedDropdownMenuBox(
+                            expanded = duracionDropdownExpanded,
+                            onExpandedChange = { duracionDropdownExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = "$duracionSeleccionada minutos",
+                                onValueChange = {},
+                                readOnly = true,
+                                leadingIcon = { Icon(Icons.Default.Timer, contentDescription = null) },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = duracionDropdownExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = colors.primary,
+                                    unfocusedBorderColor = colors.outline
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = duracionDropdownExpanded,
+                                onDismissRequest = { duracionDropdownExpanded = false }
+                            ) {
+                                duracionOpciones.forEach { minutos ->
+                                    DropdownMenuItem(
+                                        text = { Text("$minutos minutos") },
+                                        onClick = {
+                                            duracionSeleccionada = minutos
+                                            duracionDropdownExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Sección de Horario Semanal
+                Text(
+                    text = "📅 Horario semanal",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+
                 diasSemana.forEachIndexed { index, dia ->
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -785,32 +907,47 @@ fun DialogoModificarHorario(
             }
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    val franjas = diasSemana.indices.flatMap { i ->
-                        if (activo[i]) {
-                            listOf(
-                                FranjaHorarioDTO(
-                                    diaSemana = (i + 1).toShort(),
-                                    horaInicio = "${horariosInicio[i].toString().padStart(2, '0')}:00",
-                                    horaFin = "${horariosFin[i].toString().padStart(2, '0')}:00",
-                                    activo = true,
-                                    motivo = null
-                                )
-                            )
-                        } else emptyList()
-                    }
-                    onConfirmar(franjas)
-                },
-                shape = RoundedCornerShape(12.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Guardar horario")
+                Button(
+                    onClick = {
+                        val franjas = diasSemana.indices.flatMap { i ->
+                            if (activo[i]) {
+                                listOf(
+                                    FranjaHorarioDTO(
+                                        diaSemana = (i + 1).toShort(),
+                                        horaInicio = "${horariosInicio[i].toString().padStart(2, '0')}:00",
+                                        horaFin = "${horariosFin[i].toString().padStart(2, '0')}:00",
+                                        activo = true,
+                                        motivo = null
+                                    )
+                                )
+                            } else emptyList()
+                        }
+                        onConfirmar(franjas)
+                        // Solo actualizar duración si cambió
+                        if (duracionSeleccionada != duracionActual) {
+                            onConfirmarDuracion(duracionSeleccionada)
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Guardar cambios")
+                }
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(0.5f)
+                ) {
+                    Text("Cancelar")
+                }
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        dismissButton = {}
     )
 }
-
 @Composable
 fun DialogoNoDisponible(
     fecha: LocalDate,
@@ -871,6 +1008,7 @@ fun DialogoCrearEditarCita(
     onDismiss: () -> Unit
 ) {
     val esEdicion = citaAEditar != null
+    val colors = MaterialTheme.colorScheme
     val formatterFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -878,28 +1016,43 @@ fun DialogoCrearEditarCita(
     var motivo by remember { mutableStateOf(citaAEditar?.motivo ?: "") }
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
-    val pacienteInicial = if (esEdicion) {
-        pacientes.firstOrNull { "${it.nombre} ${it.apellido}" == citaAEditar.nombrePaciente }
+    // CORREGIDO: Mejor identificación del paciente para edición
+    val pacienteInicial = if (esEdicion && citaAEditar != null) {
+        pacientes.firstOrNull {
+            it.idPaciente == citaAEditar.id ||
+                    "${it.nombre} ${it.apellido}" == citaAEditar.nombrePaciente
+        }
     } else null
+
     var pacienteSeleccionado by remember { mutableStateOf(pacienteInicial) }
     var pacienteDropdownExpanded by remember { mutableStateOf(false) }
 
-    val horasDisponibles = remember(slotsLibres, citaAEditar) {
-        val libres = slotsLibres.filter { !it.ocupado }.map { it.hora }
-        if (esEdicion && citaAEditar!!.horaInicio !in libres) {
-            (listOf(citaAEditar.horaInicio) + libres).sorted()
+    // CORREGIDO: Filtrar horas disponibles correctamente
+    val horasDisponibles = remember(slotsLibres, citaAEditar, fechaSeleccionada) {
+        val libres = slotsLibres.filter { !it.ocupado }.map { it.hora }.sorted()
+        if (esEdicion && citaAEditar != null && citaAEditar.horaInicio != null) {
+            if (citaAEditar.horaInicio !in libres) {
+                (listOf(citaAEditar.horaInicio) + libres).distinct().sorted()
+            } else {
+                libres
+            }
         } else {
-            libres.sorted()
+            libres
         }
     }
-    var horaSeleccionada by remember { mutableStateOf(citaAEditar?.horaInicio ?: horasDisponibles.firstOrNull()) }
+
+    var horaSeleccionada by remember { mutableStateOf(
+        if (esEdicion && citaAEditar?.horaInicio != null) citaAEditar.horaInicio
+        else horasDisponibles.firstOrNull()
+    ) }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
     val duracionOpciones = listOf(30, 45, 60, 90, 120)
     var duracionDropdownExpanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(horasDisponibles) {
-        if (horaSeleccionada == null || horaSeleccionada !in horasDisponibles) {
+    // Actualizar horas cuando cambia la fecha
+    LaunchedEffect(fechaSeleccionada, slotsLibres) {
+        if (!esEdicion && (horaSeleccionada == null || horaSeleccionada !in horasDisponibles)) {
             horaSeleccionada = horasDisponibles.firstOrNull()
         }
     }
@@ -907,52 +1060,99 @@ fun DialogoCrearEditarCita(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = if (esEdicion) "Editar cita" else "Nueva cita", style = MaterialTheme.typography.titleLarge)
+            Column {
+                Text(
+                    text = if (esEdicion) "✏️ Editar cita" else "📅 Nueva cita",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                if (!esEdicion) {
+                    Text(
+                        text = "Completa los datos para agendar",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant
+                    )
+                }
+            }
         },
         text = {
             Column(
-                modifier = Modifier.fillMaxWidth().heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Paciente", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                ExposedDropdownMenuBox(expanded = pacienteDropdownExpanded, onExpandedChange = { pacienteDropdownExpanded = it }) {
+                // Selección de Paciente
+                Text(
+                    text = "👤 Paciente *",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = pacienteDropdownExpanded,
+                    onExpandedChange = { pacienteDropdownExpanded = it }
+                ) {
                     OutlinedTextField(
                         value = pacienteSeleccionado?.let { "${it.nombre} ${it.apellido}" } ?: "",
                         onValueChange = {},
                         readOnly = true,
                         placeholder = { Text("Selecciona un paciente") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = pacienteDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                        singleLine = true
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colors.primary,
+                            unfocusedBorderColor = colors.outline
+                        )
                     )
-                    ExposedDropdownMenu(expanded = pacienteDropdownExpanded, onDismissRequest = { pacienteDropdownExpanded = false }) {
+                    ExposedDropdownMenu(
+                        expanded = pacienteDropdownExpanded,
+                        onDismissRequest = { pacienteDropdownExpanded = false }
+                    ) {
                         when {
                             pacientesError != null -> {
                                 DropdownMenuItem(
                                     text = {
                                         Column {
-                                            Text("Error al cargar pacientes", color = MaterialTheme.colorScheme.error)
-                                            Text(pacientesError, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text("⚠️ Error al cargar pacientes", color = colors.error)
+                                            Text(pacientesError, style = MaterialTheme.typography.bodySmall)
                                         }
                                     },
                                     onClick = { onRecargarPacientes() },
-                                    leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reintentar") },
-                                    trailingIcon = { Text("Reintentar", color = MaterialTheme.colorScheme.primary) }
+                                    leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "Reintentar") }
                                 )
                             }
                             pacientes.isEmpty() -> {
-                                DropdownMenuItem(text = { Text("No hay pacientes asignados") }, onClick = { pacienteDropdownExpanded = false }, enabled = false)
+                                DropdownMenuItem(
+                                    text = { Text("No hay pacientes asignados") },
+                                    onClick = { pacienteDropdownExpanded = false },
+                                    enabled = false
+                                )
                             }
                             else -> {
                                 pacientes.forEach { paciente ->
                                     DropdownMenuItem(
                                         text = {
                                             Column {
-                                                Text("${paciente.nombre ?: ""} ${paciente.apellido ?: ""}", fontWeight = FontWeight.Medium)
-                                                Text(paciente.email ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(
+                                                    "${paciente.nombre ?: ""} ${paciente.apellido ?: ""}",
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                                Text(
+                                                    paciente.email ?: "",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = colors.onSurfaceVariant
+                                                )
                                             }
                                         },
-                                        onClick = { pacienteSeleccionado = paciente; pacienteDropdownExpanded = false }
+                                        onClick = {
+                                            pacienteSeleccionado = paciente
+                                            pacienteDropdownExpanded = false
+                                        }
                                     )
                                 }
                             }
@@ -960,103 +1160,251 @@ fun DialogoCrearEditarCita(
                     }
                 }
 
-                Text("Fecha", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                OutlinedTextField(
-                    value = fechaSeleccionada.format(formatterFecha),
-                    onValueChange = {},
-                    readOnly = true,
-                    leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                // Selección de Fecha
+                Text(
+                    text = "📆 Fecha *",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
-                Row(
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.3f))
                 ) {
-                    IconButton(onClick = { fechaSeleccionada = fechaSeleccionada.minusDays(1); onFechaChange(fechaSeleccionada) }) {
-                        Icon(Icons.Default.ChevronLeft, contentDescription = "Día anterior")
-                    }
-                    Text(
-                        text = fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("es-ES"))).replaceFirstChar { it.uppercase() },
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    IconButton(onClick = { fechaSeleccionada = fechaSeleccionada.plusDays(1); onFechaChange(fechaSeleccionada) }) {
-                        Icon(Icons.Default.ChevronRight, contentDescription = "Día siguiente")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = {
+                            fechaSeleccionada = fechaSeleccionada.minusDays(1)
+                            onFechaChange(fechaSeleccionada)
+                        }) {
+                            Icon(Icons.Default.ChevronLeft, contentDescription = "Día anterior")
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = fechaSeleccionada.format(formatterFecha),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = fechaSeleccionada.format(
+                                    DateTimeFormatter.ofPattern("EEEE", Locale.forLanguageTag("es-ES"))
+                                ).replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant
+                            )
+                        }
+                        IconButton(onClick = {
+                            fechaSeleccionada = fechaSeleccionada.plusDays(1)
+                            onFechaChange(fechaSeleccionada)
+                        }) {
+                            Icon(Icons.Default.ChevronRight, contentDescription = "Día siguiente")
+                        }
                     }
                 }
 
-                Text("Hora de inicio", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                ExposedDropdownMenuBox(expanded = horaDropdownExpanded, onExpandedChange = { horaDropdownExpanded = it }) {
+                // Selección de Hora
+                Text(
+                    text = "⏰ Hora de inicio *",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = horaDropdownExpanded,
+                    onExpandedChange = { horaDropdownExpanded = it }
+                ) {
                     OutlinedTextField(
                         value = horaSeleccionada?.format(formatterHora) ?: "Sin horarios disponibles",
                         onValueChange = {},
                         readOnly = true,
                         leadingIcon = { Icon(Icons.Default.Schedule, contentDescription = null) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = horaDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                        singleLine = true
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        isError = horasDisponibles.isEmpty() && !esEdicion
                     )
-                    ExposedDropdownMenu(expanded = horaDropdownExpanded, onDismissRequest = { horaDropdownExpanded = false }) {
-                        if (horasDisponibles.isEmpty()) {
-                            DropdownMenuItem(text = { Text("No hay horarios libres para este día") }, onClick = { horaDropdownExpanded = false }, enabled = false)
+                    ExposedDropdownMenu(
+                        expanded = horaDropdownExpanded,
+                        onDismissRequest = { horaDropdownExpanded = false }
+                    ) {
+                        if (horasDisponibles.isEmpty() && !esEdicion) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "❌ No hay horarios libres para este día",
+                                        color = colors.error
+                                    )
+                                },
+                                onClick = { horaDropdownExpanded = false },
+                                enabled = false
+                            )
                         } else {
                             horasDisponibles.forEach { hora ->
                                 DropdownMenuItem(
-                                    text = { Text(hora.format(formatterHora)) },
-                                    onClick = { horaSeleccionada = hora; horaDropdownExpanded = false },
-                                    leadingIcon = { Icon(Icons.Default.AccessTime, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                    text = {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                Icons.Default.AccessTime,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(18.dp),
+                                                tint = colors.primary
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(hora.format(formatterHora))
+                                        }
+                                    },
+                                    onClick = {
+                                        horaSeleccionada = hora
+                                        horaDropdownExpanded = false
+                                    }
                                 )
                             }
                         }
                     }
                 }
+                if (horasDisponibles.isEmpty() && !esEdicion) {
+                    Text(
+                        text = "⚠️ No hay horarios disponibles para esta fecha",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.error
+                    )
+                }
 
-                Text("Duración", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                ExposedDropdownMenuBox(expanded = duracionDropdownExpanded, onExpandedChange = { duracionDropdownExpanded = it }) {
+                // Duración
+                Text(
+                    text = "⏱️ Duración",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = duracionDropdownExpanded,
+                    onExpandedChange = { duracionDropdownExpanded = it }
+                ) {
                     OutlinedTextField(
-                        value = "$duracionMinutos min",
+                        value = "$duracionMinutos minutos",
                         onValueChange = {},
                         readOnly = true,
                         leadingIcon = { Icon(Icons.Default.Timer, contentDescription = null) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = duracionDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                        singleLine = true
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp)
                     )
-                    ExposedDropdownMenu(expanded = duracionDropdownExpanded, onDismissRequest = { duracionDropdownExpanded = false }) {
+                    ExposedDropdownMenu(
+                        expanded = duracionDropdownExpanded,
+                        onDismissRequest = { duracionDropdownExpanded = false }
+                    ) {
                         duracionOpciones.forEach { min ->
-                            DropdownMenuItem(text = { Text("$min minutos") }, onClick = { duracionMinutos = min; duracionDropdownExpanded = false })
+                            DropdownMenuItem(
+                                text = { Text("$min minutos") },
+                                onClick = {
+                                    duracionMinutos = min
+                                    duracionDropdownExpanded = false
+                                }
+                            )
                         }
                     }
                 }
 
-                Text("Motivo", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                // Motivo
+                Text(
+                    text = "📝 Motivo de la cita",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
                 OutlinedTextField(
                     value = motivo,
                     onValueChange = { motivo = it },
-                    placeholder = { Text("Describe el motivo de la cita") },
+                    placeholder = { Text("Describe el motivo de la cita (opcional)") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
-                    maxLines = 3
+                    maxLines = 3,
+                    shape = RoundedCornerShape(12.dp)
                 )
+
+                // Resumen de la cita a crear
+                if (pacienteSeleccionado != null && horaSeleccionada != null && !esEdicion) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = colors.primaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "📋 Resumen de la cita",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.primary
+                            )
+                            Text(
+                                text = "Paciente: ${pacienteSeleccionado!!.nombre} ${pacienteSeleccionado!!.apellido}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = "Fecha: ${fechaSeleccionada.format(formatterFecha)} a las ${horaSeleccionada!!.format(formatterHora)}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = "Duración: $duracionMinutos minutos",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            if (motivo.isNotBlank()) {
+                                Text(
+                                    text = "Motivo: $motivo",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
-            val habilitado = pacienteSeleccionado?.idPaciente != null && horaSeleccionada != null
+            val habilitado = pacienteSeleccionado?.idPaciente != null &&
+                    horaSeleccionada != null &&
+                    (horasDisponibles.isNotEmpty() || esEdicion)
+
             Button(
                 onClick = {
                     val idPaciente = pacienteSeleccionado?.idPaciente
                     if (idPaciente != null && horaSeleccionada != null) {
-                        onConfirmar(idPaciente, fechaSeleccionada, horaSeleccionada!!, duracionMinutos, motivo.ifBlank { "Cita psicológica" })
+                        onConfirmar(
+                            idPaciente,
+                            fechaSeleccionada,
+                            horaSeleccionada!!,
+                            duracionMinutos,
+                            motivo.ifBlank { "Cita psicológica" }
+                        )
+                        onDismiss()
                     }
                 },
-                enabled = habilitado
+                enabled = habilitado,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (esEdicion) "Guardar cambios" else "Crear cita")
+                Text(if (esEdicion) "💾 Guardar cambios" else "✅ Crear cita")
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
     )
 }
 

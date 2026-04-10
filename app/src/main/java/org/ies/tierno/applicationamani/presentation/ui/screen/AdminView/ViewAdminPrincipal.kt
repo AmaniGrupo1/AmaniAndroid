@@ -28,12 +28,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.wear.compose.navigation.currentBackStackEntryAsState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
+import org.ies.tierno.applicationamani.presentation.ui.componente.admin.AdminNavItem
+import org.ies.tierno.applicationamani.presentation.ui.componente.admin.BarraNavegationInferiorAdmin
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.koin.androidx.compose.koinViewModel
@@ -73,6 +77,15 @@ fun ViewAdminPrincipal(
     val isScrolled by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
     val scope = rememberCoroutineScope()
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val selectedItem = when (currentRoute) {
+        Screens.adminHome.route -> AdminNavItem.DOCUMENTOS
+        Screens.psicologoAgenda.route -> AdminNavItem.CALENDARIO
+
+        else -> AdminNavItem.DOCUMENTOS
+    }
     Scaffold(
         topBar = {
             MenuAdministrador(
@@ -93,7 +106,7 @@ fun ViewAdminPrincipal(
             )
         },
         bottomBar = {
-            AmaniBottomBar(navController, BottomBarConfig.Admin)
+            BarraNavegationInferiorAdmin(navController, selectedItem,onItemSelected = { /* opcional */ })
         },
         containerColor = AmaniColors.Background
     ) { innerPadding ->

@@ -4,8 +4,10 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
+import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.login.PsicologoConPacientesDTO
+import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
+
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -33,7 +35,8 @@ interface CitasApi {
     @GET("/api/citas/psicologo/{idPsicologo}/disponibilidad")
     suspend fun getDisponibilidadDia(
         @Path("idPsicologo") idPsicologo: Long,
-        @Query("fecha") fecha: String
+        @Query("fecha") fecha: String,
+        @Query("duracion") duracion: Int? = null
     ): DisponibilidadDiaResponse
 
     @POST("/api/citas/admin")
@@ -53,7 +56,7 @@ interface CitasApi {
     ): AgendaItemDTO
 
     @GET("/api/admin/psicologos/pacientes")
-    suspend fun getPsicologosConPacientes(): List<PsicologoConPacientesDTO>
+    suspend fun getPsicologosConPacientes(): List<ListaPacientesAndPsicologo>
 
     @PUT("/api/citas/psicologo/{idPsicologo}/horario")
     suspend fun actualizarHorario(
@@ -72,4 +75,23 @@ interface CitasApi {
         @Path("idPsicologo") idPsicologo: Long,
         @Path("fecha") fecha: String
     ): Unit
+
+    // 🚀 CREAR CITA (CORRECTO)
+    @POST("/api/citas/psicologo/cita")
+    suspend fun crearCitaPsicologo(
+        @Body request: CrearCitaRequestDTO
+    ): AgendaItemDTO
+
+    //Actualizo duracion de cita
+    @PUT("/api/citas/psicologo/{idPsicologo}/duracion")
+    suspend fun actualizarDuracion(
+        @Path("idPsicologo") idPsicologo: Long,
+        @Query("duracion") duracion: Int
+    ): Unit
+
+    //Obtengo duracion de cita
+    @GET("/api/citas/psicologo/{idPsicologo}/duracion")
+    suspend fun getDuracion(
+        @Path("idPsicologo") idPsicologo: Long
+    ): Int
 }
