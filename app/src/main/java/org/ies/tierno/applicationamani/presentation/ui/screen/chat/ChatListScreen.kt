@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -36,10 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +50,9 @@ fun ChatListScreen(
     navController: NavController,
     viewModel: ChatListViewModel
 ) {
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val amaniColors = LocalAmaniColors.current
     val currentUserId by viewModel.currentUserId.collectAsState()
     val currentUserRol by viewModel.currentUserRol.collectAsState()
     val normalizedRol = currentUserRol.lowercase().trim().replace("ó", "o").replace("á", "a")
@@ -55,6 +61,7 @@ fun ChatListScreen(
     val isLoading by viewModel.isLoading.collectAsState()
 
     Scaffold(
+        containerColor = amaniColors.screenBackground,
         topBar = {
             TopAppBar(
                 title = { Text("Mensajes") },
@@ -67,8 +74,8 @@ fun ChatListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = colors.surface,
+                    titleContentColor = colors.onSurface
                 )
             )
         }
@@ -85,15 +92,26 @@ fun ChatListScreen(
                     )
                 }
                 partnerId == null -> {
-                    Text(
-                        text = if (normalizedRol == "psicologo" || normalizedRol == "psicologa") {
-                            "No tienes pacientes asignados aún"
-                        } else {
-                            "No tienes psicólogo asignado aún"
-                        },
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(24.dp),
+                        shape = MaterialTheme.shapes.large,
+                        color = colors.surface,
+                        tonalElevation = 2.dp
+                    ) {
+                        Text(
+                            text = if (normalizedRol == "psicologo" || normalizedRol == "psicologa") {
+                                "No tienes pacientes asignados aún"
+                            } else {
+                                "No tienes psicólogo asignado aún"
+                            },
+                            style = typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = colors.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp)
+                        )
+                    }
                 }
                 else -> {
                     Column(
@@ -104,9 +122,10 @@ fun ChatListScreen(
                     ) {
                         Text(
                             text = "Tu conversación",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            color = colors.onSurface,
+                            modifier = Modifier.padding(bottom = 4.dp)
                         )
                         
                         ChatPartnerCard(
@@ -143,7 +162,7 @@ private fun ChatPartnerCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
             modifier = Modifier
@@ -173,7 +192,8 @@ private fun ChatPartnerCard(
                 Text(
                     text = partnerName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(

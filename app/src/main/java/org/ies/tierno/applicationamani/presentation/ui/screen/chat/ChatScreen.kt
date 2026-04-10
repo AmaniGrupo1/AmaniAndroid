@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,10 +23,13 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
@@ -36,6 +38,7 @@ import org.ies.tierno.applicationamani.domain.models.Message
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackStatus
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,6 +52,9 @@ fun ChatScreen(
     otherUserName: String,
     onNavigateBack: () -> Unit
 ) {
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val amaniColors = LocalAmaniColors.current
     val messages by viewModel.messages.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isSending by viewModel.isSending.collectAsState()
@@ -57,7 +63,7 @@ fun ChatScreen(
     val context = LocalContext.current
     val error by viewModel.error.collectAsState()
 
-    var messageText by remember { mutableStateOf("") }
+    var messageText by rememberSaveable { mutableStateOf("") }
     val isRecording by viewModel.isRecording.collectAsState()
     val audioHandler = remember { AudioHandler(context) }
 
@@ -113,9 +119,19 @@ fun ChatScreen(
     }
 
     Scaffold(
+        containerColor = amaniColors.screenBackground,
         topBar = {
             TopAppBar(
-                title = { Text(otherUserName) },
+                title = {
+                    Column {
+                        Text(otherUserName, style = typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = if (currentUserRol.lowercase().contains("paciente")) "Psicólogo" else "Paciente",
+                            style = typography.labelSmall,
+                            color = colors.onSurfaceVariant
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -125,8 +141,8 @@ fun ChatScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = colors.surface,
+                    titleContentColor = colors.onSurface
                 )
             )
         }
@@ -144,16 +160,27 @@ fun ChatScreen(
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 } else if (messages.isEmpty()) {
-                    Text(
-                        text = "No hay mensajes. ¡Envía el primero!",
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(24.dp),
+                        shape = MaterialTheme.shapes.large,
+                        color = colors.surface,
+                        tonalElevation = 2.dp
+                    ) {
+                        Text(
+                            text = "No hay mensajes. ¡Envía el primero!",
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp),
+                            style = typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = colors.onSurfaceVariant
+                        )
+                    }
                 } else {
                     LazyColumn(
                         state = listState,
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         items(messages) { message ->
                             val isPlayingThisMessage =
@@ -235,13 +262,19 @@ private fun MessageBubble(
     val bubbleColor = if (isCurrentUser) {
         MaterialTheme.colorScheme.primary
     } else {
-        MaterialTheme.colorScheme.surfaceVariant
+        MaterialTheme.colorScheme.surface
     }
 
     val textColor = if (isCurrentUser) {
         MaterialTheme.colorScheme.onPrimary
     } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
+        MaterialTheme.colorScheme.onSurface
+    }
+
+    val attachmentContainerColor = if (isCurrentUser) {
+        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.14f)
+    } else {
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
     }
 
     Row(
@@ -249,7 +282,7 @@ private fun MessageBubble(
         horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
     ) {
         Card(
-            modifier = Modifier.widthIn(max = 280.dp),
+            modifier = Modifier.widthIn(max = 300.dp),
             shape = RoundedCornerShape(
                 topStart = 18.dp,
                 topEnd = 18.dp,
@@ -302,7 +335,7 @@ private fun MessageBubble(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
+                                    .background(attachmentContainerColor)
                                     .clickable { onPlayClick() }
                                     .padding(12.dp)
                             ) {
@@ -342,7 +375,7 @@ private fun MessageBubble(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
+                                    .background(attachmentContainerColor)
                                     .clickable {
                                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                         context.startActivity(intent)
@@ -375,7 +408,7 @@ private fun MessageBubble(
                     Text(
                         text = formatTime(message.timestamp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = textColor.copy(alpha = 0.7f)
+                        color = textColor.copy(alpha = 0.72f)
                     )
                 }
             }
@@ -430,7 +463,9 @@ private fun MessageInput(
                 maxLines = 4,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             )
 
@@ -466,20 +501,12 @@ private fun MessageInput(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            if (isRecording)
-                                MaterialTheme.colorScheme.errorContainer
-                            else
-                                MaterialTheme.colorScheme.secondaryContainer
-                        )
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Mic,
                         contentDescription = "Grabar nota de voz",
-                        tint = if (isRecording)
-                            MaterialTheme.colorScheme.onErrorContainer
-                        else
-                            MaterialTheme.colorScheme.onSecondaryContainer
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
