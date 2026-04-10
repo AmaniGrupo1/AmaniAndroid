@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.google.gms.google.services)
     // alias(libs.plugins.google.gms.google.services)
 }
 
@@ -73,6 +74,7 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.firebase.database)
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
