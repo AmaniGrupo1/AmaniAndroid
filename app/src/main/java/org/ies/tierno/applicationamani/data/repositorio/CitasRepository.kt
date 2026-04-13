@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
@@ -8,6 +10,7 @@ import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate
@@ -63,7 +66,8 @@ class CitasRepository(
         fecha: LocalDate,
         hora: LocalTime,
         duracionMinutos: Int,
-        motivo: String
+        motivo: String,
+        idTipoTerapia: Long
     ): Result<AgendaItemDTO> = runCatching {
 
         val request = CrearCitaRequestDTO(
@@ -72,7 +76,8 @@ class CitasRepository(
             startDatetime = LocalDateTime.of(fecha, hora),
             durationMinutes = duracionMinutos,
             motivo = motivo,
-            estado = EstadoCita.pendiente  // ← EXPLÍCITAMENTE PENDIENTE
+            estado = EstadoCita.pendiente,  // ← EXPLÍCITAMENTE PENDIENTE
+            idTipoTerapia = idTipoTerapia
         )
 
         citasApi.crearCitaPsicologo(request)
@@ -130,5 +135,9 @@ class CitasRepository(
             )
             citasApi.marcarDiaNoDisponible(idPsicologo, request)
         }
+    }
+
+    suspend fun getTerapias(): Result<List<TerapiaResponseDTO>> = runCatching {
+        citasApi.getTerapias()
     }
 }

@@ -38,8 +38,10 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
+import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -52,7 +54,8 @@ import java.util.*
 @Composable
 fun PsicologoAgendaScreen(
     navController: NavController,
-    viewModel: PsicologoAgendaViewModel = koinViewModel()
+    viewModel: PsicologoAgendaViewModel = koinViewModel(),
+    listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -61,6 +64,9 @@ fun PsicologoAgendaScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
+
+
+    val terapias by listarTerapiasViewModel.terapias.collectAsStateWithLifecycle()
 
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     var mesVisible by remember { mutableStateOf(YearMonth.now()) }
@@ -318,8 +324,6 @@ fun PsicologoAgendaScreen(
     }
 
     if (mostrarDialogoHorario) {
-        val duracionActual by viewModel.duracionCita.collectAsStateWithLifecycle()
-
         DialogoModificarHorario(
             onConfirmar = { franjas ->
                 scope.launch {
@@ -327,16 +331,9 @@ fun PsicologoAgendaScreen(
                     mostrarDialogoHorario = false
                 }
             },
-            onConfirmarDuracion = { nuevaDuracion ->
-                scope.launch {
-                    viewModel.actualizarDuracionCita(nuevaDuracion)
-                }
-            },
-            duracionActual = duracionActual,
             onDismiss = { mostrarDialogoHorario = false }
         )
     }
-
 
     if (mostrarDialogoNoDisponible && fechaSeleccionada != null) {
         val fecha = fechaSeleccionada!!
@@ -364,10 +361,11 @@ fun PsicologoAgendaScreen(
             fechaInicial = fechaSeleccionada ?: LocalDate.now(),
             pacientes = pacientesAsignados,
             pacientesError = pacientesError,
+            terapias = terapias, // ← NUEVO: Pasar las terapias
             onRecargarPacientes = { viewModel.reintentarCargarPacientes() },
             slotsLibres = disponibilidadDia?.slotsLibres ?: emptyList(),
-            onFechaChange = { viewModel.cargarDisponibilidadDia(it,  60) },
-            onConfirmar = { idPaciente, fecha, hora, duracion, motivo ->
+            onFechaChange = { viewModel.cargarDisponibilidadDia(it, 60) },
+            onConfirmar = { idPaciente, fecha, hora, duracion, motivo, idTerapia ->
                 if (citaParaEditar != null) {
                     viewModel.editarCita(
                         idCita = citaParaEditar!!.id,
@@ -389,7 +387,8 @@ fun PsicologoAgendaScreen(
                         fecha = fecha,
                         hora = hora,
                         duracionMinutos = duracion,
-                        motivo = motivo
+                        motivo = motivo,
+                        idTipoTerapia = idTerapia
                     )
                     scope.launch {
                         val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
@@ -755,8 +754,6 @@ fun DiaNoDisponibleCard() {
 @Composable
 fun DialogoModificarHorario(
     onConfirmar: (List<FranjaHorarioDTO>) -> Unit,
-    onConfirmarDuracion: (Int) -> Unit,
-    duracionActual: Int,
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -765,79 +762,17 @@ fun DialogoModificarHorario(
     val horariosFin = remember { mutableStateListOf(*Array(7) { 17 }) }
     val activo = remember { mutableStateListOf(*Array(7) { it < 5 }) }
 
-    var duracionSeleccionada by remember { mutableIntStateOf(duracionActual) }
-    val duracionOpciones = listOf(30, 45, 60, 90, 120)
-    var duracionDropdownExpanded by remember { mutableStateOf(false) }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
         title = {
             Column {
                 Text("Configurar horario", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Define tu disponibilidad semanal y duración de citas", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                Text("Define tu disponibilidad semanal", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
             }
         },
         text = {
             Column(modifier = Modifier.heightIn(max = 550.dp).verticalScroll(rememberScrollState())) {
-
-                // Sección de Duración de Citas
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = colors.primaryContainer.copy(alpha = 0.3f))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "⏱️ Duración de las citas",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.primary
-                        )
-                        Text(
-                            text = "Esta duración se aplicará a todas las nuevas citas",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colors.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        ExposedDropdownMenuBox(
-                            expanded = duracionDropdownExpanded,
-                            onExpandedChange = { duracionDropdownExpanded = it }
-                        ) {
-                            OutlinedTextField(
-                                value = "$duracionSeleccionada minutos",
-                                onValueChange = {},
-                                readOnly = true,
-                                leadingIcon = { Icon(Icons.Default.Timer, contentDescription = null) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = duracionDropdownExpanded) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = colors.primary,
-                                    unfocusedBorderColor = colors.outline
-                                )
-                            )
-                            ExposedDropdownMenu(
-                                expanded = duracionDropdownExpanded,
-                                onDismissRequest = { duracionDropdownExpanded = false }
-                            ) {
-                                duracionOpciones.forEach { minutos ->
-                                    DropdownMenuItem(
-                                        text = { Text("$minutos minutos") },
-                                        onClick = {
-                                            duracionSeleccionada = minutos
-                                            duracionDropdownExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -927,10 +862,6 @@ fun DialogoModificarHorario(
                             } else emptyList()
                         }
                         onConfirmar(franjas)
-                        // Solo actualizar duración si cambió
-                        if (duracionSeleccionada != duracionActual) {
-                            onConfirmarDuracion(duracionSeleccionada)
-                        }
                     },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
@@ -1001,10 +932,11 @@ fun DialogoCrearEditarCita(
     fechaInicial: LocalDate,
     pacientes: List<PacientePsicologoResponseDTO>,
     pacientesError: String?,
+    terapias: List<TerapiaResponseDTO>,
     onRecargarPacientes: () -> Unit,
     slotsLibres: List<FranjaDisponibilidadResponse>,
     onFechaChange: (LocalDate) -> Unit,
-    onConfirmar: (idPaciente: Long, fecha: LocalDate, hora: LocalTime, duracion: Int, motivo: String) -> Unit,
+    onConfirmar: (idPaciente: Long, fecha: LocalDate, hora: LocalTime, duracion: Int, motivo: String, idTerapia: Long) -> Unit,
     onDismiss: () -> Unit
 ) {
     val esEdicion = citaAEditar != null
@@ -1014,9 +946,10 @@ fun DialogoCrearEditarCita(
 
     var fechaSeleccionada by remember { mutableStateOf(citaAEditar?.fecha ?: fechaInicial) }
     var motivo by remember { mutableStateOf(citaAEditar?.motivo ?: "") }
+
+    // La duración ahora viene solo de la terapia seleccionada
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
-    // CORREGIDO: Mejor identificación del paciente para edición
     val pacienteInicial = if (esEdicion && citaAEditar != null) {
         pacientes.firstOrNull {
             it.idPaciente == citaAEditar.id ||
@@ -1027,7 +960,10 @@ fun DialogoCrearEditarCita(
     var pacienteSeleccionado by remember { mutableStateOf(pacienteInicial) }
     var pacienteDropdownExpanded by remember { mutableStateOf(false) }
 
-    // CORREGIDO: Filtrar horas disponibles correctamente
+    // Estado para la terapia seleccionada
+    var terapiaSeleccionada by remember { mutableStateOf<TerapiaResponseDTO?>(null) }
+    var terapiaDropdownExpanded by remember { mutableStateOf(false) }
+
     val horasDisponibles = remember(slotsLibres, citaAEditar, fechaSeleccionada) {
         val libres = slotsLibres.filter { !it.ocupado }.map { it.hora }.sorted()
         if (esEdicion && citaAEditar != null && citaAEditar.horaInicio != null) {
@@ -1047,8 +983,12 @@ fun DialogoCrearEditarCita(
     ) }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
-    val duracionOpciones = listOf(30, 45, 60, 90, 120)
-    var duracionDropdownExpanded by remember { mutableStateOf(false) }
+    // Actualizar duración cuando cambia la terapia seleccionada
+    LaunchedEffect(terapiaSeleccionada) {
+        terapiaSeleccionada?.let {
+            duracionMinutos = it.duracionMinutos
+        }
+    }
 
     // Actualizar horas cuando cambia la fecha
     LaunchedEffect(fechaSeleccionada, slotsLibres) {
@@ -1079,7 +1019,7 @@ fun DialogoCrearEditarCita(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 500.dp)
+                    .heightIn(max = 550.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -1155,6 +1095,69 @@ fun DialogoCrearEditarCita(
                                         }
                                     )
                                 }
+                            }
+                        }
+                    }
+                }
+
+                // Selección de Tipo de Terapia
+                Text(
+                    text = "🩺 Tipo de terapia *",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                ExposedDropdownMenuBox(
+                    expanded = terapiaDropdownExpanded,
+                    onExpandedChange = { terapiaDropdownExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = terapiaSeleccionada?.nombre ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        placeholder = { Text("Selecciona el tipo de terapia") },
+                        leadingIcon = { Icon(Icons.Default.MedicalServices, contentDescription = null) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = terapiaDropdownExpanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colors.primary,
+                            unfocusedBorderColor = colors.outline
+                        )
+                    )
+                    ExposedDropdownMenu(
+                        expanded = terapiaDropdownExpanded,
+                        onDismissRequest = { terapiaDropdownExpanded = false }
+                    ) {
+                        if (terapias.isEmpty()) {
+                            DropdownMenuItem(
+                                text = { Text("No hay tipos de terapia disponibles") },
+                                onClick = { terapiaDropdownExpanded = false },
+                                enabled = false
+                            )
+                        } else {
+                            terapias.forEach { terapia ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Column {
+                                            Text(
+                                                terapia.nombre,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Text(
+                                                "Duración: ${terapia.duracionMinutos} minutos",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = colors.onSurfaceVariant
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        terapiaSeleccionada = terapia
+                                        terapiaDropdownExpanded = false
+                                    }
+                                )
                             }
                         }
                     }
@@ -1277,41 +1280,41 @@ fun DialogoCrearEditarCita(
                     )
                 }
 
-                // Duración
+                // Duración (ahora es automática y solo informativa)
                 Text(
                     text = "⏱️ Duración",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold
                 )
-                ExposedDropdownMenuBox(
-                    expanded = duracionDropdownExpanded,
-                    onExpandedChange = { duracionDropdownExpanded = it }
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.primaryContainer.copy(alpha = 0.2f))
                 ) {
-                    OutlinedTextField(
-                        value = "$duracionMinutos minutos",
-                        onValueChange = {},
-                        readOnly = true,
-                        leadingIcon = { Icon(Icons.Default.Timer, contentDescription = null) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = duracionDropdownExpanded) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = duracionDropdownExpanded,
-                        onDismissRequest = { duracionDropdownExpanded = false }
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        duracionOpciones.forEach { min ->
-                            DropdownMenuItem(
-                                text = { Text("$min minutos") },
-                                onClick = {
-                                    duracionMinutos = min
-                                    duracionDropdownExpanded = false
-                                }
+                        Column {
+                            Text(
+                                text = if (terapiaSeleccionada != null) "Duración de la terapia" else "Duración por defecto",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = colors.primary
+                            )
+                            Text(
+                                text = "$duracionMinutos minutos",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
                             )
                         }
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = colors.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
 
@@ -1332,7 +1335,7 @@ fun DialogoCrearEditarCita(
                 )
 
                 // Resumen de la cita a crear
-                if (pacienteSeleccionado != null && horaSeleccionada != null && !esEdicion) {
+                if (pacienteSeleccionado != null && horaSeleccionada != null && terapiaSeleccionada != null && !esEdicion) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -1353,6 +1356,10 @@ fun DialogoCrearEditarCita(
                             )
                             Text(
                                 text = "Paciente: ${pacienteSeleccionado!!.nombre} ${pacienteSeleccionado!!.apellido}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = "Terapia: ${terapiaSeleccionada!!.nombre}",
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Text(
@@ -1377,18 +1384,20 @@ fun DialogoCrearEditarCita(
         confirmButton = {
             val habilitado = pacienteSeleccionado?.idPaciente != null &&
                     horaSeleccionada != null &&
+                    terapiaSeleccionada != null &&
                     (horasDisponibles.isNotEmpty() || esEdicion)
 
             Button(
                 onClick = {
                     val idPaciente = pacienteSeleccionado?.idPaciente
-                    if (idPaciente != null && horaSeleccionada != null) {
+                    if (idPaciente != null && horaSeleccionada != null && terapiaSeleccionada != null) {
                         onConfirmar(
                             idPaciente,
                             fechaSeleccionada,
                             horaSeleccionada!!,
                             duracionMinutos,
-                            motivo.ifBlank { "Cita psicológica" }
+                            motivo.ifBlank { "${terapiaSeleccionada!!.nombre} - Cita psicológica" },
+                            terapiaSeleccionada!!.idTipo
                         )
                         onDismiss()
                     }

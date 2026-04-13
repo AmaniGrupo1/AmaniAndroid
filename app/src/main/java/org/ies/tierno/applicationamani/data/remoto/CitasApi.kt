@@ -6,6 +6,7 @@ import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
@@ -94,4 +95,7 @@ interface CitasApi {
     suspend fun getDuracion(
         @Path("idPsicologo") idPsicologo: Long
     ): Int
+
+    @GET("/api/citas/psicologo/terapias")
+    suspend fun getTerapias(): List<TerapiaResponseDTO>
 }

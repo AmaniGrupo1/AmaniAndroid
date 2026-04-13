@@ -35,6 +35,8 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.BarraNavegationInferiorPsicologo
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.MenuSetting
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.PsicologoNavItem
@@ -71,7 +73,6 @@ fun ViewPsicologoPrincipal(
     viewModel: ListarPacientesByPsicologoViewModel = koinViewModel(),
     profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
-    var selectedItem by remember { mutableStateOf(PsicologoNavItem.MIS_PACIENTES) }
     val pacientes by viewModel.paciente.collectAsState()
     var showLoading by remember { mutableStateOf(true) }
 
@@ -163,10 +164,9 @@ fun ViewPsicologoPrincipal(
             MenuSetting(navController = navController, idPsicologo = idPsicologo)
         },
         bottomBar = {
-            BarraNavegationInferiorPsicologo(
+            AmaniBottomBar(
                 navController = navController,
-                selectedItem = selectedItem,
-                onItemSelected = { selectedItem = it }
+                BottomBarConfig.Psicologo
             )
         },
         containerColor = AmaniPsicologoColors.Background

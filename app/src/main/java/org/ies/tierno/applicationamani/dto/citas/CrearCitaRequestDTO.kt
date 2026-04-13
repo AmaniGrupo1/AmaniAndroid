@@ -21,6 +21,7 @@ data class CrearCitaRequestDTO(
     @SerializedName("motivo")
     val motivo: String,
 
-    val estado : EstadoCita = EstadoCita.pendiente
+    val estado : EstadoCita = EstadoCita.pendiente,
 
+    val idTipoTerapia : Long
 )

@@ -72,6 +72,8 @@ private fun pacienteItems() = listOf(
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     ),
+
+
     AmaniBottomBarItem(
         route = Screens.citas.route,
         label = "Citas",
@@ -137,7 +139,7 @@ private fun psicologoItems() = listOf(
         unselectedIcon = Icons.Outlined.CalendarMonth
     ),
     AmaniBottomBarItem(
-        route = Screens.pacientes.route,
+        route = Screens.psicologoHome.route,
         label = "Pacientes",
         selectedIcon = Icons.Filled.People,
         unselectedIcon = Icons.Outlined.People

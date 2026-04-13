@@ -36,6 +36,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteV
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.koin.android.ext.koin.androidContext
 
 
@@ -82,4 +83,5 @@ val appModule = module {
     viewModel { ListarPacientesByPsicologoViewModel(get()) }
     viewModel { ProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
+    viewModel { ListarTerapiasViewModel(get()) }
 }

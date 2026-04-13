@@ -14,7 +14,6 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.time.LocalDate
@@ -253,7 +252,8 @@ class PsicologoAgendaViewModel(
         fecha: LocalDate,
         hora: LocalTime,
         duracionMinutos: Int,
-        motivo: String
+        motivo: String,
+        idTipoTerapia: Long
     ) {
         val psychologistId = _userSession.value?.idPsicologo ?: run {
             _errorMessage.value = "No hay sesión de psicólogo"
@@ -269,7 +269,8 @@ class PsicologoAgendaViewModel(
                 fecha = fecha,
                 hora = hora,
                 duracionMinutos = duracionMinutos,
-                motivo = motivo
+                motivo = motivo,
+                idTipoTerapia = idTipoTerapia
             ).onSuccess { nuevaCita ->
                 cargarAgendaMensual(_mesVisible.value)
                 _successMessage.value = "Cita creada correctamente"

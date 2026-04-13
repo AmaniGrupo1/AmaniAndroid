@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.domain.models.citas
 
+import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -13,5 +14,6 @@ data class AgendaItemDTO(
     val motivo: String?,
     val duracionMinutos: Int?,    // nullable
     val nombrePaciente: String?,  // nullable
-    val nombrePsicologo: String?
+    val nombrePsicologo: String?,
+    val terapiaResponseDTO : TerapiaResponseDTO
 )
