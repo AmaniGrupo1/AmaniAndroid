@@ -7,9 +7,16 @@ import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
+import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
+import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
+import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
@@ -27,6 +34,8 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteV
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
@@ -55,6 +64,11 @@ val appModule = module {
     single { CitasRepository(get()) }
     single { ProfileRepository(get()) }
 
+    single { FirebaseInstance }
+    single { ChatFirebaseService(get()) }
+    single<ChatRepository> { ChatRepositoryImpl(get()) }
+    single { org.ies.tierno.applicationamani.data.remoto.FileStorageService(get(), androidContext()) }
+
     factory { LoginUseCase(get()) }
     factory { GetAllClientAndPsicologoUseCase(get()) }
     factory { CrearPreguntaUseCase(get()) }
@@ -67,6 +81,10 @@ val appModule = module {
     factory { ListarSituacionUseCase(get()) }
     factory { ListarPacientesByPsicologo(get()) }
     factory { ProfileUseCaseGeneral(get()) }
+    
+    factory { SendMessageUseCase(get()) }
+    factory { GetMessagesUseCase(get()) }
+    factory { MarkMessagesAsReadUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -76,7 +94,7 @@ val appModule = module {
     viewModel { PrincipalClienteViewModel() }
     viewModel { SettingsClienteViewModel() }
     viewModel { SituacionViewModel(get()) }
-    viewModel { CitasViewModel(get(), get()) }
+    viewModel { CitasViewModel(get(), get(), get()) }
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(),get(),get()) }
     viewModel { CuestionarioViewModel(get()) }
@@ -84,4 +102,17 @@ val appModule = module {
     viewModel { ProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get()) }
+
+    viewModel { ChatListViewModel(get(), get(), get()) }
+    viewModel { (currentUserId: Long, otherUserId: Long) ->
+        ChatViewModel(
+            currentUserId = currentUserId,
+            otherUserId = otherUserId,
+            sendMessageUseCase = get(),
+            getMessagesUseCase = get(),
+            markMessagesAsReadUseCase = get(),
+            fileStorageService = get(),
+            appContext = androidContext()
+        )
+    }
 }

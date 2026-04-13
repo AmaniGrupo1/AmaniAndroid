@@ -1,24 +1,41 @@
     package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 
-    import androidx.compose.foundation.layout.*
+    import androidx.compose.foundation.layout.Arrangement
+    import androidx.compose.foundation.layout.Column
+    import androidx.compose.foundation.layout.Spacer
+    import androidx.compose.foundation.layout.fillMaxSize
+    import androidx.compose.foundation.layout.fillMaxWidth
+    import androidx.compose.foundation.layout.height
+    import androidx.compose.foundation.layout.padding
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.filled.Visibility
     import androidx.compose.material.icons.filled.VisibilityOff
-    import androidx.compose.material3.*
-    import androidx.compose.runtime.*
+    import androidx.compose.material3.Button
+    import androidx.compose.material3.ButtonDefaults
+    import androidx.compose.material3.Icon
+    import androidx.compose.material3.IconButton
+    import androidx.compose.material3.OutlinedButton
+    import androidx.compose.material3.Scaffold
+    import androidx.compose.material3.Text
+    import androidx.compose.material3.TextField
+    import androidx.compose.material3.TextFieldDefaults
+    import androidx.compose.runtime.Composable
+    import androidx.compose.runtime.collectAsState
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.remember
+    import androidx.compose.runtime.setValue
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.graphics.Color
-    import androidx.compose.ui.text.font.Font
-    import androidx.compose.ui.text.font.FontFamily
     import androidx.compose.ui.text.input.PasswordVisualTransformation
     import androidx.compose.ui.text.input.VisualTransformation
     import androidx.compose.ui.unit.dp
     import androidx.navigation.NavController
-    import org.ies.tierno.applicationamani.R
     import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
     import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+    import org.ies.tierno.applicationamani.ui.theme.Roboto
 
     /**
      * Pantalla de registro de un paciente desde el panel de administración.
@@ -38,7 +55,7 @@
         val backgroundColor = Color(0xFFCCC0E4)
         val primaryColor = Color(0xFF6C63FF)
 
-        val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+        val roboto = Roboto
 
         // Campos del ViewModel
         val nombre by loginViewModel.nombre.collectAsState()

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "560473593904",
+    "project_id": "amani-160bf",
+    "firebase_url": "https://amani-160bf-default-rtdb.europe-west1.firebasedatabase.app",
+    "storage_bucket": "amani-160bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:560473593904:android:5a43a5e5347042a04ff5f5",
+        "android_client_info": {
+          "package_name": "org.ies.tierno.applicationamani"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBogTVMHBidx5UQmbyFgti_pTlKkPmmz_s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

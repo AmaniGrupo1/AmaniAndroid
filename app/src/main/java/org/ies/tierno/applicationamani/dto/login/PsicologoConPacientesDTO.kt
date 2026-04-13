@@ -1,7 +1,5 @@
 package org.ies.tierno.applicationamani.dto.login
 
-import java.time.LocalDateTime
-
 data class ListaPacientesAndPsicologo(
     val idPsicologo: Long,
     val nombrePsicologo: String,
