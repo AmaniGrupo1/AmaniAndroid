@@ -1,3 +1,5 @@
+package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,14 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.ui.screen.Espaciado
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
+import org.ies.tierno.applicationamani.ui.theme.Roboto
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -49,9 +49,7 @@ fun TestScreen(
 ) {
     val colorButton = android.graphics.Color.parseColor("#CCC0E4")
     val request = crearPreguntaViewModel.request.collectAsState()
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght)
-    )
+    val roboto = Roboto
 
     val snackbarHostState = remember { SnackbarHostState() }
     val guardadoExitoso by crearPreguntaViewModel.guardadoExitoso.collectAsState()
@@ -83,7 +81,7 @@ fun TestScreen(
                 color = Color.Black
             )
 
-            Espaciado(30)
+
 
             Column(
                 modifier = Modifier
@@ -101,7 +99,6 @@ fun TestScreen(
                     onChange = { crearPreguntaViewModel.setTexto(it) },
                     roboto = roboto
                 )
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.tipo?:"",
@@ -110,7 +107,6 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(0) ?: "",
@@ -119,16 +115,12 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(15)
-
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(1) ?: "",
                     placeholder = "Opción 2",
                     onChange = { crearPreguntaViewModel.setOpcion2(it) },
                     roboto = roboto
                 )
-
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(2) ?: "",
@@ -137,7 +129,6 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(15)
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(3) ?: "",
@@ -146,7 +137,6 @@ fun TestScreen(
                     roboto = roboto
                 )
 
-                Espaciado(25)
 
                 Button(
                     modifier = Modifier

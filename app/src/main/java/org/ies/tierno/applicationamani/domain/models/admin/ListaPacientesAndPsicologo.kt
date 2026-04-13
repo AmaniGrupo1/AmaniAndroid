@@ -1,31 +1,31 @@
 package org.ies.tierno.applicationamani.domain.models.admin
 
 import com.google.gson.annotations.SerializedName
+import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import java.time.LocalDateTime
 
-/**
- * DTO que representa la relación entre un paciente y su psicólogo asignado.
- *
- * Se utiliza en la vista de administración para listar los pacientes
- * junto con los datos del psicólogo que los atiende.
- *
- * @property nombrePsicologo Nombre del psicólogo asignado, o `null` si no tiene.
- * @property apellidoPsicologo Apellido del psicólogo asignado, o `null` si no tiene.
- * @property nombreUsuario Nombre del paciente.
- * @property apellidoUsuario Apellido del paciente.
- * @property emailUsuario Correo electrónico del paciente.
- * @property updatedAt Fecha de última actualización en formato ISO 8601.
- */
-data class ListaPacientesAndPsicologo(
+data class PsicologoConPacientesDTO(
+    @SerializedName("idPsicologo")
+    val idPsicologo: Long? = null,
+
+    @SerializedName("nombrePsicologo")
     val nombrePsicologo: String? = null,
 
+    @SerializedName("apellidoPsicologo")
     val apellidoPsicologo: String? = null,
 
-    val nombreUsuario: String? = null,
+    @SerializedName("emailPsicologo")
+    val emailPsicologo: String? = null,
 
-    val apellidoUsuario: String? = null,
+    @SerializedName("especialidad")
+    val especialidad: String? = null,
 
-    val emailUsuario: String? = null,
+    @SerializedName("licencia")
+    val licencia: String? = null,
 
-    @SerializedName("updatedAt")
-    val updatedAt: String? = null
+    @SerializedName("fechaDadoAlta")
+    val fechaDadoAlta: LocalDateTime? = null,
+
+    @SerializedName("pacientes")
+    val pacientes: List<PacientesAsignadoDTO>? = null
 )

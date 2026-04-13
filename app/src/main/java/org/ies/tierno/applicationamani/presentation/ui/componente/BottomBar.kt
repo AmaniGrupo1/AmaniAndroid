@@ -1,161 +1,79 @@
-package org.ies.tierno.applicationamani.presentation.ui.componente
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.EditCalendar
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-
-/**
- * Barra de navegación inferior para la vista de administración.
- *
- * Muestra iconos para las secciones Pacientes, Chat, Calendario,
- * Gráfica y Ajustes. Resalta la sección activa según [currentRoute].
- *
- * @param navController Controlador de navegación para cambiar de pantalla.
- * @param currentRoute Ruta actual utilizada para resaltar el icono seleccionado.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BottomBar( navController: NavController, currentRoute: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(70.dp)
-            .background(Color(0xFFEEEEEE)),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        // Botón Pacientes
-
-        BottomBarIcon(
-            icon = Icons.Default.Book,
-            label = "Pacientes",
-            isSelected = currentRoute == "pacientes",
-            onClick = {
-                navController.navigate("pacientes") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }
-        )
-
-        // Botón Chat
-        BottomBarIcon(
-            icon = Icons.AutoMirrored.Filled.Chat,
-            label = "Chat",
-            isSelected = currentRoute == "chat",
-            onClick = {
-                navController.navigate("chat") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }
-        )
-
-        // Botón Calendario
-        BottomBarIcon(
-            icon = Icons.Default.EditCalendar,
-            label = "Calendario",
-            isSelected = currentRoute == "calendar",
-            onClick = {
-                navController.navigate("calendar") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }
-        )
-
-        // Botón Gráfica
-        BottomBarIcon(
-            icon = Icons.Default.BarChart,
-            label = "Gráfica",
-            isSelected = currentRoute == "grafica",
-            onClick = {
-                navController.navigate("grafica") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }
-        )
-
-        // Botón Ajustes
-        BottomBarIcon(
-            icon = Icons.Default.Settings,
-            label = "Ajustes",
-            isSelected = currentRoute == "settings",
-            onClick = {
-                navController.navigate("settings") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            }
-        )
-    }
-}
-
-/**
- * Icono individual de la barra de navegación inferior.
- *
- * Muestra un icono vectorial con su etiqueta de texto debajo.
- * Cambia de color según si está seleccionado.
- *
- * @param icon Icono vectorial a mostrar.
- * @param label Texto descriptivo debajo del icono.
- * @param isSelected `true` si esta sección está seleccionada.
- * @param onClick Acción al pulsar el icono.
- */
-@Composable
-fun BottomBarIcon(
-    icon: ImageVector,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxHeight()
-            .background(
-                if (isSelected) Color(0xFFB0BEC5) else Color.Transparent, // color activo
-                shape = CircleShape
-            )
-            .padding(vertical = 8.dp)
-            .clickable { onClick() }
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (isSelected) Color.White else Color.Black,
-            modifier = Modifier.size(28.dp)
-        )
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = if (isSelected) Color.White else Color.Black
-        )
-    }
-}
+//package org.ies.tierno.applicationamani.presentation.ui.componente
+//
+//import androidx.compose.material.icons.Icons
+//import androidx.compose.material.icons.filled.CalendarMonth
+//import androidx.compose.material.icons.filled.Groups
+//import androidx.compose.material.icons.filled.Home
+//import androidx.compose.material.icons.filled.Psychology
+//import androidx.compose.material3.Icon
+//import androidx.compose.material3.NavigationBar
+//import androidx.compose.material3.NavigationBarItem
+//import androidx.compose.material3.NavigationBarItemDefaults
+//import androidx.compose.material3.Text
+//import androidx.compose.runtime.Composable
+//import androidx.compose.runtime.getValue
+//import androidx.navigation.NavController
+//import androidx.navigation.compose.currentBackStackEntryAsState
+//import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+//
+//private data class BottomBarDestination(
+//    val route: String,
+//    val label: String,
+//    val icon: androidx.compose.ui.graphics.vector.ImageVector
+//)
+//
+//@Composable
+//fun BottomBar(navController: NavController) {
+//    val backStackEntry by navController.currentBackStackEntryAsState()
+//    val currentRoute = backStackEntry?.destination?.route
+//
+//    val destinations = listOf(
+//        BottomBarDestination(
+//            route = Screens.adminHome.route,
+//            label = "Inicio",
+//            icon = Icons.Default.Home
+//        ),
+//        BottomBarDestination(
+//            route = Screens.pacientes.route,
+//            label = "Pacientes",
+//            icon = Icons.Default.Groups
+//        ),
+//        BottomBarDestination(
+//            route = Screens.listaPsicologos.route,
+//            label = "Psicologos",
+//            icon = Icons.Default.Psychology
+//        ),
+//        BottomBarDestination(
+//            route = Screens.psicologoAgenda.route,
+//            label = "Calendario",
+//            icon = Icons.Default.CalendarMonth
+//        )
+//    )
+//
+//    NavigationBar {
+//        destinations.forEach { destination ->
+//            NavigationBarItem(
+//                selected = currentRoute == destination.route,
+//                onClick = {
+//                    if (currentRoute == destination.route) return@NavigationBarItem
+//
+//                    navController.navigate(destination.route) {
+//                        popUpTo(navController.graph.startDestinationId) {
+//                            saveState = true
+//                        }
+//                        launchSingleTop = true
+//                        restoreState = true
+//                    }
+//                },
+//                icon = {
+//                    Icon(
+//                        imageVector = destination.icon,
+//                        contentDescription = destination.label
+//                    )
+//                },
+//                label = { Text(destination.label) },
+//                colors = NavigationBarItemDefaults.colors()
+//            )
+//        }
+//    }
+//}

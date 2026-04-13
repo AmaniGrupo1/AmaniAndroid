@@ -46,3 +46,17 @@ val AmaniCitaOcupada  = Color(0xFFE57373)
 /** Fondo de una tarjeta de franja ocupada. */
 val AmaniCitaOcupadaBg = Color(0xFFFCE4EC)
 
+// ── Colores semánticos de estados de cita ─────────────────────
+
+/** Verde profundo para citas confirmadas. */
+val AmaniCitaConfirmada = Color(0xFF2E7D32)
+
+/** Naranja para citas pendientes de confirmación. */
+val AmaniCitaPendiente  = Color(0xFFE65100)
+
+/** Rojo profundo para citas canceladas. */
+val AmaniCitaCancelada  = Color(0xFFC62828)
+
+/** Fondo suave con tinte lila para el calendario. */
+val AmaniCalendarioBg   = Color(0xFFF5F0FF)
+

@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.domain.models.test
 
-import org.ies.tierno.applicationamani.domain.models.test.Opcion
 
 /**
  * Modelo de dominio que agrupa una pregunta con sus opciones de respuesta.

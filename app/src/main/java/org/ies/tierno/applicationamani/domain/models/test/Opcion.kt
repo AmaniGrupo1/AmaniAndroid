@@ -1,7 +1,5 @@
 package org.ies.tierno.applicationamani.domain.models.test
 
-import com.google.firebase.firestore.DocumentId
-
 /**
  * Modelo de dominio que representa una opción de respuesta dentro de una pregunta.
  *

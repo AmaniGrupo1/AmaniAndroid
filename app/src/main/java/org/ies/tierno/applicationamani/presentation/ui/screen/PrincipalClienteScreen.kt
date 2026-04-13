@@ -11,12 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -27,19 +22,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,13 +65,6 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val especialidades = viewModel.especialidades
-    var selectedItem by remember { mutableStateOf(0) }
-
-    val navBarItemColors = NavigationBarItemDefaults.colors(
-        selectedIconColor = colors.onPrimary,
-        selectedTextColor = colors.onPrimary,
-        indicatorColor = colors.primary
-    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -141,45 +122,6 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         }
                     }
                 )
-            },
-            bottomBar = {
-                NavigationBar {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, null) },
-                        label = { Text("Inicio") },
-                        selected = selectedItem == 0,
-                        onClick = { selectedItem = 0 },
-                        colors = navBarItemColors
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.AutoMirrored.Filled.Chat, null) },
-                        label = { Text("Chat") },
-                        selected = selectedItem == 1,
-                        onClick = { selectedItem = 1 },
-                        colors = navBarItemColors
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.DateRange, null) },
-                        label = { Text("Citas") },
-                        selected = selectedItem == 2,
-                        onClick = { selectedItem = 2 },
-                        colors = navBarItemColors
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Book, null) },
-                        label = { Text("Diario") },
-                        selected = selectedItem == 3,
-                        onClick = { selectedItem = 3 },
-                        colors = navBarItemColors
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Settings, null) },
-                        label = { Text("Ajustes") },
-                        selected = selectedItem == 4,
-                        onClick = { selectedItem = 4 },
-                        colors = navBarItemColors
-                    )
-                }
             }
         ) { paddingValues ->
             Column(

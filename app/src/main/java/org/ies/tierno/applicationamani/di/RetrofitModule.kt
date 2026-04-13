@@ -1,9 +1,27 @@
 package org.ies.tierno.applicationamani.di
 
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
+import org.ies.tierno.applicationamani.data.remoto.AuthApi
+import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
+import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.data.remoto.CustomerClient
+import org.ies.tierno.applicationamani.data.remoto.ProfileApi
+import org.ies.tierno.applicationamani.data.remoto.SituacionApi
+import org.ies.tierno.applicationamani.data.remoto.TestApi
+import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.reflect.Type
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 /**
  * Módulo Koin para la configuración de Retrofit.
@@ -15,25 +33,56 @@ import retrofit2.converter.gson.GsonConverterFactory
  * @see appModule
  */
 
-/**
- * Módulo Koin que registra las dependencias de red.
- *
- * Contenido:
- * - `Retrofit` — cliente HTTP singleton apuntando al backend local (`10.0.2.2:8080`).
- * - [CustomerClient] — interfaz de API generada por Retrofit.
- */
+
 val retrofitModule = module {
-    /**
-     * Instancia singleton de [Retrofit] configurada para comunicarse
-     * con el backend en el emulador (localhost mapeado a `10.0.2.2`).
-     */
+
     single {
+        AuthInterceptor(get())
+    }
+
+    single {
+        TokenRefreshInterceptor(get())
+    }
+
+    single {
+        val okHttpClient = okhttp3.OkHttpClient.Builder()
+            .addInterceptor(get<AuthInterceptor>())
+            .addInterceptor(get<TokenRefreshInterceptor>())
+            .build()
+
+        val gson = GsonBuilder()
+            .serializeNulls()
+            .registerTypeAdapter(LocalDate::class.java, object : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
+                override fun serialize(src: LocalDate, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
+                    JsonPrimitive(src.toString())
+                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDate =
+                    LocalDate.parse(json.asString)
+            })
+            .registerTypeAdapter(LocalTime::class.java, object : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
+                override fun serialize(src: LocalTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
+                    JsonPrimitive(src.toString())
+                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalTime =
+                    LocalTime.parse(json.asString)
+            })
+            .registerTypeAdapter(LocalDateTime::class.java, object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+                override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
+                    JsonPrimitive(src.toString())
+                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime =
+                    LocalDateTime.parse(json.asString)
+            })
+            .create()
+
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(okHttpClient)
             .build()
     }
 
-    /** Implementación de [CustomerClient] generada por Retrofit. */
     single<CustomerClient> { get<Retrofit>().create(CustomerClient::class.java) }
+    single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
+    single<CitasApi> { get<Retrofit>().create(CitasApi::class.java) }
+    single<SituacionApi> { get<Retrofit>().create(SituacionApi::class.java) }
+    single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
+    single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
 }

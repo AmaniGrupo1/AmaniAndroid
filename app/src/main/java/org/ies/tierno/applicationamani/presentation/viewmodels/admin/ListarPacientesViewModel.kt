@@ -3,9 +3,7 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
@@ -29,15 +27,14 @@ class ListarPacientesViewModel(
 ) : ViewModel() {
 
     /** Flujo mutable con la lista de pacientes. */
-    private val _pacientes = MutableStateFlow<List<DatosPacienteAdminDTO>>(emptyList())
-    /** Lista observable de pacientes para la UI. */
-    val paciente: StateFlow<List<DatosPacienteAdminDTO>> = _pacientes
+    private val _paciente = MutableStateFlow<List<DatosPacienteAdminDTO>>(emptyList())
+    val paciente: StateFlow<List<DatosPacienteAdminDTO>> = _paciente
 
     init {
         // Recoger los pacientes del caso de uso
         viewModelScope.launch {
             listarPacientesUseCase().collect { lista ->
-                _pacientes.value = lista
+                _paciente.value = lista
             }
         }
     }
@@ -70,7 +67,7 @@ class ListarPacientesViewModel(
      * @param id Identificador único del paciente dado de baja.
      */
     fun actualizarPacienteBaja(id: Long) {
-        _pacientes.value = _pacientes.value.map {
+        _paciente.value = _paciente.value.map {
             if (it.idPaciente == id) it.copy(activo = false) else it
         }
     }

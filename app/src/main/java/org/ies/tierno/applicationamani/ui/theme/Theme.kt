@@ -12,12 +12,15 @@ package org.ies.tierno.applicationamani.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 
 // ── Material 3 color schemes ──────────────────────────────────
 /**
@@ -72,6 +75,9 @@ private val DarkColorScheme = darkColorScheme(
  * @property screenBackground Color de fondo para pantallas de autenticación.
  * @property textFieldContainer Color del contenedor de los campos de texto.
  * @property buttonBorder Color del borde de los botones con contorno.
+ * @property citaConfirmada Color verde para citas confirmadas.
+ * @property citaPendiente Color naranja para citas pendientes.
+ * @property citaCancelada Color rojo para citas canceladas.
  */
 @Immutable
 data class AmaniExtraColors(
@@ -81,6 +87,10 @@ data class AmaniExtraColors(
     val citaLibre: Color = AmaniCitaLibre,
     val citaOcupada: Color = AmaniCitaOcupada,
     val citaOcupadaBg: Color = AmaniCitaOcupadaBg,
+    val citaConfirmada: Color = AmaniCitaConfirmada,
+    val citaPendiente: Color = AmaniCitaPendiente,
+    val citaCancelada: Color = AmaniCitaCancelada,
+    val calendarioBg: Color = AmaniCalendarioBg,
 )
 
 /**
@@ -90,6 +100,12 @@ data class AmaniExtraColors(
  * extra de la app sin necesidad de pasarlos como parámetros.
  */
 val LocalAmaniColors = staticCompositionLocalOf { AmaniExtraColors() }
+
+private val AmaniShapes = Shapes(
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp),
+)
 
 /**
  * Tema principal de la aplicación Amani.
@@ -110,13 +126,23 @@ fun ApplicationAmaniTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val extraColors = if (darkTheme) {
+        AmaniExtraColors(
+            screenBackground = colorScheme.background,
+            textFieldContainer = colorScheme.surfaceVariant,
+            buttonBorder = colorScheme.outline
+        )
+    } else {
+        AmaniExtraColors()
+    }
 
     androidx.compose.runtime.CompositionLocalProvider(
-        LocalAmaniColors provides AmaniExtraColors()
+        LocalAmaniColors provides extraColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = AmaniShapes,
             content = content
         )
     }

@@ -22,6 +22,8 @@ sealed class Screens(val route: String) {
     /** Pantalla principal para usuarios no autenticados. */
     object principal : Screens("principal")
 
+
+
     /** Pantalla del cuestionario de evaluación inicial. */
     object questionnaire : Screens("questionnaire")
 
@@ -47,7 +49,7 @@ sealed class Screens(val route: String) {
     object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
 
     /** Pantalla principal del administrador. */
-    object adminPrincipal : Screens("adminPrincipal")
+    object adminHome : Screens("home")
 
     /** Pantalla del cuestionario. */
     object cuestionario : Screens("cuestionario")
@@ -57,5 +59,26 @@ sealed class Screens(val route: String) {
 
     /** Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles). */
     object psicologoAgenda : Screens("psicologoAgenda")
+
+    object psicologoHome : Screens("psicologoHome")
+    object pacienteHome : Screens("pacienteHome/{idPaciente}"){
+        fun createRoute(idPaciente: Long) = "pacienteHome/$idPaciente"
+    }
+
+    object listarPsicologo : Screens("listarPsicologo/{pacienteId}"){
+        fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
+    }
+
+    object calendario : Screens("calendario")
+
+
+    object perfilPsicologo : Screens("perfilPsicologo/{psicologoId}"){
+        fun createRoute(psicologoId: Long?) = "perfilPsicologo/$psicologoId"
+    }
+
+    object chatList : Screens("chatList")
+    object chat : Screens("chat/{currentUserId}/{otherUserId}"){
+        fun createRoute(currentUserId: Long, otherUserId: Long) = "chat/$currentUserId/$otherUserId"
+    }
 }
 
