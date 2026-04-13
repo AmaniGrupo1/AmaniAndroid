@@ -197,11 +197,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 val otherUserName = if (currentUserRol == "paciente") "Psicólogo" else "Paciente"
 
                 ChatScreen(
-                    currentUserId = currentUserId,
-                    otherUserId = otherUserId,
                     viewModel = viewModel,
-                    currentUserRol = currentUserRol,
-                    otherUserName = otherUserName,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

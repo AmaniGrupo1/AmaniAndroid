@@ -1,544 +1,288 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import coil.compose.AsyncImage
-import org.ies.tierno.applicationamani.domain.models.AttachmentType
-import org.ies.tierno.applicationamani.domain.models.Message
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackStatus
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.PsychologistInfo
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
-    currentUserId: Long,
-    otherUserId: Long,
-    viewModel: ChatViewModel,
-    currentUserRol: String,
-    otherUserName: String,
+    viewModel: ChatViewModel = viewModel(),
     onNavigateBack: () -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-    val amaniColors = LocalAmaniColors.current
-    val messages by viewModel.messages.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val isSending by viewModel.isSending.collectAsState()
-    val audioUiState by viewModel.audioUiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val audioUiState by viewModel.audioUiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val context = LocalContext.current
-    val error by viewModel.error.collectAsState()
-
-    var messageText by rememberSaveable { mutableStateOf("") }
-    val isRecording by viewModel.isRecording.collectAsState()
     val audioHandler = remember { AudioHandler(context) }
+    val isRecording by audioHandler.isRecording.collectAsStateWithLifecycle()
+    val recordingSeconds by audioHandler.recordingSeconds.collectAsStateWithLifecycle()
 
-    // Mostrar errores
-    LaunchedEffect(error) {
-        error?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            viewModel.clearError()
-        }
+    DisposableEffect(audioHandler) {
+        onDispose { audioHandler.release() }
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.releaseAudioPlayer()
-        }
+    val chatItems = remember(uiState.messages) {
+        buildChatItems(uiState.messages, uiState.currentUserId)
     }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.sendAttachment(it)
-        }
-    }
-
-    val documentPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.sendAttachment(it)
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
             val file = audioHandler.startRecording()
-            if (file != null) {
-                viewModel.startRecording()
-            } else {
-                Toast.makeText(context, "Error al iniciar la grabación", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            Toast.makeText(context, "Permiso de micrófono requerido", Toast.LENGTH_SHORT).show()
+            file?.let { viewModel.startRecording(it) }
         }
     }
 
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+    LaunchedEffect(chatItems.size) {
+        if (chatItems.isNotEmpty()) listState.animateScrollToItem(0)
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.clearError()
         }
     }
 
     Scaffold(
-        containerColor = amaniColors.screenBackground,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(otherUserName, style = typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(
-                            text = if (currentUserRol.lowercase().contains("paciente")) "Psicólogo" else "Paciente",
-                            style = typography.labelSmall,
-                            color = colors.onSurfaceVariant
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.surface,
-                    titleContentColor = colors.onSurface
-                )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else if (messages.isEmpty()) {
-                    Surface(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(24.dp),
-                        shape = MaterialTheme.shapes.large,
-                        color = colors.surface,
-                        tonalElevation = 2.dp
+        modifier = Modifier.imePadding(),
+        topBar = { ChatTopBar(uiState.assignedPsychologist, onNavigateBack) },
+        bottomBar = {
+            ChatInputBar(
+                text = uiState.inputText,
+                onTextChange = viewModel::onInputChanged,
+                onSend = viewModel::sendMessage,
+                onMicClick = {
+                    if (ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.RECORD_AUDIO
+                        ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        Text(
-                            text = "No hay mensajes. ¡Envía el primero!",
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp),
-                            style = typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = colors.onSurfaceVariant
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        state = listState,
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(messages) { message ->
-                            val isPlayingThisMessage =
-                                audioUiState.activeMessageId == message.id &&
-                                    audioUiState.status == AudioPlaybackStatus.PLAYING
-
-                            MessageBubble(
-                                message = message,
-                                isCurrentUser = message.senderId == currentUserId.toString(),
-                                isPlaying = isPlayingThisMessage,
-                                audioUiState = audioUiState,
-                                onPlayClick = {
-                                    message.attachmentUrl?.let { url ->
-                                        viewModel.toggleAudioPlayback(message.id, url)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            MessageInput(
-                text = messageText,
-                onTextChange = { messageText = it },
-                onSend = {
-                    if (messageText.isNotBlank()) {
-                        viewModel.sendTextMessage(messageText)
-                        messageText = ""
-                    }
-                },
-                onAttachImage = { imagePickerLauncher.launch("image/*") },
-                onAttachFile = { documentPickerLauncher.launch("*/*") },
-                onRecordVoice = {
-                    if (isRecording) {
-                        // Detener y obtener el archivo antes de subir
-                        val file = audioHandler.stopRecording()
-                        if (file != null) {
-                            viewModel.stopRecordingAndSend(file)
-                        } else {
-                            Toast.makeText(context, "Error al detener la grabación", Toast.LENGTH_SHORT).show()
-                        }
+                        val file = audioHandler.startRecording()
+                        file?.let { viewModel.startRecording(it) }
                     } else {
-                        if (ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.RECORD_AUDIO
-                            ) == PackageManager.PERMISSION_GRANTED
-                        ) {
-                            val file = audioHandler.startRecording()
-                            if (file != null) {
-                                viewModel.startRecording()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Error al iniciar la grabación",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        } else {
-                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                        }
+                        audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }
+                },
+                onStopRecording = {
+                    val file = audioHandler.stopRecording()
+                    if (file != null && file.length() > 0) {
+                        viewModel.stopRecordingAndSend(file)
+                    } else {
+                        viewModel.cancelRecording()
                     }
                 },
                 isRecording = isRecording,
-                isSending = isSending
+                recordingSeconds = recordingSeconds
             )
-        }
-    }
-}
-
-@Composable
-private fun MessageBubble(
-    message: Message,
-    isCurrentUser: Boolean,
-    isPlaying: Boolean,
-    audioUiState: AudioPlaybackUiState,
-    onPlayClick: () -> Unit
-) {
-    val bubbleColor = if (isCurrentUser) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-
-    val textColor = if (isCurrentUser) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.onSurface
-    }
-
-    val attachmentContainerColor = if (isCurrentUser) {
-        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.14f)
-    } else {
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
-    }
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
-    ) {
-        Card(
-            modifier = Modifier.widthIn(max = 300.dp),
-            shape = RoundedCornerShape(
-                topStart = 18.dp,
-                topEnd = 18.dp,
-                bottomStart = if (isCurrentUser) 18.dp else 4.dp,
-                bottomEnd = if (isCurrentUser) 4.dp else 18.dp
-            ),
-            colors = CardDefaults.cardColors(containerColor = bubbleColor),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
-                if (message.content.isNotBlank()) {
-                    Text(
-                        text = message.content,
-                        color = textColor,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                message.attachmentUrl?.let { url ->
-                    val context = LocalContext.current
-                    Spacer(modifier = Modifier.height(8.dp))
-                    when (message.attachmentType) {
-                        AttachmentType.IMAGE -> {
-                            AsyncImage(
-                                model = url,
-                                contentDescription = "Imagen adjunta",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .clickable {
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                                        context.startActivity(intent)
-                                    }
-                            )
-                        }
-                        AttachmentType.AUDIO -> {
-                            val isActiveAudio = audioUiState.activeMessageId == message.id
-                            val progress = if (
-                                isActiveAudio && audioUiState.durationMs > 0
-                            ) {
-                                audioUiState.positionMs.toFloat() / audioUiState.durationMs.toFloat()
-                            } else {
-                                0f
-                            }
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(attachmentContainerColor)
-                                    .clickable { onPlayClick() }
-                                    .padding(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                    contentDescription = if (isPlaying) "Pausar" else "Reproducir",
-                                    tint = textColor,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = when {
-                                            isPlaying -> "Reproduciendo..."
-                                            isActiveAudio && audioUiState.status == AudioPlaybackStatus.LOADING -> "Cargando audio..."
-                                            isActiveAudio && audioUiState.status == AudioPlaybackStatus.ERROR -> "Error al reproducir"
-                                            else -> "Nota de voz"
-                                        },
-                                        color = textColor,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    LinearProgressIndicator(
-                                        progress = { progress.coerceIn(0f, 1f) },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(4.dp)
-                                            .clip(RoundedCornerShape(2.dp)),
-                                        color = textColor,
-                                        trackColor = textColor.copy(alpha = 0.3f)
-                                    )
-                                }
-                            }
-                        }
-                        AttachmentType.DOCUMENT -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(attachmentContainerColor)
-                                    .clickable {
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                                        context.startActivity(intent)
-                                    }
-                                    .padding(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AttachFile,
-                                    contentDescription = "Documento adjunto",
-                                    tint = textColor,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = message.attachmentName ?: "Documento",
-                                    color = textColor,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-                        null -> {}
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = formatTime(message.timestamp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = textColor.copy(alpha = 0.72f)
-                    )
+                chatItems.isEmpty() -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ChatBubbleOutline,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "Aún no hay mensajes",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        state = listState,
+                        reverseLayout = true,
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+                    ) {
+                        items(
+                            items = chatItems,
+                            key = { item ->
+                                when (item) {
+                                    is ChatListItem.MessageItem -> item.msg.id
+                                    is ChatListItem.DateSeparator -> "sep_${item.label}"
+                                }
+                            }
+                        ) { item ->
+                            when (item) {
+                                is ChatListItem.DateSeparator -> DateSeparatorChip(item.label)
+                                is ChatListItem.MessageItem -> MessageBubble(
+                                    message = item.msg,
+                                    isFirstInGroup = item.isFirstInGroup,
+                                    isLastInGroup = item.isLastInGroup,
+                                    currentUserId = uiState.currentUserId,
+                                    psychologistInfo = uiState.assignedPsychologist,
+                                    audioUiState = audioUiState,
+                                    onPlayPause = { messageId, url ->
+                                        viewModel.toggleAudioPlayback(messageId, url)
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChatTopBar(
+    psychologistInfo: PsychologistInfo?,
+    onNavigateBack: () -> Unit
+) {
+    val amaniColors = LocalAmaniColors.current
+
+    CenterAlignedTopAppBar(
+        title = {
+            psychologistInfo?.let { psychologist ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.clickable { }
+                ) {
+                    PsychologistAvatar(psychologistInfo = psychologist, size = 28.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = psychologist.name,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (psychologist.isOnline) amaniColors.citaLibre
+                                else MaterialTheme.colorScheme.outline
+                            )
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (psychologist.isOnline) "En línea" else "Desconectado",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } ?: Text(
+                text = "Psicólogo",
+                style = MaterialTheme.typography.titleSmall
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Volver"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface
+        )
+    )
 }
 
 @Composable
-private fun MessageInput(
-    text: String,
-    onTextChange: (String) -> Unit,
-    onSend: () -> Unit,
-    onAttachImage: () -> Unit,
-    onAttachFile: () -> Unit,
-    onRecordVoice: () -> Unit,
-    isRecording: Boolean,
-    isSending: Boolean
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 8.dp
+private fun DateSeparatorChip(label: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onAttachImage) {
-                Icon(
-                    imageVector = Icons.Default.Image,
-                    contentDescription = "Adjuntar imagen",
-                    tint = MaterialTheme.colorScheme.primary
+        SuggestionChip(
+            onClick = { },
+            shape = MaterialTheme.shapes.small,
+            label = {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
-
-            IconButton(onClick = onAttachFile) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Adjuntar archivo",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            OutlinedTextField(
-                value = text,
-                onValueChange = onTextChange,
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Escribe un mensaje...") },
-                shape = RoundedCornerShape(24.dp),
-                maxLines = 4,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            AnimatedVisibility(
-                visible = isRecording,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                IconButton(
-                    onClick = onRecordVoice,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colorScheme.errorContainer)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Stop,
-                        contentDescription = "Detener grabación",
-                        tint = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                }
-            }
-
-            AnimatedVisibility(
-                visible = !isRecording && !isSending,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                IconButton(
-                    onClick = onRecordVoice,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Mic,
-                        contentDescription = "Grabar nota de voz",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            }
-
-            if (isSending) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-
-            IconButton(
-                onClick = onSend,
-                enabled = text.isNotBlank() && !isSending
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Enviar",
-                    tint = if (text.isNotBlank() && !isSending)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
+        )
     }
-}
-
-private fun formatTime(timestamp: Long): String {
-    if (timestamp == 0L) return ""
-    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-    return sdf.format(Date(timestamp))
 }

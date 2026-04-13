@@ -43,33 +43,26 @@ class FileStorageService(
 
             val fileRef = storageRef.child(path)
 
-            if (attachmentType == AttachmentType.IMAGE) {
+            val uploadTask: UploadTask = if (attachmentType == AttachmentType.IMAGE) {
                 val compressedUri = compressImage(uri)
                 val inputStream = context.contentResolver.openInputStream(compressedUri)
                     ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
                 
-                val uploadTask: UploadTask = fileRef.putStream(inputStream)
-                val taskSnapshot = uploadTask.await()
-                
-                if (taskSnapshot.task.isSuccessful) {
-                    val downloadUrl = fileRef.downloadUrl.await().toString()
-                    UploadResult.Success(downloadUrl, attachmentType, fileName)
-                } else {
-                    UploadResult.Error("Error al subir archivo")
-                }
+                fileRef.putStream(inputStream)
             } else {
                 val inputStream = context.contentResolver.openInputStream(uri)
                     ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
                 
-                val uploadTask: UploadTask = fileRef.putStream(inputStream)
-                val taskSnapshot = uploadTask.await()
+                fileRef.putStream(inputStream)
+            }
+            
+            val taskSnapshot = uploadTask.await()
                 
-                if (taskSnapshot.task.isSuccessful) {
-                    val downloadUrl = fileRef.downloadUrl.await().toString()
-                    UploadResult.Success(downloadUrl, attachmentType, fileName)
-                } else {
-                    UploadResult.Error("Error al subir archivo")
-                }
+            if (taskSnapshot.task.isSuccessful) {
+                val downloadUrl = fileRef.downloadUrl.await().toString()
+                UploadResult.Success(downloadUrl, attachmentType, fileName)
+            } else {
+                UploadResult.Error("Error al subir archivo")
             }
         } catch (e: Exception) {
             UploadResult.Error(e.message ?: "Error desconocido")
@@ -82,11 +75,18 @@ class FileStorageService(
                 return@withContext UploadResult.Error("La nota de voz está vacía o no se encontró")
             }
 
-            val fileName = "voice_${UUID.randomUUID()}.m4a"
+            val extension = audioFile.extension
+            val fileName = "voice_${UUID.randomUUID()}.$extension"
             val path = "amani-chat/attachments/$conversationId/$fileName"
             val fileRef = storageRef.child(path)
+            val contentType = when (extension) {
+                "ogg" -> "audio/ogg"
+                "m4a" -> "audio/mp4"
+                "mp3" -> "audio/mpeg"
+                else -> "audio/mp4"
+            }
             val metadata = storageMetadata {
-                contentType = "audio/mp4"
+                this.contentType = contentType
             }
 
             val taskSnapshot = audioFile.inputStream().use { inputStream ->

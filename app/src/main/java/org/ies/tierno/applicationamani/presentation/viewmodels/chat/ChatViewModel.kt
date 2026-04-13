@@ -5,7 +5,10 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.Job
@@ -13,6 +16,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.remoto.FileStorageService
@@ -20,6 +26,7 @@ import org.ies.tierno.applicationamani.domain.models.Message
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
 import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
+import java.io.File
 
 enum class AudioPlaybackStatus {
     IDLE,
@@ -37,6 +44,22 @@ data class AudioPlaybackUiState(
     val errorMessage: String? = null
 )
 
+data class PsychologistInfo(
+    val id: String,
+    val name: String,
+    val avatarUrl: String?,
+    val isOnline: Boolean
+)
+
+data class ChatUiState(
+    val messages: List<Message> = emptyList(),
+    val assignedPsychologist: PsychologistInfo? = null,
+    val currentUserId: String = "",
+    val inputText: String = "",
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
+
 class ChatViewModel(
     private val currentUserId: Long,
     private val otherUserId: Long,
@@ -48,23 +71,38 @@ class ChatViewModel(
 ) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
-    val messages: StateFlow<List<Message>> = _messages.asStateFlow()
-
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    private val _isSending = MutableStateFlow(false)
-    val isSending: StateFlow<Boolean> = _isSending.asStateFlow()
-
     private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    private val _inputText = MutableStateFlow("")
+    private val _assignedPsychologist = MutableStateFlow<PsychologistInfo?>(null)
 
-    private val _audioUiState = MutableStateFlow(AudioPlaybackUiState())
-    val audioUiState: StateFlow<AudioPlaybackUiState> = _audioUiState.asStateFlow()
+    val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
+
+    val uiState: StateFlow<ChatUiState> = combine(
+        _messages,
+        _assignedPsychologist,
+        _isLoading,
+        _error,
+        _inputText
+    ) { messages, psychologist, loading, error, input ->
+        ChatUiState(
+            messages = messages,
+            assignedPsychologist = psychologist,
+            currentUserId = currentUserId.toString(),
+            inputText = input,
+            isLoading = loading,
+            error = error
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ChatUiState(currentUserId = currentUserId.toString())
+    )
 
     private val appContext = appContext.applicationContext
     private var exoPlayer: ExoPlayer? = null
     private var progressJob: Job? = null
+    private val _audioUiState = MutableStateFlow(AudioPlaybackUiState())
 
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -114,7 +152,8 @@ class ChatViewModel(
             }
         }
 
-        override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+        override fun onPlayerError(error: PlaybackException) {
+            Log.e("VoiceNote", "Error de reproducción: ${error.message}", error)
             stopProgressUpdates()
             _audioUiState.value = _audioUiState.value.copy(
                 status = AudioPlaybackStatus.ERROR,
@@ -132,7 +171,12 @@ class ChatViewModel(
 
     private fun initPlayer() {
         if (exoPlayer != null) return
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+            .setUsage(C.USAGE_MEDIA)
+            .build()
         exoPlayer = ExoPlayer.Builder(appContext).build().apply {
+            setAudioAttributes(audioAttributes, true)
             addListener(playerListener)
         }
     }
@@ -148,12 +192,6 @@ class ChatViewModel(
         }
     }
 
-    private fun markMessagesAsRead() {
-        viewModelScope.launch {
-            markMessagesAsReadUseCase(currentUserId, otherUserId)
-        }
-    }
-
     fun toggleAudioPlayback(messageId: String, remoteUrl: String) {
         if (!remoteUrl.startsWith("http")) {
             _audioUiState.value = AudioPlaybackUiState(
@@ -165,7 +203,15 @@ class ChatViewModel(
         }
 
         initPlayer()
-        val player = exoPlayer ?: return
+        val player = exoPlayer ?: run {
+            Log.e("VoiceNote", "ExoPlayer no se pudo inicializar")
+            _audioUiState.value = AudioPlaybackUiState(
+                status = AudioPlaybackStatus.ERROR,
+                activeMessageId = messageId,
+                errorMessage = "Error al inicializar el reproductor"
+            )
+            return
+        }
         val current = _audioUiState.value
 
         if (current.activeMessageId == messageId) {
@@ -183,9 +229,27 @@ class ChatViewModel(
             activeMessageId = messageId
         )
 
-        player.setMediaItem(MediaItem.fromUri(remoteUrl))
-        player.prepare()
+        val mimeType = when {
+            remoteUrl.contains(".ogg", ignoreCase = true) -> "audio/ogg"
+            remoteUrl.contains(".m4a", ignoreCase = true) -> "audio/mp4"
+            remoteUrl.contains(".mp3", ignoreCase = true) -> "audio/mpeg"
+            remoteUrl.contains(".wav", ignoreCase = true) -> "audio/wav"
+            else -> null
+        }
+
+        val mediaItem = if (mimeType != null) {
+            MediaItem.Builder()
+                .setUri(remoteUrl)
+                .setMimeType(mimeType)
+                .build()
+        } else {
+            MediaItem.fromUri(remoteUrl)
+        }
+
+        Log.d("VoiceNote", "Reproduciendo: $remoteUrl (mime=$mimeType)")
+        player.setMediaItem(mediaItem)
         player.playWhenReady = true
+        player.prepare()
     }
 
     fun stopAudioPlayback() {
@@ -228,23 +292,19 @@ class ChatViewModel(
         if (content.isBlank()) return
 
         viewModelScope.launch {
-            _isSending.value = true
             _error.value = null
 
             sendMessageUseCase(currentUserId, otherUserId, content)
                 .onSuccess {
-                    _isSending.value = false
                 }
                 .onFailure { e ->
                     _error.value = e.message
-                    _isSending.value = false
                 }
         }
     }
 
     fun sendAttachment(uri: Uri) {
         viewModelScope.launch {
-            _isSending.value = true
             _error.value = null
 
             val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
@@ -258,36 +318,40 @@ class ChatViewModel(
                         attachmentType = result.type,
                         attachmentName = result.fileName
                     ).onSuccess {
-                        _isSending.value = false
                     }.onFailure { e ->
                         _error.value = e.message
-                        _isSending.value = false
                     }
                 }
                 is FileStorageService.UploadResult.Error -> {
                     _error.value = result.message
-                    _isSending.value = false
                 }
             }
         }
     }
 
     private val _isRecording = MutableStateFlow(false)
-    val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
+    val isRecording: StateFlow<Boolean> get() = _isRecording.asStateFlow()
 
-    fun startRecording() {
+    fun startRecording(file: File) {
+        Log.d("VoiceNote", "Iniciando grabación: ${file.absolutePath}")
         _isRecording.value = true
+        _recordingFile.value = file
     }
 
-    fun stopRecordingAndSend(file: java.io.File) {
+    private val _recordingFile = MutableStateFlow<File?>(null)
+    val recordingFile: StateFlow<File?> get() = _recordingFile.asStateFlow()
+
+    fun stopRecordingAndSend(file: File) {
+        Log.d("VoiceNote", "Deteniendo grabación: ${file.absolutePath}, tamaño: ${file.length()} bytes")
         _isRecording.value = false
-        Log.d("VoiceNote", "Archivo: ${file.absolutePath}, Tamaño: ${file.length()} bytes")
+        _recordingFile.value = null
+
         if (file.length() <= 0L) {
             _error.value = "La nota de voz está vacía"
             return
         }
+
         viewModelScope.launch {
-            _isSending.value = true
             _error.value = null
 
             val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
@@ -300,23 +364,40 @@ class ChatViewModel(
                         attachmentUrl = result.url,
                         attachmentType = result.type,
                         attachmentName = result.fileName
-                    ).onSuccess {
-                        _isSending.value = false
-                    }.onFailure { e ->
-                        _error.value = e.message
-                        _isSending.value = false
-                    }
+                    )
                 }
                 is FileStorageService.UploadResult.Error -> {
                     _error.value = result.message
-                    _isSending.value = false
                 }
             }
         }
     }
 
+    fun onInputChanged(text: String) {
+        _inputText.value = text
+    }
+
+    fun sendMessage() {
+        val text = _inputText.value
+        if (text.isBlank()) return
+        sendTextMessage(text)
+        _inputText.value = ""
+    }
+
+    fun markMessagesAsRead() {
+        viewModelScope.launch {
+            markMessagesAsReadUseCase(currentUserId, otherUserId)
+        }
+    }
+
     fun clearError() {
         _error.value = null
+    }
+
+    fun cancelRecording() {
+        _isRecording.value = false
+        _recordingFile.value?.delete()
+        _recordingFile.value = null
     }
 
     override fun onCleared() {
