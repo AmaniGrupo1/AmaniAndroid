@@ -57,6 +57,23 @@ class PsicologoAgendaViewModel(
     private val _duracionCita = MutableStateFlow(60)
     val duracionCita: StateFlow<Int> = _duracionCita.asStateFlow()
 
+    private val _horarioActual = MutableStateFlow<HorarioRequestDTO?>(null)
+    val horarioActual = _horarioActual.asStateFlow()
+
+    fun cargarHorarioActual() {
+        val id = _userSession.value?.idPsicologo ?: return
+
+        viewModelScope.launch {
+            citasRepository.getHorarioActual(id)
+                .onSuccess {
+                    _horarioActual.value = it // ✔️ es HorarioRequestDTO completo
+                }
+                .onFailure {
+                    _errorMessage.value = "Error cargando horario"
+                }
+        }
+    }
+
     init {
         viewModelScope.launch {
             userSessionDataStore.sessionFlow.collect { session ->
@@ -110,10 +127,12 @@ class PsicologoAgendaViewModel(
             _errorMessage.value = "No hay franjas configuradas"
             return
         }
+
         val session = _userSession.value ?: run {
             _errorMessage.value = "No hay sesión de psicólogo"
             return
         }
+
         val psychologistId = session.idPsicologo ?: run {
             _errorMessage.value = "idPsicologo nulo"
             return
@@ -121,15 +140,27 @@ class PsicologoAgendaViewModel(
 
         viewModelScope.launch {
             _isLoading.value = true
-            val request = HorarioRequestDTO(franjas = franjas)
-            citasRepository.actualizarHorario(psychologistId, request)
+
+            citasRepository.actualizarHorario(psychologistId, HorarioRequestDTO(franjas))
                 .onSuccess {
+                    // 🔥 1. refrescar agenda
                     cargarAgendaMensual(_mesVisible.value)
+
+                    // 🔥 2. limpiar disponibilidad vieja
+                    _disponibilidadDia.value = null
+
+                    // 🔥 3. recargar si hay fecha seleccionada
+                    val fechaActual = _disponibilidadDia.value?.fecha
+                    if (fechaActual != null) {
+                        cargarDisponibilidadDia(fechaActual)
+                    }
+
                     _successMessage.value = "Horario actualizado correctamente"
                 }
-                .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al actualizar el horario"
+                .onFailure {
+                    _errorMessage.value = it.message ?: "Error al actualizar el horario"
                 }
+
             _isLoading.value = false
         }
     }
@@ -189,12 +220,26 @@ class PsicologoAgendaViewModel(
 
     fun cargarDisponibilidadDia(fecha: LocalDate, durationMinutes: Int = _duracionCita.value) {
         val psychologistId = _userSession.value?.idPsicologo ?: return
+
         viewModelScope.launch {
-            citasRepository.getDisponibilidadDia(psychologistId, fecha.toString(), durationMinutes)
-                .onSuccess { _disponibilidadDia.value = it }
-                .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al cargar disponibilidad"
+            _isLoading.value = true
+
+            // 🔥 IMPORTANTE: limpiar antes de recargar
+            _disponibilidadDia.value = null
+
+            citasRepository.getDisponibilidadDia(
+                psychologistId,
+                fecha.toString(),
+                durationMinutes
+            )
+                .onSuccess {
+                    _disponibilidadDia.value = it
                 }
+                .onFailure {
+                    _errorMessage.value = it.message ?: "Error al cargar disponibilidad"
+                }
+
+            _isLoading.value = false
         }
     }
 
@@ -271,12 +316,16 @@ class PsicologoAgendaViewModel(
                 duracionMinutos = duracionMinutos,
                 motivo = motivo,
                 idTipoTerapia = idTipoTerapia
-            ).onSuccess { nuevaCita ->
-                cargarAgendaMensual(_mesVisible.value)
-                _successMessage.value = "Cita creada correctamente"
-            }.onFailure { e ->
-                _errorMessage.value = e.message ?: "Error al crear la cita"
-            }
+            )
+                .onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                    cargarDisponibilidadDia(fecha) // 🔥 CLAVE
+                    _successMessage.value = "Cita creada correctamente"
+                }
+                .onFailure {
+                    _errorMessage.value = it.message ?: "Error al crear la cita"
+                }
+
             _isLoading.value = false
         }
     }
@@ -317,17 +366,20 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    fun cancelarCita(idCita: Long) {
+    fun cancelarCita(idCita: Long, fecha: LocalDate) {
         viewModelScope.launch {
             _isLoading.value = true
+
             citasRepository.cancelarCita(idCita)
                 .onSuccess {
                     cargarAgendaMensual(_mesVisible.value)
+                    cargarDisponibilidadDia(fecha) // 🔥 CLAVE
                     _successMessage.value = "Cita cancelada correctamente"
                 }
-                .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al cancelar la cita"
+                .onFailure {
+                    _errorMessage.value = it.message ?: "Error al cancelar la cita"
                 }
+
             _isLoading.value = false
         }
     }

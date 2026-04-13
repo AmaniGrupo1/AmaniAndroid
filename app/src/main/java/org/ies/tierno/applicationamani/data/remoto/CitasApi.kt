@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.data.remoto
 
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
@@ -98,4 +99,10 @@ interface CitasApi {
 
     @GET("/api/citas/psicologo/terapias")
     suspend fun getTerapias(): List<TerapiaResponseDTO>
+
+    @GET("/api/citas/psicologo/{idPsicologo}/horario-actual")
+    suspend fun getHorarioActual(
+        @Path("idPsicologo") idPsicologo: Long
+    ): HorarioRequestDTO
+
 }

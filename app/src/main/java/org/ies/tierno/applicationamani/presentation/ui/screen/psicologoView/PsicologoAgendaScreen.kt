@@ -34,9 +34,11 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfi
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
@@ -64,7 +66,7 @@ fun PsicologoAgendaScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
-
+    val horarioActual by viewModel.horarioActual.collectAsStateWithLifecycle()
 
     val terapias by listarTerapiasViewModel.terapias.collectAsStateWithLifecycle()
 
@@ -94,6 +96,13 @@ fun PsicologoAgendaScreen(
     val esDiaNoDisponible = fechaSeleccionada in diasNoDisponibles
 
     val userSession by viewModel.userSession.collectAsStateWithLifecycle()
+
+    // Cargar horario cuando se abre el diálogo
+    LaunchedEffect(mostrarDialogoHorario) {
+        if (mostrarDialogoHorario) {
+            viewModel.cargarHorarioActual()
+        }
+    }
 
     LaunchedEffect(mesVisible, userSession) {
         if (userSession?.idPsicologo != null) {
@@ -128,7 +137,7 @@ fun PsicologoAgendaScreen(
                 onClick = {
                     citaParaEditar = null
                     mostrarDialogoCrearEditar = true
-                    fechaSeleccionada?.let { viewModel.cargarDisponibilidadDia(it,60 ) }
+                    fechaSeleccionada?.let { viewModel.cargarDisponibilidadDia(it, 60) }
                 },
                 containerColor = colors.primary,
                 contentColor = colors.onPrimary
@@ -264,7 +273,7 @@ fun PsicologoAgendaScreen(
                                                 onEdit = {
                                                     citaParaEditar = cita
                                                     mostrarDialogoCrearEditar = true
-                                                    viewModel.cargarDisponibilidadDia(cita.fecha,cita.duracionMinutos ?: 60)
+                                                    viewModel.cargarDisponibilidadDia(cita.fecha, cita.duracionMinutos ?: 60)
                                                 },
                                                 onCancel = { citaParaCancelar = cita }
                                             )
@@ -323,8 +332,10 @@ fun PsicologoAgendaScreen(
         }
     }
 
+    // Diálogo Modificar Horario
     if (mostrarDialogoHorario) {
         DialogoModificarHorario(
+            horarioActual = viewModel.horarioActual,
             onConfirmar = { franjas ->
                 scope.launch {
                     viewModel.actualizarHorario(franjas)
@@ -335,6 +346,7 @@ fun PsicologoAgendaScreen(
         )
     }
 
+    // Diálogo No Disponible
     if (mostrarDialogoNoDisponible && fechaSeleccionada != null) {
         val fecha = fechaSeleccionada!!
         val yaNoDisponible = fecha in diasNoDisponibles
@@ -355,13 +367,14 @@ fun PsicologoAgendaScreen(
         )
     }
 
+    // Diálogo Crear/Editar Cita
     if (mostrarDialogoCrearEditar) {
         DialogoCrearEditarCita(
             citaAEditar = citaParaEditar,
             fechaInicial = fechaSeleccionada ?: LocalDate.now(),
             pacientes = pacientesAsignados,
             pacientesError = pacientesError,
-            terapias = terapias, // ← NUEVO: Pasar las terapias
+            terapias = terapias,
             onRecargarPacientes = { viewModel.reintentarCargarPacientes() },
             slotsLibres = disponibilidadDia?.slotsLibres ?: emptyList(),
             onFechaChange = { viewModel.cargarDisponibilidadDia(it, 60) },
@@ -378,7 +391,7 @@ fun PsicologoAgendaScreen(
                     scope.launch {
                         val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
                         snackbarHostState.showSnackbar(
-                            "Cita editada: ${paciente?.nombre} ${paciente?.apellido} - ${fecha} a las $hora"
+                            "Cita editada: ${paciente?.nombre} ${paciente?.apellido} - $fecha a las $hora"
                         )
                     }
                 } else {
@@ -409,11 +422,12 @@ fun PsicologoAgendaScreen(
         )
     }
 
+    // Diálogo Confirmar Cancelación
     if (citaParaCancelar != null) {
         DialogoConfirmarCancelacion(
             cita = citaParaCancelar!!,
             onConfirmar = {
-                viewModel.cancelarCita(citaParaCancelar!!.id)
+                viewModel.cancelarCita(citaParaCancelar!!.id, citaParaCancelar!!.fecha)
                 scope.launch {
                     snackbarHostState.showSnackbar("Cita cancelada correctamente")
                 }
@@ -423,6 +437,8 @@ fun PsicologoAgendaScreen(
         )
     }
 }
+
+// ==================== COMPONENTES DEL CALENDARIO ====================
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -574,6 +590,8 @@ fun DiaCalendario(
     }
 }
 
+// ==================== TARJETA DE CITA ====================
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TarjetaCitaPsicologa(
@@ -657,6 +675,8 @@ fun TarjetaCitaPsicologa(
         }
     }
 }
+
+// ==================== BOTONES Y LEYENDAS ====================
 
 @Composable
 fun BotonAccionRapida(icono: ImageVector, texto: String, subtitulo: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -750,17 +770,37 @@ fun DiaNoDisponibleCard() {
     }
 }
 
+// ==================== DIÁLOGO MODIFICAR HORARIO ====================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogoModificarHorario(
+    horarioActual: StateFlow<HorarioRequestDTO?>,
     onConfirmar: (List<FranjaHorarioDTO>) -> Unit,
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val diasSemana = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
-    val horariosInicio = remember { mutableStateListOf(*Array(7) { 9 }) }
-    val horariosFin = remember { mutableStateListOf(*Array(7) { 17 }) }
-    val activo = remember { mutableStateListOf(*Array(7) { it < 5 }) }
+
+    val horarioGuardado by horarioActual.collectAsState()
+
+    val horariosInicio = remember(horarioGuardado) {
+        mutableStateListOf(*Array(7) { dia ->
+            horarioGuardado?.franjas?.find { it.diaSemana == dia.toShort() }?.horaInicio?.split(":")?.first()?.toInt() ?: 9
+        })
+    }
+
+    val horariosFin = remember(horarioGuardado) {
+        mutableStateListOf(*Array(7) { dia ->
+            horarioGuardado?.franjas?.find { it.diaSemana == dia.toShort() }?.horaFin?.split(":")?.first()?.toInt() ?: 17
+        })
+    }
+
+    val activo = remember(horarioGuardado) {
+        mutableStateListOf(*Array(7) { dia ->
+            horarioGuardado?.franjas?.any { it.diaSemana == dia.toShort() && it.activo == true } ?: (dia < 5)
+        })
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -773,10 +813,8 @@ fun DialogoModificarHorario(
         },
         text = {
             Column(modifier = Modifier.heightIn(max = 550.dp).verticalScroll(rememberScrollState())) {
-
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Sección de Horario Semanal
                 Text(
                     text = "📅 Horario semanal",
                     style = MaterialTheme.typography.titleMedium,
@@ -852,7 +890,7 @@ fun DialogoModificarHorario(
                             if (activo[i]) {
                                 listOf(
                                     FranjaHorarioDTO(
-                                        diaSemana = (i + 1).toShort(),
+                                        diaSemana = i.toShort(),
                                         horaInicio = "${horariosInicio[i].toString().padStart(2, '0')}:00",
                                         horaFin = "${horariosFin[i].toString().padStart(2, '0')}:00",
                                         activo = true,
@@ -879,6 +917,9 @@ fun DialogoModificarHorario(
         dismissButton = {}
     )
 }
+
+// ==================== DIÁLOGO NO DISPONIBLE ====================
+
 @Composable
 fun DialogoNoDisponible(
     fecha: LocalDate,
@@ -924,6 +965,8 @@ fun DialogoNoDisponible(
     )
 }
 
+// ==================== DIÁLOGO CREAR/EDITAR CITA ====================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -946,8 +989,6 @@ fun DialogoCrearEditarCita(
 
     var fechaSeleccionada by remember { mutableStateOf(citaAEditar?.fecha ?: fechaInicial) }
     var motivo by remember { mutableStateOf(citaAEditar?.motivo ?: "") }
-
-    // La duración ahora viene solo de la terapia seleccionada
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
     val pacienteInicial = if (esEdicion && citaAEditar != null) {
@@ -959,8 +1000,6 @@ fun DialogoCrearEditarCita(
 
     var pacienteSeleccionado by remember { mutableStateOf(pacienteInicial) }
     var pacienteDropdownExpanded by remember { mutableStateOf(false) }
-
-    // Estado para la terapia seleccionada
     var terapiaSeleccionada by remember { mutableStateOf<TerapiaResponseDTO?>(null) }
     var terapiaDropdownExpanded by remember { mutableStateOf(false) }
 
@@ -983,14 +1022,12 @@ fun DialogoCrearEditarCita(
     ) }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
-    // Actualizar duración cuando cambia la terapia seleccionada
     LaunchedEffect(terapiaSeleccionada) {
         terapiaSeleccionada?.let {
             duracionMinutos = it.duracionMinutos
         }
     }
 
-    // Actualizar horas cuando cambia la fecha
     LaunchedEffect(fechaSeleccionada, slotsLibres) {
         if (!esEdicion && (horaSeleccionada == null || horaSeleccionada !in horasDisponibles)) {
             horaSeleccionada = horasDisponibles.firstOrNull()
@@ -1280,7 +1317,7 @@ fun DialogoCrearEditarCita(
                     )
                 }
 
-                // Duración (ahora es automática y solo informativa)
+                // Duración
                 Text(
                     text = "⏱️ Duración",
                     style = MaterialTheme.typography.labelMedium,
@@ -1334,7 +1371,7 @@ fun DialogoCrearEditarCita(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                // Resumen de la cita a crear
+                // Resumen
                 if (pacienteSeleccionado != null && horaSeleccionada != null && terapiaSeleccionada != null && !esEdicion) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
@@ -1416,6 +1453,8 @@ fun DialogoCrearEditarCita(
         }
     )
 }
+
+// ==================== DIÁLOGO CONFIRMAR CANCELACIÓN ====================
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

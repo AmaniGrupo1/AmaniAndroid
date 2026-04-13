@@ -1,10 +1,9 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
@@ -139,5 +138,11 @@ class CitasRepository(
 
     suspend fun getTerapias(): Result<List<TerapiaResponseDTO>> = runCatching {
         citasApi.getTerapias()
+    }
+
+    suspend fun getHorarioActual(
+        idPsicologo: Long
+    ): Result<HorarioRequestDTO> = runCatching {
+        citasApi.getHorarioActual(idPsicologo)
     }
 }

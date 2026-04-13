@@ -2,7 +2,6 @@ package org.ies.tierno.applicationamani.presentation.ui.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -311,36 +310,9 @@ fun LoginScreenContent(
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 style = typography.bodyLarge,
-                color = if (!isLoggingIn) colors.primary else colors.onSurface.copy(alpha = 0.38f)
+                color = if (!isLoggingIn) amaniColors.buttonBorder else colors.onSurface.copy(alpha = 0.38f)
             )
         }
     }
 }
 
-/**
- * Vista previa de [LoginScreen] para el panel de diseño de Android Studio.
- */
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginScreenPreview() {
-    MaterialTheme {
-        val colors = MaterialTheme.colorScheme
-        val amaniColors = LocalAmaniColors.current
-        val typography = MaterialTheme.typography
-
-        LoginScreenContent(
-            modifier = Modifier,
-            username = "usuario@ejemplo.com",
-            onUsernameChange = {},
-            password = "password123",
-            onPasswordChange = {},
-            isLoggingIn = false,
-            isLoginEnabled = true,
-            onLogin = {},
-            onRegisterClick = {},
-            colors = colors,
-            amaniColors = amaniColors,
-            typography = typography
-        )
-    }
-}

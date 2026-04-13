@@ -34,12 +34,11 @@ import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
+import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
-import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.BarraNavegationInferiorPsicologo
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.MenuSetting
-import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.PsicologoNavItem
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -73,7 +72,7 @@ fun ViewPsicologoPrincipal(
     viewModel: ListarPacientesByPsicologoViewModel = koinViewModel(),
     profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
-    val pacientes by viewModel.paciente.collectAsState()
+    val pacientes by viewModel.pacientes.collectAsState()
     var showLoading by remember { mutableStateOf(true) }
 
     // Estado para el idPsicologo obtenido de la sesión
@@ -333,6 +332,7 @@ private fun HeaderStats(totalPacientes: Int) {
 @Composable
 fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
     var expanded by remember { mutableStateOf(false) }
+    val esMenor = esMenorDeEdad(paciente.fechaNacimiento)
 
     Card(
         modifier = Modifier
@@ -353,6 +353,7 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
             PacienteHeader(
                 paciente = paciente,
                 expanded = expanded,
+                esMenor = esMenor,
                 onExpandClick = { expanded = !expanded }
             )
 
@@ -365,7 +366,10 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
                     animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
                 ) + fadeOut()
             ) {
-                ExpandedContent(paciente = paciente)
+                ExpandedContent(
+                    paciente = paciente,
+                    esMenor = esMenor
+                )
             }
         }
     }
@@ -376,6 +380,7 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
 fun PacienteHeader(
     paciente: PacientePsicologoResponseDTO,
     expanded: Boolean,
+    esMenor: Boolean,
     onExpandClick: () -> Unit
 ) {
     val estadoPago = paciente.estadoPago ?: EstadoPago.PENDIENTE
@@ -427,12 +432,44 @@ fun PacienteHeader(
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(
-                            text = "${paciente.nombre ?: "Sin nombre"} ${paciente.apellido ?: ""}".trim(),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AmaniPsicologoColors.TextPrimary
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "${paciente.nombre ?: "Sin nombre"} ${paciente.apellido ?: ""}".trim(),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AmaniPsicologoColors.TextPrimary
+                            )
+
+                            // Indicador de menor de edad
+                            if (esMenor) {
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = AmaniPsicologoColors.Warning.copy(alpha = 0.2f)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Warning,
+                                            contentDescription = "Menor de edad",
+                                            modifier = Modifier.size(12.dp),
+                                            tint = AmaniPsicologoColors.Warning
+                                        )
+                                        Text(
+                                            text = "Menor",
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = AmaniPsicologoColors.Warning
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(4.dp))
 
@@ -586,7 +623,10 @@ fun PacienteHeader(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
+fun ExpandedContent(
+    paciente: PacientePsicologoResponseDTO,
+    esMenor: Boolean
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -617,6 +657,11 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
                     "Teléfono" to (paciente.telefono ?: "No disponible")
                 )
             )
+            val tutores = paciente.tutor ?: emptyList()
+            // Mostrar datos del tutor si el paciente es menor de edad
+            if (esMenor && tutores.isNotEmpty()) {
+                TutorInfoSection(tutores = tutores)
+            }
 
             paciente.direccion?.let { direccion ->
                 InfoSection(
@@ -733,6 +778,146 @@ fun ExpandedContent(paciente: PacientePsicologoResponseDTO) {
 }
 
 @Composable
+fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FamilyRestroom,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = AmaniPsicologoColors.Warning
+                )
+                Text(
+                    text = "👨‍👩‍👧 Datos del Tutor / Responsable",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = AmaniPsicologoColors.Warning
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            tutores.forEachIndexed { index, tutor ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    if (tutores.size > 1) {
+                        Text(
+                            text = "Tutor ${index + 1}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = AmaniPsicologoColors.Primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = AmaniPsicologoColors.TextSecondary
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = tutor.nombre,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = AmaniPsicologoColors.TextPrimary
+                            )
+                            Text(
+                                text = "DNI: ${tutor.dni}",
+                                fontSize = 11.sp,
+                                color = AmaniPsicologoColors.TextSecondary
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Phone,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = AmaniPsicologoColors.TextSecondary
+                        )
+                        Text(
+                            tutor.telefono ?: "No disponible",
+                            fontSize = 12.sp,
+                            color = AmaniPsicologoColors.TextPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Email,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = AmaniPsicologoColors.TextSecondary
+                        )
+                        Text(
+                            text = tutor.email ?: "No disponible",
+                            fontSize = 12.sp,
+                            color = AmaniPsicologoColors.TextPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Badge,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = AmaniPsicologoColors.TextSecondary
+                        )
+                        Text(
+                            text = "Tipo: ${tutor.tipo}",
+                            fontSize = 12.sp,
+                            color = AmaniPsicologoColors.TextPrimary
+                        )
+                    }
+                }
+
+                if (index != tutores.size - 1) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        thickness = 0.5.dp,
+                        color = AmaniPsicologoColors.Accent
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun InfoSection(
     title: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -811,6 +996,11 @@ private fun calcularEdadDesdeString(fechaNacimientoStr: String?): Int {
     } catch (e: Exception) {
         0
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun esMenorDeEdad(fechaNacimientoStr: String?): Boolean {
+    return calcularEdadDesdeString(fechaNacimientoStr) < 18
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

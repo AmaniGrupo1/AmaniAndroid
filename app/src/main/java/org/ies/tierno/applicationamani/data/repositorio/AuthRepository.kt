@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
@@ -241,14 +242,17 @@ class AuthRepository(
         }
     }
 
-    fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> = flow {
-        try {
+    fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> =
+        flow {
             val response = api.getPacientesByPsicologo()
-            emit(if (response.isSuccessful) response.body() ?: emptyList() else emptyList())
-        } catch (e: Exception) {
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                throw HttpException(response)
+            }
+        }.catch {
             emit(emptyList())
         }
-    }
 
 
     suspend fun darBajaPaciente(id: Long): Result<String> {
