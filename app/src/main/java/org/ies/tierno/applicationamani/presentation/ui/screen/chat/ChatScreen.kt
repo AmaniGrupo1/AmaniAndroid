@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -88,6 +89,12 @@ fun ChatScreen(
         }
     }
 
+    val fileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.sendAttachment(it) }
+    }
+
     LaunchedEffect(chatItems.size) {
         if (chatItems.isNotEmpty()) listState.animateScrollToItem(0)
     }
@@ -118,6 +125,7 @@ fun ChatScreen(
                         audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }
                 },
+                onAttachFile = { fileLauncher.launch("*/*") },
                 onStopRecording = {
                     val file = audioHandler.stopRecording()
                     if (file != null && file.length() > 0) {
@@ -174,7 +182,7 @@ fun ChatScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
                         reverseLayout = true,
-                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)
                     ) {
                         items(
                             items = chatItems,

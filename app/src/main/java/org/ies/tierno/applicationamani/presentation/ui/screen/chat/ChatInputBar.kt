@@ -56,6 +56,7 @@ fun ChatInputBar(
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onMicClick: () -> Unit,
+    onAttachFile: () -> Unit,
     onStopRecording: () -> Unit,
     isRecording: Boolean,
     recordingSeconds: Int
@@ -71,12 +72,12 @@ fun ChatInputBar(
             shadowElevation = 4.dp,
             tonalElevation = 2.dp,
             color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AnimatedContent(
@@ -87,12 +88,22 @@ fun ChatInputBar(
                     },
                     label = "mic_attach_transition"
                 ) { isBlank ->
-                    IconButton(onClick = { if (isBlank) onMicClick() }) {
-                        Icon(
-                            imageVector = if (isBlank) Icons.Default.Mic else Icons.Default.AttachFile,
-                            contentDescription = if (isBlank) "Nota de voz" else "Adjuntar",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    if (isBlank) {
+                        IconButton(onClick = onMicClick) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Nota de voz",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = onAttachFile) {
+                            Icon(
+                                imageVector = Icons.Default.AttachFile,
+                                contentDescription = "Adjuntar",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
 
@@ -197,12 +208,12 @@ private fun RecordingBar(
         shadowElevation = 4.dp,
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

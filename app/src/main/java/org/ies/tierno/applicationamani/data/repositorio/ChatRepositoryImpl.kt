@@ -2,7 +2,6 @@ package org.ies.tierno.applicationamani.data.repositorio
 
 import kotlinx.coroutines.flow.Flow
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
-import org.ies.tierno.applicationamani.domain.models.AttachmentType
 import org.ies.tierno.applicationamani.domain.models.Message
 
 class ChatRepositoryImpl(

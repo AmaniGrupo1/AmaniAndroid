@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.storageMetadata
 import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.storageMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -59,7 +59,7 @@ class FileStorageService(
             val taskSnapshot = uploadTask.await()
                 
             if (taskSnapshot.task.isSuccessful) {
-                val downloadUrl = fileRef.downloadUrl.await().toString()
+                val downloadUrl = fileRef.downloadUrl.await().toString() + "?alt=media"
                 UploadResult.Success(downloadUrl, attachmentType, fileName)
             } else {
                 UploadResult.Error("Error al subir archivo")
@@ -95,7 +95,7 @@ class FileStorageService(
             }
 
             if (taskSnapshot.task.isSuccessful) {
-                val downloadUrl = fileRef.downloadUrl.await().toString()
+                val downloadUrl = fileRef.downloadUrl.await().toString() + "?alt=media"
                 UploadResult.Success(downloadUrl, AttachmentType.AUDIO, fileName)
             } else {
                 UploadResult.Error("Error al subir nota de voz")
