@@ -86,8 +86,6 @@ import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.MenuSetting
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
@@ -211,12 +209,6 @@ fun ViewPsicologoPrincipal(
     Scaffold(
         topBar = {
             MenuSetting(navController = navController, idPsicologo = idPsicologo)
-        },
-        bottomBar = {
-            AmaniBottomBar(
-                navController = navController,
-                BottomBarConfig.Psicologo
-            )
         },
         containerColor = AmaniPsicologoColors.Background
     ) { innerPadding ->

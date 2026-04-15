@@ -83,7 +83,7 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 Principal(navController)
             }
             composable(Screens.login.route) {
-                LoginScreen(navController, userSessionDataStore,loginViewModel)
+                LoginScreen(navController, loginViewModel)
             }
 
             composable (Screens.psicologoHome.route){
@@ -139,9 +139,6 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             }
             composable(Screens.citas.route) {
                 CitasScreen(navController)
-            }
-            composable(Screens.psicologoAgenda.route) {
-                PsicologoAgendaScreen(navController)
             }
             composable(Screens.calendario.route) {
                 CalendarioView()
