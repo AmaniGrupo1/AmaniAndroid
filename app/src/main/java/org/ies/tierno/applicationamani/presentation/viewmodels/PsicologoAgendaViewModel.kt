@@ -12,11 +12,13 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.domain.events.HorarioEvents
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -290,13 +292,16 @@ class PsicologoAgendaViewModel(
     }
 
     // ✅ MÉTODO CORREGIDO: Crear cita usando el endpoint de psicólogo
+    // ✅ MÉTODO CORREGIDO: Crear cita usando el endpoint de psicólogo
     fun crearCita(
         idPaciente: Long,
         fecha: LocalDate,
         hora: LocalTime,
         duracionMinutos: Int,
         motivo: String,
-        idTipoTerapia: Long
+        idTipoTerapia: Long,
+        metodoPago: MetodoPago,
+        monto: BigDecimal
     ) {
         val psychologistId = _userSession.value?.idPsicologo ?: run {
             _errorMessage.value = "No hay sesión de psicólogo"
@@ -306,18 +311,25 @@ class PsicologoAgendaViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            citasRepository.crearCitaPsicologo(
-                idPsicologo = psychologistId,
+            val startDatetime = LocalDateTime.of(fecha, hora)
+
+            val request = CitaRequest(
                 idPaciente = idPaciente,
-                fecha = fecha,
-                hora = hora,
-                duracionMinutos = duracionMinutos,
-                motivo = motivo,
-                idTipoTerapia = idTipoTerapia
+                idPsicologo = psychologistId,
+                startDatetime = startDatetime.toString(),
+                durationMinutes = duracionMinutos,
+                metodoPago = metodoPago.name,
+                monto = monto,
+                idTipoTerapia = idTipoTerapia,
+                estadoPago = if (metodoPago == MetodoPago.ONLINE) "PAGADO" else "PENDIENTE",
+                estado = "PENDIENTE",
+                motivo = motivo
             )
+
+            citasRepository.crearCita(request)
                 .onSuccess {
                     cargarAgendaMensual(_mesVisible.value)
-                    cargarDisponibilidadDia(fecha) // 🔥 CLAVE
+                    cargarDisponibilidadDia(fecha)
                     _successMessage.value = "Cita creada correctamente"
                 }
                 .onFailure {
@@ -327,7 +339,6 @@ class PsicologoAgendaViewModel(
             _isLoading.value = false
         }
     }
-
     // Método para editar cita (usando el endpoint existente)
     fun editarCita(
         idCita: Long,
@@ -335,7 +346,10 @@ class PsicologoAgendaViewModel(
         fecha: LocalDate,
         hora: LocalTime,
         duracionMinutos: Int,
-        motivo: String
+        motivo: String,
+        idTipoTerapia: Long,
+        metodoPago: MetodoPago,
+        monto: BigDecimal
     ) {
         val psychologistId = _userSession.value?.idPsicologo ?: run {
             _errorMessage.value = "No hay sesión de psicólogo"
@@ -343,23 +357,32 @@ class PsicologoAgendaViewModel(
         }
         viewModelScope.launch {
             _isLoading.value = true
+
             val startDatetime = LocalDateTime.of(fecha, hora)
+
             val request = CitaRequest(
                 idPaciente = idPaciente,
                 idPsicologo = psychologistId,
                 startDatetime = startDatetime.toString(),
                 durationMinutes = duracionMinutos,
-                estado = "pendiente",
+                metodoPago = metodoPago.name,
+                monto = monto,
+                idTipoTerapia = idTipoTerapia,
+                estadoPago = if (metodoPago == MetodoPago.ONLINE) "PAGADO" else "PENDIENTE",
+                estado = "PENDIENTE",
                 motivo = motivo
             )
+
             citasRepository.editarCita(idCita, request)
                 .onSuccess {
                     cargarAgendaMensual(_mesVisible.value)
+                    cargarDisponibilidadDia(fecha)
                     _successMessage.value = "Cita editada correctamente"
                 }
                 .onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al editar la cita"
                 }
+
             _isLoading.value = false
         }
     }

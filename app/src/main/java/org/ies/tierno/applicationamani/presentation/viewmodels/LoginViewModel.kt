@@ -444,8 +444,6 @@ class LoginViewModel(
                     fechaNacimiento = fechaNacimiento.value,
                     genero = genero.value,
                     telefono = telefono.value,
-                    estadoPago = EstadoPago.PENDIENTE.name,
-                    metodoPago = metodoPago.value.name,
                     usuario = UsuarioRequest(
                         nombre = nombre.value,
                         apellido = apellido.value,

@@ -52,33 +52,66 @@ val retrofitModule = module {
 
         val gson = GsonBuilder()
             .serializeNulls()
-            .registerTypeAdapter(LocalDate::class.java, object : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
-                override fun serialize(src: LocalDate, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
-                    JsonPrimitive(src.toString())
-                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDate =
-                    LocalDate.parse(json.asString)
-            })
-            .registerTypeAdapter(LocalTime::class.java, object : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
-                override fun serialize(src: LocalTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
-                    JsonPrimitive(src.toString())
-                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalTime =
-                    LocalTime.parse(json.asString)
-            })
-            .registerTypeAdapter(LocalDateTime::class.java, object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-                override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
-                    JsonPrimitive(src.toString())
-                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime =
-                    LocalDateTime.parse(json.asString)
-            })
+            .registerTypeAdapter(
+                LocalDate::class.java,
+                object : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
+                    override fun serialize(
+                        src: LocalDate,
+                        typeOfSrc: Type,
+                        context: JsonSerializationContext
+                    ): JsonElement =
+                        JsonPrimitive(src.toString())
+
+                    override fun deserialize(
+                        json: JsonElement,
+                        typeOfT: Type,
+                        context: JsonDeserializationContext
+                    ): LocalDate =
+                        LocalDate.parse(json.asString)
+                })
+            .registerTypeAdapter(
+                LocalTime::class.java,
+                object : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
+                    override fun serialize(
+                        src: LocalTime,
+                        typeOfSrc: Type,
+                        context: JsonSerializationContext
+                    ): JsonElement =
+                        JsonPrimitive(src.toString())
+
+                    override fun deserialize(
+                        json: JsonElement,
+                        typeOfT: Type,
+                        context: JsonDeserializationContext
+                    ): LocalTime =
+                        LocalTime.parse(json.asString)
+                })
+            .registerTypeAdapter(
+                LocalDateTime::class.java,
+                object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+                    override fun serialize(
+                        src: LocalDateTime,
+                        typeOfSrc: Type,
+                        context: JsonSerializationContext
+                    ): JsonElement =
+                        JsonPrimitive(src.toString())
+
+                    override fun deserialize(
+                        json: JsonElement,
+                        typeOfT: Type,
+                        context: JsonDeserializationContext
+                    ): LocalDateTime =
+                        LocalDateTime.parse(json.asString)
+                })
             .create()
 
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080")
+            .baseUrl("http://10.0.2.2:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
     }
-
+//    192.168.1.175
     single<CustomerClient> { get<Retrofit>().create(CustomerClient::class.java) }
     single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
     single<CitasApi> { get<Retrofit>().create(CitasApi::class.java) }
