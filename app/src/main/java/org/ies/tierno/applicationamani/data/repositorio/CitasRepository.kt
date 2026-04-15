@@ -3,6 +3,8 @@ package org.ies.tierno.applicationamani.data.repositorio
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
@@ -12,6 +14,7 @@ import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -54,7 +57,7 @@ class CitasRepository(
     }
 
     // Método original para admin (lo mantienes)
-    suspend fun crearCita(request: CitaRequest): Result<CitaAdminResponseDTO> = runCatching {
+    suspend fun crearCita(request: CrearCitaRequestDTO): Result<CitaAdminResponseDTO> = runCatching {
         citasApi.crearCita(request)
     }
 
@@ -66,7 +69,10 @@ class CitasRepository(
         hora: LocalTime,
         duracionMinutos: Int,
         motivo: String,
-        idTipoTerapia: Long
+        idTipoTerapia: Long,
+        metodoPago: MetodoPago,
+        monto: BigDecimal,
+        estadoPago: EstadoPago
     ): Result<AgendaItemDTO> = runCatching {
 
         val request = CrearCitaRequestDTO(
@@ -76,7 +82,10 @@ class CitasRepository(
             durationMinutes = duracionMinutos,
             motivo = motivo,
             estado = EstadoCita.pendiente,  // ← EXPLÍCITAMENTE PENDIENTE
-            idTipoTerapia = idTipoTerapia
+            idTipoTerapia = idTipoTerapia,
+            metodoPago = metodoPago,
+            monto = monto,
+            estadoPago = estadoPago
         )
 
         citasApi.crearCitaPsicologo(request)

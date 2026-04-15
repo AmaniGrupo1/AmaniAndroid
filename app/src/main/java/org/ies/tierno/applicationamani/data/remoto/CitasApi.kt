@@ -43,7 +43,7 @@ interface CitasApi {
 
     @POST("/api/citas/admin")
     suspend fun crearCita(
-        @Body request: CitaRequest
+        @Body request: CrearCitaRequestDTO
     ): CitaAdminResponseDTO
 
     @PATCH("/api/citas/{id}/cancelar")
