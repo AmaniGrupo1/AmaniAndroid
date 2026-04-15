@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
@@ -31,7 +33,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +40,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +55,7 @@ import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.koin.androidx.compose.koinViewModel
 
@@ -175,134 +178,150 @@ fun LoginScreenContent(
     amaniColors: org.ies.tierno.applicationamani.ui.theme.AmaniExtraColors,
     typography: Typography
 ) {
-    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 24.dp, vertical = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Logo
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo de Amani",
-            modifier = Modifier.size(250.dp),
+            modifier = Modifier.size(180.dp),
             alpha = 1f
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Campo de usuario/email
-        OutlinedTextField(
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            value = username,
-            onValueChange = onUsernameChange,
-            label = { Text("Correo electrónico", style = typography.bodyLarge) },
-            placeholder = { Text("usuario@ejemplo.com") },
-            isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
-            supportingText = {
-                if (username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
-                    Text(
-                        text = "Introduce un correo electrónico válido",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            singleLine = true,
-            enabled = !isLoggingIn,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colors.primary,
-                unfocusedBorderColor = colors.onSurface.copy(alpha = 0.5f),
-                errorBorderColor = colors.error,
-                cursorColor = colors.primary
-            )
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // Campo de contraseña
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = password,
-            onValueChange = onPasswordChange,
-            label = { Text("Contraseña", style = typography.bodyLarge) },
-            placeholder = { Text("••••••") },
-            isError = password.isNotBlank() && password.length < 6,
-            supportingText = {
-                if (password.isNotBlank() && password.length < 6) {
-                    Text(
-                        text = "La contraseña debe tener al menos 6 caracteres",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(
-                    onClick = { isPasswordVisible = !isPasswordVisible },
-                    enabled = !isLoggingIn
-                ) {
-                    Icon(
-                        imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                    )
-                }
-            },
-            singleLine = true,
-            enabled = !isLoggingIn,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colors.primary,
-                unfocusedBorderColor = colors.onSurface.copy(alpha = 0.5f),
-                errorBorderColor = colors.error,
-                cursorColor = colors.primary
-            )
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // Botón de inicio de sesión
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(50.dp),
-            onClick = onLogin,
-            enabled = isLoginEnabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isLoginEnabled) amaniColors.textFieldContainer else colors.surfaceVariant,
-                contentColor = colors.primary,
-                disabledContainerColor = colors.surfaceVariant,
-                disabledContentColor = colors.onSurface.copy(alpha = 0.38f)
-            ),
-            border = BorderStroke(
-                width = 2.dp,
-                color = if (isLoginEnabled) amaniColors.buttonBorder else colors.onSurface.copy(alpha = 0.38f)
-            )
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(containerColor = colors.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
-            if (isLoggingIn) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = colors.primary
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Iniciar sesión",
+                    style = typography.titleLarge,
+                    color = colors.onSurface
+                )
+                Text(
+                    text = "Accede a tu espacio terapéutico",
+                    style = typography.bodyMedium,
+                    color = colors.onSurfaceVariant
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = username,
+                    onValueChange = onUsernameChange,
+                    label = { Text("Correo electrónico", style = typography.bodyMedium) },
+                    placeholder = { Text("usuario@ejemplo.com") },
+                    isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
+                    supportingText = {
+                        if (username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
+                            Text(
+                                text = "Introduce un correo electrónico válido",
+                                style = typography.bodySmall,
+                                color = colors.error
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    enabled = !isLoggingIn,
+                    shape = MaterialTheme.shapes.medium,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.outline,
+                        errorBorderColor = colors.error,
+                        cursorColor = colors.primary,
+                        focusedContainerColor = amaniColors.textFieldContainer,
+                        unfocusedContainerColor = amaniColors.textFieldContainer
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Iniciando sesión...", style = typography.labelLarge)
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = password,
+                    onValueChange = onPasswordChange,
+                    label = { Text("Contraseña", style = typography.bodyMedium) },
+                    placeholder = { Text("••••••") },
+                    isError = password.isNotBlank() && password.length < 6,
+                    supportingText = {
+                        if (password.isNotBlank() && password.length < 6) {
+                            Text(
+                                text = "La contraseña debe tener al menos 6 caracteres",
+                                style = typography.bodySmall,
+                                color = colors.error
+                            )
+                        }
+                    },
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { isPasswordVisible = !isPasswordVisible },
+                            enabled = !isLoggingIn
+                        ) {
+                            Icon(
+                                imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    enabled = !isLoggingIn,
+                    shape = MaterialTheme.shapes.medium,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.outline,
+                        errorBorderColor = colors.error,
+                        cursorColor = colors.primary,
+                        focusedContainerColor = amaniColors.textFieldContainer,
+                        unfocusedContainerColor = amaniColors.textFieldContainer
+                    )
+                )
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    onClick = onLogin,
+                    enabled = isLoginEnabled,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colors.primary,
+                        contentColor = colors.onPrimary,
+                        disabledContainerColor = colors.surfaceVariant,
+                        disabledContentColor = colors.onSurfaceVariant
+                    ),
+                    border = BorderStroke(1.dp, amaniColors.buttonBorder)
+                ) {
+                    if (isLoggingIn) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = colors.onPrimary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Iniciando sesión...", style = typography.labelLarge)
+                        }
+                    } else {
+                        Text("Iniciar sesión", style = typography.labelLarge)
+                    }
                 }
-            } else {
-                Text("Iniciar sesión", style = typography.labelLarge)
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Enlace de registro
         TextButton(
             onClick = onRegisterClick,
             enabled = !isLoggingIn
@@ -310,9 +329,36 @@ fun LoginScreenContent(
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 style = typography.bodyLarge,
-                color = if (!isLoggingIn) amaniColors.buttonBorder else colors.onSurface.copy(alpha = 0.38f)
+                color = if (!isLoggingIn) colors.primary else colors.onSurface.copy(alpha = 0.38f)
             )
         }
     }
 }
 
+/**
+ * Vista previa de [LoginScreen] para el panel de diseño de Android Studio.
+ */
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    ApplicationAmaniTheme {
+        val colors = MaterialTheme.colorScheme
+        val amaniColors = LocalAmaniColors.current
+        val typography = MaterialTheme.typography
+
+        LoginScreenContent(
+            modifier = Modifier,
+            username = "usuario@ejemplo.com",
+            onUsernameChange = {},
+            password = "password123",
+            onPasswordChange = {},
+            isLoggingIn = false,
+            isLoginEnabled = true,
+            onLogin = {},
+            onRegisterClick = {},
+            colors = colors,
+            amaniColors = amaniColors,
+            typography = typography
+        )
+    }
+}

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.google.gms.google.services)
     // alias(libs.plugins.google.gms.google.services)
 }
 
@@ -54,25 +55,29 @@ kotlin {
 }
 
 dependencies {
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.coil.compose)
 
-    implementation("io.insert-koin:koin-androidx-compose:4.1.1")
+    implementation(libs.koin.androidx.compose.v421)
     // 🚨 IMPORTANTE: eliminado Spring (NO compatible con Android)
 
     // Networking
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation(libs.retrofit.v290)
     implementation(libs.converter.gson)
 
     // WorkManager (notificaciones / tareas en segundo plano)
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation(libs.androidx.work.runtime.ktx)
 
     // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.datastore.preferences)
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation(libs.androidx.compose.navigation)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
@@ -107,7 +112,7 @@ dependencies {
     implementation(libs.firebase.firestore)
 
     // Logging
-    implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation(libs.timber)
 
     // Tests
     testImplementation(libs.junit)

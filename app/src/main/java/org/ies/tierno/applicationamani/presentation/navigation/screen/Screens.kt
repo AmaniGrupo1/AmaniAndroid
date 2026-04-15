@@ -76,6 +76,9 @@ sealed class Screens(val route: String) {
         fun createRoute(psicologoId: Long?) = "perfilPsicologo/$psicologoId"
     }
 
-
+    object chatList : Screens("chatList")
+    object chat : Screens("chat/{currentUserId}/{otherUserId}"){
+        fun createRoute(currentUserId: Long, otherUserId: Long) = "chat/$currentUserId/$otherUserId"
+    }
 }
 

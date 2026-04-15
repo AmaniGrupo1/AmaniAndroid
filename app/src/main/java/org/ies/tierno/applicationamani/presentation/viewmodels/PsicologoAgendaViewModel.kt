@@ -6,10 +6,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.data.AuthRepository
+import org.ies.tierno.applicationamani.domain.events.HorarioEvents
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
@@ -145,19 +146,16 @@ class PsicologoAgendaViewModel(
 
             citasRepository.actualizarHorario(psychologistId, HorarioRequestDTO(franjas))
                 .onSuccess {
-                    // 🔥 1. refrescar agenda
+                    // Refresca agenda y disponibilidad tras guardar el horario.
                     cargarAgendaMensual(_mesVisible.value)
-
-                    // 🔥 2. limpiar disponibilidad vieja
-                    _disponibilidadDia.value = null
-
-                    // 🔥 3. recargar si hay fecha seleccionada
                     val fechaActual = _disponibilidadDia.value?.fecha
+                    _disponibilidadDia.value = null
                     if (fechaActual != null) {
                         cargarDisponibilidadDia(fechaActual)
                     }
 
                     _successMessage.value = "Horario actualizado correctamente"
+                    viewModelScope.launch { HorarioEvents.notificar() }
                 }
                 .onFailure {
                     _errorMessage.value = it.message ?: "Error al actualizar el horario"
