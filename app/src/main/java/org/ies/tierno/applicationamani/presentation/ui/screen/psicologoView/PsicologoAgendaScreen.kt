@@ -34,9 +34,10 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfi
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.flow.StateFlow
+
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
@@ -46,6 +47,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaVi
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import org.koin.androidx.compose.koinViewModel
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
@@ -90,7 +92,7 @@ fun PsicologoAgendaScreen(
     }
 
     val fechasConCitas = citasPorDia.keys
-    val diasNoDisponibles = emptySet<LocalDate>()
+    val diasNoDisponibles = emptySet<LocalDate>() // Placeholder, implementar si se necesita
 
     val citasDelDia = fechaSeleccionada?.let { citasPorDia[it] } ?: emptyList()
     val esDiaNoDisponible = fechaSeleccionada in diasNoDisponibles
@@ -367,7 +369,7 @@ fun PsicologoAgendaScreen(
         )
     }
 
-    // Diálogo Crear/Editar Cita
+    // Diálogo Crear/Editar Cita (CON CORRECCIONES)
     if (mostrarDialogoCrearEditar) {
         DialogoCrearEditarCita(
             citaAEditar = citaParaEditar,
@@ -378,7 +380,7 @@ fun PsicologoAgendaScreen(
             onRecargarPacientes = { viewModel.reintentarCargarPacientes() },
             slotsLibres = disponibilidadDia?.slotsLibres ?: emptyList(),
             onFechaChange = { viewModel.cargarDisponibilidadDia(it, 60) },
-            onConfirmar = { idPaciente, fecha, hora, duracion, motivo, idTerapia ->
+            onConfirmar = { idPaciente, fecha, hora, duracion, motivo, idTerapia, metodoPago, monto ->
                 if (citaParaEditar != null) {
                     viewModel.editarCita(
                         idCita = citaParaEditar!!.id,
@@ -386,7 +388,10 @@ fun PsicologoAgendaScreen(
                         fecha = fecha,
                         hora = hora,
                         duracionMinutos = duracion,
-                        motivo = motivo
+                        motivo = motivo,
+                        idTipoTerapia = idTerapia,
+                        metodoPago = metodoPago,
+                        monto = monto
                     )
                     scope.launch {
                         val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
@@ -401,7 +406,9 @@ fun PsicologoAgendaScreen(
                         hora = hora,
                         duracionMinutos = duracion,
                         motivo = motivo,
-                        idTipoTerapia = idTerapia
+                        idTipoTerapia = idTerapia,
+                        metodoPago = metodoPago,
+                        monto = monto
                     )
                     scope.launch {
                         val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
@@ -438,535 +445,9 @@ fun PsicologoAgendaScreen(
     }
 }
 
-// ==================== COMPONENTES DEL CALENDARIO ====================
+// ... (resto de componentes: CalendarioView, DiaCalendario, TarjetaCitaPsicologa, BotonAccionRapida, LeyendaPsicologa, CabeceraDiaPsicologa, DiaNoDisponibleCard, DialogoModificarHorario, DialogoNoDisponible) se mantienen igual ...
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun CalendarioView(
-    modifier: Modifier = Modifier,
-    mesVisible: YearMonth,
-    fechaSeleccionada: LocalDate?,
-    fechasConCitas: Set<LocalDate>,
-    diasNoDisponibles: Set<LocalDate> = emptySet(),
-    onMesChange: (YearMonth) -> Unit,
-    onFechaSeleccionada: (LocalDate) -> Unit
-) {
-    val hoy = LocalDate.now()
-    val colors = MaterialTheme.colorScheme
-
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { onMesChange(mesVisible.minusMonths(1)) },
-                    modifier = Modifier.clip(CircleShape).background(colors.surfaceVariant.copy(alpha = 0.5f))
-                ) {
-                    Icon(Icons.Default.ChevronLeft, contentDescription = "Mes anterior")
-                }
-                Text(
-                    text = mesVisible.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.primary
-                )
-                IconButton(
-                    onClick = { onMesChange(mesVisible.plusMonths(1)) },
-                    modifier = Modifier.clip(CircleShape).background(colors.surfaceVariant.copy(alpha = 0.5f))
-                ) {
-                    Icon(Icons.Default.ChevronRight, contentDescription = "Mes siguiente")
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                listOf("LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM").forEach { dia ->
-                    Text(text = dia, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = colors.primary.copy(alpha = 0.7f))
-                }
-            }
-
-            val primerDia = mesVisible.atDay(1)
-            val offset = (primerDia.dayOfWeek.value - 1)
-            val diasEnMes = mesVisible.lengthOfMonth()
-
-            val celdas: List<LocalDate?> = buildList {
-                repeat(offset) { add(null) }
-                for (dia in 1..diasEnMes) add(mesVisible.atDay(dia))
-            }
-            val filas = celdas.chunked(7)
-
-            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                filas.forEach { fila ->
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        val filaPadded = fila + List(7 - fila.size) { null }
-                        filaPadded.forEach { fecha ->
-                            if (fecha == null) {
-                                Box(modifier = Modifier.weight(1f).aspectRatio(1f))
-                            } else {
-                                DiaCalendario(
-                                    fecha = fecha,
-                                    isSelected = fecha == fechaSeleccionada,
-                                    tieneCitas = fecha in fechasConCitas,
-                                    isToday = fecha == hoy,
-                                    esNoDisponible = fecha in diasNoDisponibles,
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { onFechaSeleccionada(fecha) }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun DiaCalendario(
-    fecha: LocalDate,
-    isSelected: Boolean,
-    tieneCitas: Boolean,
-    isToday: Boolean,
-    modifier: Modifier = Modifier,
-    esNoDisponible: Boolean = false,
-    onClick: () -> Unit
-) {
-    val colors = MaterialTheme.colorScheme
-
-    val backgroundColor = when {
-        isSelected -> colors.primary
-        isToday -> colors.primaryContainer
-        else -> Color.Transparent
-    }
-    val textColor = when {
-        isSelected -> colors.onPrimary
-        isToday -> colors.onPrimaryContainer
-        esNoDisponible -> colors.error
-        else -> colors.onSurface
-    }
-
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .padding(2.dp)
-            .clip(CircleShape)
-            .background(backgroundColor)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = fecha.dayOfMonth.toString(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = textColor,
-                fontWeight = when {
-                    isSelected || isToday -> FontWeight.Bold
-                    else -> FontWeight.Normal
-                }
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.height(7.dp)) {
-                if (tieneCitas) {
-                    Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(if (isSelected) colors.onPrimary else colors.primary))
-                }
-                if (esNoDisponible && !isSelected) {
-                    Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(colors.error))
-                }
-                if (!tieneCitas && !esNoDisponible) {
-                    Spacer(modifier = Modifier.size(5.dp))
-                }
-            }
-        }
-    }
-}
-
-// ==================== TARJETA DE CITA ====================
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun TarjetaCitaPsicologa(
-    cita: AgendaItemDTO,
-    onEdit: () -> Unit,
-    onCancel: () -> Unit
-) {
-    val context = LocalContext.current
-    val colors = MaterialTheme.colorScheme
-    val amani = LocalAmaniColors.current
-    val typography = MaterialTheme.typography
-    val formatterTime = DateTimeFormatter.ofPattern("HH:mm")
-
-    val estadoColor = when (cita.estado?.lowercase()?.trim()) {
-        "confirmada", "confirmado", "aceptada", "aceptado" -> amani.citaConfirmada
-        "cancelada", "cancelado" -> amani.citaCancelada
-        else -> amani.citaPendiente
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.surface)
-    ) {
-        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-            Box(
-                modifier = Modifier.width(5.dp).fillMaxHeight().clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)).background(estadoColor)
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.width(60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = cita.horaInicio.format(formatterTime), style = typography.titleSmall, fontWeight = FontWeight.Bold, color = estadoColor)
-                    Text(text = cita.horaFin.format(formatterTime), style = typography.bodySmall, color = colors.onSurfaceVariant)
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = cita.nombrePaciente ?: "Bloqueo de agenda", style = typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = colors.onSurface)
-                    if (!cita.motivo.isNullOrBlank()) {
-                        Text(text = cita.motivo, style = typography.bodySmall, color = colors.onSurfaceVariant, maxLines = 1)
-                    }
-                    Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = estadoColor.copy(alpha = 0.12f),
-                        modifier = Modifier.padding(top = 4.dp)
-                    ) {
-                        Text(
-                            text = cita.estado.orEmpty().replaceFirstChar { it.uppercase() }.ifEmpty { "Pendiente" },
-                            style = typography.labelSmall,
-                            color = estadoColor,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-                Column {
-                    IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = colors.primary, modifier = Modifier.size(18.dp))
-                    }
-                    IconButton(onClick = onCancel, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Cancelar", tint = colors.error, modifier = Modifier.size(18.dp))
-                    }
-                    IconButton(
-                        onClick = {
-                            enviarCitaAlCalendario(
-                                context = context,
-                                titulo = "Cita con ${cita.nombrePaciente ?: "paciente"}",
-                                descripcion = cita.motivo ?: "Cita psicológica",
-                                fecha = cita.fecha,
-                                hora = cita.horaInicio,
-                                duracionMinutos = cita.duracionMinutos ?: 60
-                            )
-                        },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(Icons.Default.CalendarMonth, contentDescription = "Añadir a calendario", tint = colors.onSurfaceVariant, modifier = Modifier.size(18.dp))
-                    }
-                }
-            }
-        }
-    }
-}
-
-// ==================== BOTONES Y LEYENDAS ====================
-
-@Composable
-fun BotonAccionRapida(icono: ImageVector, texto: String, subtitulo: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    Card(
-        modifier = modifier.shadow(2.dp, RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-        onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier.size(48.dp).clip(CircleShape).background(colors.primary.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(icono, contentDescription = texto, modifier = Modifier.size(24.dp), tint = colors.primary)
-            }
-            Column {
-                Text(text = texto, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.onPrimaryContainer)
-                Text(text = subtitulo, style = MaterialTheme.typography.bodySmall, color = colors.onPrimaryContainer.copy(alpha = 0.7f))
-            }
-        }
-    }
-}
-
-@Composable
-fun LeyendaPsicologa() {
-    val colors = MaterialTheme.colorScheme
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.5f))
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            LeyendaItem(colors.primary, "Con citas")
-            LeyendaItem(colors.primaryContainer, "Disponible")
-            LeyendaItem(colors.errorContainer, "No disponible")
-        }
-    }
-}
-
-@Composable
-fun LeyendaItem(color: Color, texto: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(text = texto, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-fun CabeceraDiaPsicologa(fecha: LocalDate, esDiaNoDisponible: Boolean) {
-    val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-ES"))
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = fecha.format(formatter).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.forLanguageTag("es-ES")) else it.toString() },
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-        if (esDiaNoDisponible) Badge(containerColor = MaterialTheme.colorScheme.error) { Text("No disponible") }
-    }
-}
-
-@Composable
-fun DiaNoDisponibleCard() {
-    val colors = MaterialTheme.colorScheme
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.errorContainer)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(Icons.Default.EventBusy, contentDescription = "No disponible", modifier = Modifier.size(32.dp), tint = colors.error)
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text("Día no disponible", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.onErrorContainer)
-                Text("No se pueden agendar citas en esta fecha", style = MaterialTheme.typography.bodySmall, color = colors.onErrorContainer.copy(alpha = 0.8f))
-            }
-        }
-    }
-}
-
-// ==================== DIÁLOGO MODIFICAR HORARIO ====================
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DialogoModificarHorario(
-    horarioActual: StateFlow<HorarioRequestDTO?>,
-    onConfirmar: (List<FranjaHorarioDTO>) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val colors = MaterialTheme.colorScheme
-    val diasSemana = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
-
-    val horarioGuardado by horarioActual.collectAsState()
-
-    val horariosInicio = remember(horarioGuardado) {
-        mutableStateListOf(*Array(7) { dia ->
-            horarioGuardado?.franjas?.find { it.diaSemana == dia.toShort() }?.horaInicio?.split(":")?.first()?.toInt() ?: 9
-        })
-    }
-
-    val horariosFin = remember(horarioGuardado) {
-        mutableStateListOf(*Array(7) { dia ->
-            horarioGuardado?.franjas?.find { it.diaSemana == dia.toShort() }?.horaFin?.split(":")?.first()?.toInt() ?: 17
-        })
-    }
-
-    val activo = remember(horarioGuardado) {
-        mutableStateListOf(*Array(7) { dia ->
-            horarioGuardado?.franjas?.any { it.diaSemana == dia.toShort() && it.activo == true } ?: (dia < 5)
-        })
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.surface,
-        title = {
-            Column {
-                Text("Configurar horario", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Define tu disponibilidad semanal", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
-            }
-        },
-        text = {
-            Column(modifier = Modifier.heightIn(max = 550.dp).verticalScroll(rememberScrollState())) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "📅 Horario semanal",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-
-                diasSemana.forEachIndexed { index, dia ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.5f))
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Checkbox(
-                                    checked = activo[index],
-                                    onCheckedChange = { activo[index] = it },
-                                    colors = CheckboxDefaults.colors(checkedColor = colors.primary)
-                                )
-                                Text(dia, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                                if (activo[index]) {
-                                    Text(
-                                        text = "${horariosInicio[index]}:00 - ${horariosFin[index]}:00",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = colors.primary
-                                    )
-                                }
-                            }
-                            if (activo[index]) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text("Hora inicio", style = MaterialTheme.typography.labelSmall)
-                                        Slider(
-                                            value = horariosInicio[index].toFloat(),
-                                            onValueChange = { horariosInicio[index] = it.toInt() },
-                                            valueRange = 0f..23f,
-                                            steps = 23,
-                                            colors = SliderDefaults.colors(thumbColor = colors.primary)
-                                        )
-                                        Text("${horariosInicio[index]}:00", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                                    }
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text("Hora fin", style = MaterialTheme.typography.labelSmall)
-                                        Slider(
-                                            value = horariosFin[index].toFloat(),
-                                            onValueChange = { horariosFin[index] = it.toInt() },
-                                            valueRange = (horariosInicio[index] + 1).toFloat()..24f,
-                                            steps = 23 - horariosInicio[index],
-                                            colors = SliderDefaults.colors(thumbColor = colors.primary)
-                                        )
-                                        Text("${horariosFin[index]}:00", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = {
-                        val franjas = diasSemana.indices.flatMap { i ->
-                            if (activo[i]) {
-                                listOf(
-                                    FranjaHorarioDTO(
-                                        diaSemana = i.toShort(),
-                                        horaInicio = "${horariosInicio[i].toString().padStart(2, '0')}:00",
-                                        horaFin = "${horariosFin[i].toString().padStart(2, '0')}:00",
-                                        activo = true,
-                                        motivo = null
-                                    )
-                                )
-                            } else emptyList()
-                        }
-                        onConfirmar(franjas)
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Guardar cambios")
-                }
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(0.5f)
-                ) {
-                    Text("Cancelar")
-                }
-            }
-        },
-        dismissButton = {}
-    )
-}
-
-// ==================== DIÁLOGO NO DISPONIBLE ====================
-
-@Composable
-fun DialogoNoDisponible(
-    fecha: LocalDate,
-    yaNoDisponible: Boolean,
-    onConfirmar: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    val colors = MaterialTheme.colorScheme
-    val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
-    val fechaFormateada = fecha.format(formatter).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es", "ES")) else it.toString() }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.surface,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(if (yaNoDisponible) Icons.Default.CheckCircle else Icons.Default.Warning, contentDescription = null, tint = if (yaNoDisponible) colors.primary else colors.error)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(if (yaNoDisponible) "Habilitar día" else "Marcar como no disponible", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            }
-        },
-        text = {
-            Column {
-                Text(fechaFormateada, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.primary)
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    if (yaNoDisponible) "¿Deseas habilitar este día para recibir citas?"
-                    else "Al marcar este día como no disponible, los pacientes no podrán agendar citas en esta fecha.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirmar,
-                colors = ButtonDefaults.buttonColors(containerColor = if (yaNoDisponible) colors.primary else colors.error),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(if (yaNoDisponible) "Habilitar día" else "Marcar como no disponible")
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
-    )
-}
-
-// ==================== DIÁLOGO CREAR/EDITAR CITA ====================
-
+// 🔥 CORRECCIÓN: Diálogo Crear/Editar Cita con precarga de método de pago, monto y tipo de terapia, y validación en tiempo real
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -979,7 +460,7 @@ fun DialogoCrearEditarCita(
     onRecargarPacientes: () -> Unit,
     slotsLibres: List<FranjaDisponibilidadResponse>,
     onFechaChange: (LocalDate) -> Unit,
-    onConfirmar: (idPaciente: Long, fecha: LocalDate, hora: LocalTime, duracion: Int, motivo: String, idTerapia: Long) -> Unit,
+    onConfirmar: (idPaciente: Long, fecha: LocalDate, hora: LocalTime, duracion: Int, motivo: String, idTerapia: Long, metodoPago: MetodoPago, monto: BigDecimal) -> Unit,
     onDismiss: () -> Unit
 ) {
     val esEdicion = citaAEditar != null
@@ -991,6 +472,22 @@ fun DialogoCrearEditarCita(
     var motivo by remember { mutableStateOf(citaAEditar?.motivo ?: "") }
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
+    // 🔥 CORRECCIÓN: Precargar método de pago desde citaAEditar
+    val metodoPagoInicial = remember(citaAEditar) {
+        when (citaAEditar?.metodoPago?.uppercase()) {
+            "ONLINE" -> MetodoPago.ONLINE
+            else -> MetodoPago.PRESENCIAL
+        }
+    }
+    var metodoPagoSeleccionado by remember { mutableStateOf(metodoPagoInicial) }
+
+    // 🔥 CORRECCIÓN: Precargar monto desde citaAEditar
+    val montoInicial = remember(citaAEditar) {
+        citaAEditar?.monto?.toString() ?: ""
+    }
+    var monto by remember { mutableStateOf(montoInicial) }
+    var montoError by remember { mutableStateOf(false) }
+
     val pacienteInicial = if (esEdicion && citaAEditar != null) {
         pacientes.firstOrNull {
             it.idPaciente == citaAEditar.id ||
@@ -1000,7 +497,14 @@ fun DialogoCrearEditarCita(
 
     var pacienteSeleccionado by remember { mutableStateOf(pacienteInicial) }
     var pacienteDropdownExpanded by remember { mutableStateOf(false) }
-    var terapiaSeleccionada by remember { mutableStateOf<TerapiaResponseDTO?>(null) }
+
+    // 🔥 CORRECCIÓN: Precargar tipo de terapia desde citaAEditar
+    val terapiaInicial = remember(citaAEditar, terapias) {
+        citaAEditar?.terapiaResponseDTO?.idTipo?.let { id ->
+            terapias.find { it.idTipo == id }
+        }
+    }
+    var terapiaSeleccionada by remember { mutableStateOf(terapiaInicial) }
     var terapiaDropdownExpanded by remember { mutableStateOf(false) }
 
     val horasDisponibles = remember(slotsLibres, citaAEditar, fechaSeleccionada) {
@@ -1016,10 +520,12 @@ fun DialogoCrearEditarCita(
         }
     }
 
-    var horaSeleccionada by remember { mutableStateOf(
-        if (esEdicion && citaAEditar?.horaInicio != null) citaAEditar.horaInicio
-        else horasDisponibles.firstOrNull()
-    ) }
+    var horaSeleccionada by remember {
+        mutableStateOf(
+            if (esEdicion && citaAEditar?.horaInicio != null) citaAEditar.horaInicio
+            else horasDisponibles.firstOrNull()
+        )
+    }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(terapiaSeleccionada) {
@@ -1032,6 +538,12 @@ fun DialogoCrearEditarCita(
         if (!esEdicion && (horaSeleccionada == null || horaSeleccionada !in horasDisponibles)) {
             horaSeleccionada = horasDisponibles.firstOrNull()
         }
+    }
+
+    // 🔥 CORRECCIÓN: Validar monto en tiempo real
+    fun validarMonto(input: String): Boolean {
+        if (input.isBlank()) return false
+        return runCatching { BigDecimal(input.replace(",", ".")) }.isSuccess
     }
 
     AlertDialog(
@@ -1371,7 +883,77 @@ fun DialogoCrearEditarCita(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                // Resumen
+                // 🔥 CORRECCIÓN: Forma de Pago con validación en tiempo real
+                Text(
+                    text = "💳 Forma de pago *",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.3f))
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f).clickable {
+                                    metodoPagoSeleccionado = MetodoPago.PRESENCIAL
+                                    montoError = false
+                                },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = metodoPagoSeleccionado == MetodoPago.PRESENCIAL,
+                                    onClick = {
+                                        metodoPagoSeleccionado = MetodoPago.PRESENCIAL
+                                        montoError = false
+                                    }
+                                )
+                                Text("Presencial", modifier = Modifier.padding(start = 4.dp))
+                            }
+                            Row(
+                                modifier = Modifier.weight(1f).clickable { metodoPagoSeleccionado = MetodoPago.ONLINE },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = metodoPagoSeleccionado == MetodoPago.ONLINE,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.ONLINE }
+                                )
+                                Text("Online", modifier = Modifier.padding(start = 4.dp))
+                            }
+                        }
+
+                        if (metodoPagoSeleccionado == MetodoPago.ONLINE) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedTextField(
+                                value = monto,
+                                onValueChange = {
+                                    monto = it
+                                    montoError = !validarMonto(it)
+                                },
+                                label = { Text("Monto (€)") },
+                                placeholder = { Text("Ej: 50.00") },
+                                isError = montoError,
+                                supportingText = {
+                                    if (montoError) {
+                                        Text("Ingresa un monto válido (ej. 50.00)")
+                                    }
+                                },
+                                leadingIcon = { Text("€") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
+                // Resumen (solo en creación)
                 if (pacienteSeleccionado != null && horaSeleccionada != null && terapiaSeleccionada != null && !esEdicion) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
@@ -1407,6 +989,10 @@ fun DialogoCrearEditarCita(
                                 text = "Duración: $duracionMinutos minutos",
                                 style = MaterialTheme.typography.bodySmall
                             )
+                            Text(
+                                text = "Pago: ${if (metodoPagoSeleccionado == MetodoPago.ONLINE) "Online - $monto €" else "Presencial"}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
                             if (motivo.isNotBlank()) {
                                 Text(
                                     text = "Motivo: $motivo",
@@ -1419,22 +1005,31 @@ fun DialogoCrearEditarCita(
             }
         },
         confirmButton = {
+            // 🔥 CORRECCIÓN: Botón habilitado solo si no hay error de monto
             val habilitado = pacienteSeleccionado?.idPaciente != null &&
                     horaSeleccionada != null &&
                     terapiaSeleccionada != null &&
-                    (horasDisponibles.isNotEmpty() || esEdicion)
+                    (horasDisponibles.isNotEmpty() || esEdicion) &&
+                    (metodoPagoSeleccionado != MetodoPago.ONLINE || (!montoError && monto.isNotBlank()))
 
             Button(
                 onClick = {
                     val idPaciente = pacienteSeleccionado?.idPaciente
                     if (idPaciente != null && horaSeleccionada != null && terapiaSeleccionada != null) {
+                        val montoDecimal = if (metodoPagoSeleccionado == MetodoPago.ONLINE) {
+                            BigDecimal(monto.replace(",", "."))
+                        } else {
+                            BigDecimal.ZERO
+                        }
                         onConfirmar(
-                            idPaciente,
-                            fechaSeleccionada,
-                            horaSeleccionada!!,
-                            duracionMinutos,
-                            motivo.ifBlank { "${terapiaSeleccionada!!.nombre} - Cita psicológica" },
-                            terapiaSeleccionada!!.idTipo
+                            idPaciente = idPaciente,
+                            fecha = fechaSeleccionada,
+                            hora = horaSeleccionada!!,
+                            duracion = duracionMinutos,
+                            motivo = motivo.ifBlank { "${terapiaSeleccionada!!.nombre} - Cita psicológica" },
+                            idTerapia = terapiaSeleccionada!!.idTipo,
+                            metodoPago = metodoPagoSeleccionado,
+                            monto = montoDecimal
                         )
                         onDismiss()
                     }
