@@ -13,9 +13,14 @@ import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.domain.events.HorarioEvents
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
+import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 
@@ -120,34 +125,49 @@ class CitasViewModel(
     }
 
     suspend fun reservarCita(
+        idPaciente: Long,
         fecha: LocalDate,
         hora: LocalTime,
-        motivo: String = "Cita psicológica",
-        duracionMinutos: Int = 60
+        duracionMinutos: Int,
+        motivo: String,
+        idTipoTerapia: Long,
+        metodoPago: MetodoPago,
+        monto: BigDecimal
     ): Result<Unit> {
 
         val session = _userSession.value
             ?: return Result.failure(Exception("No hay sesión"))
 
         val idPsicologo = _psicologoId.value ?: session.idPsicologo
-            ?: return Result.failure(Exception("No hay psicólogo asignado"))
+        ?: return Result.failure(Exception("No hay psicólogo asignado"))
 
-        val idPaciente = session.idPaciente ?: session.idUsuario
+        val startDatetime = LocalDateTime.of(fecha, hora)
 
-        val request = CitaRequest(
+        val request = CrearCitaRequestDTO(
             idPaciente = idPaciente,
             idPsicologo = idPsicologo,
-            startDatetime = "${fecha}T${hora}",
+            startDatetime = startDatetime,
             durationMinutes = duracionMinutos,
-            estado = EstadoCita.pendiente.name,
-            motivo = motivo
+            metodoPago = metodoPago,
+            estadoPago = if (metodoPago == MetodoPago.ONLINE)
+                EstadoPago.PAGADO
+            else
+                EstadoPago.PENDIENTE,
+            monto = monto,
+            motivo = motivo,
+            idTipoTerapia = idTipoTerapia,
+            estado = EstadoCita.pendiente
         )
 
         return citasRepository.crearCita(request)
             .map {
-                cargarAgendaMensual(YearMonth.from(fecha))
-                cargarDisponibilidad(fecha)
+                refrescarDatosTrasCambio(fecha)
             }
+    }
+
+    private fun refrescarDatosTrasCambio(fecha: LocalDate) {
+        cargarAgendaMensual(YearMonth.from(fecha))
+        cargarDisponibilidad(fecha)
     }
 
     fun cancelarCita(idCita: Long) {

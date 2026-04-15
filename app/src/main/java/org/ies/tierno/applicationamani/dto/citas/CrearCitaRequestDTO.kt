@@ -29,11 +29,12 @@ data class CrearCitaRequestDTO(
 
     @SerializedName("monto")
     val monto: BigDecimal,
+
     @SerializedName("motivo")
     val motivo: String,
 
     val estado : EstadoCita = EstadoCita.pendiente,
-
+    @SerializedName("id_tipo_terapia")  // ← CAMBIA A snake_case
     val idTipoTerapia : Long
 
 )

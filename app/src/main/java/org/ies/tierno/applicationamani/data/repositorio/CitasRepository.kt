@@ -61,35 +61,35 @@ class CitasRepository(
         citasApi.crearCita(request)
     }
 
-    // NUEVO MÉTODO: Crear cita desde psicólogo
-      suspend fun crearCitaPsicologo(
-        idPsicologo: Long,
-        idPaciente: Long,
-        fecha: LocalDate,
-        hora: LocalTime,
-        duracionMinutos: Int,
-        motivo: String,
-        idTipoTerapia: Long,
-        metodoPago: MetodoPago,
-        monto: BigDecimal,
-        estadoPago: EstadoPago
-    ): Result<AgendaItemDTO> = runCatching {
-
-        val request = CrearCitaRequestDTO(
-            idPaciente = idPaciente,
-            idPsicologo = idPsicologo,
-            startDatetime = LocalDateTime.of(fecha, hora),
-            durationMinutes = duracionMinutos,
-            motivo = motivo,
-            estado = EstadoCita.pendiente,  // ← EXPLÍCITAMENTE PENDIENTE
-            idTipoTerapia = idTipoTerapia,
-            metodoPago = metodoPago,
-            monto = monto,
-            estadoPago = estadoPago
-        )
-
-        citasApi.crearCitaPsicologo(request)
-    }
+//    // NUEVO MÉTODO: Crear cita desde psicólogo
+//      suspend fun crearCitaPsicologo(
+//        idPsicologo: Long,
+//        idPaciente: Long,
+//        fecha: LocalDate,
+//        hora: LocalTime,
+//        duracionMinutos: Int,
+//        motivo: String,
+//        idTipoTerapia: Long,
+//        metodoPago: MetodoPago,
+//        monto: BigDecimal,
+//        estadoPago: EstadoPago
+//    ): Result<AgendaItemDTO> = runCatching {
+//
+//        val request = CrearCitaRequestDTO(
+//            idPaciente = idPaciente,
+//            idPsicologo = idPsicologo,
+//            startDatetime = LocalDateTime.of(fecha, hora),
+//            durationMinutes = duracionMinutos,
+//            motivo = motivo,
+//            estado = EstadoCita.pendiente,  // ← EXPLÍCITAMENTE PENDIENTE
+//            idTipoTerapia = idTipoTerapia,
+//            metodoPago = metodoPago,
+//            monto = monto,
+//            estadoPago = estadoPago
+//        )
+//
+//        citasApi.crearCitaPsicologo(request)
+//    }
 
     suspend fun cancelarCita(idCita: Long): Result<AgendaItemDTO> = runCatching {
         citasApi.cancelarCita(idCita)
