@@ -104,16 +104,6 @@ fun LoginScreen(
         val result = loginResult ?: return@LaunchedEffect
 
         result.onSuccess { response ->
-            userSessionDataStore.saveSession(
-                UserSession(
-                    idUsuario = response.idUsuario,
-                    nombre = response.nombre,
-                    rol = response.rol,
-                    idPaciente = response.idPaciente,
-                    idPsicologo = response.idPsicologo
-                )
-            )
-
             val rol = response.rol
             val rolNormalizado = rol.lowercase().trim()
                 .replace("ó", "o")

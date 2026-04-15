@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -724,7 +725,8 @@ fun RegisterScreen(
 
                     ExposedDropdownMenuBox(
                         expanded = expandedSituacion,
-                        onExpandedChange = { expandedSituacion = it }
+                        onExpandedChange = { expandedSituacion = it },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedTextField(
                             value = if (situacionesIds.isEmpty())
@@ -735,7 +737,7 @@ fun RegisterScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSituacion) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                .menuAnchor(),
                             shape = textFieldShape,
                             isError = situacionesIds.isEmpty(),
                             colors = OutlinedTextFieldDefaults.colors(
