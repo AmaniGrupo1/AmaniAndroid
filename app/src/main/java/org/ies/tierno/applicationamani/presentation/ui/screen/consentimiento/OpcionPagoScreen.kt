@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 @Composable
 fun OpcionPagoScreen(

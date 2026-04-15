@@ -16,13 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
@@ -41,7 +39,7 @@ fun RegisterScreen(
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val scope = rememberCoroutineScope()
 
-    // Estados del LoginViewModel - CORREGIDO: Todos usando collectAsStateWithLifecycle correctamente
+    // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
     val apellido by loginViewModel.apellido.collectAsStateWithLifecycle()
     val dni by loginViewModel.dni.collectAsStateWithLifecycle()
@@ -53,7 +51,6 @@ fun RegisterScreen(
     val aceptaTerminos by loginViewModel.aceptaTerminos.collectAsStateWithLifecycle()
     val aceptaVideoconferencia by loginViewModel.aceptaVideoconferencia.collectAsStateWithLifecycle()
     val aceptaComunicacion by loginViewModel.aceptaComunicacion.collectAsStateWithLifecycle()
-    val metodoPago by loginViewModel.metodoPago.collectAsStateWithLifecycle()
     val esMenor by loginViewModel.esMenor.collectAsStateWithLifecycle()
     val formularioCompletoValido by loginViewModel.formularioCompletoValido.collectAsStateWithLifecycle()
 
@@ -79,21 +76,11 @@ fun RegisterScreen(
 
     // Estados para UI local
     var expandedGenero by remember { mutableStateOf(false) }
-    var expandedMetodo by remember { mutableStateOf(false) }
     var expandedSituacion by remember { mutableStateOf(false) }
     var expandedTipoTutor by remember { mutableStateOf(false) }
 
     val listaGeneros = listOf("MASCULINO", "FEMENINO", "OTRO", "PREFIERO_NO_DECIR")
-    val listaMetodosPago = listOf(MetodoPago.PRESENCIAL, MetodoPago.ONLINE)
     val listaTiposTutor = listOf("PADRE", "MADRE", "TUTOR LEGAL", "ABUELO", "OTRO")
-
-    // Función para obtener texto del método de pago
-    fun getMetodoPagoText(metodo: MetodoPago): String {
-        return when (metodo) {
-            MetodoPago.PRESENCIAL -> "💰 Pago Presencial"
-            MetodoPago.ONLINE -> "💳 Pago Online"
-        }
-    }
 
     Scaffold(
         containerColor = backgroundColor,
@@ -146,7 +133,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = nombre,
-                        onValueChange = { loginViewModel.setNombre(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setNombre(it) },
                         label = { Text("Nombre *", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -158,7 +145,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = apellido,
-                        onValueChange = { loginViewModel.setApellido(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setApellido(it) },
                         label = { Text("Apellido *", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -170,7 +157,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = dni,
-                        onValueChange = { loginViewModel.setDni(it.uppercase()) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setDni(it.uppercase()) },
                         label = { Text("DNI *", fontFamily = roboto) },
                         placeholder = { Text("12345678A", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
@@ -192,7 +179,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { loginViewModel.setEmail(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setEmail(it) },
                         label = { Text("Email *", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -204,7 +191,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = regPassword,
-                        onValueChange = { loginViewModel.setRegPassword(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setRegPassword(it) },
                         label = { Text("Contraseña *", fontFamily = roboto) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
@@ -217,7 +204,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = telefono,
-                        onValueChange = { loginViewModel.setTelefono(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setTelefono(it) },
                         label = { Text("Teléfono *", fontFamily = roboto) },
                         placeholder = { Text("123456789", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
@@ -265,7 +252,7 @@ fun RegisterScreen(
                                 DropdownMenuItem(
                                     text = { Text(opcion, fontFamily = roboto) },
                                     onClick = {
-                                        loginViewModel.setGenero(opcion) // CORREGIDO
+                                        loginViewModel.setGenero(opcion)
                                         expandedGenero = false
                                     }
                                 )
@@ -275,7 +262,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = fechaNacimiento,
-                        onValueChange = { loginViewModel.setFechaNacimiento(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setFechaNacimiento(it) },
                         label = { Text("Fecha nacimiento *", fontFamily = roboto) },
                         placeholder = { Text("1990-05-15", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
@@ -330,7 +317,7 @@ fun RegisterScreen(
 
                         OutlinedTextField(
                             value = tutorNombre,
-                            onValueChange = { loginViewModel.setTutorNombre(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setTutorNombre(it) },
                             label = { Text("Nombre completo *", fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
@@ -342,7 +329,7 @@ fun RegisterScreen(
 
                         OutlinedTextField(
                             value = tutorTelefono,
-                            onValueChange = { loginViewModel.setTutorTelefono(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setTutorTelefono(it) },
                             label = { Text("Teléfono *", fontFamily = roboto) },
                             placeholder = { Text("123456789", fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
@@ -367,7 +354,7 @@ fun RegisterScreen(
 
                         OutlinedTextField(
                             value = tutorEmail,
-                            onValueChange = { loginViewModel.setTutorEmail(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setTutorEmail(it) },
                             label = { Text("Email *", fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
@@ -391,7 +378,7 @@ fun RegisterScreen(
 
                         OutlinedTextField(
                             value = tutorDni,
-                            onValueChange = { loginViewModel.setTutorDni(it.uppercase()) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setTutorDni(it.uppercase()) },
                             label = { Text("DNI *", fontFamily = roboto) },
                             placeholder = { Text("12345678A", fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
@@ -442,7 +429,7 @@ fun RegisterScreen(
                                     DropdownMenuItem(
                                         text = { Text(tipo, fontFamily = roboto) },
                                         onClick = {
-                                            loginViewModel.setTutorTipo(tipo) // CORREGIDO
+                                            loginViewModel.setTutorTipo(tipo)
                                             expandedTipoTutor = false
                                         }
                                     )
@@ -479,7 +466,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = calle,
-                        onValueChange = { loginViewModel.setCalle(it) }, // CORREGIDO
+                        onValueChange = { loginViewModel.setCalle(it) },
                         label = { Text("Calle y número *", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -495,7 +482,7 @@ fun RegisterScreen(
                     ) {
                         OutlinedTextField(
                             value = ciudad,
-                            onValueChange = { loginViewModel.setCiudad(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setCiudad(it) },
                             label = { Text("Ciudad", fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
@@ -506,7 +493,7 @@ fun RegisterScreen(
                         )
                         OutlinedTextField(
                             value = provincia,
-                            onValueChange = { loginViewModel.setProvincia(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setProvincia(it) },
                             label = { Text("Provincia", fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
@@ -523,7 +510,7 @@ fun RegisterScreen(
                     ) {
                         OutlinedTextField(
                             value = codigoPostal,
-                            onValueChange = { loginViewModel.setCodigoPostal(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setCodigoPostal(it) },
                             label = { Text("Código Postal", fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
@@ -534,7 +521,7 @@ fun RegisterScreen(
                         )
                         OutlinedTextField(
                             value = pais,
-                            onValueChange = { loginViewModel.setPais(it) }, // CORREGIDO
+                            onValueChange = { loginViewModel.setPais(it) },
                             label = { Text("País", fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
@@ -547,64 +534,7 @@ fun RegisterScreen(
                 }
             }
 
-            // ==================== SECCIÓN 4: MÉTODO DE PAGO ====================
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Payment, contentDescription = null, tint = primaryColor)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Método de Pago",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ExposedDropdownMenuBox(
-                        expanded = expandedMetodo,
-                        onExpandedChange = { expandedMetodo = it }
-                    ) {
-                        OutlinedTextField(
-                            value = getMetodoPagoText(metodoPago),
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Seleccione método de pago *", fontFamily = roboto) },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMetodo) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(),
-                            shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
-                            )
-                        )
-                        ExposedDropdownMenu(
-                            expanded = expandedMetodo,
-                            onDismissRequest = { expandedMetodo = false }
-                        ) {
-                            listaMetodosPago.forEach { metodo ->
-                                DropdownMenuItem(
-                                    text = { Text(getMetodoPagoText(metodo), fontFamily = roboto) },
-                                    onClick = {
-                                        loginViewModel.metodoPago.value = metodo
-                                        expandedMetodo = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ==================== SECCIÓN 5: SITUACIONES ====================
+            // ==================== SECCIÓN 4: SITUACIONES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -728,7 +658,7 @@ fun RegisterScreen(
                 }
             }
 
-            // ==================== SECCIÓN 6: CONSENTIMIENTOS ====================
+            // ==================== SECCIÓN 5: CONSENTIMIENTOS ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -817,7 +747,7 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
-                    loginViewModel.registrarPaciente() // solo llamamos a la función
+                    loginViewModel.registrarPaciente()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -833,11 +763,12 @@ fun RegisterScreen(
                     fontSize = MaterialTheme.typography.titleMedium.fontSize
                 )
             }
+
             // Mostramos snackbar según el estado
             LaunchedEffect(registerSuccess, registerError) {
                 if (registerSuccess) {
                     snackbarHostState.showSnackbar("Paciente registrado correctamente", withDismissAction = true)
-                    loginViewModel.resetRegisterState() // reset para no mostrar de nuevo
+                    loginViewModel.resetRegisterState()
                 } else if (!registerError.isNullOrBlank()) {
                     snackbarHostState.showSnackbar("Error: $registerError", withDismissAction = true)
                     loginViewModel.resetRegisterState()

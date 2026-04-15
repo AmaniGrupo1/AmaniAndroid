@@ -67,7 +67,7 @@ sealed interface BottomBarConfig {
 
 private fun pacienteItems() = listOf(
     AmaniBottomBarItem(
-        route = Screens.pacienteHome.route,
+        route = Screens.principalCliente.route,
         label = "Inicio",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
@@ -81,7 +81,7 @@ private fun pacienteItems() = listOf(
         unselectedIcon = Icons.Outlined.DateRange
     ),
     AmaniBottomBarItem(
-        route = null,
+        route = Screens.chatList.route,
         label = "Chat",
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
@@ -145,7 +145,7 @@ private fun psicologoItems() = listOf(
         unselectedIcon = Icons.Outlined.People
     ),
     AmaniBottomBarItem(
-        route = null,
+        route = Screens.chatList.route,
         label = "Chat",
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
@@ -193,7 +193,7 @@ fun AmaniBottomBar(
     NavigationBar(
         modifier = modifier.navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 3.dp
+        tonalElevation = 0.dp
     ) {
         items.forEach { item ->
             val isSelected = item.route != null && currentRoute == item.route
@@ -223,12 +223,13 @@ fun AmaniBottomBar(
                     Text(
                         text = item.label,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelSmall
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor       = MaterialTheme.colorScheme.primaryContainer,
-                    selectedIconColor    = MaterialTheme.colorScheme.onPrimaryContainer,
+                    selectedIconColor    = MaterialTheme.colorScheme.primary,
                     selectedTextColor    = MaterialTheme.colorScheme.primary,
                     unselectedIconColor  = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor  = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -239,4 +240,3 @@ fun AmaniBottomBar(
         }
     }
 }
-

@@ -12,12 +12,15 @@ package org.ies.tierno.applicationamani.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 
 // ── Material 3 color schemes ──────────────────────────────────
 /**
@@ -98,6 +101,12 @@ data class AmaniExtraColors(
  */
 val LocalAmaniColors = staticCompositionLocalOf { AmaniExtraColors() }
 
+private val AmaniShapes = Shapes(
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp),
+)
+
 /**
  * Tema principal de la aplicación Amani.
  *
@@ -117,13 +126,23 @@ fun ApplicationAmaniTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val extraColors = if (darkTheme) {
+        AmaniExtraColors(
+            screenBackground = colorScheme.background,
+            textFieldContainer = colorScheme.surfaceVariant,
+            buttonBorder = colorScheme.outline
+        )
+    } else {
+        AmaniExtraColors()
+    }
 
     androidx.compose.runtime.CompositionLocalProvider(
-        LocalAmaniColors provides AmaniExtraColors()
+        LocalAmaniColors provides extraColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = AmaniShapes,
             content = content
         )
     }
