@@ -62,8 +62,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
@@ -171,6 +169,21 @@ fun CitasScreen(
         } ?: emptyList()
     }
 
+    // Función auxiliar para mostrar el elemento de leyenda
+    @Composable
+    fun LeyendaItem(color: Color, texto: String) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(color)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(text = texto, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+
     // Convertir franjas de disponibilidad al formato que espera VistaDiariaHoras
     val franjasParaVista = remember(disponibilidadDia, citasDelDia) {
         if (disponibilidadDia?.diaCompleto == true) {
@@ -195,7 +208,6 @@ fun CitasScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { AmaniBottomBar(navController, BottomBarConfig.Paciente) },
         containerColor = colors.background
     ) { innerPadding ->
         Box(
@@ -223,6 +235,8 @@ fun CitasScreen(
                     color = colors.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Leyenda
                 Row(
@@ -444,8 +458,8 @@ fun CitasScreen(
 
                 Spacer(modifier = Modifier.height(80.dp))
             }
-        }
-    }
+        } // Box
+    } // Scaffold
 
     // Diálogo para ingresar motivo de la cita (fuera del Scaffold)
     if (mostrarDialogoMotivo && franjaSeleccionadaTemp != null && fechaSeleccionada != null) {
@@ -539,16 +553,3 @@ fun CitasScreen(
     }
 }
 
-@Composable
-fun LeyendaItem(color: Color, texto: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .clip(MaterialTheme.shapes.small)
-                .background(color)
-        )
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(text = texto, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}

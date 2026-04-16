@@ -345,13 +345,14 @@ class LoginViewModel(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // Validar formulario COMPLETO (incluye tutor solo si es necesario)
+    // TEMP: situaciones deshabilitadas - issue: checkbox selection no se actualiza
     val formularioCompletoValido: StateFlow<Boolean> = combine(
         formularioValido,
         tutorValido,
-        direccionValida,
-        situacionesIds
-    ) { formValido, tutorVal, dirVal, sitIds ->
-        formValido && tutorVal && dirVal && sitIds.isNotEmpty()
+        direccionValida
+        // situacionesIds  // TEMPORALMENTE DESHABILITADO
+    ) { formValido, tutorVal, dirVal /*, sitIds*/ ->
+        formValido && tutorVal && dirVal // && sitIds.isNotEmpty()
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // ── Acciones de registro ── Antigua función eliminada - reemplazada por la nueva con validaciones
