@@ -34,6 +34,5 @@ data class CrearCitaRequestDTO(
     val motivo: String,
 
     val estado : EstadoCita = EstadoCita.pendiente,
-    @SerializedName("id_tipo_terapia")  // ← CAMBIA A snake_case
     val idTipoTerapia : Long
 )
