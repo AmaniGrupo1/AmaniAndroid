@@ -60,6 +60,11 @@ class CitasRepository(
        citasApi.crearCita(request)
     }
 
+    // ✅ MÉTODO CORRECTO PARA PSICÓLOGO
+    suspend fun crearCitaPsicologo(request: CrearCitaRequestDTO): Result<AgendaItemDTO> = runCatching {
+        citasApi.crearCitaPsicologo(request)
+    }
+
 //    // NUEVO MÉTODO: Crear cita desde psicólogo
 //      suspend fun crearCitaPsicologo(
 //        idPsicologo: Long,

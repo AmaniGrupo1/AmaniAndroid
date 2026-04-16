@@ -409,7 +409,7 @@ class PsicologoAgendaViewModel(
         _isLoading.value = true
 
         return try {
-            val resultado = citasRepository.crearCita(request)
+            val resultado = citasRepository.crearCitaPsicologo(request)
 
             if (resultado.isSuccess) {
                 _successMessage.value = "Cita creada exitosamente"

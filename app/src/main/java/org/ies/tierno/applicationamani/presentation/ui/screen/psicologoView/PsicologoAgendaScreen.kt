@@ -1189,11 +1189,15 @@ fun DialogoCrearEditarCitaMejorado(
     var motivo by remember { mutableStateOf(citaAEditar?.motivo ?: "") }
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
-    val metodoPagoInicial = remember(citaAEditar) {
-        citaAEditar?.metodoPago ?: MetodoPago.PRESENCIAL
+    val metodoPagoInicial: MetodoPago = remember(citaAEditar) {
+        if (citaAEditar != null) {
+            MetodoPago.valueOf(citaAEditar.metodoPago ?: "PRESENCIAL")
+        } else {
+            MetodoPago.PRESENCIAL
+        }
     }
 
-    var metodoPagoSeleccionado by remember { mutableStateOf(metodoPagoInicial) }
+    var metodoPagoSeleccionado: MetodoPago by remember { mutableStateOf(metodoPagoInicial) }
 
     val montoInicial = remember(citaAEditar) {
         // Si es edición y tiene monto, usar ese; si no, string vacío
