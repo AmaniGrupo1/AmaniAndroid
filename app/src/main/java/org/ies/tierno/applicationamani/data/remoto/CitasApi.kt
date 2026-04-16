@@ -10,7 +10,6 @@ import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 
-import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -44,18 +43,18 @@ interface CitasApi {
     @POST("/api/citas/admin")
     suspend fun crearCita(
         @Body request: CrearCitaRequestDTO
-    ): CitaAdminResponseDTO
+    ): AgendaItemDTO
 
     @PATCH("/api/citas/{id}/cancelar")
     suspend fun cancelarCita(
         @Path("id") idCita: Long
     ): AgendaItemDTO
 
-    @PUT("/api/citas/{id}")
-    suspend fun editarCita(
-        @Path("id") idCita: Long,
-        @Body request: CitaRequest
-    ): AgendaItemDTO
+//    @PUT("/api/citas/{id}")
+//    suspend fun editarCita(
+//        @Path("id") idCita: Long,
+//        @Body request: CitaRequest
+//    ): AgendaItemDTO
 
     @GET("/api/admin/psicologos/pacientes")
     suspend fun getPsicologosConPacientes(): List<ListaPacientesAndPsicologo>

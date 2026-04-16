@@ -17,7 +17,6 @@ import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -146,7 +145,7 @@ class CitasViewModel(
         val request = CrearCitaRequestDTO(
             idPaciente = idPaciente,
             idPsicologo = idPsicologo,
-            startDatetime = startDatetime,
+            startDatetime = startDatetime.toString(),
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = if (metodoPago == MetodoPago.ONLINE)

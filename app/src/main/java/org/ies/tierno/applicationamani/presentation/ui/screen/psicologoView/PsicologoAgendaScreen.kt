@@ -431,26 +431,17 @@ fun PsicologoAgendaScreen(
             onFechaChange = { viewModel.cargarDisponibilidadDia(it, 60) },
             onConfirmar = { idPaciente, fecha, hora, duracion, motivo, idTerapia, metodoPago, monto ->
                 if (citaParaEditar != null) {
-                    viewModel.editarCita(
-                        idCita = citaParaEditar!!.id,
-                        idPaciente = idPaciente,
-                        fecha = fecha,
-                        hora = hora,
-                        duracionMinutos = duracion,
-                        motivo = motivo,
-                        idTipoTerapia = idTerapia,
-                        metodoPago = metodoPago,
-                        monto = monto
-                    )
+                    // Editar cita - COMENTADO POR AHORA
                     scope.launch {
-                        val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
-                        snackbarHostState.showSnackbar(
-                            "✏️ Cita editada: ${paciente?.nombre} ${paciente?.apellido}"
-                        )
+                        snackbarHostState.showSnackbar("✏️ Edición de citas no disponible temporalmente")
                     }
+                    mostrarDialogoCrearEditar = false
+                    citaParaEditar = null
+                    viewModel.limpiarDisponibilidad()
                 } else {
+                    // CREAR CITA NUEVA
                     scope.launch {
-                        citaViewModel.reservarCita(
+                        val resultado = viewModel.crearCitaDesdePsicologo(
                             idPaciente = idPaciente,
                             fecha = fecha,
                             hora = hora,
@@ -460,17 +451,21 @@ fun PsicologoAgendaScreen(
                             metodoPago = metodoPago,
                             monto = monto
                         )
-                    }
-                    scope.launch {
-                        val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
-                        snackbarHostState.showSnackbar(
-                            "✅ Cita creada: ${paciente?.nombre} ${paciente?.apellido} - ${fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} a las $hora"
-                        )
+
+                        if (resultado.isSuccess) {
+                            val paciente = pacientesAsignados.find { it.idPaciente == idPaciente }
+                            snackbarHostState.showSnackbar(
+                                "✅ Cita creada: ${paciente?.nombre} ${paciente?.apellido} - ${fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))} a las $hora"
+                            )
+                        } else {
+                            snackbarHostState.showSnackbar("❌ Error al crear la cita")
+                        }
+
+                        mostrarDialogoCrearEditar = false
+                        citaParaEditar = null
+                        viewModel.limpiarDisponibilidad()
                     }
                 }
-                mostrarDialogoCrearEditar = false
-                citaParaEditar = null
-                viewModel.limpiarDisponibilidad()
             },
             onDismiss = {
                 mostrarDialogoCrearEditar = false
@@ -742,8 +737,9 @@ fun TarjetaCitaMejorada(cita: AgendaItemDTO, onEdit: () -> Unit, onCancel: () ->
                     tint = colors.primary
                 )
                 Spacer(modifier = Modifier.width(8.dp))
+                // ✅ CORREGIDO: cita.terapia en lugar de cita.terapiaResponseDTO
                 Text(
-                    text = cita.terapiaResponseDTO.nombre,
+                    text = cita.terapia?.nombre ?: "Terapia no especificada",
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.primary,
                     fontWeight = FontWeight.Medium
@@ -780,7 +776,6 @@ fun TarjetaCitaMejorada(cita: AgendaItemDTO, onEdit: () -> Unit, onCancel: () ->
         }
     }
 }
-
 @Composable
 fun DiaNoDisponibleCardMejorado() {
     val colors = MaterialTheme.colorScheme
@@ -1195,17 +1190,15 @@ fun DialogoCrearEditarCitaMejorado(
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
     val metodoPagoInicial = remember(citaAEditar) {
-        when (citaAEditar?.metodoPago?.uppercase()) {
-            "ONLINE" -> MetodoPago.ONLINE
-            else -> MetodoPago.PRESENCIAL
-        }
+        citaAEditar?.metodoPago ?: MetodoPago.PRESENCIAL
     }
+
     var metodoPagoSeleccionado by remember { mutableStateOf(metodoPagoInicial) }
 
     val montoInicial = remember(citaAEditar) {
         // Si es edición y tiene monto, usar ese; si no, string vacío
-        if (citaAEditar?.monto != null && citaAEditar.monto > BigDecimal.ZERO) {
-            citaAEditar.monto.toString()
+        if (citaAEditar?.terapia?.precio != null && citaAEditar.terapia.precio > BigDecimal.ZERO) {
+            citaAEditar.terapia?.precio.toString()
         } else {
             ""
         }
@@ -1224,9 +1217,9 @@ fun DialogoCrearEditarCitaMejorado(
     var pacienteDropdownExpanded by remember { mutableStateOf(false) }
 
     val terapiaInicial = remember(citaAEditar, terapias) {
-        citaAEditar?.idTipoTerapia?.let { id ->
+        citaAEditar?.terapia?.idTipo?.let { id ->
             terapias.find { it.idTipo == id }
-        } ?: citaAEditar?.terapiaResponseDTO?.let { terapiaDTO ->
+        } ?: citaAEditar?.terapia?.let { terapiaDTO ->
             terapias.find { it.idTipo == terapiaDTO.idTipo }
         }
     }

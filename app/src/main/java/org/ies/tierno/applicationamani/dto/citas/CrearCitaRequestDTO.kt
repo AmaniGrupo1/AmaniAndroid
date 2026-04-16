@@ -16,7 +16,7 @@ data class CrearCitaRequestDTO(
     val idPsicologo: Long,
 
     @SerializedName("startDatetime")
-    val startDatetime: LocalDateTime,
+    val startDatetime: String,
 
     @SerializedName("durationMinutes")
     val durationMinutes: Int,
@@ -36,5 +36,4 @@ data class CrearCitaRequestDTO(
     val estado : EstadoCita = EstadoCita.pendiente,
     @SerializedName("id_tipo_terapia")  // ← CAMBIA A snake_case
     val idTipoTerapia : Long
-
 )

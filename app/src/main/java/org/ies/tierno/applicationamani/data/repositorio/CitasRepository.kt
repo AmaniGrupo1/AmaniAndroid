@@ -13,7 +13,6 @@ import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
-import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -57,8 +56,8 @@ class CitasRepository(
     }
 
     // Método original para admin (lo mantienes)
-    suspend fun crearCita(request: CrearCitaRequestDTO): Result<CitaAdminResponseDTO> = runCatching {
-        citasApi.crearCita(request)
+    suspend fun crearCita(request: CrearCitaRequestDTO): Result<AgendaItemDTO> = runCatching {
+       citasApi.crearCita(request)
     }
 
 //    // NUEVO MÉTODO: Crear cita desde psicólogo
@@ -95,9 +94,9 @@ class CitasRepository(
         citasApi.cancelarCita(idCita)
     }
 
-    suspend fun editarCita(idCita: Long, request: CitaRequest): Result<AgendaItemDTO> = runCatching {
-        citasApi.editarCita(idCita, request)
-    }
+//    suspend fun editarCita(idCita: Long, request: CitaRequest): Result<AgendaItemDTO> = runCatching {
+//        citasApi.editarCita(idCita, request)
+//    }
 
     suspend fun getPacientesDelPsicologo(idPsicologo: Long): Result<List<PacientesAsignadoDTO>> = runCatching {
         val todosLosPsicologos = citasApi.getPsicologosConPacientes()
