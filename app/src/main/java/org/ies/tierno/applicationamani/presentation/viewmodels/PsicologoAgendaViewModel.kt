@@ -393,7 +393,7 @@ class PsicologoAgendaViewModel(
         val request = CrearCitaRequestDTO(
             idPaciente = idPaciente,
             idPsicologo = psychologistId,
-            startDatetime = startDatetime.toString(),
+            startDatetime = startDatetime,
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = if (metodoPago == MetodoPago.ONLINE)

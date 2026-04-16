@@ -16,7 +16,7 @@ data class CrearCitaRequestDTO(
     val idPsicologo: Long,
 
     @SerializedName("startDatetime")
-    val startDatetime: String,
+    val startDatetime: LocalDateTime,
 
     @SerializedName("durationMinutes")
     val durationMinutes: Int,
