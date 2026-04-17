@@ -12,7 +12,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
@@ -49,8 +49,10 @@ import org.koin.java.KoinJavaComponent.getKoin
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NavGraph(startDestination: String = Screens.principal.route) {
-    val navController = rememberNavController()
+fun NavGraph(
+    navController: androidx.navigation.NavController,
+    startDestination: String = Screens.principal.route
+) {
     val loginViewModel: LoginViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)

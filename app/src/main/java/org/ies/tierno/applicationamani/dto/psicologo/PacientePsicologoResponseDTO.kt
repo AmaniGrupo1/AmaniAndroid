@@ -7,6 +7,7 @@ import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 
 data class PacientePsicologoResponseDTO(
     val idPaciente: Long? = null,
+    val idUsuario: Long? = null,
 
     val nombre: String? = null,
 
