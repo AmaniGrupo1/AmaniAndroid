@@ -15,7 +15,7 @@ interface ChatRepository {
         attachmentName: String? = null
     ): Result<Unit>
 
-    suspend fun markMessagesAsRead(senderId: Long, receiverId: Long): Result<Unit>
+    suspend fun markMessagesAsRead(currentUserId: Long, otherUserId: Long): Result<Unit>
 
     suspend fun getMessages(currentUserId: Long, otherUserId: Long): Result<List<Message>>
 

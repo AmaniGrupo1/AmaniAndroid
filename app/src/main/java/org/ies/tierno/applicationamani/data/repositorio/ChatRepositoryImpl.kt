@@ -30,8 +30,8 @@ class ChatRepositoryImpl(
         )
     }
 
-    override suspend fun markMessagesAsRead(senderId: Long, receiverId: Long): Result<Unit> {
-        return chatFirebaseService.markMessagesAsRead(senderId, receiverId)
+    override suspend fun markMessagesAsRead(currentUserId: Long, otherUserId: Long): Result<Unit> {
+        return chatFirebaseService.markMessagesAsRead(currentUserId, otherUserId)
     }
 
     override suspend fun getMessages(currentUserId: Long, otherUserId: Long): Result<List<Message>> {

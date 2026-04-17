@@ -115,17 +115,19 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
         }
     }
 
-    suspend fun markMessagesAsRead(senderId: Long, receiverId: Long): Result<Unit> {
+    suspend fun markMessagesAsRead(currentUserId: Long, otherUserId: Long): Result<Unit> {
         return try {
-            val roomId = generateRoomId(senderId, receiverId)
+            val roomId = generateRoomId(currentUserId, otherUserId)
             val messagesRef = chatsRef.child(roomId).child("messages")
             val snapshot = messagesRef.get().await()
 
             for (child in snapshot.children) {
-                val receiverIdValue = child.child("idReceiver").getValue(Long::class.java) ?: 0L
+                val senderIdValue = child.child("idSender").getValue(Long::class.java) ?: 0L
                 val leido = child.child("leido").getValue(Boolean::class.java) ?: false
 
-                if (receiverIdValue == senderId && !leido) {
+                // Marcar como leído los mensajes que NO fueron enviados por el usuario actual
+                // (es decir, los mensajes que el usuario recibió)
+                if (senderIdValue != currentUserId && !leido) {
                     messagesRef.child(child.key ?: "").child("leido").setValue(true).await()
                 }
             }
