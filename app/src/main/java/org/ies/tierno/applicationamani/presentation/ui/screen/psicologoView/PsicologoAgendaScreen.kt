@@ -497,6 +497,7 @@ fun PsicologoAgendaScreen(
                                 motivo = motivo,
                                 idTipoTerapia = idTerapia,
                                 metodoPago = metodoPago,
+                                estadoPago = estadoPago,
                                 monto = monto,
                                 modalidad = modalidad
                             )
@@ -678,6 +679,7 @@ fun TarjetaCitaMejorada(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Cabecera: Icono + Nombre + Estado de cita
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -694,6 +696,7 @@ fun TarjetaCitaMejorada(
                     Text(cita.nombrePaciente ?: "Paciente", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
 
+                // Estado de cita con menú
                 Box {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
@@ -757,12 +760,14 @@ fun TarjetaCitaMejorada(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Horario
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.AccessTime, contentDescription = null, modifier = Modifier.size(18.dp), tint = colors.onSurfaceVariant)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("${cita.horaInicio.format(formatterHora)} - ${cita.horaFin.format(formatterHora)}", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
             }
 
+            // Motivo
             if (!cita.motivo.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
@@ -772,6 +777,7 @@ fun TarjetaCitaMejorada(
                 }
             }
 
+            // Tipo de terapia
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.MedicalServices, contentDescription = null, modifier = Modifier.size(18.dp), tint = colors.primary)
@@ -779,10 +785,52 @@ fun TarjetaCitaMejorada(
                 Text(cita.terapia?.nombre ?: "Terapia no especificada", style = MaterialTheme.typography.bodyMedium, color = colors.primary, fontWeight = FontWeight.Medium)
             }
 
+            // ==================== ESTADO DE PAGO ====================
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    when (cita.estadoPago) {
+                        EstadoPago.PAGADO -> Icons.Default.CheckCircle
+                        EstadoPago.PENDIENTE -> Icons.Default.Schedule
+                        EstadoPago.FALLIDO -> Icons.Default.Error
+                        EstadoPago.REEMBOLSADO -> Icons.Default.Info
+                        null -> Icons.Default.Info
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = when (cita.estadoPago) {
+                        EstadoPago.PAGADO -> colors.success
+                        EstadoPago.PENDIENTE -> colors.warning
+                        EstadoPago.FALLIDO -> colors.error
+                        EstadoPago.REEMBOLSADO -> colors.primary
+                        null -> colors.onSurfaceVariant
+                    }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = when (cita.estadoPago) {
+                        EstadoPago.PAGADO -> "Pagado"
+                        EstadoPago.PENDIENTE -> "Pendiente"
+                        EstadoPago.FALLIDO -> "Fallido"
+                        EstadoPago.REEMBOLSADO -> "Reembolsado"
+                        null -> "Sin información"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = when (cita.estadoPago) {
+                        EstadoPago.PAGADO -> colors.success
+                        EstadoPago.PENDIENTE -> colors.warning
+                        EstadoPago.FALLIDO -> colors.error
+                        EstadoPago.REEMBOLSADO -> colors.primary
+                        null -> colors.onSurfaceVariant
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
             Divider(color = colors.outline.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Botones de acción
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = onEdit, colors = ButtonDefaults.textButtonColors(contentColor = colors.primary)) {
                     Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -799,7 +847,6 @@ fun TarjetaCitaMejorada(
         }
     }
 }
-
 @Composable
 fun DiaNoDisponibleCardMejorado() {
     val colors = MaterialTheme.colorScheme
@@ -1148,6 +1195,7 @@ fun DialogoCrearEditarCitaMejorado(
                         )
                     }
                 }
+
 
                 // Fecha
                 CampoFecha(fechaSeleccionada, onFechaChange, colors, formatterFecha)

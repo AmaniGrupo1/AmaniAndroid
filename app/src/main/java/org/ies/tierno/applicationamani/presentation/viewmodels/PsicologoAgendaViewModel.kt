@@ -386,10 +386,6 @@ class PsicologoAgendaViewModel(
         }
     }
 
-    // Añade este método en tu PsicologoAgendaViewModel.kt (al final de la clase)
-
-    // En PsicologoAgendaViewModel.kt - Reemplaza el método existente con este
-
     suspend fun crearCitaDesdePsicologo(
         idPaciente: Long,
         fecha: LocalDate,
@@ -398,8 +394,9 @@ class PsicologoAgendaViewModel(
         motivo: String,
         idTipoTerapia: Long,
         metodoPago: MetodoPago,
+        estadoPago: EstadoPago,
         monto: BigDecimal,
-        modalidad : ModalidadCita
+        modalidad: ModalidadCita
     ): Result<Unit> {
         val session = _userSession.value
         if (session == null) {
@@ -430,7 +427,7 @@ class PsicologoAgendaViewModel(
             startDatetime = startDatetime,
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
-            estadoPago = if (metodoPago == MetodoPago.ONLINE) EstadoPago.PAGADO else EstadoPago.PENDIENTE,
+            estadoPago = estadoPago,  // ← USAR EL ESTADO RECIBIDO
             monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
             motivo = motivo.ifBlank { "Consulta psicológica" },
             idTipoTerapia = idTipoTerapia,
