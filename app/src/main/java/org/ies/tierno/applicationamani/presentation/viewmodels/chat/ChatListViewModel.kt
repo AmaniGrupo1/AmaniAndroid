@@ -94,11 +94,13 @@ class ChatListViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val result = profileUseCaseGeneral.getPacienteById(idPaciente)
+                // Usar getPacienteByIdFirebase que acepta el Firebase UID (idUsuario)
+                val result = profileUseCaseGeneral.getPacienteByIdFirebase(idPaciente)
                 result.onSuccess { profile ->
-                    val idUsuarioPaciente = profile.usuario?.idUsuario
-                    if (idUsuarioPaciente != null) {
-                        _partnerId.value = idUsuarioPaciente
+                    // profile.usuario.idUsuario ya es el Firebase UID (idPaciente que pasamos)
+                    // lo usamos directamente como partnerId
+                    if (profile.usuario?.idUsuario != null) {
+                        _partnerId.value = profile.usuario.idUsuario
                         val nombre = buildString {
                             profile.usuario?.nombre?.let { append(it) }
                             profile.usuario?.apellido?.let {
@@ -125,9 +127,11 @@ class ChatListViewModel(
             try {
                 val pacientes = listarPacientesByPsicologo().first()
                 val first = pacientes.firstOrNull()
-                // Ahora usamos directamente idPaciente que es Firebase user ID (backend fix)
-                if (first?.idPaciente != null) {
-                    resolvePacienteParaChat(first.idPaciente)
+                // Usar idUsuario (Firebase) si está disponible, si no idPaciente (DB)
+                // El backend a veces solo devuelve idPaciente (DB table ID)
+                val pacienteId = first?.idUsuario ?: first?.idPaciente
+                if (pacienteId != null) {
+                    resolvePacienteParaChat(pacienteId)
                 } else {
                     _isLoading.value = false
                 }

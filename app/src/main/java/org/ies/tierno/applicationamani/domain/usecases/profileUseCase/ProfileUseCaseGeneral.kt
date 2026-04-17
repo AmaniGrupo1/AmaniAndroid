@@ -26,6 +26,10 @@ class ProfileUseCaseGeneral(val repository: ProfileRepository) {
         return repository.getPacienteById(idPaciente)
     }
 
+    suspend fun getPacienteByIdFirebase(idPaciente: Long): Result<PacienteProfileResponseDTO> {
+        return repository.getPacienteByIdFirebase(idPaciente)
+    }
+
     suspend fun getPsicologoById(idPsicologo: Long): Result<PsicologoProfileResponseDTO> {
         return repository.getPsicologoById(idPsicologo)
     }

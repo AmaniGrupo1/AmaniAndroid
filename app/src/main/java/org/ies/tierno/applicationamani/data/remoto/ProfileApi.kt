@@ -34,6 +34,11 @@ interface ProfileApi {
         @Path("id") id: Long
     ): PacienteProfileResponseDTO
 
+    @GET("/api/pacientes/usuario/{id}")
+    suspend fun getPacienteByIdFirebase(
+        @Path("id") id: Long
+    ): PacienteProfileResponseDTO
+
     @GET("/api/psicologo/usuario/{id}")
     suspend fun getPsicologoById(
         @Path("id") id: Long
