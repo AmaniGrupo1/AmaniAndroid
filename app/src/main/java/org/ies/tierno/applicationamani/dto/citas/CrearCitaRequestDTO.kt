@@ -1,9 +1,11 @@
 package org.ies.tierno.applicationamani.dto.citas
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -21,10 +23,9 @@ data class CrearCitaRequestDTO(
     @SerializedName("durationMinutes")
     val durationMinutes: Int,
 
-    @SerializedName("metodoPago")
+
     val metodoPago: MetodoPago,
 
-    @SerializedName("estadoPago")
     val estadoPago: EstadoPago,
 
     @SerializedName("monto")
@@ -34,6 +35,11 @@ data class CrearCitaRequestDTO(
     val motivo: String,
 
     val estado : EstadoCita = EstadoCita.pendiente,
-    @SerializedName("id_tipo_terapia")  // ← CAMBIA A snake_case
-    val idTipoTerapia : Long
+
+    @SerializedName("idTipoTerapia")
+    val idTipoTerapia: Long,
+
+    @SerializedName("modalidad")
+    val modalidad: ModalidadCita
+
 )

@@ -15,6 +15,7 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import java.math.BigDecimal
@@ -131,7 +132,8 @@ class CitasViewModel(
         motivo: String,
         idTipoTerapia: Long,
         metodoPago: MetodoPago,
-        monto: BigDecimal
+        monto: BigDecimal,
+        modalidadCita: ModalidadCita
     ): Result<Unit> {
 
         val session = _userSession.value
@@ -155,7 +157,8 @@ class CitasViewModel(
             monto = monto,
             motivo = motivo,
             idTipoTerapia = idTipoTerapia,
-            estado = EstadoCita.pendiente
+            estado = EstadoCita.pendiente,
+            modalidad = modalidadCita
         )
 
         return citasRepository.crearCita(request)

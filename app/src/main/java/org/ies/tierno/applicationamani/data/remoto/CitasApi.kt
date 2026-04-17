@@ -9,6 +9,7 @@ import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
+import retrofit2.Response
 
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -40,21 +41,21 @@ interface CitasApi {
         @Query("duracion") duracion: Int? = null
     ): DisponibilidadDiaResponse
 
-    @POST("/api/citas/admin")
-    suspend fun crearCita(
-        @Body request: CrearCitaRequestDTO
-    ): AgendaItemDTO
+//    @POST("/api/citas/admin")
+//    suspend fun crearCita(
+//        @Body request: CrearCitaRequestDTO
+//    ): AgendaItemDTO
 
     @PATCH("/api/citas/{id}/cancelar")
     suspend fun cancelarCita(
         @Path("id") idCita: Long
     ): AgendaItemDTO
 
-//    @PUT("/api/citas/{id}")
-//    suspend fun editarCita(
-//        @Path("id") idCita: Long,
-//        @Body request: CitaRequest
-//    ): AgendaItemDTO
+    @PUT("/api/citas/psicologo/{idCita}/editar")
+    suspend fun editarCita(
+        @Path("idCita") idCita: Long,
+        @Body request: CrearCitaRequestDTO
+    ): Response<AgendaItemDTO>
 
     @GET("/api/admin/psicologos/pacientes")
     suspend fun getPsicologosConPacientes(): List<ListaPacientesAndPsicologo>
@@ -104,4 +105,10 @@ interface CitasApi {
         @Path("idPsicologo") idPsicologo: Long
     ): HorarioRequestDTO
 
+    // En CitasApi.kt
+    @PATCH("/api/citas/{id}/estado")
+    suspend fun cambiarEstadoCita(
+        @Path("id") idCita: Long,
+        @Body request: Map<String, String>
+    ): AgendaItemDTO
 }

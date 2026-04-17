@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
@@ -463,7 +464,8 @@ fun CitasScreen(
                                 motivo = motivoCita.ifBlank { "Consulta psicológica" },
                                 idTipoTerapia = 1L, // ⚠️ luego lo haces dinámico
                                 metodoPago = MetodoPago.PRESENCIAL,
-                                monto = BigDecimal.ZERO
+                                monto = BigDecimal.ZERO,
+                                modalidadCita = ModalidadCita.PRESENCIAL
                             )
 
                             if (result.isSuccess) {

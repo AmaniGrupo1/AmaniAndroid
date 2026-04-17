@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
@@ -45,6 +46,9 @@ import java.util.Locale
  * @param modifier Modificador de diseño.
  * @param fechaSeleccionada Fecha actualmente seleccionada, o `null` si ninguna.
  * @param fechasDestacadas Conjunto de fechas que muestran un indicador de evento.
+ * @param diasBloqueados Conjunto de fechas bloqueadas por el psicólogo.
+ * @param diasNoLaborables Conjunto de fechas no laborables (sábados, domingos, festivos).
+ * @param onMesVisibleChange Callback para cambiar el mes visible.
  * @param onFechaSeleccionada Callback invocado cuando el usuario pulsa una fecha.
  */
 @RequiresApi(Build.VERSION_CODES.O)
@@ -54,6 +58,8 @@ fun CalendarioView(
     mesVisible: YearMonth = YearMonth.now(),
     fechaSeleccionada: LocalDate? = null,
     fechasDestacadas: Set<LocalDate> = emptySet(),
+    diasBloqueados: Set<LocalDate> = emptySet(),
+    diasNoLaborables: Set<LocalDate> = emptySet(),
     onMesVisibleChange: (YearMonth) -> Unit = {},
     onFechaSeleccionada: (LocalDate) -> Unit = {}
 ) {
@@ -68,6 +74,8 @@ fun CalendarioView(
             mes = mesVisible,
             fechaSeleccionada = fechaSeleccionada,
             fechasDestacadas = fechasDestacadas,
+            diasBloqueados = diasBloqueados,
+            diasNoLaborables = diasNoLaborables,
             onFechaSeleccionada = onFechaSeleccionada
         )
     }
@@ -75,10 +83,6 @@ fun CalendarioView(
 
 /**
  * Cabecera del calendario con el nombre del mes y flechas de navegación.
- *
- * @param mesActual Mes y año mostrados actualmente.
- * @param onMesAnterior Callback para retroceder un mes.
- * @param onMesSiguiente Callback para avanzar un mes.
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -131,14 +135,6 @@ private fun CalendarioDiasSemana() {
 
 /**
  * Cuadrícula de celdas que representa los días del mes.
- *
- * Calcula el desplazamiento del primer día y rellena las celdas
- * con los días correspondientes.
- *
- * @param mes Mes y año a representar.
- * @param fechaSeleccionada Fecha seleccionada, o `null`.
- * @param fechasDestacadas Conjunto de fechas con evento.
- * @param onFechaSeleccionada Callback al pulsar una fecha.
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -146,14 +142,15 @@ private fun CalendarioGrid(
     mes: YearMonth,
     fechaSeleccionada: LocalDate?,
     fechasDestacadas: Set<LocalDate>,
+    diasBloqueados: Set<LocalDate>,
+    diasNoLaborables: Set<LocalDate>,
     onFechaSeleccionada: (LocalDate) -> Unit
 ) {
-    // Calcular offset: primer día del mes (lunes = 0)
+    val hoy = LocalDate.now()
     val primerDia = mes.atDay(1)
     val offsetInicio = (primerDia.dayOfWeek.value - 1) // 0=Lun, 6=Dom
     val diasEnMes = mes.lengthOfMonth()
 
-    // Total de celdas (rellenamos con null los huecos)
     val celdas: List<LocalDate?> = buildList {
         repeat(offsetInicio) { add(null) }
         for (dia in 1..diasEnMes) add(mes.atDay(dia))
@@ -164,16 +161,18 @@ private fun CalendarioGrid(
     Column {
         filas.forEach { fila ->
             Row(modifier = Modifier.fillMaxWidth()) {
-                // Rellenar la última fila si tiene menos de 7 elementos
                 val filaPadded = fila + List(7 - fila.size) { null }
                 filaPadded.forEach { fecha ->
                     CeldaDia(
                         fecha = fecha,
                         esSeleccionada = fecha == fechaSeleccionada,
                         esDestacada = fecha != null && fecha in fechasDestacadas,
-                        esHoy = fecha == LocalDate.now(),
+                        esBloqueado = fecha != null && fecha in diasBloqueados,
+                        esNoLaborable = fecha != null && fecha in diasNoLaborables,
+                        esPasado = fecha != null && fecha.isBefore(hoy),
+                        esHoy = fecha == hoy,
                         modifier = Modifier.weight(1f),
-                        onClick = { if (fecha != null) onFechaSeleccionada(fecha) }
+                        onClick = { if (fecha != null && !fecha.isBefore(hoy)) onFechaSeleccionada(fecha) }
                     )
                 }
             }
@@ -184,12 +183,12 @@ private fun CalendarioGrid(
 /**
  * Celda individual que representa un día del calendario.
  *
- * Muestra el número del día y un punto indicador si la fecha está
- * destacada. Cambia su fondo y color de texto según su estado.
- *
  * @param fecha Fecha representada, o `null` si la celda es un espacio vacío.
  * @param esSeleccionada `true` si esta celda es la fecha seleccionada.
  * @param esDestacada `true` si la fecha tiene un evento asociado.
+ * @param esBloqueado `true` si la fecha está bloqueada por el psicólogo.
+ * @param esNoLaborable `true` si la fecha es no laborable (sábado/domingo/festivo).
+ * @param esPasado `true` si la fecha es anterior al día actual.
  * @param esHoy `true` si la fecha corresponde al día actual.
  * @param modifier Modificador de diseño.
  * @param onClick Acción al pulsar la celda.
@@ -200,48 +199,64 @@ private fun CeldaDia(
     fecha: LocalDate?,
     esSeleccionada: Boolean,
     esDestacada: Boolean,
+    esBloqueado: Boolean,
+    esNoLaborable: Boolean,
+    esPasado: Boolean,
     esHoy: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val colors = MaterialTheme.colorScheme
+
+    // Determinar color de fondo según el estado
     val bgColor = when {
-        esSeleccionada -> MaterialTheme.colorScheme.primary
-        esHoy -> MaterialTheme.colorScheme.primaryContainer
+        esSeleccionada -> colors.primary
+        esBloqueado -> colors.errorContainer.copy(alpha = 0.5f)
+        esNoLaborable -> colors.surfaceVariant.copy(alpha = 0.5f)
+        esHoy && !esSeleccionada -> colors.primaryContainer
         else -> Color.Transparent
     }
+
+    // Determinar color del texto según el estado
     val textColor = when {
-        esSeleccionada -> MaterialTheme.colorScheme.onPrimary
-        esHoy -> MaterialTheme.colorScheme.onPrimaryContainer
-        fecha == null -> Color.Transparent
-        else -> MaterialTheme.colorScheme.onSurface
+        esSeleccionada -> colors.onPrimary
+        esBloqueado -> colors.error
+        esNoLaborable -> colors.onSurfaceVariant
+        esPasado -> colors.onSurfaceVariant.copy(alpha = 0.4f)
+        esHoy -> colors.onPrimaryContainer
+        else -> colors.onSurface
     }
+
+    // Determinar si la celda es clickeable (no puede seleccionar días pasados ni días bloqueados)
+    val habilitado = fecha != null && !esPasado
 
     Box(
         modifier = modifier
             .aspectRatio(1f)
             .padding(2.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(8.dp))
             .background(bgColor)
-            .clickable(enabled = fecha != null, onClick = onClick),
+            .clickable(enabled = habilitado, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = fecha?.dayOfMonth?.toString() ?: "",
                 style = MaterialTheme.typography.bodySmall,
+                fontWeight = if (esSeleccionada) FontWeight.Bold else FontWeight.Normal,
                 color = textColor
             )
-            // Punto indicador para fechas destacadas (ej: citas)
-            if (esDestacada && !esSeleccionada) {
+
+            // Punto indicador para fechas con citas (solo si no está seleccionada o bloqueada)
+            if (esDestacada && !esSeleccionada && !esBloqueado) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Box(
                     modifier = Modifier
                         .size(4.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
+                        .background(colors.tertiary)
                 )
             }
         }
     }
 }
-
