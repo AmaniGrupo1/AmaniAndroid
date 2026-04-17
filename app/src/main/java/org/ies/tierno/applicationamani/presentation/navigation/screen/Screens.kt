@@ -77,8 +77,8 @@ sealed class Screens(val route: String) {
     }
 
     object chatList : Screens("chatList")
-    object chat : Screens("chat/{currentUserId}/{otherUserId}"){
-        fun createRoute(currentUserId: Long, otherUserId: Long) = "chat/$currentUserId/$otherUserId"
+    object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}"){
+        fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String) = "chat/$currentUserId/$otherUserId/$otherUserName"
     }
 }
 

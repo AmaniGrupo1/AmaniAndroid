@@ -180,21 +180,22 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 },
                 navArgument("otherUserId") {
                     type = NavType.LongType
+                },
+                navArgument("otherUserName") {
+                    type = NavType.StringType
                 }
             )
             ) { backStackEntry ->
                 val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
+                val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
 
                 val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
 
-                val currentSession = runBlocking { userSessionDataStore.getSession() }
-                val currentUserRol = currentSession?.rol ?: ""
-                val otherUserName = if (currentUserRol == "paciente") "Psicólogo" else "Paciente"
-
                 ChatScreen(
                     viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    otherUserName = otherUserName
                 )
             }
         }

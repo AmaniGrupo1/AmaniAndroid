@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -60,7 +59,8 @@ import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 @Composable
 fun ChatScreen(
     viewModel: ChatViewModel = viewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    otherUserName: String = ""
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val audioUiState by viewModel.audioUiState.collectAsStateWithLifecycle()
@@ -107,8 +107,13 @@ fun ChatScreen(
     }
 
     Scaffold(
-        modifier = Modifier.imePadding(),
-        topBar = { ChatTopBar(uiState.assignedPsychologist, onNavigateBack) },
+        topBar = {
+            ChatTopBar(
+                psychologistInfo = uiState.assignedPsychologist,
+                onNavigateBack = onNavigateBack,
+                otherUserName = otherUserName
+            )
+        },
         bottomBar = {
             ChatInputBar(
                 text = uiState.inputText,
@@ -135,7 +140,8 @@ fun ChatScreen(
                     }
                 },
                 isRecording = isRecording,
-                recordingSeconds = recordingSeconds
+                recordingSeconds = recordingSeconds,
+                isOtherTyping = uiState.isOtherTyping
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -145,6 +151,7 @@ fun ChatScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
+                .padding(bottom = 8.dp)
         ) {
             when {
                 uiState.isLoading -> {
@@ -182,7 +189,7 @@ fun ChatScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
                         reverseLayout = true,
-                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)
+                        contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
                         items(
                             items = chatItems,
@@ -219,45 +226,48 @@ fun ChatScreen(
 @Composable
 private fun ChatTopBar(
     psychologistInfo: PsychologistInfo?,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    otherUserName: String = ""
 ) {
     val amaniColors = LocalAmaniColors.current
 
     CenterAlignedTopAppBar(
         title = {
-            psychologistInfo?.let { psychologist ->
+            if (psychologistInfo != null) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier.clickable { }
                 ) {
-                    PsychologistAvatar(psychologistInfo = psychologist, size = 28.dp)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = 24.dp)
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = psychologist.name,
+                        text = psychologistInfo.name,
                         style = MaterialTheme.typography.titleSmall
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(2.dp))
                     Box(
                         modifier = Modifier
-                            .size(6.dp)
+                            .size(4.dp)
                             .clip(CircleShape)
                             .background(
-                                if (psychologist.isOnline) amaniColors.citaLibre
+                                if (psychologistInfo.isOnline) amaniColors.citaLibre
                                 else MaterialTheme.colorScheme.outline
                             )
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = if (psychologist.isOnline) "En línea" else "Desconectado",
+                        text = if (psychologistInfo.isOnline) "En línea" else "Desconectado",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            } ?: Text(
-                text = "Psicólogo",
-                style = MaterialTheme.typography.titleSmall
-            )
+            } else {
+                Text(
+                    text = otherUserName.ifEmpty { "Psicólogo" },
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = onNavigateBack) {

@@ -128,7 +128,7 @@ private fun MessageWithTimestamp(
             "statusIcon" to InlineTextContent(
                 Placeholder(14.sp, 14.sp, PlaceholderVerticalAlign.Center)
             ) {
-                StatusIcon(isRead = message.isRead, tint = timestampColor)
+                StatusIcon(isRead = message.isRead, isDelivered = message.isDelivered, tint = timestampColor)
             }
         )
         val annotatedText = buildAnnotatedString {
@@ -222,16 +222,22 @@ fun PsychologistAvatar(
 }
 
 @Composable
-fun StatusIcon(isRead: Boolean, tint: Color? = null) {
-    val icon = if (isRead) Icons.Default.DoneAll else Icons.Default.Check
+fun StatusIcon(isRead: Boolean, isDelivered: Boolean, tint: Color? = null) {
+    val icon = when {
+        isRead -> Icons.Default.DoneAll
+        isDelivered -> Icons.Default.Check
+        else -> Icons.Default.Check
+    }
     val color = tint ?: if (isRead) {
         MaterialTheme.colorScheme.primary
-    } else {
+    } else if (isDelivered) {
         MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
     }
     Icon(
         imageVector = icon,
-        contentDescription = if (isRead) "Leído" else "Enviado",
+        contentDescription = if (isRead) "Leído" else if (isDelivered) "Entregado" else "Enviado",
         modifier = Modifier.size(14.dp),
         tint = color
     )

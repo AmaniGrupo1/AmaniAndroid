@@ -135,7 +135,7 @@ fun ChatListScreen(
                                 currentUserId?.let { currentId ->
                                     partnerId?.let { pId ->
                                         navController.navigate(
-                                            Screens.chat.createRoute(currentId, pId)
+                                            Screens.chat.createRoute(currentId, pId, partnerNombre)
                                         )
                                     }
                                 }

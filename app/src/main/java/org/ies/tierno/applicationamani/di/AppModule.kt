@@ -47,6 +47,12 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePs
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -80,10 +86,16 @@ val appModule = module {
     factory { ListarSituacionUseCase(get()) }
     factory { ListarPacientesByPsicologo(get()) }
     factory { ProfileUseCaseGeneral(get()) }
-    
+
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
     factory { MarkMessagesAsReadUseCase(get()) }
+    factory { StartTypingUseCase(get()) }
+    factory { StopTypingUseCase(get()) }
+    factory { ObserveTypingUseCase(get()) }
+    factory { ObserveUserOnlineUseCase(get()) }
+    factory { MarkMessageDeliveredUseCase(get()) }
+    factory { UpdateUserOnlineUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -110,7 +122,13 @@ val appModule = module {
             sendMessageUseCase = get(),
             getMessagesUseCase = get(),
             markMessagesAsReadUseCase = get(),
+            markMessageDeliveredUseCase = get(),
             fileStorageService = get(),
+            startTypingUseCase = get(),
+            stopTypingUseCase = get(),
+            observeTypingUseCase = get(),
+            observeUserOnlineUseCase = get(),
+            updateUserOnlineUseCase = get(),
             appContext = androidContext()
         )
     }
