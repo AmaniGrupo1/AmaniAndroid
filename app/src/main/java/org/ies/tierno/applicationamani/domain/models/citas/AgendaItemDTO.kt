@@ -11,6 +11,7 @@ import java.time.LocalTime
 
 data class AgendaItemDTO(
     val id: Long,
+    val idPaciente: Long?,
     val fecha: LocalDate,
     val horaInicio: LocalTime,
     val horaFin: LocalTime,

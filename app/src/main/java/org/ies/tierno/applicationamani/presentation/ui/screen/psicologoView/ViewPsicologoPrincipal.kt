@@ -53,7 +53,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -82,6 +81,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
@@ -96,19 +96,19 @@ import java.time.format.DateTimeFormatter
 
 // Colores corporativos AMANI
 object AmaniPsicologoColors {
-    val Primary = Color(0xFF6B4E71)      // Morado principal
-    val PrimaryLight = Color(0xFF9B7E9F)  // Morado claro
-    val PrimaryDark = Color(0xFF4A2B50)   // Morado oscuro
-    val Secondary = Color(0xFFE8B4B8)     // Rosa suave
-    val Accent = Color(0xFFF5E6E8)        // Fondo rosa claro
-    val Surface = Color(0xFFFFFFFF)        // Blanco
-    val Background = Color(0xFFFDF8F9)     // Fondo general
-    val TextPrimary = Color(0xFF2D1B30)    // Texto oscuro
-    val TextSecondary = Color(0xFF7A6B7E)  // Texto gris
-    val Success = Color(0xFF81C784)        // Verde
-    val Warning = Color(0xFFFFB74D)        // Naranja
-    val Error = Color(0xFFE57373)          // Rojo
-    val Info = Color(0xFF64B5F6)           // Azul claro
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Surface = Color(0xFFFFFFFF)
+    val Background = Color(0xFFFDF8F9)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Success = Color(0xFF81C784)
+    val Warning = Color(0xFFFFB74D)
+    val Error = Color(0xFFE57373)
+    val Info = Color(0xFF64B5F6)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -121,39 +121,30 @@ fun ViewPsicologoPrincipal(
     profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
     val pacientes by viewModel.pacientes.collectAsState()
-    var showLoading by remember { mutableStateOf(true) }
+    val citasPorPaciente by viewModel.citasPorPaciente.collectAsState()
+    var isLoadingData by remember { mutableStateOf(true) }
 
-    // Estado para el idPsicologo obtenido de la sesión
     var idPsicologo by remember { mutableStateOf<Long?>(null) }
     var isLoadingSession by remember { mutableStateOf(true) }
 
-    // Obtener el idPsicologo de la sesión al inicio
     LaunchedEffect(Unit) {
         val session = userSessionDataStore.getSession()
         idPsicologo = session?.idPsicologo
         isLoadingSession = false
 
-        println("=== SESIÓN OBTENIDA EN ViewPsicologoPrincipal ===")
-        println("ID Psicólogo: $idPsicologo")
-        println("Session: $session")
-
         if (idPsicologo != null) {
-            // Cargar el perfil del psicólogo
+            viewModel.cargarPacientes(idPsicologo!!)
             profilePsicologoViewModel.fetchProfile(idPsicologo!!)
         }
+
+        isLoadingData = false
     }
 
-    val profile by profilePsicologoViewModel.perfil.collectAsState()
-
-    LaunchedEffect(pacientes) {
-        delay(500)
-        showLoading = false
-    }
+    val isLoading = isLoadingSession || (isLoadingData && pacientes.isEmpty())
 
     val listState = rememberLazyListState()
     val isScrolled by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
 
-    // Mostrar loading mientras se carga la sesión
     if (isLoadingSession) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(
@@ -165,7 +156,6 @@ fun ViewPsicologoPrincipal(
         return
     }
 
-    // Si no hay idPsicologo, mostrar error y opción de volver al login
     if (idPsicologo == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -190,9 +180,7 @@ fun ViewPsicologoPrincipal(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
-                    onClick = {
-                        navController.navigate(Screens.login.route)
-                    },
+                    onClick = { navController.navigate(Screens.login.route) },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AmaniPsicologoColors.Primary,
@@ -207,9 +195,7 @@ fun ViewPsicologoPrincipal(
     }
 
     Scaffold(
-        topBar = {
-            MenuSetting(navController = navController, idPsicologo = idPsicologo)
-        },
+        topBar = { MenuSetting(navController = navController, idPsicologo = idPsicologo) },
         containerColor = AmaniPsicologoColors.Background
     ) { innerPadding ->
         Box(
@@ -218,12 +204,12 @@ fun ViewPsicologoPrincipal(
                 .padding(innerPadding)
         ) {
             when {
-                showLoading && pacientes.isEmpty() -> LoadingState()
+                isLoading -> LoadingState()
                 pacientes.isEmpty() -> EmptyState()
                 else -> PacientesList(
                     pacientes = pacientes,
-                    listState = listState,
-                    isScrolled = isScrolled
+                    citasPorPaciente = citasPorPaciente,
+                    listState = listState
                 )
             }
         }
@@ -301,8 +287,8 @@ private fun EmptyState() {
 @Composable
 private fun PacientesList(
     pacientes: List<PacientePsicologoResponseDTO>,
-    listState: androidx.compose.foundation.lazy.LazyListState,
-    isScrolled: Boolean
+    citasPorPaciente: Map<Long, List<AgendaItemDTO>>,
+    listState: androidx.compose.foundation.lazy.LazyListState
 ) {
     LazyColumn(
         state = listState,
@@ -318,9 +304,32 @@ private fun PacientesList(
 
         items(
             items = pacientes,
-            key = { paciente -> paciente.idPaciente ?: System.currentTimeMillis() }
+            key = { paciente -> paciente.idPaciente ?: "${paciente.email}-${paciente.dni}" }
         ) { paciente ->
-            PacienteCard(paciente = paciente)
+
+            val citas = citasPorPaciente[paciente.idPaciente] ?: emptyList()
+            val hoy = LocalDate.now()
+
+            // ✅ CONTADOR DE CITAS
+            val citasPendientes = citas.count {
+                it.estado?.uppercase() != "CANCELADA" &&
+                        it.estado?.uppercase() != "COMPLETADA"
+            }
+
+            // ✅ PRÓXIMA CITA MEJORADA (incluye hora)
+            val proximaCita = citas
+                .filter {
+                    it.fecha >= hoy &&
+                            it.estado?.uppercase() != "CANCELADA" &&
+                            it.estado?.uppercase() != "COMPLETADA"
+                }
+                .minByOrNull { it.fecha.atTime(it.horaInicio) }
+
+            PacienteCard(
+                paciente = paciente,
+                proximaCita = proximaCita,
+                totalCitas = citasPendientes // ✅ NUEVO
+            )
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -372,7 +381,11 @@ private fun HeaderStats(totalPacientes: Int) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
+fun PacienteCard(
+    paciente: PacientePsicologoResponseDTO,
+    proximaCita: AgendaItemDTO?,
+    totalCitas: Int // ✅ NUEVO
+) {
     var expanded by remember { mutableStateOf(false) }
     val esMenor = esMenorDeEdad(paciente.fechaNacimiento)
 
@@ -396,6 +409,8 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
                 paciente = paciente,
                 expanded = expanded,
                 esMenor = esMenor,
+                proximaCita = proximaCita,
+                totalCitas = totalCitas, // ✅ NUEVO
                 onExpandClick = { expanded = !expanded }
             )
 
@@ -423,10 +438,17 @@ fun PacienteHeader(
     paciente: PacientePsicologoResponseDTO,
     expanded: Boolean,
     esMenor: Boolean,
+    proximaCita: AgendaItemDTO?,
+    totalCitas: Int, // ✅ NUEVO
     onExpandClick: () -> Unit
 ) {
     val estadoPago = paciente.estadoPago ?: EstadoPago.PENDIENTE
     val isPagoPendiente = estadoPago == EstadoPago.PENDIENTE
+    val formatterFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
+    val hoy = LocalDate.now()
+    val manana = hoy.plusDays(1)
+    val dentroDe3Dias = hoy.plusDays(3)
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -471,6 +493,7 @@ fun PacienteHeader(
                         )
                     }
 
+
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
@@ -485,7 +508,6 @@ fun PacienteHeader(
                                 color = AmaniPsicologoColors.TextPrimary
                             )
 
-                            // Indicador de menor de edad
                             if (esMenor) {
                                 Surface(
                                     shape = RoundedCornerShape(12.dp),
@@ -509,6 +531,98 @@ fun PacienteHeader(
                                             color = AmaniPsicologoColors.Warning
                                         )
                                     }
+                                }
+                            }
+                        }
+
+                        // ✅ NUEVO: CONTADOR DE CITAS
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        if (totalCitas > 0) {
+                            Text(
+                                text = "📅 Tienes $totalCitas cita${if (totalCitas > 1) "s" else ""}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = AmaniPsicologoColors.Primary
+                            )
+                        } else {
+                            Text(
+                                text = "Sin citas registradas",
+                                fontSize = 12.sp,
+                                color = AmaniPsicologoColors.TextSecondary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // ==================== PRÓXIMA CITA ====================
+                        if (proximaCita != null) {
+                            val fechaCita = proximaCita.fecha
+                            val esHoy = fechaCita == hoy
+                            val esManana = fechaCita == manana
+                            val esProximo = fechaCita <= dentroDe3Dias
+
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = when {
+                                    esHoy -> AmaniPsicologoColors.Success.copy(alpha = 0.15f)
+                                    esManana -> AmaniPsicologoColors.Info.copy(alpha = 0.15f)
+                                    esProximo -> AmaniPsicologoColors.Primary.copy(alpha = 0.1f)
+                                    else -> AmaniPsicologoColors.Accent
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CalendarToday,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp),
+                                        tint = when {
+                                            esHoy -> AmaniPsicologoColors.Success
+                                            esManana -> AmaniPsicologoColors.Info
+                                            else -> AmaniPsicologoColors.Primary
+                                        }
+                                    )
+                                    Text(
+                                        text = when {
+                                            esHoy -> "🔴 HOY a las ${proximaCita.horaInicio.format(formatterHora)}"
+                                            esManana -> "MAÑANA a las ${proximaCita.horaInicio.format(formatterHora)}"
+                                            else -> "${fechaCita.format(formatterFecha)} - ${proximaCita.horaInicio.format(formatterHora)}"
+                                        },
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = when {
+                                            esHoy -> AmaniPsicologoColors.Success
+                                            esManana -> AmaniPsicologoColors.Info
+                                            else -> AmaniPsicologoColors.Primary
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = AmaniPsicologoColors.Accent
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Schedule,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp),
+                                        tint = AmaniPsicologoColors.TextSecondary
+                                    )
+                                    Text(
+                                        text = "Sin citas programadas",
+                                        fontSize = 12.sp,
+                                        color = AmaniPsicologoColors.TextSecondary
+                                    )
                                 }
                             }
                         }
@@ -597,68 +711,6 @@ fun PacienteHeader(
                     }
                 }
             }
-
-            if (!expanded) {
-                Divider(
-                    color = AmaniPsicologoColors.Accent,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 0.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.Badge,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = AmaniPsicologoColors.TextSecondary
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "DNI: ${paciente.dni ?: "No registrado"}",
-                            fontSize = 11.sp,
-                            color = AmaniPsicologoColors.TextSecondary
-                        )
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.Cake,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = AmaniPsicologoColors.TextSecondary
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Edad: ${calcularEdadDesdeString(paciente.fechaNacimiento)} años",
-                            fontSize = 11.sp,
-                            color = AmaniPsicologoColors.TextSecondary
-                        )
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Outlined.Wc,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = AmaniPsicologoColors.TextSecondary
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = paciente.genero ?: "No especificado",
-                            fontSize = 11.sp,
-                            color = AmaniPsicologoColors.TextSecondary
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-            }
         }
     }
 }
@@ -700,7 +752,6 @@ fun ExpandedContent(
                 )
             )
             val tutores = paciente.tutor ?: emptyList()
-            // Mostrar datos del tutor si el paciente es menor de edad
             if (esMenor && tutores.isNotEmpty()) {
                 TutorInfoSection(tutores = tutores)
             }
@@ -1026,7 +1077,7 @@ fun InfoSection(
     }
 }
 
-// Funciones de utilidad adaptadas para String
+// Funciones de utilidad
 @RequiresApi(Build.VERSION_CODES.O)
 private fun calcularEdadDesdeString(fechaNacimientoStr: String?): Int {
     if (fechaNacimientoStr.isNullOrEmpty()) return 0
