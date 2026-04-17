@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import android.util.Log
+import okhttp3.Response
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
@@ -172,13 +173,23 @@ class CitasRepository(
     suspend fun cambiarEstadoCita(
         idCita: Long,
         estado: EstadoCita
-    ): Result<AgendaItemDTO> = runCatching {
+    ): Result<Unit> {
 
-        val request = mapOf(
-            "estado" to estado.name.lowercase()
-        )
+        return try {
+            val request = mapOf(
+                "estado" to estado.name.lowercase()
+            )
 
-        citasApi.cambiarEstadoCita(idCita, request)
+            val response = citasApi.cambiarEstadoCita(idCita, request)
+
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Error ${response.code()}"))
+            }
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
-
 }

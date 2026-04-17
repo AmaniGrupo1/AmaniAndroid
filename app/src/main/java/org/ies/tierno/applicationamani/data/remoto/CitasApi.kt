@@ -106,9 +106,9 @@ interface CitasApi {
     ): HorarioRequestDTO
 
     // En CitasApi.kt
-    @PATCH("/api/citas/{id}/estado")
+    @PATCH("/api/citas/cambio/{id}/estado")
     suspend fun cambiarEstadoCita(
         @Path("id") idCita: Long,
         @Body request: Map<String, String>
-    ): AgendaItemDTO
+    ): Response<Unit>
 }

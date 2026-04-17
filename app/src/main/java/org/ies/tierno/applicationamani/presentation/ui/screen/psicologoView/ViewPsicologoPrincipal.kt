@@ -12,10 +12,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,25 +23,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Cake
@@ -55,15 +46,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,9 +67,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
@@ -91,7 +77,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePs
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 // Colores corporativos AMANI
@@ -121,7 +106,6 @@ fun ViewPsicologoPrincipal(
     profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
     val pacientes by viewModel.pacientes.collectAsState()
-    val citasPorPaciente by viewModel.citasPorPaciente.collectAsState()
     var isLoadingData by remember { mutableStateOf(true) }
 
     var idPsicologo by remember { mutableStateOf<Long?>(null) }
@@ -143,7 +127,6 @@ fun ViewPsicologoPrincipal(
     val isLoading = isLoadingSession || (isLoadingData && pacientes.isEmpty())
 
     val listState = rememberLazyListState()
-    val isScrolled by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
 
     if (isLoadingSession) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -208,7 +191,6 @@ fun ViewPsicologoPrincipal(
                 pacientes.isEmpty() -> EmptyState()
                 else -> PacientesList(
                     pacientes = pacientes,
-                    citasPorPaciente = citasPorPaciente,
                     listState = listState
                 )
             }
@@ -268,17 +250,6 @@ private fun EmptyState() {
                 color = AmaniPsicologoColors.TextSecondary,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = { /* Navegar a alguna acción */ },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniPsicologoColors.Primary,
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Actualizar", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            }
         }
     }
 }
@@ -287,7 +258,6 @@ private fun EmptyState() {
 @Composable
 private fun PacientesList(
     pacientes: List<PacientePsicologoResponseDTO>,
-    citasPorPaciente: Map<Long, List<AgendaItemDTO>>,
     listState: androidx.compose.foundation.lazy.LazyListState
 ) {
     LazyColumn(
@@ -306,30 +276,7 @@ private fun PacientesList(
             items = pacientes,
             key = { paciente -> paciente.idPaciente ?: "${paciente.email}-${paciente.dni}" }
         ) { paciente ->
-
-            val citas = citasPorPaciente[paciente.idPaciente] ?: emptyList()
-            val hoy = LocalDate.now()
-
-            // ✅ CONTADOR DE CITAS
-            val citasPendientes = citas.count {
-                it.estado?.uppercase() != "CANCELADA" &&
-                        it.estado?.uppercase() != "COMPLETADA"
-            }
-
-            // ✅ PRÓXIMA CITA MEJORADA (incluye hora)
-            val proximaCita = citas
-                .filter {
-                    it.fecha >= hoy &&
-                            it.estado?.uppercase() != "CANCELADA" &&
-                            it.estado?.uppercase() != "COMPLETADA"
-                }
-                .minByOrNull { it.fecha.atTime(it.horaInicio) }
-
-            PacienteCard(
-                paciente = paciente,
-                proximaCita = proximaCita,
-                totalCitas = citasPendientes // ✅ NUEVO
-            )
+            PacienteCard(paciente = paciente)
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -381,17 +328,14 @@ private fun HeaderStats(totalPacientes: Int) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PacienteCard(
-    paciente: PacientePsicologoResponseDTO,
-    proximaCita: AgendaItemDTO?,
-    totalCitas: Int // ✅ NUEVO
-) {
+fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
     var expanded by remember { mutableStateOf(false) }
     val esMenor = esMenorDeEdad(paciente.fechaNacimiento)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { expanded = !expanded }
             .animateContentSize(),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -401,19 +345,15 @@ fun PacienteCard(
         colors = CardDefaults.cardColors(containerColor = AmaniPsicologoColors.Surface)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
+            // Header siempre visible
             PacienteHeader(
                 paciente = paciente,
-                expanded = expanded,
-                esMenor = esMenor,
-                proximaCita = proximaCita,
-                totalCitas = totalCitas, // ✅ NUEVO
-                onExpandClick = { expanded = !expanded }
+                esMenor = esMenor
             )
 
+            // Contenido expandible
             AnimatedVisibility(
                 visible = expanded,
                 enter = expandVertically(
@@ -436,277 +376,124 @@ fun PacienteCard(
 @Composable
 fun PacienteHeader(
     paciente: PacientePsicologoResponseDTO,
-    expanded: Boolean,
-    esMenor: Boolean,
-    proximaCita: AgendaItemDTO?,
-    totalCitas: Int, // ✅ NUEVO
-    onExpandClick: () -> Unit
+    esMenor: Boolean
 ) {
-    val estadoPago = paciente.estadoPago ?: EstadoPago.PENDIENTE
-    val isPagoPendiente = estadoPago == EstadoPago.PENDIENTE
-    val formatterFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
-    val hoy = LocalDate.now()
-    val manana = hoy.plusDays(1)
-    val dentroDe3Dias = hoy.plusDays(3)
-
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = AmaniPsicologoColors.Surface,
-        shadowElevation = if (expanded) 2.dp else 0.dp
+        color = AmaniPsicologoColors.Surface
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .animateContentSize()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        if (isPagoPendiente) AmaniPsicologoColors.Warning else AmaniPsicologoColors.Success,
-                                        if (isPagoPendiente) AmaniPsicologoColors.PrimaryLight else AmaniPsicologoColors.Primary
-                                    )
+                // Avatar con iniciales
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    AmaniPsicologoColors.Primary,
+                                    AmaniPsicologoColors.PrimaryLight
                                 )
-                            ),
-                        contentAlignment = Alignment.Center
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "${paciente.nombre?.take(1) ?: "?"}${paciente.apellido?.take(1) ?: "?"}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                // Información básica del paciente
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "${paciente.nombre?.take(1) ?: "?"}${paciente.apellido?.take(1) ?: "?"}",
-                            fontSize = 20.sp,
+                            text = "${paciente.nombre ?: "Sin nombre"} ${paciente.apellido ?: ""}".trim(),
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = AmaniPsicologoColors.TextPrimary
+                        )
+
+                        if (esMenor) {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = AmaniPsicologoColors.Warning.copy(alpha = 0.2f)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Warning,
+                                        contentDescription = "Menor de edad",
+                                        modifier = Modifier.size(12.dp),
+                                        tint = AmaniPsicologoColors.Warning
+                                    )
+                                    Text(
+                                        text = "Menor",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = AmaniPsicologoColors.Warning
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Email,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = AmaniPsicologoColors.TextSecondary
+                        )
+                        Text(
+                            text = paciente.email ?: "Email no disponible",
+                            fontSize = 12.sp,
+                            color = AmaniPsicologoColors.TextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
-
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "${paciente.nombre ?: "Sin nombre"} ${paciente.apellido ?: ""}".trim(),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AmaniPsicologoColors.TextPrimary
-                            )
-
-                            if (esMenor) {
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = AmaniPsicologoColors.Warning.copy(alpha = 0.2f)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Warning,
-                                            contentDescription = "Menor de edad",
-                                            modifier = Modifier.size(12.dp),
-                                            tint = AmaniPsicologoColors.Warning
-                                        )
-                                        Text(
-                                            text = "Menor",
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Medium,
-                                            color = AmaniPsicologoColors.Warning
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        // ✅ NUEVO: CONTADOR DE CITAS
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        if (totalCitas > 0) {
-                            Text(
-                                text = "📅 Tienes $totalCitas cita${if (totalCitas > 1) "s" else ""}",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = AmaniPsicologoColors.Primary
-                            )
-                        } else {
-                            Text(
-                                text = "Sin citas registradas",
-                                fontSize = 12.sp,
-                                color = AmaniPsicologoColors.TextSecondary
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        // ==================== PRÓXIMA CITA ====================
-                        if (proximaCita != null) {
-                            val fechaCita = proximaCita.fecha
-                            val esHoy = fechaCita == hoy
-                            val esManana = fechaCita == manana
-                            val esProximo = fechaCita <= dentroDe3Dias
-
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = when {
-                                    esHoy -> AmaniPsicologoColors.Success.copy(alpha = 0.15f)
-                                    esManana -> AmaniPsicologoColors.Info.copy(alpha = 0.15f)
-                                    esProximo -> AmaniPsicologoColors.Primary.copy(alpha = 0.1f)
-                                    else -> AmaniPsicologoColors.Accent
-                                }
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CalendarToday,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(14.dp),
-                                        tint = when {
-                                            esHoy -> AmaniPsicologoColors.Success
-                                            esManana -> AmaniPsicologoColors.Info
-                                            else -> AmaniPsicologoColors.Primary
-                                        }
-                                    )
-                                    Text(
-                                        text = when {
-                                            esHoy -> "🔴 HOY a las ${proximaCita.horaInicio.format(formatterHora)}"
-                                            esManana -> "MAÑANA a las ${proximaCita.horaInicio.format(formatterHora)}"
-                                            else -> "${fechaCita.format(formatterFecha)} - ${proximaCita.horaInicio.format(formatterHora)}"
-                                        },
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = when {
-                                            esHoy -> AmaniPsicologoColors.Success
-                                            esManana -> AmaniPsicologoColors.Info
-                                            else -> AmaniPsicologoColors.Primary
-                                        }
-                                    )
-                                }
-                            }
-                        } else {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = AmaniPsicologoColors.Accent
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Schedule,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(14.dp),
-                                        tint = AmaniPsicologoColors.TextSecondary
-                                    )
-                                    Text(
-                                        text = "Sin citas programadas",
-                                        fontSize = 12.sp,
-                                        color = AmaniPsicologoColors.TextSecondary
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Email,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = AmaniPsicologoColors.TextSecondary
-                            )
-                            Text(
-                                text = paciente.email ?: "Email no disponible",
-                                fontSize = 12.sp,
-                                color = AmaniPsicologoColors.TextSecondary,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Phone,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = AmaniPsicologoColors.TextSecondary
-                            )
-                            Text(
-                                text = paciente.telefono ?: "Teléfono no disponible",
-                                fontSize = 12.sp,
-                                color = AmaniPsicologoColors.TextSecondary
-                            )
-                        }
-                    }
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = if (isPagoPendiente)
-                            AmaniPsicologoColors.Warning.copy(alpha = 0.2f)
-                        else
-                            AmaniPsicologoColors.Success.copy(alpha = 0.2f),
-                        modifier = Modifier.width(IntrinsicSize.Min)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = if (isPagoPendiente) Icons.Default.Warning else Icons.Default.CheckCircle,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = if (isPagoPendiente) AmaniPsicologoColors.Warning else AmaniPsicologoColors.Success
-                            )
-                            Text(
-                                text = if (isPagoPendiente) "PENDIENTE" else "PAGADO",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = if (isPagoPendiente) AmaniPsicologoColors.Warning else AmaniPsicologoColors.Success
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = onExpandClick,
-                        modifier = Modifier.size(32.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                            contentDescription = if (expanded) "Contraer" else "Expandir",
-                            tint = AmaniPsicologoColors.Primary
+                            imageVector = Icons.Outlined.Phone,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = AmaniPsicologoColors.TextSecondary
+                        )
+                        Text(
+                            text = paciente.telefono ?: "Teléfono no disponible",
+                            fontSize = 12.sp,
+                            color = AmaniPsicologoColors.TextSecondary
                         )
                     }
                 }
@@ -738,6 +525,7 @@ fun ExpandedContent(
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Datos Personales
             InfoSection(
                 title = "Datos Personales",
                 icon = Icons.Default.Person,
@@ -751,15 +539,18 @@ fun ExpandedContent(
                     "Teléfono" to (paciente.telefono ?: "No disponible")
                 )
             )
+
+            // Información de Tutores (si es menor de edad)
             val tutores = paciente.tutor ?: emptyList()
             if (esMenor && tutores.isNotEmpty()) {
                 TutorInfoSection(tutores = tutores)
             }
 
+            // Dirección
             paciente.direccion?.let { direccion ->
                 InfoSection(
                     title = "📍 Dirección",
-                    icon = Icons.Default.LocationOn,
+                    icon = Icons.Default.Person,
                     items = listOf(
                         "Calle" to (direccion.calle ?: "No disponible"),
                         "Ciudad" to (direccion.ciudad ?: "No disponible"),
@@ -769,103 +560,6 @@ fun ExpandedContent(
                     )
                 )
             }
-
-            InfoSection(
-                title = "💰 Estado de Pago",
-                icon = Icons.Default.Payment,
-                items = listOf(
-                    "Estado actual" to (paciente.estadoPago?.name ?: "PENDIENTE"),
-                    "Método de pago" to "Por definir"
-                )
-            )
-
-            if (!paciente.horaInicio.isNullOrEmpty() && !paciente.horaFin.isNullOrEmpty()) {
-                InfoSection(
-                    title = "⏰ Horario de Sesiones",
-                    icon = Icons.Default.Schedule,
-                    items = listOf(
-                        "Hora de inicio" to formatearHoraDesdeString(paciente.horaInicio),
-                        "Hora de fin" to formatearHoraDesdeString(paciente.horaFin),
-                        "Duración" to "${calcularDuracionDesdeStrings(paciente.horaInicio, paciente.horaFin)} minutos"
-                    )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Button(
-                onClick = { /* Navegar a historial clínico */ },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniPsicologoColors.Primary,
-                    contentColor = Color.White
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.History,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Historial",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Button(
-                onClick = { /* Navegar a agenda */ },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniPsicologoColors.Secondary,
-                    contentColor = AmaniPsicologoColors.Primary
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Agendar cita",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedButton(
-            onClick = { /* Abrir chat */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = AmaniPsicologoColors.Primary
-            )
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Message,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Enviar mensaje",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
-            )
         }
     }
 }
@@ -1106,30 +800,5 @@ private fun formatearFechaDesdeString(fechaStr: String?): String {
         fecha.format(formatterOutput)
     } catch (e: Exception) {
         fechaStr
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-private fun formatearHoraDesdeString(horaStr: String?): String {
-    if (horaStr.isNullOrEmpty()) return "No disponible"
-    return try {
-        val formatterInput = DateTimeFormatter.ofPattern("HH:mm:ss")
-        val hora = LocalTime.parse(horaStr, formatterInput)
-        val formatterOutput = DateTimeFormatter.ofPattern("HH:mm")
-        hora.format(formatterOutput)
-    } catch (e: Exception) {
-        horaStr
-    }
-}
-
-private fun calcularDuracionDesdeStrings(inicioStr: String?, finStr: String?): Int {
-    if (inicioStr.isNullOrEmpty() || finStr.isNullOrEmpty()) return 0
-    return try {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-        val inicio = LocalTime.parse(inicioStr, formatter)
-        val fin = LocalTime.parse(finStr, formatter)
-        (fin.hour - inicio.hour) * 60 + (fin.minute - inicio.minute)
-    } catch (e: Exception) {
-        0
     }
 }

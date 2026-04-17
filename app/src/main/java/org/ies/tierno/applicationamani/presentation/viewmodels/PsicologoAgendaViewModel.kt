@@ -304,7 +304,7 @@ class PsicologoAgendaViewModel(
         metodoPago: MetodoPago,
         estadoPago: EstadoPago,  // ← AÑADIR ESTE PARÁMETRO
         monto: BigDecimal,
-        modalidad : ModalidadCita
+        modalidad: ModalidadCita
     ) {
         if (idCita <= 0) {
             _errorMessage.value = "ID de cita inválido"
@@ -468,20 +468,15 @@ class PsicologoAgendaViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             citasRepository.cambiarEstadoCita(idCita, nuevoEstado)
-                .onSuccess { citaActualizada ->
-                    // Actualizar la lista local
-                    _agendaMensual.value = _agendaMensual.value
-                        .map { if (it.id == idCita) citaActualizada else it }
-                        .sortedWith(
-                            compareBy<AgendaItemDTO> { it.fecha }
-                                .thenBy { it.horaInicio }
-                        )
-                    _successMessage.value = "Estado actualizado a ${nuevoEstado.name}"
+                .onSuccess {
+                    _agendaMensual.value = _agendaMensual.value.map {
+                        if (it.id == idCita) {
+                            it.copy(estado = nuevoEstado.name)
+                        } else it
+                    }
                 }
-                .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al cambiar el estado"
-                }
-            _isLoading.value = false
         }
     }
+
+
 }
