@@ -147,7 +147,7 @@ class CitasViewModel(
         val request = CrearCitaRequestDTO(
             idPaciente = idPaciente,
             idPsicologo = idPsicologo,
-            startDatetime = startDatetime.toString(),
+            startDatetime = startDatetime,
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = if (metodoPago == MetodoPago.ONLINE)
