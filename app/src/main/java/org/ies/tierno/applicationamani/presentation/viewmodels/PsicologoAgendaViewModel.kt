@@ -441,7 +441,7 @@ class PsicologoAgendaViewModel(
         _isLoading.value = true
 
         return try {
-            val resultado = citasRepository.crearCitaPsicologo(request)
+            val resultado = citasRepository.crearCita(request)
 
             if (resultado.isSuccess) {
                 android.util.Log.e("CITA_ERROR", "✅ CITA CREADA CON ÉXITO")

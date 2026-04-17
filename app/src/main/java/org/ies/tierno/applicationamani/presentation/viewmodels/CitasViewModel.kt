@@ -142,7 +142,8 @@ class CitasViewModel(
         val idPsicologo = _psicologoId.value ?: session.idPsicologo
         ?: return Result.failure(Exception("No hay psicólogo asignado"))
 
-        val startDatetime = LocalDateTime.of(fecha, hora)
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
         val request = CrearCitaRequestDTO(
             idPaciente = idPaciente,
