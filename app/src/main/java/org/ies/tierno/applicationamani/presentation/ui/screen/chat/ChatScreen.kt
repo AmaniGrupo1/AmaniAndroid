@@ -16,7 +16,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -117,6 +121,9 @@ fun ChatScreen(
         },
         bottomBar = {
             ChatInputBar(
+                modifier = Modifier.windowInsetsPadding(
+                    WindowInsets.navigationBars.union(WindowInsets.ime)
+                ),
                 text = uiState.inputText,
                 onTextChange = viewModel::onInputChanged,
                 onSend = viewModel::sendMessage,
@@ -146,7 +153,7 @@ fun ChatScreen(
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = Modifier.imePadding()
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -190,7 +197,7 @@ fun ChatScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
                         reverseLayout = true,
-                        contentPadding = PaddingValues(horizontal = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
                     ) {
                         items(
                             items = chatItems,

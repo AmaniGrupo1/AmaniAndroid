@@ -23,19 +23,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.data.remoto.FileStorageService
 import org.ies.tierno.applicationamani.domain.models.Message
-import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveMessageDeliveryUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import java.io.File
 

@@ -1,5 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Description
@@ -36,22 +38,17 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment as Alignment2
-import androidx.compose.ui.text.font.FontWeight
 import org.ies.tierno.applicationamani.domain.models.AttachmentType
 import org.ies.tierno.applicationamani.domain.models.Message
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.PsychologistInfo
+import androidx.compose.ui.Alignment as Alignment2
 
 @Composable
 fun MessageBubble(

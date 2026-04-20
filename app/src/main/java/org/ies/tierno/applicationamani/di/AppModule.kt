@@ -16,8 +16,14 @@ import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
+import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
@@ -47,12 +53,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePs
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
-import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
-import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module

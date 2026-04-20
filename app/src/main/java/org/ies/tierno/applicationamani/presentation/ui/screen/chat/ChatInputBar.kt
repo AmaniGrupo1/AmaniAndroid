@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,11 +7,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,9 +55,10 @@ fun ChatInputBar(
     onStopRecording: () -> Unit,
     isRecording: Boolean,
     recordingSeconds: Int,
-    isOtherTyping: Boolean = false
+    isOtherTyping: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         if (isRecording) {
             RecordingBar(
                 recordingSeconds = recordingSeconds,
