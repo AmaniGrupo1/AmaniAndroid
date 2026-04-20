@@ -1,0 +1,175 @@
+.class public abstract Landroidx/media3/extractor/text/SubtitleOutputBuffer;
+.super Landroidx/media3/decoder/DecoderOutputBuffer;
+.source "SubtitleOutputBuffer.java"
+
+# interfaces
+.implements Landroidx/media3/extractor/text/Subtitle;
+
+
+# instance fields
+.field private subsampleOffsetUs:J
+
+.field private subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+
+# direct methods
+.method public constructor <init>()V
+    .locals 0
+
+    .line 29
+    invoke-direct {p0}, Landroidx/media3/decoder/DecoderOutputBuffer;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public clear()V
+    .locals 1
+
+    .line 72
+    invoke-super {p0}, Landroidx/media3/decoder/DecoderOutputBuffer;->clear()V
+
+    .line 73
+    const/4 v0, 0x0
+
+    iput-object v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+    .line 74
+    return-void
+.end method
+
+.method public getCues(J)Ljava/util/List;
+    .locals 3
+    .param p1, "timeUs"    # J
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(J)",
+            "Ljava/util/List<",
+            "Landroidx/media3/common/text/Cue;",
+            ">;"
+        }
+    .end annotation
+
+    .line 67
+    iget-object v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+    invoke-static {v0}, Lcom/google/common/base/Preconditions;->checkNotNull(Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    check-cast v0, Landroidx/media3/extractor/text/Subtitle;
+
+    iget-wide v1, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subsampleOffsetUs:J
+
+    sub-long v1, p1, v1
+
+    invoke-interface {v0, v1, v2}, Landroidx/media3/extractor/text/Subtitle;->getCues(J)Ljava/util/List;
+
+    move-result-object v0
+
+    return-object v0
+.end method
+
+.method public getEventTime(I)J
+    .locals 4
+    .param p1, "index"    # I
+
+    .line 57
+    iget-object v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+    invoke-static {v0}, Lcom/google/common/base/Preconditions;->checkNotNull(Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    check-cast v0, Landroidx/media3/extractor/text/Subtitle;
+
+    invoke-interface {v0, p1}, Landroidx/media3/extractor/text/Subtitle;->getEventTime(I)J
+
+    move-result-wide v0
+
+    iget-wide v2, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subsampleOffsetUs:J
+
+    add-long/2addr v0, v2
+
+    return-wide v0
+.end method
+
+.method public getEventTimeCount()I
+    .locals 1
+
+    .line 52
+    iget-object v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+    invoke-static {v0}, Lcom/google/common/base/Preconditions;->checkNotNull(Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    check-cast v0, Landroidx/media3/extractor/text/Subtitle;
+
+    invoke-interface {v0}, Landroidx/media3/extractor/text/Subtitle;->getEventTimeCount()I
+
+    move-result v0
+
+    return v0
+.end method
+
+.method public getNextEventTimeIndex(J)I
+    .locals 3
+    .param p1, "timeUs"    # J
+
+    .line 62
+    iget-object v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+    invoke-static {v0}, Lcom/google/common/base/Preconditions;->checkNotNull(Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    check-cast v0, Landroidx/media3/extractor/text/Subtitle;
+
+    iget-wide v1, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subsampleOffsetUs:J
+
+    sub-long v1, p1, v1
+
+    invoke-interface {v0, v1, v2}, Landroidx/media3/extractor/text/Subtitle;->getNextEventTimeIndex(J)I
+
+    move-result v0
+
+    return v0
+.end method
+
+.method public setContent(JLandroidx/media3/extractor/text/Subtitle;J)V
+    .locals 2
+    .param p1, "timeUs"    # J
+    .param p3, "subtitle"    # Landroidx/media3/extractor/text/Subtitle;
+    .param p4, "subsampleOffsetUs"    # J
+
+    .line 44
+    iput-wide p1, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->timeUs:J
+
+    .line 45
+    iput-object p3, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subtitle:Landroidx/media3/extractor/text/Subtitle;
+
+    .line 46
+    nop
+
+    .line 47
+    const-wide v0, 0x7fffffffffffffffL
+
+    cmp-long v0, p4, v0
+
+    if-nez v0, :cond_0
+
+    iget-wide v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->timeUs:J
+
+    goto :goto_0
+
+    :cond_0
+    move-wide v0, p4
+
+    :goto_0
+    iput-wide v0, p0, Landroidx/media3/extractor/text/SubtitleOutputBuffer;->subsampleOffsetUs:J
+
+    .line 48
+    return-void
+.end method

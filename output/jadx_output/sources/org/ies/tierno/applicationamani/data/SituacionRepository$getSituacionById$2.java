@@ -1,0 +1,88 @@
+package org.ies.tierno.applicationamani.data;
+
+import kotlin.Metadata;
+import kotlin.Result;
+import kotlin.ResultKt;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.intrinsics.IntrinsicsKt;
+import kotlin.coroutines.jvm.internal.DebugMetadata;
+import kotlin.coroutines.jvm.internal.SuspendLambda;
+import kotlin.jvm.functions.Function2;
+import kotlin.jvm.internal.Intrinsics;
+import kotlinx.coroutines.CoroutineScope;
+import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO;
+import retrofit2.HttpException;
+import retrofit2.Response;
+
+/* JADX INFO: compiled from: SituacionRepositoty.kt */
+/* JADX INFO: loaded from: classes7.dex */
+@Metadata(d1 = {"\u0000\u000e\n\u0000\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\u0018\u0002\u0010\u0000\u001a\b\u0012\u0004\u0012\u00020\u00020\u0001*\u00020\u0003H\n"}, d2 = {"<anonymous>", "Lkotlin/Result;", "Lorg/ies/tierno/applicationamani/dto/situacionDTO/SituacionDTO;", "Lkotlinx/coroutines/CoroutineScope;"}, k = 3, mv = {2, 2, 0}, xi = 48)
+@DebugMetadata(c = "org.ies.tierno.applicationamani.data.SituacionRepository$getSituacionById$2", f = "SituacionRepositoty.kt", i = {}, l = {38}, m = "invokeSuspend", n = {}, s = {})
+final class SituacionRepository$getSituacionById$2 extends SuspendLambda implements Function2<CoroutineScope, Continuation<? super Result<? extends SituacionDTO>>, Object> {
+    final /* synthetic */ long $id;
+    int label;
+    final /* synthetic */ SituacionRepository this$0;
+
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    SituacionRepository$getSituacionById$2(SituacionRepository situacionRepository, long j, Continuation<? super SituacionRepository$getSituacionById$2> continuation) {
+        super(2, continuation);
+        this.this$0 = situacionRepository;
+        this.$id = j;
+    }
+
+    @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
+    public final Continuation<Unit> create(Object obj, Continuation<?> continuation) {
+        return new SituacionRepository$getSituacionById$2(this.this$0, this.$id, continuation);
+    }
+
+    @Override // kotlin.jvm.functions.Function2
+    public /* bridge */ /* synthetic */ Object invoke(CoroutineScope coroutineScope, Continuation<? super Result<? extends SituacionDTO>> continuation) {
+        return invoke2(coroutineScope, (Continuation<? super Result<SituacionDTO>>) continuation);
+    }
+
+    /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+    public final Object invoke2(CoroutineScope coroutineScope, Continuation<? super Result<SituacionDTO>> continuation) {
+        return ((SituacionRepository$getSituacionById$2) create(coroutineScope, continuation)).invokeSuspend(Unit.INSTANCE);
+    }
+
+    @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
+    public final Object invokeSuspend(Object $result) {
+        Object objM8542constructorimpl;
+        Object situacionById;
+        Object coroutine_suspended = IntrinsicsKt.getCOROUTINE_SUSPENDED();
+        try {
+            switch (this.label) {
+                case 0:
+                    ResultKt.throwOnFailure($result);
+                    this.label = 1;
+                    situacionById = this.this$0.api.getSituacionById(this.$id, this);
+                    if (situacionById == coroutine_suspended) {
+                        return coroutine_suspended;
+                    }
+                    break;
+                case 1:
+                    ResultKt.throwOnFailure($result);
+                    situacionById = $result;
+                    break;
+                default:
+                    throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine");
+            }
+            Response response = (Response) situacionById;
+            if (response.isSuccessful() && response.body() != null) {
+                Object objBody = response.body();
+                Intrinsics.checkNotNull(objBody);
+                SituacionDTO dto = (SituacionDTO) objBody;
+                Result.Companion companion = Result.INSTANCE;
+                objM8542constructorimpl = Result.m8542constructorimpl(new SituacionDTO(dto.getIdSituacion(), dto.getNombre(), dto.getCategoria(), dto.getDescripcion()));
+            } else {
+                Result.Companion companion2 = Result.INSTANCE;
+                objM8542constructorimpl = Result.m8542constructorimpl(ResultKt.createFailure(new HttpException(response)));
+            }
+        } catch (Exception e) {
+            Result.Companion companion3 = Result.INSTANCE;
+            objM8542constructorimpl = Result.m8542constructorimpl(ResultKt.createFailure(e));
+        }
+        return Result.m8541boximpl(objM8542constructorimpl);
+    }
+}

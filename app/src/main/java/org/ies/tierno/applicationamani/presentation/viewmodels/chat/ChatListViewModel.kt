@@ -2,14 +2,14 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
+import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 
 data class ChatPartner(
     val id: Long,
@@ -59,8 +59,9 @@ class ChatListViewModel(
                 when (normalizeRole(session.rol)) {
                     "paciente" -> {
                         if (session.idPsicologo != null) {
+                            // idPsicologo ya es el idUsuario del psicólogo (endpoint /psicologo/usuario/{id})
                             _partnerId.value = session.idPsicologo
-                            loadPartnerNombre(session.idPsicologo)
+                            loadPsicologoNombre(session.idPsicologo)
                         } else {
                             _isLoading.value = false
                         }
@@ -68,8 +69,8 @@ class ChatListViewModel(
 
                     "psicologo", "psicologa" -> {
                         if (session.idPaciente != null) {
-                            _partnerId.value = session.idPaciente
-                            loadPartnerNombre(session.idPaciente)
+                            // idPaciente en sesión es ahora Firebase user ID (después del fix del backend)
+                            resolvePacienteParaChat(session.idPaciente)
                         } else {
                             loadFirstAssignedPatient()
                         }
@@ -85,15 +86,52 @@ class ChatListViewModel(
         }
     }
 
+    /**
+     * Dado un idPaciente (Firebase user ID), obtiene el perfil completo del paciente
+     * para extraer su idUsuario real y usarlo como partnerId en el chat.
+     */
+    private fun resolvePacienteParaChat(idPaciente: Long) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                // Usar getPacienteByIdFirebase que acepta el Firebase UID (idUsuario)
+                val result = profileUseCaseGeneral.getPacienteByIdFirebase(idPaciente)
+                result.onSuccess { profile ->
+                    // profile.usuario.idUsuario ya es el Firebase UID (idPaciente que pasamos)
+                    // lo usamos directamente como partnerId
+                    if (profile.usuario?.idUsuario != null) {
+                        _partnerId.value = profile.usuario.idUsuario
+                        val nombre = buildString {
+                            profile.usuario?.nombre?.let { append(it) }
+                            profile.usuario?.apellido?.let {
+                                if (isNotEmpty()) append(" ")
+                                append(it)
+                            }
+                        }
+                        _partnerNombre.value = nombre.ifEmpty { "Tu Paciente" }
+                    } else {
+                        _partnerNombre.value = "Tu Paciente"
+                    }
+                }.onFailure {
+                    _partnerNombre.value = "Tu Paciente"
+                }
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     private fun loadFirstAssignedPatient() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val pacientes = listarPacientesByPsicologo().first()
                 val first = pacientes.firstOrNull()
-                if (first?.idPaciente != null) {
-                    _partnerId.value = first.idPaciente
-                    loadPartnerNombre(first.idPaciente)
+                // Usar idUsuario (Firebase) si está disponible, si no idPaciente (DB)
+                // El backend a veces solo devuelve idPaciente (DB table ID)
+                val pacienteId = first?.idUsuario ?: first?.idPaciente
+                if (pacienteId != null) {
+                    resolvePacienteParaChat(pacienteId)
                 } else {
                     _isLoading.value = false
                 }
@@ -103,40 +141,22 @@ class ChatListViewModel(
         }
     }
 
-    private fun loadPartnerNombre(partnerId: Long) {
+    private fun loadPsicologoNombre(idUsuarioPsicologo: Long) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val session = userSessionDataStore.getSession()
-                val normalizedRol = session?.rol?.let { normalizeRole(it) }
-                if (normalizedRol == "paciente") {
-                    val result = profileUseCaseGeneral.getPsicologoById(partnerId)
-                    result.onSuccess { profile ->
-                        val nombre = buildString {
-                            profile.usuario?.nombre?.let { append(it) }
-                            profile.usuario?.apellido?.let { 
-                                if (isNotEmpty()) append(" ")
-                                append(it) 
-                            }
+                val result = profileUseCaseGeneral.getPsicologoById(idUsuarioPsicologo)
+                result.onSuccess { profile ->
+                    val nombre = buildString {
+                        profile.usuario?.nombre?.let { append(it) }
+                        profile.usuario?.apellido?.let {
+                            if (isNotEmpty()) append(" ")
+                            append(it)
                         }
-                        _partnerNombre.value = nombre.ifEmpty { "Tu Psicólogo" }
-                    }.onFailure {
-                        _partnerNombre.value = "Tu Psicólogo"
                     }
-                } else {
-                    val result = profileUseCaseGeneral.getPacienteById(partnerId)
-                    result.onSuccess { profile ->
-                        val nombre = buildString {
-                            profile.usuario?.nombre?.let { append(it) }
-                            profile.usuario?.apellido?.let { 
-                                if (isNotEmpty()) append(" ")
-                                append(it) 
-                            }
-                        }
-                        _partnerNombre.value = nombre.ifEmpty { "Tu Paciente" }
-                    }.onFailure {
-                        _partnerNombre.value = "Tu Paciente"
-                    }
+                    _partnerNombre.value = nombre.ifEmpty { "Tu Psicólogo" }
+                }.onFailure {
+                    _partnerNombre.value = "Tu Psicólogo"
                 }
             } finally {
                 _isLoading.value = false

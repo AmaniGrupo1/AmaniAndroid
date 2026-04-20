@@ -1,71 +1,84 @@
 # 🧠 Amani — Aplicación de Gestión de Consultas Psicológicas
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Android-24+-green?logo=android" />
-  <img src="https://img.shields.io/badge/Kotlin-2.2-purple?logo=kotlin" />
-  <img src="https://img.shields.io/badge/Jetpack_Compose-Material3-blue?logo=jetpackcompose" />
-  <img src="https://img.shields.io/badge/Gradle-9.3.1-grey?logo=gradle" />
+  <img src="https://img.shields.io/badge/Android-24+-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
+  <img src="https://img.shields.io/badge/Kotlin-2.2-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" />
+  <img src="https://img.shields.io/badge/Jetpack_Compose-Material3-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" />
+  <img src="https://img.shields.io/badge/Gradle-9.3.1-02303A?style=for-the-badge&logo=gradle&logoColor=white" />
+  <img src="https://img.shields.io/badge/Licencia-Educativa-orange?style=for-the-badge" />
 </p>
 
-**Amani** es una aplicación Android nativa para la gestión integral de consultas psicológicas. Conecta a **administradores**, **psicólogos** y **pacientes** a través de una interfaz moderna construida con Jetpack Compose y un backend REST.
+<p align="center">
+  <strong>Amani</strong> es una aplicación Android nativa para la gestión integral de consultas psicológicas.<br/>
+  Conecta a <strong>administradores</strong>, <strong>psicólogos</strong> y <strong>pacientes</strong> a través de una interfaz moderna construida con Jetpack Compose y un backend REST.
+</p>
 
 ---
 
 ## 📋 Tabla de Contenidos
 
-- [Características](#-características)
-- [Arquitectura](#-arquitectura)
-- [Stack Tecnológico](#-stack-tecnológico)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Requisitos Previos](#-requisitos-previos)
-- [Instalación y Configuración](#-instalación-y-configuración)
-- [Roles y Funcionalidades](#-roles-y-funcionalidades)
-- [Endpoints de la API](#-endpoints-de-la-api)
-- [Navegación](#-navegación)
-- [Capturas de Pantalla](#-capturas-de-pantalla)
-- [Roadmap](#-roadmap)
-- [Autores](#-autores)
-- [Licencia](#-licencia)
+- [✨ Características](#-características)
+- [🏗 Arquitectura](#-arquitectura)
+- [🛠 Stack Tecnológico](#-stack-tecnológico)
+- [📁 Requisitos Previos](#-requisitos-previos)
+- [🚀 Instalación y Configuración](#-instalación-y-configuración)
+- [👥 Roles y Funcionalidades](#-roles-y-funcionalidades)
+- [🌐 Endpoints de la API](#-endpoints-de-la-api)
+- [🧭 Navegación](#-navegación)
+- [📸 Capturas de Pantalla](#-capturas-de-pantalla)
+- [🗺 Roadmap](#-roadmap)
+- [🔧 Configuración Avanzada](#-configuración-avanzada)
+- [👤 Contribuidores](#-contribuidores)
+- [📄 Licencia](#-licencia)
 
 ---
 
 ## ✨ Características
 
-- 🔐 **Autenticación JWT** — Login seguro con token persistido localmente vía DataStore.
-- 👨‍⚕️ **Panel de Administración** — CRUD completo de pacientes, psicólogos y cuestionarios.
-- 📝 **Cuestionarios psicológicos** — Creación de preguntas con opciones múltiples y respuestas con valor numérico.
-- 🤝 **Asignación paciente-psicólogo** — El admin asigna pacientes a psicólogos disponibles.
-- ✅ **Consentimiento informado** — Flujo de registro con aceptación de consentimiento (vídeo y comunicación).
-- 🎨 **Material 3 + Dynamic Color** — Tema adaptativo con soporte para dark mode y colores dinámicos (Android 12+).
-- 💉 **Inyección de dependencias** — Módulos Koin para desacoplamiento total entre capas.
+|  | Funcionalidad | Descripción |
+|---|---|---|
+| 🔐 | **Autenticación JWT** | Login seguro con token persistido localmente vía DataStore |
+| 👨‍⚕️ | **Panel de Administración** | CRUD completo de pacientes, psicólogos y cuestionarios |
+| 📝 | **Cuestionarios psicológicos** | Preguntas con opciones múltiples y valores numéricos |
+| 🤝 | **Asignación paciente-psicólogo** | El administrador asigna pacientes a psicólogos disponibles |
+| ✅ | **Consentimiento informado** | Flujo de registro con aceptación de consentimiento (vídeo y comunicación) |
+| 🎨 | **Material 3 + Dynamic Color** | Tema adaptativo con dark mode y colores dinámicos (Android 12+) |
+| 💉 | **Inyección de dependencias** | Módulos Koin para desacoplamiento total entre capas |
 
 ---
 
 ## 🏗 Arquitectura
 
-El proyecto sigue **Clean Architecture** con separación clara en capas:
+El proyecto sigue **Clean Architecture + MVVM** con separación clara en tres capas:
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                   PRESENTATION                       │
-│  Screens (Compose) ← ViewModels ← StateFlow/Flow   │
-├─────────────────────────────────────────────────────┤
-│                      DOMAIN                          │
-│         UseCases ← Models / DTOs                    │
-├─────────────────────────────────────────────────────┤
-│                       DATA                           │
-│   Repositories ← Retrofit APIs ← Backend REST       │
-│                 ← DataStore (local)                  │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────��───────────────┐
+│                      PRESENTATION                            │
+│        Screens (Compose)  ←  ViewModels  ←  StateFlow       │
+├─────────────────────────────────────────────────────────────┤
+│                         DOMAIN                               │
+│              UseCases  ←  Models / DTOs                      │
+├─────────────────────────────────────────────────────────────┤
+│                          DATA                                │
+│   Repositories  ←  Retrofit APIs  ←  Backend REST (:8080)   │
+│                 ←  DataStore (JWT local)                     │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 **Flujo de datos:**
 
 ```
-UI (Compose) → ViewModel → UseCase → Repository → Retrofit API → Backend (:8080)
-                                         ↕
-                                  TokenDataStore (JWT)
+UI (Compose) ──► ViewModel ──► UseCase ──► Repository ──► Retrofit ──► Backend
+                                               │
+                                        TokenDataStore (JWT)
 ```
+
+| Capa | Color | Responsabilidad |
+|---|---|---|
+| **Data** | 🟦 | APIs Retrofit, DataStore, implementación de repositorios |
+| **Domain** | 🟩 | Modelos de negocio, casos de uso |
+| **Presentation** | 🟧 | UI con Jetpack Compose, ViewModels |
+| **DI** | 🟪 | Inyección de dependencias con Koin |
 
 ---
 
@@ -81,106 +94,22 @@ UI (Compose) → ViewModel → UseCase → Repository → Retrofit API → Backe
 | **Persistencia local** | DataStore Preferences | 1.2.1 |
 | **Coroutines** | Kotlinx Coroutines | 1.10.2 |
 | **Build system** | Gradle (Kotlin DSL) | 9.3.1 |
-| **AGP** | Android Gradle Plugin | 9.0.1 |
-| **Min SDK** | Android 7.0 (API 24) | — |
-| **Target SDK** | Android 14 (API 34) | — |
-| **Compile SDK** | API 36 | — |
+| **Android Gradle Plugin** | AGP | 9.0.1 |
+| **Min SDK** | Android 7.0 | API 24 |
+| **Target SDK** | Android 14 | API 34 |
+| **Compile SDK** | — | API 36 |
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Requisitos Previos
 
-```
-app/src/main/java/org/ies/tierno/applicationamani/
-│
-├── MainActivity.kt                  # Activity principal, punto de entrada
-├── MyLibraryApplication.kt          # Application class, inicializa Koin
-│
-├── data/                            # 🟦 CAPA DE DATOS
-│   ├── local/
-│   │   └── TokenDataStore.kt        # Persistencia JWT con DataStore
-│   ├── remoto/
-│   │   ├── AuthApi.kt               # Endpoints de autenticación y admin
-│   │   ├── TestApi.kt               # Endpoints de cuestionarios
-│   │   ├── AuthInterceptor.kt       # Interceptor OkHttp (inyecta Bearer token)
-│   │   └── CustomerClient.kt        # (Legacy, no usado)
-│   └── repositorio/
-│       ├── AuthRepository.kt        # Repositorio principal (auth + admin)
-│       ├── TestRepositoryApi.kt     # Repositorio de tests/cuestionarios
-│       ├── CustomerRepository.kt    # Utilidad de polling genérico
-│       ├── PreguntasRepository.kt   # (Comentado, legacy Firebase)
-│       └── RespuestaRepository.kt   # (Comentado, legacy Firebase)
-│
-├── domain/                          # 🟩 CAPA DE DOMINIO
-│   ├── models/
-│   │   ├── User.kt                  # Modelo genérico de usuario
-│   │   ├── login/                   # LoginRequestDTO, LoginResponseDTO, RegistryPacienteDTO
-│   │   ├── admin/                   # RegistrarPsicologoAdminDTO, PsicologoSelfResponseDTO...
-│   │   ├── psicologo/               # CitaPsicologo, PacienteAsignado (en desarrollo)
-│   │   └── test/                    # PreguntaConOpciones, Opcion, Respuesta, RespuestasRequestDTO
-│   └── usecases/
-│       ├── login/
-│       │   └── LoginUseCase.kt      # Login, registro paciente/admin/psicólogo
-│       ├── adminUseCase/
-│       │   ├── GetAllClientAndPsicologoUseCase.kt
-│       │   ├── CrearPreguntaUseCase.kt
-│       │   ├── DarBajaPacienteUseCase.kt
-│       │   ├── TodosLosPacientesUseCase.kt
-│       │   ├── ListarPsicologoAdminUseCase.kt
-│       │   └── AsignarPacienteAlPsicologoUseCase.kt
-│       └── pacienteUseCase/
-│           ├── ListarPreguntasUseCase.kt
-│           └── ResponderTestUseCase.kt
-│
-├── dto/                             # 🟨 DTOs DE TRANSFERENCIA
-│   ├── login/                       # PsicologoConPacientesDTO, PacientesAsignadoDTO
-│   ├── opcionAdminDTO/              # OpcionAdminDTO, PreguntaRequest
-│   └── requestPaciente/             # PacienteRequest, UsuarioRequest, CitaRequest...
-│
-├── presentation/                    # 🟧 CAPA DE PRESENTACIÓN
-│   ├── navigation/
-│   │   ├── screen/Screens.kt        # 16 rutas (sealed class)
-│   │   └── navGraph/NavGraph.kt     # Configuración NavHost
-│   ├── viewmodels/
-│   │   ├── LoginViewModel.kt        # ViewModel principal (auth + registro)
-│   │   ├── PrincipalClienteViewModel.kt
-│   │   ├── SettingsClienteViewModel.kt
-│   │   ├── admin/                   # CrearPreguntaVM, ListarPacientesVM...
-│   │   └── cuestionario/            # CuestionarioViewModel
-│   ├── components/
-│   │   └── BottomBar.kt             # Barra de navegación inferior
-│   └── ui/
-│       ├── componente/              # MenuAdministrador, MenuPrincipal, BottomBar
-│       └── screen/
-│           ├── LoginScreen.kt
-│           ├── Principal.kt
-│           ├── PrincipalClienteScreen.kt
-│           ├── SettingsClienteScreen.kt
-│           ├── AdminView/           # 7 pantallas de administración
-│           ├── psicologoView/       # ViewPsicologoPrincipal (en desarrollo)
-│           ├── pacienteView/        # ViewPacientePrincipal, TestPacienteScreen
-│           ├── cuestionario/        # Cuestionario.kt
-│           └── consentimiento/      # ConsentimientoScreen, RegisterScreen...
-│
-├── di/                              # 🟪 INYECCIÓN DE DEPENDENCIAS
-│   ├── AppModule.kt                 # Repositorios, UseCases, ViewModels
-│   └── RetrofitModule.kt            # Retrofit, OkHttp, APIs, TokenDataStore
-│
-└── ui/theme/                        # 🎨 TEMA
-    ├── Color.kt                     # Paleta púrpura/rosa
-    ├── Theme.kt                     # Material 3 + Dynamic Color
-    └── Type.kt                      # Tipografía
-```
+Antes de comenzar, asegúrate de tener instalado:
 
----
-
-## 📋 Requisitos Previos
-
-- **Android Studio** Ladybug (2024.3+) o superior
-- **JDK 11** o superior
-- **Android SDK** con API 36 instalada
-- **Backend REST** corriendo en `http://localhost:8080` (Spring Boot)
-- **Emulador Android** o dispositivo físico (API 24+)
+- ✅ **Android Studio** Ladybug (2024.3) o superior
+- ✅ **JDK 11** o superior
+- ✅ **Android SDK** con API 36
+- ✅ **Backend REST** (Spring Boot) corriendo en `http://localhost:8080`
+- ✅ **Emulador** Android o dispositivo físico con API 24+
 
 ---
 
@@ -189,28 +118,35 @@ app/src/main/java/org/ies/tierno/applicationamani/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/AmaniGrupo1/AmaniAndroid.git
 cd AmaniAndroid
 ```
 
-### 2. Configurar el backend
+### 2. Configurar la URL del backend
 
-La app espera un backend REST en `http://10.0.2.2:8080` (dirección del host desde el emulador Android).
+La app apunta por defecto a `http://10.0.2.2:8080` (host desde el emulador de Android).
 
-Si usas un **dispositivo físico**, modifica la URL base en `app/.../di/RetrofitModule.kt`:
+Si usas un **dispositivo físico**, edita `app/.../di/RetrofitModule.kt`:
 
 ```kotlin
-.baseUrl("http://<TU_IP_LOCAL>:8080")
+// Emulador (por defecto)
+.baseUrl("http://10.0.2.2:8080")
+
+// Dispositivo físico en la misma red
+.baseUrl("http://192.168.1.XXX:8080")
+
+// Servidor remoto
+.baseUrl("https://tu-dominio.com/api/")
 ```
 
 ### 3. Compilar y ejecutar
 
 ```bash
-# Desde terminal
+# Compilar APK de debug
 ./gradlew assembleDebug
-
-# O abrir directamente en Android Studio y pulsar ▶ Run
 ```
+
+> También puedes abrir el proyecto en **Android Studio** y pulsar ▶️ **Run**.
 
 ### 4. Permisos requeridos
 
@@ -233,17 +169,17 @@ Si usas un **dispositivo físico**, modifica la URL base en `app/.../di/Retrofit
 | Listar todos los pacientes | `ListadoPacientesScreen` |
 | Listar todos los psicólogos | `ListadoPsicologosScreen` |
 | Asignar paciente a psicólogo | `ListadoPsicologosScreen` (selección) |
-| Dar de baja pacientes | `ListadoPacientesScreen` (acción) |
+| Dar de baja un paciente | `ListadoPacientesScreen` (acción) |
 | Crear preguntas de test | `TestScreen` |
 
 ### 👨‍⚕️ Psicólogo
 
-| Funcionalidad | Pantalla |
+| Funcionalidad | Estado |
 |---|---|
-| Vista principal | `ViewPsicologoPrincipal` |
-| _Ver pacientes asignados_ | 🚧 En desarrollo |
-| _Gestión de citas_ | 🚧 En desarrollo |
-| _Gestión de horarios_ | 🚧 En desarrollo |
+| Vista principal | ✅ Disponible (`ViewPsicologoPrincipal`) |
+| Ver pacientes asignados | 🚧 En desarrollo |
+| Gestión de citas | 🚧 En desarrollo |
+| Gestión de horarios | 🚧 En desarrollo |
 
 ### 🧑‍🤝‍🧑 Paciente
 
@@ -259,17 +195,17 @@ Si usas un **dispositivo físico**, modifica la URL base en `app/.../di/Retrofit
 
 ## 🌐 Endpoints de la API
 
-### Autenticación
+### 🔓 Autenticación
 
 | Método | Ruta | Descripción |
 |---|---|---|
 | `POST` | `/auth/login` | Login (devuelve JWT + rol) |
 | `POST` | `/auth/register-paciente` | Registro de paciente |
-| `POST` | `/auth/registry/pacienteAdmin` | Registro de paciente (desde admin) |
+| `POST` | `/auth/registry/pacienteAdmin` | Registro de paciente desde admin |
 | `POST` | `/auth/register-admin` | Registro de administrador |
 | `PUT` | `/auth/pacientes/{id}/baja` | Dar de baja a un paciente |
 
-### Administración
+### 🔒 Administración *(requiere JWT)*
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -279,7 +215,7 @@ Si usas un **dispositivo físico**, modifica la URL base en `app/.../di/Retrofit
 | `POST` | `/api/admin/psicologos/asignar-psicologo` | Asignar paciente a psicólogo |
 | `GET` | `/api/pacientes/admin` | Listar todos los pacientes |
 
-### Cuestionarios
+### 📋 Cuestionarios *(requiere JWT)*
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -291,12 +227,23 @@ Si usas un **dispositivo físico**, modifica la URL base en `app/.../di/Retrofit
 
 ## 🧭 Navegación
 
-La app tiene **16 rutas** gestionadas por Navigation Compose:
+La app gestiona **16 rutas** con Navigation Compose. El flujo de login redirige según el rol recibido en el `LoginResponseDTO`:
+
+```
+Login ──► rol →
+            ├── "admin"     ──► adminHome
+            ├── "psicologo" ──► psicologoHome
+            └── "paciente"  ──► pacienteHome
+```
+
+**Árbol completo de rutas:**
 
 ```
 principal (inicio)
 ├── login
-├── registro → consentimiento → registroConsentimiento
+├── registro
+│   └── consentimiento
+│       └── registroConsentimiento
 │
 ├── adminHome
 │   ├── agregarPsicologo
@@ -311,37 +258,30 @@ principal (inicio)
 │
 ├── psicologoHome
 │
-├── pacienteHome
-│   ├── testPaciente/{pacienteId}
-│   ├── vistaPrincipalPaciente
-│   └── settings
-```
-
-**Flujo de login según rol:**
-
-```
-Login → LoginResponseDTO.rol →
-    ├── "admin"     → adminHome
-    ├── "psicologo" → psicologoHome
-    └── "paciente"  → pacienteHome
+└── pacienteHome
+    ├── testPaciente/{pacienteId}
+    ├── vistaPrincipalPaciente
+    └── settings
 ```
 
 ---
 
 ## 📸 Capturas de Pantalla
 
-> _Próximamente: añade capturas en una carpeta `screenshots/` y referéncialas aquí._
+> 📌 *Próximamente — añade las capturas en una carpeta `screenshots/` y referéncialas aquí.*
 
-| Pantalla | Descripción |
+| Pantalla | Vista previa |
 |---|---|
-| <!-- ![Principal](screenshots/principal.png) --> | Pantalla de bienvenida |
-| <!-- ![Login](screenshots/login.png) --> | Inicio de sesión |
-| <!-- ![Admin](screenshots/admin.png) --> | Panel de administración |
-| <!-- ![Test](screenshots/test.png) --> | Cuestionario psicológico |
+| 🏠 Bienvenida | `screenshots/principal.png` |
+| 🔑 Login | `screenshots/login.png` |
+| 🛠 Panel Admin | `screenshots/admin.png` |
+| 📝 Cuestionario | `screenshots/test.png` |
 
 ---
 
 ## 🗺 Roadmap
+
+#### ✅ Completado
 
 - [x] Autenticación JWT con persistencia local
 - [x] Panel de administración completo
@@ -351,37 +291,25 @@ Login → LoginResponseDTO.rol →
 - [x] Dar de baja pacientes
 - [x] Listado de psicólogos desde admin
 - [x] Registro de administradores desde admin
-- [ ] 🚧 Vista completa del psicólogo (pacientes asignados, citas)
-- [ ] 🚧 Gestión de horarios del psicólogo
-- [ ] 🚧 Notificaciones push locales
-- [ ] 🚧 Integración con calendario del sistema
-- [ ] 🚧 Chat entre paciente y psicólogo
-- [ ] 🚧 Diario del paciente
-- [ ] 🚧 Ajustes de perfil con persistencia real (backend)
-- [ ] 🚧 Tests unitarios y de integración
+
+#### 🚧 En desarrollo / Planificado
+
+- [ ] Vista completa del psicólogo (pacientes asignados, citas)
+- [ ] Gestión de horarios del psicólogo
+- [ ] Notificaciones push locales
+- [ ] Integración con calendario del sistema
+- [ ] Chat entre paciente y psicólogo
+- [ ] Diario del paciente
+- [ ] Ajustes de perfil con persistencia en backend
+- [ ] Tests unitarios y de integración
 
 ---
 
 ## 🔧 Configuración Avanzada
 
-### Cambiar URL del backend
-
-Edita `RetrofitModule.kt`:
-
-```kotlin
-// Para emulador Android (por defecto)
-.baseUrl("http://10.0.2.2:8080")
-
-// Para dispositivo físico en la misma red
-.baseUrl("http://192.168.1.XXX:8080")
-
-// Para servidor remoto
-.baseUrl("https://tu-dominio.com/api/")
-```
-
 ### Timeouts de red
 
-Los timeouts están configurados en `RetrofitModule.kt`:
+Configurados en `RetrofitModule.kt`:
 
 ```kotlin
 OkHttpClient.Builder()
@@ -393,28 +321,51 @@ OkHttpClient.Builder()
 
 ### Módulos Koin
 
-La app carga dos módulos en `MyLibraryApplication.kt`:
+La aplicación inicializa dos módulos en `MyLibraryApplication.kt`:
 
 | Módulo | Contenido |
 |---|---|
-| `retrofitModule` | TokenDataStore, AuthInterceptor, OkHttpClient, Retrofit, AuthApi, TestApi |
-| `appModule` | AuthRepository, TestRepositoryApi, 9 UseCases, 8 ViewModels |
+| `retrofitModule` | `TokenDataStore`, `AuthInterceptor`, `OkHttpClient`, `Retrofit`, `AuthApi`, `TestApi` |
+| `appModule` | `AuthRepository`, `TestRepositoryApi`, 9 UseCases, 8 ViewModels |
 
 ---
 
-## 👥 Autores
+## 👤 Contribuidores
 
-- **IES José Luis Sampedro (Tierno)** — Proyecto educativo
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/irilopa">
+        <img src="https://github.com/irilopa.png" width="80px" style="border-radius:50%" /><br/>
+        <sub><b>Ivan Lopez Rilopa</b></sub>
+      </a><br/>
+      <sub>Backend / Arquitectura</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/FelixPatricio29">
+        <img src="https://github.com/FelixPatricio29.png" width="80px" style="border-radius:50%" /><br/>
+        <sub><b>Felix Patricio Peñafel Burgos</b></sub>
+      </a><br/>
+      <sub>Backend / Lógica</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/AlexGarKan">
+        <img src="https://github.com/AlexGarKan.png" width="80px" style="border-radius:50%" /><br/>
+        <sub><b>Alejandro Garcia Kanouka</b></sub>
+      </a><br/>
+      <sub>Frontend / UI</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto es de uso educativo y fue desarrollado como parte del currículo del IES José Luis Sampedro.
+Este proyecto es de **uso educativo** y fue desarrollado como parte del currículo del **IES Enrique Tierno Galván**.
 
 ---
 
 <p align="center">
-  Hecho con ❤️ y Kotlin
+  Hecho con ❤️ y Kotlin por el equipo <strong>Amani</strong>
 </p>
-

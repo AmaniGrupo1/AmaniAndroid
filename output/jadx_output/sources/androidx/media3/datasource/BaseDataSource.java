@@ -1,0 +1,54 @@
+package androidx.media3.datasource;
+
+import androidx.media3.common.util.Util;
+import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+
+/* JADX INFO: loaded from: classes21.dex */
+public abstract class BaseDataSource implements DataSource {
+    private DataSpec dataSpec;
+    private final boolean isNetwork;
+    private int listenerCount;
+    private final ArrayList<TransferListener> listeners = new ArrayList<>(1);
+
+    protected BaseDataSource(boolean isNetwork) {
+        this.isNetwork = isNetwork;
+    }
+
+    @Override // androidx.media3.datasource.DataSource
+    public final void addTransferListener(TransferListener transferListener) {
+        Preconditions.checkNotNull(transferListener);
+        if (!this.listeners.contains(transferListener)) {
+            this.listeners.add(transferListener);
+            this.listenerCount++;
+        }
+    }
+
+    protected final void transferInitializing(DataSpec dataSpec) {
+        for (int i = 0; i < this.listenerCount; i++) {
+            this.listeners.get(i).onTransferInitializing(this, dataSpec, this.isNetwork);
+        }
+    }
+
+    protected final void transferStarted(DataSpec dataSpec) {
+        this.dataSpec = dataSpec;
+        for (int i = 0; i < this.listenerCount; i++) {
+            this.listeners.get(i).onTransferStart(this, dataSpec, this.isNetwork);
+        }
+    }
+
+    protected final void bytesTransferred(int bytesTransferred) {
+        DataSpec dataSpec = (DataSpec) Util.castNonNull(this.dataSpec);
+        for (int i = 0; i < this.listenerCount; i++) {
+            this.listeners.get(i).onBytesTransferred(this, dataSpec, this.isNetwork, bytesTransferred);
+        }
+    }
+
+    protected final void transferEnded() {
+        DataSpec dataSpec = (DataSpec) Util.castNonNull(this.dataSpec);
+        for (int i = 0; i < this.listenerCount; i++) {
+            this.listeners.get(i).onTransferEnd(this, dataSpec, this.isNetwork);
+        }
+        this.dataSpec = null;
+    }
+}

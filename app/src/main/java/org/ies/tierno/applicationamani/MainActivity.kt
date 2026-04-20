@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 
@@ -16,6 +17,7 @@ import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
  * - Habilitar el modo *edge-to-edge* para aprovechar toda la pantalla.
  * - Aplicar el tema personalizado [ApplicationAmaniTheme].
  * - Montar el grafo de navegación [NavGraph] dentro de `setContent`.
+ * - Crear el NavController que se pasará a [NavGraph] para mantener estado de navegación.
  *
  * @see ApplicationAmaniTheme
  * @see NavGraph
@@ -33,7 +35,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ApplicationAmaniTheme {
-               NavGraph()
+                val navController = rememberNavController()
+                NavGraph(navController = navController)
             }
         }
     }

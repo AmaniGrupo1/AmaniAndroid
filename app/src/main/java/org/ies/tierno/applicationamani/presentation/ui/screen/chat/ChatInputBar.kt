@@ -15,9 +15,11 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -56,81 +58,117 @@ fun ChatInputBar(
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onMicClick: () -> Unit,
+    onAttachFile: () -> Unit,
     onStopRecording: () -> Unit,
     isRecording: Boolean,
-    recordingSeconds: Int
+    recordingSeconds: Int,
+    isOtherTyping: Boolean = false
 ) {
-    if (isRecording) {
-        RecordingBar(
-            recordingSeconds = recordingSeconds,
-            onStopClick = onStopRecording
-        )
-    } else {
-        Surface(
-            shape = MaterialTheme.shapes.large,
-            shadowElevation = 4.dp,
-            tonalElevation = 2.dp,
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+    // Usar imePadding() para adaptarse automáticamente a la altura del teclado
+    Column(modifier = Modifier.imePadding()) {
+        if (isRecording) {
+            RecordingBar(
+                recordingSeconds = recordingSeconds,
+                onStopClick = onStopRecording
+            )
+        } else {
+            // Input con padding adecuado para estilo mensajería
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                shadowElevation = 4.dp,
+                tonalElevation = 2.dp,
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                AnimatedContent(
-                    targetState = text.isBlank(),
-                    transitionSpec = {
-                        (fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.8f, animationSpec = tween(200)))
-                            .togetherWith(fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200)))
-                    },
-                    label = "mic_attach_transition"
-                ) { isBlank ->
-                    IconButton(onClick = { if (isBlank) onMicClick() }) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AnimatedContent(
+                        targetState = text.isBlank(),
+                        transitionSpec = {
+                            (fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.8f, animationSpec = tween(200)))
+                                .togetherWith(fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200)))
+                        },
+                        label = "mic_attach_transition"
+                    ) { isBlank ->
+                        if (isBlank) {
+                            IconButton(onClick = onMicClick) {
+                                Icon(
+                                    imageVector = Icons.Default.Mic,
+                                    contentDescription = "Nota de voz",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        } else {
+                            IconButton(onClick = onAttachFile) {
+                                Icon(
+                                    imageVector = Icons.Default.AttachFile,
+                                    contentDescription = "Adjuntar",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    PillTextField(
+                        text = text,
+                        onTextChange = onTextChange,
+                        onSend = onSend,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    val sendScale by animateFloatAsState(
+                        targetValue = if (text.isNotBlank()) 1f else 0.85f,
+                        animationSpec = spring(dampingRatio = 0.6f),
+                        label = "send_scale"
+                    )
+
+                    FilledIconButton(
+                        onClick = onSend,
+                        enabled = text.isNotBlank(),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        ),
+                        modifier = Modifier
+                            .size(44.dp)
+                            .graphicsLayer { scaleX = sendScale; scaleY = sendScale }
+                    ) {
                         Icon(
-                            imageVector = if (isBlank) Icons.Default.Mic else Icons.Default.AttachFile,
-                            contentDescription = if (isBlank) "Nota de voz" else "Adjuntar",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "Enviar mensaje"
                         )
                     }
                 }
+            }
 
-                PillTextField(
-                    text = text,
-                    onTextChange = onTextChange,
-                    onSend = onSend,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(4.dp))
-
-                val sendScale by animateFloatAsState(
-                    targetValue = if (text.isNotBlank()) 1f else 0.85f,
-                    animationSpec = spring(dampingRatio = 0.6f),
-                    label = "send_scale"
-                )
-
-                FilledIconButton(
-                    onClick = onSend,
-                    enabled = text.isNotBlank(),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                    ),
-                    modifier = Modifier
-                        .size(44.dp)
-                        .graphicsLayer { scaleX = sendScale; scaleY = sendScale }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Enviar mensaje"
-                    )
-                }
+            if (isOtherTyping) {
+                TypingIndicator()
             }
         }
+    }
+}
+
+@Composable
+private fun TypingIndicator() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 48.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Escribiendo...",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        )
     }
 }
 
@@ -149,7 +187,7 @@ private fun PillTextField(
                 MaterialTheme.colorScheme.surfaceVariant,
                 RoundedCornerShape(28.dp)
             )
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         textStyle = TextStyle(
             color = MaterialTheme.colorScheme.onSurface,
             fontSize = MaterialTheme.typography.bodyMedium.fontSize
@@ -197,12 +235,12 @@ private fun RecordingBar(
         shadowElevation = 4.dp,
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

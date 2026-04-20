@@ -14,18 +14,28 @@ import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.data.remoto.FileStorageService
 import org.ies.tierno.applicationamani.domain.models.Message
+import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
-import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
+import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveMessageDeliveryUseCase
 import java.io.File
 
 enum class AudioPlaybackStatus {
@@ -57,7 +67,9 @@ data class ChatUiState(
     val currentUserId: String = "",
     val inputText: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isOtherTyping: Boolean = false,
+    val psychologistOnline: Boolean = false
 )
 
 class ChatViewModel(
@@ -66,7 +78,13 @@ class ChatViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesUseCase: GetMessagesUseCase,
     private val markMessagesAsReadUseCase: MarkMessagesAsReadUseCase,
+    private val markMessageDeliveredUseCase: MarkMessageDeliveredUseCase,
     private val fileStorageService: FileStorageService,
+    private val startTypingUseCase: StartTypingUseCase,
+    private val stopTypingUseCase: StopTypingUseCase,
+    private val observeTypingUseCase: ObserveTypingUseCase,
+    private val observeUserOnlineUseCase: ObserveUserOnlineUseCase,
+    private val updateUserOnlineUseCase: UpdateUserOnlineUseCase,
     appContext: Context
 ) : ViewModel() {
 
@@ -75,6 +93,8 @@ class ChatViewModel(
     private val _error = MutableStateFlow<String?>(null)
     private val _inputText = MutableStateFlow("")
     private val _assignedPsychologist = MutableStateFlow<PsychologistInfo?>(null)
+    private val _isOtherTyping = MutableStateFlow(false)
+    private val _psychologistOnline = MutableStateFlow(false)
 
     val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
 
@@ -97,6 +117,15 @@ class ChatViewModel(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = ChatUiState(currentUserId = currentUserId.toString())
+    )
+
+    // Flow combinado para typing y online (usado por UI)
+    val typingOnlineState: StateFlow<Pair<Boolean, Boolean>> = combine(_isOtherTyping, _psychologistOnline) { isTyping, isOnline ->
+        Pair(isTyping, isOnline)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = Pair(false, false)
     )
 
     private val appContext = appContext.applicationContext
@@ -165,6 +194,7 @@ class ChatViewModel(
     init {
         viewModelScope.launch {
             initPlayer()
+            initChatFeatures()
         }
         observeMessages()
     }
@@ -181,6 +211,35 @@ class ChatViewModel(
         }
     }
 
+    private suspend fun initChatFeatures() {
+        initTyping()
+        initOnlineStatus()
+    }
+
+    private fun initTyping() {
+        observeTypingUseCase(currentUserId, otherUserId)
+            .onEach { isTyping ->
+                _isOtherTyping.value = isTyping
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun initOnlineStatus() {
+        observeUserOnlineUseCase(otherUserId)
+            .onEach { isOnline ->
+                _psychologistOnline.value = isOnline
+                updatePsychologistInfo()
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun updatePsychologistInfo() {
+        val current = _assignedPsychologist.value
+        current?.let {
+            _assignedPsychologist.value = it.copy(isOnline = _psychologistOnline.value)
+        }
+    }
+
     fun observeMessages() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -188,7 +247,30 @@ class ChatViewModel(
                 _messages.value = messages
                 _isLoading.value = false
                 markMessagesAsRead()
+                markMessagesAsDelivered()
             }
+        }
+    }
+
+    fun markMessagesAsDelivered() {
+        viewModelScope.launch {
+            _messages.value.forEach { message ->
+                if (!message.isDelivered && message.senderId != currentUserId.toString()) {
+                    markMessageDeliveredUseCase(message.id.toLong(), currentUserId)
+                }
+            }
+        }
+    }
+
+    fun startTyping() {
+        viewModelScope.launch {
+            startTypingUseCase(currentUserId, otherUserId)
+        }
+    }
+
+    fun stopTyping() {
+        viewModelScope.launch {
+            stopTypingUseCase(currentUserId, otherUserId)
         }
     }
 
@@ -293,6 +375,7 @@ class ChatViewModel(
 
         viewModelScope.launch {
             _error.value = null
+            stopTyping()
 
             sendMessageUseCase(currentUserId, otherUserId, content)
                 .onSuccess {
@@ -306,6 +389,7 @@ class ChatViewModel(
     fun sendAttachment(uri: Uri) {
         viewModelScope.launch {
             _error.value = null
+            stopTyping()
 
             val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
             when (val result = fileStorageService.uploadFile(uri, conversationId)) {
@@ -336,6 +420,7 @@ class ChatViewModel(
         Log.d("VoiceNote", "Iniciando grabación: ${file.absolutePath}")
         _isRecording.value = true
         _recordingFile.value = file
+        startTyping()
     }
 
     private val _recordingFile = MutableStateFlow<File?>(null)
@@ -345,6 +430,7 @@ class ChatViewModel(
         Log.d("VoiceNote", "Deteniendo grabación: ${file.absolutePath}, tamaño: ${file.length()} bytes")
         _isRecording.value = false
         _recordingFile.value = null
+        stopTyping()
 
         if (file.length() <= 0L) {
             _error.value = "La nota de voz está vacía"
@@ -375,6 +461,11 @@ class ChatViewModel(
 
     fun onInputChanged(text: String) {
         _inputText.value = text
+        if (text.isNotBlank()) {
+            startTyping()
+        } else {
+            stopTyping()
+        }
     }
 
     fun sendMessage() {
@@ -398,6 +489,7 @@ class ChatViewModel(
         _isRecording.value = false
         _recordingFile.value?.delete()
         _recordingFile.value = null
+        stopTyping()
     }
 
     override fun onCleared() {

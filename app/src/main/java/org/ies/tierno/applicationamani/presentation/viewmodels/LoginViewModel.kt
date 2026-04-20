@@ -210,6 +210,28 @@ class LoginViewModel(
     private val _registerSuccess = MutableStateFlow(false)
     val registerSuccess: StateFlow<Boolean> = _registerSuccess
 
+    // ── DatePicker para fecha de nacimiento (Psicólogo) ──
+    private val _dateOfBirth = MutableStateFlow<LocalDate?>(null)
+    val dateOfBirth: StateFlow<LocalDate?> = _dateOfBirth
+
+    private val _showDatePicker = MutableStateFlow(false)
+    val showDatePicker: StateFlow<Boolean> = _showDatePicker
+
+    private val _dateError = MutableStateFlow<String?>(null)
+    val dateError: StateFlow<String?> = _dateError
+
+    private val _phoneError = MutableStateFlow<String?>(null)
+    val phoneError: StateFlow<String?> = _phoneError
+
+    private val _emailError = MutableStateFlow<String?>(null)
+    val emailError: StateFlow<String?> = _emailError
+
+    private val _passwordError = MutableStateFlow<String?>(null)
+    val passwordError: StateFlow<String?> = _passwordError
+
+    // ── Checkbox para términos ──
+    val aceptaTerminosPsicologo = MutableStateFlow(false)
+
     // ── Setters ──
     fun setNombre(value: String) { nombre.value = value }
     fun setApellido(value: String) { apellido.value = value }
@@ -232,11 +254,27 @@ class LoginViewModel(
     fun setRegistroDescripcion(value: String?) { registroDescripcion.value = value }
     fun setRegistroLicencia(value: String?) { registroLicencia.value = value }
 
+    // Setters para DatePicker y validaciones
+    fun setDateOfBirth(date: LocalDate) { _dateOfBirth.value = date }
+    fun setShowDatePicker(show: Boolean) { _showDatePicker.value = show }
+    fun setDateError(error: String?) { _dateError.value = error }
+    fun setPhoneError(error: String?) { _phoneError.value = error }
+    fun setEmailError(error: String?) { _emailError.value = error }
+    fun setPasswordError(error: String?) { _passwordError.value = error }
+    fun setAceptaTerminosPsicologo(value: Boolean) { aceptaTerminosPsicologo.value = value }
+    fun setTelefonoPsicologo(value: String) { telefono.value = value }
+
     // Función para resetear estados de registro
     fun resetRegisterState() {
         _isRegistering.value = false
         _registerError.value = null
         _registerSuccess.value = false
+        _dateOfBirth.value = null
+        _dateError.value = null
+        _phoneError.value = null
+        _emailError.value = null
+        _passwordError.value = null
+        aceptaTerminosPsicologo.value = false
     }
 
     // ── Dirección ──
@@ -307,58 +345,17 @@ class LoginViewModel(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // Validar formulario COMPLETO (incluye tutor solo si es necesario)
+    // TEMP: situaciones deshabilitadas - issue: checkbox selection no se actualiza
     val formularioCompletoValido: StateFlow<Boolean> = combine(
         formularioValido,
         tutorValido,
-        direccionValida,
-        situacionesIds
-    ) { formValido, tutorVal, dirVal, sitIds ->
-        formValido && tutorVal && dirVal && sitIds.isNotEmpty()
+        direccionValida
+        // situacionesIds  // TEMPORALMENTE DESHABILITADO
+    ) { formValido, tutorVal, dirVal /*, sitIds*/ ->
+        formValido && tutorVal && dirVal // && sitIds.isNotEmpty()
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    // ── Acciones de registro ──
-    fun registrarPsicologo() {
-        if (nombre.value.isBlank() || apellido.value.isBlank() ||
-            email.value.isBlank() || regPassword.value.isBlank() ||
-            registroEspecialidad.value.isBlank()) {
-            _registerError.value = "Todos los campos obligatorios deben estar completos"
-            return
-        }
-
-        _isRegistering.value = true
-        _registerError.value = null
-        _registerSuccess.value = false
-
-        viewModelScope.launch {
-            try {
-                val psicologoRequest = PsicologoRequestDTO(
-                    nombrePsicologo = nombre.value,
-                    apellidoPsicologo = apellido.value,
-                    email = email.value,
-                    password = regPassword.value,
-                    especialidad = registroEspecialidad.value,
-                    experiencia = registroExperiencia.value,
-                    descripcion = registroDescripcion.value,
-                    licencia = registroLicencia.value
-                )
-
-                val result = loginUseCase.registrarPsicologo(psicologoRequest)
-
-                result.onSuccess { response ->
-                    _registerSuccess.value = true
-                    _registerError.value = null
-                }.onFailure { error ->
-                    _registerError.value = error.message ?: "Error al registrar psicólogo"
-                    _registerSuccess.value = false
-                }
-            } catch (e: Exception) {
-                _registerError.value = e.message ?: "Error inesperado al registrar psicólogo"
-                _registerSuccess.value = false
-            } finally {
-                _isRegistering.value = false
-            }
-        }
-    }
+    // ── Acciones de registro ── Antigua función eliminada - reemplazada por la nueva con validaciones
 
     // ── Funciones auxiliares ──
     fun limpiarFormularioPsicologo() {
@@ -366,10 +363,14 @@ class LoginViewModel(
         apellido.value = ""
         email.value = ""
         regPassword.value = ""
+        telefono.value = ""
         registroEspecialidad.value = ""
         registroExperiencia.value = null
         registroDescripcion.value = null
         registroLicencia.value = null
+        _dateOfBirth.value = null
+        aceptaTerminosPsicologo.value = false
+        clearAllErrors()
         resetRegisterState()
     }
 
@@ -552,5 +553,147 @@ class LoginViewModel(
     fun clearAsignarPsicologoResult() {
         _asignarPacienteSuccess.value = false
         _asignarPacienteError.value = null
+    }
+
+    // ── Registro de Psicólogo con DatePicker ──
+
+    /**
+     * Valida el formato de email
+     */
+    private fun isValidEmail(email: String): Boolean {
+        return Regex("^[A-Za-z0-9+_.-]+@(.+)$").matches(email)
+    }
+
+    /**
+     * Valida que la contraseña tenga al menos 8 caracteres
+     */
+    private fun isValidPassword(password: String): Boolean {
+        return password.length >= 8
+    }
+
+    /**
+     * Valida que el teléfono tenga 9 dígitos
+     */
+    private fun isValidPhone(phone: String): Boolean {
+        return Regex("^[0-9]{9}$").matches(phone)
+    }
+
+    /**
+     * Calcula la edad a partir de la fecha de nacimiento
+     */
+    private fun calculateAge(dateOfBirth: LocalDate): Int {
+        return Period.between(dateOfBirth, LocalDate.now()).years
+    }
+
+    /**
+     * Valida que el psicólogo sea mayor de 18 años
+     */
+    private fun isAdult(dateOfBirth: LocalDate): Boolean {
+        return calculateAge(dateOfBirth) >= 18
+    }
+
+    /**
+     * Limpia todos los errores de validación
+     */
+    fun clearAllErrors() {
+        _dateError.value = null
+        _phoneError.value = null
+        _emailError.value = null
+        _passwordError.value = null
+    }
+
+    /**
+     * Validar todos los campos antes de registrar
+     * @return Pair<Boolean, String?> donde el primer valor indica si es válido
+     *         y el segundo el nombre del campo con error (null si todos son válidos)
+     */
+    fun validatePsychologistForm(): Pair<Boolean, String?> {
+        // Validar nombre
+        if (nombre.value.isBlank()) return Pair(false, "nombre")
+        // Validar apellido
+        if (apellido.value.isBlank()) return Pair(false, "apellido")
+        // Validar email
+        if (email.value.isBlank()) return Pair(false, "email")
+        if (!isValidEmail(email.value)) return Pair(false, "email")
+        // Validar contraseña
+        if (regPassword.value.isBlank()) return Pair(false, "password")
+        if (!isValidPassword(regPassword.value)) return Pair(false, "password")
+        // Validar fecha de nacimiento
+        if (_dateOfBirth.value == null) return Pair(false, "fecha")
+        if (!isAdult(_dateOfBirth.value!!)) return Pair(false, "fecha")
+        // Validar teléfono
+        if (telefono.value.isBlank()) return Pair(false, "telefono")
+        if (!isValidPhone(telefono.value)) return Pair(false, "telefono")
+        // Validar especialidad
+        if (registroEspecialidad.value.isBlank()) return Pair(false, "especialidad")
+        // Validar términos
+        if (!aceptaTerminosPsicologo.value) return Pair(false, "terminos")
+
+        return Pair(true, null)
+    }
+
+    /**
+     * Ejecuta el proceso de registro de psicólogo.
+     * Validar todos los campos antes de realizar la llamada al caso de uso.
+     */
+    fun registrarPsicologo() {
+        // Limpiar errores previos
+        clearAllErrors()
+
+        // Validar formulario
+        val (isValid, invalidField) = validatePsychologistForm()
+        if (!isValid) {
+            when (invalidField) {
+                "fecha" -> _dateError.value = "Debes ser mayor de 18 años"
+                "email" -> _emailError.value = "Introduce un correo electrónico válido"
+                "password" -> _passwordError.value = "La contraseña debe tener al menos 8 caracteres"
+                "telefono" -> _phoneError.value = "El teléfono debe tener 9 dígitos"
+                "nombre" -> _registerError.value = "El nombre es obligatorio"
+                "apellido" -> _registerError.value = "El apellido es obligatorio"
+                "especialidad" -> _registerError.value = "La especialidad es obligatoria"
+                "terminos" -> _registerError.value = "Debes aceptar los términos y condiciones"
+            }
+            return
+        }
+
+        _isRegistering.value = true
+        _registerError.value = null
+        _registerSuccess.value = false
+
+        viewModelScope.launch {
+            try {
+                val psicologoRequest = PsicologoRequestDTO(
+                    nombrePsicologo = nombre.value,
+                    apellidoPsicologo = apellido.value,
+                    email = email.value,
+                    password = regPassword.value,
+                    especialidad = registroEspecialidad.value,
+                    experiencia = registroExperiencia.value,
+                    descripcion = registroDescripcion.value,
+                    licencia = registroLicencia.value
+                )
+
+                val result = loginUseCase.registrarPsicologo(psicologoRequest)
+
+                result.onSuccess { response ->
+                    _registerSuccess.value = true
+                    _registerError.value = null
+                    // Nota: El backend devuelve PsicologoSelfResponseDTO que no tiene idUsuario/rol
+                    // El usuario debe iniciar sesión manualmente después de registrar
+                }.onFailure { error ->
+                    // Manejar email duplicado
+                    if (error.message?.contains("email", ignoreCase = true) == true) {
+                        _emailError.value = "Este correo electrónico ya está registrado"
+                    }
+                    _registerError.value = error.message ?: "Error al registrar psicólogo"
+                    _registerSuccess.value = false
+                }
+            } catch (e: Exception) {
+                _registerError.value = e.message ?: "Error inesperado al registrar psicólogo"
+                _registerSuccess.value = false
+            } finally {
+                _isRegistering.value = false
+            }
+        }
     }
 }

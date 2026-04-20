@@ -43,6 +43,15 @@ class ProfileRepository(private val api: ProfileApi){
         }
     }
 
+    suspend fun getPacienteByIdFirebase(idPaciente: Long): Result<PacienteProfileResponseDTO> {
+        return try {
+            val response = api.getPacienteByIdFirebase(idPaciente)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getPsicologoById(idPsicologo: Long): Result<PsicologoProfileResponseDTO> {
         return try {
             val response = api.getPsicologoById(idPsicologo)

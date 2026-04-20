@@ -2,23 +2,25 @@ package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.padding
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.screens.profile.PsicologoProfileScreen
+import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
@@ -32,27 +34,27 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteSc
 import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
-import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
-import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.java.KoinJavaComponent.getKoin
 import org.koin.core.parameter.parametersOf
+import org.koin.java.KoinJavaComponent.getKoin
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NavGraph(startDestination: String = Screens.principal.route) {
-    val navController = rememberNavController()
+fun NavGraph(
+    navController: NavHostController,
+    startDestination: String = Screens.principal.route
+) {
     val loginViewModel: LoginViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
@@ -180,21 +182,22 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 },
                 navArgument("otherUserId") {
                     type = NavType.LongType
+                },
+                navArgument("otherUserName") {
+                    type = NavType.StringType
                 }
             )
             ) { backStackEntry ->
                 val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
+                val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
 
                 val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
 
-                val currentSession = runBlocking { userSessionDataStore.getSession() }
-                val currentUserRol = currentSession?.rol ?: ""
-                val otherUserName = if (currentUserRol == "paciente") "Psicólogo" else "Paciente"
-
                 ChatScreen(
                     viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    otherUserName = otherUserName
                 )
             }
 

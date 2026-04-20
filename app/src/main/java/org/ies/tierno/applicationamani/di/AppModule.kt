@@ -1,18 +1,19 @@
 package org.ies.tierno.applicationamani.di
 
+
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.local.AuthEventChannel
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
-import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
-import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
-import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
+import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
+import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
+import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
+import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
@@ -35,22 +36,26 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteV
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.koin.android.ext.koin.androidContext
-
-
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -83,11 +88,17 @@ val appModule = module {
     factory { ListarSituacionUseCase(get()) }
     factory { ListarPacientesByPsicologo(get()) }
     factory { ProfileUseCaseGeneral(get()) }
-    
+
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
     factory { MarkMessagesAsReadUseCase(get()) }
     factory { ListarCitasUseCase(get()) }
+    factory { StartTypingUseCase(get()) }
+    factory { StopTypingUseCase(get()) }
+    factory { ObserveTypingUseCase(get()) }
+    factory { ObserveUserOnlineUseCase(get()) }
+    factory { MarkMessageDeliveredUseCase(get()) }
+    factory { UpdateUserOnlineUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -115,7 +126,13 @@ val appModule = module {
             sendMessageUseCase = get(),
             getMessagesUseCase = get(),
             markMessagesAsReadUseCase = get(),
+            markMessageDeliveredUseCase = get(),
             fileStorageService = get(),
+            startTypingUseCase = get(),
+            stopTypingUseCase = get(),
+            observeTypingUseCase = get(),
+            observeUserOnlineUseCase = get(),
+            updateUserOnlineUseCase = get(),
             appContext = androidContext()
         )
     }

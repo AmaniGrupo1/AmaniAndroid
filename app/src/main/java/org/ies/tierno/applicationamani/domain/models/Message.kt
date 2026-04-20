@@ -9,8 +9,13 @@ data class Message(
     val attachmentType: AttachmentType? = null,
     val attachmentName: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
-    val isRead: Boolean = false
-)
+    val isRead: Boolean = false,
+    val deliveredAt: Long? = null,
+    val readBy: Map<String, Long>? = null
+) {
+    val isDelivered: Boolean
+        get() = deliveredAt != null
+}
 
 enum class AttachmentType {
     IMAGE,

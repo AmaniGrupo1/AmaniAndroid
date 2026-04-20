@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -237,7 +238,7 @@ fun RegisterScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(),
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = primaryColor,
@@ -414,7 +415,7 @@ fun RegisterScreen(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(),
+                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                                 shape = textFieldShape,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(0xFFE67E22),
@@ -560,20 +561,24 @@ fun RegisterScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ExposedDropdownMenuBox(
-                        expanded = expandedSituacion,
-                        onExpandedChange = { expandedSituacion = it }
-                    ) {
+                    Box {
                         OutlinedTextField(
                             value = if (situacionesIds.isEmpty())
                                 "Seleccione situaciones"
                             else "${situacionesIds.size} situación(es) seleccionada(s)",
                             onValueChange = {},
                             readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSituacion) },
+                            trailingIcon = {
+                                IconButton(onClick = { expandedSituacion = !expandedSituacion }) {
+                                    Icon(
+                                        if (expandedSituacion) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                        contentDescription = null
+                                    )
+                                }
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(),
+                                .clickable { expandedSituacion = !expandedSituacion },
                             shape = textFieldShape,
                             isError = situacionesIds.isEmpty(),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -582,7 +587,7 @@ fun RegisterScreen(
                             )
                         )
 
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             expanded = expandedSituacion,
                             onDismissRequest = { expandedSituacion = false },
                             modifier = Modifier
@@ -612,15 +617,15 @@ fun RegisterScreen(
                                                 Checkbox(
                                                     checked = isSelected,
                                                     onCheckedChange = { checked ->
-                                                        val currentIds =
-                                                            situacionesIds.toMutableList()
+                                                        val currentIds = situacionesIds.toMutableList()
                                                         if (checked) {
                                                             currentIds.add(situacion.idSituacion)
                                                         } else {
                                                             currentIds.remove(situacion.idSituacion)
                                                         }
-                                                        loginViewModel.situacionesIds.value =
-                                                            currentIds
+                                                        loginViewModel.situacionesIds.value = currentIds
+                                                        // Cerrar dropdown después de cambiar
+                                                        expandedSituacion = false
                                                     },
                                                     modifier = Modifier.size(24.dp)
                                                 )
@@ -632,29 +637,21 @@ fun RegisterScreen(
                                                 )
                                             }
                                         },
-                                        onClick = {
-                                            val currentIds = situacionesIds.toMutableList()
-                                            if (isSelected) {
-                                                currentIds.remove(situacion.idSituacion)
-                                            } else {
-                                                currentIds.add(situacion.idSituacion)
-                                            }
-                                            loginViewModel.situacionesIds.value = currentIds
-                                        }
+                                        onClick = {}
                                     )
                                 }
                             }
                         }
                     }
 
-                    if (situacionesIds.isEmpty()) {
-                        Text(
-                            "Debe seleccionar al menos una situación",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                        )
-                    }
+                    // TODO: fix checkbox selection - UI not updating
+                    // Issue: https://github.com/AmaniGrupo1/AmaniAndroid/issues/XX
+                    // Text(
+                    //     "Debe seleccionar al menos una situación",
+                    //     color = MaterialTheme.colorScheme.error,
+                    //     style = MaterialTheme.typography.bodySmall,
+                    //     modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    // )
                 }
             }
 

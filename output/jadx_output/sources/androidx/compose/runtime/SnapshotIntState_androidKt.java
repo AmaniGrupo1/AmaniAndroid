@@ -1,0 +1,13 @@
+package androidx.compose.runtime;
+
+import com.google.firebase.firestore.model.Values;
+import kotlin.Metadata;
+
+/* JADX INFO: compiled from: SnapshotIntState.android.kt */
+/* JADX INFO: loaded from: classes20.dex */
+@Metadata(d1 = {"\u0000\u000e\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\b\n\u0000\u001a\u0010\u0010\u0000\u001a\u00020\u00012\u0006\u0010\u0002\u001a\u00020\u0003H\u0000¨\u0006\u0004"}, d2 = {"createSnapshotMutableIntState", "Landroidx/compose/runtime/MutableIntState;", Values.VECTOR_MAP_VECTORS_KEY, "", "runtime"}, k = 2, mv = {2, 0, 0}, xi = 48)
+public final class SnapshotIntState_androidKt {
+    public static final MutableIntState createSnapshotMutableIntState(int value) {
+        return new ParcelableSnapshotMutableIntState(value);
+    }
+}

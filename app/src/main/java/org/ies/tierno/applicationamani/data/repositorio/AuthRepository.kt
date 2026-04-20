@@ -37,10 +37,10 @@ class AuthRepository(
 
                     if (body != null) {
 
-                        // 🔥 GUARDAR TOKEN
+                        // GUARDAR TOKEN
                         tokenDataStore.saveToken(body.token)
 
-                        // 🔥 GUARDAR SESIÓN
+                        // GUARDAR SESION
                         userSessionDataStore.saveSession(
                             UserSession(
                                 idUsuario = body.idUsuario,
@@ -56,11 +56,26 @@ class AuthRepository(
                         Result.failure(Exception("Response body is null"))
                     }
                 } else {
-                    Result.failure(HttpException(response))
+                    val errorBody = response.errorBody()?.string()
+                    val errorMessage = when (response.code()) {
+                        401 -> "Credenciales incorrectas"
+                        403 -> "Acceso denegado"
+                        404 -> "Usuario no encontrado"
+                        500 -> "Error del servidor"
+                        else -> errorBody ?: "Error HTTP: ${response.code()}"
+                    }
+                    Result.failure(Exception(errorMessage))
                 }
 
             } catch (e: Exception) {
-                Result.failure(e)
+                val errorMsg = when {
+                    e.message?.contains("Connection", ignoreCase = true) == true -> 
+                        "No se puede conectar al servidor. Verifica que el backend este ejecutandose en http://10.0.2.2:8080"
+                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+                        "Tiempo de espera agotado. Intenta de nuevo."
+                    else -> e.message ?: "Error de conexion"
+                }
+                Result.failure(Exception(errorMsg))
             }
         }
     }

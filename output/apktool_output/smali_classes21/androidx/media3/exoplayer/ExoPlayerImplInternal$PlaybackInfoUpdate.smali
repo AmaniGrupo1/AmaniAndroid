@@ -1,0 +1,161 @@
+.class public final Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;
+.super Ljava/lang/Object;
+.source "ExoPlayerImplInternal.java"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Landroidx/media3/exoplayer/ExoPlayerImplInternal;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x19
+    name = "PlaybackInfoUpdate"
+.end annotation
+
+
+# instance fields
+.field public discontinuityReason:I
+
+.field private hasPendingChange:Z
+
+.field public operationAcks:I
+
+.field public playbackInfo:Landroidx/media3/exoplayer/PlaybackInfo;
+
+.field public positionDiscontinuity:Z
+
+
+# direct methods
+.method public constructor <init>(Landroidx/media3/exoplayer/PlaybackInfo;)V
+    .locals 0
+    .param p1, "playbackInfo"    # Landroidx/media3/exoplayer/PlaybackInfo;
+
+    .line 113
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 114
+    iput-object p1, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->playbackInfo:Landroidx/media3/exoplayer/PlaybackInfo;
+
+    .line 115
+    return-void
+.end method
+
+.method static synthetic access$100(Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;)Z
+    .locals 1
+    .param p0, "x0"    # Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;
+
+    .line 104
+    iget-boolean v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->hasPendingChange:Z
+
+    return v0
+.end method
+
+
+# virtual methods
+.method public incrementPendingOperationAcks(I)V
+    .locals 2
+    .param p1, "operationAcks"    # I
+
+    .line 118
+    iget-boolean v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->hasPendingChange:Z
+
+    if-lez p1, :cond_0
+
+    const/4 v1, 0x1
+
+    goto :goto_0
+
+    :cond_0
+    const/4 v1, 0x0
+
+    :goto_0
+    or-int/2addr v0, v1
+
+    iput-boolean v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->hasPendingChange:Z
+
+    .line 119
+    iget v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->operationAcks:I
+
+    add-int/2addr v0, p1
+
+    iput v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->operationAcks:I
+
+    .line 120
+    return-void
+.end method
+
+.method public setPlaybackInfo(Landroidx/media3/exoplayer/PlaybackInfo;)V
+    .locals 2
+    .param p1, "playbackInfo"    # Landroidx/media3/exoplayer/PlaybackInfo;
+
+    .line 123
+    iget-boolean v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->hasPendingChange:Z
+
+    iget-object v1, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->playbackInfo:Landroidx/media3/exoplayer/PlaybackInfo;
+
+    if-eq v1, p1, :cond_0
+
+    const/4 v1, 0x1
+
+    goto :goto_0
+
+    :cond_0
+    const/4 v1, 0x0
+
+    :goto_0
+    or-int/2addr v0, v1
+
+    iput-boolean v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->hasPendingChange:Z
+
+    .line 124
+    iput-object p1, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->playbackInfo:Landroidx/media3/exoplayer/PlaybackInfo;
+
+    .line 125
+    return-void
+.end method
+
+.method public setPositionDiscontinuity(I)V
+    .locals 3
+    .param p1, "discontinuityReason"    # I
+
+    .line 128
+    iget-boolean v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->positionDiscontinuity:Z
+
+    const/4 v1, 0x1
+
+    if-eqz v0, :cond_1
+
+    iget v0, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->discontinuityReason:I
+
+    const/4 v2, 0x5
+
+    if-eq v0, v2, :cond_1
+
+    .line 132
+    if-ne p1, v2, :cond_0
+
+    goto :goto_0
+
+    :cond_0
+    const/4 v1, 0x0
+
+    :goto_0
+    invoke-static {v1}, Lcom/google/common/base/Preconditions;->checkArgument(Z)V
+
+    .line 133
+    return-void
+
+    .line 135
+    :cond_1
+    iput-boolean v1, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->hasPendingChange:Z
+
+    .line 136
+    iput-boolean v1, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->positionDiscontinuity:Z
+
+    .line 137
+    iput p1, p0, Landroidx/media3/exoplayer/ExoPlayerImplInternal$PlaybackInfoUpdate;->discontinuityReason:I
+
+    .line 138
+    return-void
+.end method
