@@ -66,6 +66,7 @@ import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
@@ -263,7 +264,9 @@ fun CitasScreen(
                         mesVisible = mesVisible,
                         fechaSeleccionada = fechaSeleccionada,
                         fechasDestacadas = fechasConCitas,
-                        onMesVisibleChange = { mesVisible = it },
+                        onMesVisibleChange = { newMes ->
+                            mesVisible = newMes
+                        },
                         onFechaSeleccionada = { fecha ->
                             fechaSeleccionada = if (fechaSeleccionada == fecha) null else fecha
                             if (fechaSeleccionada != null) {
