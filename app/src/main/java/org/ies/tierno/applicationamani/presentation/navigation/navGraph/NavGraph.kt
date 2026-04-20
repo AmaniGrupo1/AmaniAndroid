@@ -41,6 +41,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewP
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
@@ -145,6 +146,12 @@ fun NavGraph(
             composable(Screens.calendario.route) {
                 CalendarioView()
             }
+
+            composable(Screens.agendaCitaScreen.route){
+                AgendaCitaScreen(navController)
+            }
+
+
             composable(
             route = Screens.perfilPsicologo.route,
             arguments = listOf(
@@ -158,17 +165,9 @@ fun NavGraph(
         }
 
 
-            composable(
-            route = Screens.pacienteHome.route,
-            arguments = listOf(
-                navArgument("idPaciente") {
-                    type = NavType.LongType
-                }
-            )
-        ) { backStackEntry ->
-            val idPaciente = backStackEntry.arguments?.getLong("idPaciente") ?: 0L
-            ViewPacientePrincipalScreen(navController,idPaciente)
-        }
+            composable(Screens.pacienteHome.route) {
+                ViewPacientePrincipalScreen(navController)
+            }
 
             composable(Screens.chatList.route) {
                 val viewModel: ChatListViewModel = koinViewModel()
@@ -201,6 +200,8 @@ fun NavGraph(
                     otherUserName = otherUserName
                 )
             }
+
+
         }
     }
 }

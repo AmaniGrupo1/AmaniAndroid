@@ -1,6 +1,8 @@
 package org.ies.tierno.applicationamani.data.remoto
 
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CitaAdminResponseDTO
@@ -9,6 +11,7 @@ import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.requestPaciente.CitaRequest
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -39,21 +42,21 @@ interface CitasApi {
         @Query("duracion") duracion: Int? = null
     ): DisponibilidadDiaResponse
 
-    @POST("/api/citas/admin")
-    suspend fun crearCita(
-        @Body request: CitaRequest
-    ): CitaAdminResponseDTO
+//    @POST("/api/citas/admin")
+//    suspend fun crearCita(
+//        @Body request: CrearCitaRequestDTO
+//    ): AgendaItemDTO
 
     @PATCH("/api/citas/{id}/cancelar")
     suspend fun cancelarCita(
         @Path("id") idCita: Long
     ): AgendaItemDTO
 
-    @PUT("/api/citas/{id}")
+    @PUT("/api/citas/psicologo/{idCita}/editar")
     suspend fun editarCita(
-        @Path("id") idCita: Long,
-        @Body request: CitaRequest
-    ): AgendaItemDTO
+        @Path("idCita") idCita: Long,
+        @Body request: CrearCitaRequestDTO
+    ): Response<AgendaItemDTO>
 
     @GET("/api/admin/psicologos/pacientes")
     suspend fun getPsicologosConPacientes(): List<ListaPacientesAndPsicologo>
@@ -103,4 +106,13 @@ interface CitasApi {
         @Path("idPsicologo") idPsicologo: Long
     ): HorarioRequestDTO
 
+    // En CitasApi.kt
+    @PATCH("/api/citas/cambio/{id}/estado")
+    suspend fun cambiarEstadoCita(
+        @Path("id") idCita: Long,
+        @Body request: Map<String, String>
+    ): Response<Unit>
+
+    @GET("/api/citas/mis-citas")
+    suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO>
 }

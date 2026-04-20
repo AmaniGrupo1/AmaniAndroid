@@ -139,11 +139,3 @@ fun MenuPrincipal(navController: NavController) {
     )
 }
 
-/**
- * Vista previa de [MenuPrincipal] para el panel de diseño de Android Studio.
- */
-@Composable
-@Preview(showBackground = true)
-fun MenuPrincipalPreview() {
-    MenuPrincipal(rememberNavController())
-}

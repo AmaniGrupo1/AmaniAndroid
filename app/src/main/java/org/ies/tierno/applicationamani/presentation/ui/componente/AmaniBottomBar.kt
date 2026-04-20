@@ -67,7 +67,7 @@ sealed interface BottomBarConfig {
 
 private fun pacienteItems() = listOf(
     AmaniBottomBarItem(
-        route = Screens.principalCliente.route,
+        route = Screens.pacienteHome.route,
         label = "Inicio",
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
@@ -75,7 +75,7 @@ private fun pacienteItems() = listOf(
 
 
     AmaniBottomBarItem(
-        route = Screens.citas.route,
+        route = Screens.agendaCitaScreen.route,
         label = "Citas",
         selectedIcon = Icons.Filled.DateRange,
         unselectedIcon = Icons.Outlined.DateRange

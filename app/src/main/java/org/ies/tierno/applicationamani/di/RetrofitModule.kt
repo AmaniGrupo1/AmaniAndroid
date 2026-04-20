@@ -106,11 +106,12 @@ val retrofitModule = module {
             .create()
 
         Retrofit.Builder()
-            .baseUrl("http://192.168.1.20:8080/")
+            .baseUrl("http://10.0.2.2:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
     }
+    //http://10.0.2.2
 //    192.168.1.175
     single<CustomerClient> { get<Retrofit>().create(CustomerClient::class.java) }
     single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }

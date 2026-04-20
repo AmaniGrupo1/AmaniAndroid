@@ -62,13 +62,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.presentation.ui.componente.FranjaHoraria
 import org.ies.tierno.applicationamani.presentation.ui.componente.VistaDiariaHoras
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
-import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.utils.enviarCitaAlCalendario
 import org.ies.tierno.applicationamani.utils.programarRecordatorioCita
 import org.koin.androidx.compose.koinViewModel
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
@@ -503,12 +505,19 @@ fun CitasScreen(
                         scope.launch {
                             val hora = LocalTime.parse(franjaSeleccionadaTemp!!.horaInicio)
 
-                            // Usar la función reservarCita del ViewModel
+                            val session = viewModel.userSession.value
+                            val idPaciente = session?.idPaciente ?: session?.idUsuario ?: return@launch
+
                             val result = viewModel.reservarCita(
+                                idPaciente = idPaciente,
                                 fecha = fechaSeleccionada!!,
                                 hora = hora,
+                                duracionMinutos = 60,
                                 motivo = motivoCita.ifBlank { "Consulta psicológica" },
-                                duracionMinutos = 60
+                                idTipoTerapia = 1L, // ⚠️ luego lo haces dinámico
+                                metodoPago = MetodoPago.PRESENCIAL,
+                                monto = BigDecimal.ZERO,
+                                modalidadCita = ModalidadCita.PRESENCIAL
                             )
 
                             if (result.isSuccess) {

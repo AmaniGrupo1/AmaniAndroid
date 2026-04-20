@@ -61,9 +61,7 @@ sealed class Screens(val route: String) {
     object psicologoAgenda : Screens("psicologoAgenda")
 
     object psicologoHome : Screens("psicologoHome")
-    object pacienteHome : Screens("pacienteHome/{idPaciente}"){
-        fun createRoute(idPaciente: Long) = "pacienteHome/$idPaciente"
-    }
+    object pacienteHome : Screens("pacienteHome")
 
     object listarPsicologo : Screens("listarPsicologo/{pacienteId}"){
         fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
@@ -80,5 +78,8 @@ sealed class Screens(val route: String) {
     object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}"){
         fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String) = "chat/$currentUserId/$otherUserId/$otherUserName"
     }
+
+    object agendaCitaScreen : Screens("agendaCitaScreen")
+
 }
 

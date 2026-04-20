@@ -12,7 +12,7 @@ class AuthInterceptor(private val tokenHolder: TokenHolder) : Interceptor {
         val token = tokenHolder.getToken()
 
         val originalRequest = chain.request()
-
+        println("TOKEN EN INTERCEPTOR: $token")
         // Si no hay token, dejamos pasar la petición tal cual
         // (login y register no lo necesitan)
         val request = if (token != null) {

@@ -7,5 +7,7 @@ enum class MetodoPago {
 
 enum class EstadoPago {
     PENDIENTE,
-    PAGADO
+    PAGADO,
+    FALLIDO,
+    REEMBOLSADO
 }
