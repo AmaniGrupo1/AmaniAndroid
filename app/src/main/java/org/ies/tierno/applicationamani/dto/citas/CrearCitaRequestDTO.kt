@@ -24,7 +24,6 @@ data class CrearCitaRequestDTO(
     @SerializedName("durationMinutes")
     val durationMinutes: Int,
 
-
     val metodoPago: MetodoPago,
 
     val estadoPago: EstadoPago,

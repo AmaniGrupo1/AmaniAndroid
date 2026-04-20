@@ -24,11 +24,12 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetAllClient
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicologoAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
+import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarCitasUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ResponderTestUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
-import org.ies.tierno.applicationamani.presentation.viewmodels.CitasViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
@@ -40,6 +41,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPregun
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
@@ -85,6 +87,7 @@ val appModule = module {
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
     factory { MarkMessagesAsReadUseCase(get()) }
+    factory { ListarCitasUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -102,6 +105,7 @@ val appModule = module {
     viewModel { ProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get()) }
+    viewModel { ListarCitasViewModel(get(), get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
     viewModel { (currentUserId: Long, otherUserId: Long) ->

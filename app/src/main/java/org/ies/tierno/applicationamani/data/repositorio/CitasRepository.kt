@@ -7,6 +7,7 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
@@ -34,8 +35,23 @@ class CitasRepository(
     suspend fun getAgendaPsicologo(
         idPsicologo: Long,
         month: String
-    ): Result<List<AgendaItemDTO>> = runCatching {
-        citasApi.getAgendaPsicologo(idPsicologo, month)
+    ): Result<List<AgendaItemDTO>> {
+        return try {
+            android.util.Log.e("API_DEBUG", "========== GET AGENDA ==========")
+            android.util.Log.e("API_DEBUG", "URL: /api/citas/psicologo/$idPsicologo/agenda?month=$month")
+
+            val result = citasApi.getAgendaPsicologo(idPsicologo, month)
+
+            android.util.Log.e("API_DEBUG", "✅ Éxito: ${result.size} citas encontradas")
+            Result.success(result)
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            android.util.Log.e("API_ERROR", "❌ Error HTTP ${e.code()}: $errorBody")
+            Result.failure(Exception("Error ${e.code()}: $errorBody"))
+        } catch (e: Exception) {
+            android.util.Log.e("API_ERROR", "❌ Excepción: ${e.message}", e)
+            Result.failure(e)
+        }
     }
 
     // ✅ MÉTODO GET DURACION
@@ -121,8 +137,34 @@ class CitasRepository(
     suspend fun actualizarHorario(
         idPsicologo: Long,
         request: HorarioRequestDTO
-    ): Result<Unit> = runCatching {
-        citasApi.actualizarHorario(idPsicologo, request)
+    ): Result<Unit> {
+        return try {
+
+            Log.e("HORARIO_API", "========== REQUEST ==========")
+            Log.e("HORARIO_API", "PUT /api/citas/psicologo/$idPsicologo/horario")
+            Log.e("HORARIO_API", "BODY: $request")
+
+            val response = citasApi.actualizarHorario(idPsicologo, request)
+
+            Log.e("HORARIO_API", "SUCCESS RESPONSE")
+
+            Result.success(response)
+
+        } catch (e: retrofit2.HttpException) {
+
+            val errorBody = e.response()?.errorBody()?.string()
+
+            Log.e("HORARIO_API", "❌ HTTP ERROR ${e.code()}")
+            Log.e("HORARIO_API", "ERROR BODY: $errorBody")
+
+            Result.failure(Exception("HTTP ${e.code()} $errorBody"))
+
+        } catch (e: Exception) {
+
+            Log.e("HORARIO_API", "❌ EXCEPTION: ${e.message}", e)
+
+            Result.failure(e)
+        }
     }
 
     suspend fun actualizarDuracion(
@@ -169,6 +211,9 @@ class CitasRepository(
         citasApi.getHorarioActual(idPsicologo)
     }
 
+    suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO> {
+        return citasApi.getMisCitas()
+    }
 
     suspend fun cambiarEstadoCita(
         idCita: Long,

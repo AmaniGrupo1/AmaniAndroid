@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.data.remoto
 
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
@@ -111,4 +112,7 @@ interface CitasApi {
         @Path("id") idCita: Long,
         @Body request: Map<String, String>
     ): Response<Unit>
+
+    @GET("/api/citas/mis-citas")
+    suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO>
 }

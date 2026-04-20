@@ -41,6 +41,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScree
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
@@ -143,6 +144,12 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
             composable(Screens.calendario.route) {
                 CalendarioView()
             }
+
+            composable(Screens.agendaCitaScreen.route){
+                AgendaCitaScreen(navController)
+            }
+
+
             composable(
             route = Screens.perfilPsicologo.route,
             arguments = listOf(
@@ -156,17 +163,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
         }
 
 
-            composable(
-            route = Screens.pacienteHome.route,
-            arguments = listOf(
-                navArgument("idPaciente") {
-                    type = NavType.LongType
-                }
-            )
-        ) { backStackEntry ->
-            val idPaciente = backStackEntry.arguments?.getLong("idPaciente") ?: 0L
-            ViewPacientePrincipalScreen(navController,idPaciente)
-        }
+            composable(Screens.pacienteHome.route) {
+                ViewPacientePrincipalScreen(navController)
+            }
 
             composable(Screens.chatList.route) {
                 val viewModel: ChatListViewModel = koinViewModel()
@@ -198,6 +197,8 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
+
+
         }
     }
 }

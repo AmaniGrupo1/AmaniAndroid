@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.viewmodels
+package org.ies.tierno.applicationamani.presentation.viewmodels.citas
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,6 +23,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 class CitasViewModel(
     private val citasRepository: CitasRepository,
@@ -142,7 +143,7 @@ class CitasViewModel(
         val idPsicologo = _psicologoId.value ?: session.idPsicologo
         ?: return Result.failure(Exception("No hay psicólogo asignado"))
 
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
         val request = CrearCitaRequestDTO(

@@ -344,22 +344,3 @@ fun generarFranjasDia(
     return franjas
 }
 
-// ─── Preview ───────────────────────────────────────────────────
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-@Preview(showBackground = true)
-fun VistaDiariaHorasPreview() {
-    val citasEjemplo = mapOf(
-        LocalTime.of(9, 0) to "Sesión con Dr. García",
-        LocalTime.of(12, 0) to "Terapia grupal",
-        LocalTime.of(16, 0) to "Seguimiento telefónico"
-    )
-
-    VistaDiariaHoras(
-        fecha = LocalDate.now(),
-        franjas = generarFranjasDia(citasOcupadas = citasEjemplo),
-        modifier = Modifier.padding(16.dp),
-        onFranjaSeleccionada = { /* reservar cita */ }
-    )
-}

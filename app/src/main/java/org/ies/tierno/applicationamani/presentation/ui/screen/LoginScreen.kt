@@ -117,7 +117,7 @@ fun LoginScreen(
             val destination = when (rolNormalizado) {
                 "admin", "administrador" -> Screens.adminHome.route
                 "psicologo", "psicologa" -> Screens.psicologoHome.route
-                else -> Screens.pacienteHome.createRoute(response.idPaciente ?: 0L)
+                else -> Screens.pacienteHome.route
             }
 
             navController.navigate(destination) {
