@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -64,8 +63,7 @@ fun ChatInputBar(
     recordingSeconds: Int,
     isOtherTyping: Boolean = false
 ) {
-    // Usar imePadding() para adaptarse automáticamente a la altura del teclado
-    Column(modifier = Modifier.imePadding()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         if (isRecording) {
             RecordingBar(
                 recordingSeconds = recordingSeconds,
@@ -86,30 +84,23 @@ fun ChatInputBar(
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AnimatedContent(
-                        targetState = text.isBlank(),
-                        transitionSpec = {
-                            (fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.8f, animationSpec = tween(200)))
-                                .togetherWith(fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200)))
-                        },
-                        label = "mic_attach_transition"
-                    ) { isBlank ->
-                        if (isBlank) {
-                            IconButton(onClick = onMicClick) {
-                                Icon(
-                                    imageVector = Icons.Default.Mic,
-                                    contentDescription = "Nota de voz",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = onAttachFile) {
-                                Icon(
-                                    imageVector = Icons.Default.AttachFile,
-                                    contentDescription = "Adjuntar",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                    // Botón de archivo siempre visible
+                    IconButton(onClick = onAttachFile) {
+                        Icon(
+                            imageVector = Icons.Default.AttachFile,
+                            contentDescription = "Adjuntar archivo",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Botón de micrófono siempre visible (si no se está grabando)
+                    if (!isRecording) {
+                        IconButton(onClick = onMicClick) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Nota de voz",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
 

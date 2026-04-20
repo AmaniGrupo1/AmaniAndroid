@@ -115,10 +115,11 @@ val appModule = module {
     viewModel { ListarTerapiasViewModel(get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
-    viewModel { (currentUserId: Long, otherUserId: Long) ->
+    viewModel { (currentUserId: Long, otherUserId: Long, otherUserName: String) ->
         ChatViewModel(
             currentUserId = currentUserId,
             otherUserId = otherUserId,
+            otherUserName = otherUserName,
             sendMessageUseCase = get(),
             getMessagesUseCase = get(),
             markMessagesAsReadUseCase = get(),
@@ -129,6 +130,7 @@ val appModule = module {
             observeTypingUseCase = get(),
             observeUserOnlineUseCase = get(),
             updateUserOnlineUseCase = get(),
+            profileUseCaseGeneral = get(),
             appContext = androidContext()
         )
     }

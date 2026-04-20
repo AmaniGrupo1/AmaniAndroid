@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -14,9 +15,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -36,6 +41,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment as Alignment2
+import androidx.compose.ui.text.font.FontWeight
 import org.ies.tierno.applicationamani.domain.models.AttachmentType
 import org.ies.tierno.applicationamani.domain.models.Message
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
@@ -84,7 +96,39 @@ fun MessageBubble(
         ) {
             Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                 when (message.attachmentType) {
+                    AttachmentType.IMAGE -> {
+                        AttachmentImage(
+                            message = message,
+                            isOwn = isOwn
+                        )
+                        if (message.content.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            MessageWithTimestamp(
+                                message = message,
+                                isOwn = isOwn
+                            )
+                        }
+                    }
+                    AttachmentType.DOCUMENT -> {
+                        AttachmentDocument(
+                            message = message,
+                            isOwn = isOwn
+                        )
+                        if (message.content.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            MessageWithTimestamp(
+                                message = message,
+                                isOwn = isOwn
+                            )
+                        }
+                    }
                     AttachmentType.AUDIO -> {
+                        if (message.content.isNotBlank()) {
+                            MessageWithTimestamp(
+                                message = message,
+                                isOwn = isOwn
+                            )
+                        }
                         AudioBubble(
                             message = message,
                             isOwn = isOwn,
@@ -241,4 +285,119 @@ fun StatusIcon(isRead: Boolean, isDelivered: Boolean, tint: Color? = null) {
         modifier = Modifier.size(14.dp),
         tint = color
     )
+}
+
+@Composable
+private fun AttachmentImage(
+    message: Message,
+    isOwn: Boolean
+) {
+    val contentColor = if (isOwn)
+        MaterialTheme.colorScheme.onPrimaryContainer
+    else
+        MaterialTheme.colorScheme.onSurfaceVariant
+
+    // Imagen estilo WhatsApp
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, contentColor.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .clickable { /* Preview image */ }
+    ) {
+        AsyncImage(
+            model = message.attachmentUrl,
+            contentDescription = "Imagen adjunta",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        // Botón de descarga en esquina inferior derecha
+        Box(
+            modifier = Modifier
+                .align(Alignment2.BottomEnd)
+                .padding(8.dp)
+                .background(color = contentColor.copy(alpha = 0.8f))
+                .clip(CircleShape)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Download,
+                contentDescription = "Descargar",
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+
+    if (message.attachmentName != null) {
+        Spacer(modifier = Modifier.height(6.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = message.attachmentName,
+                style = MaterialTheme.typography.labelSmall,
+                color = contentColor.copy(alpha = 0.8f),
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+private fun AttachmentDocument(
+    message: Message,
+    isOwn: Boolean
+) {
+    val contentColor = if (isOwn)
+        MaterialTheme.colorScheme.onPrimaryContainer
+    else
+        MaterialTheme.colorScheme.onSurfaceVariant
+
+    // Estilo WhatsApp: tarjeta simple con icono y nombre
+    Surface(
+        color = if (isOwn) contentColor.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(color = contentColor.copy(alpha = 0.2f)),
+                contentAlignment = Alignment2.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Description,
+                    contentDescription = "Documento",
+                    tint = contentColor,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Column {
+                Text(
+                    text = message.attachmentName ?: "Documento adjunto",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = contentColor,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Toca para descargar",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = contentColor.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
 }
