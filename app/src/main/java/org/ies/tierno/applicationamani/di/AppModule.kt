@@ -29,7 +29,6 @@ import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarCit
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ResponderTestUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
-import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
@@ -86,7 +85,6 @@ val appModule = module {
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
     factory { ListarSituacionUseCase(get()) }
-    factory { ListarPacientesByPsicologo(get()) }
     factory { ProfileUseCaseGeneral(get()) }
 
     factory { SendMessageUseCase(get()) }
