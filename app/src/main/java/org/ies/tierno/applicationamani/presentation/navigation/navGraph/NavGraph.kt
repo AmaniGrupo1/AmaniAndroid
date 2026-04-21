@@ -34,7 +34,6 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScr
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
@@ -42,9 +41,12 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.java.KoinJavaComponent.getKoin
 import org.koin.core.parameter.parametersOf
@@ -54,6 +56,8 @@ import org.koin.core.parameter.parametersOf
 fun NavGraph(startDestination: String = Screens.principal.route) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = koinViewModel()
+    val psicologoAgendaViewModel : PsicologoAgendaViewModel = koinViewModel()
+    val listarTerapiasViewModel : ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -136,11 +140,9 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 ViewAdminPrincipal(navController)
             }
             composable(Screens.psicologoAgenda.route) {
-                PsicologoAgendaScreen(navController)
+                PsicologoAgendaScreen(navController, psicologoAgendaViewModel, listarTerapiasViewModel)
             }
-            composable(Screens.citas.route) {
-                CitasScreen(navController)
-            }
+
             composable(Screens.calendario.route) {
                 CalendarioView()
             }
@@ -195,6 +197,38 @@ fun NavGraph(startDestination: String = Screens.principal.route) {
                 ChatScreen(
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // En tu NavGraph
+            // CREAR CITA
+            composable(Screens.citas.route) {
+
+                CitasScreen(
+                    navController,
+                    null,
+                    psicologoAgendaViewModel,
+                    listarTerapiasViewModel
+                )
+            }
+
+// EDITAR / REAGENDAR CITA
+            composable(
+                route = Screens.EditarCita.route,
+                arguments = listOf(
+                    navArgument("citaId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+
+                val citaId = backStackEntry.arguments?.getLong("citaId")
+
+                CitasScreen(
+                   navController,
+                    citaId,
+                     psicologoAgendaViewModel,
+                    listarTerapiasViewModel
                 )
             }
 

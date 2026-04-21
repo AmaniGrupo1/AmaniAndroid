@@ -52,4 +52,3 @@ fun enviarCitaAlCalendario(
     }
     context.startActivity(intent)
 }
-

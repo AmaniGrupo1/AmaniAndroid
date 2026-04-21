@@ -58,7 +58,7 @@ class ListarCitasViewModel(
     }
 
     /**
-     * Cancelar una cita
+     * Cancelar una cita y eliminarla de la lista localmente
      */
     fun cancelarCita(idCita: Long, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
@@ -68,11 +68,10 @@ class ListarCitasViewModel(
 
                 val response = citasApi.cancelarCita(idCita)
 
-                // Actualizar el estado local de la cita
+                // 🔥 ELIMINAR la cita de la lista local
                 val index = citas.indexOfFirst { it.idCita == idCita }
                 if (index != -1) {
-                    val citaActualizada = citas[index].copy(estado = "cancelada")
-                    citas[index] = citaActualizada
+                    citas.removeAt(index)  // Elimina completamente la cita
                 }
 
                 onSuccess()

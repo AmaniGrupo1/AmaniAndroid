@@ -81,5 +81,8 @@ sealed class Screens(val route: String) {
 
     object agendaCitaScreen : Screens("agendaCitaScreen")
 
+    object EditarCita : Screens("editar_cita/{citaId}") {
+        fun pass(id: Long) = "editar_cita/$id"
+    }
 }
 

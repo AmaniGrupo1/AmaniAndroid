@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 class PsicologoAgendaViewModel(
     private val citasRepository: CitasRepository,
@@ -319,7 +320,7 @@ class PsicologoAgendaViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
             val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
             val request = CrearCitaRequestDTO(
@@ -415,7 +416,7 @@ class PsicologoAgendaViewModel(
             return Result.failure(Exception("Tipo de terapia inválido"))
         }
 
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
         val startDatetime = LocalDateTime
             .of(fecha, hora)
@@ -463,6 +464,60 @@ class PsicologoAgendaViewModel(
         }
     }
 
+    // En PsicologoAgendaViewModel.kt, añadir este método:
+
+
+    suspend fun crearCitaParaPaciente(
+        idPaciente: Long,
+        fecha: LocalDate,
+        hora: LocalTime,
+        duracionMinutos: Int,
+        motivo: String,
+        idTipoTerapia: Long,
+        metodoPago: MetodoPago,
+        estadoPago: EstadoPago,
+        monto: BigDecimal,
+        modalidad: ModalidadCita
+    ): Result<Unit> {
+        val session = _userSession.value
+        if (session == null) {
+            return Result.failure(Exception("No hay sesión"))
+        }
+
+        val psychologistId = session.idPsicologo
+        if (psychologistId == null) {
+            return Result.failure(Exception("No hay ID del psicólogo"))
+        }
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
+
+        val request = CrearCitaRequestDTO(
+            idPaciente = idPaciente,
+            idPsicologo = psychologistId,
+            startDatetime = startDatetime,
+            durationMinutes = duracionMinutos,
+            metodoPago = metodoPago,
+            estadoPago = estadoPago,
+            monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
+            motivo = motivo.ifBlank { "Consulta psicológica" },
+            idTipoTerapia = idTipoTerapia,
+            modalidad = modalidad
+        )
+
+        return try {
+            val resultado = citasRepository.crearCita(request)
+            if (resultado.isSuccess) {
+                cargarAgendaMensual(_mesVisible.value)
+                cargarDisponibilidadDia(fecha, duracionMinutos)
+                Result.success(Unit)
+            } else {
+                Result.failure(resultado.exceptionOrNull() ?: Exception("Error al crear cita"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
     // En PsicologoAgendaViewModel.kt
     fun cambiarEstadoCita(idCita: Long, nuevoEstado: EstadoCita) {
         viewModelScope.launch {

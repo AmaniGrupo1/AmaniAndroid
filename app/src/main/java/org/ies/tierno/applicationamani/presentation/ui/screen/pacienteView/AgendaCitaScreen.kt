@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,9 +9,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.ContactoPsicologoDTO
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -46,6 +50,10 @@ fun AgendaCitaScreen(
     // Estado para el diálogo de confirmación de cancelación
     var showCancelDialog by remember { mutableStateOf(false) }
     var citaToCancel by remember { mutableStateOf<CitaPacienteViewResponseDTO?>(null) }
+
+    // Estado para el diálogo de información de terapia
+    var showTerapiaInfoDialog by remember { mutableStateOf(false) }
+    var terapiaInfoSeleccionada by remember { mutableStateOf<CitaPacienteViewResponseDTO?>(null) }
 
     // Cargar citas al iniciar
     LaunchedEffect(Unit) {
@@ -170,10 +178,14 @@ fun AgendaCitaScreen(
                                     showCancelDialog = true
                                 },
                                 onRescheduleClick = {
-                                    navController.navigate("reagendar_cita/${cita.idCita}")
+                                    navController.navigate(Screens.EditarCita.pass(cita.idCita ?: 0L))
                                 },
                                 onCardClick = {
                                     viewModel.selectCita(cita)
+                                },
+                                onTerapiaClick = {
+                                    terapiaInfoSeleccionada = cita
+                                    showTerapiaInfoDialog = true
                                 }
                             )
                         }
@@ -186,6 +198,17 @@ fun AgendaCitaScreen(
     // Diálogo de contacto
     if (showContactDialog) {
         ContactDialog(onDismiss = { showContactDialog = false })
+    }
+
+    // Diálogo de información de terapia
+    if (showTerapiaInfoDialog && terapiaInfoSeleccionada != null) {
+        TerapiaInfoDialog(
+            cita = terapiaInfoSeleccionada!!,
+            onDismiss = {
+                showTerapiaInfoDialog = false
+                terapiaInfoSeleccionada = null
+            }
+        )
     }
 
     // Diálogo de confirmación de cancelación
@@ -217,7 +240,8 @@ fun CitaCard(
     cita: CitaPacienteViewResponseDTO,
     onCancelClick: () -> Unit,
     onRescheduleClick: () -> Unit,
-    onCardClick: () -> Unit
+    onCardClick: () -> Unit,
+    onTerapiaClick: () -> Unit
 ) {
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -355,22 +379,35 @@ fun CitaCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Tipo de terapia y modalidad
+            // Tipo de terapia - AHORA CLICKEABLE PARA VER DURACIÓN
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 cita.tipoTerapia?.let { terapia ->
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        modifier = Modifier.clickable { onTerapiaClick() }
                     ) {
-                        Text(
-                            text = terapia,
-                            fontSize = 12.sp,
+                        Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = terapia,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = "Info terapia",
+                                modifier = Modifier.size(12.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
 
@@ -408,7 +445,6 @@ fun CitaCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Botón Cancelar
                     OutlinedButton(
                         onClick = onCancelClick,
                         modifier = Modifier.weight(1f),
@@ -426,7 +462,6 @@ fun CitaCard(
                         Text("Cancelar")
                     }
 
-                    // Botón Reagendar
                     Button(
                         onClick = onRescheduleClick,
                         modifier = Modifier.weight(1f),
@@ -443,6 +478,177 @@ fun CitaCard(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Reagendar")
                     }
+                }
+            }
+        }
+    }
+}
+
+// NUEVO DIÁLOGO: Información detallada de la terapia
+@Composable
+fun TerapiaInfoDialog(
+    cita: CitaPacienteViewResponseDTO,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🎯 Información de la Terapia",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Tipo de Terapia
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Psychology,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = cita.tipoTerapia ?: "Terapia no especificada",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Duración de la sesión
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "${cita.durationMinutes ?: 60}",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "minutos",
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "⏰ Duración de la sesión",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "${cita.durationMinutes ?: 60} minutos",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = if ((cita.durationMinutes ?: 60) <= 60)
+                                    "Sesión estándar de una hora"
+                                else
+                                    "Sesión extendida para mayor profundidad",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Recomendaciones
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "💡 Recomendaciones",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "• Llega 5 minutos antes para prepararte\n• Ten lista tu identificación\n• Prepara tus preguntas o temas a tratar\n• Busca un lugar tranquilo si es online",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Entendido", modifier = Modifier.padding(vertical = 4.dp))
                 }
             }
         }
@@ -507,7 +713,7 @@ fun ContactDialog(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Divider()
+                HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
@@ -570,7 +776,6 @@ fun CancelConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Parsear fecha para mostrar
     val fechaFormateada = try {
         cita.fecha?.let {
             LocalDate.parse(it).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
