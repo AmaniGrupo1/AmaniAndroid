@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.domain.usecases
 
-import kotlinx.coroutines.flow.Flow
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 
 class StopTypingUseCase(private val chatRepository: ChatRepository) {

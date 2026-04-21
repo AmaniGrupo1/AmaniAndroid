@@ -1,10 +1,5 @@
 package org.ies.tierno.applicationamani.dto
 
-import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
-import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
-import java.time.LocalDate
-import java.time.LocalTime
-
 data class CitaPacienteViewResponseDTO(
     val idCita: Long?,
     val fecha: String?,          // 👈 importante (no LocalDate)

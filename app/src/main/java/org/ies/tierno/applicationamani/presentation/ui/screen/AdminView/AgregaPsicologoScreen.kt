@@ -36,6 +36,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -76,9 +77,9 @@ fun AgregaPsicologoScreen(
     navController: NavController,
     loginViewModel: LoginViewModel
 ) {
-    val primaryColor = Color(0xFF7B68EE) // Púrpura AMANI
-    val backgroundColor = Color(0xFFCCC0E4)
-    val errorColor = Color(0xFFD32F2F) // Rojo para errores
+    val primaryColor = Color(0xFF6B4E71) // Amani Primary
+    val backgroundColor = Color(0xFFFDF8F9) // Amani Background
+    val errorColor = Color(0xFFE57373) // Amani Error
 
     val name by loginViewModel.nombre.collectAsStateWithLifecycle()
     val surname by loginViewModel.apellido.collectAsStateWithLifecycle()
@@ -347,7 +348,7 @@ fun AgregaPsicologoScreen(
                             label = { Text("Especialidad *", fontWeight = FontWeight.SemiBold) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(),
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                             shape = textFieldShape,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedEspecialidad) },
                             colors = OutlinedTextFieldDefaults.colors(

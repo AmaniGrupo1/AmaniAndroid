@@ -478,7 +478,7 @@ fun CitasScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "${fechaSeleccionada!!.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES")))} a las ${franjaSeleccionadaTemp!!.horaInicio}",
+                        "${fechaSeleccionada!!.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale.Builder().setLanguage("es").setRegion("ES").build()))} a las ${franjaSeleccionadaTemp!!.horaInicio}",
                         style = typography.bodyMedium,
                         color = colors.primary
                     )

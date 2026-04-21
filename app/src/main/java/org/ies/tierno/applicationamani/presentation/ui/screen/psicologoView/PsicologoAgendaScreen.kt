@@ -1,20 +1,92 @@
-@file:Suppress("DEPRECATION")
-
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuBoxScope
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +121,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
 
 // Extensiones de color
 val ColorScheme.success: Color
@@ -698,7 +770,7 @@ fun LeyendaMejorada() {
 @Composable
 fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
+    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale.Builder().setLanguage("es").setRegion("ES").build())
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -990,7 +1062,7 @@ fun TarjetaCitaMejorada(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(color = colors.outline.copy(alpha = 0.3f))
+            HorizontalDivider(color = colors.outline.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
 
             // Botones de acción
@@ -1178,7 +1250,7 @@ fun DialogoModificarHorarioMejorado(
                             AnimatedVisibility(visible = franja.activo) {
                                 Column {
                                     Spacer(modifier = Modifier.height(12.dp))
-                                    Divider()
+                                    HorizontalDivider()
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -1241,7 +1313,7 @@ fun HoraSelector(horaActual: String, onHoraSeleccionada: (String) -> Unit) {
             value = horaActual,
             onValueChange = {},
             readOnly = true,
-            modifier = Modifier.menuAnchor()
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             horas.forEach { hora ->
@@ -1264,7 +1336,7 @@ fun DialogoNoDisponibleMejorado(
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
+    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale.Builder().setLanguage("es").setRegion("ES").build())
     var motivoBloqueo by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -1420,14 +1492,14 @@ fun DialogoCrearEditarCitaMejorado(
 
     val horasDisponibles = remember(slotsLibres, citaAEditar, fechaSeleccionada) {
         val libres = slotsLibres.filter { !it.ocupado }.map { it.hora }.sorted()
-        if (esEdicion && citaAEditar != null) {
+        if (citaAEditar != null) {
             val horaEdicion = citaAEditar.horaInicio
             if (horaEdicion !in libres) (listOf(horaEdicion) + libres).distinct()
                 .sorted() else libres
         } else libres
     }
 
-    var horaSeleccionada by remember { mutableStateOf(if (esEdicion && citaAEditar != null) citaAEditar.horaInicio else horasDisponibles.firstOrNull()) }
+    var horaSeleccionada by remember { mutableStateOf(if (citaAEditar != null) citaAEditar.horaInicio else horasDisponibles.firstOrNull()) }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(terapiaSeleccionada) {
@@ -1691,7 +1763,7 @@ fun DialogoCrearEditarCitaMejorado(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         shape = RoundedCornerShape(14.dp)
                     )
                     ExposedDropdownMenu(
@@ -1794,7 +1866,7 @@ fun DialogoCrearEditarCitaMejorado(
                                 readOnly = true,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                                 shape = RoundedCornerShape(12.dp)
                             )
                             ExposedDropdownMenu(
@@ -1991,7 +2063,7 @@ fun CampoFecha(
                         fechaSeleccionada.format(
                             DateTimeFormatter.ofPattern(
                                 "EEEE",
-                                Locale("es", "ES")
+                                Locale.Builder().setLanguage("es").setRegion("ES").build()
                             )
                         ).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodySmall,
