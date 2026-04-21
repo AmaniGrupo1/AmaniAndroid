@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose) // ✅ Incluye Kotlin + Compose
+    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
@@ -69,6 +71,9 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -128,7 +133,7 @@ dependencies {
 // 📚 Dokka
 dokka {
     moduleName.set("Amani Android")
-    dokkaSourceSets.register("main") {
+    dokkaSourceSets.named("main") {
         sourceRoots.from(file("src/main/java"))
         includes.from("MODULE.md")
     }

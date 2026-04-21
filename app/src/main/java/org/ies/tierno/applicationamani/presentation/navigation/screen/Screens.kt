@@ -80,6 +80,6 @@ sealed class Screens(val route: String) {
     }
 
     object agendaCitaScreen : Screens("agendaCitaScreen")
+    object diarioEmocional : Screens("diarioEmocional")
 
 }
-

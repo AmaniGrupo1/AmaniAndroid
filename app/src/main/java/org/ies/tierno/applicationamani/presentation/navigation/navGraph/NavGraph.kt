@@ -34,6 +34,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScr
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.diario.DiarioEmocionalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
@@ -170,6 +171,10 @@ fun NavGraph(
             composable(Screens.chatList.route) {
                 val viewModel: ChatListViewModel = koinViewModel()
                 ChatListScreen(navController = navController, viewModel = viewModel)
+            }
+
+            composable(Screens.diarioEmocional.route) {
+                DiarioEmocionalScreen()
             }
 
             composable(
