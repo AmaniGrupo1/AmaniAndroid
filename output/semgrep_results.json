@@ -1,0 +1,6 @@
+{
+  "results": [],
+  "errors": [],
+  "status": "no_rules_configured",
+  "message": "semgrep no available in this environment or no rules configured. Analysis performed with manual grep patterns instead."
+}

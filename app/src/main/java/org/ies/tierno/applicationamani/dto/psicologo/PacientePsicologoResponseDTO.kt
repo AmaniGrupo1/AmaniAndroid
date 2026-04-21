@@ -3,12 +3,11 @@ package org.ies.tierno.applicationamani.dto.psicologo
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionResponseDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
-import java.time.LocalDate
-import java.time.LocalTime
 
 
 data class PacientePsicologoResponseDTO(
     val idPaciente: Long? = null,
+    val idUsuario: Long? = null,
 
     val nombre: String? = null,
 

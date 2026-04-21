@@ -1,0 +1,438 @@
+.class public final Lorg/koin/androidx/fragment/dsl/ScopeFragmentOfKt$fragmentOf$8;
+.super Ljava/lang/Object;
+.source "ScopeFragmentOf.kt"
+
+# interfaces
+.implements Lkotlin/jvm/functions/Function2;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lorg/koin/androidx/fragment/dsl/ScopeFragmentOfKt;->fragmentOf(Lorg/koin/dsl/ScopeDSL;Lkotlin/jvm/functions/Function7;Lkotlin/jvm/functions/Function1;)Lorg/koin/core/definition/KoinDefinition;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x19
+    name = null
+.end annotation
+
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "Ljava/lang/Object;",
+        "Lkotlin/jvm/functions/Function2<",
+        "Lorg/koin/core/scope/Scope;",
+        "Lorg/koin/core/parameter/ParametersHolder;",
+        "TR;>;"
+    }
+.end annotation
+
+.annotation system Ldalvik/annotation/SourceDebugExtension;
+    value = "SMAP\nScopeFragmentOf.kt\nKotlin\n*S Kotlin\n*F\n+ 1 ScopeFragmentOf.kt\norg/koin/androidx/fragment/dsl/ScopeFragmentOfKt$fragmentOf$8\n+ 2 New.kt\norg/koin/core/module/dsl/NewKt\n+ 3 Scope.kt\norg/koin/core/scope/Scope\n*L\n1#1,211:1\n85#2:212\n149#3,5:213\n*S KotlinDebug\n*F\n+ 1 ScopeFragmentOf.kt\norg/koin/androidx/fragment/dsl/ScopeFragmentOfKt$fragmentOf$8\n*L\n90#1:212\n90#1:213,5\n*E\n"
+.end annotation
+
+.annotation runtime Lkotlin/Metadata;
+    k = 0x3
+    mv = {
+        0x2,
+        0x3,
+        0x0
+    }
+    xi = 0xb0
+.end annotation
+
+
+# instance fields
+.field final synthetic $constructor:Lkotlin/jvm/functions/Function7;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Lkotlin/jvm/functions/Function7<",
+            "TT1;TT2;TT3;TT4;TT5;TT6;TT7;TR;>;"
+        }
+    .end annotation
+.end field
+
+
+# direct methods
+.method public constructor <init>(Lkotlin/jvm/functions/Function7;)V
+    .locals 0
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lkotlin/jvm/functions/Function7<",
+            "-TT1;-TT2;-TT3;-TT4;-TT5;-TT6;-TT7;+TR;>;)V"
+        }
+    .end annotation
+
+    iput-object p1, p0, Lorg/koin/androidx/fragment/dsl/ScopeFragmentOfKt$fragmentOf$8;->$constructor:Lkotlin/jvm/functions/Function7;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final invoke(Lorg/koin/core/scope/Scope;Lorg/koin/core/parameter/ParametersHolder;)Landroidx/fragment/app/Fragment;
+    .locals 17
+    .param p1, "$this$fragment"    # Lorg/koin/core/scope/Scope;
+    .param p2, "it"    # Lorg/koin/core/parameter/ParametersHolder;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lorg/koin/core/scope/Scope;",
+            "Lorg/koin/core/parameter/ParametersHolder;",
+            ")TR;"
+        }
+    .end annotation
+
+    const-string v0, "$this$fragment"
+
+    move-object/from16 v1, p1
+
+    invoke-static {v1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    const-string v0, "it"
+
+    move-object/from16 v2, p2
+
+    invoke-static {v2, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 90
+    move-object/from16 v0, p0
+
+    iget-object v3, v0, Lorg/koin/androidx/fragment/dsl/ScopeFragmentOfKt$fragmentOf$8;->$constructor:Lkotlin/jvm/functions/Function7;
+
+    .local v3, "constructor$iv":Lkotlin/jvm/functions/Function7;
+    move-object/from16 v11, p1
+
+    .local v11, "$this$new$iv":Lorg/koin/core/scope/Scope;
+    const/4 v12, 0x0
+
+    .line 212
+    .local v12, "$i$f$new":I
+    move-object v4, v11
+
+    .line 213
+    .local v4, "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v5, 0x0
+
+    .line 213
+    .local v5, "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v6, 0x0
+
+    .line 213
+    .local v6, "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v7, 0x0
+
+    .line 217
+    .local v7, "$i$f$get":I
+    const-string v8, "T1"
+
+    const/4 v9, 0x4
+
+    invoke-static {v9, v8}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v8, Ljava/lang/Object;
+
+    invoke-static {v8}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v8
+
+    invoke-virtual {v4, v8, v5, v6}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v4
+
+    .line 212
+    .end local v4    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v5    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v6    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v7    # "$i$f$get":I
+    move-object v5, v11
+
+    .line 213
+    .local v5, "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v6, 0x0
+
+    .line 213
+    .local v6, "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v7, 0x0
+
+    .line 213
+    .local v7, "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v8, 0x0
+
+    .line 217
+    .local v8, "$i$f$get":I
+    const-string v10, "T2"
+
+    invoke-static {v9, v10}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v10, Ljava/lang/Object;
+
+    invoke-static {v10}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v10
+
+    invoke-virtual {v5, v10, v6, v7}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v5
+
+    .line 212
+    .end local v5    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v6    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v7    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v8    # "$i$f$get":I
+    move-object v6, v11
+
+    .line 213
+    .local v6, "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v7, 0x0
+
+    .line 213
+    .local v7, "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v8, 0x0
+
+    .line 213
+    .local v8, "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v10, 0x0
+
+    .line 217
+    .local v10, "$i$f$get":I
+    const-string v13, "T3"
+
+    invoke-static {v9, v13}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v13, Ljava/lang/Object;
+
+    invoke-static {v13}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v13
+
+    invoke-virtual {v6, v13, v7, v8}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v6
+
+    .line 212
+    .end local v6    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v7    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v8    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v10    # "$i$f$get":I
+    move-object v7, v11
+
+    .line 213
+    .local v7, "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v8, 0x0
+
+    .line 213
+    .local v8, "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v10, 0x0
+
+    .line 213
+    .local v10, "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v13, 0x0
+
+    .line 217
+    .local v13, "$i$f$get":I
+    const-string v14, "T4"
+
+    invoke-static {v9, v14}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v14, Ljava/lang/Object;
+
+    invoke-static {v14}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v14
+
+    invoke-virtual {v7, v14, v8, v10}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v7
+
+    .line 212
+    .end local v7    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v8    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v10    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v13    # "$i$f$get":I
+    move-object v8, v11
+
+    .line 213
+    .local v8, "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v10, 0x0
+
+    .line 213
+    .local v10, "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v13, 0x0
+
+    .line 213
+    .local v13, "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v14, 0x0
+
+    .line 217
+    .local v14, "$i$f$get":I
+    const-string v15, "T5"
+
+    invoke-static {v9, v15}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v15, Ljava/lang/Object;
+
+    invoke-static {v15}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v15
+
+    invoke-virtual {v8, v15, v10, v13}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v8
+
+    .line 212
+    .end local v8    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v10    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v13    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v14    # "$i$f$get":I
+    move-object v10, v11
+
+    .line 213
+    .local v10, "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v13, 0x0
+
+    .line 213
+    .local v13, "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v14, 0x0
+
+    .line 213
+    .local v14, "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v15, 0x0
+
+    .line 217
+    .local v15, "$i$f$get":I
+    const-string v0, "T6"
+
+    invoke-static {v9, v0}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v0, Ljava/lang/Object;
+
+    invoke-static {v0}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v0
+
+    invoke-virtual {v10, v0, v13, v14}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    .line 212
+    .end local v10    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v13    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v14    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v15    # "$i$f$get":I
+    nop
+
+    .line 213
+    .restart local v10    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    nop
+
+    .line 214
+    const/4 v13, 0x0
+
+    .line 213
+    .restart local v13    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    nop
+
+    .line 215
+    const/4 v14, 0x0
+
+    .line 213
+    .restart local v14    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    const/4 v15, 0x0
+
+    .line 217
+    .restart local v15    # "$i$f$get":I
+    move-object/from16 v16, v0
+
+    const-string v0, "T7"
+
+    invoke-static {v9, v0}, Lkotlin/jvm/internal/Intrinsics;->reifiedOperationMarker(ILjava/lang/String;)V
+
+    const-class v0, Ljava/lang/Object;
+
+    invoke-static {v0}, Lkotlin/jvm/internal/Reflection;->getOrCreateKotlinClass(Ljava/lang/Class;)Lkotlin/reflect/KClass;
+
+    move-result-object v0
+
+    invoke-virtual {v10, v0, v13, v14}, Lorg/koin/core/scope/Scope;->get(Lkotlin/reflect/KClass;Lorg/koin/core/qualifier/Qualifier;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+
+    move-result-object v10
+
+    .line 212
+    .end local v10    # "$this$iv$iv":Lorg/koin/core/scope/Scope;
+    .end local v13    # "qualifier$iv$iv":Lorg/koin/core/qualifier/Qualifier;
+    .end local v14    # "parameters$iv$iv":Lkotlin/jvm/functions/Function0;
+    .end local v15    # "$i$f$get":I
+    move-object/from16 v9, v16
+
+    invoke-interface/range {v3 .. v10}, Lkotlin/jvm/functions/Function7;->invoke(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    .end local v3    # "constructor$iv":Lkotlin/jvm/functions/Function7;
+    .end local v11    # "$this$new$iv":Lorg/koin/core/scope/Scope;
+    .end local v12    # "$i$f$new":I
+    check-cast v0, Landroidx/fragment/app/Fragment;
+
+    .line 90
+    return-object v0
+.end method
+
+.method public bridge synthetic invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+    .locals 2
+    .param p1, "p1"    # Ljava/lang/Object;
+    .param p2, "p2"    # Ljava/lang/Object;
+
+    .line 90
+    move-object v0, p1
+
+    check-cast v0, Lorg/koin/core/scope/Scope;
+
+    move-object v1, p2
+
+    check-cast v1, Lorg/koin/core/parameter/ParametersHolder;
+
+    invoke-virtual {p0, v0, v1}, Lorg/koin/androidx/fragment/dsl/ScopeFragmentOfKt$fragmentOf$8;->invoke(Lorg/koin/core/scope/Scope;Lorg/koin/core/parameter/ParametersHolder;)Landroidx/fragment/app/Fragment;
+
+    move-result-object v0
+
+    return-object v0
+.end method

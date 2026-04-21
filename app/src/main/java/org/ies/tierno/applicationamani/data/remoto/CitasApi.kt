@@ -11,7 +11,6 @@ import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import retrofit2.Response
-
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
