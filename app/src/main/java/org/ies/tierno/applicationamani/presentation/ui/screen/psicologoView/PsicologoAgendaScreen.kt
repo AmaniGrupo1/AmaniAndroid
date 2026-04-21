@@ -97,6 +97,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import org.ies.tierno.applicationamani.utils.exportarAgendaAPdf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
@@ -150,6 +152,7 @@ fun PsicologoAgendaScreen(
 
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     var mesVisible by remember { mutableStateOf(YearMonth.now()) }
+    var mostrarDialogoExportarPaciente by remember { mutableStateOf(false) }
 
     // Días no laborables (sábados y domingos por defecto)
     val diasNoLaborables = remember(mesVisible) {
@@ -290,7 +293,7 @@ fun PsicologoAgendaScreen(
                 // Tarjetas de acciones rápidas
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TarjetaAccionRapidaMejorada(
                         icono = Icons.Default.Schedule,
@@ -309,20 +312,28 @@ fun PsicologoAgendaScreen(
                             esDiaNoDisponible -> "Habilitar día para citas"
                             else -> "Marcar como no disponible"
                         },
-                        colorFondo = if (esDiaNoDisponible) colors.primaryContainer.copy(alpha = 0.5f) else colors.errorContainer.copy(
-                            alpha = 0.3f
-                        ),
+                        colorFondo = if (esDiaNoDisponible)
+                            colors.primaryContainer.copy(alpha = 0.5f)
+                        else
+                            colors.errorContainer.copy(alpha = 0.3f),
                         colorIcono = if (esDiaNoDisponible) colors.primary else colors.error,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            if (fechaSeleccionada != null) {
-                                mostrarDialogoNoDisponible = true
-                            } else {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("📅 Selecciona primero un día en el calendario")
-                                }
+                            if (fechaSeleccionada != null) mostrarDialogoNoDisponible = true
+                            else scope.launch {
+                                snackbarHostState.showSnackbar("📅 Selecciona primero un día en el calendario")
                             }
                         }
+                    )
+                    // ✅ NUEVA TARJETA — Exportar PDF
+                    TarjetaAccionRapidaMejorada(
+                        icono = Icons.Default.Description,
+                        titulo = "Exportar",
+                        subtitulo = if (fechaSeleccionada != null) "PDF del día" else "PDF del mes",
+                        colorFondo = colors.tertiaryContainer.copy(alpha = 0.4f),
+                        colorIcono = colors.tertiary,
+                        modifier = Modifier.weight(1f),
+                        onClick = { mostrarDialogoExportarPaciente = true }
                     )
                 }
 
@@ -668,6 +679,35 @@ fun PsicologoAgendaScreen(
                 citaParaCancelar = null
             },
             onDismiss = { citaParaCancelar = null }
+        )
+    }
+
+    // Diálogo Exportar por paciente
+    if (mostrarDialogoExportarPaciente) {
+        val context = LocalContext.current
+        DialogoExportarPorPaciente(
+            pacientes = pacientesAsignados,
+            onPacienteSeleccionado = { paciente ->
+                // Ejecutar en coroutine para usar snackbar y operaciones potencialmente largas
+                scope.launch {
+                    val citasParaExportar = agendaMensual.filter {
+                        it.idPaciente == paciente.idPaciente && it.estado?.uppercase() != "CANCELADA"
+                    }
+
+                    if (citasParaExportar.isEmpty()) {
+                        snackbarHostState.showSnackbar("📭 No hay citas para este paciente")
+                    } else {
+                        val tituloPdf = if (fechaSeleccionada != null) {
+                            "Agenda ${paciente.nombre} ${paciente.apellido} - ${fechaSeleccionada!!.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))}"
+                        } else {
+                            "Agenda ${paciente.nombre} ${paciente.apellido} - ${mesVisible.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.Builder().setLanguage("es").setRegion("ES").build())).replaceFirstChar { it.uppercase() }}"
+                        }
+                        exportarAgendaAPdf(context, citasParaExportar, tituloPdf)
+                    }
+                    mostrarDialogoExportarPaciente = false
+                }
+            },
+            onDismiss = { mostrarDialogoExportarPaciente = false }
         )
     }
 }
@@ -2168,6 +2208,142 @@ fun DialogoConfirmarCancelacionMejorado(
         },
         dismissButton = {
             TextButton(onClick = onDismiss, shape = RoundedCornerShape(14.dp)) { Text("Volver") }
+        }
+    )
+}
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DialogoExportarPorPaciente(
+    pacientes: List<PacientePsicologoResponseDTO>,
+    onPacienteSeleccionado: (PacientePsicologoResponseDTO) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = MaterialTheme.colorScheme
+    var busqueda by remember { mutableStateOf("") }
+
+    val pacientesFiltrados = remember(busqueda, pacientes) {
+        if (busqueda.isBlank()) pacientes
+        else pacientes.filter {
+            val nombreCompleto = "${it.nombre} ${it.apellido}".lowercase()
+            nombreCompleto.contains(busqueda.lowercase())
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = colors.surface,
+        shape = RoundedCornerShape(28.dp),
+        title = {
+            Column {
+                Text(
+                    "📄 Exportar por paciente",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.primary
+                )
+                Text(
+                    "Selecciona un paciente para generar su informe",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp)
+            ) {
+                // Buscador
+                OutlinedTextField(
+                    value = busqueda,
+                    onValueChange = { busqueda = it },
+                    label = { Text("Buscar paciente") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (pacientesFiltrados.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No se encontraron pacientes",
+                            color = colors.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        pacientesFiltrados.forEach { paciente ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onPacienteSeleccionado(paciente) },
+                                shape = RoundedCornerShape(14.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = colors.primaryContainer.copy(alpha = 0.15f)
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(14.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(
+                                                colors.primary.copy(alpha = 0.15f),
+                                                RoundedCornerShape(12.dp)
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Person,
+                                            contentDescription = null,
+                                            tint = colors.primary,
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            "${paciente.nombre} ${paciente.apellido}",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            paciente.email ?: "",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = colors.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
         }
     )
 }
