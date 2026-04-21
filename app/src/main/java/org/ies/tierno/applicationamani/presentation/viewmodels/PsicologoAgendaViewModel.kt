@@ -106,6 +106,7 @@ class PsicologoAgendaViewModel(
     }
 
     fun cargarAgendaMensual(month: YearMonth) {
+        println("📅 Cargando agenda para mes: $month")
         val session = _userSession.value
         val psychologistId = session?.idPsicologo
         if (psychologistId == null) {
@@ -336,9 +337,20 @@ class PsicologoAgendaViewModel(
                 idTipoTerapia = idTipoTerapia,
                 modalidad = modalidad
             )
-
+            android.util.Log.d("EDIT_CITA", "========== EDITAR CITA ==========")
+            android.util.Log.d("EDIT_CITA", "idCita: $idCita")
+            android.util.Log.d("EDIT_CITA", "idPaciente: $idPaciente")
+            android.util.Log.d("EDIT_CITA", "fecha: $fecha hora: $hora")
+            android.util.Log.d("EDIT_CITA", "motivo: $motivo")
+            android.util.Log.d("EDIT_CITA", "metodoPago: $metodoPago")
+            android.util.Log.d("EDIT_CITA", "estadoPago: $estadoPago")
+            android.util.Log.d("EDIT_CITA", "monto: $monto")
+            android.util.Log.d("EDIT_CITA", "modalidad: $modalidad")
+            android.util.Log.d("EDIT_CITA", "request FINAL: $request")
             citasRepository.editarCita(idCita, request)
                 .onSuccess { citaActualizada ->
+
+                    android.util.Log.d("EDIT_CITA", "✅ SUCCESS RESPONSE: $citaActualizada")
                     // Actualizar la lista localmente sin recargar todo
                     _agendaMensual.value = _agendaMensual.value
                         .map { if (it.id == idCita) citaActualizada else it }
@@ -352,9 +364,12 @@ class PsicologoAgendaViewModel(
 
                     _successMessage.value = "✏️ Cita editada correctamente"
                 }
+
                 .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al editar la cita"
+                    android.util.Log.e("EDIT_CITA", "❌ ERROR EDITANDO CITA", e)
+                    android.util.Log.e("EDIT_CITA", "mensaje: ${e.message}")
                 }
+
 
             _isLoading.value = false
         }
@@ -518,6 +533,7 @@ class PsicologoAgendaViewModel(
             Result.failure(e)
         }
     }
+
     // En PsicologoAgendaViewModel.kt
     fun cambiarEstadoCita(idCita: Long, nuevoEstado: EstadoCita) {
         viewModelScope.launch {
@@ -533,5 +549,16 @@ class PsicologoAgendaViewModel(
         }
     }
 
+
+    private val _citaSeleccionada = MutableStateFlow<AgendaItemDTO?>(null)
+    val citaSeleccionada = _citaSeleccionada.asStateFlow()
+
+    fun seleccionarCitaPorId(id: Long) {
+        println("🔍 seleccionarCitaPorId llamado con id: $id")
+        println("📋 Agenda actual tiene ${_agendaMensual.value.size} citas")
+        val cita = _agendaMensual.value.find { it.id == id }
+        println("✅ Cita encontrada: ${cita != null}")
+        _citaSeleccionada.value = cita
+    }
 
 }

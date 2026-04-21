@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.toLong
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -102,7 +103,7 @@ fun AgendaCitaScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate("agendar_cita")
+                    navController.navigate(Screens.citas.route)
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
@@ -178,7 +179,18 @@ fun AgendaCitaScreen(
                                     showCancelDialog = true
                                 },
                                 onRescheduleClick = {
-                                    navController.navigate(Screens.EditarCita.pass(cita.idCita ?: 0L))
+                                    val citaId = cita.idCita
+                                    println("➡️ Navegando con citaId = $citaId")
+                                    if (citaId != null && citaId > 0) {
+                                        navController.navigate(Screens.editarCitaScreen.pass(citaId.toString()))
+                                    } else {
+                                        // Si no hay ID, mostrar error
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            "No se puede reagendar esta cita",
+                                            android.widget.Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 },
                                 onCardClick = {
                                     viewModel.selectCita(cita)
