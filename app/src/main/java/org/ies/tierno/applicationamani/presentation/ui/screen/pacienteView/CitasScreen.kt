@@ -35,6 +35,7 @@ import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
 import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
@@ -76,23 +77,21 @@ fun CitasScreen(
     val scope = rememberCoroutineScope()
 
     var mostrarDialogo by remember { mutableStateOf(false) }
-    var modoEdicion by remember { mutableStateOf(false) }
     var citaEditando by remember { mutableStateOf<AgendaItemDTO?>(null) }
     var pendingRecordatorio by remember { mutableStateOf<Pair<LocalDate, LocalTime>?>(null) }
 
-    // Buscar cita a editar
     LaunchedEffect(agendaMensual, citaIdEditar) {
-        if (citaIdEditar != null && citaIdEditar > 0 && !modoEdicion) {
+        if (citaIdEditar != null && citaIdEditar > 0 && citaEditando == null) {
             val cita = agendaMensual.find { it.id == citaIdEditar }
             if (cita != null) {
-                modoEdicion = true
                 citaEditando = cita
                 fechaSeleccionada = cita.fecha
                 mostrarDialogo = true
-                viewModel.cargarDisponibilidadDia(cita.fecha)
             }
         }
     }
+
+
 
     LaunchedEffect(mesVisible, session) {
         if (session?.idPsicologo != null) {
@@ -157,13 +156,13 @@ fun CitasScreen(
         } ?: emptyList()
     }
 
-    val tieneDisponibilidad = remember(disponibilidadDia, citasDelDia, modoEdicion, citaEditando) {
+    val tieneDisponibilidad = remember(disponibilidadDia, citasDelDia, citaEditando) {
         if (disponibilidadDia?.diaCompleto == true) {
             false
         } else {
             val slotsLibres = disponibilidadDia?.slotsLibres?.filter { !it.ocupado } ?: emptyList()
             slotsLibres.any { franja ->
-                if (modoEdicion && citaEditando?.horaInicio == franja.hora) {
+                if (citaEditando?.horaInicio == franja.hora) {
                     true
                 } else {
                     !citasDelDia.any { cita -> cita.horaInicio == franja.hora }
@@ -174,7 +173,27 @@ fun CitasScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = colors.background
+        containerColor = colors.background,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    citaEditando = null
+                    mostrarDialogo = true
+                    val fechaParaCargar = fechaSeleccionada ?: LocalDate.now()
+                    viewModel.cargarDisponibilidadDia(fechaParaCargar)
+                },
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.size(56.dp)
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Agendar Cita",
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -194,28 +213,16 @@ fun CitasScreen(
                 ) {
                     Column {
                         Text(
-                            text = if (modoEdicion) "Reagendar cita" else "Mis citas",
+                            text = "Mis citas",
                             style = typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.onBackground
                         )
                         Text(
-                            text = if (modoEdicion) "Modifica los datos de tu cita" else "Selecciona una fecha y agenda tu cita",
+                            text = "Selecciona una fecha y agenda tu cita",
                             style = typography.bodyMedium,
                             color = colors.onSurfaceVariant
                         )
-                    }
-                    if (modoEdicion) {
-                        TextButton(onClick = {
-                            modoEdicion = false
-                            citaEditando = null
-                            fechaSeleccionada = null
-                            navController.navigateUp()
-                        }) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancelar")
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Cancelar")
-                        }
                     }
                 }
 
@@ -311,11 +318,7 @@ fun CitasScreen(
                                     }
                                     Row {
                                         IconButton(onClick = {
-                                            modoEdicion = true
-                                            citaEditando = cita
-                                            fechaSeleccionada = cita.fecha
-                                            mostrarDialogo = true
-                                            viewModel.cargarDisponibilidadDia(cita.fecha)
+                                            navController.navigate(Screens.EditarCita.pass(cita.id ?: 0L))
                                         }) {
                                             Icon(Icons.Default.Edit, contentDescription = "Editar")
                                         }
@@ -377,7 +380,7 @@ fun CitasScreen(
                                             )
                                             if (tieneDisponibilidad) {
                                                 Text(
-                                                    if (modoEdicion) "✅ Puedes reagendar a este horario" else "✅ Hay horarios disponibles",
+                                                    "✅ Hay horarios disponibles",
                                                     style = typography.bodySmall,
                                                     color = colors.primary
                                                 )
@@ -390,27 +393,6 @@ fun CitasScreen(
                                             }
                                         }
                                     }
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                Button(
-                                    onClick = { mostrarDialogo = true },
-                                    enabled = tieneDisponibilidad,
-                                    shape = RoundedCornerShape(16.dp),
-                                    modifier = Modifier.fillMaxWidth().height(56.dp)
-                                ) {
-                                    Icon(
-                                        if (modoEdicion) Icons.Default.Edit else Icons.Default.Add,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        if (modoEdicion) "Reagendar cita" else "Agendar nueva cita",
-                                        style = typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
                                 }
                             }
                         }
@@ -432,8 +414,9 @@ fun CitasScreen(
     }
 
     if (mostrarDialogo && fechaSeleccionada != null && idPaciente > 0) {
+        val esEdicion = citaEditando != null
         DialogoGestionCita(
-            modoEdicion = modoEdicion,
+            modoEdicion = esEdicion,
             citaExistente = citaEditando,
             fechaInicial = fechaSeleccionada!!,
             terapias = terapias,
@@ -462,8 +445,6 @@ fun CitasScreen(
                         programarConPermiso(fecha, hora)
                         snackbarHostState.showSnackbar("✅ Cita agendada correctamente")
                         mostrarDialogo = false
-                        modoEdicion = false
-                        citaEditando = null
                         viewModel.cargarDisponibilidadDia(fecha)
                     } else {
                         snackbarHostState.showSnackbar(result.exceptionOrNull()?.message ?: "Error al crear cita")
@@ -485,18 +466,18 @@ fun CitasScreen(
                         monto = monto,
                         modalidad = modalidad
                     )
-                    snackbarHostState.showSnackbar("✏️ Cita reagendada correctamente")
+                    snackbarHostState.showSnackbar("✏️ Cita editada correctamente")
                     mostrarDialogo = false
-                    modoEdicion = false
                     citaEditando = null
                     viewModel.cargarDisponibilidadDia(fecha)
+                    navController.navigateUp()
                 }
             },
             onDismiss = {
                 mostrarDialogo = false
-                if (citaIdEditar == null) {
-                    modoEdicion = false
+                if (citaEditando != null) {
                     citaEditando = null
+                    navController.navigateUp()
                 }
             }
         )
@@ -521,8 +502,8 @@ fun LeyendaItem(color: Color, texto: String) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DialogoGestionCita(
-    modoEdicion: Boolean,
-    citaExistente: AgendaItemDTO?,
+    modoEdicion: Boolean = false,
+    citaExistente: AgendaItemDTO? = null,
     fechaInicial: LocalDate,
     terapias: List<TerapiaResponseDTO>,
     slotsLibres: List<FranjaDisponibilidadResponse>,
@@ -530,7 +511,7 @@ fun DialogoGestionCita(
     idPaciente: Long,
     onFechaChange: (LocalDate) -> Unit,
     onCrearCita: (Long, LocalDate, LocalTime, Int, String, Long, MetodoPago, EstadoPago, BigDecimal, ModalidadCita) -> Unit,
-    onEditarCita: (Long, Long, LocalDate, LocalTime, Int, String, Long, MetodoPago, EstadoPago, BigDecimal, ModalidadCita) -> Unit,
+    onEditarCita: (Long, Long, LocalDate, LocalTime, Int, String, Long, MetodoPago, EstadoPago, BigDecimal, ModalidadCita) -> Unit = { _, _, _, _, _, _, _, _, _, _, _ -> },
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -599,7 +580,7 @@ fun DialogoGestionCita(
         title = {
             Column {
                 Text(
-                    if (modoEdicion) "✏️ Reagendar cita" else "📅 Agendar nueva cita",
+                    if (modoEdicion) "✏️ Editar cita" else "📅 Agendar nueva cita",
                     style = typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.primary
