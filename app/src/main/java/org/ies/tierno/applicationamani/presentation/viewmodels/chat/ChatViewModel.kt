@@ -34,6 +34,7 @@ import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import java.io.File
 
 enum class AudioPlaybackStatus {
@@ -73,6 +74,7 @@ data class ChatUiState(
 class ChatViewModel(
     private val currentUserId: Long,
     private val otherUserId: Long,
+    private val otherUserName: String,
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesUseCase: GetMessagesUseCase,
     private val markMessagesAsReadUseCase: MarkMessagesAsReadUseCase,
@@ -83,6 +85,7 @@ class ChatViewModel(
     private val observeTypingUseCase: ObserveTypingUseCase,
     private val observeUserOnlineUseCase: ObserveUserOnlineUseCase,
     private val updateUserOnlineUseCase: UpdateUserOnlineUseCase,
+    private val profileUseCaseGeneral: ProfileUseCaseGeneral,
     appContext: Context
 ) : ViewModel() {
 
@@ -193,8 +196,35 @@ class ChatViewModel(
         viewModelScope.launch {
             initPlayer()
             initChatFeatures()
+            loadPsychologistInfo()
         }
         observeMessages()
+    }
+
+    private suspend fun loadPsychologistInfo() {
+        if (currentUserId == otherUserId) return
+
+        val psicologoInfo = profileUseCaseGeneral.getPsicologoById(otherUserId).getOrNull()?.usuario
+            ?: profileUseCaseGeneral.getPacienteByIdFirebase(otherUserId).getOrNull()?.usuario
+
+        val name = if (psicologoInfo != null) {
+            buildString {
+                psicologoInfo.nombre?.let { append(it) }
+                psicologoInfo.apellido?.let {
+                    if (isNotEmpty()) append(" ")
+                    append(it)
+                }
+            }
+        } else {
+            otherUserName
+        }
+
+        _assignedPsychologist.value = PsychologistInfo(
+            id = otherUserId.toString(),
+            name = name.ifEmpty { "Usuario" },
+            avatarUrl = psicologoInfo?.fotoPerfilUrl,
+            isOnline = _psychologistOnline.value
+        )
     }
 
     private fun initPlayer() {

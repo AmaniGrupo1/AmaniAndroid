@@ -13,12 +13,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -116,6 +121,9 @@ fun ChatScreen(
         },
         bottomBar = {
             ChatInputBar(
+                modifier = Modifier.windowInsetsPadding(
+                    WindowInsets.navigationBars.union(WindowInsets.ime)
+                ),
                 text = uiState.inputText,
                 onTextChange = viewModel::onInputChanged,
                 onSend = viewModel::sendMessage,
@@ -144,14 +152,14 @@ fun ChatScreen(
                 isOtherTyping = uiState.isOtherTyping
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
-                .padding(bottom = 8.dp)
         ) {
             when {
                 uiState.isLoading -> {
@@ -189,7 +197,7 @@ fun ChatScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
                         reverseLayout = true,
-                        contentPadding = PaddingValues(horizontal = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
                     ) {
                         items(
                             items = chatItems,

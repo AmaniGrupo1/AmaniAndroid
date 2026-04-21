@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,18 +7,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -62,10 +55,10 @@ fun ChatInputBar(
     onStopRecording: () -> Unit,
     isRecording: Boolean,
     recordingSeconds: Int,
-    isOtherTyping: Boolean = false
+    isOtherTyping: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
-    // Usar imePadding() para adaptarse automáticamente a la altura del teclado
-    Column(modifier = Modifier.imePadding()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         if (isRecording) {
             RecordingBar(
                 recordingSeconds = recordingSeconds,
@@ -86,30 +79,23 @@ fun ChatInputBar(
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AnimatedContent(
-                        targetState = text.isBlank(),
-                        transitionSpec = {
-                            (fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.8f, animationSpec = tween(200)))
-                                .togetherWith(fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200)))
-                        },
-                        label = "mic_attach_transition"
-                    ) { isBlank ->
-                        if (isBlank) {
-                            IconButton(onClick = onMicClick) {
-                                Icon(
-                                    imageVector = Icons.Default.Mic,
-                                    contentDescription = "Nota de voz",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = onAttachFile) {
-                                Icon(
-                                    imageVector = Icons.Default.AttachFile,
-                                    contentDescription = "Adjuntar",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                    // Botón de archivo siempre visible
+                    IconButton(onClick = onAttachFile) {
+                        Icon(
+                            imageVector = Icons.Default.AttachFile,
+                            contentDescription = "Adjuntar archivo",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Botón de micrófono siempre visible (si no se está grabando)
+                    if (!isRecording) {
+                        IconButton(onClick = onMicClick) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Nota de voz",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
 

@@ -190,7 +190,7 @@ fun NavGraph(
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
                 val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
 
-                val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
+                val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId, otherUserName) })
 
                 ChatScreen(
                     viewModel = viewModel,
