@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.diario
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,10 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -19,10 +23,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,6 +43,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalViewModel
@@ -233,149 +243,294 @@ fun SubEmotionChips(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun StepEmocion(
+    titulo: String,
+    onTituloChange: (String) -> Unit,
+    emocion: String,
+    onEmocionChange: (String) -> Unit,
+    subEmocion: String,
+    onSubEmocionChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val primaryEmotion = resolvePrimaryEmotion(emocion)
+    val selectedPrimary = PlutchikEmotion.entries.find { it.label == primaryEmotion }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = titulo,
+            onValueChange = onTituloChange,
+            label = { Text("Título") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(
+            text = "Selecciona tu emoción",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+        EmotionWheel(
+            selectedEmotion = emocion,
+            onEmotionSelected = onEmocionChange,
+            selectedSubEmotion = subEmocion,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        if (selectedPrimary != null && selectedPrimary.variants.isNotEmpty()) {
+            SubEmotionChips(
+                variants = selectedPrimary.variants,
+                selectedSubEmotion = subEmocion,
+                onSubEmotionSelected = onSubEmocionChange
+            )
+        }
+    }
+}
+
+@Composable
+private fun StepIntensidad(
+    intensidad: Float,
+    onIntensidadChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Intensidad: ${intensidad.toInt()}/10",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Slider(
+            value = intensidad,
+            onValueChange = onIntensidadChange,
+            valueRange = 1f..10f,
+            steps = 8,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        )
+    }
+}
+
+@Composable
+private fun StepContexto(
+    contenido: String,
+    onContenidoChange: (String) -> Unit,
+    isEditing: Boolean,
+    onGuardar: () -> Unit,
+    onCancelar: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = contenido,
+            onValueChange = onContenidoChange,
+            label = { Text("¿Cómo te sientes hoy?") },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 3
+        )
+        Text(
+            text = "${contenido.length}/500",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (contenido.length >= 480)
+                MaterialTheme.colorScheme.error
+            else
+                MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(top = 4.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = onGuardar,
+                modifier = Modifier
+                    .weight(1f)
+                    .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+            ) {
+                Text(if (isEditing) "Actualizar entrada" else "Guardar entrada")
+            }
+            if (isEditing) {
+                Button(
+                    onClick = onCancelar,
+                    modifier = Modifier
+                        .weight(1f)
+                        .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DiarioEmocionalScreen(
     viewModel: DiarioEmocionalViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-    val primaryEmotion = resolvePrimaryEmotion(state.emocion)
-    val selectedPrimary = PlutchikEmotion.entries.find { it.label == primaryEmotion }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val pagerState = rememberPagerState(pageCount = { 3 })
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Text(
-                text = "Diario emocional",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
+    LaunchedEffect(state.currentStep) {
+        pagerState.animateScrollToPage(state.currentStep)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage.collect { message ->
+            snackbarHostState.showSnackbar(message)
         }
-        item {
-            OutlinedTextField(
-                value = state.titulo,
-                onValueChange = viewModel::onTituloChange,
-                label = { Text("Título") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
                 Text(
-                    text = "Selecciona tu emoción",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                EmotionWheel(
-                    selectedEmotion = state.emocion,
-                    onEmotionSelected = viewModel::onEmocionChange,
-                    selectedSubEmotion = state.subEmocion,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                if (selectedPrimary != null && selectedPrimary.variants.isNotEmpty()) {
-                    SubEmotionChips(
-                        variants = selectedPrimary.variants,
-                        selectedSubEmotion = state.subEmocion,
-                        onSubEmotionSelected = viewModel::onSubEmocionChange
-                    )
-                }
-            }
-        }
-        item {
-            OutlinedTextField(
-                value = state.contenido,
-                onValueChange = viewModel::onContenidoChange,
-                label = { Text("¿Cómo te sientes hoy?") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3
-            )
-        }
-        item {
-            Column {
-                Text("Intensidad: ${state.intensidad.toInt()}/10")
-                Slider(
-                    value = state.intensidad,
-                    onValueChange = viewModel::onIntensidadChange,
-                    valueRange = 1f..10f,
-                    steps = 8
+                    text = "Diario emocional",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
                 )
             }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = viewModel::guardarEntrada, modifier = Modifier.weight(1f)) {
-                    Text(if (state.editandoId == null) "Guardar entrada" else "Actualizar entrada")
-                }
-                if (state.editandoId != null) {
-                    Button(onClick = viewModel::cancelarEdicion, modifier = Modifier.weight(1f)) {
-                        Text("Cancelar")
+            item {
+                Text(
+                    text = "Paso ${state.currentStep + 1} / 3",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+            item {
+                HorizontalPager(
+                    state = pagerState,
+                    userScrollEnabled = false,
+                    modifier = Modifier.height(420.dp)
+                ) { page ->
+                    when (page) {
+                        0 -> StepEmocion(
+                            titulo = state.titulo,
+                            onTituloChange = viewModel::onTituloChange,
+                            emocion = state.emocion,
+                            onEmocionChange = viewModel::onEmocionChange,
+                            subEmocion = state.subEmocion,
+                            onSubEmocionChange = viewModel::onSubEmocionChange,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        1 -> StepIntensidad(
+                            intensidad = state.intensidad,
+                            onIntensidadChange = viewModel::onIntensidadChange,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        2 -> StepContexto(
+                            contenido = state.contenido,
+                            onContenidoChange = viewModel::onContenidoChange,
+                            isEditing = state.editandoId != null,
+                            onGuardar = viewModel::guardarEntrada,
+                            onCancelar = viewModel::cancelarEdicion,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }
-        }
-        if (!state.mensajeError.isNullOrBlank()) {
             item {
-                Text(
-                    text = state.mensajeError ?: "",
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        }
-        item {
-            Text(
-                text = "Historial",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-        if (state.entradas.isEmpty()) {
-            item {
-                Text(
-                    text = "Aún no tienes entradas guardadas.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            items(state.entradas, key = { it.id }) { entrada ->
-                val emotionEntry = PlutchikEmotion.entries.find { it.label == entrada.emocion }
-                    ?: PlutchikEmotion.entries.find { it.variants.contains(entrada.emocion) }
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    if (state.currentStep > 0) {
+                        Button(
+                            onClick = viewModel::onPreviousStep,
+                            modifier = Modifier.defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                        ) {
+                            Text("← Anterior")
+                        }
+                    }
+                    if (state.currentStep < 2) {
+                        Button(
+                            onClick = viewModel::onNextStep,
+                            modifier = Modifier.defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                        ) {
+                            Text("Siguiente →")
+                        }
+                    }
+                }
+            }
+            if (!state.mensajeError.isNullOrBlank()) {
+                item {
+                    Text(
+                        text = state.mensajeError ?: "",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+            item {
+                Text(
+                    text = "Historial",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            if (state.entradas.isEmpty()) {
+                item {
+                    Text(
+                        text = "Aún no tienes entradas guardadas.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                items(state.entradas, key = { it.id }) { entrada ->
+                    val emotionEntry = PlutchikEmotion.entries.find { it.label == entrada.emocion }
+                        ?: PlutchikEmotion.entries.find { it.variants.contains(entrada.emocion) }
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
                     ) {
-                        Text(text = entrada.titulo, fontWeight = FontWeight.Bold)
-                        Text(text = entrada.contenido)
-                        Text(
-                            text = "Emoción: ${entrada.emocion} | Intensidad: ${entrada.intensidad}/10",
-                            color = emotionEntry?.color
-                                ?: MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Creado: ${formatter.format(Instant.ofEpochMilli(entrada.createdAt).atZone(ZoneId.systemDefault()).toLocalDateTime())}",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = { viewModel.editarEntrada(entrada) }) {
-                                Text("Editar")
-                            }
-                            Button(onClick = { viewModel.eliminarEntrada(entrada) }) {
-                                Text("Eliminar")
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(text = entrada.titulo, fontWeight = FontWeight.Bold)
+                            Text(text = entrada.contenido)
+                            Text(
+                                text = "Emoción: ${entrada.emocion} | Intensidad: ${entrada.intensidad}/10",
+                                color = emotionEntry?.color
+                                    ?: MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Creado: ${formatter.format(Instant.ofEpochMilli(entrada.createdAt).atZone(ZoneId.systemDefault()).toLocalDateTime())}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(onClick = { viewModel.editarEntrada(entrada) }) {
+                                    Text("Editar")
+                                }
+                                Button(onClick = { viewModel.eliminarEntrada(entrada) }) {
+                                    Text("Eliminar")
+                                }
                             }
                         }
                     }

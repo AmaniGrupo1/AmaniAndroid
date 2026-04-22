@@ -2,8 +2,11 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.diario
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +20,7 @@ data class DiarioEmocionalUiState(
     val emocion: String = "Tranquilo",
     val subEmocion: String = "",
     val intensidad: Float = 5f,
+    val currentStep: Int = 0,
     val editandoId: Long? = null,
     val mensajeError: String? = null
 )
@@ -27,6 +31,9 @@ class DiarioEmocionalViewModel(
 
     private val _uiState = MutableStateFlow(DiarioEmocionalUiState())
     val uiState: StateFlow<DiarioEmocionalUiState> = _uiState.asStateFlow()
+
+    private val _snackbarMessage = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val snackbarMessage: SharedFlow<String> = _snackbarMessage.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -41,7 +48,9 @@ class DiarioEmocionalViewModel(
     }
 
     fun onContenidoChange(value: String) {
-        _uiState.update { it.copy(contenido = value) }
+        if (value.length <= 500) {
+            _uiState.update { it.copy(contenido = value) }
+        }
     }
 
     fun onEmocionChange(value: String) {
@@ -56,6 +65,14 @@ class DiarioEmocionalViewModel(
         _uiState.update { it.copy(intensidad = value) }
     }
 
+    fun onNextStep() {
+        _uiState.update { it.copy(currentStep = minOf(it.currentStep + 1, 2)) }
+    }
+
+    fun onPreviousStep() {
+        _uiState.update { it.copy(currentStep = maxOf(it.currentStep - 1, 0)) }
+    }
+
     fun editarEntrada(entrada: EntradaDiario) {
         _uiState.update {
             it.copy(
@@ -65,6 +82,7 @@ class DiarioEmocionalViewModel(
                 emocion = entrada.emocion,
                 subEmocion = "",
                 intensidad = entrada.intensidad.toFloat(),
+                currentStep = 0,
                 mensajeError = null
             )
         }
@@ -89,6 +107,9 @@ class DiarioEmocionalViewModel(
                 emocion = state.emocion,
                 intensidad = state.intensidad.toInt()
             )
+            _snackbarMessage.emit(
+                if (state.editandoId == null) "Entrada guardada ✓" else "Entrada actualizada ✓"
+            )
             limpiarFormulario()
         }
     }
@@ -110,6 +131,7 @@ class DiarioEmocionalViewModel(
                 emocion = "Tranquilo",
                 subEmocion = "",
                 intensidad = 5f,
+                currentStep = 0,
                 editandoId = null,
                 mensajeError = null
             )
