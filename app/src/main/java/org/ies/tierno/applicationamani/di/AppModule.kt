@@ -12,6 +12,7 @@ import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
@@ -54,6 +55,8 @@ import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -69,6 +72,7 @@ val appModule = module {
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
     single { ProfileRepository(get()) }
+    single { NotificacionRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -86,6 +90,9 @@ val appModule = module {
     factory { ResponderTestUseCase(get()) }
     factory { ListarSituacionUseCase(get()) }
     factory { ProfileUseCaseGeneral(get()) }
+    //REPOSITORIO
+    factory { NotificacionUseCase(get()) }
+
 
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
@@ -134,4 +141,9 @@ val appModule = module {
             appContext = androidContext()
         )
     }
+
+
+    //NOTIFICACION
+    viewModel { NotificacionViewModel(get()) }
+
 }
