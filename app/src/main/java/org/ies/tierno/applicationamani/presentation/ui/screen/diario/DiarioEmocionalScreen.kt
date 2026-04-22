@@ -1,7 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.diario
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,27 +24,35 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalViewModel
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.sin
 
-enum class PlutchikEmotion(val label: String, val color: Color) {
-    ALEGRIA("Alegría", Color(0xFFFFEB3B)),
-    IRA("Ira", Color(0xFFF44336)),
-    TRISTEZA("Tristeza", Color(0xFF2196F3)),
-    ASCO("Asco", Color(0xFF4CAF50)),
-    MIEDO("Miedo", Color(0xFF9C27B0)),
-    SORPRESA("Sorpresa", Color(0xFF00BCD4))
+enum class PlutchikEmotion(val label: String, val color: Color, val emoji: String) {
+    ALEGRIA("Alegría", Color(0xFFFFEB3B), "😊"),
+    CONFIANZA("Confianza", Color(0xFF8BC34A), "🤝"),
+    IRA("Ira", Color(0xFFF44336), "😡"),
+    TRISTEZA("Tristeza", Color(0xFF2196F3), "😢"),
+    ASCO("Asco", Color(0xFF4CAF50), "🤢"),
+    MIEDO("Miedo", Color(0xFF9C27B0), "😨"),
+    SORPRESA("Sorpresa", Color(0xFF00BCD4), "😲"),
+    ANTICIPACION("Anticipación", Color(0xFFFF9800), "⏳")
 }
 
 @Composable
@@ -58,57 +64,102 @@ fun EmotionWheel(
     val emotions = PlutchikEmotion.entries
     val angleStep = 360f / emotions.size
 
+    val accessibilityLabel = if (selectedEmotion.isBlank())
+        "Rueda de emociones. Toca un segmento para seleccionar tu emoción."
+    else
+        "Emoción seleccionada: $selectedEmotion. Toca otro segmento para cambiar."
+
     Box(
         modifier = modifier
             .size(280.dp)
+            .semantics { contentDescription = accessibilityLabel }
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
                     val center = Offset(size.width / 2f, size.height / 2f)
                     val dx = offset.x - center.x
                     val dy = offset.y - center.y
+
+                    val radius = min(size.width, size.height) / 2f
+                    if (dx * dx + dy * dy > radius * radius) return@detectTapGestures
+
                     var angle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
                     if (angle < 0) angle += 360f
-
-                    // Adjust angle to match PlutchikEmotion order (starting from top/right)
-                    // atan2 returns 0 at (1,0), but we want a logical map.
-                    // Shift by 90 to start from top.
-                    val adjustedAngle = (angle + 270f) % 360f
+                    val adjustedAngle = (angle + 90f) % 360f
                     val index = (adjustedAngle / angleStep).toInt().coerceIn(0, emotions.size - 1)
                     onEmotionSelected(emotions[index].label)
                 }
             },
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.size(280.dp)) {
+            val radius = min(size.width, size.height) / 2f
+            val center = Offset(size.width / 2f, size.height / 2f)
+            val arcSize = Size(radius * 2, radius * 2)
+            val arcTopLeft = Offset(center.x - radius, center.y - radius)
+
             emotions.forEachIndexed { index, emotion ->
                 val startAngle = index * angleStep - 90f
+                val isSelected = emotion.label == selectedEmotion
+
                 drawArc(
-                    color = emotion.color,
+                    color = if (isSelected) emotion.color else emotion.color.copy(alpha = 0.75f),
                     startAngle = startAngle,
                     sweepAngle = angleStep,
-                    useCenter = true
+                    useCenter = true,
+                    topLeft = arcTopLeft,
+                    size = arcSize
                 )
-                if (emotion.label == selectedEmotion) {
+
+                if (isSelected) {
                     drawArc(
                         color = Color.White,
                         startAngle = startAngle,
                         sweepAngle = angleStep,
                         useCenter = true,
-                        style = Stroke(width = 8f)
+                        topLeft = arcTopLeft,
+                        size = arcSize,
+                        style = Stroke(width = 6f)
                     )
                 }
+
+                val midAngleRad = Math.toRadians((startAngle + angleStep / 2.0))
+                val textRadius = radius * 0.65f
+                val textX = center.x + textRadius * cos(midAngleRad).toFloat()
+                val textY = center.y + textRadius * sin(midAngleRad).toFloat()
+
+                drawContext.canvas.nativeCanvas.apply {
+                    val paint = android.graphics.Paint().apply {
+                        color = android.graphics.Color.WHITE
+                        textSize = 28f
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        isFakeBoldText = isSelected
+                        setShadowLayer(3f, 1f, 1f, android.graphics.Color.BLACK)
+                    }
+                    drawText(emotion.emoji, textX, textY - 14f, paint)
+                    paint.textSize = 22f
+                    drawText(emotion.label, textX, textY + 18f, paint)
+                }
             }
+
+            emotions.forEachIndexed { index, _ ->
+                val lineAngleRad = Math.toRadians((index * angleStep - 90.0))
+                drawLine(
+                    color = Color.White.copy(alpha = 0.4f),
+                    start = center,
+                    end = Offset(
+                        center.x + radius * cos(lineAngleRad).toFloat(),
+                        center.y + radius * sin(lineAngleRad).toFloat()
+                    ),
+                    strokeWidth = 2f
+                )
+            }
+
+            drawCircle(
+                color = Color.White,
+                radius = radius * 0.2f,
+                center = center
+            )
         }
-        Text(
-            text = selectedEmotion,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            fontSize = 20.sp,
-            modifier = Modifier
-                .background(Color.White.copy(alpha = 0.7f))
-                .border(1.dp, Color.Gray)
-                .padding(8.dp)
-        )
     }
 }
 
@@ -119,7 +170,7 @@ fun DiarioEmocionalScreen(
     viewModel: DiarioEmocionalViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
     LazyColumn(
         modifier = Modifier
@@ -230,11 +281,12 @@ fun DiarioEmocionalScreen(
                         Text(text = entrada.contenido)
                         Text(
                             text = "Emoción: ${entrada.emocion} | Intensidad: ${entrada.intensidad}/10",
-                            color = PlutchikEmotion.entries.find { it.label == entrada.emocion }?.color ?: MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = PlutchikEmotion.entries.find { it.label == entrada.emocion }?.color
+                                ?: MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Creado: ${formatter.format(Date(entrada.createdAt))}",
+                            text = "Creado: ${formatter.format(Instant.ofEpochMilli(entrada.createdAt).atZone(ZoneId.systemDefault()).toLocalDateTime())}",
                             style = MaterialTheme.typography.bodySmall
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
