@@ -15,6 +15,7 @@ data class DiarioEmocionalUiState(
     val titulo: String = "",
     val contenido: String = "",
     val emocion: String = "Tranquilo",
+    val subEmocion: String = "",
     val intensidad: Float = 5f,
     val editandoId: Long? = null,
     val mensajeError: String? = null
@@ -44,7 +45,11 @@ class DiarioEmocionalViewModel(
     }
 
     fun onEmocionChange(value: String) {
-        _uiState.update { it.copy(emocion = value) }
+        _uiState.update { it.copy(emocion = value, subEmocion = "") }
+    }
+
+    fun onSubEmocionChange(value: String) {
+        _uiState.update { it.copy(subEmocion = value, emocion = value) }
     }
 
     fun onIntensidadChange(value: Float) {
@@ -58,6 +63,7 @@ class DiarioEmocionalViewModel(
                 titulo = entrada.titulo,
                 contenido = entrada.contenido,
                 emocion = entrada.emocion,
+                subEmocion = "",
                 intensidad = entrada.intensidad.toFloat(),
                 mensajeError = null
             )
@@ -102,6 +108,7 @@ class DiarioEmocionalViewModel(
                 titulo = "",
                 contenido = "",
                 emocion = "Tranquilo",
+                subEmocion = "",
                 intensidad = 5f,
                 editandoId = null,
                 mensajeError = null
