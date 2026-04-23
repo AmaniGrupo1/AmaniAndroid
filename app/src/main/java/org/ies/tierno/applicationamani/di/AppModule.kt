@@ -60,6 +60,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -83,7 +84,9 @@ val appModule = module {
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
     single { ProfileRepository(get()) }
-    single { DiarioEmocionalRepository(get()) }
+    single { DiarioEmocionalRepository(get(), get()) }
+    single { DiarioRemoteRepository(get()) }
+    single { DiarioSyncManager(androidContext(), get(), get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -132,6 +135,8 @@ val appModule = module {
     viewModel { ListarTerapiasViewModel(get()) }
     viewModel { ListarCitasViewModel(get(), get()) }
     viewModel { DiarioEmocionalViewModel(get()) }
+
+    worker { SyncDiarioWorker(get(), get(), get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
     viewModel { (currentUserId: Long, otherUserId: Long, otherUserName: String) ->
