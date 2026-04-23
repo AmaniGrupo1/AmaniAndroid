@@ -108,7 +108,7 @@ class DiarioEmocionalViewModel(
                 intensidad = state.intensidad.toInt()
             )
             _snackbarMessage.emit(
-                if (state.editandoId == null) "Entrada guardada ✓" else "Entrada actualizada ✓"
+                if (state.editandoId == null) "Entrada guardada. Se sincronizará con el servidor." else "Entrada actualizada. Se sincronizará con el servidor."
             )
             limpiarFormulario()
         }
@@ -117,9 +117,17 @@ class DiarioEmocionalViewModel(
     fun eliminarEntrada(entrada: EntradaDiario) {
         viewModelScope.launch {
             repository.eliminarEntrada(entrada)
+            _snackbarMessage.emit("Entrada eliminada. Se sincronizará con el servidor.")
             if (_uiState.value.editandoId == entrada.id) {
                 limpiarFormulario()
             }
+        }
+    }
+
+    fun forzarSincronizacion() {
+        viewModelScope.launch {
+            repository.syncNow()
+            _snackbarMessage.emit("Sincronización iniciada...")
         }
     }
 

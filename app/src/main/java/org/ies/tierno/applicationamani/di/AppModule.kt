@@ -86,7 +86,7 @@ val appModule = module {
     single { ProfileRepository(get()) }
     single { DiarioEmocionalRepository(get(), get()) }
     single { DiarioRemoteRepository(get()) }
-    single { DiarioSyncManager(androidContext(), get(), get()) }
+    single { DiarioSyncManager(androidContext(), get(), get(), get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
