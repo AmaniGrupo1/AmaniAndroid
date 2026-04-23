@@ -6,6 +6,7 @@ import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 
 /**
@@ -44,9 +45,9 @@ class LoginUseCase(private val repository: AuthRepository) {
      * @return [Result.success] con [LoginResponseDTO] del paciente creado,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend fun registerPacienteAdmin(request: PacienteRequest): Result<LoginResponseDTO> {
-        return repository.registerPacienteAdmin(request)
-    }
+//    suspend fun registerPacienteAdmin(request: PacienteRequest): Result<DatosPacienteAdminDTO> {
+//        return repository.crearPacienteAdmin(request)
+//    }
 
     /**
      * Registra un nuevo usuario con rol de administrador.
@@ -68,6 +69,12 @@ class LoginUseCase(private val repository: AuthRepository) {
      */
     suspend fun registrarPsicologo(request: PsicologoRequestDTO): Result<PsicologoSelfResponseDTO> {
         return repository.registerPsicologo(request)
+    }
+
+    suspend fun registrarPacienteDesdePsicologo(
+        request: PacienteRequest
+    ): Result<LoginResponseDTO> {
+        return repository.crearPacienteDesdePsicologo(request)
     }
 
 }

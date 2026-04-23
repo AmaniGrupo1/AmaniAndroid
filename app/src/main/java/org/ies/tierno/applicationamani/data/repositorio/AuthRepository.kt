@@ -12,6 +12,7 @@ import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
@@ -129,27 +130,38 @@ class AuthRepository(
         }
     }
 
-    suspend fun registerPacienteAdmin(request: PacienteRequest): Result<LoginResponseDTO> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = api.registerPacienteAdmin(request)
-
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        Result.success(body)
-                    } else {
-                        Result.failure(Exception("Response body is null"))
-                    }
-                } else {
-                    Result.failure(HttpException(response))
-                }
-
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
+//    suspend fun crearPacienteAdmin(request: PacienteRequest): Result<DatosPacienteAdminDTO> {
+//        return withContext(Dispatchers.IO) {
+//            try {
+//                val response = api.crearPaciente(request)
+//
+//                if (response.isSuccessful) {
+//                    val body = response.body()
+//
+//                    if (body != null) {
+//                        Result.success(body)
+//                    } else {
+//                        Result.failure(Exception("Response body is null"))
+//                    }
+//
+//                } else {
+//                    val errorMsg = when (response.code()) {
+//                        400 -> "Datos inválidos"
+//                        401 -> "No autorizado"
+//                        403 -> "Acceso denegado"
+//                        404 -> "Recurso no encontrado"
+//                        500 -> "Error del servidor"
+//                        else -> "Error HTTP: ${response.code()}"
+//                    }
+//
+//                    Result.failure(Exception(errorMsg))
+//                }
+//
+//            } catch (e: Exception) {
+//                Result.failure(e)
+//            }
+//        }
+//    }
 
     suspend fun registerAdmin(request: RegistryPacienteDTO): Result<LoginResponseDTO> {
         return withContext(Dispatchers.IO) {
@@ -297,5 +309,55 @@ class AuthRepository(
     suspend fun logout() {
         tokenDataStore.clearToken()
         userSessionDataStore.clearSession()
+    }
+
+    suspend fun crearPacienteDesdePsicologo(
+        request: PacienteRequest
+    ): Result<LoginResponseDTO> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.crearPacienteDesdePsicologo(request)
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+
+                    if (body != null) {
+                        Result.success(body)
+                    } else {
+                        Result.failure(Exception("Response body is null"))
+                    }
+
+                } else {
+                    val errorMessage = when (response.code()) {
+                        401 -> "No autorizado"
+                        403 -> "Acceso denegado"
+                        404 -> "Endpoint no encontrado"
+                        500 -> "Error del servidor"
+                        else -> "Error HTTP: ${response.code()}"
+                    }
+
+                    Result.failure(Exception(errorMessage))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+
+    fun getPacientesSinPsicologo(): Flow<List<PacienteBasicoResponseDTO>> = flow {
+        try {
+            val response = api.getPacientesSinPsicologo()
+
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                if (response.code() == 401) throw HttpException(response)
+                emit(emptyList())
+            }
+
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
     }
 }

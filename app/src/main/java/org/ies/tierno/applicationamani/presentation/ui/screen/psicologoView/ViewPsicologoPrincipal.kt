@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.People
@@ -44,6 +45,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -179,7 +181,18 @@ fun ViewPsicologoPrincipal(
 
     Scaffold(
         topBar = { MenuSetting(navController = navController, idPsicologo = idPsicologo) },
-        containerColor = AmaniPsicologoColors.Background
+        containerColor = AmaniPsicologoColors.Background,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screens.registroPacienteDesdePsicologo.route)
+                }
+            ) {
+                Icon(
+                    Icons.Default.Add, contentDescription = "Agregar paciente"
+                )
+            }
+        }
     ) { innerPadding ->
         Box(
             modifier = Modifier

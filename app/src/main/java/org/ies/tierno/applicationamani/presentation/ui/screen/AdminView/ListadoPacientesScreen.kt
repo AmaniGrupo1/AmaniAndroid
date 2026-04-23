@@ -104,7 +104,7 @@ fun ListadoPacientesScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screens.agregarPacienteAdmin.route) },
+                onClick = { navController.navigate(Screens.registro.route) },
                 containerColor = primaryColor,
                 shape = RoundedCornerShape(50.dp)
             ) {
@@ -138,7 +138,7 @@ fun ListadoPacientesScreen(
                         color = Color.Gray
                     )
                     Button(
-                        onClick = { navController.navigate(Screens.agregarPacienteAdmin.route) },
+                        onClick = { navController.navigate(Screens.registro.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
                     ) {
                         Text("Agregar primer paciente", fontFamily = roboto)

@@ -1,4 +1,5 @@
-package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
+
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,17 +22,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
+fun RegistrarPacientePsicologoScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
     situacionViewModel: SituacionViewModel
@@ -40,7 +38,6 @@ fun RegisterScreen(
     val backgroundColor = Color(0xFFCCC0E4)
     val snackbarHostState = remember { SnackbarHostState() }
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val scope = rememberCoroutineScope()
 
     // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
@@ -736,12 +733,12 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ==================== BOTÓN REGISTRAR ====================
-            val registerSuccess by loginViewModel.registerSuccess.collectAsStateWithLifecycle()
-            val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
+            val registerSuccess by loginViewModel.crearPacienteDesdePsicologoSuccess.collectAsStateWithLifecycle()
+            val registerError by loginViewModel.crearPacienteDesdePsicologoError.collectAsStateWithLifecycle()
 
             Button(
                 onClick = {
-                    loginViewModel.registrarPaciente()
+                    loginViewModel.registrarPacienteDesdePsicologo()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -762,17 +759,17 @@ fun RegisterScreen(
             LaunchedEffect(registerSuccess, registerError) {
                 if (registerSuccess) {
                     showSuccessDialog = true
-                    loginViewModel.resetRegisterState()
+                    loginViewModel.resetCrearPacienteDesdePsicologoState()
                 } else if (!registerError.isNullOrBlank()) {
                     errorMessage = registerError!!
                     showErrorDialog = true
-                    loginViewModel.resetRegisterState()
+                    loginViewModel.resetCrearPacienteDesdePsicologoState()
                 }
             }
         }
     }
 
-    // ==================== DIÁLOGO DE ÉXITO MODIFICADO ====================
+    // ==================== DIÁLOGO DE ÉXITO ====================
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -796,7 +793,7 @@ fun RegisterScreen(
             },
             text = {
                 Text(
-                    "El paciente ha sido registrado correctamente en el sistema.",
+                    "El paciente ha sido registrado correctamente y asignado a tu lista.",
                     fontFamily = roboto
                 )
             },

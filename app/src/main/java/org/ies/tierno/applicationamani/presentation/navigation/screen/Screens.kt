@@ -45,8 +45,6 @@
         /** Pantalla para agregar un administrador. */
         object agregarAdmin : Screens("agregarAdmin")
 
-        /** Pantalla para registrar un paciente desde la vista de administrador. */
-        object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
 
         /** Pantalla principal del administrador. */
         object adminHome : Screens("home")
@@ -84,5 +82,10 @@
         object editarCitaScreen : Screens("editarCitaScreen/{citaId}") {
             fun pass(citaId: String) = "editarCitaScreen/$citaId"
         }
+
+
+        object registroPacienteDesdePsicologo : Screens("registroPacienteDesdePsicologo")
+
+        object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
     }
 

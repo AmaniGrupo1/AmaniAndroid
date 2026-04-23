@@ -55,7 +55,9 @@ import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -92,6 +94,7 @@ val appModule = module {
     factory { ProfileUseCaseGeneral(get()) }
     //REPOSITORIO
     factory { NotificacionUseCase(get()) }
+    factory { GetPacientesSinPsicologoUseCase(get()) }
 
 
     factory { SendMessageUseCase(get()) }
@@ -145,5 +148,6 @@ val appModule = module {
 
     //NOTIFICACION
     viewModel { NotificacionViewModel(get()) }
+    viewModel { PacientesViewModel(get()) }
 
 }

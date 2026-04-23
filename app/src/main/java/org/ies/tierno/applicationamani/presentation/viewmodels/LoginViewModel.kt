@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -696,4 +697,96 @@ class LoginViewModel(
             }
         }
     }
+
+    // Añade esto en tu LoginViewModel.kt
+
+    private val _crearPacienteDesdePsicologoSuccess = MutableStateFlow(false)
+    val crearPacienteDesdePsicologoSuccess: StateFlow<Boolean> = _crearPacienteDesdePsicologoSuccess
+
+    private val _crearPacienteDesdePsicologoError = MutableStateFlow<String?>(null)
+    val crearPacienteDesdePsicologoError: StateFlow<String?> = _crearPacienteDesdePsicologoError
+
+    private val _isCreandoPacienteDesdePsicologo = MutableStateFlow(false)
+    val isCreandoPacienteDesdePsicologo: StateFlow<Boolean> = _isCreandoPacienteDesdePsicologo
+
+    fun registrarPacienteDesdePsicologo() {
+        if (!formularioCompletoValido.value) {
+            _crearPacienteDesdePsicologoError.value = "Complete todos los campos obligatorios"
+            return
+        }
+
+        _isCreandoPacienteDesdePsicologo.value = true
+        _crearPacienteDesdePsicologoError.value = null
+        _crearPacienteDesdePsicologoSuccess.value = false
+
+        viewModelScope.launch {
+            try {
+                val tutoresList = if (esMenor.value) {
+                    listOf(
+                        TutorRequestDTO(
+                            nombre = tutorNombre.value,
+                            telefono = tutorTelefono.value,
+                            email = tutorEmail.value,
+                            dni = tutorDni.value,
+                            tipo = tutorTipo.value
+                        )
+                    )
+                } else {
+                    emptyList()
+                }
+
+                val direccion = DireccionRequest(
+                    idPaciente = null,
+                    calle = calle.value,
+                    ciudad = ciudad.value.ifBlank { null },
+                    provincia = provincia.value.ifBlank { null },
+                    codigoPostal = codigoPostal.value.ifBlank { null },
+                    pais = pais.value.ifBlank { null }
+                )
+
+                val request = PacienteRequest(
+                    fechaNacimiento = fechaNacimiento.value,
+                    genero = genero.value,
+                    telefono = telefono.value,
+                    usuario = UsuarioRequest(
+                        nombre = nombre.value,
+                        apellido = apellido.value,
+                        email = email.value,
+                        password = regPassword.value,
+                        rol = Rol.paciente,
+                        dni = dni.value
+                    ),
+                    aceptaTerminos = aceptaTerminos.value,
+                    aceptaVideoconferencia = aceptaVideoconferencia.value,
+                    aceptaComunicacion = aceptaComunicacion.value,
+                    idSituaciones = situacionesIds.value,
+                    tutores = tutoresList,
+                    direccion = listOf(direccion)
+                )
+
+                val result = loginUseCase.registrarPacienteDesdePsicologo(request)
+
+                result.onSuccess { response ->
+                    _crearPacienteDesdePsicologoSuccess.value = true
+                    _crearPacienteDesdePsicologoError.value = null
+                    limpiarFormulario()
+                }.onFailure { error ->
+                    _crearPacienteDesdePsicologoError.value = error.message ?: "Error al registrar paciente"
+                    _crearPacienteDesdePsicologoSuccess.value = false
+                }
+            } catch (e: Exception) {
+                _crearPacienteDesdePsicologoError.value = e.message ?: "Error inesperado al registrar paciente"
+                _crearPacienteDesdePsicologoSuccess.value = false
+            } finally {
+                _isCreandoPacienteDesdePsicologo.value = false
+            }
+        }
+    }
+
+    fun resetCrearPacienteDesdePsicologoState() {
+        _crearPacienteDesdePsicologoSuccess.value = false
+        _crearPacienteDesdePsicologoError.value = null
+        _isCreandoPacienteDesdePsicologo.value = false
+    }
+
 }

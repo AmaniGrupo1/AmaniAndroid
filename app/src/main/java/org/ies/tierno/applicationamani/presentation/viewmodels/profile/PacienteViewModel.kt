@@ -24,15 +24,19 @@ class PacienteViewModel(
 
     fun cargarPsicologoAsignado(idPaciente: Long) {
         _isLoading.value = true
+
         viewModelScope.launch {
             val result = profileUseCaseGeneral.obtenerPsicologoAsignado(idPaciente)
+
             result.onSuccess { psicologo ->
                 _psicologoAsignado.value = psicologo
                 _error.value = null
-            }.onFailure { error ->
-                _error.value = error.message ?: "Error al cargar los datos del psicólogo"
+            }.onFailure {
+                // solo errores REALES (red, backend, 500)
+                _error.value = it.message ?: "Error al cargar datos"
                 _psicologoAsignado.value = null
             }
+
             _isLoading.value = false
         }
     }
