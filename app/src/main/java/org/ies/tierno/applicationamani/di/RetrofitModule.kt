@@ -10,7 +10,7 @@ import com.google.gson.JsonSerializer
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
-import org.ies.tierno.applicationamani.data.remoto.CustomerClient
+import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
@@ -107,16 +107,19 @@ val retrofitModule = module {
 
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
+            //.baseUrl("http://192.168.1.175:8080/")
+
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
     }
     //http://10.0.2.2
 //    192.168.1.175
-    single<CustomerClient> { get<Retrofit>().create(CustomerClient::class.java) }
+
     single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
     single<CitasApi> { get<Retrofit>().create(CitasApi::class.java) }
     single<SituacionApi> { get<Retrofit>().create(SituacionApi::class.java) }
     single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
     single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
+    single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
 }

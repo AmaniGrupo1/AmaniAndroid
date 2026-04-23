@@ -41,6 +41,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewP
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
@@ -58,8 +59,8 @@ fun NavGraph(
     startDestination: String = Screens.principal.route
 ) {
     val loginViewModel: LoginViewModel = koinViewModel()
-    val psicologoAgendaViewModel : PsicologoAgendaViewModel = koinViewModel()
-    val listarTerapiasViewModel : ListarTerapiasViewModel = koinViewModel()
+    val psicologoAgendaViewModel: PsicologoAgendaViewModel = koinViewModel()
+    val listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -74,8 +75,8 @@ fun NavGraph(
         bottomBar = {
             val currentRoute = currentBackStackEntry?.destination?.route
             val hideBottomBar = currentRoute == Screens.login.route ||
-                                currentRoute == Screens.registro.route ||
-                                currentRoute == Screens.principal.route
+                    currentRoute == Screens.registro.route ||
+                    currentRoute == Screens.principal.route
             if (!hideBottomBar) {
                 AmaniBottomBar(navController, bottomBarConfig)
             }
@@ -93,8 +94,8 @@ fun NavGraph(
                 LoginScreen(navController, loginViewModel)
             }
 
-            composable (Screens.psicologoHome.route){
-                ViewPsicologoPrincipal(userSessionDataStore,navController)
+            composable(Screens.psicologoHome.route) {
+                ViewPsicologoPrincipal(userSessionDataStore, navController)
             }
             composable(Screens.registro.route) {
                 RegisterScreen(navController, loginViewModel)
@@ -115,20 +116,20 @@ fun NavGraph(
                 TestScreen(navController)
             }
             composable(
-            route = Screens.listarPsicologo.route,
-            arguments = listOf(
-                navArgument("pacienteId") {
-                    type = NavType.LongType
-                }
-            )
-        ) { backStackEntry ->
-            val idPaciente = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-            ListadoPsicologosScreen(
-                navController = navController,
-                loginViewModel = loginViewModel,
-                pacienteId = idPaciente
-            )
-        }
+                route = Screens.listarPsicologo.route,
+                arguments = listOf(
+                    navArgument("pacienteId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val idPaciente = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+                ListadoPsicologosScreen(
+                    navController = navController,
+                    loginViewModel = loginViewModel,
+                    pacienteId = idPaciente
+                )
+            }
             composable(Screens.pacientes.route) {
                 ListadoPacientesScreen(navController)
             }
@@ -142,29 +143,33 @@ fun NavGraph(
                 ViewAdminPrincipal(navController)
             }
             composable(Screens.psicologoAgenda.route) {
-                PsicologoAgendaScreen(navController, psicologoAgendaViewModel, listarTerapiasViewModel)
+                PsicologoAgendaScreen(
+                    navController,
+                    psicologoAgendaViewModel,
+                    listarTerapiasViewModel
+                )
             }
 
             composable(Screens.calendario.route) {
                 CalendarioView()
             }
 
-            composable(Screens.agendaCitaScreen.route){
+            composable(Screens.agendaCitaScreen.route) {
                 AgendaCitaScreen(navController)
             }
 
 
             composable(
-            route = Screens.perfilPsicologo.route,
-            arguments = listOf(
-                navArgument("psicologoId") {
-                    type = NavType.LongType
-                }
-            )
-        ) { backStackEntry ->
-            val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
-            PsicologoProfileScreen(idPsicologo, navController)
-        }
+                route = Screens.perfilPsicologo.route,
+                arguments = listOf(
+                    navArgument("psicologoId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
+                PsicologoProfileScreen(idPsicologo, navController)
+            }
 
 
             composable(Screens.pacienteHome.route) {
@@ -177,24 +182,25 @@ fun NavGraph(
             }
 
             composable(
-            route = Screens.chat.route,
-            arguments = listOf(
-                navArgument("currentUserId") {
-                    type = NavType.LongType
-                },
-                navArgument("otherUserId") {
-                    type = NavType.LongType
-                },
-                navArgument("otherUserName") {
-                    type = NavType.StringType
-                }
-            )
+                route = Screens.chat.route,
+                arguments = listOf(
+                    navArgument("currentUserId") {
+                        type = NavType.LongType
+                    },
+                    navArgument("otherUserId") {
+                        type = NavType.LongType
+                    },
+                    navArgument("otherUserName") {
+                        type = NavType.StringType
+                    }
+                )
             ) { backStackEntry ->
                 val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
                 val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
 
-                val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
+                val viewModel: ChatViewModel =
+                    koinViewModel(parameters = { parametersOf(currentUserId, otherUserId) })
 
                 ChatScreen(
                     viewModel = viewModel,
@@ -203,13 +209,11 @@ fun NavGraph(
                 )
             }
 
-            // En tu NavGraph
             // CREAR CITA
             composable(Screens.citas.route) {
 
                 CitasScreen(
                     navController,
-                    null,
                     psicologoAgendaViewModel,
                     listarTerapiasViewModel
                 )
@@ -217,22 +221,24 @@ fun NavGraph(
 
 // EDITAR / REAGENDAR CITA
             composable(
-                route = Screens.EditarCita.route,
+                route = Screens.editarCitaScreen.route,
                 arguments = listOf(
                     navArgument("citaId") {
-                        type = NavType.LongType
+                        type = NavType.StringType
                     }
                 )
             ) { backStackEntry ->
 
-                val citaId = backStackEntry.arguments?.getLong("citaId")
+                backStackEntry.arguments?.getString("citaId")?.let { citaId ->
+                    EditarCitaScreen(
+                        navController,
+                        citaId,
+                        psicologoAgendaViewModel,
+                        listarTerapiasViewModel
+                    )
+                }
 
-                CitasScreen(
-                   navController,
-                    citaId,
-                     psicologoAgendaViewModel,
-                    listarTerapiasViewModel
-                )
+
             }
 
 
