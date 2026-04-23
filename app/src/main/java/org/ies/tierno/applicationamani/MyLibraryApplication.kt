@@ -9,7 +9,6 @@ import org.ies.tierno.applicationamani.di.retrofitModule
 import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
 import org.ies.tierno.applicationamani.utils.FileLoggingTree
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.workmanager.koin.setupWorkManagerFactory
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.GlobalContext.startKoin
 import timber.log.Timber
@@ -52,7 +51,6 @@ class MyLibraryApplication : Application() {
                 retrofitModule
             )
         }
-        setupWorkManagerFactory()
     }
 
     /**

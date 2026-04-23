@@ -10,7 +10,10 @@ import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.local.diario.AmaniDatabase
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+import org.ies.tierno.applicationamani.data.remoto.DiarioRemoteRepository
+import org.ies.tierno.applicationamani.data.remoto.DiarioSyncManager
 import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
+import org.ies.tierno.applicationamani.data.remoto.SyncDiarioWorker
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
