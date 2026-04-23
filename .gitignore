@@ -31,3 +31,8 @@ local.properties
 /.agents/skills/mcp-integration/references/tool-usage.md
 /.agents/skills/agent-development/references/triggering-examples.md
 /.agents/skills/agent-development/scripts/validate-agent.sh
+# Eclipse/IDE files
+.project
+.classpath
+.settings/
+.settings
