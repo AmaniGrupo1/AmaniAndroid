@@ -69,14 +69,44 @@ enum class PlutchikEmotion(
     val variants: List<String>,
     val valence: Valence
 ) {
-    ALEGRIA("Alegría", Color(0xFFFFEB3B), "😊", listOf("Éxtasis", "Alegría", "Serenidad"), Valence.Warm),
-    CONFIANZA("Confianza", Color(0xFF8BC34A), "🤝", listOf("Admiración", "Confianza", "Aceptación"), Valence.Neutral),
+    ALEGRIA(
+        "Alegría",
+        Color(0xFFFFEB3B),
+        "😊",
+        listOf("Éxtasis", "Alegría", "Serenidad"),
+        Valence.Warm
+    ),
+    CONFIANZA(
+        "Confianza",
+        Color(0xFF8BC34A),
+        "🤝",
+        listOf("Admiración", "Confianza", "Aceptación"),
+        Valence.Neutral
+    ),
     IRA("Ira", Color(0xFFF44336), "😡", listOf("Furia", "Ira", "Irritación"), Valence.Warm),
-    TRISTEZA("Tristeza", Color(0xFF2196F3), "😢", listOf("Congoja", "Tristeza", "Melancolía"), Valence.Cold),
+    TRISTEZA(
+        "Tristeza",
+        Color(0xFF2196F3),
+        "😢",
+        listOf("Congoja", "Tristeza", "Melancolía"),
+        Valence.Cold
+    ),
     ASCO("Asco", Color(0xFF4CAF50), "🤢", listOf("Repulsión", "Asco", "Aburrimiento"), Valence.Cold),
     MIEDO("Miedo", Color(0xFF9C27B0), "😨", listOf("Terror", "Miedo", "Aprensión"), Valence.Cold),
-    SORPRESA("Sorpresa", Color(0xFF00BCD4), "😲", listOf("Asombro", "Sorpresa", "Distracción"), Valence.Neutral),
-    ANTICIPACION("Anticipación", Color(0xFFFF9800), "⏳", listOf("Vigilancia", "Anticipación", "Interés"), Valence.Warm)
+    SORPRESA(
+        "Sorpresa",
+        Color(0xFF00BCD4),
+        "😲",
+        listOf("Asombro", "Sorpresa", "Distracción"),
+        Valence.Neutral
+    ),
+    ANTICIPACION(
+        "Anticipación",
+        Color(0xFFFF9800),
+        "⏳",
+        listOf("Vigilancia", "Anticipación", "Interés"),
+        Valence.Warm
+    )
 }
 
 private fun resolvePrimaryEmotion(emocion: String): String {
@@ -100,8 +130,10 @@ fun EmotionWheel(
     val accessibilityLabel = when {
         primaryLabel.isBlank() ->
             "Rueda de emociones. Toca un segmento para seleccionar tu emoción."
+
         selectedSubEmotion.isNotBlank() ->
             "Emoción: $primaryLabel – $selectedSubEmotion"
+
         else ->
             "Emoción seleccionada: $primaryLabel. Toca otro segmento para cambiar."
     }
@@ -434,11 +466,13 @@ fun DiarioEmocionalScreen(
                             onSubEmocionChange = viewModel::onSubEmocionChange,
                             modifier = Modifier.fillMaxSize()
                         )
+
                         1 -> StepIntensidad(
                             intensidad = state.intensidad,
                             onIntensidadChange = viewModel::onIntensidadChange,
                             modifier = Modifier.fillMaxSize()
                         )
+
                         2 -> StepContexto(
                             contenido = state.contenido,
                             onContenidoChange = viewModel::onContenidoChange,
@@ -521,7 +555,12 @@ fun DiarioEmocionalScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Creado: ${formatter.format(Instant.ofEpochMilli(entrada.createdAt).atZone(ZoneId.systemDefault()).toLocalDateTime())}",
+                                text = "Creado: ${
+                                    formatter.format(
+                                        Instant.ofEpochMilli(entrada.createdAt)
+                                            .atZone(ZoneId.systemDefault()).toLocalDateTime()
+                                    )
+                                }",
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

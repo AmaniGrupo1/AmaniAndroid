@@ -17,7 +17,7 @@ data class DiarioEmocionalUiState(
     val entradas: List<EntradaDiario> = emptyList(),
     val titulo: String = "",
     val contenido: String = "",
-    val emocion: String = "Tranquilo",
+    val emocion: String = "",
     val subEmocion: String = "",
     val intensidad: Float = 5f,
     val currentStep: Int = 0,
@@ -128,7 +128,7 @@ class DiarioEmocionalViewModel(
             it.copy(
                 titulo = "",
                 contenido = "",
-                emocion = "Tranquilo",
+                emocion = "",
                 subEmocion = "",
                 intensidad = 5f,
                 currentStep = 0,
