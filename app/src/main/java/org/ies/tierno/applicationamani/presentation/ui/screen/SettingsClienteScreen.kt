@@ -241,14 +241,3 @@ fun TextFieldCustom(
         )
     }
 }
-
-/**
- * Vista previa de la pantalla de ajustes del cliente.
- */
-@Preview(showBackground = true)
-@Composable
-fun SettingsClienteScreenPreview() {
-    ApplicationAmaniTheme {
-        SettingsClienteScreen(rememberNavController())
-    }
-}

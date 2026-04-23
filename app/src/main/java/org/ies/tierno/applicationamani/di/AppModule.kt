@@ -18,6 +18,7 @@ import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepository
+import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
@@ -62,6 +63,8 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePs
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
@@ -90,6 +93,7 @@ val appModule = module {
     single { DiarioEmocionalRepository(get(), get()) }
     single { DiarioRemoteRepository(get()) }
     single { DiarioSyncManager(androidContext(), get(), get(), get()) }
+    single { NotificacionRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -106,8 +110,10 @@ val appModule = module {
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
     factory { ListarSituacionUseCase(get()) }
-    factory { ListarPacientesByPsicologo(get()) }
     factory { ProfileUseCaseGeneral(get()) }
+    //REPOSITORIO
+    factory { NotificacionUseCase(get()) }
+
 
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
@@ -161,4 +167,9 @@ val appModule = module {
             appContext = androidContext()
         )
     }
+
+
+    //NOTIFICACION
+    viewModel { NotificacionViewModel(get()) }
+
 }

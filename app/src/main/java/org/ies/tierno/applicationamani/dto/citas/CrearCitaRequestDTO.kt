@@ -8,7 +8,6 @@ import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import java.math.BigDecimal
 
 data class CrearCitaRequestDTO(
-
     @SerializedName("idPaciente")
     val idPaciente: Long,
 
@@ -21,8 +20,10 @@ data class CrearCitaRequestDTO(
     @SerializedName("durationMinutes")
     val durationMinutes: Int,
 
+    @SerializedName("metodoPago")
     val metodoPago: MetodoPago,
 
+    @SerializedName("estadoPago")
     val estadoPago: EstadoPago,
 
     @SerializedName("monto")
@@ -31,12 +32,12 @@ data class CrearCitaRequestDTO(
     @SerializedName("motivo")
     val motivo: String,
 
-    val estado : EstadoCita = EstadoCita.pendiente,
+    @SerializedName("estado")
+    val estado: EstadoCita = EstadoCita.pendiente,
 
     @SerializedName("idTipoTerapia")
     val idTipoTerapia: Long,
 
     @SerializedName("modalidad")
     val modalidad: ModalidadCita
-
 )

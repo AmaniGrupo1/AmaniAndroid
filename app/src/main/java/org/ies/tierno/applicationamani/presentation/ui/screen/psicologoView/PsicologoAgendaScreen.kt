@@ -134,8 +134,8 @@ val ColorScheme.warning: Color
 @Composable
 fun PsicologoAgendaScreen(
     navController: NavController,
-    viewModel: PsicologoAgendaViewModel = koinViewModel(),
-    listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
+    viewModel: PsicologoAgendaViewModel,
+    listarTerapiasViewModel: ListarTerapiasViewModel
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -594,6 +594,7 @@ fun PsicologoAgendaScreen(
                                 monto = monto,
                                 modalidad = modalidad
                             )
+
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar("Error: ${e.message}")
                         } finally {

@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 class PsicologoAgendaViewModel(
     private val citasRepository: CitasRepository,
@@ -105,6 +106,7 @@ class PsicologoAgendaViewModel(
     }
 
     fun cargarAgendaMensual(month: YearMonth) {
+        println("📅 Cargando agenda para mes: $month")
         val session = _userSession.value
         val psychologistId = session?.idPsicologo
         if (psychologistId == null) {
@@ -319,7 +321,7 @@ class PsicologoAgendaViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
             val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
             val request = CrearCitaRequestDTO(
@@ -335,9 +337,20 @@ class PsicologoAgendaViewModel(
                 idTipoTerapia = idTipoTerapia,
                 modalidad = modalidad
             )
-
+            android.util.Log.d("EDIT_CITA", "========== EDITAR CITA ==========")
+            android.util.Log.d("EDIT_CITA", "idCita: $idCita")
+            android.util.Log.d("EDIT_CITA", "idPaciente: $idPaciente")
+            android.util.Log.d("EDIT_CITA", "fecha: $fecha hora: $hora")
+            android.util.Log.d("EDIT_CITA", "motivo: $motivo")
+            android.util.Log.d("EDIT_CITA", "metodoPago: $metodoPago")
+            android.util.Log.d("EDIT_CITA", "estadoPago: $estadoPago")
+            android.util.Log.d("EDIT_CITA", "monto: $monto")
+            android.util.Log.d("EDIT_CITA", "modalidad: $modalidad")
+            android.util.Log.d("EDIT_CITA", "request FINAL: $request")
             citasRepository.editarCita(idCita, request)
                 .onSuccess { citaActualizada ->
+
+                    android.util.Log.d("EDIT_CITA", "✅ SUCCESS RESPONSE: $citaActualizada")
                     // Actualizar la lista localmente sin recargar todo
                     _agendaMensual.value = _agendaMensual.value
                         .map { if (it.id == idCita) citaActualizada else it }
@@ -351,9 +364,12 @@ class PsicologoAgendaViewModel(
 
                     _successMessage.value = "✏️ Cita editada correctamente"
                 }
+
                 .onFailure { e ->
-                    _errorMessage.value = e.message ?: "Error al editar la cita"
+                    android.util.Log.e("EDIT_CITA", "❌ ERROR EDITANDO CITA", e)
+                    android.util.Log.e("EDIT_CITA", "mensaje: ${e.message}")
                 }
+
 
             _isLoading.value = false
         }
@@ -415,7 +431,7 @@ class PsicologoAgendaViewModel(
             return Result.failure(Exception("Tipo de terapia inválido"))
         }
 
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
         val startDatetime = LocalDateTime
             .of(fecha, hora)
@@ -463,6 +479,61 @@ class PsicologoAgendaViewModel(
         }
     }
 
+    // En PsicologoAgendaViewModel.kt, añadir este método:
+
+
+    suspend fun crearCitaParaPaciente(
+        idPaciente: Long,
+        fecha: LocalDate,
+        hora: LocalTime,
+        duracionMinutos: Int,
+        motivo: String,
+        idTipoTerapia: Long,
+        metodoPago: MetodoPago,
+        estadoPago: EstadoPago,
+        monto: BigDecimal,
+        modalidad: ModalidadCita
+    ): Result<Unit> {
+        val session = _userSession.value
+        if (session == null) {
+            return Result.failure(Exception("No hay sesión"))
+        }
+
+        val psychologistId = session.idPsicologo
+        if (psychologistId == null) {
+            return Result.failure(Exception("No hay ID del psicólogo"))
+        }
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
+
+        val request = CrearCitaRequestDTO(
+            idPaciente = idPaciente,
+            idPsicologo = psychologistId,
+            startDatetime = startDatetime,
+            durationMinutes = duracionMinutos,
+            metodoPago = metodoPago,
+            estadoPago = estadoPago,
+            monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
+            motivo = motivo.ifBlank { "Consulta psicológica" },
+            idTipoTerapia = idTipoTerapia,
+            modalidad = modalidad
+        )
+
+        return try {
+            val resultado = citasRepository.crearCita(request)
+            if (resultado.isSuccess) {
+                cargarAgendaMensual(_mesVisible.value)
+                cargarDisponibilidadDia(fecha, duracionMinutos)
+                Result.success(Unit)
+            } else {
+                Result.failure(resultado.exceptionOrNull() ?: Exception("Error al crear cita"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     // En PsicologoAgendaViewModel.kt
     fun cambiarEstadoCita(idCita: Long, nuevoEstado: EstadoCita) {
         viewModelScope.launch {
@@ -478,5 +549,16 @@ class PsicologoAgendaViewModel(
         }
     }
 
+
+    private val _citaSeleccionada = MutableStateFlow<AgendaItemDTO?>(null)
+    val citaSeleccionada = _citaSeleccionada.asStateFlow()
+
+    fun seleccionarCitaPorId(id: Long) {
+        println("🔍 seleccionarCitaPorId llamado con id: $id")
+        println("📋 Agenda actual tiene ${_agendaMensual.value.size} citas")
+        val cita = _agendaMensual.value.find { it.id == id }
+        println("✅ Cita encontrada: ${cita != null}")
+        _citaSeleccionada.value = cita
+    }
 
 }
