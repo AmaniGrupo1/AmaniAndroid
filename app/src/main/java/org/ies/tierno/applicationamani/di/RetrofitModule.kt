@@ -11,6 +11,7 @@ import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.data.remoto.CustomerClient
+import org.ies.tierno.applicationamani.data.remoto.DiarioApi
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
@@ -119,4 +120,5 @@ val retrofitModule = module {
     single<SituacionApi> { get<Retrofit>().create(SituacionApi::class.java) }
     single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
     single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
+    single<DiarioApi> { get<Retrofit>().create(DiarioApi::class.java) }
 }

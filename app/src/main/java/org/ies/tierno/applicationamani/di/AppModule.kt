@@ -1,17 +1,23 @@
 package org.ies.tierno.applicationamani.di
 
 
+import androidx.room.Room
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.local.AuthEventChannel
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.data.local.diario.AmaniDatabase
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+import org.ies.tierno.applicationamani.data.remoto.DiarioRemoteRepository
+import org.ies.tierno.applicationamani.data.remoto.DiarioSyncManager
 import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
+import org.ies.tierno.applicationamani.data.remoto.SyncDiarioWorker
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
@@ -50,12 +56,14 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -64,12 +72,24 @@ val appModule = module {
     single { TokenHolder(get()) }
     single { AuthEventChannel() }
     single { UserSessionDataStore(get()) }
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AmaniDatabase::class.java,
+            "amani_local.db"
+        ).addMigrations(AmaniDatabase.MIGRATION_1_2)
+            .build()
+    }
+    single { get<AmaniDatabase>().diarioEmocionalDao() }
 
     single { AuthRepository(get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
     single { ProfileRepository(get()) }
+    single { DiarioEmocionalRepository(get(), get()) }
+    single { DiarioRemoteRepository(get()) }
+    single { DiarioSyncManager(androidContext(), get(), get(), get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -117,6 +137,9 @@ val appModule = module {
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get()) }
     viewModel { ListarCitasViewModel(get(), get()) }
+    viewModel { DiarioEmocionalViewModel(get()) }
+
+    worker { SyncDiarioWorker(get(), get(), get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
     viewModel { (currentUserId: Long, otherUserId: Long, otherUserName: String) ->

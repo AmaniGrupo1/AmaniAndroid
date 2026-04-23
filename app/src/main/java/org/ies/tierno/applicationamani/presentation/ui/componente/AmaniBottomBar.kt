@@ -86,7 +86,7 @@ private fun pacienteItems() = listOf(
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
     AmaniBottomBarItem(
-        route = null,
+        route = Screens.diarioEmocional.route,
         label = "Diario",
         selectedIcon = Icons.Filled.Book,
         unselectedIcon = Icons.Outlined.Book
