@@ -73,7 +73,8 @@ val appModule = module {
             androidContext(),
             AmaniDatabase::class.java,
             "amani_local.db"
-        ).build()
+        ).addMigrations(AmaniDatabase.MIGRATION_1_2)
+            .build()
     }
     single { get<AmaniDatabase>().diarioEmocionalDao() }
 
