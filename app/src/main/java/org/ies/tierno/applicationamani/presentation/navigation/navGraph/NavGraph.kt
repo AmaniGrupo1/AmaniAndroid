@@ -37,10 +37,11 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.diario.DiarioEmocionalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
-import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
@@ -156,7 +157,6 @@ fun NavGraph(
                 AgendaCitaScreen(navController)
             }
 
-
             composable(
                 route = Screens.perfilPsicologo.route,
                 arguments = listOf(
@@ -168,7 +168,6 @@ fun NavGraph(
                 val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
                 PsicologoProfileScreen(idPsicologo, navController)
             }
-
 
             composable(Screens.pacienteHome.route) {
                 ViewPacientePrincipalScreen(navController)
@@ -210,9 +209,7 @@ fun NavGraph(
                 )
             }
 
-            // CREAR CITA
             composable(Screens.citas.route) {
-
                 CitasScreen(
                     navController,
                     psicologoAgendaViewModel,
@@ -220,7 +217,6 @@ fun NavGraph(
                 )
             }
 
-// EDITAR / REAGENDAR CITA
             composable(
                 route = Screens.editarCitaScreen.route,
                 arguments = listOf(
@@ -229,7 +225,6 @@ fun NavGraph(
                     }
                 )
             ) { backStackEntry ->
-
                 backStackEntry.arguments?.getString("citaId")?.let { citaId ->
                     EditarCitaScreen(
                         navController,
@@ -238,11 +233,7 @@ fun NavGraph(
                         listarTerapiasViewModel
                     )
                 }
-
-
             }
-
-
         }
     }
 }
