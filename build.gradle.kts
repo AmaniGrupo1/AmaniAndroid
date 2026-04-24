@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.google.firebase.crashlytics) apply false
 }
 
 sonar {
