@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
@@ -191,6 +192,42 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                 )
             ) {
                 Text("Guardar cambios")
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = colors.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "¿Necesitas ayuda?",
+                        style = typography.titleMedium,
+                        color = colors.onSurface
+                    )
+                    Text(
+                        "Reporta un bug o envía una sugerencia al equipo de soporte.",
+                        style = typography.bodyMedium,
+                        color = colors.onSurfaceVariant
+                    )
+                    Button(
+                        onClick = { navController.navigate(Screens.nuevoTicket.route) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colors.secondaryContainer,
+                            contentColor = colors.onSecondaryContainer
+                        )
+                    ) {
+                        Text("Abrir ticket de soporte")
+                    }
+                }
             }
 
             TextButton(

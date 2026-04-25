@@ -89,4 +89,7 @@ sealed class Screens(val route: String) {
     object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
 
     object diarioEmocional : Screens("diarioEmocional")
+
+    object nuevoTicket : Screens("nuevoTicket")
+    object misTickets : Screens("misTickets")
 }

@@ -65,6 +65,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
@@ -169,7 +170,10 @@ val appModule = module {
     }
 
 
-    //NOTIFICACION
+    // NOTIFICACION
     viewModel { NotificacionViewModel(get()) }
+
+    // SOPORTE
+    viewModel { SoporteTicketViewModel() }
 
 }

@@ -12,6 +12,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.GlobalContext.startKoin
 import timber.log.Timber
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
  * Clase [Application] personalizada para la aplicación Amani.
@@ -37,6 +39,11 @@ class MyLibraryApplication : Application() {
      */
     override fun onCreate() {
         super.onCreate()
+
+        // Inicializar Firebase y configurar Crashlytics
+        FirebaseApp.initializeApp(this)
+        // Desactivar la recolección automática en DEBUG para evitar ruido durante el desarrollo
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
         Timber.plant(FileLoggingTree(this))

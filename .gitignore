@@ -36,3 +36,7 @@ local.properties
 .classpath
 .settings/
 .settings
+
+# Firebase config
+/app/google-services.json
+
