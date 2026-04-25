@@ -1,68 +1,17 @@
-package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
+
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DocumentScanner
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -73,8 +22,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
@@ -82,16 +29,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
+fun RegistrarPacientePsicologoScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
     situacionViewModel: SituacionViewModel
 ) {
-    val primaryColor = Color(0xFF6B4E71)
-    val backgroundColor = Color(0xFFFDF8F9)
+    val primaryColor = Color(0xFF6C63FF)
+    val backgroundColor = Color(0xFFCCC0E4)
     val snackbarHostState = remember { SnackbarHostState() }
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val scope = rememberCoroutineScope()
 
     // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
@@ -319,21 +265,13 @@ fun RegisterScreen(
                         }
                     }
 
-                    // Fecha de Nacimiento con DatePicker
                     OutlinedTextField(
                         value = fechaNacimiento,
-                        onValueChange = {},
+                        onValueChange = { loginViewModel.setFechaNacimiento(it) },
                         label = { Text("Fecha nacimiento *", fontFamily = roboto) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { loginViewModel.setShowDatePicker(true) },
-                        readOnly = true,
+                        placeholder = { Text("1990-05-15", fontFamily = roboto) },
+                        modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        trailingIcon = {
-                            IconButton(onClick = { loginViewModel.setShowDatePicker(true) }) {
-                                Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha")
-                            }
-                        },
                         isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
                         supportingText = {
                             if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
@@ -610,7 +548,7 @@ fun RegisterScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Situaciones",
@@ -795,12 +733,12 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ==================== BOTÓN REGISTRAR ====================
-            val registerSuccess by loginViewModel.registerSuccess.collectAsStateWithLifecycle()
-            val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
+            val registerSuccess by loginViewModel.crearPacienteDesdePsicologoSuccess.collectAsStateWithLifecycle()
+            val registerError by loginViewModel.crearPacienteDesdePsicologoError.collectAsStateWithLifecycle()
 
             Button(
                 onClick = {
-                    loginViewModel.registrarPaciente()
+                    loginViewModel.registrarPacienteDesdePsicologo()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -821,46 +759,17 @@ fun RegisterScreen(
             LaunchedEffect(registerSuccess, registerError) {
                 if (registerSuccess) {
                     showSuccessDialog = true
-                    loginViewModel.resetRegisterState()
+                    loginViewModel.resetCrearPacienteDesdePsicologoState()
                 } else if (!registerError.isNullOrBlank()) {
                     errorMessage = registerError!!
                     showErrorDialog = true
-                    loginViewModel.resetRegisterState()
-                }
-            }
-
-            // DatePicker Dialog
-            if (loginViewModel.showDatePicker.collectAsStateWithLifecycle().value) {
-                val datePickerState = rememberDatePickerState()
-
-                DatePickerDialog(
-                    onDismissRequest = { loginViewModel.setShowDatePicker(false) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            datePickerState.selectedDateMillis?.let { millis ->
-                                val selectedDate = java.time.Instant.ofEpochMilli(millis)
-                                    .atZone(java.time.ZoneId.systemDefault())
-                                    .toLocalDate()
-                                loginViewModel.setFechaNacimiento(selectedDate.toString())
-                            }
-                            loginViewModel.setShowDatePicker(false)
-                        }) {
-                            Text("Aceptar")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { loginViewModel.setShowDatePicker(false) }) {
-                            Text("Cancelar")
-                        }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
+                    loginViewModel.resetCrearPacienteDesdePsicologoState()
                 }
             }
         }
     }
 
-    // ==================== DIÁLOGO DE ÉXITO MODIFICADO ====================
+    // ==================== DIÁLOGO DE ÉXITO ====================
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -884,7 +793,7 @@ fun RegisterScreen(
             },
             text = {
                 Text(
-                    "El paciente ha sido registrado correctamente en el sistema.",
+                    "El paciente ha sido registrado correctamente y asignado a tu lista.",
                     fontFamily = roboto
                 )
             },

@@ -35,5 +35,6 @@ data class DatosPacienteAdminDTO (
     val estadoPago : String,
     val situaciones : List<SituacionDTO>,
     val tutores : List<TutorResponseDTO>,
-    val direccion : List<DireccionResponseDTO>
+    val direccion : List<DireccionResponseDTO>,
+    val edad : Int
 )

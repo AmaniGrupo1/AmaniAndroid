@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.data.remoto
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
@@ -31,10 +32,6 @@ interface AuthApi {
         @Body request: PacienteRequest
     ): Response<LoginResponseDTO>
 
-    @POST("/auth/registry/pacienteAdmin")
-    suspend fun registerPacienteAdmin(
-        @Body request: PacienteRequest
-    ): Response<LoginResponseDTO>
 
 
     @POST("/auth/register-admin")
@@ -74,5 +71,12 @@ interface AuthApi {
     @GET("/api/psicologo/pacientes/getAll")
     suspend fun getPacientesByPsicologo(): Response<List<PacientePsicologoResponseDTO>>
 
+   @POST("/auth/registrar/pacienteDesde/psicologo")
+   suspend fun crearPacienteDesdePsicologo(
+       @Body request: PacienteRequest
+   ): Response<LoginResponseDTO>
 
+
+    @GET("/api/pacientes/sin-psicologo")
+    suspend fun getPacientesSinPsicologo(): Response<List<PacienteBasicoResponseDTO>>
 }

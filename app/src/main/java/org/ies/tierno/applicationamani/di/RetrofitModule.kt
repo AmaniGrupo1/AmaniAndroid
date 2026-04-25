@@ -10,7 +10,6 @@ import com.google.gson.JsonSerializer
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
-import org.ies.tierno.applicationamani.data.remoto.CustomerClient
 import org.ies.tierno.applicationamani.data.remoto.DiarioApi
 import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi

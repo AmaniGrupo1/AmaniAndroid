@@ -118,6 +118,12 @@ fun MenuAdministrador(
                 dividerAfter = true
             ),
             MenuAdministrador(
+                title = "Registrar paciente",
+                icon = Icons.Default.Psychology,
+                route = Screens.registro.route,
+                dividerAfter = true
+            ),
+            MenuAdministrador(
                 title = "Crear test",
                 icon = Icons.Default.Quiz,
                 route = Screens.test.route

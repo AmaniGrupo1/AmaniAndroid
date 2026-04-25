@@ -107,7 +107,7 @@ private fun adminItems() = listOf(
         unselectedIcon = Icons.Outlined.Home
     ),
     AmaniBottomBarItem(
-        route = Screens.pacientes.route,
+        route = Screens.pacientesSinPsicologo.route,
         label = "Pacientes",
         selectedIcon = Icons.Filled.People,
         unselectedIcon = Icons.Outlined.People

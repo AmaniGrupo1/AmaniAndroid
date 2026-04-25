@@ -23,8 +23,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPs
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegisterScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.RegistrarPacienteDesdeAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
@@ -44,10 +44,12 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.MisTickets
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.NuevoTicketScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.RegistrarPacientePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -60,6 +62,7 @@ fun NavGraph(
     startDestination: String = Screens.principal.route
 ) {
     val loginViewModel: LoginViewModel = koinViewModel()
+    val situacionViewModel : SituacionViewModel = koinViewModel()
     val psicologoAgendaViewModel: PsicologoAgendaViewModel = koinViewModel()
     val listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
@@ -99,7 +102,7 @@ fun NavGraph(
                 ViewPsicologoPrincipal(userSessionDataStore, navController)
             }
             composable(Screens.registro.route) {
-                RegisterScreen(navController, loginViewModel)
+                RegisterScreen(navController, loginViewModel, situacionViewModel)
             }
             composable(Screens.questionnaire.route) {
                 QuestionnaireScreen(navController)
@@ -136,9 +139,6 @@ fun NavGraph(
             }
             composable(Screens.agregarAdmin.route) {
                 AgregarAdministrador(navController, loginViewModel)
-            }
-            composable(Screens.agregarPacienteAdmin.route) {
-                RegistrarPacienteDesdeAdminScreen(navController, loginViewModel)
             }
             composable(Screens.adminHome.route) {
                 ViewAdminPrincipal(navController)
@@ -243,6 +243,12 @@ fun NavGraph(
 
             composable(Screens.misTickets.route) {
                 MisTicketsScreen(navController)
+            }
+            composable(Screens.registroPacienteDesdePsicologo.route){
+                RegistrarPacientePsicologoScreen(navController, loginViewModel, situacionViewModel)
+            }
+            composable(Screens.pacientesSinPsicologo.route){
+                ListarPacienteSinPsicologos(navController)
             }
         }
     }

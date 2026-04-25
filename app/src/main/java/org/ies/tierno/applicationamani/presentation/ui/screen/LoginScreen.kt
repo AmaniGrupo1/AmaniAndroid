@@ -111,7 +111,7 @@ fun LoginScreen(
                 .replace("á", "a")
 
             val destination = when (rolNormalizado) {
-                "admin", "administrador" -> Screens.adminHome.route
+                "admin", "administrador" -> Screens.pacientesSinPsicologo.route
                 "psicologo", "psicologa" -> Screens.psicologoHome.route
                 else -> Screens.pacienteHome.route
             }

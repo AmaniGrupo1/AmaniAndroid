@@ -164,17 +164,6 @@ fun ViewPacientePrincipalScreen(
                     }
                 }
 
-                error != null -> {
-                    ErrorState(
-                        error = error,
-                        onRetry = {
-                            val idPaciente = session?.idPaciente ?: return@ErrorState
-                            pacienteViewModel.cargarPsicologoAsignado(idPaciente)
-                            profilePsicologoViewModel.fetchProfile(idPaciente)
-                        }
-                    )
-                }
-
                 psicologo != null -> {
                     Column(
                         modifier = Modifier
@@ -193,6 +182,17 @@ fun ViewPacientePrincipalScreen(
                             navController = navController
                         )
                     }
+                }
+
+                error != null -> {
+                    ErrorState(
+                        error = error,
+                        onRetry = {
+                            val idPaciente = session?.idPaciente ?: return@ErrorState
+                            pacienteViewModel.cargarPsicologoAsignado(idPaciente)
+                            profilePsicologoViewModel.fetchProfile(idPaciente)
+                        }
+                    )
                 }
 
                 else -> {
