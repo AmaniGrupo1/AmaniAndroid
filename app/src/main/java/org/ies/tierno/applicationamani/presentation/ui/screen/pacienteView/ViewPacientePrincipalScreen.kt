@@ -616,6 +616,20 @@ fun PsicologoContent(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = { navController.navigate(Screens.chatList.route) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text("Ir al chat", modifier = Modifier.padding(vertical = 4.dp))
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 

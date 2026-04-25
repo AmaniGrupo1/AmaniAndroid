@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
@@ -200,7 +201,7 @@ fun NavGraph(
             ) { backStackEntry ->
                 val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
-                val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
+                val otherUserName = Uri.decode(backStackEntry.arguments?.getString("otherUserName") ?: "")
 
                 val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId, otherUserName) })
 

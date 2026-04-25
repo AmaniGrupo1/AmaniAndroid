@@ -63,7 +63,9 @@ class ChatListViewModel(
                             _partnerId.value = session.idPsicologo
                             loadPsicologoNombre(session.idPsicologo)
                         } else {
-                            _isLoading.value = false
+                            // Fallback cuando la sesión no trae idPsicologo pero el paciente sí tiene asignación.
+                            val idPaciente = session.idPaciente ?: session.idUsuario
+                            resolvePsychologistForPatient(idPaciente)
                         }
                     }
 
@@ -136,6 +138,35 @@ class ChatListViewModel(
                     _isLoading.value = false
                 }
             } catch (_: Exception) {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun resolvePsychologistForPatient(idPaciente: Long) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val result = profileUseCaseGeneral.obtenerPsicologoAsignado(idPaciente)
+                result.onSuccess { profile ->
+                    val psicologoUserId = profile.usuario?.idUsuario ?: profile.idPsicologo
+                    if (psicologoUserId != null) {
+                        _partnerId.value = psicologoUserId
+                    }
+
+                    val nombre = buildString {
+                        profile.usuario?.nombre?.let { append(it) }
+                        profile.usuario?.apellido?.let {
+                            if (isNotEmpty()) append(" ")
+                            append(it)
+                        }
+                    }
+                    _partnerNombre.value = nombre.ifEmpty { "Tu Psicólogo" }
+                }.onFailure {
+                    _partnerId.value = null
+                    _partnerNombre.value = ""
+                }
+            } finally {
                 _isLoading.value = false
             }
         }

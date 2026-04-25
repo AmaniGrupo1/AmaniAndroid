@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.navigation.screen
 
+import android.net.Uri
+
 /**
  * Clase sellada que define todas las rutas de navegación de la aplicación.
  *
@@ -75,7 +77,10 @@ sealed class Screens(val route: String) {
 
     object chatList : Screens("chatList")
     object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}"){
-        fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String) = "chat/$currentUserId/$otherUserId/$otherUserName"
+        fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String): String {
+            val encodedName = Uri.encode(otherUserName)
+            return "chat/$currentUserId/$otherUserId/$encodedName"
+        }
     }
 
     object agendaCitaScreen : Screens("agendaCitaScreen")
