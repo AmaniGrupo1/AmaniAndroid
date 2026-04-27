@@ -11,12 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
-import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaOpcion
+import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.FiltroTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TicketSoporte
 import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
 import org.ies.tierno.applicationamani.dto.soporte.TicketSoporteRequestDTO
+import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -30,7 +31,7 @@ data class SoporteUiState(
     val tipoTicket: TipoTicket = TipoTicket.PROBLEMA,
     val titulo: String = "",
     val descripcion: String = "",
-    val categoria: String = CategoriaOpcion.todas[0].display,
+    val categoria: CategoriaTicket = CategoriaTicket.BUG_APP,
     val tickets: List<TicketSoporte> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -60,24 +61,26 @@ class SoporteTicketViewModel(
 
     fun cargarTickets() {
         viewModelScope.launch {
+            Timber.d("Iniciando carga de tickets...")
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 val lista = repository.getMisTickets()
+                Timber.i("Se han obtenido ${lista.size} tickets del repositorio")
                 val tickets = lista.map { dto ->
-                    val estado = dto.estado.toEstadoTicket()
                     TicketSoporte(
                         id = dto.idTicket,
                         titulo = dto.titulo,
                         descripcion = dto.descripcion,
                         fecha = formatFecha(dto.creadoEn),
-                        estado = estado,
-                        etiquetaEstado = estado.nombreVisual,
-                        tipo = dto.tipo.toTipoTicket(),
+                        estado = dto.estado,
+                        etiquetaEstado = dto.estado.nombreVisual,
+                        tipo = dto.tipo,
                         categoria = dto.categoria
                     )
                 }
                 _uiState.update { it.copy(tickets = tickets, isLoading = false) }
             } catch (e: Exception) {
+                Timber.e(e, "Error al cargar tickets")
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
                 _snackbarMessage.emit("Error al cargar tickets: ${e.message}")
             }
@@ -85,14 +88,17 @@ class SoporteTicketViewModel(
     }
 
     fun navegarA(pantalla: PantallaSoporte) {
+        Timber.d("Navegando a: $pantalla")
         _uiState.update { it.copy(pantallaActual = pantalla) }
     }
 
     fun seleccionarFiltro(filtro: FiltroTicket) {
+        Timber.d("Filtro seleccionado: $filtro")
         _uiState.update { it.copy(filtroSeleccionado = filtro) }
     }
 
     fun seleccionarTipo(tipo: TipoTicket) {
+        Timber.d("Tipo de ticket seleccionado: $tipo")
         _uiState.update { it.copy(tipoTicket = tipo) }
     }
 
@@ -106,42 +112,45 @@ class SoporteTicketViewModel(
         }
     }
 
-    fun onCategoriaChange(categoria: String) {
+    fun onCategoriaChange(categoria: CategoriaTicket) {
+        Timber.d("Categor\u00eda seleccionada: $categoria")
         _uiState.update { it.copy(categoria = categoria) }
     }
 
     fun enviarTicket() {
         val state = _uiState.value
+        Timber.d("Iniciando env\u00edo de ticket: t\u00edtulo='${state.titulo}', tipo=${state.tipoTicket}, categor\u00eda=${state.categoria}")
+
         if (state.titulo.isBlank() || state.descripcion.isBlank()) {
+            Timber.w("Validaci\u00f3n fallida: t\u00edtulo o descripci\u00f3n est\u00e1n vac\u00edos")
             viewModelScope.launch {
                 _snackbarMessage.emit("T\u00edtulo y descripci\u00f3n son obligatorios.")
             }
             return
         }
 
-        val backendCategoria = CategoriaOpcion.todas
-            .find { it.display == state.categoria }?.backend ?: "otro"
-
         val request = TicketSoporteRequestDTO(
             titulo = state.titulo.trim(),
             descripcion = state.descripcion.trim(),
-            tipo = state.tipoTicket.backend,
-            categoria = backendCategoria
+            tipo = state.tipoTicket,
+            categoria = state.categoria
         )
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
+                Timber.d("Llamando al repositorio para crear ticket...")
                 val dto = repository.crearTicket(request)
-                val estado = dto.estado.toEstadoTicket()
+                Timber.i("Ticket creado con \u00e9xito. ID: ${dto.idTicket}, Estado: ${dto.estado}")
+
                 val nuevo = TicketSoporte(
                     id = dto.idTicket,
                     titulo = dto.titulo,
                     descripcion = dto.descripcion,
                     fecha = formatFecha(dto.creadoEn),
-                    estado = estado,
-                    etiquetaEstado = estado.nombreVisual,
-                    tipo = dto.tipo.toTipoTicket(),
+                    estado = dto.estado,
+                    etiquetaEstado = dto.estado.nombreVisual,
+                    tipo = dto.tipo,
                     categoria = dto.categoria
                 )
                 _uiState.update {
@@ -154,6 +163,7 @@ class SoporteTicketViewModel(
                     )
                 }
             } catch (e: Exception) {
+                Timber.e(e, "Error al enviar ticket")
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
                 _snackbarMessage.emit("Error al enviar ticket: ${e.message}")
             }
@@ -175,27 +185,12 @@ class SoporteTicketViewModel(
             FiltroTicket.CERRADOS -> _uiState.value.tickets.filter { it.estado == EstadoTicket.CERRADO }
         }
 
-    private fun formatFecha(iso: String?): String {
+    private fun formatFecha(dateTime: LocalDateTime?): String {
         return try {
-            LocalDateTime.parse(iso).format(formatter)
+            dateTime?.format(formatter) ?: "Fecha desconocida"
         } catch (e: Exception) {
-            iso ?: "Fecha desconocida"
-        }
-    }
-
-    companion object {
-        fun String.toEstadoTicket(): EstadoTicket = when (this.lowercase().trim()) {
-            EstadoTicket.ABIERTO.backend -> EstadoTicket.ABIERTO
-            EstadoTicket.EN_PROCESO.backend -> EstadoTicket.EN_PROCESO
-            EstadoTicket.CERRADO.backend -> EstadoTicket.CERRADO
-            else -> EstadoTicket.ABIERTO
-        }
-
-        fun String.toTipoTicket(): TipoTicket = when (this.lowercase().trim()) {
-            TipoTicket.PROBLEMA.backend -> TipoTicket.PROBLEMA
-            TipoTicket.PREGUNTA.backend -> TipoTicket.PREGUNTA
-            TipoTicket.SUGERENCIA.backend -> TipoTicket.SUGERENCIA
-            else -> TipoTicket.PROBLEMA
+            Timber.e(e, "Error al formatear fecha")
+            "Error formato fecha"
         }
     }
 }

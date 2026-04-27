@@ -39,7 +39,7 @@ interface SoporteTicketApi {
      *
      * @param request DTO con título, descripción, tipo y categoría.
      */
-    @POST("api/tickets-soporte/")
+    @POST("api/tickets-soporte")
     suspend fun crearTicket(
         @Body request: TicketSoporteRequestDTO
     ): Response<TicketSoporteResponseDTO>

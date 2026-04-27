@@ -62,7 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
-import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaOpcion
+import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
@@ -178,15 +178,15 @@ fun NuevoTicketScreen(
             }
 
             // Categoría
-            EtiquetaFormulario("Categoría")
+            EtiquetaFormulario("Categor\u00eda")
             var categoriaExpanded by remember { mutableStateOf(false) }
-            val categorias = CategoriaOpcion.todas.map { it.display }
+            val categorias = CategoriaTicket.todas
             ExposedDropdownMenuBox(
                 expanded = categoriaExpanded,
                 onExpandedChange = { categoriaExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = uiState.categoria,
+                    value = uiState.categoria.display,
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoriaExpanded) },
@@ -205,7 +205,7 @@ fun NuevoTicketScreen(
                 ) {
                     categorias.forEach { cat ->
                         DropdownMenuItem(
-                            text = { Text(cat) },
+                            text = { Text(cat.display) },
                             onClick = {
                                 viewModel.onCategoriaChange(cat)
                                 categoriaExpanded = false

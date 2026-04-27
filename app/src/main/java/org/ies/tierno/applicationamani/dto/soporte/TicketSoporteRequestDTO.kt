@@ -1,5 +1,8 @@
 package org.ies.tierno.applicationamani.dto.soporte
 
+import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
+import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
+
 /**
  * DTO para crear un nuevo ticket de soporte.
  *
@@ -11,6 +14,6 @@ package org.ies.tierno.applicationamani.dto.soporte
 data class TicketSoporteRequestDTO(
     val titulo: String,
     val descripcion: String,
-    val tipo: String,
-    val categoria: String
+    val tipo: TipoTicket,
+    val categoria: CategoriaTicket
 )

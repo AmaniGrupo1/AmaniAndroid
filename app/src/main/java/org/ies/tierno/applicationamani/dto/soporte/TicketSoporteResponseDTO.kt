@@ -1,5 +1,10 @@
 package org.ies.tierno.applicationamani.dto.soporte
 
+import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
+import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
+import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
+import java.time.LocalDateTime
+
 /**
  * DTO de respuesta para un ticket de soporte.
  *
@@ -19,12 +24,12 @@ data class TicketSoporteResponseDTO(
     val idTicket: Long,
     val titulo: String,
     val descripcion: String,
-    val tipo: String,
-    val categoria: String,
-    val estado: String,
-    val creadoEn: String?,
-    val actualizadoEn: String?,
-    val cerradoEn: String?,
+    val tipo: TipoTicket,
+    val categoria: CategoriaTicket,
+    val estado: EstadoTicket,
+    val creadoEn: LocalDateTime?,
+    val actualizadoEn: LocalDateTime?,
+    val cerradoEn: LocalDateTime?,
     val nombreUsuario: String?,
     val apellidoUsuario: String?
 )

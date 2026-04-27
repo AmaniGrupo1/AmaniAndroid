@@ -119,6 +119,7 @@ val appModule = module {
     //REPOSITORIO
     factory { NotificacionUseCase(get()) }
     factory { GetPacientesSinPsicologoUseCase(get()) }
+    factory { ListarPacientesByPsicologo(get()) }
 
 
     factory { SendMessageUseCase(get()) }

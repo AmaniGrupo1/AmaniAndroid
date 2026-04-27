@@ -4,6 +4,7 @@ import org.ies.tierno.applicationamani.data.remoto.SoporteTicketApi
 import org.ies.tierno.applicationamani.dto.soporte.TicketSoporteRequestDTO
 import org.ies.tierno.applicationamani.dto.soporte.TicketSoporteResponseDTO
 import retrofit2.Response
+import timber.log.Timber
 
 /**
  * Repositorio para tickets de soporte.
@@ -21,10 +22,14 @@ class SoporteTicketRepository(
      * @throws Exception si la respuesta no es exitosa.
      */
     suspend fun getMisTickets(): List<TicketSoporteResponseDTO> {
+        Timber.d("Repositorio: Solicitando mis tickets...")
         val response: Response<List<TicketSoporteResponseDTO>> = api.getMisTickets()
         if (response.isSuccessful) {
-            return response.body() ?: emptyList()
+            val body = response.body() ?: emptyList()
+            Timber.i("Repositorio: Tickets obtenidos correctamente (${body.size} items)")
+            return body
         } else {
+            Timber.e("Repositorio: Error HTTP al obtener tickets. C\u00f3digo: ${response.code()}")
             throw Exception("Error al obtener los tickets: ${response.code()}")
         }
     }
@@ -52,11 +57,14 @@ class SoporteTicketRepository(
      * @throws Exception si la respuesta no es exitosa.
      */
     suspend fun crearTicket(request: TicketSoporteRequestDTO): TicketSoporteResponseDTO {
+        Timber.d("Repositorio: Creando ticket: ${request.titulo}")
         val response: Response<TicketSoporteResponseDTO> = api.crearTicket(request)
         if (response.isSuccessful) {
-            return response.body()
-                ?: throw Exception("Respuesta vacía al crear ticket")
+            val body = response.body() ?: throw Exception("Respuesta vac\u00eda al crear ticket")
+            Timber.i("Repositorio: Ticket creado con \u00e9xito. ID: ${body.idTicket}")
+            return body
         } else {
+            Timber.e("Repositorio: Error HTTP al crear ticket. C\u00f3digo: ${response.code()}, ErrorBody: ${response.errorBody()?.string()}")
             throw Exception("Error al crear ticket: ${response.code()}")
         }
     }

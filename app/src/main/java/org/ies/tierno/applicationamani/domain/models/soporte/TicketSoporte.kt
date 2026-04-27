@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.domain.models.soporte
 
+import com.google.gson.annotations.SerializedName
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -22,7 +23,7 @@ data class TicketSoporte(
     val estado: EstadoTicket,
     val etiquetaEstado: String,
     val tipo: TipoTicket,
-    val categoria: String
+    val categoria: CategoriaTicket
 )
 
 /**
@@ -39,18 +40,23 @@ enum class EstadoTicket(
     val colorContenedor: Color,
     val colorContenido: Color
 ) {
+    @SerializedName("abierto")
     ABIERTO(
         nombreVisual = "ABIERTO",
         backend = "abierto",
         colorContenedor = Color(0xFFDBEAFE),
         colorContenido = Color(0xFF1E40AF)
     ),
+
+    @SerializedName("en_progreso")
     EN_PROCESO(
         nombreVisual = "EN PROCESO",
         backend = "en_progreso",
         colorContenedor = Color(0xFFDCFCE7),
         colorContenido = Color(0xFF166534)
     ),
+
+    @SerializedName("cerrado")
     CERRADO(
         nombreVisual = "CERRADO",
         backend = "cerrado",
@@ -63,8 +69,13 @@ enum class TipoTicket(
     val backend: String,
     val display: String
 ) {
+    @SerializedName("problema")
     PROBLEMA("problema", "Reportar problema"),
+
+    @SerializedName("pregunta")
     PREGUNTA("pregunta", "Hacer pregunta"),
+
+    @SerializedName("sugerencia")
     SUGERENCIA("sugerencia", "Sugerir mejora")
 }
 
@@ -77,17 +88,23 @@ enum class FiltroTicket {
 /**
  * Opción de categoría mostrada en la UI y mapeada al backend.
  */
-data class CategoriaOpcion(
-    val display: String,
-    val backend: String
-) {
+enum class CategoriaTicket(val display: String, val backend: String) {
+    @SerializedName("app")
+    BUG_APP("Bug en la aplicación", "app"),
+
+    @SerializedName("pago")
+    PAGO("Problema de pago", "pago"),
+
+    @SerializedName("cuenta")
+    CUENTA("Cuenta y acceso", "cuenta"),
+
+    @SerializedName("tecnico")
+    TECNICO("Rendimiento / técnico", "tecnico"),
+
+    @SerializedName("otro")
+    OTRO("Otros", "otro");
+
     companion object {
-        val todas = listOf(
-            CategoriaOpcion("Bug en la aplicación", "app"),
-            CategoriaOpcion("Problema de pago", "pago"),
-            CategoriaOpcion("Cuenta y acceso", "cuenta"),
-            CategoriaOpcion("Rendimiento / técnico", "tecnico"),
-            CategoriaOpcion("Otros", "otro")
-        )
+        val todas = values().toList()
     }
 }
