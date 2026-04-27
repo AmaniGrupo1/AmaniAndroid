@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.soporte
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,10 +10,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
+import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaOpcion
 import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.FiltroTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TicketSoporte
 import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
+import org.ies.tierno.applicationamani.dto.soporte.TicketSoporteRequestDTO
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -23,16 +25,16 @@ import java.util.Locale
  * Estado UI consolidado para la pantalla de tickets de soporte.
  */
 data class SoporteUiState(
-    val pantallaActual: PantallaSoporte = PantallaSoporte.NUEVO_TICKET,
+    val pantallaActual: PantallaSoporte = PantallaSoporte.MIS_TICKETS,
     val filtroSeleccionado: FiltroTicket = FiltroTicket.TODOS,
-    val tipoTicket: TipoTicket = TipoTicket.BUG,
+    val tipoTicket: TipoTicket = TipoTicket.PROBLEMA,
     val titulo: String = "",
     val descripcion: String = "",
-    val uriImagen: Uri? = null,
-    val mostrarToastExito: Boolean = false,
+    val categoria: String = CategoriaOpcion.todas[0].display,
     val tickets: List<TicketSoporte> = emptyList(),
-    val categoria: String = "Bug en la aplicación",
-    val error: String? = null
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val mostrarToastExito: Boolean = false
 )
 
 enum class PantallaSoporte {
@@ -40,7 +42,9 @@ enum class PantallaSoporte {
     MIS_TICKETS
 }
 
-class SoporteTicketViewModel : ViewModel() {
+class SoporteTicketViewModel(
+    private val repository: SoporteTicketRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SoporteUiState())
     val uiState: StateFlow<SoporteUiState> = _uiState.asStateFlow()
@@ -48,48 +52,36 @@ class SoporteTicketViewModel : ViewModel() {
     private val _snackbarMessage = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val snackbarMessage: SharedFlow<String> = _snackbarMessage.asSharedFlow()
 
-    private val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy • HH:mm", Locale.forLanguageTag("es-ES"))
+    private val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy \u2022 HH:mm", Locale.forLanguageTag("es-ES"))
 
     init {
-        cargarTicketsMock()
+        cargarTickets()
     }
 
-    private fun cargarTicketsMock() {
-        val mock = listOf(
-            TicketSoporte(
-                id = "#TK-2024-0187",
-                titulo = "La app se cierra al abrir mis citas",
-                fecha = "Reportado el 20/05/2024 • 10:15",
-                estado = EstadoTicket.ABIERTO,
-                etiquetaEstado = "En revisión por soporte",
-                tipo = TipoTicket.BUG
-            ),
-            TicketSoporte(
-                id = "#TK-2024-0152",
-                titulo = "Error al realizar el pago",
-                fecha = "Reportado el 18/05/2024 • 16:42",
-                estado = EstadoTicket.EN_PROCESO,
-                etiquetaEstado = "En curso",
-                tipo = TipoTicket.BUG
-            ),
-            TicketSoporte(
-                id = "#TK-2024-0103",
-                titulo = "No recibo recordatorio de cita",
-                fecha = "Reportado el 10/05/2024 • 09:20",
-                estado = EstadoTicket.PENDIENTE,
-                etiquetaEstado = "Pendiente de más información",
-                tipo = TipoTicket.BUG
-            ),
-            TicketSoporte(
-                id = "#TK-2024-0089",
-                titulo = "Sugerencia: modo oscuro",
-                fecha = "Reportado el 05/05/2024 • 11:05",
-                estado = EstadoTicket.CERRADO,
-                etiquetaEstado = "Resuelto",
-                tipo = TipoTicket.FEATURE
-            )
-        )
-        _uiState.update { it.copy(tickets = mock) }
+    fun cargarTickets() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                val lista = repository.getMisTickets()
+                val tickets = lista.map { dto ->
+                    val estado = dto.estado.toEstadoTicket()
+                    TicketSoporte(
+                        id = dto.idTicket,
+                        titulo = dto.titulo,
+                        descripcion = dto.descripcion,
+                        fecha = formatFecha(dto.creadoEn),
+                        estado = estado,
+                        etiquetaEstado = estado.nombreVisual,
+                        tipo = dto.tipo.toTipoTicket(),
+                        categoria = dto.categoria
+                    )
+                }
+                _uiState.update { it.copy(tickets = tickets, isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message) }
+                _snackbarMessage.emit("Error al cargar tickets: ${e.message}")
+            }
+        }
     }
 
     fun navegarA(pantalla: PantallaSoporte) {
@@ -114,10 +106,6 @@ class SoporteTicketViewModel : ViewModel() {
         }
     }
 
-    fun onImagenSeleccionada(uri: Uri?) {
-        _uiState.update { it.copy(uriImagen = uri) }
-    }
-
     fun onCategoriaChange(categoria: String) {
         _uiState.update { it.copy(categoria = categoria) }
     }
@@ -126,34 +114,58 @@ class SoporteTicketViewModel : ViewModel() {
         val state = _uiState.value
         if (state.titulo.isBlank() || state.descripcion.isBlank()) {
             viewModelScope.launch {
-                _snackbarMessage.emit("Título y descripción son obligatorios.")
+                _snackbarMessage.emit("T\u00edtulo y descripci\u00f3n son obligatorios.")
             }
             return
         }
 
-        val ahora = LocalDateTime.now()
-        val nuevo = TicketSoporte(
-            id = "#TK-2024-${(1000..9999).random()}",
-            titulo = state.titulo,
-            fecha = "Reportado el ${ahora.format(formatter)}",
-            estado = EstadoTicket.ABIERTO,
-            etiquetaEstado = "En revisión por soporte",
-            tipo = state.tipoTicket
+        val backendCategoria = CategoriaOpcion.todas
+            .find { it.display == state.categoria }?.backend ?: "otro"
+
+        val request = TicketSoporteRequestDTO(
+            titulo = state.titulo.trim(),
+            descripcion = state.descripcion.trim(),
+            tipo = state.tipoTicket.backend,
+            categoria = backendCategoria
         )
 
-        _uiState.update {
-            it.copy(
-                tickets = listOf(nuevo) + it.tickets,
-                titulo = "",
-                descripcion = "",
-                uriImagen = null,
-                mostrarToastExito = true
-            )
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                val dto = repository.crearTicket(request)
+                val estado = dto.estado.toEstadoTicket()
+                val nuevo = TicketSoporte(
+                    id = dto.idTicket,
+                    titulo = dto.titulo,
+                    descripcion = dto.descripcion,
+                    fecha = formatFecha(dto.creadoEn),
+                    estado = estado,
+                    etiquetaEstado = estado.nombreVisual,
+                    tipo = dto.tipo.toTipoTicket(),
+                    categoria = dto.categoria
+                )
+                _uiState.update {
+                    it.copy(
+                        tickets = listOf(nuevo) + it.tickets,
+                        titulo = "",
+                        descripcion = "",
+                        mostrarToastExito = true,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message) }
+                _snackbarMessage.emit("Error al enviar ticket: ${e.message}")
+            }
         }
     }
 
     fun dismissToast() {
         _uiState.update { it.copy(mostrarToastExito = false) }
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     val ticketsFiltrados: List<TicketSoporte>
@@ -162,4 +174,28 @@ class SoporteTicketViewModel : ViewModel() {
             FiltroTicket.ABIERTOS -> _uiState.value.tickets.filter { it.estado != EstadoTicket.CERRADO }
             FiltroTicket.CERRADOS -> _uiState.value.tickets.filter { it.estado == EstadoTicket.CERRADO }
         }
+
+    private fun formatFecha(iso: String?): String {
+        return try {
+            LocalDateTime.parse(iso).format(formatter)
+        } catch (e: Exception) {
+            iso ?: "Fecha desconocida"
+        }
+    }
+
+    companion object {
+        fun String.toEstadoTicket(): EstadoTicket = when (this.lowercase().trim()) {
+            EstadoTicket.ABIERTO.backend -> EstadoTicket.ABIERTO
+            EstadoTicket.EN_PROCESO.backend -> EstadoTicket.EN_PROCESO
+            EstadoTicket.CERRADO.backend -> EstadoTicket.CERRADO
+            else -> EstadoTicket.ABIERTO
+        }
+
+        fun String.toTipoTicket(): TipoTicket = when (this.lowercase().trim()) {
+            TipoTicket.PROBLEMA.backend -> TipoTicket.PROBLEMA
+            TipoTicket.PREGUNTA.backend -> TipoTicket.PREGUNTA
+            TipoTicket.SUGERENCIA.backend -> TipoTicket.SUGERENCIA
+            else -> TipoTicket.PROBLEMA
+        }
+    }
 }

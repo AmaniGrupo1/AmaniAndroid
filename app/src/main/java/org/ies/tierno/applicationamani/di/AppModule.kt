@@ -20,6 +20,7 @@ import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepository
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
+import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
@@ -97,6 +98,7 @@ val appModule = module {
     single { DiarioRemoteRepository(get()) }
     single { DiarioSyncManager(androidContext(), get(), get(), get()) }
     single { NotificacionRepository(get()) }
+    single { SoporteTicketRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -178,6 +180,6 @@ val appModule = module {
     viewModel { PacientesViewModel(get()) }
 
     // SOPORTE
-    viewModel { SoporteTicketViewModel() }
+    viewModel { SoporteTicketViewModel(get()) }
 
 }

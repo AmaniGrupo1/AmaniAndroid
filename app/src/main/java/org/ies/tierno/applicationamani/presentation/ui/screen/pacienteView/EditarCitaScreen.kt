@@ -430,9 +430,7 @@ fun EditarCitaScreen(
                             onMesVisibleChange = { mesVisible = it },
                             onFechaSeleccionada = { fecha ->
                                 fechaSeleccionada = fecha
-                                if (fecha != null) {
-                                    viewModel.cargarDisponibilidadDia(fecha)
-                                }
+                                viewModel.cargarDisponibilidadDia(fecha)
                             }
                         )
                     }
@@ -468,7 +466,7 @@ fun EditarCitaScreen(
                                             text = fechaSeleccionada!!.format(
                                                 DateTimeFormatter.ofPattern(
                                                     "EEEE, d 'de' MMMM",
-                                                    Locale("es", "ES")
+                                                    Locale.forLanguageTag("es-ES")
                                                 )
                                             ).replaceFirstChar { it.uppercase() },
                                             style = typography.titleSmall,
@@ -513,7 +511,7 @@ fun EditarCitaScreen(
                                             },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .menuAnchor(),
+                                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
                                             shape = RoundedCornerShape(12.dp)
                                         )
                                         ExposedDropdownMenu(

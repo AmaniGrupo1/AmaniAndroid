@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -202,6 +203,13 @@ fun NavGraph(
                 val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
                 val otherUserName = Uri.decode(backStackEntry.arguments?.getString("otherUserName") ?: "")
+
+                if (currentUserId <= 0L || otherUserId <= 0L) {
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
+                    return@composable
+                }
 
                 val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId, otherUserName) })
 

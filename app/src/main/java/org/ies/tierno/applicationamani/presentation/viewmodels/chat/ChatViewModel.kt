@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -88,6 +89,9 @@ class ChatViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
     appContext: Context
 ) : ViewModel() {
+    companion object {
+        private const val TAG = "ChatViewModel"
+    }
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     private val _isLoading = MutableStateFlow(false)
@@ -99,7 +103,7 @@ class ChatViewModel(
 
     val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
 
-    val uiState: StateFlow<ChatUiState> = combine(
+    private val baseUiState = combine(
         _messages,
         _assignedPsychologist,
         _isLoading,
@@ -113,6 +117,17 @@ class ChatViewModel(
             inputText = input,
             isLoading = loading,
             error = error
+        )
+    }
+
+    val uiState: StateFlow<ChatUiState> = combine(
+        baseUiState,
+        _isOtherTyping,
+        _psychologistOnline
+    ) { base, isTyping, isOnline ->
+        base.copy(
+            isOtherTyping = isTyping,
+            psychologistOnline = isOnline
         )
     }.stateIn(
         scope = viewModelScope,
@@ -193,12 +208,24 @@ class ChatViewModel(
     }
 
     init {
-        viewModelScope.launch {
-            initPlayer()
-            initChatFeatures()
-            loadPsychologistInfo()
+        if (currentUserId <= 0L || otherUserId <= 0L) {
+            _error.value = "No se pudo abrir el chat. IDs inválidos."
+            Log.e(TAG, "Chat init abortado: currentUserId=$currentUserId otherUserId=$otherUserId")
+        } else {
+            viewModelScope.launch {
+                initPlayer()
+                runCatching { initChatFeatures() }
+                    .onFailure { throwable ->
+                        Log.e(TAG, "Error iniciando features de chat", throwable)
+                        _error.value = throwable.message ?: "Error al inicializar chat"
+                    }
+                runCatching { loadPsychologistInfo() }
+                    .onFailure { throwable ->
+                        Log.e(TAG, "Error cargando info de interlocutor", throwable)
+                    }
+            }
+            observeMessages()
         }
-        observeMessages()
     }
 
     private suspend fun loadPsychologistInfo() {
@@ -246,6 +273,10 @@ class ChatViewModel(
 
     private fun initTyping() {
         observeTypingUseCase(currentUserId, otherUserId)
+            .catch { throwable ->
+                Log.e(TAG, "Error observando typing", throwable)
+                _isOtherTyping.value = false
+            }
             .onEach { isTyping ->
                 _isOtherTyping.value = isTyping
             }
@@ -254,6 +285,10 @@ class ChatViewModel(
 
     private fun initOnlineStatus() {
         observeUserOnlineUseCase(otherUserId)
+            .catch { throwable ->
+                Log.e(TAG, "Error observando estado online", throwable)
+                _psychologistOnline.value = false
+            }
             .onEach { isOnline ->
                 _psychologistOnline.value = isOnline
                 updatePsychologistInfo()
@@ -271,12 +306,19 @@ class ChatViewModel(
     fun observeMessages() {
         viewModelScope.launch {
             _isLoading.value = true
-            getMessagesUseCase(currentUserId, otherUserId).collect { messages ->
-                _messages.value = messages
-                _isLoading.value = false
-                markMessagesAsRead()
-                markMessagesAsDelivered()
-            }
+            getMessagesUseCase(currentUserId, otherUserId)
+                .catch { throwable ->
+                    Log.e(TAG, "Error observando mensajes", throwable)
+                    _error.value = throwable.message ?: "No se pudieron cargar los mensajes"
+                    _messages.value = emptyList()
+                    _isLoading.value = false
+                }
+                .collect { messages ->
+                    _messages.value = messages
+                    _isLoading.value = false
+                    markMessagesAsRead()
+                    markMessagesAsDelivered()
+                }
         }
     }
 
@@ -284,7 +326,12 @@ class ChatViewModel(
         viewModelScope.launch {
             _messages.value.forEach { message ->
                 if (!message.isDelivered && message.senderId != currentUserId.toString()) {
-                    markMessageDeliveredUseCase(message.id.toLong(), currentUserId)
+                    val messageId = message.id.toLongOrNull()
+                    if (messageId == null) {
+                        Log.w(TAG, "Se omite delivery receipt por id no numérico: ${message.id}")
+                    } else {
+                        markMessageDeliveredUseCase(messageId, currentUserId)
+                    }
                 }
             }
         }
@@ -409,6 +456,7 @@ class ChatViewModel(
                 .onSuccess {
                 }
                 .onFailure { e ->
+                    Log.e(TAG, "Error enviando mensaje de texto", e)
                     _error.value = e.message
                 }
         }
@@ -431,10 +479,12 @@ class ChatViewModel(
                         attachmentName = result.fileName
                     ).onSuccess {
                     }.onFailure { e ->
+                        Log.e(TAG, "Error enviando adjunto", e)
                         _error.value = e.message
                     }
                 }
                 is FileStorageService.UploadResult.Error -> {
+                    Log.e(TAG, "Error subiendo adjunto: ${result.message}")
                     _error.value = result.message
                 }
             }
@@ -481,6 +531,7 @@ class ChatViewModel(
                     )
                 }
                 is FileStorageService.UploadResult.Error -> {
+                    Log.e(TAG, "Error subiendo nota de voz: ${result.message}")
                     _error.value = result.message
                 }
             }
@@ -505,7 +556,10 @@ class ChatViewModel(
 
     fun markMessagesAsRead() {
         viewModelScope.launch {
-            markMessagesAsReadUseCase(currentUserId, otherUserId)
+            val result = markMessagesAsReadUseCase(currentUserId, otherUserId)
+            result.exceptionOrNull()?.let { throwable ->
+                Log.w(TAG, "No se pudieron marcar mensajes como leídos", throwable)
+            }
         }
     }
 

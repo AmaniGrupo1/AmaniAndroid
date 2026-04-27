@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +62,10 @@ fun MisTicketsScreen(
 
     val tickets = viewModel.ticketsFiltrados
 
+    LaunchedEffect(Unit) {
+        viewModel.cargarTickets()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -74,7 +79,17 @@ fun MisTicketsScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = "Atr\u00e1s"
+                        )
+                    }
+                },
+                actions = {
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .size(20.dp),
+                            strokeWidth = 2.dp
                         )
                     }
                 },
@@ -129,14 +144,58 @@ fun MisTicketsScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (tickets.isEmpty()) {
+                uiState.error?.let { msg ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFFFEF2F2), RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = msg,
+                                color = Color(0xFF991B1B),
+                                style = typography.bodyMedium
+                            )
+                            Text(
+                                text = "Tocar para reintentar",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                                modifier = Modifier.clickable {
+                                    viewModel.clearError()
+                                    viewModel.cargarTickets()
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (!uiState.isLoading && tickets.isEmpty() && uiState.error == null) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No hay tickets en esta categoría", color = colors.onSurfaceVariant)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                "No hay tickets",
+                                style = typography.titleMedium,
+                                color = colors.onSurfaceVariant
+                            )
+                            Text(
+                                "Crea uno nuevo desde Ajustes",
+                                style = typography.bodySmall,
+                                color = colors.onSurfaceVariant
+                            )
+                        }
                     }
                 } else {
                     tickets.forEach { ticket ->
@@ -208,7 +267,7 @@ private fun TicketCard(ticket: TicketSoporte) {
                     )
                 }
                 Text(
-                    ticket.id,
+                    "#${ticket.id}",
                     style = typography.bodySmall,
                     color = colors.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
@@ -262,12 +321,6 @@ private fun EstadoIcono(estado: EstadoTicket) {
             modifier = Modifier.size(14.dp),
             strokeWidth = 2.dp,
             color = color
-        )
-        EstadoTicket.PENDIENTE -> Icon(
-            Icons.Default.Schedule,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(16.dp)
         )
         EstadoTicket.CERRADO -> Icon(
             Icons.Default.CheckCircle,

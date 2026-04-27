@@ -326,22 +326,21 @@ class LoginViewModel(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // Validar campos básicos del paciente
-    val formularioValido: StateFlow<Boolean> = combine(
-        listOf(nombre, apellido, dni, email, regPassword, telefono, genero, fechaNacimiento, aceptaTerminos)
+    private val camposBasicosValidos: StateFlow<Boolean> = combine(
+        listOf(nombre, apellido, dni, email, regPassword, telefono, genero, fechaNacimiento)
     ) { values ->
-        val n = values[0] as String
-        val a = values[1] as String
-        val d = values[2] as String
-        val e = values[3] as String
-        val p = values[4] as String
-        val t = values[5] as String
-        val g = values[6] as String
-        val f = values[7] as String
-        val term = values[8] as Boolean
+        val campos = values.map { it as String }
+        val fecha = campos.lastOrNull().orEmpty()
+        val camposCompletos = campos.all { it.isNotBlank() }
+        val fechaValida = fecha.matches(Regex("""\d{4}-\d{2}-\d{2}"""))
+        camposCompletos && fechaValida
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-        val camposCompletos = listOf(n, a, d, e, p, t, g, f).all { it.isNotBlank() }
-        val fechaValida = f.matches(Regex("""\d{4}-\d{2}-\d{2}"""))
-        camposCompletos && fechaValida && term
+    val formularioValido: StateFlow<Boolean> = combine(
+        camposBasicosValidos,
+        aceptaTerminos
+    ) { camposOk, terminosOk ->
+        camposOk && terminosOk
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // Validar formulario COMPLETO (incluye tutor solo si es necesario)

@@ -59,6 +59,7 @@ fun ChatListScreen(
     val partnerId by viewModel.partnerId.collectAsState()
     val partnerNombre by viewModel.partnerNombre.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     Scaffold(
         containerColor = amaniColors.screenBackground,
@@ -90,6 +91,32 @@ fun ChatListScreen(
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
+                }
+                error != null && partnerId == null -> {
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(24.dp),
+                        shape = MaterialTheme.shapes.large,
+                        color = colors.surface,
+                        tonalElevation = 2.dp
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            Text(
+                                text = error ?: "No se pudo abrir el chat",
+                                style = typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                color = colors.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            androidx.compose.material3.Button(
+                                onClick = viewModel::retry,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+                                Text("Reintentar")
+                            }
+                        }
+                    }
                 }
                 partnerId == null -> {
                     Surface(
@@ -134,8 +161,15 @@ fun ChatListScreen(
                             onClick = {
                                 currentUserId?.let { currentId ->
                                     partnerId?.let { pId ->
+                                        if (currentId <= 0L || pId <= 0L) {
+                                            viewModel.retry()
+                                            return@let
+                                        }
+                                        val safePartnerName = partnerNombre.ifBlank {
+                                            if (normalizedRol == "paciente") "Tu Psicólogo" else "Tu Paciente"
+                                        }
                                         navController.navigate(
-                                            Screens.chat.createRoute(currentId, pId, partnerNombre)
+                                            Screens.chat.createRoute(currentId, pId, safePartnerName)
                                         )
                                     }
                                 }

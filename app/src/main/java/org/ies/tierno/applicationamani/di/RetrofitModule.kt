@@ -14,6 +14,7 @@ import org.ies.tierno.applicationamani.data.remoto.DiarioApi
 import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
+import org.ies.tierno.applicationamani.data.remoto.SoporteTicketApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
 import org.koin.dsl.module
@@ -107,7 +108,7 @@ val retrofitModule = module {
             .create()
 
         Retrofit.Builder()
-            .baseUrl("http://192.168.1.21:8080/")
+            .baseUrl("http://10.0.2.2:8080/")
             //.baseUrl("http://192.168.1.175:8080/")
 
             .addConverterFactory(GsonConverterFactory.create(gson))
@@ -124,4 +125,5 @@ val retrofitModule = module {
     single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
     single<DiarioApi> { get<Retrofit>().create(DiarioApi::class.java) }
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
+    single<SoporteTicketApi> { get<Retrofit>().create(SoporteTicketApi::class.java) }
 }

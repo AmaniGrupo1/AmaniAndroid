@@ -287,7 +287,7 @@ fun PacienteExpandableCard(
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 16.dp)
                 ) {
-                    Divider(
+                    HorizontalDivider(
                         color = Color.LightGray,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )

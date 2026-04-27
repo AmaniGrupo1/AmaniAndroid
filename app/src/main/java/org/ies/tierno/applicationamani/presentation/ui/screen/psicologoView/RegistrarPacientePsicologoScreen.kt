@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.MenuAnchorType
@@ -548,7 +549,7 @@ fun RegistrarPacientePsicologoScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Situaciones",

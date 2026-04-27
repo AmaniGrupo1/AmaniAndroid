@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,9 @@ class ChatListViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
     private val listarPacientesByPsicologo: ListarPacientesByPsicologo
 ) : ViewModel() {
+    companion object {
+        private const val TAG = "ChatListViewModel"
+    }
 
     private val _currentUserId = MutableStateFlow<Long?>(null)
     val currentUserId: StateFlow<Long?> = _currentUserId.asStateFlow()
@@ -38,6 +42,9 @@ class ChatListViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
     init {
         loadCurrentUser()
     }
@@ -51,6 +58,7 @@ class ChatListViewModel(
     private fun loadCurrentUser() {
         viewModelScope.launch {
             _isLoading.value = true
+            _error.value = null
             val session = userSessionDataStore.getSession()
             if (session != null) {
                 _currentUserId.value = session.idUsuario
@@ -79,10 +87,12 @@ class ChatListViewModel(
                     }
 
                     else -> {
+                        _error.value = "Rol de usuario no soportado para chat"
                         _isLoading.value = false
                     }
                 }
             } else {
+                _error.value = "No hay sesión activa"
                 _isLoading.value = false
             }
         }
@@ -112,9 +122,14 @@ class ChatListViewModel(
                         }
                         _partnerNombre.value = nombre.ifEmpty { "Tu Paciente" }
                     } else {
+                        _partnerId.value = null
+                        _error.value = "No se pudo resolver el paciente para chat"
                         _partnerNombre.value = "Tu Paciente"
                     }
                 }.onFailure {
+                    Log.e(TAG, "Error resolviendo paciente para chat", it)
+                    _partnerId.value = null
+                    _error.value = it.message ?: "No se pudo cargar el paciente"
                     _partnerNombre.value = "Tu Paciente"
                 }
             } finally {
@@ -135,9 +150,12 @@ class ChatListViewModel(
                 if (pacienteId != null) {
                     resolvePacienteParaChat(pacienteId)
                 } else {
+                    _error.value = "No tienes pacientes asignados para iniciar chat"
                     _isLoading.value = false
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "Error cargando pacientes asignados", e)
+                _error.value = e.message ?: "No se pudieron cargar pacientes"
                 _isLoading.value = false
             }
         }
@@ -163,7 +181,9 @@ class ChatListViewModel(
                     }
                     _partnerNombre.value = nombre.ifEmpty { "Tu Psicólogo" }
                 }.onFailure {
+                    Log.e(TAG, "Error resolviendo psicólogo asignado", it)
                     _partnerId.value = null
+                    _error.value = it.message ?: "No se pudo cargar tu psicólogo"
                     _partnerNombre.value = ""
                 }
             } finally {
@@ -187,11 +207,20 @@ class ChatListViewModel(
                     }
                     _partnerNombre.value = nombre.ifEmpty { "Tu Psicólogo" }
                 }.onFailure {
+                    Log.e(TAG, "Error cargando nombre de psicólogo", it)
+                    _error.value = it.message ?: "No se pudo cargar el psicólogo"
                     _partnerNombre.value = "Tu Psicólogo"
                 }
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+    fun retry() {
+        _partnerId.value = null
+        _partnerNombre.value = ""
+        _error.value = null
+        loadCurrentUser()
     }
 }

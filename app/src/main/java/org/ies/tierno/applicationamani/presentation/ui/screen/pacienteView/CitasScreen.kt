@@ -387,7 +387,7 @@ fun CitasScreen(
                                                 text = fecha.format(
                                                     DateTimeFormatter.ofPattern(
                                                         "EEEE, d 'de' MMMM",
-                                                        Locale("es", "ES")
+                                                        Locale.forLanguageTag("es-ES")
                                                     )
                                                 ).replaceFirstChar { it.uppercase() },
                                                 style = typography.titleMedium,
@@ -769,7 +769,9 @@ fun DialogoGestionCitaPaciente(
                             )
                         },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
                         shape = RoundedCornerShape(14.dp)
                     )
                     ExposedDropdownMenu(
@@ -954,7 +956,12 @@ fun CampoFechaPaciente(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(fechaSeleccionada.format(formatterFecha), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text(
-                        fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                        fechaSeleccionada.format(
+                            DateTimeFormatter.ofPattern(
+                                "EEEE",
+                                Locale.forLanguageTag("es-ES")
+                            )
+                        ).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant
                     )

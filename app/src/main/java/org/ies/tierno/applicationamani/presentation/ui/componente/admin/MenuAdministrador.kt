@@ -8,7 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +30,6 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
@@ -165,7 +164,7 @@ fun MenuAdministrador(
             ),
             MenuAdministrador(
                 title = "Cerrar sesión",
-                icon = Icons.Default.Logout,
+                icon = Icons.AutoMirrored.Filled.Logout,
                 route = Screens.login.route,
                 isDanger = true
             )
@@ -199,7 +198,7 @@ fun MenuAdministrador(
             AnimatedContent(
                 targetState = showLogo to title,
                 transitionSpec = {
-                    fadeIn() with fadeOut()
+                    fadeIn() togetherWith fadeOut()
                 }
             ) { (showLogoValue, titleValue) ->
                 if (showLogoValue) {

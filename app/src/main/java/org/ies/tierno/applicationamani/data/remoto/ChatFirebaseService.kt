@@ -23,6 +23,33 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
         }
     }
 
+    private fun DataSnapshot.longValue(vararg keys: String): Long? {
+        for (key in keys) {
+            val node = child(key)
+            val asLong = node.getValue(Long::class.java)
+            if (asLong != null) return asLong
+            val asString = node.getValue(String::class.java)
+            val parsed = asString?.toLongOrNull()
+            if (parsed != null) return parsed
+        }
+        return null
+    }
+
+    private fun DataSnapshot.longMapValue(key: String): Map<String, Long>? {
+        val mapNode = child(key)
+        if (!mapNode.exists()) return null
+
+        val result = mutableMapOf<String, Long>()
+        for (entry in mapNode.children) {
+            val parsed = entry.getValue(Long::class.java)
+                ?: entry.getValue(String::class.java)?.toLongOrNull()
+            if (parsed != null && entry.key != null) {
+                result[entry.key!!] = parsed
+            }
+        }
+        return result.ifEmpty { null }
+    }
+
     fun observeMessages(userId1: Long, userId2: Long): Flow<List<Message>> = callbackFlow {
         val roomId = generateRoomId(userId1, userId2)
         val messagesRef = chatsRef.child(roomId).child("messages")
@@ -31,8 +58,8 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val messages = mutableListOf<Message>()
                 for (child in snapshot.children) {
-                    val idMensaje = child.child("idMensaje").getValue(Long::class.java) ?: 0L
-                    val senderId = child.child("idSender").getValue(Long::class.java) ?: 0L
+                    val idMensaje = child.longValue("idMensaje") ?: 0L
+                    val senderId = child.longValue("idSender", "senderId") ?: 0L
                     val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
                     val enviadoEn = child.child("enviadoEn").getValue(String::class.java)
                     val leido = child.child("leido").getValue(Boolean::class.java) ?: false
@@ -46,13 +73,8 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
                     }
                     val attachmentName = child.child("attachmentName").getValue(String::class.java)
 
-                    // Leer readBy map si existe (Firebase serializa keys como strings)
-                    val readByData = child.child("readBy").getValue(Map::class.java) as? Map<String, *>
-                    val readBy = readByData?.mapKeys { it.key } as? Map<String, Long>
-
-                    // Leer deliveredTo map
-                    val deliveredToData = child.child("deliveredTo").getValue(Map::class.java) as? Map<String, *>
-                    val deliveredAt = deliveredToData?.get(userId1.toString()) as? Long
+                    val readBy = child.longMapValue("readBy")
+                    val deliveredAt = child.longMapValue("deliveredTo")?.get(userId1.toString())
 
                     messages.add(
                         Message(
@@ -122,7 +144,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             val snapshot = messagesRef.get().await()
 
             for (child in snapshot.children) {
-                val senderIdValue = child.child("idSender").getValue(Long::class.java) ?: 0L
+                val senderIdValue = child.longValue("idSender", "senderId") ?: 0L
                 val leido = child.child("leido").getValue(Boolean::class.java) ?: false
 
                 // Marcar como leído los mensajes que NO fueron enviados por el usuario actual
@@ -146,7 +168,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             val messages = mutableListOf<Message>()
             for (child in snapshot.children) {
                 val idMensaje = child.child("idMensaje").getValue(Long::class.java) ?: 0L
-                val senderId = child.child("idSender").getValue(Long::class.java)
+                val senderId = child.longValue("idSender", "senderId")
                 val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
                 val leido = child.child("leido").getValue(Boolean::class.java) ?: false
                 val enviadoEn = child.child("enviadoEn").getValue(String::class.java)
@@ -160,13 +182,8 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
                 }
                 val attachmentName = child.child("attachmentName").getValue(String::class.java)
 
-                // Leer readBy map si existe
-                val readByData = child.child("readBy").getValue(Map::class.java) as? Map<String, *>
-                val readBy = readByData?.mapKeys { it.key } as? Map<String, Long>
-
-                // Leer deliveredTo map
-                val deliveredToData = child.child("deliveredTo").getValue(Map::class.java) as? Map<String, *>
-                val deliveredAt = deliveredToData?.get(userId1.toString()) as? Long
+                val readBy = child.longMapValue("readBy")
+                val deliveredAt = child.longMapValue("deliveredTo")?.get(userId1.toString())
 
                 messages.add(
                     Message(
