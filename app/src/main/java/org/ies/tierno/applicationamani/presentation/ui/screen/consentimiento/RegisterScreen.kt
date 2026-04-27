@@ -93,6 +93,11 @@ fun RegisterScreen(
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val scope = rememberCoroutineScope()
 
+    // Estado del DatePicker
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis() - (20L * 365 * 24 * 60 * 60 * 1000)
+    )
+
     // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
     val apellido by loginViewModel.apellido.collectAsStateWithLifecycle()
@@ -831,8 +836,6 @@ fun RegisterScreen(
 
             // DatePicker Dialog
             if (loginViewModel.showDatePicker.collectAsStateWithLifecycle().value) {
-                val datePickerState = rememberDatePickerState()
-
                 DatePickerDialog(
                     onDismissRequest = { loginViewModel.setShowDatePicker(false) },
                     confirmButton = {

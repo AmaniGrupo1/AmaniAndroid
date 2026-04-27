@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -56,8 +58,7 @@ fun ChatListScreen(
     val currentUserId by viewModel.currentUserId.collectAsState()
     val currentUserRol by viewModel.currentUserRol.collectAsState()
     val normalizedRol = currentUserRol.lowercase().trim().replace("ó", "o").replace("á", "a")
-    val partnerId by viewModel.partnerId.collectAsState()
-    val partnerNombre by viewModel.partnerNombre.collectAsState()
+    val partners by viewModel.partners.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
@@ -92,7 +93,7 @@ fun ChatListScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
-                error != null && partnerId == null -> {
+                error != null && partners.isEmpty() -> {
                     Surface(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -118,7 +119,7 @@ fun ChatListScreen(
                         }
                     }
                 }
-                partnerId == null -> {
+                partners.isEmpty() -> {
                     Surface(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -154,27 +155,31 @@ fun ChatListScreen(
                             color = colors.onSurface,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
-                        
-                        ChatPartnerCard(
-                            partnerName = partnerNombre,
-                            currentUserRol = currentUserRol,
-                            onClick = {
-                                currentUserId?.let { currentId ->
-                                    partnerId?.let { pId ->
-                                        if (currentId <= 0L || pId <= 0L) {
-                                            viewModel.retry()
-                                            return@let
+
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(partners) { partner ->
+                                ChatPartnerCard(
+                                    partnerName = partner.nombre,
+                                    currentUserRol = currentUserRol,
+                                    onClick = {
+                                        currentUserId?.let { currentId ->
+                                            val safePartnerName = partner.nombre.ifBlank {
+                                                if (normalizedRol == "paciente") "Tu Psicólogo" else "Tu Paciente"
+                                            }
+                                            navController.navigate(
+                                                Screens.chat.createRoute(
+                                                    currentId,
+                                                    partner.id,
+                                                    safePartnerName
+                                                )
+                                            )
                                         }
-                                        val safePartnerName = partnerNombre.ifBlank {
-                                            if (normalizedRol == "paciente") "Tu Psicólogo" else "Tu Paciente"
-                                        }
-                                        navController.navigate(
-                                            Screens.chat.createRoute(currentId, pId, safePartnerName)
-                                        )
                                     }
-                                }
+                                )
                             }
-                        )
+                        }
                     }
                 }
             }

@@ -109,6 +109,11 @@ fun AgregaPsicologoScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    // Estado del DatePicker
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis() - (30L * 365 * 24 * 60 * 60 * 1000)
+    )
+
     // Formateador de fecha
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
@@ -471,22 +476,22 @@ fun AgregaPsicologoScreen(
 
     // DatePicker Dialog
     if (showDatePicker) {
-        var year by remember { mutableStateOf(1990) }
-        var month by remember { mutableStateOf(0) }
-        var day by remember { mutableStateOf(1) }
-
         DatePickerDialog(
             onDismissRequest = { loginViewModel.setShowDatePicker(false) },
             confirmButton = {
                 TextButton(onClick = {
-                    val selectedDate = LocalDate.of(year, month + 1, day)
-                    val age = Period.between(selectedDate, LocalDate.now()).years
-                    if (age >= 18) {
-                        loginViewModel.setDateOfBirth(selectedDate)
-                        loginViewModel.setDateError(null)
-                        loginViewModel.setShowDatePicker(false)
-                    } else {
-                        loginViewModel.setDateError("Debes ser mayor de 18 años")
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val selectedDate = java.time.Instant.ofEpochMilli(millis)
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate()
+                        val age = Period.between(selectedDate, LocalDate.now()).years
+                        if (age >= 18) {
+                            loginViewModel.setDateOfBirth(selectedDate)
+                            loginViewModel.setDateError(null)
+                            loginViewModel.setShowDatePicker(false)
+                        } else {
+                            loginViewModel.setDateError("Debes ser mayor de 18 años")
+                        }
                     }
                 }) {
                     Text("Aceptar")
@@ -499,7 +504,7 @@ fun AgregaPsicologoScreen(
             }
         ) {
             DatePicker(
-                state = rememberDatePickerState()
+                state = datePickerState
             )
         }
     }
