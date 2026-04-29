@@ -42,6 +42,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.Citas
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.SettingsPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.MisTicketsScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.NuevoTicketScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
@@ -114,6 +115,10 @@ fun NavGraph(
             }
             composable(Screens.settingsCliente.route) {
                 SettingsClienteScreen(navController)
+            }
+            composable(Screens.settingsPsicologo.route) {
+                val idPsicologo = session?.idPsicologo ?: 0L
+                SettingsPsicologoScreen(idPsicologo, navController)
             }
             composable(Screens.agregarPsicologo.route) {
                 AgregaPsicologoScreen(navController, loginViewModel)

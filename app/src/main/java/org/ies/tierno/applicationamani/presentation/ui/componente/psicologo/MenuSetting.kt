@@ -70,11 +70,18 @@ fun MenuSetting(
                 onDismissRequest = { expanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Perfil", style = typography.labelLarge) },
+                    text = { Text("Mi Perfil", style = typography.labelLarge) },
                     onClick = {
                         expanded = false
-                        print("idPsicologo en MenuSetting: $idPsicologo") // Debug
                         navController.navigate(Screens.perfilPsicologo.createRoute(idPsicologo))
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text("Ajustes", style = typography.labelLarge) },
+                    onClick = {
+                        expanded = false
+                        navController.navigate(Screens.settingsPsicologo.route)
                     }
                 )
 
