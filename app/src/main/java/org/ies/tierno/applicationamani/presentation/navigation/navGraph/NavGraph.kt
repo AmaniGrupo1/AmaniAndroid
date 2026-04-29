@@ -44,6 +44,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.Agend
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.RegistrarPacientePsicologoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsAdminScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
@@ -244,6 +245,10 @@ fun NavGraph(
             }
             composable(Screens.pacientesSinPsicologo.route){
                 ListarPacienteSinPsicologos(navController)
+            }
+
+            composable(Screens.settingsAdmin.route){
+                SettingsAdminScreen(navController, userSessionDataStore)
             }
         }
     }

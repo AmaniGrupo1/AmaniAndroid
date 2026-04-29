@@ -87,5 +87,7 @@
         object registroPacienteDesdePsicologo : Screens("registroPacienteDesdePsicologo")
 
         object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
+
+        object settingsAdmin : Screens("settingsAdmin")
     }
 

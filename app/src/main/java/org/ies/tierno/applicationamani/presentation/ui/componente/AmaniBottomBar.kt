@@ -119,10 +119,10 @@ private fun adminItems() = listOf(
         unselectedIcon = Icons.Outlined.Psychology
     ),
     AmaniBottomBarItem(
-        route = Screens.test.route,
-        label = "Tests",
-        selectedIcon = Icons.Filled.Quiz,
-        unselectedIcon = Icons.Outlined.Quiz
+        route = Screens.settingsAdmin.route,
+        label = "Ajustes",
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings
     ),
     AmaniBottomBarItem(
         route = null,
@@ -150,7 +150,7 @@ private fun psicologoItems() = listOf(
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
     AmaniBottomBarItem(
-        route = Screens.settingsCliente.route,
+        route = Screens.settingsAdmin.route,
         label = "Ajustes",
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings

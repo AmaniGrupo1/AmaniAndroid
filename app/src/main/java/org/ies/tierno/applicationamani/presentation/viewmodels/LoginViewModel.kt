@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
@@ -31,7 +33,8 @@ import java.time.Period
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
     private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
+    private val tokenDataStore: TokenDataStore
 ) : ViewModel() {
 
     // ── Login ──
@@ -95,6 +98,7 @@ class LoginViewModel(
                 val result = loginUseCase.login(request)
 
                 result.onSuccess { loginResponse ->
+                    tokenDataStore.saveToken(loginResponse.token)
                     // ✅ GUARDAR LA SESIÓN INMEDIATAMENTE DESPUÉS DEL LOGIN EXITOSO
                     saveUserSession(loginResponse)
                     _loginResult.value = Result.success(loginResponse)

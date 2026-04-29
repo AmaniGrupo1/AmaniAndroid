@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +29,7 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionResponseDTO
+import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
@@ -161,6 +163,7 @@ fun ListarPacienteSinPsicologos(
                                 },
                                 primaryColor = primaryColor,
                                 roboto = roboto
+
                             )
                         }
                     }
@@ -304,7 +307,21 @@ fun PacienteExpandableCard(
                         DetailRow("Género", paciente.genero ?: "No especificado", roboto)
                         DetailRow("Fecha Nacimiento", paciente.fechaNacimiento ?: "No especificado", roboto)
                     }
-
+                    // Situaciones (AQUÍ debe ir, NO en el header)
+                    if (!paciente.situaciones.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SubSection(
+                            title = "Situaciones",
+                            icon = Icons.Default.Info,
+                            iconColor = Color(0xFF27AE60),
+                            roboto = roboto
+                        ) {
+                            paciente.situaciones!!.forEachIndexed { index, situacion ->
+                                if (index > 0) Spacer(modifier = Modifier.height(8.dp))
+                                SituacionCard(situacion, roboto)
+                            }
+                        }
+                    }
                     // Direcciones
                     if (!paciente.direcciones.isNullOrEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
@@ -375,7 +392,7 @@ fun PacienteExpandableCard(
 @Composable
 fun SubSection(
     title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     iconColor: Color,
     roboto: FontFamily,
     content: @Composable () -> Unit
@@ -491,6 +508,65 @@ fun TutorCard(
             }
             if (!tutor.dni.isNullOrBlank()) {
                 DetailRow("DNI", tutor.dni, roboto)
+            }
+        }
+    }
+}
+
+@Composable
+fun SituacionCard(
+    situacion: SituacionDTO,
+    roboto: FontFamily
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FFF4))  // Verde muy claro
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            // Nombre de la situación (siempre visible)
+            if (!situacion.nombre.isNullOrBlank()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = situacion.nombre,
+                        fontFamily = roboto,
+                        fontSize = 14.sp,
+                        fontWeight = Bold,
+                        color = Color(0xFF27AE60)
+                    )
+                    if (!situacion.categoria.isNullOrBlank()) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF27AE60).copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text = situacion.categoria,
+                                fontFamily = roboto,
+                                fontSize = 11.sp,
+                                color = Color(0xFF27AE60),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Descripción (si existe)
+            if (!situacion.descripcion.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = situacion.descripcion,
+                    fontFamily = roboto,
+                    fontSize = 12.sp,
+                    color = Color(0xFF555555),
+                    lineHeight = 16.sp
+                )
             }
         }
     }

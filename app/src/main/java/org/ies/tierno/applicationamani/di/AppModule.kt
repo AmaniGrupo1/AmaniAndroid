@@ -108,7 +108,7 @@ val appModule = module {
     factory { MarkMessageDeliveredUseCase(get()) }
     factory { UpdateUserOnlineUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { ListarPacientesViewModel(get(), get()) }

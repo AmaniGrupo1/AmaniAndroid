@@ -1,5 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.screens.profile
 
+import android.Manifest.permission.CAMERA
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CameraAlt
@@ -42,6 +46,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -52,6 +60,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,14 +71,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
-import java.io.FileOutputStream
+import android.util.Log
+import org.koin.compose.koinInject
+
+private const val TAG = "PsicologoProfileScreen"
+// Usar la MISMA URL que en Retrofit
+private const val BASE_URL = "http://192.168.1.175:8080"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,23 +95,89 @@ fun PsicologoProfileScreen(
     navController: NavController,
     viewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
+
+    //INYECTO LA IMAGEN EN EL VIEWMODEL PARA QUE PUEDA GESTIONAR EL ESTADO DE LA URL Y FORZAR REFRESH DESDE ALLÍ
+    val imageLoader = koinInject<coil.ImageLoader>()
+
+    val context = LocalContext.current
     val perfil by viewModel.perfil.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val uploadStatus by viewModel.uploadStatus.collectAsState()
 
-    // Cargar perfil al iniciar
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    Log.d(TAG, "PsicologoProfileScreen iniciada con ID: $psicologoId")
+
     LaunchedEffect(Unit) {
+        Log.d(TAG, "LaunchedEffect - Fetching profile for ID: $psicologoId")
         viewModel.fetchProfile(psicologoId)
     }
 
-    // Mostrar error si existe
-    error?.let {
-        LaunchedEffect(it) {
-            // Aquí podrías mostrar un Snackbar
+    LaunchedEffect(perfil) {
+        if (perfil != null) {
+            Log.d(TAG, "Perfil cargado correctamente")
+            Log.d(TAG, "Nombre: ${perfil?.usuario?.nombre} ${perfil?.usuario?.apellido}")
+            Log.d(TAG, "Email: ${perfil?.usuario?.email}")
+            Log.d(TAG, "URL foto perfil: ${perfil?.usuario?.fotoPerfilUrl}")
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let { errorMessage ->
+            Log.e(TAG, "Error en perfil: $errorMessage")
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = errorMessage,
+                    actionLabel = "Cerrar",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(uploadStatus) {
+        when (uploadStatus) {
+            is ProfilePsicologoViewModel.UploadStatus.Success -> {
+                Log.d(TAG, "UploadStatus: SUCCESS - Foto subida correctamente")
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "¡Foto de perfil actualizada correctamente!",
+                        actionLabel = "👍",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+            is ProfilePsicologoViewModel.UploadStatus.Error -> {
+                val errorMessage = (uploadStatus as ProfilePsicologoViewModel.UploadStatus.Error).message
+                Log.e(TAG, "UploadStatus: ERROR - $errorMessage")
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = errorMessage,
+                        actionLabel = "Cerrar",
+                        duration = SnackbarDuration.Long
+                    )
+                }
+            }
+            else -> {}
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(16.dp)
+            ) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    actionColor = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -108,8 +191,12 @@ fun PsicologoProfileScreen(
                     titleContentColor = Color.White
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { /* Navegar hacia atrás */ }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 }
             )
@@ -120,22 +207,34 @@ fun PsicologoProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else if (perfil != null) {
-                ProfileContent(
-                    perfil = perfil!!,
-                    onPhotoUpload = { uri ->
-                        viewModel.uploadFotoPerfil(psicologoId, uri)
-                    }
-                )
-            } else if (error != null) {
-                ErrorContent(
-                    error = error!!,
-                    onRetry = { viewModel.fetchProfile(psicologoId) }
-                )
+            when {
+                isLoading -> {
+                    Log.d(TAG, "Estado: Cargando...")
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                perfil != null -> {
+                    Log.d(TAG, "Estado: Mostrando contenido del perfil")
+                    ProfileContent(
+                        perfil = perfil!!,
+                        imageLoader = imageLoader,
+                        onPhotoUpload = { uri ->
+                            Log.d(TAG, "onPhotoUpload llamado con URI: $uri")
+                            viewModel.uploadFotoPerfil(psicologoId, uri, context)
+                        }
+                    )
+                }
+                error != null -> {
+                    Log.d(TAG, "Estado: Mostrando error: $error")
+                    ErrorContent(
+                        error = error!!,
+                        onRetry = {
+                            Log.d(TAG, "Retry clicked - fetching profile again")
+                            viewModel.fetchProfile(psicologoId)
+                        }
+                    )
+                }
             }
         }
     }
@@ -143,35 +242,97 @@ fun PsicologoProfileScreen(
 
 @Composable
 fun ProfileContent(
-    perfil: org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO,
+    perfil: PsicologoProfileResponseDTO,
+    imageLoader: coil.ImageLoader,
     onPhotoUpload: (Uri) -> Unit
 ) {
     val context = LocalContext.current
     var showOptions by remember { mutableStateOf(false) }
 
-    // Selector de imagen de galería
+    // Variable para forzar refresco de la imagen
+    var refreshTrigger by remember { mutableStateOf(0L) }
+
+    // Función para construir la URL completa de la imagen
+    fun buildFullImageUrl(relativeUrl: String?): String {
+        if (relativeUrl.isNullOrEmpty()) {
+            return ""
+        }
+        // Si ya es una URL completa, la devolvemos tal cual
+        if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
+            return relativeUrl
+        }
+        // Construimos la URL completa con la base
+        return "${BASE_URL}${relativeUrl}"
+    }
+
+    val currentPhotoUrl = perfil.usuario?.fotoPerfilUrl
+    val fullImageUrl = buildFullImageUrl(currentPhotoUrl)
+
+    Log.d(TAG, "ProfileContent - URL foto actual (relativa): $currentPhotoUrl")
+    Log.d(TAG, "ProfileContent - URL foto completa: $fullImageUrl")
+    Log.d(TAG, "ProfileContent - ¿URL vacía o nula?: ${currentPhotoUrl.isNullOrEmpty()}")
+
+    // ========== LAUNCHER PARA GALERÍA ==========
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
+        Log.d(TAG, "Galería - URI seleccionada: $uri")
         uri?.let {
+            Log.d(TAG, "Galería - Path: ${it.path}")
+            Log.d(TAG, "Galería - Scheme: ${it.scheme}")
             onPhotoUpload(it)
+            // Forzar refresco después del upload
+            refreshTrigger = System.currentTimeMillis()
+            Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
         }
     }
 
-    // Selector de imagen desde cámara
+    // ========== CÁMARA SIN FILEPROVIDER (CORREGIDO) ==========
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
+    ) { bitmap: Bitmap? ->
+        Log.d(TAG, "Cámara - Bitmap obtenido: ${bitmap?.width}x${bitmap?.height}")
         bitmap?.let {
-            // Convertir bitmap a URI
-            val tempFile = File(context.cacheDir, "profile_photo_${System.currentTimeMillis()}.jpg")
-            FileOutputStream(tempFile).use { out ->
-                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+            // Guardar Bitmap en archivo temporal en cacheDir
+            val tempFile = File(context.cacheDir, "camera_photo_${System.currentTimeMillis()}.jpg")
+            Log.d(TAG, "Cámara - Archivo temporal creado: ${tempFile.absolutePath}")
+            java.io.FileOutputStream(tempFile).use { out ->
+                it.compress(Bitmap.CompressFormat.JPEG, 90, out)
             }
-            onPhotoUpload(Uri.fromFile(tempFile))
+            val uri = Uri.fromFile(tempFile)
+            Log.d(TAG, "Cámara - URI generada: $uri")
+            Log.d(TAG, "Cámara - ¿URI existe?: ${File(uri.path ?: "").exists()}")
+            onPhotoUpload(uri)
+            // Forzar refresco después del upload
+            refreshTrigger = System.currentTimeMillis()
+            Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
         }
     }
 
+    // ========== PERMISOS ==========
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                CAMERA
+            ) == PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        Log.d(TAG, "Permiso de cámara - ¿Concedido?: $isGranted")
+        hasCameraPermission = isGranted
+        if (isGranted) {
+            Log.d(TAG, "Permiso concedido - lanzando cámara")
+            cameraLauncher.launch(null)
+        } else {
+            Log.w(TAG, "Permiso de cámara denegado")
+        }
+    }
+
+    // ========== UI ==========
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -179,7 +340,6 @@ fun ProfileContent(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Sección de Foto de Perfil
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -204,18 +364,43 @@ fun ProfileContent(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Imagen de perfil
                 Box(
                     modifier = Modifier.size(120.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
+                    val imageUrl = if (fullImageUrl.isEmpty()) {
+                        Log.d(TAG, "AsyncImage - Usando avatar por defecto (URL vacía)")
+                        R.drawable.ic_default_avatar
+                    } else {
+                        val urlWithTimestamp = "$fullImageUrl?t=$refreshTrigger"
+                        Log.d(TAG, "AsyncImage - URL construida: $urlWithTimestamp")
+                        Log.d(TAG, "AsyncImage - URL base: $fullImageUrl")
+                        Log.d(TAG, "AsyncImage - Timestamp: $refreshTrigger")
+                        urlWithTimestamp
+                    }
+
+                    // ✅ FORZAR REFRESH CON refreshTrigger
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(perfil.usuario?.fotoPerfilUrl)
+                            .data(imageUrl)
                             .crossfade(true)
                             .error(R.drawable.ic_default_avatar)
                             .placeholder(R.drawable.ic_default_avatar)
+                            .diskCacheKey("$fullImageUrl$refreshTrigger")
+                            .listener(
+                                onStart = { request ->
+                                    Log.d(TAG, "AsyncImage - Iniciando carga: ${request.data}")
+                                },
+                                onSuccess = { request, metadata ->
+                                    Log.d(TAG, "AsyncImage - Éxito al cargar imagen: ${request.data}")
+                                },
+                                onError = { request, throwable ->
+                                    Log.e(TAG, "AsyncImage - Error al cargar imagen: ${request.data}")
+                                    Log.e(TAG, "AsyncImage - Error mensaje: ")
+                                }
+                            )
                             .build(),
+                        imageLoader = imageLoader,
                         contentDescription = "Foto de perfil",
                         modifier = Modifier
                             .fillMaxSize()
@@ -227,14 +412,20 @@ fun ProfileContent(
                         contentScale = ContentScale.Crop
                     )
 
-                    // Botón para editar foto
                     FloatingActionButton(
-                        onClick = { showOptions = true },
+                        onClick = {
+                            Log.d(TAG, "Botón cámara clickeado - Mostrando opciones")
+                            showOptions = true
+                        },
                         modifier = Modifier.size(40.dp),
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = Color.White
                     ) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = "Cambiar foto", modifier = Modifier.size(20.dp))
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = "Cambiar foto",
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
 
@@ -253,7 +444,6 @@ fun ProfileContent(
             }
         }
 
-        // Información Profesional
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -275,7 +465,6 @@ fun ProfileContent(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Especialidad
                 InfoRow(
                     icon = Icons.Default.Work,
                     label = "Especialidad",
@@ -284,7 +473,6 @@ fun ProfileContent(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Experiencia
                 InfoRow(
                     icon = Icons.Default.Timeline,
                     label = "Experiencia",
@@ -293,7 +481,6 @@ fun ProfileContent(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Licencia
                 InfoRow(
                     icon = Icons.Default.Badge,
                     label = "Número de Licencia",
@@ -302,7 +489,6 @@ fun ProfileContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Descripción
                 Text(
                     text = "Descripción",
                     fontSize = 14.sp,
@@ -321,13 +507,14 @@ fun ProfileContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botones de acción
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedButton(
-                onClick = { /* Editar perfil */ },
+                onClick = {
+                    Log.d(TAG, "Botón Editar Perfil clickeado")
+                },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -337,7 +524,9 @@ fun ProfileContent(
             }
 
             Button(
-                onClick = { /* Configuración */ },
+                onClick = {
+                    Log.d(TAG, "Botón Configuración clickeado")
+                },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -348,15 +537,20 @@ fun ProfileContent(
         }
     }
 
-    // Diálogo de opciones para la foto
+    // Diálogo para seleccionar origen de la foto
     if (showOptions) {
+        Log.d(TAG, "Mostrando diálogo de opciones de foto")
         AlertDialog(
-            onDismissRequest = { showOptions = false },
+            onDismissRequest = {
+                Log.d(TAG, "Diálogo cerrado sin selección")
+                showOptions = false
+            },
             title = { Text("Cambiar foto de perfil") },
             text = { Text("Selecciona una opción para actualizar tu foto de perfil") },
             confirmButton = {
                 TextButton(
                     onClick = {
+                        Log.d(TAG, "Opción Galería seleccionada")
                         showOptions = false
                         galleryLauncher.launch("image/*")
                     }
@@ -367,8 +561,15 @@ fun ProfileContent(
             dismissButton = {
                 TextButton(
                     onClick = {
+                        Log.d(TAG, "Opción Cámara seleccionada")
                         showOptions = false
-                        cameraLauncher.launch(null)
+                        if (hasCameraPermission) {
+                            Log.d(TAG, "Permiso de cámara ya concedido, lanzando cámara")
+                            cameraLauncher.launch(null)
+                        } else {
+                            Log.d(TAG, "Solicitando permiso de cámara")
+                            permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                        }
                     }
                 ) {
                     Text("Cámara")
@@ -415,6 +616,8 @@ fun ErrorContent(
     error: String,
     onRetry: () -> Unit
 ) {
+    Log.e(TAG, "ErrorContent mostrando error: $error")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -443,7 +646,10 @@ fun ErrorContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = onRetry,
+            onClick = {
+                Log.d(TAG, "Botón Reintentar clickeado")
+                onRetry()
+            },
             shape = RoundedCornerShape(12.dp)
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
