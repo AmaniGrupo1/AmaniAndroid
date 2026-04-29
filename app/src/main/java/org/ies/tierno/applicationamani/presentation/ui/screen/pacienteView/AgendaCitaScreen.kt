@@ -68,6 +68,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.ContactoPsicologoDTO
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -141,7 +142,7 @@ fun AgendaCitaScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate("agendar_cita")
+                    navController.navigate(Screens.citas.route)
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
@@ -217,7 +218,7 @@ fun AgendaCitaScreen(
                                     showCancelDialog = true
                                 },
                                 onRescheduleClick = {
-                                    navController.navigate("reagendar_cita/${cita.idCita}")
+                                    navController.navigate(Screens.editarCitaScreen.pass(cita.idCita.toString()))
                                 },
                                 onCardClick = {
                                     viewModel.selectCita(cita)
