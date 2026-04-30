@@ -10,6 +10,19 @@ plugins {
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.google.firebase.crashlytics) apply false
+    alias(libs.plugins.kover)
+}
+
+tasks.register("qualityCheck") {
+    dependsOn(
+        ":app:testDebugUnitTest",
+        ":app:detekt",
+        ":app:ktlintCheck",
+        ":app:lintDebug",
+        ":app:koverHtmlReportDebug"
+    )
+    group = "Verification"
+    description = "Runs all unit tests, static analysis, and generates coverage reports."
 }
 
 sonar {

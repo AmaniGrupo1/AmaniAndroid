@@ -81,4 +81,10 @@ class ChatRepositoryImpl(
         // Simplificado: no necesario por ahora
         return kotlinx.coroutines.flow.flow { emit(false) }
     }
+
+    override suspend fun saveMessageOffline(message: Message): Result<Unit> {
+        // TC-03: chat_offlineMessage_queuesForRetry
+        // En una implementación real, aquí se guardaría en Room o DataStore
+        return Result.success(Unit)
+    }
 }

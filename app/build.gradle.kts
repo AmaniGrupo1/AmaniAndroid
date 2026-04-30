@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.kover)
     // alias(libs.plugins.google.gms.google.services)
 }
 
@@ -124,6 +125,12 @@ dependencies {
 
     // Tests
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
+
+    androidTestImplementation(libs.mockk.agent)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -148,6 +155,32 @@ detekt {
     buildUponDefaultConfig = true
     ignoreFailures = true
     source.setFrom(files("src/main/java", "src/main/kotlin"))
+}
+
+kover {
+    reports {
+        variant("debug") {
+            filters {
+                excludes {
+                    classes(
+                        "*.di.*",
+                        "*.ui.*",
+                        "*Activity",
+                        "*Application",
+                        "*.dto.*",
+                        "*.models.*",
+                        "*.R",
+                        "*.R$*"
+                    )
+                }
+            }
+            verify {
+                rule {
+                    minBound(7)
+                }
+            }
+        }
+    }
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

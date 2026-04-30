@@ -84,7 +84,8 @@ fun NuevoTicketScreen(
     val versionApp = remember {
         try {
             val info = context.packageManager.getPackageInfo(context.packageName, 0)
-            "${info.versionName} (${info.longVersionCode})"
+            val versionCode = androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(info)
+            "${info.versionName} ($versionCode)"
         } catch (_: Exception) {
             "Desconocida"
         }

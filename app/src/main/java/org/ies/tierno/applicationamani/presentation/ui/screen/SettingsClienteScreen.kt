@@ -14,8 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,10 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Pantalla de ajustes del perfil del cliente (paciente).
@@ -37,10 +36,13 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteVi
 @Composable
 fun SettingsClienteScreen(
     navController: NavController,
-    viewModel: SettingsClienteViewModel = viewModel()
+    viewModel: SettingsClienteViewModel = koinViewModel()
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+
+    var genderExpanded by remember { mutableStateOf(false) }
+    val genderOptions = listOf("Hombre", "Mujer", "No Binario")
 
     val consentimientoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -70,188 +72,243 @@ fun SettingsClienteScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            // Sección de Perfil / Foto
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // Sección de Perfil / Foto
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(colors.primaryContainer)
-                            .border(2.dp, colors.primary, CircleShape),
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(60.dp),
-                            tint = colors.primary
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .background(colors.primaryContainer)
+                                    .border(2.dp, colors.primary, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(60.dp),
+                                    tint = colors.primary
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.primary)
+                                        .padding(6.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "${viewModel.nombre} ${viewModel.apellidos}",
+                                style = typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    // Sección: Información Personal
+                    SettingsSection(title = "Información Personal", icon = Icons.Default.Badge) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            TextFieldCustom(
+                                "Nombre",
+                                viewModel.nombre,
+                                { viewModel.nombre = it },
+                                Icons.Default.Person,
+                                Modifier.weight(1f)
+                            )
+                            TextFieldCustom(
+                                "Apellidos",
+                                viewModel.apellidos,
+                                { viewModel.apellidos = it },
+                                Icons.Default.Person,
+                                Modifier.weight(1f)
+                            )
+                        }
+
+                        // Selector de Género
+                        Column {
+                            Text(
+                                text = "Género",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                            )
+                            ExposedDropdownMenuBox(
+                                expanded = genderExpanded,
+                                onExpandedChange = { genderExpanded = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = viewModel.genero,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                    leadingIcon = { Icon(Icons.Default.Transgender, contentDescription = null) },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                                    shape = RoundedCornerShape(14.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedContainerColor = colors.surface,
+                                        unfocusedContainerColor = colors.surface,
+                                        focusedBorderColor = colors.primary,
+                                        unfocusedBorderColor = colors.outlineVariant
+                                    )
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = genderExpanded,
+                                    onDismissRequest = { genderExpanded = false }
+                                ) {
+                                    genderOptions.forEach { option ->
+                                        DropdownMenuItem(
+                                            text = { Text(option) },
+                                            onClick = {
+                                                viewModel.genero = option
+                                                genderExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Sección: Contacto
+                    SettingsSection(title = "Contacto y Ubicación", icon = Icons.Default.ContactPage) {
+                        TextFieldCustom(
+                            "Teléfono",
+                            viewModel.telefono,
+                            { viewModel.telefono = it },
+                            Icons.Default.Phone,
+                            Modifier.fillMaxWidth()
                         )
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(colors.primary)
-                                .padding(6.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
+                        TextFieldCustom(
+                            "Dirección",
+                            viewModel.direccion,
+                            { viewModel.direccion = it },
+                            Icons.Default.Home,
+                            Modifier.fillMaxWidth()
+                        )
+                        TextFieldCustom(
+                            "Código Postal",
+                            viewModel.codigoPostal,
+                            { viewModel.codigoPostal = it },
+                            Icons.Default.MarkunreadMailbox,
+                            Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Sección: Documentación
+                    SettingsSection(title = "Documentación Legal", icon = Icons.Default.Description) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedButton(
+                                onClick = { consentimientoLauncher.launch("application/pdf") },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Default.UploadFile, contentDescription = null)
+                                    Text("Consentimiento", fontSize = 12.sp)
+                                }
+                            }
+                            OutlinedButton(
+                                onClick = { proteccionDatosLauncher.launch("application/pdf") },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Default.GppGood, contentDescription = null)
+                                    Text("Prot. Datos", fontSize = 12.sp)
+                                }
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "${viewModel.nombre} ${viewModel.apellidos}",
-                        style = typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
 
-            // Sección: Información Personal
-            SettingsSection(title = "Información Personal", icon = Icons.Default.Badge) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    TextFieldCustom(
-                        "Nombre",
-                        viewModel.nombre,
-                        { viewModel.nombre = it },
-                        Icons.Default.Person,
-                        Modifier.weight(1f)
-                    )
-                    TextFieldCustom(
-                        "Apellidos",
-                        viewModel.apellidos,
-                        { viewModel.apellidos = it },
-                        Icons.Default.Person,
-                        Modifier.weight(1f)
-                    )
-                }
-                TextFieldCustom(
-                    "Género",
-                    viewModel.genero,
-                    { viewModel.genero = it },
-                    Icons.Default.Transgender,
-                    Modifier.fillMaxWidth()
-                )
-            }
-
-            // Sección: Contacto
-            SettingsSection(title = "Contacto y Ubicación", icon = Icons.Default.ContactPage) {
-                TextFieldCustom(
-                    "Teléfono",
-                    viewModel.telefono,
-                    { viewModel.telefono = it },
-                    Icons.Default.Phone,
-                    Modifier.fillMaxWidth()
-                )
-                TextFieldCustom(
-                    "Dirección",
-                    viewModel.direccion,
-                    { viewModel.direccion = it },
-                    Icons.Default.Home,
-                    Modifier.fillMaxWidth()
-                )
-                TextFieldCustom(
-                    "Código Postal",
-                    viewModel.codigoPostal,
-                    { viewModel.codigoPostal = it },
-                    Icons.Default.MarkunreadMailbox,
-                    Modifier.fillMaxWidth()
-                )
-            }
-
-            // Sección: Documentación
-            SettingsSection(title = "Documentación Legal", icon = Icons.Default.Description) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedButton(
-                        onClick = { consentimientoLauncher.launch("application/pdf") },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.UploadFile, contentDescription = null)
-                            Text("Consentimiento", fontSize = 12.sp)
-                        }
-                    }
-                    OutlinedButton(
-                        onClick = { proteccionDatosLauncher.launch("application/pdf") },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.GppGood, contentDescription = null)
-                            Text("Prot. Datos", fontSize = 12.sp)
-                        }
-                    }
-                }
-            }
-
-            // Botón Guardar
-            Button(
-                onClick = { viewModel.guardarUsuario() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = ButtonDefaults.elevatedButtonElevation()
-            ) {
-                Icon(Icons.Default.Save, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Guardar cambios", fontWeight = FontWeight.Bold)
-            }
-
-            // Sección: Soporte
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.4f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
-                    Text("¿Necesitas ayuda?", style = typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text(
-                        "Reporta un bug o envía una sugerencia al equipo de soporte.",
-                        style = typography.bodySmall,
-                        textAlign = TextAlign.Center
-                    )
+                    // Botón Guardar
                     Button(
-                        onClick = { navController.navigate(Screens.nuevoTicket.route) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = colors.secondary)
+                        onClick = { viewModel.guardarUsuario() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = ButtonDefaults.elevatedButtonElevation()
                     ) {
-                        Text("Abrir ticket de soporte")
+                        Icon(Icons.Default.Save, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Guardar cambios", fontWeight = FontWeight.Bold)
                     }
+
+                    // Sección: Soporte
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.4f))
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
+                            Text("¿Necesitas ayuda?", style = typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text(
+                                "Reporta un bug o envía una sugerencia al equipo de soporte.",
+                                style = typography.bodySmall,
+                                textAlign = TextAlign.Center
+                            )
+                            Button(
+                                onClick = { navController.navigate(Screens.nuevoTicket.route) },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = colors.secondary)
+                            ) {
+                                Text("Abrir ticket de soporte")
+                            }
+                        }
+                    }
+
+                    // Eliminar cuenta
+                    TextButton(
+                        onClick = { viewModel.borrarCuenta() },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Icon(Icons.Default.DeleteForever, contentDescription = null, tint = colors.error)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Eliminar mi cuenta", color = colors.error, fontWeight = FontWeight.Medium)
+                    }
+
+                    // Mensaje de Error
+                    viewModel.errorMessage?.let { error ->
+                        Text(
+                            text = error,
+                            color = colors.error,
+                            style = typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-
-            // Eliminar cuenta
-            TextButton(
-                onClick = { viewModel.borrarCuenta() },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Icon(Icons.Default.DeleteForever, contentDescription = null, tint = colors.error)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Eliminar mi cuenta", color = colors.error, fontWeight = FontWeight.Medium)
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

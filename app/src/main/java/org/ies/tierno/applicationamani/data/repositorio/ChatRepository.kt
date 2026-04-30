@@ -34,4 +34,6 @@ interface ChatRepository {
     suspend fun markMessageAsRead(messageId: Long, receiverId: Long): Result<Unit>
     fun observeMessageDelivery(messageId: Long, receiverId: Long): Flow<Boolean>
     fun observeMessageRead(messageId: Long, receiverId: Long): Flow<Boolean>
+
+    suspend fun saveMessageOffline(message: Message): Result<Unit>
 }

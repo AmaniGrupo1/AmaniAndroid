@@ -11,7 +11,8 @@ data class Message(
     val timestamp: Long = System.currentTimeMillis(),
     val isRead: Boolean = false,
     val deliveredAt: Long? = null,
-    val readBy: Map<String, Long>? = null
+    val readBy: Map<String, Long>? = null,
+    val status: MessageStatus = MessageStatus.SENT
 ) {
     val isDelivered: Boolean
         get() = deliveredAt != null
