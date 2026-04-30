@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.di
 
 
+import EditProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.local.AuthEventChannel
@@ -122,6 +123,7 @@ val appModule = module {
     viewModel { CuestionarioViewModel(get()) }
     viewModel { ListarPacientesByPsicologoViewModel(get(), get()) }
     viewModel { ProfilePsicologoViewModel(get()) }
+    viewModel { EditProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get()) }
     viewModel { ListarCitasViewModel(get(), get()) }

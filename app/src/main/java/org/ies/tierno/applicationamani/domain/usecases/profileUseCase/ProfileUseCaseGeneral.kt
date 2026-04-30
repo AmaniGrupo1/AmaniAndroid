@@ -4,6 +4,7 @@ import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
 
 class ProfileUseCaseGeneral(val repository: ProfileRepository) {
 
@@ -32,6 +33,13 @@ class ProfileUseCaseGeneral(val repository: ProfileRepository) {
 
     suspend fun getPsicologoById(idPsicologo: Long): Result<PsicologoProfileResponseDTO> {
         return repository.getPsicologoById(idPsicologo)
+    }
+
+    suspend fun updatePsicologoProfile(
+        idPsicologo: Long,
+        profileData: UpdatePsicologoRequestDTO
+    ): Result<PsicologoProfileResponseDTO> {
+        return repository.updateProfile(idPsicologo, profileData)
     }
 
 }

@@ -82,6 +82,8 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePs
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
 import android.util.Log
+import androidx.compose.ui.text.style.TextAlign
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.koin.compose.koinInject
 
 private const val TAG = "PsicologoProfileScreen"
@@ -177,29 +179,6 @@ fun PsicologoProfileScreen(
                     actionColor = MaterialTheme.colorScheme.primary
                 )
             }
-        },
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Mi Perfil Profesional",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
-                ),
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
         }
     ) { paddingValues ->
         Box(
@@ -217,6 +196,7 @@ fun PsicologoProfileScreen(
                 perfil != null -> {
                     Log.d(TAG, "Estado: Mostrando contenido del perfil")
                     ProfileContent(
+                        navController,
                         perfil = perfil!!,
                         imageLoader = imageLoader,
                         onPhotoUpload = { uri ->
@@ -242,6 +222,7 @@ fun PsicologoProfileScreen(
 
 @Composable
 fun ProfileContent(
+    navControler: NavController,
     perfil: PsicologoProfileResponseDTO,
     imageLoader: coil.ImageLoader,
     onPhotoUpload: (Uri) -> Unit
@@ -513,7 +494,11 @@ fun ProfileContent(
         ) {
             OutlinedButton(
                 onClick = {
-                    Log.d(TAG, "Botón Editar Perfil clickeado")
+                    perfil.idPsicologo?.let { id ->
+                        navControler.navigate(
+                            Screens.editProfilePsicologo.createRoute(id)
+                        )
+                    }
                 },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
@@ -525,14 +510,14 @@ fun ProfileContent(
 
             Button(
                 onClick = {
-                    Log.d(TAG, "Botón Configuración clickeado")
+                    navControler.popBackStack()
                 },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Configuración")
+                Text("Cancelar")
             }
         }
     }
@@ -642,7 +627,7 @@ fun ErrorContent(
             text = error,
             fontSize = 14.sp,
             color = Color.Gray,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(

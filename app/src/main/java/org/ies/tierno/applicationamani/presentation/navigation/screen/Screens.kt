@@ -89,5 +89,10 @@
         object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
 
         object settingsAdmin : Screens("settingsAdmin")
+
+        object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}"){
+            fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
+        }
+
     }
 

@@ -42,6 +42,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EditProfilePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.RegistrarPacientePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsAdminScreen
@@ -251,6 +252,19 @@ fun NavGraph(
 
             composable(Screens.settingsAdmin.route){
                 SettingsAdminScreen(navController, userSessionDataStore)
+            }
+
+
+            composable(
+                route = Screens.editProfilePsicologo.route,
+                arguments = listOf(
+                    navArgument("identificador") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val idPsicologo = backStackEntry.arguments?.getLong("identificador") ?: 0L
+                EditProfilePsicologoScreen(navController, idPsicologo)
             }
         }
     }

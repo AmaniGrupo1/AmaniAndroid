@@ -4,9 +4,12 @@ package org.ies.tierno.applicationamani.data.remoto
 import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
@@ -42,5 +45,11 @@ interface ProfileApi {
     @GET("/api/psicologo/usuario/{id}")
     suspend fun getPsicologoById(
         @Path("id") id: Long
+    ): PsicologoProfileResponseDTO
+
+    @PUT("/api/psicologo/update/{id}")
+    suspend fun updateProfile(
+        @Path("id") id: Long,
+        @Body psicologoProfile: UpdatePsicologoRequestDTO
     ): PsicologoProfileResponseDTO
 }

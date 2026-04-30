@@ -4,6 +4,7 @@ import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
 
 class ProfileRepository(private val api: ProfileApi){
 
@@ -55,6 +56,18 @@ class ProfileRepository(private val api: ProfileApi){
     suspend fun getPsicologoById(idPsicologo: Long): Result<PsicologoProfileResponseDTO> {
         return try {
             val response = api.getPsicologoById(idPsicologo)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateProfile(
+        id: Long,
+        profile: UpdatePsicologoRequestDTO
+    ): Result<PsicologoProfileResponseDTO> {
+        return try {
+            val response = api.updateProfile(id, profile)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
