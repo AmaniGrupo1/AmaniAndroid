@@ -45,12 +45,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,7 +61,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
@@ -68,13 +72,14 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteV
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPacientePrincipalScreen(
     navController: NavController,
+    profilePsicologoViewModel: ProfilePsicologoViewModel,  // Para datos del paciente
     pacienteViewModel: PacienteViewModel = koinViewModel(),  // Para el psicólogo asignado
-    profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel(),  // Para datos del paciente
     userSessionDataStore: UserSessionDataStore = getKoin().get()
 ) {
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
@@ -376,6 +381,18 @@ fun NoPsicologoAssignedState(navController: NavController) {
     }
 }
 
+private const val BASE_URL = "http://192.168.1.175:8080"
+
+fun buildFullImageUrl(relativeUrl: String?): String {
+    if (relativeUrl.isNullOrEmpty()) return ""
+
+    return if (relativeUrl.startsWith("http")) {
+        relativeUrl
+    } else {
+        "$BASE_URL$relativeUrl"
+    }
+}
+
 @Composable
 fun PsicologoContent(
     psicologo: org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO,
@@ -424,15 +441,30 @@ fun PsicologoContent(
                             .clip(CircleShape)
                             .background(Color.White)
                     ) {
-                        val fotoUrl = psicologo.usuario?.fotoPerfilUrl
+                        val fotoUrl = buildFullImageUrl(psicologo.usuario?.fotoPerfilUrl)
 
+                        android.util.Log.d(
+                            "PacienteView",
+                            "URL original: ${psicologo.usuario?.fotoPerfilUrl}"
+                        )
+                        android.util.Log.d("PacienteView", "URL final: $fotoUrl")
+
+                        val context = LocalContext.current
+                        val tokenHolder = koinInject<TokenHolder>()
+                        val token = tokenHolder.getToken()
+
+                        val request = remember(fotoUrl, token) {
+                            ImageRequest.Builder(context)
+                                .data(fotoUrl)
+                                .addHeader("Authorization", "Bearer $token")
+                                .crossfade(true)
+                                .placeholder(R.drawable.ic_default_avatar)
+                                .error(R.drawable.ic_default_avatar)
+                                .build()
+                        }
                         if (!fotoUrl.isNullOrBlank()) {
                             Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = fotoUrl,
-                                    error = painterResource(R.drawable.ic_default_avatar),
-                                    placeholder = painterResource(R.drawable.ic_default_avatar)
-                                ),
+                                painter = rememberAsyncImagePainter(model = request),
                                 contentDescription = "Foto de perfil",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop

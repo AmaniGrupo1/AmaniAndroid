@@ -25,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -95,7 +94,6 @@ fun AgregaPsicologoScreen(
     val phoneError by loginViewModel.phoneError.collectAsStateWithLifecycle()
     val emailError by loginViewModel.emailError.collectAsStateWithLifecycle()
     val passwordError by loginViewModel.passwordError.collectAsStateWithLifecycle()
-    val aceptaTerminos by loginViewModel.aceptaTerminosPsicologo.collectAsStateWithLifecycle()
 
     val isRegistering by loginViewModel.isRegistering.collectAsStateWithLifecycle()
     val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
@@ -409,30 +407,6 @@ fun AgregaPsicologoScreen(
                             unfocusedBorderColor = Color.Gray
                         )
                     )
-                }
-            }
-
-            // ==================== SECCIÓN 3: TÉRMINOS Y CONDICIONES ====================
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = aceptaTerminos,
-                            onCheckedChange = { loginViewModel.setAceptaTerminosPsicologo(it) }
-                        )
-                        Text(
-                            "Acepto términos y condiciones",
-                            modifier = Modifier.weight(1f).clickable { loginViewModel.setAceptaTerminosPsicologo(!aceptaTerminos) }
-                        )
-                    }
                 }
             }
 

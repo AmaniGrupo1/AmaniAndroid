@@ -60,10 +60,6 @@ class LoginViewModel(
      * Ejecuta el proceso de inicio de sesión.
      * Válida los campos antes de realizar la llamada al caso de uso.
      */
-    /**
-     * Ejecuta el proceso de inicio de sesión.
-     * Válida los campos antes de realizar la llamada al caso de uso.
-     */
     fun login() {
         // Validaciones previas
         val usernameValue = _username.value
@@ -234,9 +230,6 @@ class LoginViewModel(
     private val _passwordError = MutableStateFlow<String?>(null)
     val passwordError: StateFlow<String?> = _passwordError
 
-    // ── Checkbox para términos ──
-    val aceptaTerminosPsicologo = MutableStateFlow(false)
-
     // ── Setters ──
     fun setNombre(value: String) { nombre.value = value }
     fun setApellido(value: String) { apellido.value = value }
@@ -266,7 +259,6 @@ class LoginViewModel(
     fun setPhoneError(error: String?) { _phoneError.value = error }
     fun setEmailError(error: String?) { _emailError.value = error }
     fun setPasswordError(error: String?) { _passwordError.value = error }
-    fun setAceptaTerminosPsicologo(value: Boolean) { aceptaTerminosPsicologo.value = value }
     fun setTelefonoPsicologo(value: String) { telefono.value = value }
 
     // Función para resetear estados de registro
@@ -279,7 +271,6 @@ class LoginViewModel(
         _phoneError.value = null
         _emailError.value = null
         _passwordError.value = null
-        aceptaTerminosPsicologo.value = false
     }
 
     // ── Dirección ──
@@ -374,7 +365,6 @@ class LoginViewModel(
         registroDescripcion.value = null
         registroLicencia.value = null
         _dateOfBirth.value = null
-        aceptaTerminosPsicologo.value = false
         clearAllErrors()
         resetRegisterState()
     }
@@ -631,8 +621,6 @@ class LoginViewModel(
         if (!isValidPhone(telefono.value)) return Pair(false, "telefono")
         // Validar especialidad
         if (registroEspecialidad.value.isBlank()) return Pair(false, "especialidad")
-        // Validar términos
-        if (!aceptaTerminosPsicologo.value) return Pair(false, "terminos")
 
         return Pair(true, null)
     }
@@ -656,7 +644,6 @@ class LoginViewModel(
                 "nombre" -> _registerError.value = "El nombre es obligatorio"
                 "apellido" -> _registerError.value = "El apellido es obligatorio"
                 "especialidad" -> _registerError.value = "La especialidad es obligatoria"
-                "terminos" -> _registerError.value = "Debes aceptar los términos y condiciones"
             }
             return
         }
@@ -675,7 +662,8 @@ class LoginViewModel(
                     especialidad = registroEspecialidad.value,
                     experiencia = registroExperiencia.value,
                     descripcion = registroDescripcion.value,
-                    licencia = registroLicencia.value
+                    licencia = registroLicencia.value,
+                    telefono = telefono.value
                 )
 
                 val result = loginUseCase.registrarPsicologo(psicologoRequest)
@@ -683,8 +671,7 @@ class LoginViewModel(
                 result.onSuccess { response ->
                     _registerSuccess.value = true
                     _registerError.value = null
-                    // Nota: El backend devuelve PsicologoSelfResponseDTO que no tiene idUsuario/rol
-                    // El usuario debe iniciar sesión manualmente después de registrar
+
                 }.onFailure { error ->
                     // Manejar email duplicado
                     if (error.message?.contains("email", ignoreCase = true) == true) {
@@ -792,5 +779,4 @@ class LoginViewModel(
         _crearPacienteDesdePsicologoError.value = null
         _isCreandoPacienteDesdePsicologo.value = false
     }
-
 }

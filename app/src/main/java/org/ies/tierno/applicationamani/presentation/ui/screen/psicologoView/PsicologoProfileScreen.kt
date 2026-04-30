@@ -93,7 +93,7 @@ private const val BASE_URL = "http://192.168.1.175:8080"
 fun PsicologoProfileScreen(
     psicologoId: Long,
     navController: NavController,
-    viewModel: ProfilePsicologoViewModel = koinViewModel()
+    viewModel: ProfilePsicologoViewModel
 ) {
 
     //INYECTO LA IMAGEN EN EL VIEWMODEL PARA QUE PUEDA GESTIONAR EL ESTADO DE LA URL Y FORZAR REFRESH DESDE ALLÍ

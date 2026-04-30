@@ -49,6 +49,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -66,6 +67,7 @@ fun NavGraph(
     val psicologoAgendaViewModel: PsicologoAgendaViewModel = koinViewModel()
     val listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
+    val profilePsicolgo : ProfilePsicologoViewModel = koinViewModel()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -169,12 +171,12 @@ fun NavGraph(
                 )
             ) { backStackEntry ->
                 val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
-                PsicologoProfileScreen(idPsicologo, navController)
+                PsicologoProfileScreen(idPsicologo, navController,profilePsicolgo)
             }
 
 
             composable(Screens.pacienteHome.route) {
-                ViewPacientePrincipalScreen(navController)
+                ViewPacientePrincipalScreen(navController,profilePsicolgo)
             }
 
             composable(Screens.chatList.route) {
