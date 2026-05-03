@@ -36,12 +36,21 @@ private val LightColorScheme = lightColorScheme(
     onPrimaryContainer = AmaniBlack,
     secondary          = AmaniPurpleDark,
     onSecondary        = AmaniWhite,
+    tertiary           = AmaniFuchsia,
+    onTertiary         = AmaniOnFuchsia,
+    tertiaryContainer  = AmaniFuchsiaContainer,
+    onTertiaryContainer = AmaniOnFuchsiaContainer,
+    error              = AmaniError,
+    onError            = AmaniOnError,
+    errorContainer     = AmaniErrorContainer,
+    onErrorContainer   = AmaniOnErrorContainer,
     background         = AmaniSurface,
     onBackground       = AmaniOnSurface,
     surface            = AmaniSurface,
     onSurface          = AmaniOnSurface,
     surfaceVariant     = AmaniWhite,
     outline            = AmaniBlack,
+    surfaceTint        = AmaniSurfaceTint,
 )
 
 /**
@@ -57,12 +66,21 @@ private val DarkColorScheme = darkColorScheme(
     onPrimaryContainer = AmaniWhite,
     secondary          = AmaniPurple,
     onSecondary        = AmaniBlack,
+    tertiary           = AmaniFuchsiaContainer,
+    onTertiary         = AmaniOnFuchsiaContainer,
+    tertiaryContainer  = AmaniFuchsia,
+    onTertiaryContainer = AmaniOnFuchsia,
+    error              = AmaniErrorContainer,
+    onError            = AmaniOnErrorContainer,
+    errorContainer     = AmaniError,
+    onErrorContainer   = AmaniOnError,
     background         = Color(0xFF1C1B1F),
     onBackground       = AmaniWhite,
     surface            = Color(0xFF1C1B1F),
     onSurface          = AmaniWhite,
     surfaceVariant     = Color(0xFF49454F),
     outline            = AmaniWhite,
+    surfaceTint        = AmaniSurfaceTint,
 )
 
 // ── Colores extra de Amani (no cubiertos por Material 3) ──────
@@ -85,11 +103,15 @@ data class AmaniExtraColors(
     val textFieldContainer: Color = AmaniWhite,
     val buttonBorder: Color = AmaniBlack,
     val citaLibre: Color = AmaniCitaLibre,
+    val citaLibreBg: Color = AmaniCalendarioBg,
     val citaOcupada: Color = AmaniCitaOcupada,
     val citaOcupadaBg: Color = AmaniCitaOcupadaBg,
     val citaConfirmada: Color = AmaniCitaConfirmada,
+    val citaConfirmadaBg: Color = AmaniCalendarioBg,
     val citaPendiente: Color = AmaniCitaPendiente,
+    val citaPendienteBg: Color = AmaniCalendarioBg,
     val citaCancelada: Color = AmaniCitaCancelada,
+    val citaCanceladaBg: Color = AmaniCitaOcupadaBg,
     val calendarioBg: Color = AmaniCalendarioBg,
 )
 
@@ -102,9 +124,11 @@ data class AmaniExtraColors(
 val LocalAmaniColors = staticCompositionLocalOf { AmaniExtraColors() }
 
 private val AmaniShapes = Shapes(
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(24.dp),
+    extraSmall = RoundedCornerShape(4.dp),
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(16.dp),
+    extraLarge = RoundedCornerShape(28.dp),
 )
 
 /**
@@ -130,10 +154,36 @@ fun ApplicationAmaniTheme(
         AmaniExtraColors(
             screenBackground = colorScheme.background,
             textFieldContainer = colorScheme.surfaceVariant,
-            buttonBorder = colorScheme.outline
+            buttonBorder = colorScheme.outline,
+            citaLibre = colorScheme.primary,
+            citaLibreBg = colorScheme.primaryContainer,
+            citaOcupada = colorScheme.tertiary,
+            citaOcupadaBg = colorScheme.tertiaryContainer,
+            citaConfirmada = colorScheme.secondary,
+            citaConfirmadaBg = colorScheme.secondaryContainer,
+            citaPendiente = colorScheme.secondaryContainer,
+            citaPendienteBg = colorScheme.secondaryContainer,
+            citaCancelada = colorScheme.error,
+            citaCanceladaBg = colorScheme.errorContainer,
+            calendarioBg = colorScheme.surfaceVariant
         )
     } else {
-        AmaniExtraColors()
+        AmaniExtraColors(
+            screenBackground = AmaniBackground,
+            textFieldContainer = AmaniWhite,
+            buttonBorder = AmaniBlack,
+            citaLibre = colorScheme.primary,
+            citaLibreBg = colorScheme.primaryContainer,
+            citaOcupada = colorScheme.tertiary,
+            citaOcupadaBg = colorScheme.tertiaryContainer,
+            citaConfirmada = colorScheme.secondary,
+            citaConfirmadaBg = colorScheme.secondaryContainer,
+            citaPendiente = colorScheme.secondaryContainer,
+            citaPendienteBg = colorScheme.secondaryContainer,
+            citaCancelada = colorScheme.error,
+            citaCanceladaBg = colorScheme.errorContainer,
+            calendarioBg = colorScheme.surfaceVariant
+        )
     }
 
     androidx.compose.runtime.CompositionLocalProvider(

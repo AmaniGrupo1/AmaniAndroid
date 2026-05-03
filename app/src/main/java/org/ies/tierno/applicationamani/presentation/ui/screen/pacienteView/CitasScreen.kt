@@ -172,8 +172,8 @@ fun CitasScreen(
                     val fechaParaCargar = fechaSeleccionada ?: LocalDate.now()
                     viewModel.cargarDisponibilidadDia(fechaParaCargar)
                 },
-                containerColor = colors.primary,
-                contentColor = colors.onPrimary
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Nueva cita")
             }

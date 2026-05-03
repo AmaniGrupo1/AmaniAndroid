@@ -105,7 +105,11 @@ fun NavGraph(
                 ViewPsicologoPrincipal(userSessionDataStore, navController)
             }
             composable(Screens.registro.route) {
-                RegisterScreen(navController, loginViewModel, situacionViewModel)
+                RegisterScreen(
+                    onBack = { navController.popBackStack() },
+                    loginViewModel = loginViewModel,
+                    situacionViewModel = situacionViewModel
+                )
             }
             composable(Screens.questionnaire.route) {
                 QuestionnaireScreen(navController)
@@ -114,14 +118,19 @@ fun NavGraph(
                 PrincipalClienteScreen(navController)
             }
             composable(Screens.settingsCliente.route) {
-                SettingsClienteScreen(navController)
+                SettingsClienteScreen(
+                    onNavigateToSupport = { navController.navigate(Screens.nuevoTicket.route) }
+                )
             }
             composable(Screens.settingsPsicologo.route) {
                 val idPsicologo = session?.idPsicologo ?: 0L
                 SettingsPsicologoScreen(idPsicologo, navController)
             }
             composable(Screens.agregarPsicologo.route) {
-                AgregaPsicologoScreen(navController, loginViewModel)
+                AgregaPsicologoScreen(
+                    onBack = { navController.popBackStack() },
+                    loginViewModel = loginViewModel
+                )
             }
             composable(Screens.test.route) {
                 TestScreen(navController)
@@ -175,7 +184,10 @@ fun NavGraph(
                 )
             ) { backStackEntry ->
                 val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
-                PsicologoProfileScreen(idPsicologo, navController)
+                PsicologoProfileScreen(
+                    psicologoId = idPsicologo,
+                    onBack = { navController.popBackStack() }
+                )
             }
 
             composable(Screens.pacienteHome.route) {

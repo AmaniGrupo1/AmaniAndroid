@@ -74,7 +74,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgregaPsicologoScreen(
-    navController: NavController,
+    onBack: () -> Unit,
     loginViewModel: LoginViewModel
 ) {
     val primaryColor = Color(0xFF6B4E71) // Amani Primary
@@ -142,7 +142,7 @@ fun AgregaPsicologoScreen(
             scope.launch {
                 delay(1500)
                 loginViewModel.limpiarFormularioPsicologo()
-                navController.popBackStack()
+                onBack()
             }
         }
     }
@@ -155,7 +155,7 @@ fun AgregaPsicologoScreen(
                 title = { Text("Registrar Psicólogo", color = Color.White) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",

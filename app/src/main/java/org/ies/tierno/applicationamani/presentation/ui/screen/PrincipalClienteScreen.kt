@@ -60,7 +60,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteV
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalClienteViewModel = viewModel()) {
-    val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -136,7 +135,8 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         .fillMaxWidth()
                         .height(200.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = colors.primary
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Box(
@@ -150,7 +150,8 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = colors.primary
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Column(
@@ -159,6 +160,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         Text(
                             text = "N. Psico",
                             style = typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(16.dp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -166,6 +168,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         Text(
                             "Biografía",
                             style = typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(16.dp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -177,6 +180,7 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                                 Text(
                                     especialidad,
                                     style = typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(16.dp),
                                 )
                             }

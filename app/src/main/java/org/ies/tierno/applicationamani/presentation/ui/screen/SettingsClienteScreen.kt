@@ -35,7 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsClienteScreen(
-    navController: NavController,
+    onNavigateToSupport: () -> Unit,
     viewModel: SettingsClienteViewModel = koinViewModel()
 ) {
     val colors = MaterialTheme.colorScheme
@@ -59,11 +59,6 @@ fun SettingsClienteScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Configuración", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colors.primary,
                     titleContentColor = Color.White,
@@ -276,7 +271,7 @@ fun SettingsClienteScreen(
                                 textAlign = TextAlign.Center
                             )
                             Button(
-                                onClick = { navController.navigate(Screens.nuevoTicket.route) },
+                                onClick = onNavigateToSupport,
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = colors.secondary)
                             ) {

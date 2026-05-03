@@ -59,8 +59,9 @@ val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = Nunito,
         fontWeight = FontWeight.Normal,
-        fontSize = 50.sp,
-        lineHeight = 56.sp,
+        fontSize = 57.sp,
+        lineHeight = 64.sp,
+        letterSpacing = (-0.25).sp,
     ),
 
     // Barlow Condensed – encabezados de pantalla ("Crear cuenta")
@@ -90,9 +91,10 @@ val Typography = Typography(
     // Roboto – subtítulos / texto destacado (biografía, preguntas)
     titleMedium = TextStyle(
         fontFamily = Roboto,
-        fontWeight = FontWeight.Normal,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp,
     ),
 
     // Roboto – cuerpo principal (descripciones, párrafos)

@@ -83,7 +83,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    navController: NavController,
+    onBack: () -> Unit,
     loginViewModel: LoginViewModel,
     situacionViewModel: SituacionViewModel
 ) {
@@ -154,7 +154,7 @@ fun RegisterScreen(
                 title = { Text("Registrar Paciente", color = Color.White) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
@@ -868,7 +868,7 @@ fun RegisterScreen(
         AlertDialog(
             onDismissRequest = {
                 showSuccessDialog = false
-                navController.navigateUp()
+                onBack()
             },
             icon = {
                 Icon(
@@ -895,7 +895,7 @@ fun RegisterScreen(
                 TextButton(
                     onClick = {
                         showSuccessDialog = false
-                        navController.navigateUp()
+                        onBack()
                     }
                 ) {
                     Text("Aceptar", color = primaryColor, fontFamily = roboto)

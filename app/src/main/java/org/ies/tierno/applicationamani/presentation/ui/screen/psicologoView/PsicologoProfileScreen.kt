@@ -75,7 +75,7 @@ import java.io.FileOutputStream
 @Composable
 fun PsicologoProfileScreen(
     psicologoId: Long,
-    navController: NavController,
+    onBack: () -> Unit,
     viewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
     val perfil by viewModel.perfil.collectAsState()
@@ -108,7 +108,7 @@ fun PsicologoProfileScreen(
                     titleContentColor = Color.White
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { /* Navegar hacia atrás */ }) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
                     }
                 }

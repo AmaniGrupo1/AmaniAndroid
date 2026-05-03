@@ -1,6 +1,6 @@
 [versions]
 #9.1.0
-agp = "9.1.1"
+agp = "9.2.0"
 coilCompose = "2.7.0"
 converterGson = "3.0.0"
 coreKtx = "1.17.0"
@@ -47,6 +47,7 @@ workRuntimeKtx = "2.11.2"
 room = "2.8.4"
 firebaseCrashlytics = "20.0.5"
 googleFirebaseCrashlytics = "3.0.7"
+material = "1.12.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -100,6 +101,7 @@ mockk-agent = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesCore" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

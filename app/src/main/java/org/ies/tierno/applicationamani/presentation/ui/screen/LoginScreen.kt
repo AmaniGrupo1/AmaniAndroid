@@ -117,7 +117,7 @@ fun LoginScreen(
             }
 
             navController.navigate(destination) {
-                popUpTo(Screens.login.route) { inclusive = true }
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 launchSingleTop = true
             }
             loginViewModel.clearLoginFields()
@@ -184,12 +184,14 @@ fun LoginScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo con sombra
-            Box(
+            // Logo con elevación tonal
+            androidx.compose.material3.Surface(
                 modifier = Modifier
                     .size(140.dp)
-                    .imePadding()
-                    .shadow(8.dp, RoundedCornerShape(70.dp))
+                    .imePadding(),
+                shape = androidx.compose.foundation.shape.CircleShape,
+                tonalElevation = 2.dp,
+                shadowElevation = 1.dp
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
@@ -203,11 +205,10 @@ fun LoginScreenContent(
             // Nombre de la marca
             Text(
                 text = "AMANI",
-                style = typography.displayLarge?.copy(
-                    fontSize = 56.sp,
+                style = MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
-                ) ?: MaterialTheme.typography.displayLarge,
+                ),
                 color = AmaniLoginColors.Primary
             )
 
@@ -222,13 +223,11 @@ fun LoginScreenContent(
             )
 
             // Tarjeta de inicio de sesión
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(28.dp)),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = AmaniLoginColors.Surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            androidx.compose.material3.ElevatedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = CardDefaults.elevatedCardColors(containerColor = AmaniLoginColors.Surface),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -296,9 +295,9 @@ fun LoginScreenContent(
                         enabled = !isLoggingIn,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            // TEXTO PRINCIPAL - NEGRO VISIBLE
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
+                            // TEXTO PRINCIPAL
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             // LABEL
                             focusedLabelColor = AmaniLoginColors.Primary,
                             unfocusedLabelColor = AmaniLoginColors.TextSecondary,
@@ -312,8 +311,8 @@ fun LoginScreenContent(
                             unfocusedBorderColor = AmaniLoginColors.TextSecondary.copy(alpha = 0.3f),
                             errorBorderColor = AmaniLoginColors.Error,
                             // FONDO
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
 
@@ -365,9 +364,9 @@ fun LoginScreenContent(
                         enabled = !isLoggingIn,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            // TEXTO PRINCIPAL - NEGRO VISIBLE
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
+                            // TEXTO PRINCIPAL
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             // LABEL
                             focusedLabelColor = AmaniLoginColors.Primary,
                             unfocusedLabelColor = AmaniLoginColors.TextSecondary,
@@ -381,8 +380,8 @@ fun LoginScreenContent(
                             unfocusedBorderColor = AmaniLoginColors.TextSecondary.copy(alpha = 0.3f),
                             errorBorderColor = AmaniLoginColors.Error,
                             // FONDO
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
 
@@ -410,7 +409,7 @@ fun LoginScreenContent(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(20.dp),
                                     strokeWidth = 2.dp,
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(

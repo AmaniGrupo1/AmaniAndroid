@@ -193,7 +193,7 @@ fun AmaniBottomBar(
     NavigationBar(
         modifier = modifier.navigationBarsPadding(),
         containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp
+        tonalElevation = 3.dp
     ) {
         items.forEach { item ->
             val isSelected = item.route != null && currentRoute == item.route

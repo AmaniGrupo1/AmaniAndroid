@@ -186,7 +186,7 @@ private fun IndicadorLeyenda(color: Color, texto: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(10.dp)
+                .size(16.dp)
                 .clip(CircleShape)
                 .background(color)
         )
