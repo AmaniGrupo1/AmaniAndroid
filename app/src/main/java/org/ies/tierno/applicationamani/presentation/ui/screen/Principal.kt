@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,72 +37,95 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
+import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPrincipal
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
 // Colores corporativos AMANI Psicología
 object AmaniPrincipalColors {
-    val Primary = Color(0xFF6B4E71)      // Morado principal
-    val PrimaryLight = Color(0xFF9B7E9F)  // Morado claro
-    val PrimaryDark = Color(0xFF4A2B50)   // Morado oscuro
-    val Secondary = Color(0xFFE8B4B8)     // Rosa suave
-    val Accent = Color(0xFFF5E6E8)        // Fondo claro
-    val Gold = Color(0xFFD4AF37)          // Dorado para detalles
-    val TextPrimary = Color(0xFF2D1B30)   // Texto principal
-    val TextSecondary = Color(0xFF7A6B7E) // Texto secundario
-    val Surface = Color(0xFFFFFFFF)       // Superficie blanca
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Gold = Color(0xFFD4AF37)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Surface = Color(0xFFFFFFFF)
 }
 
-/**
- * Frases motivacionales de AMANI Psicología
- */
-val frasesMotivacionales = listOf(
-    "🌿 Cada paso que das hacia tu bienestar es un acto de amor propio",
-    "🌸 La sanación comienza cuando te permites sentir",
-    "💜 Tu salud mental es tan importante como tu salud física",
-    "🌟 Eres más fuerte de lo que crees y más amado de lo que imaginas",
-    "🍃 No estás roto, solo estás en proceso de transformación",
-    "✨ Permítete crecer a tu propio ritmo",
-    "🌙 Descansar también es parte del camino hacia el bienestar",
-    "💫 La terapia es un regalo que te haces a ti mismo"
-)
+// Función para obtener las frases según el idioma actual
+fun getFrasesMotivacionales(context: Context): List<String> {
+    val resources = context.resources
+    return listOf(
+        resources.getString(R.string.frase_1),
+        resources.getString(R.string.frase_2),
+        resources.getString(R.string.frase_3),
+        resources.getString(R.string.frase_4),
+        resources.getString(R.string.frase_5),
+        resources.getString(R.string.frase_6),
+        resources.getString(R.string.frase_7),
+        resources.getString(R.string.frase_8)
+    )
+}
 
-/**
- * Consejos aleatorios de AMANI Psicología
- */
-val consejosLista = listOf(
-    "🧘‍♀️ Tómate 5 minutos al día para respirar profundamente",
-    "📝 Escribe tres cosas por las que estás agradecido cada noche",
-    "💬 No tengas miedo de pedir ayuda cuando la necesites",
-    "🚶‍♂️ Una caminata corta al aire libre puede mejorar tu estado de ánimo",
-    "😴 Duerme al menos 7-8 horas para una buena salud mental",
-    "🎨 Encuentra un hobby creativo que te haga feliz",
-    "📱 Desconéctate de las redes sociales una hora antes de dormir",
-    "🤗 Acepta tus emociones, todas son válidas"
-)
+// Función para obtener los consejos según el idioma actual
+fun getConsejosLista(context: Context): List<String> {
+    val resources = context.resources
+    return listOf(
+        resources.getString(R.string.consejo_1),
+        resources.getString(R.string.consejo_2),
+        resources.getString(R.string.consejo_3),
+        resources.getString(R.string.consejo_4),
+        resources.getString(R.string.consejo_5),
+        resources.getString(R.string.consejo_6),
+        resources.getString(R.string.consejo_7),
+        resources.getString(R.string.consejo_8)
+    )
+}
 
-/**
- * Pantalla principal de bienvenida de AMANI Psicología.
- *
- * @param navController Controlador de navegación para transiciones entre pantallas.
- */
 @Composable
-fun Principal(navController: NavController) {
+fun Principal(
+    navController: NavController,
+    userSessionDataStore: UserSessionDataStore
+) {
     val typography = MaterialTheme.typography
+    val context = LocalContext.current
+
+    // ✅ Obtener el idioma desde la sesión (igual que en SettingsAdminScreen)
+    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+    val currentLanguage = session?.idioma ?: "es"
+
+    // ✅ Forzar recomposición cuando cambia el idioma
+    val frasesMotivacionales = remember(currentLanguage) {
+        getFrasesMotivacionales(context)
+    }
+    val consejosLista = remember(currentLanguage) {
+        getConsejosLista(context)
+    }
 
     var mostrarConsejo by remember { mutableStateOf(false) }
     var consejoActual by remember { mutableStateOf("") }
     var fraseActual by remember { mutableStateOf(frasesMotivacionales[0]) }
 
-    // Función para cambiar a una frase aleatoria diferente
+    // ✅ Actualizar cuando cambia el idioma
+    LaunchedEffect(currentLanguage) {
+        val nuevasFrases = getFrasesMotivacionales(context)
+        fraseActual = nuevasFrases[0]
+        if (mostrarConsejo) {
+            consejoActual = getConsejosLista(context).random()
+        }
+    }
+
     fun cambiarFrase() {
         val otrasFrases = frasesMotivacionales.filter { it != fraseActual }
         fraseActual = if (otrasFrases.isNotEmpty()) {
@@ -111,10 +135,9 @@ fun Principal(navController: NavController) {
         }
     }
 
-    // Cambiar frase automáticamente cada 15 segundos
     LaunchedEffect(Unit) {
         while (true) {
-            delay(15000) // 15 segundos
+            delay(15000)
             cambiarFrase()
         }
     }
@@ -141,9 +164,8 @@ fun Principal(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo / Nombre de la marca
             Text(
-                text = "AMANI",
+                text = stringResource(R.string.amani),
                 style = typography.displayLarge?.copy(
                     fontSize = 56.sp,
                     fontWeight = FontWeight.Bold,
@@ -153,9 +175,8 @@ fun Principal(navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Subtítulo
             Text(
-                text = "Psicología y Bienestar",
+                text = stringResource(R.string.psicologia_bienestar),
                 style = typography.titleMedium?.copy(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
@@ -164,7 +185,6 @@ fun Principal(navController: NavController) {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Tarjeta de frase motivacional
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,7 +199,6 @@ fun Principal(navController: NavController) {
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Icono clickable para cambiar frase manualmente
                     Icon(
                         imageVector = Icons.Default.SelfImprovement,
                         contentDescription = "Cambiar frase",
@@ -190,7 +209,6 @@ fun Principal(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Texto de la frase
                     Text(
                         text = fraseActual,
                         style = typography.bodyLarge?.copy(
@@ -203,7 +221,6 @@ fun Principal(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Indicadores visuales
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -216,7 +233,7 @@ fun Principal(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Tap para nueva frase",
+                            text = stringResource(R.string.tap_nueva_frase),
                             style = typography.labelSmall?.copy(
                                 fontSize = 12.sp,
                                 color = AmaniPrincipalColors.TextSecondary
@@ -234,7 +251,6 @@ fun Principal(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón Consejo (único botón)
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -257,7 +273,7 @@ fun Principal(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Recibir Consejo de Bienestar",
+                    text = stringResource(R.string.recibir_consejo),
                     style = typography.labelLarge?.copy(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
@@ -265,7 +281,6 @@ fun Principal(navController: NavController) {
                 )
             }
 
-            // Mostrar consejo
             if (mostrarConsejo) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Card(
@@ -283,7 +298,7 @@ fun Principal(navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "💫 Consejo del Día",
+                            text = stringResource(R.string.consejo_dia),
                             style = typography.titleSmall?.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = AmaniPrincipalColors.Primary
@@ -301,7 +316,7 @@ fun Principal(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "✖ Tap para cerrar",
+                            text = stringResource(R.string.tap_cerrar),
                             style = typography.labelSmall?.copy(
                                 fontSize = 12.sp,
                                 color = AmaniPrincipalColors.TextSecondary

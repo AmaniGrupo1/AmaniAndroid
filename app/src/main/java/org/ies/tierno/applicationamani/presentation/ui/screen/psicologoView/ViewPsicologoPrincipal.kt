@@ -24,22 +24,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Phone
-import androidx.compose.material.icons.outlined.Wc
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -63,14 +61,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
@@ -152,14 +152,14 @@ fun ViewPsicologoPrincipal(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Error de sesión",
+                    text = stringResource(R.string.error_sesion),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = AmaniPsicologoColors.TextPrimary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "No se encontró el ID del psicólogo",
+                    text = stringResource(R.string.no_encontrado_id_psicologo),
                     fontSize = 14.sp,
                     color = AmaniPsicologoColors.TextSecondary
                 )
@@ -172,7 +172,7 @@ fun ViewPsicologoPrincipal(
                         contentColor = Color.White
                     )
                 ) {
-                    Text("Volver al login")
+                    Text(stringResource(R.string.volver_login))
                 }
             }
         }
@@ -189,7 +189,7 @@ fun ViewPsicologoPrincipal(
                 }
             ) {
                 Icon(
-                    Icons.Default.Add, contentDescription = "Agregar paciente"
+                    Icons.Default.Add, contentDescription = stringResource(R.string.agregar_paciente)
                 )
             }
         }
@@ -222,13 +222,13 @@ private fun LoadingState() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Cargando tus pacientes...",
+                text = stringResource(R.string.cargando_pacientes),
                 color = AmaniPsicologoColors.TextSecondary,
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Esto puede tomar unos segundos",
+                text = stringResource(R.string.puede_tomar_segundos),
                 color = AmaniPsicologoColors.TextSecondary.copy(alpha = 0.7f),
                 fontSize = 12.sp
             )
@@ -251,14 +251,14 @@ private fun EmptyState() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "No tienes pacientes asignados",
+                text = stringResource(R.string.no_tienes_pacientes),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = AmaniPsicologoColors.TextPrimary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Cuando te asignen pacientes, aparecerán aquí",
+                text = stringResource(R.string.cuando_asignen_pacientes),
                 fontSize = 14.sp,
                 color = AmaniPsicologoColors.TextSecondary,
                 textAlign = TextAlign.Center
@@ -271,7 +271,7 @@ private fun EmptyState() {
 @Composable
 private fun PacientesList(
     pacientes: List<PacientePsicologoResponseDTO>,
-    listState: androidx.compose.foundation.lazy.LazyListState
+    listState: LazyListState
 ) {
     LazyColumn(
         state = listState,
@@ -313,7 +313,7 @@ private fun HeaderStats(totalPacientes: Int) {
         ) {
             Column {
                 Text(
-                    text = "Total de Pacientes",
+                    text = stringResource(R.string.total_pacientes),
                     fontSize = 14.sp,
                     color = Color.White.copy(alpha = 0.9f)
                 )
@@ -324,7 +324,7 @@ private fun HeaderStats(totalPacientes: Int) {
                     color = Color.White
                 )
                 Text(
-                    text = "Asignados a tu consulta",
+                    text = stringResource(R.string.asignados_consulta),
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.8f)
                 )
@@ -360,13 +360,11 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Header siempre visible
             PacienteHeader(
                 paciente = paciente,
                 esMenor = esMenor
             )
 
-            // Contenido expandible
             AnimatedVisibility(
                 visible = expanded,
                 enter = expandVertically(
@@ -407,7 +405,6 @@ fun PacienteHeader(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar con iniciales
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -430,7 +427,6 @@ fun PacienteHeader(
                     )
                 }
 
-                // Información básica del paciente
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -439,7 +435,7 @@ fun PacienteHeader(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "${paciente.nombre ?: "Sin nombre"} ${paciente.apellido ?: ""}".trim(),
+                            text = "${paciente.nombre ?: stringResource(R.string.sin_nombre)} ${paciente.apellido ?: ""}".trim(),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = AmaniPsicologoColors.TextPrimary
@@ -457,12 +453,12 @@ fun PacienteHeader(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Warning,
-                                        contentDescription = "Menor de edad",
+                                        contentDescription = stringResource(R.string.menor),
                                         modifier = Modifier.size(12.dp),
                                         tint = AmaniPsicologoColors.Warning
                                     )
                                     Text(
-                                        text = "Menor",
+                                        text = stringResource(R.string.menor),
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = AmaniPsicologoColors.Warning
@@ -485,7 +481,7 @@ fun PacienteHeader(
                             tint = AmaniPsicologoColors.TextSecondary
                         )
                         Text(
-                            text = paciente.email ?: "Email no disponible",
+                            text = paciente.email ?: stringResource(R.string.email_no_disponible),
                             fontSize = 12.sp,
                             color = AmaniPsicologoColors.TextSecondary,
                             maxLines = 1,
@@ -504,7 +500,7 @@ fun PacienteHeader(
                             tint = AmaniPsicologoColors.TextSecondary
                         )
                         Text(
-                            text = paciente.telefono ?: "Teléfono no disponible",
+                            text = paciente.telefono ?: stringResource(R.string.telefono_no_disponible),
                             fontSize = 12.sp,
                             color = AmaniPsicologoColors.TextSecondary
                         )
@@ -528,7 +524,7 @@ fun ExpandedContent(
             .padding(16.dp)
     ) {
         Text(
-            text = "📋 Información Detallada",
+            text = stringResource(R.string.informacion_detallada),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             color = AmaniPsicologoColors.TextPrimary,
@@ -538,38 +534,43 @@ fun ExpandedContent(
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Datos Personales
             InfoSection(
-                title = "Datos Personales",
+                title = stringResource(R.string.datos_personales),
                 icon = Icons.Default.Person,
                 items = listOf(
-                    "Nombre completo" to "${paciente.nombre ?: "N/A"} ${paciente.apellido ?: ""}".trim(),
-                    "DNI" to (paciente.dni ?: "No registrado"),
-                    "Fecha de nacimiento" to formatearFechaDesdeString(paciente.fechaNacimiento),
-                    "Edad" to "${calcularEdadDesdeString(paciente.fechaNacimiento)} años",
-                    "Género" to (paciente.genero ?: "No especificado"),
-                    "Email" to (paciente.email ?: "No disponible"),
-                    "Teléfono" to (paciente.telefono ?: "No disponible")
+                    stringResource(R.string.nombre_completo) to "${paciente.nombre ?: stringResource(R.string.no_disponible)} ${paciente.apellido ?: ""}".trim(),
+                    stringResource(R.string.dni) to (paciente.dni ?: stringResource(R.string.no_registrado)),
+                    stringResource(R.string.fecha_nacimiento) to formatearFechaDesdeString(paciente.fechaNacimiento),
+                    stringResource(R.string.edad) to "${calcularEdadDesdeString(paciente.fechaNacimiento)} ${stringResource(R.string.anios)}",
+                    stringResource(R.string.genero) to (paciente.genero?.let {
+                        when(it) {
+                            "MASCULINO" -> stringResource(R.string.masculino)
+                            "FEMENINO" -> stringResource(R.string.femenino)
+                            "OTRO" -> stringResource(R.string.otro)
+                            "PREFIERO_NO_DECIR" -> stringResource(R.string.prefiero_no_decir)
+                            else -> it
+                        }
+                    } ?: stringResource(R.string.no_especificado)),
+                    stringResource(R.string.email) to (paciente.email ?: stringResource(R.string.no_disponible)),
+                    stringResource(R.string.telefono) to (paciente.telefono ?: stringResource(R.string.no_disponible))
                 )
             )
 
-            // Información de Tutores (si es menor de edad)
             val tutores = paciente.tutor ?: emptyList()
             if (esMenor && tutores.isNotEmpty()) {
                 TutorInfoSection(tutores = tutores)
             }
 
-            // Dirección
             paciente.direccion?.let { direccion ->
                 InfoSection(
-                    title = "📍 Dirección",
+                    title = stringResource(R.string.direccion),
                     icon = Icons.Default.Person,
                     items = listOf(
-                        "Calle" to (direccion.calle ?: "No disponible"),
-                        "Ciudad" to (direccion.ciudad ?: "No disponible"),
-                        "Provincia" to (direccion.provincia ?: "No disponible"),
-                        "Código Postal" to (direccion.codigoPostal ?: "No disponible"),
-                        "País" to (direccion.pais ?: "No disponible")
+                        stringResource(R.string.calle) to (direccion.calle ?: stringResource(R.string.no_disponible)),
+                        stringResource(R.string.ciudad) to (direccion.ciudad ?: stringResource(R.string.no_disponible)),
+                        stringResource(R.string.provincia) to (direccion.provincia ?: stringResource(R.string.no_disponible)),
+                        stringResource(R.string.codigo_postal) to (direccion.codigoPostal ?: stringResource(R.string.no_disponible)),
+                        stringResource(R.string.pais) to (direccion.pais ?: stringResource(R.string.no_disponible))
                     )
                 )
             }
@@ -601,7 +602,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                     tint = AmaniPsicologoColors.Warning
                 )
                 Text(
-                    text = "👨‍👩‍👧 Datos del Tutor / Responsable",
+                    text = stringResource(R.string.datos_tutor_responsable),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = AmaniPsicologoColors.Warning
@@ -618,7 +619,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                 ) {
                     if (tutores.size > 1) {
                         Text(
-                            text = "Tutor ${index + 1}",
+                            text = "${stringResource(R.string.tutor)} ${index + 1}",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             color = AmaniPsicologoColors.Primary
@@ -644,7 +645,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                                 color = AmaniPsicologoColors.TextPrimary
                             )
                             Text(
-                                text = "DNI: ${tutor.dni}",
+                                text = "${stringResource(R.string.dni)}: ${tutor.dni}",
                                 fontSize = 11.sp,
                                 color = AmaniPsicologoColors.TextSecondary
                             )
@@ -664,7 +665,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                             tint = AmaniPsicologoColors.TextSecondary
                         )
                         Text(
-                            tutor.telefono ?: "No disponible",
+                            tutor.telefono ?: stringResource(R.string.no_disponible),
                             fontSize = 12.sp,
                             color = AmaniPsicologoColors.TextPrimary
                         )
@@ -681,7 +682,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                             tint = AmaniPsicologoColors.TextSecondary
                         )
                         Text(
-                            text = tutor.email ?: "No disponible",
+                            text = tutor.email ?: stringResource(R.string.no_disponible),
                             fontSize = 12.sp,
                             color = AmaniPsicologoColors.TextPrimary
                         )
@@ -698,7 +699,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                             tint = AmaniPsicologoColors.TextSecondary
                         )
                         Text(
-                            text = "Tipo: ${tutor.tipo}",
+                            text = "${stringResource(R.string.parentesco)}: ${tutor.tipo}",
                             fontSize = 12.sp,
                             color = AmaniPsicologoColors.TextPrimary
                         )
@@ -720,7 +721,7 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
 @Composable
 fun InfoSection(
     title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     items: List<Pair<String, String>>
 ) {
     Card(
@@ -766,7 +767,7 @@ fun InfoSection(
                         color = AmaniPsicologoColors.TextSecondary
                     )
                     Text(
-                        text = value.ifEmpty { "No disponible" },
+                        text = value.ifEmpty { stringResource(R.string.no_disponible) },
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         color = AmaniPsicologoColors.TextPrimary
@@ -803,9 +804,10 @@ private fun esMenorDeEdad(fechaNacimientoStr: String?): Boolean {
     return calcularEdadDesdeString(fechaNacimientoStr) < 18
 }
 
+@Composable
 @RequiresApi(Build.VERSION_CODES.O)
 private fun formatearFechaDesdeString(fechaStr: String?): String {
-    if (fechaStr.isNullOrEmpty()) return "No disponible"
+    if (fechaStr.isNullOrEmpty()) return stringResource(R.string.no_disponible)
     return try {
         val formatterInput = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val fecha = LocalDate.parse(fechaStr, formatterInput)

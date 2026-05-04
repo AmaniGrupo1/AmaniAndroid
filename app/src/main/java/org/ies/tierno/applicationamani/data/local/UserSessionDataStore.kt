@@ -20,7 +20,8 @@ data class UserSession(
     val nombre: String?, // Permitimos nulo aquí también
     val rol: String,
     val idPsicologo: Long? = null,
-    val idPaciente: Long? = null
+    val idPaciente: Long? = null,
+    val idioma : String? = "es" // Valor por defecto a español
 )
 
 class UserSessionDataStore(private val context: Context) {
@@ -32,6 +33,8 @@ class UserSessionDataStore(private val context: Context) {
         val PSYCHOLOGIST_ID_KEY = longPreferencesKey("psychologist_id")
 
         val PATIENT_ID_KEY = longPreferencesKey("patient_id")
+
+        val LANGUAGE_KEY = stringPreferencesKey("language")
     }
 
     val sessionFlow: Flow<UserSession?> = context.userSessionDataStore.data.map { preferences ->
@@ -40,6 +43,7 @@ class UserSessionDataStore(private val context: Context) {
         val rol = preferences[USER_ROLE_KEY]
         val idPsicologo = preferences[PSYCHOLOGIST_ID_KEY]
         val idPaciente = preferences[PATIENT_ID_KEY]
+        val idioma = preferences[LANGUAGE_KEY]
 
         // Normalizar valores: si el id del psicólogo existe pero es 0 -> tratar como null
         val normalizedPsychologistId = when (idPsicologo) {
@@ -55,7 +59,8 @@ class UserSessionDataStore(private val context: Context) {
                 nombre = nombre,
                 rol = rol,
                 idPsicologo = normalizedPsychologistId,
-                idPaciente = idPaciente
+                idPaciente = idPaciente,
+                idioma = idioma
             )
         } else {
             null
@@ -64,14 +69,17 @@ class UserSessionDataStore(private val context: Context) {
 
     suspend fun saveSession(session: UserSession) {
         context.userSessionDataStore.edit { preferences ->
+
             preferences[USER_ID_KEY] = session.idUsuario
+
             if (session.nombre != null) {
                 preferences[USER_NAME_KEY] = session.nombre
             } else {
                 preferences.remove(USER_NAME_KEY)
             }
+
             preferences[USER_ROLE_KEY] = session.rol
-            // Si el psicólogo es null, eliminamos la clave para evitar valores obsoletos
+
             if (session.idPsicologo != null) {
                 preferences[PSYCHOLOGIST_ID_KEY] = session.idPsicologo
             } else {
@@ -82,6 +90,13 @@ class UserSessionDataStore(private val context: Context) {
                 preferences[PATIENT_ID_KEY] = session.idPaciente
             } else {
                 preferences.remove(PATIENT_ID_KEY)
+            }
+
+            // 👇 idioma al final (más limpio y consistente)
+            if (session.idioma != null) {
+                preferences[LANGUAGE_KEY] = session.idioma
+            } else {
+                preferences.remove(LANGUAGE_KEY)
             }
         }
     }

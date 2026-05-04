@@ -150,7 +150,7 @@ private fun psicologoItems() = listOf(
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
     AmaniBottomBarItem(
-        route = Screens.settingsAdmin.route,
+        route = Screens.settingPsicologo.route,
         label = "Ajustes",
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings

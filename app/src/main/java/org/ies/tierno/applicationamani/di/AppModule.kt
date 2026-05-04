@@ -10,6 +10,7 @@ import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
+import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
@@ -57,8 +58,10 @@ import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -76,6 +79,7 @@ val appModule = module {
     single { CitasRepository(get()) }
     single { ProfileRepository(get()) }
     single { NotificacionRepository(get()) }
+    single { AjustesRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -108,6 +112,7 @@ val appModule = module {
     factory { ObserveUserOnlineUseCase(get()) }
     factory { MarkMessageDeliveredUseCase(get()) }
     factory { UpdateUserOnlineUseCase(get()) }
+    factory { IdiomaUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -151,5 +156,6 @@ val appModule = module {
     //NOTIFICACION
     viewModel { NotificacionViewModel(get()) }
     viewModel { PacientesViewModel(get()) }
+    viewModel { IdiomaViewModel(get(), get()) }
 
 }

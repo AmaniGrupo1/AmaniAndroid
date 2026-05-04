@@ -1,0 +1,203 @@
+<resources>
+
+    <!-- SettingsAdminScreen -->
+    <string name="citas">Appointments</string>
+    <string name="notificaciones">Notifications</string>
+    <string name="roles_permisos">Roles &amp; Permissions</string>
+    <string name="sistema">System</string>
+
+    <!-- General section options -->
+    <string name="nombre_clinica">Clinic name</string>
+    <string name="logo">Logo</string>
+    <string name="cambiar_logo">Change clinic logo</string>
+    <string name="zona_horaria">Timezone</string>
+    <string name="moneda">Currency</string>
+    <string name="color_sistema">System color</string>
+    <string name="tema_oscuro_claro">Dark / Light theme</string>
+    <string name="claro">Light</string>
+
+    <!-- Appointments section options -->
+    <string name="duracion_cita">Appointment duration</string>
+    <string name="horario_laboral">Working hours</string>
+    <string name="dias_disponibles">Available days</string>
+    <string name="tiempo_entre_citas">Time between appointments</string>
+    <string name="lunes_viernes">Monday to Friday</string>
+
+    <!-- Notifications section options -->
+    <string name="enviar_recordatorio">Send reminder</string>
+    <string name="activado">Enabled</string>
+    <string name="desactivado">Disabled</string>
+    <string name="tiempo_antes_cita">Time before appointment</string>
+    <string name="notificacion_email">Email notification</string>
+    <string name="notificacion_sms">SMS notification</string>
+
+    <!-- Roles & Permissions section options -->
+    <string name="roles">Roles</string>
+    <string name="permisos">Permissions</string>
+    <string name="admin_psicologo_recepcionista">Administrator · Psychologist · Receptionist</string>
+    <string name="descripcion_permisos">Create appointments · View patients · Edit history · Delete users</string>
+
+    <!-- System section options -->
+    <string name="backup">Backup</string>
+    <string name="version">Version</string>
+    <string name="ultima_copia">Last backup: 15/04/2026</string>
+
+    <!-- Other texts -->
+    <string name="cambia_tu_perfil">Change your profile</string>
+    <string name="euro">Euro (€)</string>
+    <string name="morado">Purple (#6C63FF)</string>
+
+    <string name="app_name">Amani</string>
+    <string name="general">General</string>
+    <string name="perfil">Profile</string>
+    <string name="idioma">Language</string>
+    <string name="cambiar_idioma">Change language</string>
+    <string name="espanol">Spanish</string>
+    <string name="ingles">English</string>
+
+    <!-- Texts for Principal screen -->
+    <string name="amani">AMANI</string>
+    <string name="psicologia_bienestar">Psychology &amp; Wellness</string>
+    <string name="recibir_consejo">Get Wellness Tip</string>
+    <string name="consejo_dia">💫 Tip of the Day</string>
+    <string name="tap_cerrar">✖ Tap to close</string>
+    <string name="tap_nueva_frase">Tap for new phrase</string>
+
+    <!-- Motivational Phrases -->
+    <string name="frase_1">🌿 Every step you take towards your well-being is an act of self-love</string>
+    <string name="frase_2">🌸 Healing begins when you allow yourself to feel</string>
+    <string name="frase_3">💜 Your mental health is as important as your physical health</string>
+    <string name="frase_4">🌟 You are stronger than you think and more loved than you imagine</string>
+    <string name="frase_5">🍃 You are not broken, you are just in the process of transformation</string>
+    <string name="frase_6">✨ Allow yourself to grow at your own pace</string>
+    <string name="frase_7">🌙 Resting is also part of the path to wellness</string>
+    <string name="frase_8">💫 Therapy is a gift you give to yourself</string>
+
+    <!-- Tips -->
+    <string name="consejo_1">🧘‍♀️ Take 5 minutes a day to breathe deeply</string>
+    <string name="consejo_2">📝 Write down three things you are grateful for every night</string>
+    <string name="consejo_3">💬 Don\'t be afraid to ask for help when you need it</string>
+    <string name="consejo_4">🚶‍♂️ A short walk outdoors can improve your mood</string>
+    <string name="consejo_5">😴 Get at least 7-8 hours of sleep for good mental health</string>
+    <string name="consejo_6">🎨 Find a creative hobby that makes you happy</string>
+    <string name="consejo_7">📱 Disconnect from social media one hour before sleeping</string>
+    <string name="consejo_8">🤗 Accept your emotions, they are all valid</string>
+
+    <!-- Screen ViewPsicologoPrincipal -->
+    <string name="error_sesion">Session Error</string>
+    <string name="no_encontrado_id_psicologo">Psychologist ID not found</string>
+    <string name="volver_login">Back to Login</string>
+    <string name="cargando_pacientes">Loading your patients...</string>
+    <string name="puede_tomar_segundos">This may take a few seconds</string>
+    <string name="no_tienes_pacientes">You have no assigned patients</string>
+    <string name="cuando_asignen_pacientes">When patients are assigned to you, they will appear here</string>
+    <string name="total_pacientes">Total Patients</string>
+    <string name="asignados_consulta">Assigned to your practice</string>
+    <string name="menor">Minor</string>
+    <string name="email_no_disponible">Email not available</string>
+    <string name="telefono_no_disponible">Phone not available</string>
+    <string name="sin_nombre">No name</string>
+    <string name="informacion_detallada">📋 Detailed Information</string>
+    <string name="datos_personales">Personal Information</string>
+    <string name="nombre_completo">Full name</string>
+    <string name="dni">ID Number</string>
+    <string name="fecha_nacimiento">Date of birth</string>
+    <string name="edad">Age</string>
+    <string name="genero">Gender</string>
+    <string name="email">Email</string>
+    <string name="telefono">Phone</string>
+    <string name="no_registrado">Not registered</string>
+    <string name="no_especificado">Not specified</string>
+    <string name="no_disponible">Not available</string>
+    <string name="direccion">📍 Address</string>
+    <string name="calle">Street</string>
+    <string name="ciudad">City</string>
+    <string name="provincia">Province</string>
+    <string name="codigo_postal">Postal Code</string>
+    <string name="pais">Country</string>
+    <string name="datos_tutor_responsable">👨‍👩‍👧 Guardian / Responsible Data</string>
+    <string name="tutor">Guardian</string>
+    <string name="parentesco">Relationship</string>
+    <string name="anos">years</string>
+    <string name="agregar_paciente">Add patient</string>
+    <string name="anios">years</string>
+
+    <!-- Screen RegistrarPacientePsicologoScreen -->
+    <string name="registrar_paciente">Register Patient</string>
+    <string name="volver">Back</string>
+    <string name="datos_personales_titulo">Personal Data</string>
+    <string name="nombre">First Name *</string>
+    <string name="apellido">Last Name *</string>
+    <string name="dni_label">ID Number *</string>
+    <string name="formato_dni_invalido">Invalid format (8 numbers + 1 letter)</string>
+    <string name="email_label">Email *</string>
+    <string name="contrasena">Password *</string>
+    <string name="telefono_label">Phone *</string>
+    <string name="telefono_9_digitos">Must have 9 digits</string>
+    <string name="genero_label">Gender *</string>
+    <string name="fecha_nacimiento_label">Date of birth *</string>
+    <string name="formato_fecha_invalido">Invalid format (YYYY-MM-DD)</string>
+    <string name="formato_email_invalido">Invalid email format</string>
+    <string name="placeholder_dni">12345678A</string>
+    <string name="placeholder_telefono">123456789</string>
+    <string name="placeholder_fecha">1990-05-15</string>
+    <string name="datos_tutor">Guardian Data</string>
+    <string name="obligatorio_menor">Required because patient is a minor</string>
+    <string name="nombre_completo_tutor">Full name *</string>
+    <string name="telefono_tutor">Phone *</string>
+    <string name="email_tutor">Email *</string>
+    <string name="dni_tutor">ID Number *</string>
+    <string name="parentesco_label">Relationship *</string>
+    <string name="direccion_titulo">Address</string>
+    <string name="calle_numero">Street and number *</string>
+    <string name="ciudad_label">City</string>
+    <string name="provincia_label">Province</string>
+    <string name="codigo_postal_label">Postal Code</string>
+    <string name="pais_label">Country</string>
+    <string name="situaciones_titulo">Situations</string>
+    <string name="seleccione_situaciones">Select one or more situations *</string>
+    <string name="seleccione_situaciones_texto">Select situations</string>
+    <string name="situaciones_seleccionadas">situation(s) selected</string>
+    <string name="no_hay_situaciones">No situations available</string>
+    <string name="consentimientos_titulo">Consents</string>
+    <string name="acepto_terminos">I accept the terms and conditions *</string>
+    <string name="acepto_videoconferencia">I accept videoconference</string>
+    <string name="acepto_comunicaciones">I accept communications</string>
+    <string name="boton_registrar_paciente">📝 Register Patient</string>
+    <string name="registro_exitoso">Registration Successful!</string>
+    <string name="paciente_registrado_correctamente">The patient has been successfully registered and assigned to your list.</string>
+    <string name="aceptar">Accept</string>
+    <string name="error_registro">Registration Error</string>
+    <string name="error_registro_mensaje">An error occurred while registering the patient. Please try again.</string>
+
+    <!-- Gender options -->
+    <string name="masculino">MALE</string>
+    <string name="femenino">FEMALE</string>
+    <string name="otro">OTHER</string>
+    <string name="prefiero_no_decir">PREFER_NOT_TO_SAY</string>
+
+    <!-- Guardian types -->
+    <string name="padre">FATHER</string>
+    <string name="madre">MOTHER</string>
+    <string name="tutor_legal">LEGAL_GUARDIAN</string>
+    <string name="abuelo">GRANDPARENT</string>
+    <string name="otro_tutor">OTHER</string>
+
+    <!-- Missing strings for SettingsPsychologistScreen (English) -->
+    <string name="editar_datos_personales">Edit your personal data</string>
+    <string name="configurar_horario_atencion">Configure your schedule</string>
+    <string name="agregar_especialidades">Add or modify your specialties</string>
+    <string name="mis_especialidades">My specialties</string>
+    <string name="preferencias">Preferences</string>
+    <string name="tema">Theme</string>
+    <string name="recordatorios">Reminders</string>
+    <string name="enviar_recordatorios">Configure send reminders</string>
+    <string name="terminos_condiciones">Terms and Conditions</string>
+    <string name="leer_terminos">Read terms and conditions</string>
+    <string name="politica_privacidad">Privacy Policy</string>
+    <string name="ver_politica">View privacy policy</string>
+    <string name="duracion_minutos">%d minutes</string>
+    <string name="tiempo_minutos">%d minutes</string>
+    <string name="version_actual">Version %s</string>
+    <string name="configurar_notificaciones">Configure your notifications</string>
+</resources>

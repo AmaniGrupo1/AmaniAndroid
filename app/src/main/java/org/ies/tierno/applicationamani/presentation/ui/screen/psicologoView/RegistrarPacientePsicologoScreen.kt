@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
@@ -25,7 +25,6 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,13 +91,13 @@ fun RegistrarPacientePsicologoScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Registrar Paciente", color = Color.White) },
+                title = { Text(stringResource(R.string.registrar_paciente), color = Color.White) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.volver),
                             tint = Color.White
                         )
                     }
@@ -128,7 +127,7 @@ fun RegistrarPacientePsicologoScreen(
                         Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Datos Personales",
+                            stringResource(R.string.datos_personales_titulo),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
@@ -139,7 +138,7 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { loginViewModel.setNombre(it) },
-                        label = { Text("Nombre *", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.nombre), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -151,7 +150,7 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = apellido,
                         onValueChange = { loginViewModel.setApellido(it) },
-                        label = { Text("Apellido *", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.apellido), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -163,15 +162,15 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = dni,
                         onValueChange = { loginViewModel.setDni(it.uppercase()) },
-                        label = { Text("DNI *", fontFamily = roboto) },
-                        placeholder = { Text("12345678A", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.dni_label), fontFamily = roboto) },
+                        placeholder = { Text(stringResource(R.string.placeholder_dni), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                         supportingText = {
                             if (dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
                                 Text(
-                                    "Formato inválido (8 números + 1 letra)",
+                                    stringResource(R.string.formato_dni_invalido),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -185,7 +184,7 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = email,
                         onValueChange = { loginViewModel.setEmail(it) },
-                        label = { Text("Email *", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.email_label), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -197,7 +196,7 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = regPassword,
                         onValueChange = { loginViewModel.setRegPassword(it) },
-                        label = { Text("Contraseña *", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.contrasena), fontFamily = roboto) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -210,15 +209,15 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = telefono,
                         onValueChange = { loginViewModel.setTelefono(it) },
-                        label = { Text("Teléfono *", fontFamily = roboto) },
-                        placeholder = { Text("123456789", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.telefono_label), fontFamily = roboto) },
+                        placeholder = { Text(stringResource(R.string.placeholder_telefono), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
                         supportingText = {
                             if (telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) {
                                 Text(
-                                    "Debe tener 9 dígitos",
+                                    stringResource(R.string.telefono_9_digitos),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -238,7 +237,7 @@ fun RegistrarPacientePsicologoScreen(
                             value = genero,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Género *", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.genero_label), fontFamily = roboto) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -268,15 +267,15 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = fechaNacimiento,
                         onValueChange = { loginViewModel.setFechaNacimiento(it) },
-                        label = { Text("Fecha nacimiento *", fontFamily = roboto) },
-                        placeholder = { Text("1990-05-15", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.fecha_nacimiento_label), fontFamily = roboto) },
+                        placeholder = { Text(stringResource(R.string.placeholder_fecha), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
                         supportingText = {
                             if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
                                 Text(
-                                    "Formato inválido (YYYY-MM-DD)",
+                                    stringResource(R.string.formato_fecha_invalido),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -306,14 +305,14 @@ fun RegistrarPacientePsicologoScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Datos del Tutor",
+                                stringResource(R.string.datos_tutor),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = Color(0xFFE67E22),
                                 fontFamily = roboto
                             )
                         }
                         Text(
-                            "Obligatorio por ser menor de edad",
+                            stringResource(R.string.obligatorio_menor),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFFE67E22),
                             fontFamily = roboto
@@ -323,7 +322,7 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = tutorNombre,
                             onValueChange = { loginViewModel.setTutorNombre(it) },
-                            label = { Text("Nombre completo *", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.nombre_completo_tutor), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -335,8 +334,8 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = tutorTelefono,
                             onValueChange = { loginViewModel.setTutorTelefono(it) },
-                            label = { Text("Teléfono *", fontFamily = roboto) },
-                            placeholder = { Text("123456789", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.telefono_tutor), fontFamily = roboto) },
+                            placeholder = { Text(stringResource(R.string.placeholder_telefono), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             isError = tutorTelefono.isNotBlank() &&
@@ -346,7 +345,7 @@ fun RegistrarPacientePsicologoScreen(
                                     !tutorTelefono.matches(Regex("^[0-9]{9}$"))
                                 ) {
                                     Text(
-                                        "Debe tener 9 dígitos",
+                                        stringResource(R.string.telefono_9_digitos),
                                         color = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -360,7 +359,7 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = tutorEmail,
                             onValueChange = { loginViewModel.setTutorEmail(it) },
-                            label = { Text("Email *", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.email_tutor), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             isError = tutorEmail.isNotBlank() &&
@@ -370,7 +369,7 @@ fun RegistrarPacientePsicologoScreen(
                                     !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))
                                 ) {
                                     Text(
-                                        "Formato de email inválido",
+                                        stringResource(R.string.formato_email_invalido),
                                         color = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -384,8 +383,8 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = tutorDni,
                             onValueChange = { loginViewModel.setTutorDni(it.uppercase()) },
-                            label = { Text("DNI *", fontFamily = roboto) },
-                            placeholder = { Text("12345678A", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.dni_tutor), fontFamily = roboto) },
+                            placeholder = { Text(stringResource(R.string.placeholder_dni), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             isError = tutorDni.isNotBlank() &&
@@ -395,7 +394,7 @@ fun RegistrarPacientePsicologoScreen(
                                     !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))
                                 ) {
                                     Text(
-                                        "Formato inválido (8 números + 1 letra)",
+                                        stringResource(R.string.formato_dni_invalido),
                                         color = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -415,7 +414,7 @@ fun RegistrarPacientePsicologoScreen(
                                 value = tutorTipo,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Parentesco *", fontFamily = roboto) },
+                                label = { Text(stringResource(R.string.parentesco_label), fontFamily = roboto) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -461,7 +460,7 @@ fun RegistrarPacientePsicologoScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Dirección",
+                            stringResource(R.string.direccion_titulo),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
@@ -472,7 +471,7 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = calle,
                         onValueChange = { loginViewModel.setCalle(it) },
-                        label = { Text("Calle y número *", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.calle_numero), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -488,7 +487,7 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = ciudad,
                             onValueChange = { loginViewModel.setCiudad(it) },
-                            label = { Text("Ciudad", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.ciudad_label), fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -499,7 +498,7 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = provincia,
                             onValueChange = { loginViewModel.setProvincia(it) },
-                            label = { Text("Provincia", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.provincia_label), fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -516,7 +515,7 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = codigoPostal,
                             onValueChange = { loginViewModel.setCodigoPostal(it) },
-                            label = { Text("Código Postal", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.codigo_postal_label), fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -527,7 +526,7 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = pais,
                             onValueChange = { loginViewModel.setPais(it) },
-                            label = { Text("País", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.pais_label), fontFamily = roboto) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -551,14 +550,14 @@ fun RegistrarPacientePsicologoScreen(
                         Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Situaciones",
+                            stringResource(R.string.situaciones_titulo),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
                         )
                     }
                     Text(
-                        "Seleccione una o más situaciones *",
+                        stringResource(R.string.seleccione_situaciones),
                         style = MaterialTheme.typography.bodySmall,
                         fontFamily = roboto,
                         color = Color.Gray
@@ -568,8 +567,8 @@ fun RegistrarPacientePsicologoScreen(
                     Box {
                         OutlinedTextField(
                             value = if (situacionesIds.isEmpty())
-                                "Seleccione situaciones"
-                            else "${situacionesIds.size} situación(es) seleccionada(s)",
+                                stringResource(R.string.seleccione_situaciones_texto)
+                            else "${situacionesIds.size} ${stringResource(R.string.situaciones_seleccionadas)}",
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = {
@@ -602,7 +601,7 @@ fun RegistrarPacientePsicologoScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            "No hay situaciones disponibles",
+                                            stringResource(R.string.no_hay_situaciones),
                                             fontFamily = roboto
                                         )
                                     },
@@ -665,7 +664,7 @@ fun RegistrarPacientePsicologoScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Consentimientos",
+                            stringResource(R.string.consentimientos_titulo),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
@@ -683,7 +682,7 @@ fun RegistrarPacientePsicologoScreen(
                             colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                         )
                         Text(
-                            "Acepto los términos y condiciones *",
+                            stringResource(R.string.acepto_terminos),
                             fontFamily = roboto,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaTerminos.value = !aceptaTerminos
@@ -701,7 +700,7 @@ fun RegistrarPacientePsicologoScreen(
                             colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                         )
                         Text(
-                            "Acepto videoconferencia",
+                            stringResource(R.string.acepto_videoconferencia),
                             fontFamily = roboto,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaVideoconferencia.value =
@@ -720,7 +719,7 @@ fun RegistrarPacientePsicologoScreen(
                             colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                         )
                         Text(
-                            "Acepto comunicaciones",
+                            stringResource(R.string.acepto_comunicaciones),
                             fontFamily = roboto,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaComunicacion.value = !aceptaComunicacion
@@ -748,7 +747,7 @@ fun RegistrarPacientePsicologoScreen(
                 enabled = formularioCompletoValido
             ) {
                 Text(
-                    text = "📝 Registrar Paciente",
+                    text = stringResource(R.string.boton_registrar_paciente),
                     color = Color.White,
                     fontFamily = roboto,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize
@@ -786,14 +785,14 @@ fun RegistrarPacientePsicologoScreen(
             },
             title = {
                 Text(
-                    "¡Registro Exitoso!",
+                    stringResource(R.string.registro_exitoso),
                     fontFamily = roboto,
                     fontWeight = Bold
                 )
             },
             text = {
                 Text(
-                    "El paciente ha sido registrado correctamente y asignado a tu lista.",
+                    stringResource(R.string.paciente_registrado_correctamente),
                     fontFamily = roboto
                 )
             },
@@ -804,7 +803,7 @@ fun RegistrarPacientePsicologoScreen(
                         navController.navigateUp()
                     }
                 ) {
-                    Text("Aceptar", color = primaryColor, fontFamily = roboto)
+                    Text(stringResource(R.string.aceptar), color = primaryColor, fontFamily = roboto)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -826,14 +825,14 @@ fun RegistrarPacientePsicologoScreen(
             },
             title = {
                 Text(
-                    "Error en el Registro",
+                    stringResource(R.string.error_registro),
                     fontFamily = roboto,
                     fontWeight = Bold
                 )
             },
             text = {
                 Text(
-                    text = errorMessage.ifBlank { "Ocurrió un error al registrar el paciente. Por favor, inténtalo de nuevo." },
+                    text = errorMessage.ifBlank { stringResource(R.string.error_registro_mensaje) },
                     fontFamily = roboto
                 )
             },
@@ -841,7 +840,7 @@ fun RegistrarPacientePsicologoScreen(
                 TextButton(
                     onClick = { showErrorDialog = false }
                 ) {
-                    Text("Aceptar", color = primaryColor, fontFamily = roboto)
+                    Text(stringResource(R.string.aceptar), color = primaryColor, fontFamily = roboto)
                 }
             },
             shape = RoundedCornerShape(16.dp),

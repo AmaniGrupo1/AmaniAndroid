@@ -45,11 +45,13 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.Edita
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EditProfilePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.RegistrarPacientePsicologoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.SettingsPsychologistScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsAdminScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
@@ -71,9 +73,8 @@ fun NavGraph(
     val profilePsicolgo : ProfilePsicologoViewModel = koinViewModel()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
-
-    val bottomBarConfig = when (session?.rol?.lowercase()?.trim()) {
-        "admin", "administrador" -> BottomBarConfig.Admin
+ val idiomaViewModel : IdiomaViewModel = koinViewModel()
+    val bottomBarConfig = when (session?.rol?.lowercase()?.trim()) {"admin", "administrador" -> BottomBarConfig.Admin
         "psicologo", "psicóloga", "psicologa" -> BottomBarConfig.Psicologo
         else -> BottomBarConfig.Paciente
     }
@@ -95,7 +96,7 @@ fun NavGraph(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screens.principal.route) {
-                Principal(navController)
+                Principal(navController, userSessionDataStore)
             }
             composable(Screens.login.route) {
                 LoginScreen(navController, loginViewModel)
@@ -251,7 +252,7 @@ fun NavGraph(
             }
 
             composable(Screens.settingsAdmin.route){
-                SettingsAdminScreen(navController, userSessionDataStore)
+                SettingsAdminScreen(navController, userSessionDataStore, idiomaViewModel)
             }
 
 
@@ -265,6 +266,10 @@ fun NavGraph(
             ) { backStackEntry ->
                 val idPsicologo = backStackEntry.arguments?.getLong("identificador") ?: 0L
                 EditProfilePsicologoScreen(navController, idPsicologo)
+            }
+
+            composable(Screens.settingPsicologo.route){
+                SettingsPsychologistScreen(navController, userSessionDataStore, idiomaViewModel)
             }
         }
     }

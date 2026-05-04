@@ -7,6 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import org.ies.tierno.applicationamani.data.remoto.AjustesApi
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
@@ -93,7 +94,7 @@ val retrofitModule = module {
         Retrofit.Builder()
             // .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
 
-           .baseUrl("http://192.168.1.175:8080/")
+            .baseUrl("http://192.168.1.175:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(get<okhttp3.OkHttpClient>())  // Usar el mismo cliente
             .build()
@@ -106,4 +107,5 @@ val retrofitModule = module {
     single<TestApi> { get<Retrofit>().create(TestApi::class.java) }
     single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
+    single<AjustesApi> { get<Retrofit>().create(AjustesApi::class.java) }
 }

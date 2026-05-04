@@ -161,7 +161,6 @@ fun CitasScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { AmaniBottomBar(navController, BottomBarConfig.Paciente) },
         containerColor = colors.background,
         floatingActionButton = {
             FloatingActionButton(

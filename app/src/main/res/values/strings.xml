@@ -1,3 +1,204 @@
 <resources>
+
+    <!-- Pantalla SettingsAdminScreen -->
+    <string name="citas">Citas</string>
+    <string name="notificaciones">Notificaciones</string>
+    <string name="roles_permisos">Roles y Permisos</string>
+    <string name="sistema">Sistema</string>
+
+    <!-- Opciones de la sección General -->
+    <string name="nombre_clinica">Nombre de la clínica</string>
+    <string name="logo">Logo</string>
+    <string name="cambiar_logo">Cambiar logo de la clínica</string>
+    <string name="zona_horaria">Zona horaria</string>
+    <string name="moneda">Moneda</string>
+    <string name="color_sistema">Color del sistema</string>
+    <string name="tema_oscuro_claro">Tema oscuro / claro</string>
+    <string name="claro">Claro</string>
+
+    <!-- Opciones de la sección Citas -->
+    <string name="duracion_cita">Duración de la cita</string>
+    <string name="horario_laboral">Horario laboral</string>
+    <string name="dias_disponibles">Días disponibles</string>
+    <string name="tiempo_entre_citas">Tiempo entre citas</string>
+    <string name="lunes_viernes">Lunes a Viernes</string>
+
+    <!-- Opciones de la sección Notificaciones -->
+    <string name="enviar_recordatorio">Enviar recordatorio</string>
+    <string name="activado">Activado</string>
+    <string name="desactivado">Desactivado</string>
+    <string name="tiempo_antes_cita">Tiempo antes de la cita</string>
+    <string name="notificacion_email">Notificación por email</string>
+    <string name="notificacion_sms">Notificación por SMS</string>
+
+    <!-- Opciones de la sección Roles y Permisos -->
+    <string name="roles">Roles</string>
+    <string name="permisos">Permisos</string>
+    <string name="admin_psicologo_recepcionista">Administrador · Psicólogo · Recepcionista</string>
+    <string name="descripcion_permisos">Crear citas · Ver pacientes · Editar historial · Eliminar usuarios</string>
+
+    <!-- Opciones de la sección Sistema -->
+    <string name="backup">Backup</string>
+    <string name="version">Versión</string>
+    <string name="ultima_copia">Última copia: 15/04/2026</string>
+
+    <!-- Otros textos -->
+    <string name="cambia_tu_perfil">Cambia tu perfil</string>
+    <string name="euro">Euro (€)</string>
+    <string name="morado">Morado (#6C63FF)</string>
+
+
     <string name="app_name">Amani</string>
+    <string name="general">General</string>
+    <string name="perfil">Perfil</string>
+    <string name="idioma">Idioma</string>
+    <string name="cambiar_idioma">Cambiar idioma</string>
+    <string name="espanol">Español</string>
+    <string name="ingles">Inglés</string>
+
+    <!-- Textos para pantalla Principal -->
+    <string name="amani">AMANI</string>
+    <string name="psicologia_bienestar">Psicología y Bienestar</string>
+    <string name="recibir_consejo">Recibir Consejo de Bienestar</string>
+    <string name="consejo_dia">💫 Consejo del Día</string>
+    <string name="tap_cerrar">✖ Tap para cerrar</string>
+    <string name="tap_nueva_frase">Tap para nueva frase</string>
+
+    <!-- Frases Motivacionales -->
+    <string name="frase_1">🌿 Cada paso que das hacia tu bienestar es un acto de amor propio</string>
+    <string name="frase_2">🌸 La sanación comienza cuando te permites sentir</string>
+    <string name="frase_3">💜 Tu salud mental es tan importante como tu salud física</string>
+    <string name="frase_4">🌟 Eres más fuerte de lo que crees y más amado de lo que imaginas</string>
+    <string name="frase_5">🍃 No estás roto, solo estás en proceso de transformación</string>
+    <string name="frase_6">✨ Permítete crecer a tu propio ritmo</string>
+    <string name="frase_7">🌙 Descansar también es parte del camino hacia el bienestar</string>
+    <string name="frase_8">💫 La terapia es un regalo que te haces a ti mismo</string>
+
+    <!-- Consejos -->
+    <string name="consejo_1">🧘‍♀️ Tómate 5 minutos al día para respirar profundamente</string>
+    <string name="consejo_2">📝 Escribe tres cosas por las que estás agradecido cada noche</string>
+    <string name="consejo_3">💬 No tengas miedo de pedir ayuda cuando la necesites</string>
+    <string name="consejo_4">🚶‍♂️ Una caminata corta al aire libre puede mejorar tu estado de ánimo</string>
+    <string name="consejo_5">😴 Duerme al menos 7-8 horas para una buena salud mental</string>
+    <string name="consejo_6">🎨 Encuentra un hobby creativo que te haga feliz</string>
+    <string name="consejo_7">📱 Desconéctate de las redes sociales una hora antes de dormir</string>
+    <string name="consejo_8">🤗 Acepta tus emociones, todas son válidas</string>
+
+    <!-- Pantalla ViewPsicologoPrincipal -->
+    <string name="error_sesion">Error de sesión</string>
+    <string name="no_encontrado_id_psicologo">No se encontró el ID del psicólogo</string>
+    <string name="volver_login">Volver al login</string>
+    <string name="cargando_pacientes">Cargando tus pacientes...</string>
+    <string name="puede_tomar_segundos">Esto puede tomar unos segundos</string>
+    <string name="no_tienes_pacientes">No tienes pacientes asignados</string>
+    <string name="cuando_asignen_pacientes">Cuando te asignen pacientes, aparecerán aquí</string>
+    <string name="total_pacientes">Total de Pacientes</string>
+    <string name="asignados_consulta">Asignados a tu consulta</string>
+    <string name="menor">Menor</string>
+    <string name="email_no_disponible">Email no disponible</string>
+    <string name="telefono_no_disponible">Teléfono no disponible</string>
+    <string name="sin_nombre">Sin nombre</string>
+    <string name="informacion_detallada">📋 Información Detallada</string>
+    <string name="datos_personales">Datos Personales</string>
+    <string name="nombre_completo">Nombre completo</string>
+    <string name="dni">DNI</string>
+    <string name="fecha_nacimiento">Fecha de nacimiento</string>
+    <string name="edad">Edad</string>
+    <string name="genero">Género</string>
+    <string name="email">Email</string>
+    <string name="telefono">Teléfono</string>
+    <string name="no_registrado">No registrado</string>
+    <string name="no_especificado">No especificado</string>
+    <string name="no_disponible">No disponible</string>
+    <string name="direccion">📍 Dirección</string>
+    <string name="calle">Calle</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="provincia">Provincia</string>
+    <string name="codigo_postal">Código Postal</string>
+    <string name="pais">País</string>
+    <string name="datos_tutor_responsable">👨‍👩‍👧 Datos del Tutor / Responsable</string>
+    <string name="tutor">Tutor</string>
+    <string name="parentesco">Parentesco</string>
+    <string name="anos">años</string>
+    <string name="agregar_paciente">Agregar paciente</string>
+    <string name="anios">años</string>
+
+    <!-- Pantalla RegistrarPacientePsicologoScreen -->
+    <string name="registrar_paciente">Registrar Paciente</string>
+    <string name="volver">Volver</string>
+    <string name="datos_personales_titulo">Datos Personales</string>
+    <string name="nombre">Nombre *</string>
+    <string name="apellido">Apellido *</string>
+    <string name="dni_label">DNI *</string>
+    <string name="formato_dni_invalido">Formato inválido (8 números + 1 letra)</string>
+    <string name="email_label">Email *</string>
+    <string name="contrasena">Contraseña *</string>
+    <string name="telefono_label">Teléfono *</string>
+    <string name="telefono_9_digitos">Debe tener 9 dígitos</string>
+    <string name="genero_label">Género *</string>
+    <string name="fecha_nacimiento_label">Fecha nacimiento *</string>
+    <string name="formato_fecha_invalido">Formato inválido (YYYY-MM-DD)</string>
+    <string name="formato_email_invalido">Formato de email inválido</string>
+    <string name="placeholder_dni">12345678A</string>
+    <string name="placeholder_telefono">123456789</string>
+    <string name="placeholder_fecha">1990-05-15</string>
+    <string name="datos_tutor">Datos del Tutor</string>
+    <string name="obligatorio_menor">Obligatorio por ser menor de edad</string>
+    <string name="nombre_completo_tutor">Nombre completo *</string>
+    <string name="telefono_tutor">Teléfono *</string>
+    <string name="email_tutor">Email *</string>
+    <string name="dni_tutor">DNI *</string>
+    <string name="parentesco_label">Parentesco *</string>
+    <string name="direccion_titulo">Dirección</string>
+    <string name="calle_numero">Calle y número *</string>
+    <string name="ciudad_label">Ciudad</string>
+    <string name="provincia_label">Provincia</string>
+    <string name="codigo_postal_label">Código Postal</string>
+    <string name="pais_label">País</string>
+    <string name="situaciones_titulo">Situaciones</string>
+    <string name="seleccione_situaciones">Seleccione una o más situaciones *</string>
+    <string name="seleccione_situaciones_texto">Seleccione situaciones</string>
+    <string name="situaciones_seleccionadas">situación(es) seleccionada(s)</string>
+    <string name="no_hay_situaciones">No hay situaciones disponibles</string>
+    <string name="consentimientos_titulo">Consentimientos</string>
+    <string name="acepto_terminos">Acepto los términos y condiciones *</string>
+    <string name="acepto_videoconferencia">Acepto videoconferencia</string>
+    <string name="acepto_comunicaciones">Acepto comunicaciones</string>
+    <string name="boton_registrar_paciente">📝 Registrar Paciente</string>
+    <string name="registro_exitoso">¡Registro Exitoso!</string>
+    <string name="paciente_registrado_correctamente">El paciente ha sido registrado correctamente y asignado a tu lista.</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="error_registro">Error en el Registro</string>
+    <string name="error_registro_mensaje">Ocurrió un error al registrar el paciente. Por favor, inténtalo de nuevo.</string>
+
+    <!-- Opciones de género -->
+    <string name="masculino">MASCULINO</string>
+    <string name="femenino">FEMENINO</string>
+    <string name="otro">OTRO</string>
+    <string name="prefiero_no_decir">PREFIERO_NO_DECIR</string>
+
+    <!-- Tipos de tutor -->
+    <string name="padre">PADRE</string>
+    <string name="madre">MADRE</string>
+    <string name="tutor_legal">TUTOR LEGAL</string>
+    <string name="abuelo">ABUELO</string>
+    <string name="otro_tutor">OTRO</string>
+
+    <!-- Strings faltantes para SettingsPsychologistScreen -->
+    <string name="editar_datos_personales">Editar tus datos personales</string>
+    <string name="configurar_horario_atencion">Configurar tu horario de atención</string>
+    <string name="agregar_especialidades">Agregar o modificar tus especialidades</string>
+    <string name="mis_especialidades">Mis especialidades</string>
+    <string name="preferencias">Preferencias</string>
+    <string name="tema">Tema</string>
+    <string name="recordatorios">Recordatorios</string>
+    <string name="enviar_recordatorios">Configurar enviar recordatorios</string>
+    <string name="terminos_condiciones">Términos y Condiciones</string>
+    <string name="leer_terminos">Leer términos y condiciones</string>
+    <string name="politica_privacidad">Política de Privacidad</string>
+    <string name="ver_politica">Ver política de privacidad</string>
+    <string name="duracion_minutos">%d minutos</string>
+    <string name="tiempo_minutos">%d minutos</string>
+    <string name="version_actual">Versión %s</string>
+    <string name="configurar_notificaciones">Configurar tus notificaciones</string>
 </resources>

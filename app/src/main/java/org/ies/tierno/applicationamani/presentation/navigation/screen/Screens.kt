@@ -94,5 +94,8 @@
             fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
         }
 
+
+        object settingPsicologo : Screens("settingPsicologo")
+
     }
 

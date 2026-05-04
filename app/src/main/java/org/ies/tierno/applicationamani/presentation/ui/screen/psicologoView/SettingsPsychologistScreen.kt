@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.screen.settings
+package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,11 +35,19 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaView
 import android.app.Activity
 import android.util.Log
 
-private const val TAG = "SettingsLanguage"
+private const val TAG = "SettingsPsychologist"
+
+// ✅ Definir SettingsOption localmente
+data class SettingsOption(
+    val id: String,
+    val title: String,
+    val subtitle: String,
+    val icon: ImageVector
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsAdminScreen(
+fun SettingsPsychologistScreen(
     navController: NavController,
     userSessionDataStore: UserSessionDataStore,
     idiomaViewModel: IdiomaViewModel
@@ -50,10 +58,9 @@ fun SettingsAdminScreen(
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
 
-    // También necesitamos la sesión completa para otros datos (idPsicologo, etc)
+    // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    // 📍 LOG: Ver idioma actual en cada recomposición
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
 
     // Control de recreación para evitar loops
@@ -62,18 +69,11 @@ fun SettingsAdminScreen(
 
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
     LaunchedEffect(currentLanguage) {
-        Log.d(TAG, "🚀 [LaunchedEffect] currentLanguage=$currentLanguage, previousLanguage=$previousLanguage, isRecreating=$isRecreating")
-
         if (!isRecreating && previousLanguage != currentLanguage) {
-            Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage' - Recreando Activity")
-
+            Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage'")
             previousLanguage = currentLanguage
             isRecreating = true
-
-            // Pequeño delay para evitar conflictos con el ciclo de vida
             delay(150)
-
-            // Recrear la Activity para aplicar el nuevo idioma
             (context as? Activity)?.recreate()
         }
     }
@@ -93,10 +93,11 @@ fun SettingsAdminScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ==================== PERFIL (Solo para psicólogo) ====================
             item {
-                SettingsCategoryCard(
-                    title = stringResource(R.string.general),
-                    icon = Icons.Outlined.Settings,
+                SettingsCategoryCardPsychologist(
+                    title = stringResource(R.string.perfil),
+                    icon = Icons.Outlined.Person,
                     iconColor = primaryColor,
                     roboto = roboto,
                     navController = navController,
@@ -105,23 +106,39 @@ fun SettingsAdminScreen(
                     idiomaViewModel = idiomaViewModel,
                     options = listOf(
                         SettingsOption(
-                            id = "perfil",
+                            id = "mi_perfil",
                             title = stringResource(R.string.perfil),
-                            subtitle = stringResource(R.string.cambia_tu_perfil),
-                            icon = Icons.Default.Person
+                            subtitle = stringResource(R.string.editar_datos_personales),
+                            icon = Icons.Default.PersonOutline
                         ),
                         SettingsOption(
-                            id = "clinic_name",
-                            title = stringResource(R.string.nombre_clinica),
-                            subtitle = "Clínica Amani",
-                            icon = Icons.Default.Business
+                            id = "horario",
+                            title = stringResource(R.string.horario_laboral),
+                            subtitle = stringResource(R.string.configurar_horario_atencion),
+                            icon = Icons.Default.Schedule
                         ),
                         SettingsOption(
-                            id = "logo",
-                            title = stringResource(R.string.logo),
-                            subtitle = stringResource(R.string.cambiar_logo),
-                            icon = Icons.Default.Image
-                        ),
+                            id = "especialidad",
+                            title = stringResource(R.string.mis_especialidades),
+                            subtitle = stringResource(R.string.agregar_especialidades),
+                            icon = Icons.Default.Work
+                        )
+                    )
+                )
+            }
+
+            // ==================== PREFERENCIAS ====================
+            item {
+                SettingsCategoryCardPsychologist(
+                    title = stringResource(R.string.preferencias),
+                    icon = Icons.Outlined.Settings,
+                    iconColor = Color(0xFFE67E22),
+                    roboto = roboto,
+                    navController = navController,
+                    session = session,
+                    currentLanguage = currentLanguage,
+                    idiomaViewModel = idiomaViewModel,
+                    options = listOf(
                         SettingsOption(
                             id = "language",
                             title = stringResource(R.string.idioma),
@@ -132,76 +149,26 @@ fun SettingsAdminScreen(
                             icon = Icons.Default.Language
                         ),
                         SettingsOption(
-                            id = "timezone",
-                            title = stringResource(R.string.zona_horaria),
-                            subtitle = "Europe/Madrid",
-                            icon = Icons.Default.AccessTime
+                            id = "notificaciones",
+                            title = stringResource(R.string.notificaciones),
+                            subtitle = stringResource(R.string.configurar_notificaciones),
+                            icon = Icons.Default.Notifications
                         ),
                         SettingsOption(
-                            id = "currency",
-                            title = stringResource(R.string.moneda),
-                            subtitle = stringResource(R.string.euro),
-                            icon = Icons.Default.AttachMoney
-                        ),
-                        SettingsOption(
-                            id = "theme_color",
-                            title = stringResource(R.string.color_sistema),
-                            subtitle = stringResource(R.string.morado),
-                            icon = Icons.Default.ColorLens
-                        ),
-                        SettingsOption(
-                            id = "dark_mode",
-                            title = stringResource(R.string.tema_oscuro_claro),
-                            subtitle = stringResource(R.string.claro),
+                            id = "tema",
+                            title = stringResource(R.string.tema),
+                            subtitle = stringResource(R.string.tema_oscuro_claro),
                             icon = Icons.Default.BrightnessMedium
                         )
                     )
                 )
             }
 
+            // ==================== CITAS ====================
             item {
-                SettingsCategoryCard(
+                SettingsCategoryCardPsychologist(
                     title = stringResource(R.string.citas),
                     icon = Icons.Outlined.CalendarMonth,
-                    iconColor = Color(0xFFE67E22),
-                    roboto = roboto,
-                    navController = navController,
-                    session = session,
-                    currentLanguage = currentLanguage,
-                    idiomaViewModel = idiomaViewModel,
-                    options = listOf(
-                        SettingsOption(
-                            id = "appointment_duration",
-                            title = stringResource(R.string.duracion_cita),
-                            subtitle = "45 minutos",
-                            icon = Icons.Default.Timer,
-                        ),
-                        SettingsOption(
-                            id = "working_hours",
-                            title = stringResource(R.string.horario_laboral),
-                            subtitle = "08:00 - 18:00",
-                            icon = Icons.Default.Schedule
-                        ),
-                        SettingsOption(
-                            id = "available_days",
-                            title = stringResource(R.string.dias_disponibles),
-                            subtitle = stringResource(R.string.lunes_viernes),
-                            icon = Icons.Default.CalendarToday
-                        ),
-                        SettingsOption(
-                            id = "appointment_interval",
-                            title = stringResource(R.string.tiempo_entre_citas),
-                            subtitle = "10 minutos",
-                            icon = Icons.Default.Timelapse
-                        )
-                    )
-                )
-            }
-
-            item {
-                SettingsCategoryCard(
-                    title = stringResource(R.string.notificaciones),
-                    icon = Icons.Outlined.Notifications,
                     iconColor = Color(0xFF27AE60),
                     roboto = roboto,
                     navController = navController,
@@ -210,62 +177,30 @@ fun SettingsAdminScreen(
                     idiomaViewModel = idiomaViewModel,
                     options = listOf(
                         SettingsOption(
-                            id = "send_reminder",
-                            title = stringResource(R.string.enviar_recordatorio),
-                            subtitle = stringResource(R.string.activado),
-                            icon = Icons.Default.NotificationsActive
+                            id = "duracion_cita",
+                            title = stringResource(R.string.duracion_cita),
+                            subtitle = stringResource(R.string.duracion_minutos, 45),
+                            icon = Icons.Default.Timer
                         ),
                         SettingsOption(
-                            id = "reminder_time",
-                            title = stringResource(R.string.tiempo_antes_cita),
-                            subtitle = "60 minutos",
+                            id = "tiempo_entre_citas",
+                            title = stringResource(R.string.tiempo_entre_citas),
+                            subtitle = stringResource(R.string.tiempo_minutos, 10),
+                            icon = Icons.Default.Timelapse
+                        ),
+                        SettingsOption(
+                            id = "recordatorios",
+                            title = stringResource(R.string.recordatorios),
+                            subtitle = stringResource(R.string.enviar_recordatorios),
                             icon = Icons.Default.Alarm
-                        ),
-                        SettingsOption(
-                            id = "email_notification",
-                            title = stringResource(R.string.notificacion_email),
-                            subtitle = stringResource(R.string.activado),
-                            icon = Icons.Default.Email
-                        ),
-                        SettingsOption(
-                            id = "sms_notification",
-                            title = stringResource(R.string.notificacion_sms),
-                            subtitle = stringResource(R.string.desactivado),
-                            icon = Icons.Default.Sms
                         )
                     )
                 )
             }
 
+            // ==================== SISTEMA ====================
             item {
-                SettingsCategoryCard(
-                    title = stringResource(R.string.roles_permisos),
-                    icon = Icons.Outlined.People,
-                    iconColor = Color(0xFF3498DB),
-                    roboto = roboto,
-                    navController = navController,
-                    session = session,
-                    currentLanguage = currentLanguage,
-                    idiomaViewModel = idiomaViewModel,
-                    options = listOf(
-                        SettingsOption(
-                            id = "roles",
-                            title = stringResource(R.string.roles),
-                            subtitle = stringResource(R.string.admin_psicologo_recepcionista),
-                            icon = Icons.Default.AdminPanelSettings
-                        ),
-                        SettingsOption(
-                            id = "permissions",
-                            title = stringResource(R.string.permisos),
-                            subtitle = stringResource(R.string.descripcion_permisos),
-                            icon = Icons.Default.Lock
-                        )
-                    )
-                )
-            }
-
-            item {
-                SettingsCategoryCard(
+                SettingsCategoryCardPsychologist(
                     title = stringResource(R.string.sistema),
                     icon = Icons.Outlined.Storage,
                     iconColor = Color(0xFF9B59B6),
@@ -276,16 +211,22 @@ fun SettingsAdminScreen(
                     idiomaViewModel = idiomaViewModel,
                     options = listOf(
                         SettingsOption(
-                            id = "backup",
-                            title = stringResource(R.string.backup),
-                            subtitle = stringResource(R.string.ultima_copia),
-                            icon = Icons.Default.Backup
-                        ),
-                        SettingsOption(
                             id = "version",
                             title = stringResource(R.string.version),
-                            subtitle = "1.0.0",
+                            subtitle = stringResource(R.string.version_actual, "1.0.0"),
                             icon = Icons.Default.Info
+                        ),
+                        SettingsOption(
+                            id = "terminos",
+                            title = stringResource(R.string.terminos_condiciones),
+                            subtitle = stringResource(R.string.leer_terminos),
+                            icon = Icons.Default.Description
+                        ),
+                        SettingsOption(
+                            id = "privacidad",
+                            title = stringResource(R.string.politica_privacidad),
+                            subtitle = stringResource(R.string.ver_politica),
+                            icon = Icons.Default.Lock
                         )
                     )
                 )
@@ -294,15 +235,8 @@ fun SettingsAdminScreen(
     }
 }
 
-data class SettingsOption(
-    val id: String,
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector
-)
-
 @Composable
-fun SettingsCategoryCard(
+fun SettingsCategoryCardPsychologist(
     title: String,
     icon: ImageVector,
     iconColor: Color,
@@ -359,7 +293,7 @@ fun SettingsCategoryCard(
                     )
                 }
 
-                SettingsOptionRow(
+                SettingsOptionRowPsychologist(
                     option = option,
                     roboto = roboto,
                     navController = navController,
@@ -373,7 +307,7 @@ fun SettingsCategoryCard(
 }
 
 @Composable
-fun SettingsOptionRow(
+fun SettingsOptionRowPsychologist(
     option: SettingsOption,
     roboto: FontFamily,
     navController: NavController,
@@ -390,13 +324,38 @@ fun SettingsOptionRow(
             .clickable {
                 when (option.id) {
                     "language" -> expanded = true
-                    "perfil" -> {
+                    "mi_perfil" -> {
                         val identificador = session?.idPsicologo
                         if (identificador != null && identificador > 0L) {
                             navController.navigate(
                                 Screens.perfilPsicologo.createRoute(identificador)
                             )
                         }
+                    }
+                    "horario" -> {
+                        // TODO: Implementar navegación a pantalla de horario
+                        Log.d(TAG, "📅 Navegar a horario del psicólogo")
+                        // navController.navigate(Screens.horarioPsicologo)
+                    }
+                    "especialidad" -> {
+                        // TODO: Implementar navegación a pantalla de especialidades
+                        Log.d(TAG, "🏷️ Navegar a especialidades del psicólogo")
+                        // navController.navigate(Screens.especialidadesPsicologo)
+                    }
+                    "notificaciones" -> {
+                        // TODO: Implementar navegación a configuración de notificaciones
+                        Log.d(TAG, "🔔 Navegar a notificaciones")
+                        // navController.navigate(Screens.notificaciones)
+                    }
+                    "terminos" -> {
+                        // TODO: Implementar navegación a términos y condiciones
+                        Log.d(TAG, "📄 Navegar a términos y condiciones")
+                        // navController.navigate(Screens.terminos)
+                    }
+                    "privacidad" -> {
+                        // TODO: Implementar navegación a política de privacidad
+                        Log.d(TAG, "🔒 Navegar a política de privacidad")
+                        // navController.navigate(Screens.privacidad)
                     }
                 }
             }
@@ -425,7 +384,6 @@ fun SettingsOptionRow(
                     color = Color(0xFF333333)
                 )
 
-                // ✅ Actualizar subtítulo dinámicamente para el idioma
                 val displaySubtitle = if (option.id == "language") {
                     if (currentLanguage == "es") stringResource(R.string.espanol)
                     else stringResource(R.string.ingles)
@@ -453,7 +411,7 @@ fun SettingsOptionRow(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.espanol)) },
                         onClick = {
-                            Log.d(TAG, "🇪🇸 Usuario seleccionó ESPAÑOL")
+                            Log.d(TAG, "🇪🇸 Psicólogo seleccionó ESPAÑOL")
                             scope.launch {
                                 idiomaViewModel.cambiarIdioma("es")
                             }
@@ -464,7 +422,7 @@ fun SettingsOptionRow(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.ingles)) },
                         onClick = {
-                            Log.d(TAG, "🇬🇧 Usuario seleccionó INGLÉS")
+                            Log.d(TAG, "🇬🇧 Psicólogo seleccionó INGLÉS")
                             scope.launch {
                                 idiomaViewModel.cambiarIdioma("en")
                             }
