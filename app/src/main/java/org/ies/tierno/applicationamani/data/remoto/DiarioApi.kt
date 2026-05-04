@@ -17,6 +17,9 @@ interface DiarioApi {
     @GET("/api/diario-emocion/{id}")
     suspend fun getById(@Path("id") id: Long): DiarioEmocionResponseDTO
 
+    @GET("/api/diario-emocion/paciente/{idPaciente}")
+    suspend fun getByPaciente(@Path("idPaciente") idPaciente: Long): List<DiarioEmocionResponseDTO>
+
     @POST("/api/diario-emocion")
     suspend fun create(@Body request: DiarioEmocionRequestDTO): DiarioEmocionResponseDTO
 

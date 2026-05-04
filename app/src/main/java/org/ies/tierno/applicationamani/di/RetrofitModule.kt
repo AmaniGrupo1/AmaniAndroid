@@ -108,7 +108,7 @@ val retrofitModule = module {
             .create()
 
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("http://192.168.1.21:8080/")
             //.baseUrl("http://192.168.1.175:8080/")
 
             .addConverterFactory(GsonConverterFactory.create(gson))
@@ -126,4 +126,5 @@ val retrofitModule = module {
     single<DiarioApi> { get<Retrofit>().create(DiarioApi::class.java) }
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
     single<SoporteTicketApi> { get<Retrofit>().create(SoporteTicketApi::class.java) }
+    single<org.ies.tierno.applicationamani.data.remoto.ChatApi> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.ChatApi::class.java) }
 }

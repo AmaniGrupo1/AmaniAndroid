@@ -11,6 +11,9 @@ class DiarioRemoteRepository(
 
     suspend fun getById(id: Long): Result<DiarioEmocionResponseDTO> = runCatching { api.getById(id) }
 
+    suspend fun getByPaciente(idPaciente: Long): Result<List<DiarioEmocionResponseDTO>> =
+        runCatching { api.getByPaciente(idPaciente) }
+
     suspend fun create(request: DiarioEmocionRequestDTO): Result<DiarioEmocionResponseDTO> =
         runCatching { api.create(request) }
 

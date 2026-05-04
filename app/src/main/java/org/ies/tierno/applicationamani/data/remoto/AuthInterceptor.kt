@@ -1,20 +1,22 @@
 package org.ies.tierno.applicationamani.data.remoto
 
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 
-// data/remote/AuthInterceptor.kt
 class AuthInterceptor(private val tokenHolder: TokenHolder) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        // Lectura no-bloqueante desde caché en memoria
         val token = tokenHolder.getToken()
 
         val originalRequest = chain.request()
-        println("TOKEN EN INTERCEPTOR: $token")
-        // Si no hay token, dejamos pasar la petición tal cual
-        // (login y register no lo necesitan)
+        if (token != null) {
+            Log.d("AuthInterceptor", "Token presente (${token.take(20)}...), añadiendo Authorization header. URL: ${originalRequest.url}")
+        } else {
+            Log.w("AuthInterceptor", "TOKEN ES NULL — petición sin Authorization. URL: ${originalRequest.url}")
+        }
+
         val request = if (token != null) {
             originalRequest.newBuilder()
                 .header("Authorization", "Bearer $token")

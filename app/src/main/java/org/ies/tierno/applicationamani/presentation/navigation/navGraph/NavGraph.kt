@@ -43,6 +43,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.Edita
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.SettingsPsicologoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EstadisticasPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.MisTicketsScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.NuevoTicketScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
@@ -103,6 +104,9 @@ fun NavGraph(
 
             composable(Screens.psicologoHome.route) {
                 ViewPsicologoPrincipal(userSessionDataStore, navController)
+            }
+            composable(Screens.estadisticasPsicologo.route) {
+                EstadisticasPsicologoScreen()
             }
             composable(Screens.registro.route) {
                 RegisterScreen(

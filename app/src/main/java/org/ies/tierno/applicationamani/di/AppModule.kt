@@ -61,6 +61,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.Cues
 import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
@@ -102,7 +103,7 @@ val appModule = module {
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
-    single<ChatRepository> { ChatRepositoryImpl(get()) }
+    single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
     single { org.ies.tierno.applicationamani.data.remoto.FileStorageService(get(), androidContext()) }
 
     factory { LoginUseCase(get()) }
@@ -146,6 +147,7 @@ val appModule = module {
     viewModel { PsicologoAgendaViewModel(get(),get(),get()) }
     viewModel { CuestionarioViewModel(get()) }
     viewModel { ListarPacientesByPsicologoViewModel(get(), get()) }
+    viewModel { EstadisticasPsicologoViewModel(get(), get()) }
     viewModel { ProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get()) }

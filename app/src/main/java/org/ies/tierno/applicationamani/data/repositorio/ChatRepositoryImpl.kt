@@ -1,11 +1,14 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import kotlinx.coroutines.flow.Flow
+import org.ies.tierno.applicationamani.data.remoto.ChatApi
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+import org.ies.tierno.applicationamani.data.remoto.SendMessageRequest
 import org.ies.tierno.applicationamani.domain.models.Message
 
 class ChatRepositoryImpl(
-    private val chatFirebaseService: ChatFirebaseService
+    private val chatFirebaseService: ChatFirebaseService,
+    private val chatApi: ChatApi
 ) : ChatRepository {
 
     override fun observeMessages(currentUserId: Long, otherUserId: Long): Flow<List<Message>> {
@@ -20,14 +23,26 @@ class ChatRepositoryImpl(
         attachmentType: org.ies.tierno.applicationamani.domain.models.AttachmentType?,
         attachmentName: String?
     ): Result<Unit> {
-        return chatFirebaseService.sendMessage(
-            senderId,
-            receiverId,
-            content,
-            attachmentUrl,
-            attachmentType?.name,
-            attachmentName
-        )
+        return try {
+            val response = chatApi.sendMessage(
+                SendMessageRequest(
+                    idSender = senderId,
+                    idReceiver = receiverId,
+                    mensaje = content,
+                    idCita = null
+                )
+            )
+            if (response.isSuccessful) {
+                android.util.Log.d("ChatRepository", "Mensaje enviado OK — HTTP ${response.code()}")
+                Result.success(Unit)
+            } else {
+                android.util.Log.e("ChatRepository", "Error enviando mensaje — HTTP ${response.code()}: ${response.message()}. Body: ${response.errorBody()?.string()}")
+                Result.failure(Exception("Error sending message: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("ChatRepository", "Excepción enviando mensaje: ${e.message}", e)
+            Result.failure(e)
+        }
     }
 
     override suspend fun markMessagesAsRead(currentUserId: Long, otherUserId: Long): Result<Unit> {

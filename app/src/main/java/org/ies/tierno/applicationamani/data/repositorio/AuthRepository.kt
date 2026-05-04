@@ -58,14 +58,26 @@ class AuthRepository(
                         try {
                             val firebaseTokenResponse = api.getFirebaseToken()
                             if (firebaseTokenResponse.isSuccessful) {
-                                val firebaseToken = firebaseTokenResponse.body()?.get("firebaseToken")
-                                if (firebaseToken != null) {
-                                    FirebaseAuth.getInstance().signInWithCustomToken(firebaseToken).await()
+                                val responseBody = firebaseTokenResponse.body()
+                                val rawToken = responseBody?.get("firebaseToken")
+                                
+                                if (rawToken != null) {
+                                    // Limpiar el token de posibles comillas, espacios o saltos de línea
+                                    val sanitizedToken = rawToken.trim().replace("\"", "")
+                                    android.util.Log.d("AuthRepository", "Sanitized Firebase token length: ${sanitizedToken.length}, starts: ${sanitizedToken.take(20)}")
+                                    
+                                    if (sanitizedToken.isNotEmpty()) {
+                                        FirebaseAuth.getInstance().signInWithCustomToken(sanitizedToken).await()
+                                        android.util.Log.d("AuthRepository", "Firebase sign-in OK")
+                                    }
+                                } else {
+                                    android.util.Log.e("AuthRepository", "firebaseToken key not found in response: $responseBody")
                                 }
+                            } else {
+                                android.util.Log.e("AuthRepository", "getFirebaseToken HTTP ${firebaseTokenResponse.code()}: ${firebaseTokenResponse.errorBody()?.string()}")
                             }
                         } catch (e: Exception) {
-                            // Log and ignore Firebase errors to allow login even if chat is down
-                            android.util.Log.e("AuthRepository", "Error signing in to Firebase", e)
+                            android.util.Log.e("AuthRepository", "Error signing in to Firebase (Posible reloj desincronizado en emulador)", e)
                         }
 
                         Result.success(body)

@@ -6,21 +6,26 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.ies.tierno.applicationamani.data.remoto.ChatApi
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.domain.models.Message
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import retrofit2.Response
 
 class ChatRepositoryImplTest {
 
     private lateinit var chatFirebaseService: ChatFirebaseService
+    private lateinit var chatApi: ChatApi
     private lateinit var chatRepository: ChatRepositoryImpl
 
     @Before
     fun setUp() {
         chatFirebaseService = mockk()
-        chatRepository = ChatRepositoryImpl(chatFirebaseService)
+        chatApi = mockk()
+        chatRepository = ChatRepositoryImpl(chatFirebaseService, chatApi)
     }
 
     @Test
@@ -39,11 +44,11 @@ class ChatRepositoryImplTest {
     }
 
     @Test
-    fun `sendMessage should return success when Firebase service succeeds`() = runTest {
+    fun `sendMessage should return success when API service succeeds`() = runTest {
         // Given
         coEvery {
-            chatFirebaseService.sendMessage(any(), any(), any(), any(), any(), any())
-        } returns Result.success(Unit)
+            chatApi.sendMessage(any())
+        } returns Response.success(Unit)
 
         // When
         val result = chatRepository.sendMessage(1L, 2L, "Hello")
@@ -53,18 +58,17 @@ class ChatRepositoryImplTest {
     }
 
     @Test
-    fun `sendMessage should return failure when Firebase service fails`() = runTest {
+    fun `sendMessage should return failure when API service fails`() = runTest {
         // Given
-        val exception = Exception("Firebase Error")
         coEvery {
-            chatFirebaseService.sendMessage(any(), any(), any(), any(), any(), any())
-        } returns Result.failure(exception)
+            chatApi.sendMessage(any())
+        } returns Response.error(400, mockk(relaxed = true))
 
         // When
         val result = chatRepository.sendMessage(1L, 2L, "Hello")
 
         // Then
-        assertEquals(Result.failure<Unit>(exception), result)
+        assertTrue(result.isFailure)
     }
 
     @Test
