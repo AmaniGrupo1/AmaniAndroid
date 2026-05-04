@@ -120,6 +120,7 @@ dependencies {
 
     // Firebase
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
 
     // Logging
     implementation(libs.timber)

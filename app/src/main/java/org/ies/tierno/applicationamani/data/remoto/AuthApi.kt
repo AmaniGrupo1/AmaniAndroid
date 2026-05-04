@@ -79,4 +79,7 @@ interface AuthApi {
 
     @GET("/api/pacientes/sin-psicologo")
     suspend fun getPacientesSinPsicologo(): Response<List<PacienteBasicoResponseDTO>>
+
+    @GET("/api/auth/firebase-token")
+    suspend fun getFirebaseToken(): Response<Map<String, String>>
 }

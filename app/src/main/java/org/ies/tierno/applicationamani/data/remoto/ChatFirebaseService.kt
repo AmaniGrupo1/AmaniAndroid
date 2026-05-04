@@ -61,7 +61,17 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
                     val idMensaje = child.longValue("idMensaje") ?: 0L
                     val senderId = child.longValue("idSender", "senderId") ?: 0L
                     val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
-                    val enviadoEn = child.child("enviadoEn").getValue(String::class.java)
+                    val enviadoEnRaw = child.child("enviadoEn").getValue()
+                    val timestamp = when (enviadoEnRaw) {
+                        is Long -> enviadoEnRaw
+                        is String -> enviadoEnRaw.toLongOrNull() ?: try {
+                            // Intento de parseo de ISO 8601 si es necesario
+                            java.time.OffsetDateTime.parse(enviadoEnRaw).toInstant().toEpochMilli()
+                        } catch (e: Exception) {
+                            System.currentTimeMillis()
+                        }
+                        else -> System.currentTimeMillis()
+                    }
                     val leido = child.child("leido").getValue(Boolean::class.java) ?: false
                     val attachmentUrl = child.child("attachmentUrl").getValue(String::class.java)
                     val attachmentType = child.child("attachmentType").getValue(String::class.java)?.let {
@@ -81,7 +91,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
                             id = idMensaje.toString(),
                             senderId = senderId.toString(),
                             content = mensaje,
-                            timestamp = enviadoEn?.toLongOrNull() ?: System.currentTimeMillis(),
+                            timestamp = timestamp,
                             isRead = leido,
                             attachmentUrl = attachmentUrl,
                             attachmentType = attachmentType,

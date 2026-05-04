@@ -1,9 +1,11 @@
 package org.ies.tierno.applicationamani.data
 
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.UserSession
@@ -51,6 +53,20 @@ class AuthRepository(
                                 idPaciente = body.idPaciente
                             )
                         )
+
+                        // AUTENTICACIÓN CON FIREBASE
+                        try {
+                            val firebaseTokenResponse = api.getFirebaseToken()
+                            if (firebaseTokenResponse.isSuccessful) {
+                                val firebaseToken = firebaseTokenResponse.body()?.get("firebaseToken")
+                                if (firebaseToken != null) {
+                                    FirebaseAuth.getInstance().signInWithCustomToken(firebaseToken).await()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // Log and ignore Firebase errors to allow login even if chat is down
+                            android.util.Log.e("AuthRepository", "Error signing in to Firebase", e)
+                        }
 
                         Result.success(body)
                     } else {
