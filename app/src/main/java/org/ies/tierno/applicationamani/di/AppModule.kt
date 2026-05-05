@@ -18,7 +18,7 @@ import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
 import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
@@ -96,7 +96,7 @@ val appModule = module {
     factory { ListarPsicologoAdminUseCase(get()) }
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
-    factory { ListarSituacionUseCase(get()) }
+    factory { SituacionUseCase(get()) }
     factory { ProfileUseCaseGeneral(get()) }
     //REPOSITORIO
     factory { NotificacionUseCase(get()) }

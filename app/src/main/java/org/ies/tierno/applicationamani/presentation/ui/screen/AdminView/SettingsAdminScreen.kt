@@ -113,14 +113,20 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "clinic_name",
                             title = stringResource(R.string.nombre_clinica),
-                            subtitle = "Clínica Amani",
+                            subtitle = stringResource(R.string.clinica_amani),
                             icon = Icons.Default.Business
                         ),
                         SettingsOption(
-                            id = "crear_terapia",  // 🔥
+                            id = "crear_terapia",
                             title = stringResource(R.string.crear_terapia),
                             subtitle = stringResource(R.string.gestionar_terapias),
                             icon = Icons.Default.FitnessCenter
+                        ),
+                        SettingsOption(
+                            id = "crear_situacion",
+                            title = stringResource(R.string.crear_situacion),
+                            subtitle = stringResource(R.string.gestionar_situaciones),
+                            icon = Icons.Default.List
                         ),
                         SettingsOption(
                             id = "language",
@@ -134,7 +140,7 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "timezone",
                             title = stringResource(R.string.zona_horaria),
-                            subtitle = "Europe/Madrid",
+                            subtitle = stringResource(R.string.europa_madrid),
                             icon = Icons.Default.AccessTime
                         ),
                         SettingsOption(
@@ -173,13 +179,13 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "appointment_duration",
                             title = stringResource(R.string.duracion_cita),
-                            subtitle = "45 minutos",
+                            subtitle = stringResource(R.string.minutos_45),
                             icon = Icons.Default.Timer,
                         ),
                         SettingsOption(
                             id = "working_hours",
                             title = stringResource(R.string.horario_laboral),
-                            subtitle = "08:00 - 18:00",
+                            subtitle = stringResource(R.string.horario_08_18),
                             icon = Icons.Default.Schedule
                         ),
                         SettingsOption(
@@ -191,7 +197,7 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "appointment_interval",
                             title = stringResource(R.string.tiempo_entre_citas),
-                            subtitle = "10 minutos",
+                            subtitle = stringResource(R.string.minutos_10),
                             icon = Icons.Default.Timelapse
                         )
                     )
@@ -218,7 +224,7 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "reminder_time",
                             title = stringResource(R.string.tiempo_antes_cita),
-                            subtitle = "60 minutos",
+                            subtitle = stringResource(R.string.minutos_60),
                             icon = Icons.Default.Alarm
                         ),
                         SettingsOption(
@@ -284,7 +290,7 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "version",
                             title = stringResource(R.string.version),
-                            subtitle = "1.0.0",
+                            subtitle = stringResource(R.string.version_100),
                             icon = Icons.Default.Info
                         )
                     )
@@ -401,6 +407,9 @@ fun SettingsOptionRow(
                     "crear_terapia" -> {
                         navController.navigate(Screens.terapias.route)
                     }
+                    "crear_situacion" -> {
+                        navController.navigate(Screens.crearSituaciones.route)
+                    }
                 }
             }
             .padding(vertical = 8.dp),
@@ -428,7 +437,6 @@ fun SettingsOptionRow(
                     color = Color(0xFF333333)
                 )
 
-                // ✅ Actualizar subtítulo dinámicamente para el idioma
                 val displaySubtitle = if (option.id == "language") {
                     if (currentLanguage == "es") stringResource(R.string.espanol)
                     else stringResource(R.string.ingles)

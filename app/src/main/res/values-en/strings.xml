@@ -47,7 +47,6 @@
     <string name="cambia_tu_perfil">Change your profile</string>
     <string name="euro">Euro (€)</string>
     <string name="morado">Purple (#6C63FF)</string>
-
     <string name="app_name">Amani</string>
     <string name="general">General</string>
     <string name="perfil">Profile</string>
@@ -212,12 +211,41 @@
     <string name="precio_label">Price (€)</string>
     <string name="nueva_terapia">New Therapy</string>
     <string name="editar_terapia">Edit Therapy</string>
-    <string name="actualizar">Update</string>
-    <string name="crear">Create</string>
+    <string name="precio_formato">€ %s</string>
+    <string name="confirmar_eliminar_terapia">Are you sure you want to delete the therapy "%s"?\n\nThis action cannot be undone.</string>
+
+    <!-- Situations Management Screen -->
+    <string name="gestion_situaciones">Situations Management</string>
+    <string name="agregar_situacion">Add Situation</string>
+    <string name="presiona_para_agregar_situacion">Press the + button to add a situation</string>
+    <string name="nombre_situacion">Situation name</string>
+    <string name="descripcion_situacion">Description (optional)</string>
+    <string name="nueva_situacion">New Situation</string>
+    <string name="editar_situacion">Edit Situation</string>
+    <string name="confirmar_eliminar_situacion">Are you sure you want to delete the situation "%s"?\n\nThis action cannot be undone.</string>
+    <string name="situacion_creada">Situation created successfully</string>
+    <string name="situacion_actualizada">Situation updated successfully</string>
+    <string name="situacion_eliminada">Situation deleted successfully</string>
+    <string name="error_crear_situacion">Error creating situation</string>
+    <string name="error_actualizar_situacion">Error updating situation</string>
+    <string name="error_eliminar_situacion">Error deleting situation</string>
+
+    <!-- ==================== SETTINGS ADMIN SCREEN ==================== -->
+    <string name="clinica_amani">Amani Clinic</string>
+    <string name="crear_situacion">Create Situation</string>
+    <string name="gestionar_situaciones">Manage situation types</string>
+    <string name="europa_madrid">Europe/Madrid</string>
+    <string name="minutos_45">45 minutes</string>
+    <string name="horario_08_18">08:00 - 18:00</string>
+    <string name="minutos_10">10 minutes</string>
+    <string name="minutos_60">60 minutes</string>
+    <string name="version_100">1.0.0</string>
+
+    <!-- ==================== GENERAL STRINGS ==================== -->
     <string name="eliminar">Delete</string>
     <string name="cancelar">Cancel</string>
     <string name="editar">Edit</string>
-    <string name="precio_formato">€ %s</string>
+    <string name="actualizar">Update</string>
+    <string name="crear">Create</string>
     <string name="confirmar_eliminacion">Confirm deletion</string>
-    <string name="confirmar_eliminar_terapia">Are you sure you want to delete the therapy "%s"?\n\nThis action cannot be undone.</string>
 </resources>

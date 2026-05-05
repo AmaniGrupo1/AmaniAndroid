@@ -47,8 +47,6 @@
     <string name="cambia_tu_perfil">Cambia tu perfil</string>
     <string name="euro">Euro (€)</string>
     <string name="morado">Morado (#6C63FF)</string>
-
-
     <string name="app_name">Amani</string>
     <string name="general">General</string>
     <string name="perfil">Perfil</string>
@@ -203,7 +201,6 @@
     <string name="version_actual">Versión %s</string>
     <string name="configurar_notificaciones">Configurar tus notificaciones</string>
 
-
     <!-- Pantalla de Gestión de Terapias -->
     <string name="gestion_terapias">Gestión de Terapias</string>
     <string name="agregar_terapia">Agregar Terapia</string>
@@ -214,12 +211,42 @@
     <string name="precio_label">Precio (€)</string>
     <string name="nueva_terapia">Nueva Terapia</string>
     <string name="editar_terapia">Editar Terapia</string>
-    <string name="actualizar">Actualizar</string>
-    <string name="crear">Crear</string>
+    <string name="precio_formato">€ %s</string>
+    <string name="confirmar_eliminar_terapia">¿Estás seguro de que quieres eliminar la terapia "%s"?\n\nEsta acción no se puede deshacer.</string>
+
+    <!-- Pantalla de Gestión de Situaciones -->
+    <string name="gestion_situaciones">Gestión de Situaciones</string>
+    <string name="agregar_situacion">Agregar Situación</string>
+    <string name="presiona_para_agregar_situacion">Presiona el botón + para agregar una situación</string>
+    <string name="nombre_situacion">Nombre de la situación</string>
+    <string name="descripcion_situacion">Descripción (opcional)</string>
+    <string name="nueva_situacion">Nueva Situación</string>
+    <string name="editar_situacion">Editar Situación</string>
+    <string name="confirmar_eliminar_situacion">¿Estás seguro de que quieres eliminar la situación "%s"?\n\nEsta acción no se puede deshacer.</string>
+    <string name="situacion_creada">Situación creada correctamente</string>
+    <string name="situacion_actualizada">Situación actualizada correctamente</string>
+    <string name="situacion_eliminada">Situación eliminada correctamente</string>
+    <string name="error_crear_situacion">Error al crear la situación</string>
+    <string name="error_actualizar_situacion">Error al actualizar la situación</string>
+    <string name="error_eliminar_situacion">Error al eliminar la situación</string>
+
+
+    <!-- ==================== SETTINGS ADMIN SCREEN ==================== -->
+    <string name="clinica_amani">Clínica Amani</string>
+    <string name="crear_situacion">Crear Situación</string>
+    <string name="gestionar_situaciones">Gestionar tipos de situación</string>
+    <string name="europa_madrid">Europe/Madrid</string>
+    <string name="minutos_45">45 minutos</string>
+    <string name="horario_08_18">08:00 - 18:00</string>
+    <string name="minutos_10">10 minutos</string>
+    <string name="minutos_60">60 minutos</string>
+    <string name="version_100">1.0.0</string>
+
+    <!-- ==================== STRINGS GENERALES ==================== -->
     <string name="eliminar">Eliminar</string>
     <string name="cancelar">Cancelar</string>
     <string name="editar">Editar</string>
-    <string name="precio_formato">€ %s</string>
+    <string name="actualizar">Actualizar</string>
+    <string name="crear">Crear</string>
     <string name="confirmar_eliminacion">Confirmar eliminación</string>
-    <string name="confirmar_eliminar_terapia">¿Estás seguro de que quieres eliminar la terapia "%s"?\n\nEsta acción no se puede deshacer.</string>
 </resources>
