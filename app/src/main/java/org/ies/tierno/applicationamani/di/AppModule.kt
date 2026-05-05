@@ -9,6 +9,7 @@ import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+import org.ies.tierno.applicationamani.data.remoto.FileStorageService
 import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
 import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
@@ -85,7 +86,7 @@ val appModule = module {
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
     single<ChatRepository> { ChatRepositoryImpl(get()) }
-    single { org.ies.tierno.applicationamani.data.remoto.FileStorageService(get(), androidContext()) }
+    single { FileStorageService(get(), androidContext()) }
 
     factory { LoginUseCase(get()) }
     factory { GetAllClientAndPsicologoUseCase(get()) }

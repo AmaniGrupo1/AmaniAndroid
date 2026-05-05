@@ -40,10 +40,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,16 +53,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import java.time.LocalDate
 import java.time.Period
@@ -78,6 +82,14 @@ fun AgregaPsicologoScreen(
     val primaryColor = Color(0xFF7B68EE) // Púrpura AMANI
     val backgroundColor = Color(0xFFCCC0E4)
     val errorColor = Color(0xFFD32F2F) // Rojo para errores
+
+    // Fuente Roboto correctamente configurada
+    val roboto = FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
+    )
 
     val name by loginViewModel.nombre.collectAsStateWithLifecycle()
     val surname by loginViewModel.apellido.collectAsStateWithLifecycle()
@@ -143,19 +155,35 @@ fun AgregaPsicologoScreen(
         containerColor = backgroundColor,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("Registrar Psicólogo", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
-                        )
-                    }
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = primaryColor,
+                shadowElevation = 4.dp,
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "REGISTRAR PSICÓLOGO",
+                        color = Color.White,
+                        fontFamily = roboto,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+
+                    // Espaciador para balancear el ícono de navegación
+                    Spacer(modifier = Modifier.width(48.dp))
                 }
-            )
+            }
         }
     ) { paddingValues ->
         Column(
@@ -183,6 +211,7 @@ fun AgregaPsicologoScreen(
                             "Datos Personales",
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
+                            fontFamily = roboto,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -192,7 +221,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { loginViewModel.setNombre(it) },
-                        label = { Text("Nombre *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text("Nombre *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -205,7 +234,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = surname,
                         onValueChange = { loginViewModel.setApellido(it) },
-                        label = { Text("Apellido *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text("Apellido *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -218,7 +247,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = email,
                         onValueChange = { loginViewModel.setEmail(it) },
-                        label = { Text("Email *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text("Email *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = emailError != null,
@@ -228,7 +257,7 @@ fun AgregaPsicologoScreen(
                         ),
                         supportingText = {
                             if (emailError != null) {
-                                Text(emailError!!, color = errorColor)
+                                Text(emailError!!, fontFamily = roboto, color = errorColor)
                             }
                         }
                     )
@@ -237,7 +266,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = password,
                         onValueChange = { loginViewModel.setRegPassword(it) },
-                        label = { Text("Contraseña *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text("Contraseña *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -256,9 +285,9 @@ fun AgregaPsicologoScreen(
                         },
                         supportingText = {
                             if (passwordError != null) {
-                                Text(passwordError!!, color = errorColor)
+                                Text(passwordError!!, fontFamily = roboto, color = errorColor)
                             } else if (password.isNotBlank() && password.length < 8) {
-                                Text("Mínimo 8 caracteres", color = errorColor)
+                                Text("Mínimo 8 caracteres", fontFamily = roboto, color = errorColor)
                             }
                         }
                     )
@@ -267,7 +296,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = dateOfBirth?.format(dateFormatter) ?: "",
                         onValueChange = {},
-                        label = { Text("Fecha de Nacimiento *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text("Fecha de Nacimiento *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { loginViewModel.setShowDatePicker(true) },
@@ -285,7 +314,7 @@ fun AgregaPsicologoScreen(
                         ),
                         supportingText = {
                             if (dateError != null) {
-                                Text(dateError!!, color = errorColor)
+                                Text(dateError!!, fontFamily = roboto, color = errorColor)
                             }
                         }
                     )
@@ -294,7 +323,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = telefono,
                         onValueChange = { loginViewModel.setTelefonoPsicologo(it.filter { c -> c.isDigit() }) },
-                        label = { Text("Teléfono *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text("Teléfono *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = phoneError != null,
@@ -304,9 +333,9 @@ fun AgregaPsicologoScreen(
                         ),
                         supportingText = {
                             if (phoneError != null) {
-                                Text(phoneError!!, color = errorColor)
+                                Text(phoneError!!, fontFamily = roboto, color = errorColor)
                             } else if (telefono.isNotBlank() && telefono.length != 9) {
-                                Text("Debe tener 9 dígitos", color = errorColor)
+                                Text("Debe tener 9 dígitos", fontFamily = roboto, color = errorColor)
                             }
                         }
                     )
@@ -328,6 +357,7 @@ fun AgregaPsicologoScreen(
                             "Datos Profesionales",
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
+                            fontFamily = roboto,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -342,7 +372,7 @@ fun AgregaPsicologoScreen(
                             value = especialidad,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Especialidad *", fontWeight = FontWeight.SemiBold) },
+                            label = { Text("Especialidad *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .menuAnchor(),
@@ -359,7 +389,7 @@ fun AgregaPsicologoScreen(
                         ) {
                             listaEspecialidades.forEach { opcion ->
                                 DropdownMenuItem(
-                                    text = { Text(opcion) },
+                                    text = { Text(opcion, fontFamily = roboto) },
                                     onClick = {
                                         loginViewModel.setRegistroEspecialidad(opcion)
                                         expandedEspecialidad = false
@@ -373,7 +403,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = experiencia?.toString() ?: "",
                         onValueChange = { loginViewModel.setRegistroExperiencia(it.toIntOrNull()) },
-                        label = { Text("Experiencia (años)") },
+                        label = { Text("Experiencia (años)", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -386,7 +416,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = descripcion ?: "",
                         onValueChange = { loginViewModel.setRegistroDescripcion(it) },
-                        label = { Text("Descripción") },
+                        label = { Text("Descripción", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -399,7 +429,7 @@ fun AgregaPsicologoScreen(
                     OutlinedTextField(
                         value = licencia ?: "",
                         onValueChange = { loginViewModel.setRegistroLicencia(it) },
-                        label = { Text("Licencia Colegiada") },
+                        label = { Text("Licencia Colegiada", fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -414,14 +444,14 @@ fun AgregaPsicologoScreen(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(56.dp),
                 enabled = !isRegistering,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = primaryColor,
                     contentColor = Color.White,
                     disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
                 ),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 onClick = { loginViewModel.registrarPsicologo() }
             ) {
                 if (isRegistering) {
@@ -431,9 +461,19 @@ fun AgregaPsicologoScreen(
                         strokeWidth = 2.dp
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Registrando...", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Registrando...",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = roboto
+                    )
                 } else {
-                    Text("Crear Cuenta", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "📝 Crear Cuenta",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = roboto
+                    )
                 }
             }
 
@@ -462,12 +502,12 @@ fun AgregaPsicologoScreen(
                         loginViewModel.setDateError("Debes ser mayor de 18 años")
                     }
                 }) {
-                    Text("Aceptar")
+                    Text("Aceptar", fontFamily = roboto)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { loginViewModel.setShowDatePicker(false) }) {
-                    Text("Cancelar")
+                    Text("Cancelar", fontFamily = roboto)
                 }
             }
         ) {

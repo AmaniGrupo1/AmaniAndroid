@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+package org.ies.tierno.applicationamani.presentation.ui.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,18 +13,18 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -33,13 +33,21 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel,
-    situacionViewModel: SituacionViewModel
+    loginViewModel: LoginViewModel = koinViewModel(),
+    situacionViewModel: SituacionViewModel = koinViewModel()
 ) {
     val primaryColor = Color(0xFF6C63FF)
     val backgroundColor = Color(0xFFCCC0E4)
     val snackbarHostState = remember { SnackbarHostState() }
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
+    // Fuente Roboto correctamente configurada
+    val roboto = FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
+    )
+
     val scope = rememberCoroutineScope()
 
     // Estados del LoginViewModel
@@ -87,26 +95,50 @@ fun RegisterScreen(
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    val listaGeneros = listOf("MASCULINO", "FEMENINO", "OTRO", "PREFIERO_NO_DECIR")
-    val listaTiposTutor = listOf("PADRE", "MADRE", "TUTOR LEGAL", "ABUELO", "OTRO")
+    val listaGeneros = listOf("Masculino", "Femenino", "Otro", "Prefiero no decirlo")
+    val listaTiposTutor = listOf("Padre", "Madre", "Tutor legal", "Abuelo", "Otro")
 
     Scaffold(
         containerColor = backgroundColor,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("Registrar Paciente", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = primaryColor,
+                shadowElevation = 4.dp,
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                             tint = Color.White
                         )
                     }
+
+                    Text(
+                        text = "REGISTRAR PACIENTE",
+                        color = Color.White,
+                        fontFamily = roboto,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+
+                    // Espaciador para balancear el ícono de navegación
+                    Spacer(modifier = Modifier.width(48.dp))
                 }
-            )
+            }
         }
     ) { padding ->
         Column(
@@ -772,7 +804,7 @@ fun RegisterScreen(
         }
     }
 
-    // ==================== DIÁLOGO DE ÉXITO MODIFICADO ====================
+    // ==================== DIÁLOGO DE ÉXITO ====================
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -791,7 +823,7 @@ fun RegisterScreen(
                 Text(
                     "¡Registro Exitoso!",
                     fontFamily = roboto,
-                    fontWeight = Bold
+                    fontWeight = FontWeight.Bold
                 )
             },
             text = {
@@ -831,7 +863,7 @@ fun RegisterScreen(
                 Text(
                     "Error en el Registro",
                     fontFamily = roboto,
-                    fontWeight = Bold
+                    fontWeight = FontWeight.Bold
                 )
             },
             text = {

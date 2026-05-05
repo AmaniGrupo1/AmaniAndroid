@@ -71,15 +71,6 @@ fun ListarPacienteSinPsicologos(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = primaryColor
                 ),
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
-                        )
-                    }
-                },
                 actions = {
                     IconButton(onClick = {
                         pacientesViewModel.cargarPacientesSinPsicologo()

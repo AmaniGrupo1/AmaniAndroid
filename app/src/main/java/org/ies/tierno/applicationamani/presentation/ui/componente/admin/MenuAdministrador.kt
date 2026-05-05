@@ -125,17 +125,6 @@ fun MenuAdministrador(
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Crear test",
-                icon = Icons.Default.Quiz,
-                route = Screens.test.route
-            ),
-            MenuAdministrador(
-                title = "Crear preguntas",
-                icon = Icons.Default.Edit,
-                route = Screens.test.route,
-                dividerAfter = true
-            ),
-            MenuAdministrador(
                 title = "Listar pacientes",
                 icon = Icons.Default.People,
                 route = Screens.pacientes.route
@@ -166,7 +155,7 @@ fun MenuAdministrador(
             ),
             MenuAdministrador(
                 title = "Cerrar sesión",
-                icon = Icons.Default.Logout,
+                icon = Icons.AutoMirrored.Filled.Logout,
                 route = Screens.login.route,
                 isDanger = true
             )
