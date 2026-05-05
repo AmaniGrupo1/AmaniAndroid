@@ -117,10 +117,10 @@ fun SettingsAdminScreen(
                             icon = Icons.Default.Business
                         ),
                         SettingsOption(
-                            id = "logo",
-                            title = stringResource(R.string.logo),
-                            subtitle = stringResource(R.string.cambiar_logo),
-                            icon = Icons.Default.Image
+                            id = "crear_terapia",  // 🔥
+                            title = stringResource(R.string.crear_terapia),
+                            subtitle = stringResource(R.string.gestionar_terapias),
+                            icon = Icons.Default.FitnessCenter
                         ),
                         SettingsOption(
                             id = "language",
@@ -397,6 +397,9 @@ fun SettingsOptionRow(
                                 Screens.perfilPsicologo.createRoute(identificador)
                             )
                         }
+                    }
+                    "crear_terapia" -> {
+                        navController.navigate(Screens.terapias.route)
                     }
                 }
             }

@@ -30,7 +30,7 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
-import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.warning
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel

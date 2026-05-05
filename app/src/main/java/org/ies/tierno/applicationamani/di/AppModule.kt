@@ -60,6 +60,7 @@ import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
@@ -113,6 +114,7 @@ val appModule = module {
     factory { MarkMessageDeliveredUseCase(get()) }
     factory { UpdateUserOnlineUseCase(get()) }
     factory { IdiomaUseCase(get()) }
+    factory { TerapiasGeneralUseCase(get()) }
 
     viewModel { LoginViewModel(get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
@@ -130,7 +132,7 @@ val appModule = module {
     viewModel { ProfilePsicologoViewModel(get()) }
     viewModel { EditProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
-    viewModel { ListarTerapiasViewModel(get()) }
+    viewModel { ListarTerapiasViewModel(get(), get()) }
     viewModel { ListarCitasViewModel(get(), get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }

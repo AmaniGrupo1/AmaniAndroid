@@ -8,7 +8,8 @@
 
     <!-- General section options -->
     <string name="nombre_clinica">Clinic name</string>
-    <string name="logo">Logo</string>
+    <string name="crear_terapia">Create Therapy</string>
+    <string name="gestionar_terapias">Manage therapy types</string>
     <string name="cambiar_logo">Change clinic logo</string>
     <string name="zona_horaria">Timezone</string>
     <string name="moneda">Currency</string>
@@ -200,4 +201,23 @@
     <string name="tiempo_minutos">%d minutes</string>
     <string name="version_actual">Version %s</string>
     <string name="configurar_notificaciones">Configure your notifications</string>
+
+    <!-- Therapy Management Screen -->
+    <string name="gestion_terapias">Therapy Management</string>
+    <string name="agregar_terapia">Add Therapy</string>
+    <string name="no_hay_terapias">No therapies available</string>
+    <string name="presiona_para_agregar">Press the + button to add a therapy</string>
+    <string name="nombre_terapia">Therapy name</string>
+    <string name="duracion_minutos_label">Duration (minutes)</string>
+    <string name="precio_label">Price (€)</string>
+    <string name="nueva_terapia">New Therapy</string>
+    <string name="editar_terapia">Edit Therapy</string>
+    <string name="actualizar">Update</string>
+    <string name="crear">Create</string>
+    <string name="eliminar">Delete</string>
+    <string name="cancelar">Cancel</string>
+    <string name="editar">Edit</string>
+    <string name="precio_formato">€ %s</string>
+    <string name="confirmar_eliminacion">Confirm deletion</string>
+    <string name="confirmar_eliminar_terapia">Are you sure you want to delete the therapy "%s"?\n\nThis action cannot be undone.</string>
 </resources>

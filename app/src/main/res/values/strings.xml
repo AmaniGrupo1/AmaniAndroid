@@ -8,7 +8,8 @@
 
     <!-- Opciones de la sección General -->
     <string name="nombre_clinica">Nombre de la clínica</string>
-    <string name="logo">Logo</string>
+    <string name="crear_terapia">Crear Terapia</string>
+    <string name="gestionar_terapias">Gestionar tipos de terapia</string>
     <string name="cambiar_logo">Cambiar logo de la clínica</string>
     <string name="zona_horaria">Zona horaria</string>
     <string name="moneda">Moneda</string>
@@ -201,4 +202,24 @@
     <string name="tiempo_minutos">%d minutos</string>
     <string name="version_actual">Versión %s</string>
     <string name="configurar_notificaciones">Configurar tus notificaciones</string>
+
+
+    <!-- Pantalla de Gestión de Terapias -->
+    <string name="gestion_terapias">Gestión de Terapias</string>
+    <string name="agregar_terapia">Agregar Terapia</string>
+    <string name="no_hay_terapias">No hay terapias disponibles</string>
+    <string name="presiona_para_agregar">Presiona el botón + para agregar una terapia</string>
+    <string name="nombre_terapia">Nombre de la terapia</string>
+    <string name="duracion_minutos_label">Duración (minutos)</string>
+    <string name="precio_label">Precio (€)</string>
+    <string name="nueva_terapia">Nueva Terapia</string>
+    <string name="editar_terapia">Editar Terapia</string>
+    <string name="actualizar">Actualizar</string>
+    <string name="crear">Crear</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="editar">Editar</string>
+    <string name="precio_formato">€ %s</string>
+    <string name="confirmar_eliminacion">Confirmar eliminación</string>
+    <string name="confirmar_eliminar_terapia">¿Estás seguro de que quieres eliminar la terapia "%s"?\n\nEsta acción no se puede deshacer.</string>
 </resources>

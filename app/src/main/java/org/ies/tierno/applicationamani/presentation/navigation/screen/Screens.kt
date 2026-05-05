@@ -97,5 +97,7 @@
 
         object settingPsicologo : Screens("settingPsicologo")
 
+        object terapias : Screens("terapias")
+
     }
 

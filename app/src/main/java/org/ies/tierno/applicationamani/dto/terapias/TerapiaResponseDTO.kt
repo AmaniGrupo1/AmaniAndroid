@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.dto.citas
+package org.ies.tierno.applicationamani.dto.terapias
 
 import java.math.BigDecimal
 
@@ -7,4 +7,6 @@ data class TerapiaResponseDTO (
  val nombre : String,
  val duracionMinutos : Int,
  val precio : BigDecimal
-)
+){
+ val id get() = idTipo
+}
