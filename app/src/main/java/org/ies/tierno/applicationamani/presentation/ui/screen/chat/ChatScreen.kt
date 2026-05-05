@@ -14,14 +14,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -112,6 +114,11 @@ fun ChatScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        // CAMBIO 1: Desactivamos los insets automáticos de Scaffold.
+        // Esto evita el "doble padding" al no añadir el espacio del teclado a los `paddingValues`
+        // que se pasan al contenido principal. Ahora tenemos control manual total.
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             ChatTopBar(
                 psychologistInfo = uiState.assignedPsychologist,
@@ -122,7 +129,7 @@ fun ChatScreen(
         bottomBar = {
             ChatInputBar(
                 modifier = Modifier.windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
+                    WindowInsets.navigationBars.union(WindowInsets.ime)
                 ),
                 text = uiState.inputText,
                 onTextChange = viewModel::onInputChanged,
@@ -152,14 +159,14 @@ fun ChatScreen(
                 isOtherTyping = uiState.isOtherTyping
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = Modifier.fillMaxSize()
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
             when {
                 uiState.isLoading -> {

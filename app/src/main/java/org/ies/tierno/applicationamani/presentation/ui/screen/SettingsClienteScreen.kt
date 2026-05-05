@@ -158,7 +158,7 @@ fun SettingsClienteScreen(
                                     readOnly = true,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                        .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                     leadingIcon = { Icon(Icons.Default.Transgender, contentDescription = null) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
                                     shape = RoundedCornerShape(14.dp),

@@ -67,7 +67,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
@@ -1314,7 +1314,7 @@ fun HoraSelector(horaActual: String, onHoraSeleccionada: (String) -> Unit) {
             value = horaActual,
             onValueChange = {},
             readOnly = true,
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             horas.forEach { hora ->
@@ -1764,7 +1764,7 @@ fun DialogoCrearEditarCitaMejorado(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                         shape = RoundedCornerShape(14.dp)
                     )
                     ExposedDropdownMenu(
@@ -1867,7 +1867,7 @@ fun DialogoCrearEditarCitaMejorado(
                                 readOnly = true,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                                 shape = RoundedCornerShape(12.dp)
                             )
                             ExposedDropdownMenu(
@@ -2004,7 +2004,7 @@ fun CampoSeleccionConIcono(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                 singleLine = true, shape = RoundedCornerShape(14.dp), isError = error,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colors.primary,

@@ -511,7 +511,7 @@ fun EditarCitaScreen(
                                             },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                             shape = RoundedCornerShape(12.dp)
                                         )
                                         ExposedDropdownMenu(

@@ -771,7 +771,7 @@ fun DialogoGestionCitaPaciente(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                            .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                         shape = RoundedCornerShape(14.dp)
                     )
                     ExposedDropdownMenu(
@@ -915,7 +915,7 @@ fun CampoSeleccionConIconoPaciente(
                 readOnly = true,
                 leadingIcon = { Icon(icono, contentDescription = label, modifier = Modifier.size(20.dp)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 isError = error
