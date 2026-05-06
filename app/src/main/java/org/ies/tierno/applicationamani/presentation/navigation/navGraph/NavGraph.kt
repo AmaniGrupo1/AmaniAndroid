@@ -45,6 +45,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.HistorialClinicoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.SettingsPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EditProfilePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
@@ -303,6 +304,18 @@ fun NavGraph(
             ) { backStackEntry ->
                 val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
                 PacienteProfileScreen(pacienteId, navController)
+            }
+
+            composable(
+                route = Screens.historialClinico.route,
+                arguments = listOf(
+                    navArgument("pacienteId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+                HistorialClinicoScreen(navController, pacienteId)
             }
         }
     }

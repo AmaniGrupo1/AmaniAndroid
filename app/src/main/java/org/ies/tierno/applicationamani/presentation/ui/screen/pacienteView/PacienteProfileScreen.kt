@@ -1008,7 +1008,6 @@ fun ErrorContentPaciente(
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(containerColor = colors.Primary),
             shape = RoundedCornerShape(12.dp)
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)

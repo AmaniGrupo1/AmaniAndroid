@@ -11,6 +11,7 @@ import org.ies.tierno.applicationamani.data.remoto.AjustesApi
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
+import org.ies.tierno.applicationamani.data.remoto.HistorialApi
 import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
@@ -108,4 +109,5 @@ val retrofitModule = module {
     single<ProfileApi> { get<Retrofit>().create(ProfileApi::class.java) }
     single<AjustesApi> { get<Retrofit>().create(AjustesApi::class.java) }
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
+    single<HistorialApi> { get<Retrofit>().create(HistorialApi::class.java) }
 }

@@ -445,8 +445,7 @@ fun SettingsOptionRowPaciente(
 
                     "historial" -> {
                         // TODO: Navegar a historial clínico
-                        Log.d(TAG, "📋 Navegar a historial clínico")
-                        // navController.navigate(Screens.historialClinico)
+                        navController.navigate(Screens.historialClinico.createRoute(session?.idPaciente ?: 0L))
                     }
 
                     "notificaciones" -> {

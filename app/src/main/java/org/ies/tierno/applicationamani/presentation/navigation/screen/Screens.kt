@@ -101,6 +101,10 @@
 
         object crearSituaciones : Screens("crearSituaciones")
 
+        object historialClinico : Screens("historialClinico/{pacienteId}"){
+            fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
+        }
+
         object profileAdmin : Screens("profileAdmin/{adminId}"){
             fun createRoute(adminId: Long?) = "profileAdmin/$adminId"
         }
