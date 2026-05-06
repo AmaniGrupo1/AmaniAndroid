@@ -397,10 +397,10 @@ fun SettingsOptionRow(
                 when (option.id) {
                     "language" -> expanded = true
                     "perfil" -> {
-                        val identificador = session?.idPsicologo
+                        val identificador = session?.idUsuario
                         if (identificador != null && identificador > 0L) {
                             navController.navigate(
-                                Screens.perfilPsicologo.createRoute(identificador)
+                                Screens.profileAdmin.createRoute(identificador)
                             )
                         }
                     }

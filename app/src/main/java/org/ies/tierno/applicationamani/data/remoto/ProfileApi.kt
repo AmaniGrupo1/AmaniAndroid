@@ -85,7 +85,7 @@ interface ProfileApi {
     // 🟢 PACIENTE (NUEVO)
     // ============================
 
-    @GET("/api/psicologo/paciente/{id}")
+    @GET("/api/psicologo/paciente/{id}/get")
     suspend fun getPacienteProfile(
         @Path("id") id: Long
     ): PacienteProfileResponseDTO
@@ -101,7 +101,7 @@ interface ProfileApi {
     suspend fun updatePacientePhoto(
         @Path("id") id: Long,
         @Part file: MultipartBody.Part
-    ): PacienteResponseDTO
+    ): PacienteProfileResponseDTO
 
 
 }

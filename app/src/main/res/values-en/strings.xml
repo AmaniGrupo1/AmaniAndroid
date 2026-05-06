@@ -248,4 +248,36 @@
     <string name="actualizar">Update</string>
     <string name="crear">Create</string>
     <string name="confirmar_eliminacion">Confirm deletion</string>
+
+    <!-- ==================== SETTINGS PACIENTE SCREEN ==================== -->
+    <string name="configuracion">Settings</string>
+    <string name="mi_psicologo">My Psychologist</string>
+    <string name="ver_info_psicologo">View your psychologist\'s information</string>
+    <string name="historial_clinico">Medical History</string>
+    <string name="ver_historial">View your medical history</string>
+    <string name="mis_citas">My Appointments</string>
+    <string name="proximas_citas">Upcoming Appointments</string>
+    <string name="ver_citas_proximas">View scheduled appointments</string>
+    <string name="historial_citas">Appointment History</string>
+    <string name="citas_pasadas">Past and completed appointments</string>
+    <string name="recordatorios_citas">Appointment Reminders</string>
+    <string name="configurar_recordatorios">Configure appointment reminders</string>
+    <string name="facturacion">Billing</string>
+    <string name="metodos_pago">Payment Methods</string>
+    <string name="gestionar_pagos">Manage your payment methods</string>
+    <string name="historial_pagos">Payment History</string>
+    <string name="ver_pagos_realizados">View your payments</string>
+    <string name="facturas">Invoices</string>
+    <string name="descargar_facturas">Download your invoices</string>
+    <string name="soporte">Support</string>
+    <string name="ayuda">Help</string>
+    <string name="preguntas_frecuentes">Frequently Asked Questions</string>
+    <string name="contacto">Contact</string>
+    <string name="contactar_soporte">Contact support</string>
+    <string name="reportar_problema">Report Issue</string>
+    <string name="enviar_reporte">Send an issue report</string>
+    <string name="cerrar_sesion">Log Out</string>
+    <string name="salir_aplicacion">Exit the application</string>
+
+    <string name="configuracion_titulo">Settings</string>
 </resources>

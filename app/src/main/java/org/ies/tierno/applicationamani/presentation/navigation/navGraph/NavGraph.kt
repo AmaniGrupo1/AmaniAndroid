@@ -18,9 +18,11 @@ import androidx.navigation.navArgument
 import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.screens.profile.PacienteProfileScreen
 import org.ies.tierno.applicationamani.presentation.screens.profile.PsicologoProfileScreen
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AdminProfileScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
@@ -43,6 +45,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.SettingsPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EditProfilePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.RegistrarPacientePsicologoScreen
@@ -117,7 +120,7 @@ fun NavGraph(
                 PrincipalClienteScreen(navController)
             }
             composable(Screens.settingsCliente.route) {
-                SettingsClienteScreen(navController)
+                SettingsPacienteScreen(navController, userSessionDataStore, idiomaViewModel)
             }
             composable(Screens.agregarPsicologo.route) {
                 AgregaPsicologoScreen(navController, loginViewModel)
@@ -278,6 +281,28 @@ fun NavGraph(
             }
             composable(Screens.crearSituaciones.route){
                 SituacionAdminScreen(navController, situacionViewModel)
+            }
+            composable(
+                route = Screens.profileAdmin.route,
+                arguments = listOf(
+                    navArgument("adminId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val adminId = backStackEntry.arguments?.getLong("adminId") ?: 0L
+                AdminProfileScreen(adminId, navController)
+            }
+            composable(
+                route = Screens.perfilPaciente.route,
+                arguments = listOf(
+                    navArgument("pacienteId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+                PacienteProfileScreen(pacienteId, navController)
             }
         }
     }

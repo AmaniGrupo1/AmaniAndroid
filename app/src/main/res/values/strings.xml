@@ -249,4 +249,36 @@
     <string name="actualizar">Actualizar</string>
     <string name="crear">Crear</string>
     <string name="confirmar_eliminacion">Confirmar eliminación</string>
+
+    <!-- ==================== SETTINGS PACIENTE SCREEN ==================== -->
+    <string name="configuracion">Configuración</string>
+    <string name="mi_psicologo">Mi Psicólogo</string>
+    <string name="ver_info_psicologo">Ver información de tu psicólogo</string>
+    <string name="historial_clinico">Historial Clínico</string>
+    <string name="ver_historial">Ver tu historial clínico</string>
+    <string name="mis_citas">Mis Citas</string>
+    <string name="proximas_citas">Próximas Citas</string>
+    <string name="ver_citas_proximas">Ver las citas programadas</string>
+    <string name="historial_citas">Historial de Citas</string>
+    <string name="citas_pasadas">Citas pasadas y completadas</string>
+    <string name="recordatorios_citas">Recordatorios de Citas</string>
+    <string name="configurar_recordatorios">Configurar recordatorios de citas</string>
+    <string name="facturacion">Facturación</string>
+    <string name="metodos_pago">Métodos de Pago</string>
+    <string name="gestionar_pagos">Gestionar tus métodos de pago</string>
+    <string name="historial_pagos">Historial de Pagos</string>
+    <string name="ver_pagos_realizados">Ver pagos realizados</string>
+    <string name="facturas">Facturas</string>
+    <string name="descargar_facturas">Descargar tus facturas</string>
+    <string name="soporte">Soporte</string>
+    <string name="ayuda">Ayuda</string>
+    <string name="preguntas_frecuentes">Preguntas frecuentes</string>
+    <string name="contacto">Contacto</string>
+    <string name="contactar_soporte">Contactar con soporte</string>
+    <string name="reportar_problema">Reportar Problema</string>
+    <string name="enviar_reporte">Enviar un reporte de problema</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
+    <string name="salir_aplicacion">Salir de la aplicación</string>
+
+    <string name="configuracion_titulo">Configuración</string>
 </resources>

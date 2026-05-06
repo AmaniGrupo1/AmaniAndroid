@@ -65,6 +65,8 @@ import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUs
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.ProfileAdminViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente.ProfilePacienteViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -160,5 +162,6 @@ val appModule = module {
     viewModel { NotificacionViewModel(get()) }
     viewModel { PacientesViewModel(get()) }
     viewModel { IdiomaViewModel(get(), get()) }
-
+    viewModel { ProfileAdminViewModel(get()) }
+    viewModel { ProfilePacienteViewModel(get()) }
 }
