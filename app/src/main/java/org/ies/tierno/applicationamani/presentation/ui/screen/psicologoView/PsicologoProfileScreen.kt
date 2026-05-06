@@ -77,7 +77,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.File

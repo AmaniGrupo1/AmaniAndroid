@@ -2,9 +2,9 @@ package org.ies.tierno.applicationamani.domain.usecases.profileUseCase
 
 import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
-import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
 
 class ProfileUseCaseGeneral(val repository: ProfileRepository) {
 

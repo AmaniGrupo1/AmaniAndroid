@@ -13,8 +13,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
-import org.ies.tierno.applicationamani.dto.perfil.PacienteProfeleResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import java.io.File
 import java.io.FileOutputStream
 
@@ -26,8 +26,8 @@ class ProfilePsicologoViewModel(
     private val _perfil = MutableStateFlow<PsicologoProfileResponseDTO?>(null)
     val perfil: StateFlow<PsicologoProfileResponseDTO?> = _perfil.asStateFlow()
 
-    private val _pacientesProfile = MutableStateFlow<PacienteProfeleResponseDTO?>(null)
-    val pacientesProfile: StateFlow<PacienteProfeleResponseDTO?> = _pacientesProfile.asStateFlow()
+    private val _pacientesProfile = MutableStateFlow<PacienteProfileResponseDTO?>(null)
+    val pacientesProfile: StateFlow<PacienteProfileResponseDTO?> = _pacientesProfile.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()

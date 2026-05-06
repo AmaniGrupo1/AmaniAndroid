@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 
 class PacienteViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral

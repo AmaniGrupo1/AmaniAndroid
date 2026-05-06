@@ -1,4 +1,6 @@
-package org.ies.tierno.applicationamani.dto.perfil
+package org.ies.tierno.applicationamani.dto.perfil.psicologo
+
+import org.ies.tierno.applicationamani.dto.perfil.UsuarioUpdateDTO
 
 data class UpdatePsicologoRequestDTO(
     val especialidad: String?,

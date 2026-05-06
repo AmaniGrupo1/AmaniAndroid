@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.dto.perfil
+package org.ies.tierno.applicationamani.dto.perfil.psicologo
 
 data class UsuarioProfileResponseDTO (
     val idUsuario: Long? = null,

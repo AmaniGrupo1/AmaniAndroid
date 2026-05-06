@@ -2,9 +2,9 @@ package org.ies.tierno.applicationamani.data.repositorio
 
 import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
-import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
 
 class ProfileRepository(private val api: ProfileApi){
 

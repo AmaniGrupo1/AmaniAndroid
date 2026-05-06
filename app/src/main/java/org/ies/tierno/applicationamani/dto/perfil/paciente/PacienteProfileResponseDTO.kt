@@ -1,5 +1,6 @@
-package org.ies.tierno.applicationamani.dto.perfil
+package org.ies.tierno.applicationamani.dto.perfil.paciente
 
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UsuarioProfileResponseDTO
 import java.time.LocalDate
 
 data class PacienteProfileResponseDTO(

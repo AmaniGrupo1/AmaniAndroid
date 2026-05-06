@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.perfil.UsuarioUpdateDTO
 
 class EditProfilePsicologoViewModel(

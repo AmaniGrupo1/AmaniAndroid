@@ -2,9 +2,14 @@ package org.ies.tierno.applicationamani.data.remoto
 
 
 import okhttp3.MultipartBody
-import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.admin.AdminDTO
+import org.ies.tierno.applicationamani.dto.perfil.admin.AdminResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -52,4 +57,51 @@ interface ProfileApi {
         @Path("id") id: Long,
         @Body psicologoProfile: UpdatePsicologoRequestDTO
     ): PsicologoProfileResponseDTO
+
+    // ============================
+    // 🟡 ADMIN (NUEVO)
+    // ============================
+
+    @GET("/api/psicologo/admin/{id}/perfil")
+    suspend fun getAdminProfile(
+        @Path("id") id: Long
+    ): AdminDTO
+
+    @PUT("/api/psicologo/admin/{id}/update")
+    suspend fun updateAdmin(
+        @Path("id") id: Long,
+        @Body dto: UpdateAdminRequestDTO
+    ): AdminResponseDTO
+
+    @Multipart
+    @POST("/api/psicologo/admin/{id}/foto")
+    suspend fun updateAdminPhoto(
+        @Path("id") id: Long,
+        @Part file: MultipartBody.Part
+    ): AdminDTO
+
+
+    // ============================
+    // 🟢 PACIENTE (NUEVO)
+    // ============================
+
+    @GET("/api/psicologo/paciente/{id}")
+    suspend fun getPacienteProfile(
+        @Path("id") id: Long
+    ): PacienteProfileResponseDTO
+
+    @PUT("/api/psicologo/paciente/update/{id}")
+    suspend fun updatePaciente(
+        @Path("id") id: Long,
+        @Body dto: UpdatePacienteRequestDTO
+    ): PacienteResponseDTO
+
+    @Multipart
+    @POST("/api/psicologo/paciente/{id}/foto")
+    suspend fun updatePacientePhoto(
+        @Path("id") id: Long,
+        @Part file: MultipartBody.Part
+    ): PacienteResponseDTO
+
+
 }

@@ -65,6 +65,7 @@ import coil.request.ImageRequest
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
@@ -395,7 +396,7 @@ fun buildFullImageUrl(relativeUrl: String?): String {
 
 @Composable
 fun PsicologoContent(
-    psicologo: org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO,
+    psicologo: PsicologoProfileResponseDTO,
     navController: NavController
 ) {
     Column(
