@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -55,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -115,9 +117,8 @@ fun ChatScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        // CAMBIO 1: Desactivamos los insets automáticos de Scaffold.
-        // Esto evita el "doble padding" al no añadir el espacio del teclado a los `paddingValues`
-        // que se pasan al contenido principal. Ahora tenemos control manual total.
+        // Usamos insets a cero para que el Scaffold no añada padding automático al contenido.
+        // Esto nos da control total y evita el "doble padding" con el teclado.
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             ChatTopBar(
@@ -128,9 +129,9 @@ fun ChatScreen(
         },
         bottomBar = {
             ChatInputBar(
-                modifier = Modifier.windowInsetsPadding(
-                    WindowInsets.navigationBars.union(WindowInsets.ime)
-                ),
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding(),
                 text = uiState.inputText,
                 onTextChange = viewModel::onInputChanged,
                 onSend = viewModel::sendMessage,
@@ -254,33 +255,36 @@ private fun ChatTopBar(
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier.clickable { }
                 ) {
-                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = 24.dp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = psychologistInfo.name,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(4.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (psychologistInfo.isOnline) amaniColors.citaLibre
-                                else MaterialTheme.colorScheme.outline
+                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = 28.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = psychologistInfo.name,
+                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp)
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (psychologistInfo.isOnline) amaniColors.citaLibre
+                                        else MaterialTheme.colorScheme.outline
+                                    )
                             )
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(
-                        text = if (psychologistInfo.isOnline) "En línea" else "Desconectado",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (psychologistInfo.isOnline) "En línea" else "Desconectado",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             } else {
                 Text(
                     text = otherUserName.ifEmpty { "Psicólogo" },
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp)
                 )
             }
         },
@@ -288,14 +292,16 @@ private fun ChatTopBar(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
+                    contentDescription = "Volver",
+                    modifier = Modifier.size(20.dp)
                 )
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
-        )
+        ),
+        windowInsets = WindowInsets(0, 0, 0, 0) // Minimizar insets superiores si es posible
     )
 }
 

@@ -16,12 +16,15 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
+
 data class EstadisticasPsicologoUiState(
     val pacientes: List<PacientePsicologoResponseDTO> = emptyList(),
     val pacienteSeleccionado: PacientePsicologoResponseDTO? = null,
     val periodoSeleccionado: String = "Últimos 3 meses",
     val vistaSeleccionada: String = "Línea",
     val entradas: List<DiarioEmocionResponseDTO> = emptyList(),
+    val chartData: List<Pair<LocalDate, Float>> = emptyList(), // Nueva fuente de verdad para el gráfico
     val estadisticas: EstadisticasEmocionales = EstadisticasEmocionales(),
     val isLoading: Boolean = false,
     val error: String? = null
@@ -70,8 +73,16 @@ class EstadisticasPsicologoViewModel(
             _uiState.update { it.copy(isLoading = true) }
             diarioRepository.getByPaciente(idPaciente).onSuccess { allEntradas ->
                 val filtradas = filtrarPorPeriodo(allEntradas, _uiState.value.periodoSeleccionado)
+                val chartData = transformarParaGrafico(filtradas)
                 val stats = calcularEstadisticas(filtradas)
-                _uiState.update { it.copy(entradas = filtradas, estadisticas = stats, isLoading = false) }
+                _uiState.update { 
+                    it.copy(
+                        entradas = filtradas, 
+                        chartData = chartData,
+                        estadisticas = stats, 
+                        isLoading = false 
+                    ) 
+                }
             }.onFailure { e ->
                 _uiState.update { it.copy(error = e.message, isLoading = false) }
             }
@@ -88,15 +99,24 @@ class EstadisticasPsicologoViewModel(
             else -> LocalDate.MIN
         }
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
         return entradas.filter {
-            try {
-                val fecha = LocalDate.parse(it.fecha.substring(0, 10), formatter)
-                fecha.isAfter(limitDate) || fecha.isEqual(limitDate)
-            } catch (e: Exception) {
-                false
-            }
+            val fecha = it.fecha.toLocalDateSafe()
+            fecha != null && (fecha.isAfter(limitDate) || fecha.isEqual(limitDate))
         }.sortedBy { it.fecha }
+    }
+
+    /**
+     * Transforma las entradas en una lista de puntos (Fecha, Promedio Intensidad) para el gráfico.
+     */
+    private fun transformarParaGrafico(entradas: List<DiarioEmocionResponseDTO>): List<Pair<LocalDate, Float>> {
+        return entradas
+            .groupBy { it.fecha.toLocalDateSafe() }
+            .mapNotNull { (fecha, entradasDelDia) ->
+                if (fecha == null) return@mapNotNull null
+                val promedio = entradasDelDia.map { it.intensidad }.average().toFloat()
+                fecha to promedio
+            }
+            .sortedBy { it.first }
     }
 
     private fun calcularEstadisticas(entradas: List<DiarioEmocionResponseDTO>): EstadisticasEmocionales {
@@ -131,3 +151,4 @@ class EstadisticasPsicologoViewModel(
         )
     }
 }
+

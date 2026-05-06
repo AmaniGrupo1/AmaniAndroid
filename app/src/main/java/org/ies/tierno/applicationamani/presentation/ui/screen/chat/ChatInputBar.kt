@@ -59,6 +59,7 @@ fun ChatInputBar(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
+
         if (isRecording) {
             RecordingBar(
                 recordingSeconds = recordingSeconds,
@@ -71,9 +72,6 @@ fun ChatInputBar(
                 shadowElevation = 4.dp,
                 tonalElevation = 2.dp,
                 color = MaterialTheme.colorScheme.surface,
-                // CORRECCIÓN: Se ha eliminado el padding vertical (vertical = 4.dp).
-                // Este padding fijo creaba un pequeño hueco ("doble padding") al combinarse
-                // con los insets del teclado que ya gestiona la pantalla contenedora (ChatScreen).
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Row(

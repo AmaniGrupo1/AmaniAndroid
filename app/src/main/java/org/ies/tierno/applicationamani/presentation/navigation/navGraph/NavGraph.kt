@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -84,7 +85,8 @@ fun NavGraph(
             val currentRoute = currentBackStackEntry?.destination?.route
             val hideBottomBar = currentRoute == Screens.login.route ||
                     currentRoute == Screens.registro.route ||
-                    currentRoute == Screens.principal.route
+                    currentRoute == Screens.principal.route ||
+                    currentRoute?.startsWith("chat") == true
             if (!hideBottomBar) {
                 AmaniBottomBar(navController, bottomBarConfig)
             }
@@ -93,7 +95,9 @@ fun NavGraph(
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ) {
             composable(Screens.principal.route) {
                 Principal(navController)

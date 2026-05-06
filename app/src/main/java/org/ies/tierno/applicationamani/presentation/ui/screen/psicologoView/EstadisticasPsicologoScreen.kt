@@ -10,27 +10,32 @@ import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.column.columnChart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
+import com.patrykandpatrick.vico.compose.style.currentChartStyle
+import com.patrykandpatrick.vico.core.chart.column.ColumnChart
+import com.patrykandpatrick.vico.core.chart.line.LineChart
+import com.patrykandpatrick.vico.core.component.shape.LineComponent
+import com.patrykandpatrick.vico.core.component.shape.Shapes
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.core.entry.entryOf
+import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
 import androidx.compose.ui.platform.testTag
 import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
@@ -43,6 +48,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
+
+import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +97,7 @@ fun EstadisticasPsicologoScreen(
             }
 
             item {
-                ChartCard(entradas = uiState.entradas)
+                ChartCard(chartData = uiState.chartData)
             }
 
             item {
@@ -240,11 +247,11 @@ fun FiltersSection(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ChartCard(entradas: List<DiarioEmocionResponseDTO>) {
+fun ChartCard(chartData: List<Pair<LocalDate, Float>>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp),
+            .height(350.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp)
@@ -256,32 +263,13 @@ fun ChartCard(entradas: List<DiarioEmocionResponseDTO>) {
                 fontWeight = FontWeight.SemiBold,
                 color = AmaniPsicologoColors.TextSecondary
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            if (entradas.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag("chart_empty_state"), // FIX: Added testTag
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ShowChart,
-                            contentDescription = null,
-                            tint = AmaniPsicologoColors.TextSecondary.copy(alpha = 0.4f),
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Sin datos disponibles",
-                            color = AmaniPsicologoColors.TextSecondary.copy(alpha = 0.6f),
-                            fontSize = 14.sp
-                        )
-                    }
-                }
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            if (chartData.isEmpty()) {
+                EmptyStateContent()
             } else {
                 EmotionalEvolutionChart(
-                    entradas = entradas,
+                    chartData = chartData,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -289,78 +277,96 @@ fun ChartCard(entradas: List<DiarioEmocionResponseDTO>) {
     }
 }
 
+@Composable
+private fun EmptyStateContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("chart_empty_state"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.BarChart,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            modifier = Modifier.size(64.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Sin datos disponibles",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = "Este paciente no tiene registros en el periodo seleccionado",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Normal,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EmotionalEvolutionChart(
-    entradas: List<DiarioEmocionResponseDTO>,
+    chartData: List<Pair<LocalDate, Float>>,
     modifier: Modifier = Modifier
 ) {
-    val modelProducer = remember { CartesianChartModelProducer() }
-    val primaryColor = AmaniPsicologoColors.Primary
+    val modelProducer = remember { ChartEntryModelProducer() }
+    val primaryColor = MaterialTheme.colorScheme.primary
 
-    val dateLabels = remember(entradas) {
+    val dateLabels = remember(chartData) {
         val formatter = DateTimeFormatter.ofPattern("d MMM", Locale.forLanguageTag("es"))
-        entradas.map {
-            try {
-                // FIX: Added safer date parsing to prevent substring crash
-                val dateString = if (it.fecha.length >= 10) it.fecha.substring(0, 10) else it.fecha
-                val date = LocalDate.parse(dateString)
-                date.format(formatter)
-            } catch (e: Exception) {
-                it.fecha.take(5)
-            }
-        }
+        chartData.map { it.first.format(formatter) }
     }
 
-    LaunchedEffect(entradas) {
-        modelProducer.runTransaction {
-            lineSeries {
-                series(
-                    entradas.mapIndexed { index, _ -> index },
-                    entradas.map { it.intensidad }
+    LaunchedEffect(chartData) {
+        val entries = chartData.mapIndexed { index, item ->
+            entryOf(index.toFloat(), item.second)
+        }
+        modelProducer.setEntries(entries)
+    }
+
+    Chart(
+        chart = columnChart(
+            columns = listOf(
+                LineComponent(
+                    color = primaryColor.toArgb(),
+                    thicknessDp = 16f,
+                    shape = Shapes.pillShape
                 )
-            }
-        }
-    }
-
-    CartesianChartHost(
-        chart = rememberCartesianChart(
-            rememberLineCartesianLayer(
-                lineProvider = LineCartesianLayer.LineProvider.series(
-                    LineCartesianLayer.rememberLine(
-                        fill = LineCartesianLayer.LineFill.single(Fill(primaryColor)),
-                        areaFill = LineCartesianLayer.AreaFill.single(
-                            Fill(
-                                Brush.verticalGradient(
-                                    listOf(
-                                        primaryColor.copy(alpha = 0.25f),
-                                        Color.Transparent
-                                    )
-                                )
-                            )
-                        ),
-                    )
-                ),
             ),
-            startAxis = VerticalAxis.rememberStart(
-                valueFormatter = CartesianValueFormatter.decimal(),
-            ),
-            bottomAxis = HorizontalAxis.rememberBottom(
-                valueFormatter = CartesianValueFormatter { _, x, _ ->
-                    val index = x.toInt()
-                    if (index in dateLabels.indices) dateLabels[index] else ""
-                },
-            ),
+            axisValuesOverrider = com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider.fixed(
+                minY = 0f,
+                maxY = 10f
+            )
         ),
-        modelProducer = modelProducer,
+        chartModelProducer = modelProducer,
+        startAxis = rememberStartAxis(
+            valueFormatter = { value, _ -> value.toInt().toString() },
+            itemPlacer = AxisItemPlacer.Vertical.default(maxItemCount = 6) // Muestra 0, 2, 4, 6, 8, 10
+        ),
+        bottomAxis = rememberBottomAxis(
+            valueFormatter = { value, _ ->
+                val index = value.toInt()
+                if (index in dateLabels.indices) dateLabels[index] else ""
+            },
+            itemPlacer = AxisItemPlacer.Horizontal.default(spacing = 1)
+        ),
         modifier = modifier,
-        scrollState = rememberVicoScrollState(scrollEnabled = entradas.size > 7),
+        chartScrollState = rememberChartScrollState()
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
     val stats = uiState.estadisticas
+    val hasData = uiState.chartData.isNotEmpty()
+
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -368,20 +374,15 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
         ) {
             MetricCard(
                 title = "Promedio periodo",
-                value = String.format(Locale.getDefault(), "%.1f / 10", stats.promedioPeriodo),
-                subtitle = getEmotionalLevel(stats.promedioPeriodo),
+                value = if (hasData) String.format(Locale.getDefault(), "%.1f / 10", stats.promedioPeriodo) else "— / 10",
+                subtitle = if (hasData) getEmotionalLevel(stats.promedioPeriodo) else "Sin datos",
                 icon = Icons.AutoMirrored.Filled.ShowChart,
                 modifier = Modifier.weight(1f)
             )
             MetricCard(
                 title = "Mejor sesión",
-                value = String.format(
-                    Locale.getDefault(), "%d / 10", stats.mejorSesion?.intensidad ?: 0
-                ),
-                // FIX: Added safe substring
-                subtitle = stats.mejorSesion?.fecha?.let { 
-                    if (it.length >= 10) it.substring(0, 10) else it 
-                } ?: "N/A",
+                value = if (hasData) String.format(Locale.getDefault(), "%d / 10", stats.mejorSesion?.intensidad ?: 0) else "— / 10",
+                subtitle = stats.mejorSesion?.fecha.toLocalDateSafe()?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
                 color = AmaniPsicologoColors.Success,
                 modifier = Modifier.weight(1f)
@@ -393,20 +394,15 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
         ) {
             MetricCard(
                 title = "Peor sesión",
-                value = String.format(
-                    Locale.getDefault(), "%d / 10", stats.peorSesion?.intensidad ?: 0
-                ),
-                // FIX: Added safe substring
-                subtitle = stats.peorSesion?.fecha?.let { 
-                    if (it.length >= 10) it.substring(0, 10) else it 
-                } ?: "N/A",
+                value = if (hasData) String.format(Locale.getDefault(), "%d / 10", stats.peorSesion?.intensidad ?: 0) else "— / 10",
+                subtitle = stats.peorSesion?.fecha.toLocalDateSafe()?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
                 icon = Icons.AutoMirrored.Filled.TrendingDown,
                 color = AmaniPsicologoColors.Error,
                 modifier = Modifier.weight(1f)
             )
             MetricCard(
                 title = "Total sesiones",
-                value = stats.totalSesiones.toString(),
+                value = if (hasData) stats.totalSesiones.toString() else "0",
                 subtitle = uiState.periodoSeleccionado,
                 icon = Icons.Default.CalendarToday,
                 modifier = Modifier.weight(1f)
@@ -414,16 +410,18 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
         }
         MetricCard(
             title = "Tendencia general",
-            value = if (stats.tendenciaPuntos > 0) "Mejorando"
-            else if (stats.tendenciaPuntos < 0) "Bajando"
-            else "Estable",
-            subtitle = String.format(
-                Locale.getDefault(), "%+.1f puntos", stats.tendenciaPuntos
-            ),
+            value = when {
+                !hasData -> "N/A"
+                stats.tendenciaPuntos > 1.0 -> "Mejorando"
+                stats.tendenciaPuntos < -1.0 -> "Bajando"
+                else -> "Estable"
+            },
+            subtitle = if (hasData) String.format(Locale.getDefault(), "%+.1f puntos", stats.tendenciaPuntos) else "Sin tendencia",
             icon = Icons.Default.Timeline,
             color = when {
-                stats.tendenciaPuntos > 0 -> AmaniPsicologoColors.Success
-                stats.tendenciaPuntos < 0 -> AmaniPsicologoColors.Error
+                !hasData -> AmaniPsicologoColors.TextSecondary
+                stats.tendenciaPuntos > 1.0 -> AmaniPsicologoColors.Success
+                stats.tendenciaPuntos < -1.0 -> AmaniPsicologoColors.Error
                 else -> AmaniPsicologoColors.TextSecondary
             },
             modifier = Modifier.fillMaxWidth()

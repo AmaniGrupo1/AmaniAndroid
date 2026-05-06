@@ -220,10 +220,12 @@ private fun messageBubbleShape(
             bottomEnd = if (isLastInGroup) tail else reduced
         )
     } else {
+        // Mensajes ajenos (izquierda): el "rabo" va en la esquina inferior-izquierda,
+        // que corresponde al último mensaje del grupo (el más reciente, visualmente abajo).
         RoundedCornerShape(
-            topStart = if (isLastInGroup) tail else reduced,
-            topEnd = if (isLastInGroup) full else reduced,
-            bottomStart = if (isFirstInGroup) full else reduced,
+            topStart = if (isFirstInGroup) full else reduced,
+            topEnd = if (isFirstInGroup) full else reduced,
+            bottomStart = if (isLastInGroup) tail else reduced,
             bottomEnd = full
         )
     }

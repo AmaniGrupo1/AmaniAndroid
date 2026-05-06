@@ -105,6 +105,8 @@ dependencies {
 
     // Charts
     implementation(libs.vico.compose.m3)
+    implementation(libs.vico.core)
+    implementation(libs.vico.views)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
