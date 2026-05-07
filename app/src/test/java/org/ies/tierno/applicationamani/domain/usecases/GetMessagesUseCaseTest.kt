@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.domain.usecases
 import app.cash.turbine.test
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
@@ -28,6 +29,39 @@ class GetMessagesUseCaseTest {
         every { repository.observeMessages(1L, 2L) } returns flowOf(messages)
 
         useCase(1L, 2L).test {
+            assertEquals(messages, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `invoke should emit empty list when no messages`() = runTest {
+        every { repository.observeMessages(1L, 2L) } returns flowOf(emptyList())
+
+        useCase(1L, 2L).test {
+            assertEquals(emptyList<Message>(), awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `invoke should propagate error when repository flow throws`() = runTest {
+        every { repository.observeMessages(1L, 2L) } returns flow {
+            throw RuntimeException("Firebase error")
+        }
+
+        useCase(1L, 2L).test {
+            assertEquals(emptyList<Message>(), awaitItem())
+            awaitError()
+        }
+    }
+
+    @Test
+    fun `invoke with different user ids delegates to repository`() = runTest {
+        val messages = listOf(Message(content = "Test"))
+        every { repository.observeMessages(5L, 10L) } returns flowOf(messages)
+
+        useCase(5L, 10L).test {
             assertEquals(messages, awaitItem())
             awaitComplete()
         }
