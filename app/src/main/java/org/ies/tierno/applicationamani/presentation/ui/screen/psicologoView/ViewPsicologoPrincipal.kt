@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
@@ -46,6 +47,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -186,10 +188,13 @@ fun ViewPsicologoPrincipal(
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screens.registroPacienteDesdePsicologo.route)
-                }
+                },
+                containerColor = AmaniPsicologoColors.Primary,
+                contentColor = Color.White
             ) {
                 Icon(
-                    Icons.Default.Add, contentDescription = stringResource(R.string.agregar_paciente)
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.agregar_paciente)
                 )
             }
         }
@@ -204,7 +209,8 @@ fun ViewPsicologoPrincipal(
                 pacientes.isEmpty() -> EmptyState()
                 else -> PacientesList(
                     pacientes = pacientes,
-                    listState = listState
+                    listState = listState,
+                    navController = navController
                 )
             }
         }
@@ -271,7 +277,8 @@ private fun EmptyState() {
 @Composable
 private fun PacientesList(
     pacientes: List<PacientePsicologoResponseDTO>,
-    listState: LazyListState
+    listState: LazyListState,
+    navController: NavController
 ) {
     LazyColumn(
         state = listState,
@@ -289,7 +296,10 @@ private fun PacientesList(
             items = pacientes,
             key = { paciente -> paciente.idPaciente ?: "${paciente.email}-${paciente.dni}" }
         ) { paciente ->
-            PacienteCard(paciente = paciente)
+            PacienteCard(
+                paciente = paciente,
+                navController = navController
+            )
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -341,7 +351,10 @@ private fun HeaderStats(totalPacientes: Int) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
+fun PacienteCard(
+    paciente: PacientePsicologoResponseDTO,
+    navController: NavController
+) {
     var expanded by remember { mutableStateOf(false) }
     val esMenor = esMenorDeEdad(paciente.fechaNacimiento)
 
@@ -362,7 +375,8 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
         ) {
             PacienteHeader(
                 paciente = paciente,
-                esMenor = esMenor
+                esMenor = esMenor,
+                navController = navController
             )
 
             AnimatedVisibility(
@@ -387,7 +401,8 @@ fun PacienteCard(paciente: PacientePsicologoResponseDTO) {
 @Composable
 fun PacienteHeader(
     paciente: PacientePsicologoResponseDTO,
-    esMenor: Boolean
+    esMenor: Boolean,
+    navController: NavController
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -405,6 +420,7 @@ fun PacienteHeader(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Avatar circular con iniciales
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -506,6 +522,25 @@ fun PacienteHeader(
                         )
                     }
                 }
+            }
+
+            // Botón para crear historial clínico
+            IconButton(
+                onClick = {
+                    paciente.idPaciente?.let { id ->
+                        navController.navigate(
+                            Screens.crearHistorialClinico.createRoute(id)
+                        )
+                    }
+                },
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Description,
+                    contentDescription = stringResource(R.string.crear_historial_clinico),
+                    tint = AmaniPsicologoColors.Primary,
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     }

@@ -281,4 +281,15 @@
     <string name="salir_aplicacion">Salir de la aplicación</string>
 
     <string name="configuracion_titulo">Configuración</string>
+
+    <!-- Strings para crear historial clínico -->
+    <string name="crear_historial_clinico">Crear Historial Clínico</string>
+    <string name="historial_creado_exitosamente">Historial clínico creado exitosamente</string>
+    <string name="error_crear_historial">Error al crear historial clínico</string>
+    <string name="nuevo_historial_clinico">Nuevo Historial Clínico</string>
+    <string name="informacion_historial">Información del Historial</string>
+    <string name="registra_informacion_clinica">Registra la información clínica del paciente</string>
+    <string name="guardar_historial_clinico">Guardar Historial Clínico</string>
+    <string name="guardando">Guardando...</string>
+
 </resources>

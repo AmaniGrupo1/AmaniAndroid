@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,17 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
-import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
 import org.ies.tierno.applicationamani.presentation.ui.screen.AmaniLoginColors
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
-import org.koin.androidx.compose.koinViewModel
-import org.koin.java.KoinJavaComponent.getKoin
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -40,33 +36,26 @@ import java.util.Locale
 @Composable
 fun HistorialClinicoScreen(
     navController: NavController,
-    pacienteId: Long,
-    viewModel: HistorialClinicoPacienteViewModel = koinViewModel()
+    idPaciente: Long,
+    viewModel: HistorialClinicoPacienteViewModel
 ) {
     val colors = AmaniLoginColors
     val scope = rememberCoroutineScope()
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
-    // Obtener sesión y token del usuario
-    val userSessionDataStore: UserSessionDataStore = getKoin().get()
-    val tokenDataStore: TokenDataStore = getKoin().get()
-    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+    val context = LocalContext.current
+    val tokenDataStore = remember { TokenDataStore(context) }
 
-
-    val historial = viewModel.historial
-    val isLoading = viewModel.isLoading
-    val error = viewModel.error
-
+    val historial by viewModel.historial
+    val isLoading by viewModel.isLoading
+    val error by viewModel.error
 
     var expandedCardId by remember { mutableStateOf<Long?>(null) }
 
     // Cargar historial al iniciar
-    LaunchedEffect(Unit) {
-        val idPaciente = session?.idPaciente
-        val token = tokenDataStore.getToken()
-        if (idPaciente != null && token != null) {
-            viewModel.cargarHistorialClinico(idPaciente, token)
-        }
+    LaunchedEffect(idPaciente) {
+        val token = tokenDataStore.getToken() ?: ""
+        viewModel.cargarHistorialClinico(idPaciente, "Bearer $token")
     }
 
     // Formateador de fechas
@@ -208,12 +197,9 @@ fun HistorialClinicoScreen(
                             Spacer(modifier = Modifier.height(24.dp))
                             Button(
                                 onClick = {
-                                    val idPaciente = session?.idPaciente
                                     scope.launch {
-                                        val token = tokenDataStore.getToken()
-                                        if (idPaciente != null && token != null) {
-                                            viewModel.cargarHistorialClinico(idPaciente, token)
-                                        }
+                                        val token = tokenDataStore.getToken() ?: ""
+                                        viewModel.cargarHistorialClinico(idPaciente, "Bearer $token")
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = colors.Primary),
@@ -237,7 +223,7 @@ fun HistorialClinicoScreen(
                             HistorialCard(
                                 item = item,
                                 isExpanded = expandedCardId == item.id,
-                                onExpandClick = {
+                                onCardClick = {
                                     expandedCardId = if (expandedCardId == item.id) null else item.id
                                 },
                                 colors = colors,
@@ -256,13 +242,15 @@ fun HistorialClinicoScreen(
 fun HistorialCard(
     item: HistorialClinicoResponseDTO,
     isExpanded: Boolean,
-    onExpandClick: () -> Unit,
+    onCardClick: () -> Unit,
     colors: AmaniLoginColors,
     roboto: FontFamily,
     formatFecha: (String) -> String
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCardClick() },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = colors.Surface)
@@ -306,17 +294,6 @@ fun HistorialCard(
                             fontFamily = roboto
                         )
                     }
-                }
-
-                IconButton(
-                    onClick = onExpandClick,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (isExpanded) "Ver menos" else "Ver más",
-                        tint = colors.Primary
-                    )
                 }
             }
 

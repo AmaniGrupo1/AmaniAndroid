@@ -47,6 +47,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.Agend
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.HistorialClinicoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.SettingsPacienteScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.CrearHistorialClinicoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EditProfilePsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.RegistrarPacientePsicologoScreen
@@ -57,6 +58,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
@@ -77,6 +79,7 @@ fun NavGraph(
     val listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val profilePsicolgo : ProfilePsicologoViewModel = koinViewModel()
+    val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
  val idiomaViewModel : IdiomaViewModel = koinViewModel()
@@ -315,7 +318,23 @@ fun NavGraph(
                 )
             ) { backStackEntry ->
                 val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-                HistorialClinicoScreen(navController, pacienteId)
+                HistorialClinicoScreen(navController, pacienteId, historialClinicoPacienteViewModel)
+            }
+
+            composable(
+                route = Screens.crearHistorialClinico.route,
+                arguments = listOf(
+                    navArgument("pacienteId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+                CrearHistorialClinicoScreen(
+                    navController = navController,
+                    pacienteId = pacienteId,
+                    historialClinicoPacienteViewModel
+                )
             }
         }
     }

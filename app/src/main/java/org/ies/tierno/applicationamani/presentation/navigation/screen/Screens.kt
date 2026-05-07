@@ -112,5 +112,9 @@
             fun createRoute(pacienteId: Long?) = "perfilPaciente/$pacienteId"
         }
 
+        object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}"){
+            fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
+        }
+
     }
 

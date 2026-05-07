@@ -444,8 +444,25 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "historial" -> {
-                        // TODO: Navegar a historial clínico
-                        navController.navigate(Screens.historialClinico.createRoute(session?.idPaciente ?: 0L))
+
+                        val pacienteId = session?.idPaciente
+
+                        Log.d(TAG, "📌 CLICK HISTORIAL CLÍNICO")
+                        Log.d(TAG, "👤 Session completa: $session")
+                        Log.d(TAG, "🆔 idPaciente obtenido: $pacienteId")
+
+                        if (pacienteId != null && pacienteId > 0L) {
+
+                            Log.d(TAG, "🚀 Navegando a historial con idPaciente = $pacienteId")
+
+                            navController.navigate(
+                                Screens.historialClinico.createRoute(pacienteId)
+                            )
+
+                        } else {
+
+                            Log.e(TAG, "❌ ERROR: idPaciente es NULL o inválido")
+                        }
                     }
 
                     "notificaciones" -> {
