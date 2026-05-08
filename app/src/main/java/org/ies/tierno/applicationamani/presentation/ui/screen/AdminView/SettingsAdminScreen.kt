@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -34,6 +33,8 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import android.app.Activity
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 
 private const val TAG = "SettingsLanguage"
 
@@ -126,7 +127,13 @@ fun SettingsAdminScreen(
                             id = "crear_situacion",
                             title = stringResource(R.string.crear_situacion),
                             subtitle = stringResource(R.string.gestionar_situaciones),
-                            icon = Icons.Default.List
+                            icon = Icons.AutoMirrored.Filled.List
+                        ),
+                        SettingsOption(
+                            id = "politica_privacidad",
+                            title = stringResource(R.string.crear_politica_privacidad),
+                            subtitle = stringResource(R.string.gestionar_situaciones),
+                            icon = Icons.AutoMirrored.Filled.List
                         ),
                         SettingsOption(
                             id = "language",
@@ -409,6 +416,9 @@ fun SettingsOptionRow(
                     }
                     "crear_situacion" -> {
                         navController.navigate(Screens.crearSituaciones.route)
+                    }
+                    "politica_privacidad" -> {
+                        navController.navigate(Screens.politicaPrivacidad.route)
                     }
                 }
             }

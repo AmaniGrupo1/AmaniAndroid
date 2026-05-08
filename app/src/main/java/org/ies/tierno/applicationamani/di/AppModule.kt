@@ -15,6 +15,7 @@ import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.data.repositorio.DocumentoLegalRepository
 import org.ies.tierno.applicationamani.data.repositorio.HistorialRepository
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
@@ -60,11 +61,13 @@ import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
@@ -88,6 +91,7 @@ val appModule = module {
     single { NotificacionRepository(get()) }
     single { AjustesRepository(get()) }
     single { HistorialRepository(get()) }
+    single { DocumentoLegalRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -109,6 +113,7 @@ val appModule = module {
     factory { NotificacionUseCase(get()) }
     factory { GetPacientesSinPsicologoUseCase(get()) }
     factory { HistorialClinicoUseCase(get()) }
+    factory { DocumentoLegalUseCase(get()) }
 
 
     factory { SendMessageUseCase(get()) }
@@ -170,4 +175,5 @@ val appModule = module {
     viewModel { ProfileAdminViewModel(get()) }
     viewModel { ProfilePacienteViewModel(get()) }
     viewModel { HistorialClinicoPacienteViewModel(get()) }
+    viewModel { DocumentoLegalViewModel(get()) }
 }

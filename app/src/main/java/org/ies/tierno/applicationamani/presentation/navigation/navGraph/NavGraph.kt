@@ -30,6 +30,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoP
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TerapiasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal.GestionPoliticasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
@@ -39,6 +40,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.SettingsClienteScr
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal.GestionDocumentosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
@@ -285,6 +287,9 @@ fun NavGraph(
             }
             composable(Screens.crearSituaciones.route){
                 SituacionAdminScreen(navController, situacionViewModel)
+            }
+            composable(Screens.politicaPrivacidad.route){
+                GestionPoliticasScreen(navController)
             }
             composable(
                 route = Screens.profileAdmin.route,
