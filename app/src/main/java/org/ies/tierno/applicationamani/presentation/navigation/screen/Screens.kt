@@ -97,5 +97,9 @@ sealed class Screens(val route: String) {
     object diarioEmocional : Screens("diarioEmocional")
 
     object nuevoTicket : Screens("nuevoTicket")
+    object paymentScreen : Screens("paymentScreen/{citaId}/{psicologoName}/{fecha}/{monto}") {
+        fun createRoute(citaId: Long, psicologoName: String, fecha: String, monto: String) =
+            "paymentScreen/$citaId/${Uri.encode(psicologoName)}/$fecha/$monto"
+    }
     object misTickets : Screens("misTickets")
 }

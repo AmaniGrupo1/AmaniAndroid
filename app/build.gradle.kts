@@ -127,6 +127,7 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
+    implementation(libs.stripe.android)
 
     // Tests
     testImplementation(libs.junit)

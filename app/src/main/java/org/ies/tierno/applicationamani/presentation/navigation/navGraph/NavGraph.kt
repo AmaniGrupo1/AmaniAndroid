@@ -275,6 +275,30 @@ fun NavGraph(
                 NuevoTicketScreen(navController)
             }
 
+            composable(
+                route = Screens.paymentScreen.route,
+                arguments = listOf(
+                    androidx.navigation.navArgument("citaId") { type = androidx.navigation.NavType.LongType },
+                    androidx.navigation.navArgument("psicologoName") { type = androidx.navigation.NavType.StringType },
+                    androidx.navigation.navArgument("fecha") { type = androidx.navigation.NavType.StringType },
+                    androidx.navigation.navArgument("monto") { type = androidx.navigation.NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val citaId = backStackEntry.arguments?.getLong("citaId") ?: 0L
+                val psicologoName = backStackEntry.arguments?.getString("psicologoName") ?: ""
+                val fecha = backStackEntry.arguments?.getString("fecha") ?: ""
+                val monto = backStackEntry.arguments?.getString("monto") ?: ""
+                val paymentViewModel: PaymentViewModel = org.koin.androidx.compose.koinViewModel()
+                PaymentScreen(
+                    citaId = citaId,
+                    psicologoName = psicologoName,
+                    fecha = fecha,
+                    monto = monto,
+                    viewModel = paymentViewModel,
+                    onPaymentSuccess = { navController.popBackStack() },
+                    onPaymentCanceled = { navController.popBackStack() }
+                )
+            }
             composable(Screens.misTickets.route) {
                 MisTicketsScreen(navController)
             }

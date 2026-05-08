@@ -127,4 +127,5 @@ val retrofitModule = module {
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
     single<SoporteTicketApi> { get<Retrofit>().create(SoporteTicketApi::class.java) }
     single<org.ies.tierno.applicationamani.data.remoto.ChatApi> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.ChatApi::class.java) }
+    single<org.ies.tierno.applicationamani.data.remoto.PaymentApiService> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.PaymentApiService::class.java) }
 }

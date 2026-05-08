@@ -21,6 +21,9 @@ import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepositor
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
+import org.ies.tierno.applicationamani.data.repositorio.PaymentRepository
+import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentIntentUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
@@ -181,6 +184,11 @@ val appModule = module {
     // NOTIFICACION
     viewModel { NotificacionViewModel(get()) }
     viewModel { PacientesViewModel(get()) }
+
+    single { PaymentRepository(get()) }
+    factory { CreatePaymentIntentUseCase(get()) }
+
+    viewModel { PaymentViewModel(get()) }
 
     // SOPORTE
     viewModel { SoporteTicketViewModel(get()) }

@@ -40,6 +40,7 @@ mockwebserver = "5.3.2"
 firebaseDatabase = "22.0.1"
 firebaseStorage = "21.0.1"
 timber = "5.0.1"
+stripeAndroid = "21.9.0"
 firebaseAuth = "23.2.0"
 workRuntimeKtx = "2.11.2"
 room = "2.8.4"
@@ -89,6 +90,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 retrofit-v290 = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
+stripe-android = { module = "com.stripe:stripe-android", version.ref = "stripeAndroid" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
