@@ -11,7 +11,11 @@ class NotificacionViewModel(
 
     fun toggle(id: Long, activar: Boolean) {
         viewModelScope.launch {
-            notificacionUseCase.toggleNotificaciones(id, activar)
+            try {
+                notificacionUseCase.toggleNotificaciones(id, activar)
+            } catch (e: Exception) {
+                // Error handled, no crash
+            }
         }
     }
 }

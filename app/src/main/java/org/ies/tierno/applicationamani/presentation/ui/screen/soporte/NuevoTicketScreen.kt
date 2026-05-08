@@ -22,7 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Smartphone
@@ -163,7 +163,7 @@ fun NuevoTicketScreen(
                     )
                     BotonTipoTicket(
                         texto = "Pregunta",
-                        icono = Icons.Default.Help,
+                        icono = Icons.AutoMirrored.Filled.Help,
                         seleccionado = uiState.tipoTicket == TipoTicket.PREGUNTA,
                         onClick = { viewModel.seleccionarTipo(TipoTicket.PREGUNTA) },
                         modifier = Modifier.weight(1f)

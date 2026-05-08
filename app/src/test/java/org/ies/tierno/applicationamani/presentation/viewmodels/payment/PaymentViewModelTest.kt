@@ -14,8 +14,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import io.mockk.coEvery
+import io.mockk.mockk
 import java.math.BigDecimal
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -28,7 +28,7 @@ class PaymentViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        createPaymentIntentUseCase = mock()
+        createPaymentIntentUseCase = mockk()
         viewModel = PaymentViewModel(createPaymentIntentUseCase)
     }
 
@@ -45,7 +45,7 @@ class PaymentViewModelTest {
             amount = BigDecimal("50.00"),
             currency = "EUR"
         )
-        whenever(createPaymentIntentUseCase(100L)).thenReturn(Result.success(response))
+        coEvery { createPaymentIntentUseCase(100L) } returns Result.success(response)
 
         viewModel.preparePayment(100L)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -59,7 +59,7 @@ class PaymentViewModelTest {
 
     @Test
     fun preparePayment_failure_emits_Error() = runTest {
-        whenever(createPaymentIntentUseCase(100L)).thenReturn(Result.failure(RuntimeException("Network error")))
+        coEvery { createPaymentIntentUseCase(100L) } returns Result.failure(RuntimeException("Network error"))
 
         viewModel.preparePayment(100L)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -79,7 +79,7 @@ class PaymentViewModelTest {
             amount = BigDecimal("50.00"),
             currency = "EUR"
         )
-        whenever(createPaymentIntentUseCase(100L)).thenReturn(Result.success(response))
+        coEvery { createPaymentIntentUseCase(100L) } returns Result.success(response)
 
         viewModel.preparePayment(100L)
         testDispatcher.scheduler.advanceUntilIdle()

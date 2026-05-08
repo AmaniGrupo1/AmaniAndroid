@@ -24,6 +24,7 @@ class PacientesViewModel(
             getPacientesSinPsicologoUseCase()
                 .catch {
                     _pacientes.value = emptyList()
+                    _loading.value = false
                 }
                 .collect {
                     _pacientes.value = it

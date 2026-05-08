@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
@@ -24,9 +25,10 @@ class CuestionarioViewModel(
     /** Lista observable de preguntas del cuestionario. Puede ser `null` si no hay datos. */
     val preguntas: StateFlow<List<OpcionAdminDTO>?> =
         obtenerPreguntasUseCase()
+            .catch { emit(emptyList()) }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
+                started = SharingStarted.Eagerly,
                 initialValue = emptyList()
             )
 }

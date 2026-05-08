@@ -19,6 +19,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.ui.screen.payment.PaymentScreen
+import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
 import org.ies.tierno.applicationamani.presentation.screens.profile.PsicologoProfileScreen
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig

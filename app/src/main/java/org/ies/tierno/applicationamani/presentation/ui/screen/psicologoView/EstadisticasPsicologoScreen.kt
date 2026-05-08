@@ -69,7 +69,7 @@ fun EstadisticasPsicologoScreen(
                         color = Color.White
                     )
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AmaniPsicologoColors.Primary
                 )
             )

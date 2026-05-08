@@ -88,7 +88,6 @@ class CuestionarioViewModelTest {
 
         viewModel.preguntas.test {
             assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
-            assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

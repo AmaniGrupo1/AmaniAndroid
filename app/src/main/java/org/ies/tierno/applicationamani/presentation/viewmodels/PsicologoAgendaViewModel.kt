@@ -520,17 +520,25 @@ class PsicologoAgendaViewModel(
             modalidad = modalidad
         )
 
+        _isLoading.value = true
+
         return try {
             val resultado = citasRepository.crearCita(request)
             if (resultado.isSuccess) {
+                _successMessage.value = "Cita creada exitosamente"
                 cargarAgendaMensual(_mesVisible.value)
                 cargarDisponibilidadDia(fecha, duracionMinutos)
                 Result.success(Unit)
             } else {
-                Result.failure(resultado.exceptionOrNull() ?: Exception("Error al crear cita"))
+                val error = resultado.exceptionOrNull() ?: Exception("Error al crear cita")
+                _errorMessage.value = error.message
+                Result.failure(error)
             }
         } catch (e: Exception) {
+            _errorMessage.value = e.message
             Result.failure(e)
+        } finally {
+            _isLoading.value = false
         }
     }
 
@@ -538,14 +546,21 @@ class PsicologoAgendaViewModel(
     fun cambiarEstadoCita(idCita: Long, nuevoEstado: EstadoCita) {
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.cambiarEstadoCita(idCita, nuevoEstado)
-                .onSuccess {
-                    _agendaMensual.value = _agendaMensual.value.map {
-                        if (it.id == idCita) {
-                            it.copy(estado = nuevoEstado.name)
-                        } else it
+            try {
+                citasRepository.cambiarEstadoCita(idCita, nuevoEstado)
+                    .onSuccess {
+                        _agendaMensual.value = _agendaMensual.value.map {
+                            if (it.id == idCita) {
+                                it.copy(estado = nuevoEstado.name)
+                            } else it
+                        }
                     }
-                }
+                    .onFailure {
+                        _errorMessage.value = it.message
+                    }
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 

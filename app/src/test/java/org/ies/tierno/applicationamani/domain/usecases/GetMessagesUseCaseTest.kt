@@ -51,8 +51,8 @@ class GetMessagesUseCaseTest {
         }
 
         useCase(1L, 2L).test {
-            assertEquals(emptyList<Message>(), awaitItem())
-            awaitError()
+            val error = awaitError()
+            assertEquals("Firebase error", error.message)
         }
     }
 

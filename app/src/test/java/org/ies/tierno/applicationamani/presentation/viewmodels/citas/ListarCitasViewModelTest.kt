@@ -4,9 +4,10 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
@@ -21,7 +22,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListarCitasViewModelTest {
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
     private val listarCitasUseCase: ListarCitasUseCase = mockk()
     private val citasRepository: CitasRepository = mockk()
 
@@ -80,13 +81,14 @@ class ListarCitasViewModelTest {
 
     @Test
     fun `cargarCitas sets isLoading properly`() = runTest {
-        coEvery { listarCitasUseCase() } returns listOf(testCita)
+        val deferred = kotlinx.coroutines.CompletableDeferred<List<CitaPacienteViewResponseDTO>>()
+        coEvery { listarCitasUseCase() } coAnswers { deferred.await() }
 
         val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
         viewModel.cargarCitas()
         assertTrue(viewModel.isLoading.value)
 
-        advanceUntilIdle()
+        deferred.complete(listOf(testCita))
         assertFalse(viewModel.isLoading.value)
     }
 

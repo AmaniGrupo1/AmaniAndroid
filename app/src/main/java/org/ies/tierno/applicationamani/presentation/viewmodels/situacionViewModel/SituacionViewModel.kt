@@ -22,9 +22,13 @@ class SituacionViewModel(
 
     private fun cargarSituaciones() {
         viewModelScope.launch {
-            listUseCase().collect { lista ->
-                println("DEBUG: situaciones recibidas = ${lista.size}")
-                _situaciones.value = lista
+            try {
+                listUseCase().collect { lista ->
+                    println("DEBUG: situaciones recibidas = ${lista.size}")
+                    _situaciones.value = lista
+                }
+            } catch (e: Exception) {
+                println("DEBUG: error en SituacionViewModel = ${e.message}")
             }
         }
     }

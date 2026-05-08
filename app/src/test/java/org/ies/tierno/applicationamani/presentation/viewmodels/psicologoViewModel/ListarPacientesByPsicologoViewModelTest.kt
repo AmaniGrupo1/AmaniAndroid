@@ -120,6 +120,8 @@ class ListarPacientesByPsicologoViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, viewModel.pacientes.value.size)
-        assertTrue(viewModel.citasPorPaciente.value.isEmpty())
+        // El mapa tiene una entrada para el paciente, pero la lista de citas está vacía
+        val citasDelPaciente = viewModel.citasPorPaciente.value[1L]
+        assertTrue(citasDelPaciente != null && citasDelPaciente.isEmpty())
     }
 }

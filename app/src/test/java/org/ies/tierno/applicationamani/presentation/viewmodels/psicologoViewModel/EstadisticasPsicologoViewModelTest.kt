@@ -37,7 +37,7 @@ class EstadisticasPsicologoViewModelTest {
     )
 
     private val testEntrada = DiarioEmocionResponseDTO(
-        idDiario = 1L, fecha = "2025-04-15", titulo = "Sesión",
+        idDiario = 1L, fecha = java.time.LocalDate.now().toString(), titulo = "Sesión",
         emocion = "Feliz", intensidad = 8, nota = "Buena sesión"
     )
 
@@ -93,7 +93,8 @@ class EstadisticasPsicologoViewModelTest {
 
     @Test
     fun `seleccionarPaciente updates state and triggers cargarEntradas`() = runTest {
-        val entrada2 = DiarioEmocionResponseDTO(2L, "2025-05-01", "Otra", "Triste", 3, "")
+        val today = java.time.LocalDate.now().toString()
+        val entrada2 = DiarioEmocionResponseDTO(2L, today, "Otra", "Triste", 3, "")
         coEvery { diarioRepository.getByPaciente(1L) } returns Result.success(listOf(testEntrada))
         coEvery { diarioRepository.getByPaciente(2L) } returns Result.success(listOf(entrada2))
 
