@@ -10,7 +10,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -22,6 +23,7 @@ class ListarTerapiasViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val repository: CitasRepository = mockk(relaxed = true)
+    private val terapiasGeneralUseCase: TerapiasGeneralUseCase = mockk(relaxed = true)
 
     @Before
     fun setUp() {
@@ -40,7 +42,7 @@ class ListarTerapiasViewModelTest {
         )
         coEvery { repository.getTerapias() } returns Result.success(terapias)
 
-        val viewModel = ListarTerapiasViewModel(repository)
+        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
         advanceUntilIdle()
 
         assertEquals(1, viewModel.terapias.value.size)
@@ -51,7 +53,7 @@ class ListarTerapiasViewModelTest {
     fun `init on failure sets empty list`() = runTest {
         coEvery { repository.getTerapias() } returns Result.failure(Exception("Error API"))
 
-        val viewModel = ListarTerapiasViewModel(repository)
+        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
         advanceUntilIdle()
 
         assertTrue(viewModel.terapias.value.isEmpty())
@@ -62,7 +64,7 @@ class ListarTerapiasViewModelTest {
         val terapias = listOf(TerapiaResponseDTO(idTipo = 1L, nombre = "Test", duracionMinutos = 60, precio = BigDecimal("50")))
         coEvery { repository.getTerapias() } returns Result.success(terapias)
 
-        val viewModel = ListarTerapiasViewModel(repository)
+        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
         advanceUntilIdle()
         assertEquals(1, viewModel.terapias.value.size)
 
@@ -82,7 +84,7 @@ class ListarTerapiasViewModelTest {
     fun `boundary empty terapias list`() = runTest {
         coEvery { repository.getTerapias() } returns Result.success(emptyList())
 
-        val viewModel = ListarTerapiasViewModel(repository)
+        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
         advanceUntilIdle()
 
         assertTrue(viewModel.terapias.value.isEmpty())

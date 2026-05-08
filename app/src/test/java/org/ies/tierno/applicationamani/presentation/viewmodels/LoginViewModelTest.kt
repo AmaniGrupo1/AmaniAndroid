@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
@@ -23,6 +24,7 @@ class LoginViewModelTest {
     private val loginUseCase: LoginUseCase = mockk()
     private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase = mockk()
     private val userSessionDataStore: UserSessionDataStore = mockk(relaxed = true)
+    private val tokenDataStore: TokenDataStore = mockk(relaxed = true)
     private lateinit var viewModel: LoginViewModel
 
     @Before
@@ -32,7 +34,7 @@ class LoginViewModelTest {
         mockkStatic(Log::class)
         every { Log.e(any<String>(), any<String>()) } returns 0
         
-        viewModel = LoginViewModel(loginUseCase, asignarPacienteAlPsicologoUseCase, userSessionDataStore)
+        viewModel = LoginViewModel(loginUseCase, asignarPacienteAlPsicologoUseCase, userSessionDataStore, tokenDataStore)
     }
 
     @After
@@ -79,7 +81,6 @@ class LoginViewModelTest {
         viewModel.setDateOfBirth(LocalDate.now().minusYears(17)) // 17 years old
         viewModel.setTelefono("123456789")
         viewModel.setRegistroEspecialidad("Clinica")
-        viewModel.setAceptaTerminosPsicologo(true)
 
         viewModel.registrarPsicologo()
 

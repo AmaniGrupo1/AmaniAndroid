@@ -7,10 +7,12 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import org.ies.tierno.applicationamani.data.remoto.AjustesApi
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.data.remoto.DiarioApi
+import org.ies.tierno.applicationamani.data.remoto.HistorialApi
 import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
@@ -46,78 +48,61 @@ val retrofitModule = module {
         TokenRefreshInterceptor(get())
     }
 
-    single {
-        val okHttpClient = okhttp3.OkHttpClient.Builder()
+    // ✅ Proveer el OkHttpClient como singleton
+    single<okhttp3.OkHttpClient> {
+        okhttp3.OkHttpClient.Builder()
             .addInterceptor(get<AuthInterceptor>())
             .addInterceptor(get<TokenRefreshInterceptor>())
             .build()
+    }
 
+    // ✅ Proveer el ImageLoader usando el OkHttpClient
+    single<coil.ImageLoader> {
+        coil.ImageLoader.Builder(get())
+            .okHttpClient { get<okhttp3.OkHttpClient>() }
+            .crossfade(true)
+            .build()
+    }
+
+    // ✅ Proveer Retrofit usando el mismo OkHttpClient
+    single<Retrofit> {
         val gson = GsonBuilder()
             .serializeNulls()
             .registerTypeAdapter(
                 LocalDate::class.java,
                 object : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
-                    override fun serialize(
-                        src: LocalDate,
-                        typeOfSrc: Type,
-                        context: JsonSerializationContext
-                    ): JsonElement =
+                    override fun serialize(src: LocalDate, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
                         JsonPrimitive(src.toString())
-
-                    override fun deserialize(
-                        json: JsonElement,
-                        typeOfT: Type,
-                        context: JsonDeserializationContext
-                    ): LocalDate =
+                    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDate =
                         LocalDate.parse(json.asString)
                 })
             .registerTypeAdapter(
                 LocalTime::class.java,
                 object : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
-                    override fun serialize(
-                        src: LocalTime,
-                        typeOfSrc: Type,
-                        context: JsonSerializationContext
-                    ): JsonElement =
+                    override fun serialize(src: LocalTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
                         JsonPrimitive(src.toString())
-
-                    override fun deserialize(
-                        json: JsonElement,
-                        typeOfT: Type,
-                        context: JsonDeserializationContext
-                    ): LocalTime =
+                    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalTime =
                         LocalTime.parse(json.asString)
                 })
             .registerTypeAdapter(
                 LocalDateTime::class.java,
                 object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-                    override fun serialize(
-                        src: LocalDateTime,
-                        typeOfSrc: Type,
-                        context: JsonSerializationContext
-                    ): JsonElement =
+                    override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
                         JsonPrimitive(src.toString())
-
-                    override fun deserialize(
-                        json: JsonElement,
-                        typeOfT: Type,
-                        context: JsonDeserializationContext
-                    ): LocalDateTime =
+                    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime =
                         LocalDateTime.parse(json.asString)
                 })
             .create()
 
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/")
-            //.baseUrl("http://192.168.1.175:8080/")
-
+            // .baseUrl("http://192.168.1.175:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .client(okHttpClient)
+            .client(get<okhttp3.OkHttpClient>())  // Usar el mismo cliente
             .build()
     }
-    //http://10.0.2.2
-//    192.168.1.175
 
+    // APIs
     single<AuthApi> { get<Retrofit>().create(AuthApi::class.java) }
     single<CitasApi> { get<Retrofit>().create(CitasApi::class.java) }
     single<SituacionApi> { get<Retrofit>().create(SituacionApi::class.java) }
@@ -128,4 +113,6 @@ val retrofitModule = module {
     single<SoporteTicketApi> { get<Retrofit>().create(SoporteTicketApi::class.java) }
     single<org.ies.tierno.applicationamani.data.remoto.ChatApi> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.ChatApi::class.java) }
     single<org.ies.tierno.applicationamani.data.remoto.PaymentApiService> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.PaymentApiService::class.java) }
+    single<AjustesApi> { get<Retrofit>().create(AjustesApi::class.java) }
+    single<HistorialApi> { get<Retrofit>().create(HistorialApi::class.java) }
 }

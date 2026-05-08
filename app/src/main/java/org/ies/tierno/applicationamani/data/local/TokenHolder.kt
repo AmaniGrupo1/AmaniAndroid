@@ -47,5 +47,9 @@ class TokenHolder(private val tokenDataStore: TokenDataStore) {
     fun clearToken() {
         _token = null
     }
+
+    suspend fun getTokenSuspend(): String? {
+        return tokenDataStore.getToken()
+    }
 }
 

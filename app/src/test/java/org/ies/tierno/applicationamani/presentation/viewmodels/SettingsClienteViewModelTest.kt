@@ -14,8 +14,8 @@ import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
-import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.UsuarioProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UsuarioProfileResponseDTO
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.di
 
-
+import EditProfilePsicologoViewModel
 import androidx.room.Room
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
@@ -14,10 +14,13 @@ import org.ies.tierno.applicationamani.data.remoto.DiarioRemoteRepository
 import org.ies.tierno.applicationamani.data.remoto.DiarioSyncManager
 import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
 import org.ies.tierno.applicationamani.data.remoto.SyncDiarioWorker
+import org.ies.tierno.applicationamani.data.remoto.FileStorageService
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepository
+import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
+import org.ies.tierno.applicationamani.data.repositorio.HistorialRepository
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
@@ -26,8 +29,8 @@ import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentInte
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
@@ -69,10 +72,17 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.ProfileAdminViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente.ProfilePacienteViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
@@ -103,11 +113,13 @@ val appModule = module {
     single { DiarioSyncManager(androidContext(), get(), get(), get()) }
     single { NotificacionRepository(get()) }
     single { SoporteTicketRepository(get()) }
+    single { AjustesRepository(get()) }
+    single { HistorialRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
     single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
-    single { org.ies.tierno.applicationamani.data.remoto.FileStorageService(get(), androidContext()) }
+    single { FileStorageService(get(), androidContext()) }
 
     factory { LoginUseCase(get()) }
     factory { GetAllClientAndPsicologoUseCase(get()) }
@@ -118,13 +130,12 @@ val appModule = module {
     factory { ListarPsicologoAdminUseCase(get()) }
     factory { AsignarPacienteAlPsicologoUseCase(get()) }
     factory { ResponderTestUseCase(get()) }
-    factory { ListarSituacionUseCase(get()) }
+    factory { SituacionUseCase(get()) }
     factory { ProfileUseCaseGeneral(get()) }
-    //REPOSITORIO
     factory { NotificacionUseCase(get()) }
     factory { GetPacientesSinPsicologoUseCase(get()) }
     factory { ListarPacientesByPsicologo(get()) }
-
+    factory { HistorialClinicoUseCase(get()) }
 
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
@@ -136,8 +147,10 @@ val appModule = module {
     factory { ObserveUserOnlineUseCase(get()) }
     factory { MarkMessageDeliveredUseCase(get()) }
     factory { UpdateUserOnlineUseCase(get()) }
+    factory { IdiomaUseCase(get()) }
+    factory { TerapiasGeneralUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { ListarPacientesViewModel(get(), get()) }
@@ -152,8 +165,9 @@ val appModule = module {
     viewModel { ListarPacientesByPsicologoViewModel(get(), get()) }
     viewModel { EstadisticasPsicologoViewModel(get(), get()) }
     viewModel { ProfilePsicologoViewModel(get()) }
+    viewModel { EditProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
-    viewModel { ListarTerapiasViewModel(get()) }
+    viewModel { ListarTerapiasViewModel(get(), get()) }
     viewModel { ListarCitasViewModel(get(), get()) }
     viewModel { DiarioEmocionalViewModel(get()) }
 
@@ -180,17 +194,16 @@ val appModule = module {
         )
     }
 
-
-    // NOTIFICACION
     viewModel { NotificacionViewModel(get()) }
     viewModel { PacientesViewModel(get()) }
 
     single { PaymentRepository(get()) }
     factory { CreatePaymentIntentUseCase(get()) }
-
     viewModel { PaymentViewModel(get()) }
 
-    // SOPORTE
     viewModel { SoporteTicketViewModel(get()) }
-
+    viewModel { IdiomaViewModel(get(), get()) }
+    viewModel { ProfileAdminViewModel(get()) }
+    viewModel { ProfilePacienteViewModel(get()) }
+    viewModel { HistorialClinicoPacienteViewModel(get()) }
 }

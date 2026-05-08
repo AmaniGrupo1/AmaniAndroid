@@ -3,7 +3,7 @@ package org.ies.tierno.applicationamani.domain.models.citas
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
-import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import java.time.LocalDate
 import java.time.LocalTime
 

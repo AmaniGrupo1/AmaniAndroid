@@ -20,7 +20,7 @@ class GetPacientesSinPsicologoUseCaseTest {
     private val testPaciente = PacienteBasicoResponseDTO(
         idPaciente = 1L, idUsuario = 10L, nombre = "Juan", apellido = "Perez",
         email = "j@t.com", dni = "123", fechaNacimiento = "2000-01-01",
-        genero = "Hombre", telefono = "123", direcciones = null, tutores = null
+        genero = "Hombre", telefono = "123", situaciones = null, direcciones = null, tutores = null
     )
 
     @Before

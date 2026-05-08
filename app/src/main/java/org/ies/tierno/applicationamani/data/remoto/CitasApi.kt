@@ -6,8 +6,9 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -98,6 +99,13 @@ interface CitasApi {
     @GET("/api/citas/psicologo/terapias")
     suspend fun getTerapias(): List<TerapiaResponseDTO>
 
+
+    @POST("/api/citas/psicologo/terapias")
+    suspend fun crearTerapia(
+        @Body request: TerapiaRequest
+    ): Response<TerapiaResponseDTO>
+
+
     @GET("/api/citas/psicologo/{idPsicologo}/horario-actual")
     suspend fun getHorarioActual(
         @Path("idPsicologo") idPsicologo: Long
@@ -112,4 +120,17 @@ interface CitasApi {
 
     @GET("/api/citas/mis-citas")
     suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO>
+
+
+
+    @PUT("/api/citas/update/{id}")
+    suspend fun actualizarTerapia(
+        @Path("id") id: Long,
+        @Body request: TerapiaRequest
+    ): TerapiaResponseDTO
+
+    @DELETE("/api/citas/delete/{id}")
+    suspend fun eliminarTerapia(
+        @Path("id") id: Long
+    ): Unit
 }

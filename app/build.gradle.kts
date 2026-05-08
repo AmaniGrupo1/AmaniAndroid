@@ -24,13 +24,32 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // ✅ IMPORTANTE (plan B compatibilidad NDK)
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
+
+    // ✅ SOLUCIÓN ERROR 16 KB
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    // ✅ NDK moderno
+    ndkVersion = "26.1.10909125"
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -46,33 +65,36 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
 }
 
-// ✅ Kotlin moderno (sustituye kotlinOptions)
+// ✅ Kotlin moderno
 kotlin {
     jvmToolchain(17)
 }
 
 dependencies {
+
+    // ✅ CameraX ACTUALIZADO (CRÍTICO)
+    implementation("androidx.camera:camera-camera2:1.4.0")
+    implementation("androidx.camera:camera-lifecycle:1.4.0")
+    implementation("androidx.camera:camera-view:1.4.0")
+
+    // Imágenes
     implementation(libs.coil.compose)
 
-    implementation(libs.koin.androidx.compose.v421)
-    // 🚨 IMPORTANTE: eliminado Spring (NO compatible con Android)
+    // DI
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.workmanager)
 
     // Networking
     implementation(libs.retrofit.v290)
     implementation(libs.converter.gson)
 
-    // WorkManager (notificaciones / tareas en segundo plano)
+    // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
     // DataStore
@@ -86,18 +108,19 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // Firebase
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+
+    // Media
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-    // DI
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.androidx.workmanager)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -124,10 +147,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.material)
-
-    // Firebase
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth)
 
     // Logging
     implementation(libs.timber)

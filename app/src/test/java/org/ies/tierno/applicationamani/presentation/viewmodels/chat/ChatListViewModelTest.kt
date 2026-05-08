@@ -15,8 +15,9 @@ import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.UsuarioProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UsuarioProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.junit.After
 import org.junit.Assert.*
@@ -97,7 +98,7 @@ class ChatListViewModelTest {
         )
         every { listarPacientesByPsicologo() } returns flowOf(pacientes)
         coEvery { profileUseCaseGeneral.getPacienteByIdFirebase(any()) } returns Result.success(
-            org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO(
+            PacienteProfileResponseDTO(
                 idPaciente = 5L, telefono = "123", genero = "Hombre", fechaNacimiento = null,
                 usuario = UsuarioProfileResponseDTO(idUsuario = 100L, nombre = "Juan", apellido = "Perez", email = null, fotoPerfilUrl = null)
             )

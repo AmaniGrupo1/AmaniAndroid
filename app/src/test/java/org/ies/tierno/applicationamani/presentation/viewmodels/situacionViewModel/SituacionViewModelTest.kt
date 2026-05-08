@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.ies.tierno.applicationamani.domain.usecases.ListarSituacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -24,12 +24,12 @@ import org.junit.Test
 class SituacionViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var listUseCase: ListarSituacionUseCase
+    private lateinit var useCase: SituacionUseCase
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        listUseCase = mockk()
+        useCase = mockk()
     }
 
     @After
@@ -39,9 +39,9 @@ class SituacionViewModelTest {
 
     @Test
     fun `initial state with empty flow - situaciones is empty`() = runTest {
-        every { listUseCase() } returns flowOf(emptyList<SituacionDTO>())
+        every { useCase.getSituaciones() } returns flowOf(emptyList<SituacionDTO>())
 
-        val viewModel = SituacionViewModel(listUseCase)
+        val viewModel = SituacionViewModel(useCase)
         advanceUntilIdle()
 
         viewModel.situaciones.test {
@@ -55,9 +55,9 @@ class SituacionViewModelTest {
         val situacion2 = SituacionDTO(2L, "Estrés", "Laboral", "Descripción estrés")
         val expected = listOf(situacion1, situacion2)
 
-        every { listUseCase() } returns flowOf(expected)
+        every { useCase.getSituaciones() } returns flowOf(expected)
 
-        val viewModel = SituacionViewModel(listUseCase)
+        val viewModel = SituacionViewModel(useCase)
         advanceUntilIdle()
 
         viewModel.situaciones.test {
@@ -67,9 +67,9 @@ class SituacionViewModelTest {
 
     @Test
     fun `when useCase emits empty list - situaciones is empty`() = runTest {
-        every { listUseCase() } returns flowOf(emptyList<SituacionDTO>())
+        every { useCase.getSituaciones() } returns flowOf(emptyList<SituacionDTO>())
 
-        val viewModel = SituacionViewModel(listUseCase)
+        val viewModel = SituacionViewModel(useCase)
         advanceUntilIdle()
 
         viewModel.situaciones.test {
@@ -79,9 +79,9 @@ class SituacionViewModelTest {
 
     @Test
     fun `when useCase flow throws - situaciones remains empty without crash`() = runTest {
-        every { listUseCase() } returns flow { throw RuntimeException("Network error") }
+        every { useCase.getSituaciones() } returns flow { throw RuntimeException("Network error") }
 
-        val viewModel = SituacionViewModel(listUseCase)
+        val viewModel = SituacionViewModel(useCase)
         advanceUntilIdle()
 
         viewModel.situaciones.test {
@@ -96,9 +96,9 @@ class SituacionViewModelTest {
         val thirdList = listOf(SituacionDTO(3L, "Tercera", "Cat", "Desc"))
 
         val mutableFlow = MutableStateFlow(firstList)
-        every { listUseCase() } returns mutableFlow
+        every { useCase.getSituaciones() } returns mutableFlow
 
-        val viewModel = SituacionViewModel(listUseCase)
+        val viewModel = SituacionViewModel(useCase)
         advanceUntilIdle()
 
         assertEquals(firstList, viewModel.situaciones.value)

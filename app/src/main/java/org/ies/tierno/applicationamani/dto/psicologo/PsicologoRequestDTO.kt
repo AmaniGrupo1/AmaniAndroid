@@ -9,6 +9,5 @@ data class PsicologoRequestDTO(
     val experiencia: Int? = null,
     val descripcion: String? = null,
     val licencia: String? = null,
-    val fechaNacimiento: String? = null,
     val telefono: String? = null
 )

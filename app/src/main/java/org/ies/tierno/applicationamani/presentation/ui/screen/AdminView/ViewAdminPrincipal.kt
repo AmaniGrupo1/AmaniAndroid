@@ -67,6 +67,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -75,6 +77,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
@@ -84,18 +87,20 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-object AmaniColors {
-    val Primary = Color(0xFF6B4E71)
+// Paleta de colores unificada con las demás pantallas
+object AmaniColorsUnified {
+    val Primary = Color(0xFF6C63FF)  // Púrpura principal consistente
     val PrimaryLight = Color(0xFF9B7E9F)
     val PrimaryDark = Color(0xFF4A2B50)
     val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
+    val Accent = Color(0xFFCCC0E4)  // Fondo consistente
     val Surface = Color(0xFFFFFFFF)
-    val Background = Color(0xFFFDF8F9)
+    val Background = Color(0xFFCCC0E4)  // Mismo fondo que RegisterScreen
     val TextPrimary = Color(0xFF2D1B30)
     val TextSecondary = Color(0xFF7A6B7E)
     val Success = Color(0xFF81C784)
     val Warning = Color(0xFFFFB74D)
+    val Error = Color(0xFFE57373)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -104,6 +109,14 @@ fun ViewAdminPrincipal(
     navController: NavController,
     viewModel: GetAllPacientAndPsicologoVeiwModel = koinViewModel()
 ) {
+    // Fuente Roboto correctamente configurada
+    val roboto = FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
+    )
+
     val psicologos by viewModel.paciente.collectAsState()
     var showLoading by remember { mutableStateOf(true) }
 
@@ -130,12 +143,16 @@ fun ViewAdminPrincipal(
                             showLoading = false
                         }
                     }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Actualizar", tint = AmaniColors.Primary)
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Actualizar",
+                            tint = AmaniColorsUnified.Primary
+                        )
                     }
                 }
             )
         },
-        containerColor = AmaniColors.Background
+        containerColor = AmaniColorsUnified.Background
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -143,12 +160,13 @@ fun ViewAdminPrincipal(
                 .padding(innerPadding)
         ) {
             when {
-                showLoading && psicologos.isEmpty() -> LoadingState()
-                psicologos.isEmpty() -> EmptyState()
+                showLoading && psicologos.isEmpty() -> LoadingState(roboto)
+                psicologos.isEmpty() -> EmptyState(roboto)
                 else -> PsicologosList(
                     psicologos = psicologos,
                     listState = listState,
-                    isScrolled = isScrolled
+                    isScrolled = isScrolled,
+                    roboto = roboto
                 )
             }
 
@@ -168,7 +186,8 @@ fun ViewAdminPrincipal(
                     Text(
                         text = "Desliza para ver más",
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = AmaniColorsUnified.Primary,
+                        fontFamily = roboto,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                     )
                 }
@@ -178,47 +197,53 @@ fun ViewAdminPrincipal(
 }
 
 @Composable
-private fun LoadingState() {
+private fun LoadingState(roboto: FontFamily) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
-                color = AmaniColors.Primary,
+                color = AmaniColorsUnified.Primary,
                 strokeWidth = 3.dp
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Cargando psicólogos...",
-                color = AmaniColors.TextSecondary,
-                fontSize = 14.sp
+                color = AmaniColorsUnified.TextSecondary,
+                fontSize = 14.sp,
+                fontFamily = roboto
             )
         }
     }
 }
 
 @Composable
-private fun EmptyState() {
+private fun EmptyState(roboto: FontFamily) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(24.dp)
+        ) {
             Icon(
                 imageVector = Icons.Default.Psychology,
                 contentDescription = null,
                 modifier = Modifier.size(80.dp),
-                tint = AmaniColors.PrimaryLight.copy(alpha = 0.5f)
+                tint = AmaniColorsUnified.PrimaryLight.copy(alpha = 0.5f)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "No hay psicólogos registrados",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = AmaniColors.TextPrimary
+                color = AmaniColorsUnified.TextPrimary,
+                fontFamily = roboto
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Los psicólogos aparecerán aquí una vez registrados",
                 fontSize = 14.sp,
-                color = AmaniColors.TextSecondary,
-                textAlign = TextAlign.Center
+                color = AmaniColorsUnified.TextSecondary,
+                textAlign = TextAlign.Center,
+                fontFamily = roboto
             )
         }
     }
@@ -229,7 +254,8 @@ private fun EmptyState() {
 private fun PsicologosList(
     psicologos: List<ListaPacientesAndPsicologo>,
     listState: androidx.compose.foundation.lazy.LazyListState,
-    isScrolled: Boolean
+    isScrolled: Boolean,
+    roboto: FontFamily
 ) {
     LazyColumn(
         state = listState,
@@ -240,14 +266,14 @@ private fun PsicologosList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            HeaderStats(psicologos.size)
+            HeaderStats(psicologos.size, roboto)
         }
 
         items(
             items = psicologos,
             key = { psicologo -> psicologo.idPsicologo }
         ) { psicologo ->
-            PsicologoCard(psicologo = psicologo)
+            PsicologoCard(psicologo = psicologo, roboto = roboto)
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -255,11 +281,11 @@ private fun PsicologosList(
 }
 
 @Composable
-private fun HeaderStats(totalPsicologos: Int) {
+private fun HeaderStats(totalPsicologos: Int, roboto: FontFamily) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = AmaniColors.Primary),
+        colors = CardDefaults.cardColors(containerColor = AmaniColorsUnified.Primary),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -273,13 +299,15 @@ private fun HeaderStats(totalPsicologos: Int) {
                 Text(
                     text = "Total de Psicólogos",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontFamily = roboto
                 )
                 Text(
                     text = "$totalPsicologos",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    fontFamily = roboto
                 )
             }
             Icon(
@@ -294,7 +322,7 @@ private fun HeaderStats(totalPsicologos: Int) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PsicologoCard(psicologo: ListaPacientesAndPsicologo) {
+fun PsicologoCard(psicologo: ListaPacientesAndPsicologo, roboto: FontFamily) {
     var expanded by remember { mutableStateOf(false) }
     val pacientesCount = psicologo.pacientes.size
 
@@ -307,7 +335,7 @@ fun PsicologoCard(psicologo: ListaPacientesAndPsicologo) {
             defaultElevation = 2.dp,
             pressedElevation = 6.dp
         ),
-        colors = CardDefaults.cardColors(containerColor = AmaniColors.Surface)
+        colors = CardDefaults.cardColors(containerColor = AmaniColorsUnified.Surface)
     ) {
         Column(
             modifier = Modifier
@@ -317,7 +345,8 @@ fun PsicologoCard(psicologo: ListaPacientesAndPsicologo) {
             PsicologoHeader(
                 psicologo = psicologo,
                 expanded = expanded,
-                onExpandClick = { expanded = !expanded }
+                onExpandClick = { expanded = !expanded },
+                roboto = roboto
             )
 
             AnimatedVisibility(
@@ -329,7 +358,7 @@ fun PsicologoCard(psicologo: ListaPacientesAndPsicologo) {
                     animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
                 ) + fadeOut()
             ) {
-                ExpandedContent(psicologo = psicologo)
+                ExpandedContent(psicologo = psicologo, roboto = roboto)
             }
         }
     }
@@ -340,13 +369,14 @@ fun PsicologoCard(psicologo: ListaPacientesAndPsicologo) {
 fun PsicologoHeader(
     psicologo: ListaPacientesAndPsicologo,
     expanded: Boolean,
-    onExpandClick: () -> Unit
+    onExpandClick: () -> Unit,
+    roboto: FontFamily
 ) {
     val pacientesCount = psicologo.pacientes.size
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = AmaniColors.Surface,
+        color = AmaniColorsUnified.Surface,
         shadowElevation = if (expanded) 2.dp else 0.dp
     ) {
         Column(
@@ -371,16 +401,22 @@ fun PsicologoHeader(
                             .clip(CircleShape)
                             .background(
                                 brush = Brush.linearGradient(
-                                    colors = listOf(AmaniColors.Primary, AmaniColors.PrimaryLight)
+                                    colors = listOf(
+                                        AmaniColorsUnified.Primary,
+                                        AmaniColorsUnified.PrimaryLight
+                                    )
                                 )
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = psicologo.nombrePsicologo.take(1) + psicologo.apellidoPsicologo.take(1),
+                            text = psicologo.nombrePsicologo.take(1) + psicologo.apellidoPsicologo.take(
+                                1
+                            ),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = Color.White,
+                            fontFamily = roboto
                         )
                     }
 
@@ -389,45 +425,57 @@ fun PsicologoHeader(
                             text = "${psicologo.nombrePsicologo} ${psicologo.apellidoPsicologo}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = AmaniColors.TextPrimary
+                            color = AmaniColorsUnified.TextPrimary,
+                            fontFamily = roboto
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.Email,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = AmaniColors.TextSecondary
+                                tint = AmaniColorsUnified.TextSecondary
                             )
                             Text(
                                 text = psicologo.emailPsicologo,
                                 fontSize = 12.sp,
-                                color = AmaniColors.TextSecondary,
+                                color = AmaniColorsUnified.TextSecondary,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = roboto
                             )
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.Work,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = AmaniColors.Primary
+                                tint = AmaniColorsUnified.Primary
                             )
                             Text(
                                 text = psicologo.especialidad,
                                 fontSize = 12.sp,
-                                color = AmaniColors.Primary,
-                                fontWeight = FontWeight.Medium
+                                color = AmaniColorsUnified.Primary,
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = roboto
                             )
                         }
                     }
                 }
 
-                Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Surface(
                         shape = RoundedCornerShape(20.dp),
-                        color = if (pacientesCount > 0) AmaniColors.Secondary else AmaniColors.Accent,
+                        color = if (pacientesCount > 0) AmaniColorsUnified.Secondary else AmaniColorsUnified.Accent,
                         modifier = Modifier.width(IntrinsicSize.Min)
                     ) {
                         Row(
@@ -439,13 +487,14 @@ fun PsicologoHeader(
                                 imageVector = Icons.Default.People,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = if (pacientesCount > 0) AmaniColors.Primary else AmaniColors.TextSecondary
+                                tint = if (pacientesCount > 0) AmaniColorsUnified.Primary else AmaniColorsUnified.TextSecondary
                             )
                             Text(
                                 text = "$pacientesCount paciente${if (pacientesCount != 1) "s" else ""}",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = if (pacientesCount > 0) AmaniColors.Primary else AmaniColors.TextSecondary
+                                color = if (pacientesCount > 0) AmaniColorsUnified.Primary else AmaniColorsUnified.TextSecondary,
+                                fontFamily = roboto
                             )
                         }
                     }
@@ -453,7 +502,7 @@ fun PsicologoHeader(
                         Icon(
                             imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                             contentDescription = if (expanded) "Contraer" else "Expandir",
-                            tint = AmaniColors.Primary
+                            tint = AmaniColorsUnified.Primary
                         )
                     }
                 }
@@ -463,7 +512,7 @@ fun PsicologoHeader(
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     thickness = 1.dp,
-                    color = AmaniColors.Accent
+                    color = AmaniColorsUnified.Accent
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
@@ -477,13 +526,14 @@ fun PsicologoHeader(
                             imageVector = Icons.Outlined.Badge,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = AmaniColors.TextSecondary
+                            tint = AmaniColorsUnified.TextSecondary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Lic: ${psicologo.licencia ?: "No registrada"}",
                             fontSize = 11.sp,
-                            color = AmaniColors.TextSecondary
+                            color = AmaniColorsUnified.TextSecondary,
+                            fontFamily = roboto
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -491,13 +541,14 @@ fun PsicologoHeader(
                             imageVector = Icons.Outlined.CalendarToday,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = AmaniColors.TextSecondary
+                            tint = AmaniColorsUnified.TextSecondary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Alta: ${formatFechaCompacta(psicologo.fechaDadoAlta)}",
                             fontSize = 11.sp,
-                            color = AmaniColors.TextSecondary
+                            color = AmaniColorsUnified.TextSecondary,
+                            fontFamily = roboto
                         )
                     }
                 }
@@ -509,13 +560,13 @@ fun PsicologoHeader(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
+fun ExpandedContent(psicologo: ListaPacientesAndPsicologo, roboto: FontFamily) {
     val pacientes = psicologo.pacientes
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(AmaniColors.Accent)
+            .background(AmaniColorsUnified.Accent)
             .padding(16.dp)
     ) {
         Row(
@@ -527,14 +578,16 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
                 text = "Pacientes Asignados",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = AmaniColors.TextPrimary
+                color = AmaniColorsUnified.TextPrimary,
+                fontFamily = roboto
             )
             if (pacientes.isNotEmpty()) {
                 Text(
                     text = "Total: ${pacientes.size}",
                     fontSize = 12.sp,
-                    color = AmaniColors.Primary,
-                    fontWeight = FontWeight.Medium
+                    color = AmaniColorsUnified.Primary,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = roboto
                 )
             }
         }
@@ -553,19 +606,20 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
                         imageVector = Icons.Outlined.PersonOutline,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = AmaniColors.TextSecondary.copy(alpha = 0.5f)
+                        tint = AmaniColorsUnified.TextSecondary.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "No hay pacientes asignados",
                         fontSize = 13.sp,
-                        color = AmaniColors.TextSecondary
+                        color = AmaniColorsUnified.TextSecondary,
+                        fontFamily = roboto
                     )
                 }
             }
         } else {
             pacientes.forEach { paciente ->
-                PacienteItem(paciente = paciente)
+                PacienteItem(paciente = paciente, roboto = roboto)
                 if (paciente != pacientes.last()) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -578,20 +632,29 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = AmaniColors.Primary,
+                containerColor = AmaniColorsUnified.Primary,
                 contentColor = Color.White
             ),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
         ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Asignar nuevo paciente", fontSize = 13.sp, fontWeight = FontWeight.Medium)
+            Text(
+                text = "Asignar nuevo paciente",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = roboto
+            )
         }
     }
 }
 
 @Composable
-fun PacienteItem(paciente: PacientesAsignadoDTO) {
+fun PacienteItem(paciente: PacientesAsignadoDTO, roboto: FontFamily) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -609,14 +672,15 @@ fun PacienteItem(paciente: PacientesAsignadoDTO) {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(AmaniColors.Secondary),
+                    .background(AmaniColorsUnified.Secondary),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = paciente.nombre.take(1) + paciente.apellido.take(1),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AmaniColors.Primary
+                    color = AmaniColorsUnified.Primary,
+                    fontFamily = roboto
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
@@ -624,27 +688,32 @@ fun PacienteItem(paciente: PacientesAsignadoDTO) {
                     text = "${paciente.nombre} ${paciente.apellido}",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = AmaniColors.TextPrimary
+                    color = AmaniColorsUnified.TextPrimary,
+                    fontFamily = roboto
                 )
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Outlined.Email,
                         contentDescription = null,
                         modifier = Modifier.size(12.dp),
-                        tint = AmaniColors.TextSecondary
+                        tint = AmaniColorsUnified.TextSecondary
                     )
                     Text(
                         text = paciente.email,
                         fontSize = 11.sp,
-                        color = AmaniColors.TextSecondary,
+                        color = AmaniColorsUnified.TextSecondary,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = roboto
                     )
                 }
             }
             Surface(
                 shape = CircleShape,
-                color = AmaniColors.Success.copy(alpha = 0.2f),
+                color = AmaniColorsUnified.Success.copy(alpha = 0.2f),
                 modifier = Modifier.size(32.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -652,7 +721,7 @@ fun PacienteItem(paciente: PacientesAsignadoDTO) {
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = AmaniColors.Success
+                        tint = AmaniColorsUnified.Success
                     )
                 }
             }

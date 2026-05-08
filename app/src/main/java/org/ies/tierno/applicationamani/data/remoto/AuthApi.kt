@@ -49,6 +49,7 @@ interface AuthApi {
     @GET("/api/admin/psicologos/pacientes")
     suspend fun getPacientesConPsicologo(): Response<List<ListaPacientesAndPsicologo>>
 
+    // OBTENEMOS  TODOS LOS PACIENTES
     @GET("/api/pacientes/admin")
     suspend fun getPacientes(): Response<List<DatosPacienteAdminDTO>>
 

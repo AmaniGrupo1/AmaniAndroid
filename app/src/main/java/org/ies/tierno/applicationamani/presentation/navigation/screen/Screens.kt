@@ -24,8 +24,6 @@ sealed class Screens(val route: String) {
     /** Pantalla principal para usuarios no autenticados. */
     object principal : Screens("principal")
 
-
-
     /** Pantalla del cuestionario de evaluación inicial. */
     object questionnaire : Screens("questionnaire")
 
@@ -102,4 +100,25 @@ sealed class Screens(val route: String) {
             "paymentScreen/$citaId/${Uri.encode(psicologoName)}/$fecha/$monto"
     }
     object misTickets : Screens("misTickets")
+
+    // New from login branch
+    object settingsAdmin : Screens("settingsAdmin")
+    object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}"){
+        fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
+    }
+    object settingPsicologo : Screens("settingPsicologo")
+    object terapias : Screens("terapias")
+    object crearSituaciones : Screens("crearSituaciones")
+    object historialClinico : Screens("historialClinico/{pacienteId}"){
+        fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
+    }
+    object profileAdmin : Screens("profileAdmin/{adminId}"){
+        fun createRoute(adminId: Long?) = "profileAdmin/$adminId"
+    }
+    object perfilPaciente : Screens("perfilPaciente/{pacienteId}"){
+        fun createRoute(pacienteId: Long?) = "perfilPaciente/$pacienteId"
+    }
+    object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}"){
+        fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
+    }
 }

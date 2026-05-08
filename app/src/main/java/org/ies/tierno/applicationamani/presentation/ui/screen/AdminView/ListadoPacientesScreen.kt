@@ -15,62 +15,72 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Wc
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
-import org.ies.tierno.applicationamani.ui.theme.BarlowCondensed
-import org.ies.tierno.applicationamani.ui.theme.Roboto
 import org.koin.androidx.compose.koinViewModel
+
+// Paleta de colores unificada con las demás pantallas
+object AmaniColorsListado {
+    val Primary = Color(0xFF6C63FF)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFCCC0E4)
+    val Surface = Color(0xFFFFFFFF)
+    val Background = Color(0xFFCCC0E4)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Success = Color(0xFF81C784)
+    val Warning = Color(0xFFFFB74D)
+    val Error = Color(0xFFE57373)
+}
 
 /**
  * Pantalla de listado de pacientes con opciones de gestión.
@@ -84,31 +94,70 @@ fun ListadoPacientesScreen(
     val pacientes by viewModel.paciente.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var pacienteSeleccionado by remember { mutableStateOf<DatosPacienteAdminDTO?>(null) }
-    var mostrarDialogoBaja by remember { mutableStateOf(false) }
 
-    val roboto = Roboto
-    val balow = BarlowCondensed
-
-    val backgroundColor = Color(0xFFF5F5F5)
-    val primaryColor = Color(0xFF6C63FF)
-    val pendingColor = Color(0xFFFF9800)
-    val paidColor = Color(0xFF4CAF50)
-    val inactiveColor = Color(0xFF9E9E9E)
+    // Fuente Roboto correctamente configurada
+    val roboto = FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
+    )
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = AmaniColorsListado.Background,
         topBar = {
-            MenuAdministrador("Listado de pacientes", navController)
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = AmaniColorsListado.Primary,
+                shadowElevation = 4.dp,
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "LISTADO DE PACIENTES",
+                        color = Color.White,
+                        fontFamily = roboto,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+
+                    // Espaciador para balancear el ícono
+                    Spacer(modifier = Modifier.width(48.dp))
+                }
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(Screens.registro.route) },
-                containerColor = primaryColor,
-                shape = RoundedCornerShape(50.dp)
+                containerColor = AmaniColorsListado.Primary,
+                shape = RoundedCornerShape(50.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
             ) {
-                Icon(Icons.Default.PersonAdd, contentDescription = "Agregar paciente", tint = Color.White)
+                Icon(
+                    Icons.Default.People,
+                    contentDescription = "Agregar paciente",
+                    tint = Color.White
+                )
             }
         }
     ) { paddingValues ->
@@ -128,18 +177,19 @@ fun ListadoPacientesScreen(
                     Icon(
                         imageVector = Icons.Default.People,
                         contentDescription = "Sin pacientes",
-                        modifier = Modifier.size(64.dp),
-                        tint = Color.Gray
+                        modifier = Modifier.size(80.dp),
+                        tint = AmaniColorsListado.PrimaryLight.copy(alpha = 0.5f)
                     )
                     Text(
                         text = "No hay pacientes registrados",
                         fontFamily = roboto,
                         fontSize = 16.sp,
-                        color = Color.Gray
+                        color = AmaniColorsListado.TextSecondary
                     )
                     Button(
                         onClick = { navController.navigate(Screens.registro.route) },
-                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = AmaniColorsListado.Primary),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Agregar primer paciente", fontFamily = roboto)
                     }
@@ -152,217 +202,146 @@ fun ListadoPacientesScreen(
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
                     .padding(top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(pacientes) { paciente ->
                     PacienteCard(
-                        navController,
                         paciente = paciente,
-                        onDarBaja = {
-                            pacienteSeleccionado = paciente
-                            mostrarDialogoBaja = true
-                        },
                         onEditar = {
                             navController.navigate("editarPaciente/${paciente.idPaciente}")
                         },
-                        onAsignarPsicologo = {
-                            // navController.navigate(Screens.asignarPsicologo.createRoute(paciente.idPaciente))
-                        },
-                        primaryColor = primaryColor,
-                        pendingColor = pendingColor,
-                        paidColor = paidColor,
-                        inactiveColor = inactiveColor,
                         roboto = roboto
                     )
                 }
-            }
-        }
 
-        // Dialogo Dar de baja
-        if (mostrarDialogoBaja && pacienteSeleccionado != null) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoBaja = false },
-                title = {
-                    Text(
-                        "Confirmar baja",
-                        fontFamily = balow,
-                        fontSize = 20.sp
-                    )
-                },
-                text = {
-                    Text(
-                        "¿Seguro que deseas dar de baja a ${pacienteSeleccionado!!.nombreUsuario} ${pacienteSeleccionado!!.apellidoUsuario}?",
-                        fontFamily = roboto
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            scope.launch {
-                                pacienteSeleccionado?.let { paciente ->
-                                    val result = viewModel.darBajaPaciente(paciente.idPaciente)
-                                    if (result.isSuccess) {
-                                        viewModel.actualizarPacienteBaja(paciente.idPaciente)
-                                        snackbarHostState.showSnackbar("Paciente dado de baja correctamente")
-                                    } else {
-                                        snackbarHostState.showSnackbar("Error al dar de baja al paciente")
-                                    }
-                                }
-                                mostrarDialogoBaja = false
-                            }
-                        },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
-                    ) {
-                        Text("Dar de baja", fontFamily = roboto)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { mostrarDialogoBaja = false },
-                        colors = ButtonDefaults.textButtonColors(contentColor = primaryColor)
-                    ) {
-                        Text("Cancelar", fontFamily = roboto)
-                    }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            )
+            }
         }
     }
 }
 
 @Composable
 fun PacienteCard(
-    navController: NavController,
     paciente: DatosPacienteAdminDTO,
-    onDarBaja: () -> Unit,
     onEditar: () -> Unit,
-    onAsignarPsicologo: () -> Unit,
-    primaryColor: Color,
-    pendingColor: Color,
-    paidColor: Color,
-    inactiveColor: Color,
     roboto: FontFamily
 ) {
-    val metodoPagoStr = paciente.metodoPago?.uppercase() ?: ""
-    val estadoPagoStr = paciente.estadoPago?.uppercase() ?: ""
-
-    val (estadoTexto, estadoColor, metodoIcon) = when {
-        !paciente.activo -> Triple("INACTIVO", inactiveColor, Icons.Default.Error)
-        metodoPagoStr == "ONLINE" && estadoPagoStr == "PAGADO" -> Triple("PAGADO (Online)", paidColor, Icons.Default.CreditCard)
-        metodoPagoStr == "ONLINE" && estadoPagoStr == "PENDIENTE" -> Triple("PENDIENTE (Online)", pendingColor, Icons.Default.CreditCard)
-        metodoPagoStr == "PRESENCIAL" && estadoPagoStr == "PENDIENTE" -> Triple("PENDIENTE (Presencial)", pendingColor, Icons.Default.AttachMoney)
-        metodoPagoStr == "PRESENCIAL" && estadoPagoStr == "PAGADO" -> Triple("PAGADO (Presencial)", paidColor, Icons.Default.AttachMoney)
-        else -> Triple(estadoPagoStr, Color.Gray, Icons.Default.Info)
-    }
-
-    val (metodoIcono, metodoTexto) = when (metodoPagoStr) {
-        "ONLINE" -> Pair(Icons.Default.Payment, "Pago Online")
-        "PRESENCIAL" -> Pair(Icons.Default.AttachMoney, "Pago Presencial")
-        else -> Pair(Icons.Default.Info, metodoPagoStr)
-    }
+    val metodoPagoStr = paciente.metodoPago
+    val metodoIcono = if (metodoPagoStr == "ONLINE") Icons.Default.CreditCard else Icons.Default.Payments
+    val metodoTexto = if (metodoPagoStr == "ONLINE") "Pago Online" else if (metodoPagoStr == "PRESENCIAL") "Pago Presencial" else "No especificado"
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = AmaniColorsListado.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Header
+            // Header - Nombre completo con avatar
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                // Avatar circular con iniciales
+                Surface(
+                    modifier = Modifier.size(50.dp),
+                    shape = RoundedCornerShape(25.dp),
+                    color = AmaniColorsListado.Primary,
+                    shadowElevation = 2.dp
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Paciente",
-                        tint = primaryColor,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = paciente.nombreUsuario.take(1).uppercase() +
+                                    paciente.apellidoUsuario.take(1).uppercase(),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            fontFamily = roboto
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${paciente.nombreUsuario} ${paciente.apellidoUsuario}",
-                        color = Color.Black,
+                        color = AmaniColorsListado.TextPrimary,
                         fontFamily = roboto,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = estadoColor.copy(alpha = 0.2f)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                    ) {
-                        Icon(
-                            imageVector = metodoIcon,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = estadoColor
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = estadoTexto,
-                            color = estadoColor,
-                            fontSize = 11.sp,
-                            fontFamily = roboto,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    Text(
+                        text = "ID: ${paciente.idPaciente}",
+                        color = AmaniColorsListado.TextSecondary,
+                        fontFamily = roboto,
+                        fontSize = 12.sp
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Información de contacto
+            // Línea divisoria
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = AmaniColorsListado.Accent,
+                shape = RoundedCornerShape(2.dp)
+            ) {
+                Spacer(modifier = Modifier.height(1.dp))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Email
             InfoRow(
                 icon = Icons.Default.Email,
                 label = "Email",
                 value = paciente.emailUsuario,
-                iconColor = primaryColor,
+                iconColor = AmaniColorsListado.Primary,
                 roboto = roboto
             )
 
+            // Teléfono
             InfoRow(
                 icon = Icons.Default.Phone,
                 label = "Teléfono",
                 value = paciente.telefono,
-                iconColor = primaryColor,
+                iconColor = AmaniColorsListado.Primary,
                 roboto = roboto
             )
 
-            // Información personal
-            Row(
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Fecha Nacimiento y Género en columnas separadas (una debajo de otra)
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Fecha de Nacimiento
                 InfoRowCompact(
                     icon = Icons.Default.Cake,
-                    label = "Fecha Nac.",
+                    label = "Fecha de Nacimiento",
                     value = paciente.fechaNacimiento,
-                    iconColor = primaryColor,
+                    iconColor = AmaniColorsListado.Primary,
                     roboto = roboto,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth()
                 )
 
+                // Género
                 InfoRowCompact(
                     icon = Icons.Default.Wc,
                     label = "Género",
                     value = paciente.genero,
-                    iconColor = primaryColor,
+                    iconColor = AmaniColorsListado.Primary,
                     roboto = roboto,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -377,7 +356,7 @@ fun PacienteCard(
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                paciente.direccion?.forEach { direccion ->
+                paciente.direccion.forEach { direccion ->
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -564,79 +543,38 @@ fun PacienteCard(
 
                 InfoRowCompact(
                     icon = Icons.Default.DateRange,
-                    label = "Creado",
+                    label = "Fecha de Registro",
                     value = paciente.createdAt.split("T")[0],
-                    iconColor = Color.Gray,
+                    iconColor = AmaniColorsListado.TextSecondary,
                     roboto = roboto,
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                if (paciente.updatedAt.isNotBlank() && paciente.updatedAt != paciente.createdAt) {
-                    InfoRowCompact(
-                        icon = Icons.Default.Update,
-                        label = "Actualizado",
-                        value = paciente.updatedAt.split("T")[0],
-                        iconColor = Color.Gray,
-                        roboto = roboto,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Botones
-            Row(
+            // Botón Editar
+            Button(
+                onClick = onEditar,
+                colors = ButtonDefaults.buttonColors(containerColor = AmaniColorsListado.Primary),
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
             ) {
-                if (paciente.activo) {
-                    Button(
-                        onClick = onDarBaja,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Dar de baja", modifier = Modifier.size(18.dp), tint = Color.White)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Baja", color = Color.White, fontFamily = roboto)
-                    }
-                } else {
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(Icons.Default.Restore, contentDescription = "Reactivar", modifier = Modifier.size(18.dp), tint = Color.White)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Reactivar", color = Color.White, fontFamily = roboto)
-                    }
-                }
-
-                Button(
-                    onClick = onEditar,
-                    colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(18.dp), tint = Color.White)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Editar", color = Color.White, fontFamily = roboto)
-                }
-
-                //-------------------------------------------------------------------------------------------------------
-
-                Button(
-                    onClick = {navController.navigate(Screens.listarPsicologo.createRoute(paciente.idPaciente))},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Icon(Icons.Default.Psychology, contentDescription = "Asignar psicólogo", modifier = Modifier.size(18.dp), tint = Color.White)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Asignar", color = Color.White, fontFamily = roboto)
-                }
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = "Editar",
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Editar datos",
+                    color = Color.White,
+                    fontFamily = roboto,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp
+                )
             }
         }
     }
@@ -663,17 +601,17 @@ fun InfoRow(
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "$label:",
-            color = Color.Gray,
-            fontFamily = roboto,
-            fontSize = 14.sp,
-            modifier = Modifier.width(100.dp)
-        )
-        Text(
-            text = value,
-            color = Color.Black,
+            color = AmaniColorsListado.TextSecondary,
             fontFamily = roboto,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
+            modifier = Modifier.width(80.dp)
+        )
+        Text(
+            text = value,
+            color = AmaniColorsListado.TextPrimary,
+            fontFamily = roboto,
+            fontSize = 14.sp,
             modifier = Modifier.weight(1f)
         )
     }
@@ -696,21 +634,23 @@ fun InfoRowCompact(
             imageVector = icon,
             contentDescription = label,
             tint = iconColor,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(18.dp)
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "$label:",
-            color = Color.Gray,
+            color = AmaniColorsListado.TextSecondary,
             fontFamily = roboto,
-            fontSize = 12.sp,
-            modifier = Modifier.width(80.dp)
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.width(130.dp)
         )
         Text(
-            text = value,
-            color = Color.Black,
+            text = value.ifEmpty { "No especificado" },
+            color = AmaniColorsListado.TextPrimary,
             fontFamily = roboto,
-            fontSize = 12.sp,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
     }

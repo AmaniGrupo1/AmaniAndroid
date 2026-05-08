@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.data.remoto
 
 import android.util.Log
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 
@@ -17,13 +18,11 @@ class AuthInterceptor(private val tokenHolder: TokenHolder) : Interceptor {
             Log.w("AuthInterceptor", "TOKEN ES NULL — petición sin Authorization. URL: ${originalRequest.url}")
         }
 
-        val request = if (token != null) {
-            originalRequest.newBuilder()
-                .header("Authorization", "Bearer $token")
-                .build()
-        } else {
-            originalRequest
-        }
+        val request = originalRequest.newBuilder().apply {
+            if (!token.isNullOrEmpty()) {
+                header("Authorization", "Bearer $token")
+            }
+        }.build()
 
         return chain.proceed(request)
     }

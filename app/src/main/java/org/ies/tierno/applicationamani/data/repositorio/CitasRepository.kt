@@ -8,8 +8,9 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.citas.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaRequest
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -158,4 +159,46 @@ class CitasRepository(
     }
 
 
+    suspend fun crearTerapia(request: TerapiaRequest): Result<TerapiaResponseDTO> {
+        return try {
+            val response = citasApi.crearTerapia(request)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Result.success(body)
+                } else {
+                    Result.failure(Exception("Respuesta vacía del servidor"))
+                }
+            } else {
+                Result.failure(Exception("Error HTTP: ${response.code()}"))
+            }
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun actualizarTerapia(
+        id: Long,
+        request: TerapiaRequest
+    ): Result<TerapiaResponseDTO> {
+        return try {
+            val response = citasApi.actualizarTerapia(id, request)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun eliminarTerapia(id: Long): Result<Unit> {
+        return try {
+            citasApi.eliminarTerapia(id)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

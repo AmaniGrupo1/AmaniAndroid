@@ -6,8 +6,8 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
-import org.ies.tierno.applicationamani.dto.perfil.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
