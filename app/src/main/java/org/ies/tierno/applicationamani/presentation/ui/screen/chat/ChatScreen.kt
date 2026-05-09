@@ -64,6 +64,16 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.PsychologistInfo
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
+/**
+ * Pantalla principal del chat individual entre un paciente y un psicólogo (o viceversa).
+ *
+ * Muestra la lista de mensajes, permite enviar texto, archivos adjuntos y notas de voz.
+ * Gestiona los permisos de grabación de audio y la navegación hacia atrás.
+ *
+ * @param viewModel ViewModel que gestiona la lógica y el estado del chat.
+ * @param onNavigateBack Callback ejecutado al pulsar el botón de retroceso.
+ * @param otherUserName Nombre del interlocutor para mostrar en la cabecera si no hay info completa.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
@@ -117,8 +127,6 @@ fun ChatScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        // Usamos insets a cero para que el Scaffold no añada padding automático al contenido.
-        // Esto nos da control total y evita el "doble padding" con el teclado.
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             ChatTopBar(
@@ -238,6 +246,11 @@ fun ChatScreen(
     }
 }
 
+/**
+ * Barra superior personalizada para la pantalla de chat.
+ *
+ * Muestra el avatar del psicólogo, su nombre y su estado de conexión.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChatTopBar(
@@ -301,10 +314,13 @@ private fun ChatTopBar(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
         ),
-        windowInsets = WindowInsets(0, 0, 0, 0) // Minimizar insets superiores si es posible
+        windowInsets = WindowInsets(0, 0, 0, 0)
     )
 }
 
+/**
+ * Chip visual que se utiliza para separar mensajes por fecha en el LazyColumn.
+ */
 @Composable
 private fun DateSeparatorChip(label: String) {
     Row(

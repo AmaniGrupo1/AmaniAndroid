@@ -38,14 +38,31 @@ import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import java.io.File
 
+/**
+ * Define los posibles estados de la reproducción de audio en el chat.
+ */
 enum class AudioPlaybackStatus {
+    /** El reproductor está inactivo. */
     IDLE,
+    /** El audio se está cargando o cargando en el buffer. */
     LOADING,
+    /** El audio se está reproduciendo actualmente. */
     PLAYING,
+    /** La reproducción está pausada. */
     PAUSED,
+    /** Ocurrió un error durante la reproducción. */
     ERROR
 }
 
+/**
+ * Representa el estado de la interfaz de usuario para la reproducción de audio.
+ *
+ * @property status Estado actual del reproductor.
+ * @property activeMessageId Identificador del mensaje cuyo audio está activo.
+ * @property positionMs Posición actual de reproducción en milisegundos.
+ * @property durationMs Duración total del audio en milisegundos.
+ * @property errorMessage Mensaje de error en caso de fallo.
+ */
 data class AudioPlaybackUiState(
     val status: AudioPlaybackStatus = AudioPlaybackStatus.IDLE,
     val activeMessageId: String? = null,
@@ -54,6 +71,14 @@ data class AudioPlaybackUiState(
     val errorMessage: String? = null
 )
 
+/**
+ * Información básica del psicólogo para la vista de chat.
+ *
+ * @property id Identificador del psicólogo.
+ * @property name Nombre completo o apelativo.
+ * @property avatarUrl URL de la imagen de perfil.
+ * @property isOnline Indica si el psicólogo está actualmente conectado.
+ */
 data class PsychologistInfo(
     val id: String,
     val name: String,
@@ -61,6 +86,18 @@ data class PsychologistInfo(
     val isOnline: Boolean
 )
 
+/**
+ * Estado integral de la pantalla de chat.
+ *
+ * @property messages Lista de mensajes de la conversación.
+ * @property assignedPsychologist Información del psicólogo con el que se chatea.
+ * @property currentUserId Identificador del usuario que usa la aplicación.
+ * @property inputText Texto actual en el campo de entrada del chat.
+ * @property isLoading Indica si se están cargando mensajes.
+ * @property error Mensaje de error para mostrar al usuario.
+ * @property isOtherTyping Indica si el interlocutor está escribiendo.
+ * @property psychologistOnline Indica si el interlocutor está en línea.
+ */
 data class ChatUiState(
     val messages: List<Message> = emptyList(),
     val assignedPsychologist: PsychologistInfo? = null,
@@ -72,6 +109,13 @@ data class ChatUiState(
     val psychologistOnline: Boolean = false
 )
 
+/**
+ * ViewModel que gestiona la lógica de la pantalla de chat individual.
+ *
+ * Maneja el envío y recepción de mensajes en tiempo real (mediante Firebase),
+ * la gestión de estados "escribiendo" y "en línea", la subida de archivos adjuntos
+ * y la reproducción de notas de voz.
+ */
 class ChatViewModel(
     private val currentUserId: Long,
     private val otherUserId: Long,
@@ -101,6 +145,7 @@ class ChatViewModel(
     private val _isOtherTyping = MutableStateFlow(false)
     private val _psychologistOnline = MutableStateFlow(false)
 
+    /** Flujo de estado de la reproducción de audio. */
     val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
 
     private val baseUiState = combine(
@@ -120,6 +165,7 @@ class ChatViewModel(
         )
     }
 
+    /** Flujo de estado principal de la interfaz de chat. */
     val uiState: StateFlow<ChatUiState> = combine(
         baseUiState,
         _isOtherTyping,
@@ -135,7 +181,7 @@ class ChatViewModel(
         initialValue = ChatUiState(currentUserId = currentUserId.toString())
     )
 
-    // Flow combinado para typing y online (usado por UI)
+    /** Flujo que combina los estados de presencia y actividad de escritura del interlocutor. */
     val typingOnlineState: StateFlow<Pair<Boolean, Boolean>> = combine(_isOtherTyping, _psychologistOnline) { isTyping, isOnline ->
         Pair(isTyping, isOnline)
     }.stateIn(
@@ -228,6 +274,9 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Carga la información del interlocutor (nombre, avatar) desde los casos de uso de perfil.
+     */
     private suspend fun loadPsychologistInfo() {
         if (currentUserId == otherUserId) return
 
@@ -254,6 +303,9 @@ class ChatViewModel(
         )
     }
 
+    /**
+     * Inicializa el reproductor multimedia ExoPlayer.
+     */
     private fun initPlayer() {
         if (exoPlayer != null) return
         val audioAttributes = AudioAttributes.Builder()
@@ -266,11 +318,17 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Inicializa las funcionalidades de tiempo real del chat (escritura y presencia).
+     */
     private suspend fun initChatFeatures() {
         initTyping()
         initOnlineStatus()
     }
 
+    /**
+     * Suscribe el ViewModel a los cambios en el estado de escritura del otro usuario.
+     */
     private fun initTyping() {
         observeTypingUseCase(currentUserId, otherUserId)
             .catch { throwable ->
@@ -283,6 +341,9 @@ class ChatViewModel(
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Suscribe el ViewModel a los cambios en el estado online del otro usuario.
+     */
     private fun initOnlineStatus() {
         observeUserOnlineUseCase(otherUserId)
             .catch { throwable ->
@@ -296,6 +357,9 @@ class ChatViewModel(
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Actualiza el estado online dentro del objeto de información del psicólogo.
+     */
     private fun updatePsychologistInfo() {
         val current = _assignedPsychologist.value
         current?.let {
@@ -303,6 +367,9 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Inicia la observación de los mensajes de la conversación actual.
+     */
     fun observeMessages() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -322,6 +389,9 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Marca como entregados todos los mensajes recibidos que aún no tengan ese estado.
+     */
     fun markMessagesAsDelivered() {
         viewModelScope.launch {
             _messages.value.forEach { message ->
@@ -337,18 +407,33 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Notifica que el usuario actual ha empezado a escribir.
+     */
     fun startTyping() {
         viewModelScope.launch {
             startTypingUseCase(currentUserId, otherUserId)
         }
     }
 
+    /**
+     * Notifica que el usuario actual ha dejado de escribir.
+     */
     fun stopTyping() {
         viewModelScope.launch {
             stopTypingUseCase(currentUserId, otherUserId)
         }
     }
 
+    /**
+     * Controla la reproducción de una nota de voz.
+     *
+     * Si ya se está reproduciendo el audio solicitado, alterna entre pausa y reproducción.
+     * Si es un audio nuevo, detiene el anterior y carga el solicitado.
+     *
+     * @param messageId ID del mensaje que contiene el audio.
+     * @param remoteUrl URL remota del archivo de audio.
+     */
     fun toggleAudioPlayback(messageId: String, remoteUrl: String) {
         if (!remoteUrl.startsWith("http")) {
             _audioUiState.value = AudioPlaybackUiState(
@@ -409,12 +494,18 @@ class ChatViewModel(
         player.prepare()
     }
 
+    /**
+     * Detiene la reproducción de audio actual.
+     */
     fun stopAudioPlayback() {
         exoPlayer?.stop()
         stopProgressUpdates()
         _audioUiState.value = AudioPlaybackUiState()
     }
 
+    /**
+     * Libera los recursos del reproductor de audio.
+     */
     fun releaseAudioPlayer() {
         stopProgressUpdates()
         exoPlayer?.removeListener(playerListener)
@@ -423,6 +514,9 @@ class ChatViewModel(
         _audioUiState.value = AudioPlaybackUiState()
     }
 
+    /**
+     * Inicia una tarea periódica para actualizar la posición de reproducción del audio.
+     */
     private fun startProgressUpdates() {
         val player = exoPlayer ?: return
         progressJob?.cancel()
@@ -440,11 +534,19 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Cancela la tarea de actualización de progreso de audio.
+     */
     private fun stopProgressUpdates() {
         progressJob?.cancel()
         progressJob = null
     }
 
+    /**
+     * Envía un mensaje de texto.
+     *
+     * @param content Texto del mensaje.
+     */
     fun sendTextMessage(content: String) {
         if (content.isBlank()) return
 
@@ -462,6 +564,11 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Sube y envía un archivo adjunto.
+     *
+     * @param uri URI local del archivo a enviar.
+     */
     fun sendAttachment(uri: Uri) {
         viewModelScope.launch {
             _error.value = null
@@ -492,8 +599,14 @@ class ChatViewModel(
     }
 
     private val _isRecording = MutableStateFlow(false)
+    /** Indica si se está grabando una nota de voz en este momento. */
     val isRecording: StateFlow<Boolean> get() = _isRecording.asStateFlow()
 
+    /**
+     * Prepara el estado para el inicio de una grabación de voz.
+     *
+     * @param file Archivo local donde se guardará el audio.
+     */
     fun startRecording(file: File) {
         Log.d("VoiceNote", "Iniciando grabación: ${file.absolutePath}")
         _isRecording.value = true
@@ -502,8 +615,14 @@ class ChatViewModel(
     }
 
     private val _recordingFile = MutableStateFlow<File?>(null)
+    /** Referencia al archivo de audio que se está grabando actualmente. */
     val recordingFile: StateFlow<File?> get() = _recordingFile.asStateFlow()
 
+    /**
+     * Detiene la grabación y envía el archivo resultante como nota de voz.
+     *
+     * @param file Archivo de audio finalizado.
+     */
     fun stopRecordingAndSend(file: File) {
         Log.d("VoiceNote", "Deteniendo grabación: ${file.absolutePath}, tamaño: ${file.length()} bytes")
         _isRecording.value = false
@@ -538,6 +657,11 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Actualiza el texto de entrada y gestiona el estado de escritura.
+     *
+     * @param text Nuevo contenido del campo de entrada.
+     */
     fun onInputChanged(text: String) {
         _inputText.value = text
         if (text.isNotBlank()) {
@@ -547,6 +671,9 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Envía el contenido actual del campo de entrada del chat.
+     */
     fun sendMessage() {
         val text = _inputText.value
         if (text.isBlank()) return
@@ -554,6 +681,9 @@ class ChatViewModel(
         _inputText.value = ""
     }
 
+    /**
+     * Marca todos los mensajes de la conversación como leídos por el usuario actual.
+     */
     fun markMessagesAsRead() {
         viewModelScope.launch {
             val result = markMessagesAsReadUseCase(currentUserId, otherUserId)
@@ -563,10 +693,16 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Limpia el estado de error actual.
+     */
     fun clearError() {
         _error.value = null
     }
 
+    /**
+     * Cancela la grabación actual y elimina el archivo temporal.
+     */
     fun cancelRecording() {
         _isRecording.value = false
         _recordingFile.value?.delete()
@@ -574,6 +710,9 @@ class ChatViewModel(
         stopTyping()
     }
 
+    /**
+     * Se llama cuando el ViewModel se destruye para liberar recursos.
+     */
     override fun onCleared() {
         super.onCleared()
         releaseAudioPlayer()
