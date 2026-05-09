@@ -65,6 +65,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.compose.runtime.collectAsState
 
+import androidx.core.content.FileProvider
+import androidx.compose.runtime.mutableLongStateOf
+
 private const val TAG = "PacienteProfileScreen"
 private const val BASE_URL = "http://192.168.1.175:8080"
 
@@ -96,7 +99,7 @@ fun PacienteProfileScreen(
     var telefonoEdit by remember { mutableStateOf("") }
     var fechaNacimientoEdit by remember { mutableStateOf("") }
     var generoEdit by remember { mutableStateOf("") }
-    var refreshTrigger by remember { mutableStateOf(0L) }
+    var refreshTrigger by remember { mutableLongStateOf(0L) }
 
     // Estado para controlar si se está redirigiendo al login
     var isRedirecting by remember { mutableStateOf(false) }
@@ -178,19 +181,28 @@ fun PacienteProfileScreen(
     ) { uri: Uri? ->
         uri?.let {
             viewModel.uploadFoto(pacienteId, it, context)
+            refreshTrigger = System.currentTimeMillis()
         }
     }
 
+    // Archivo temporal para la cámara
+    val photoFile = remember {
+        File(context.cacheDir, "camera_photo_paciente.jpg")
+    }
+    val photoUri = remember(photoFile) {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            photoFile
+        )
+    }
+
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        bitmap?.let {
-            val tempFile = File(context.cacheDir, "camera_photo_${System.currentTimeMillis()}.jpg")
-            FileOutputStream(tempFile).use { out ->
-                it.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            }
-            val uri = Uri.fromFile(tempFile)
-            viewModel.uploadFoto(pacienteId, uri, context)
+        contract = ActivityResultContracts.TakePicture()
+    ) { success: Boolean ->
+        if (success) {
+            viewModel.uploadFoto(pacienteId, photoUri, context)
+            refreshTrigger = System.currentTimeMillis()
         }
     }
 
@@ -199,7 +211,7 @@ fun PacienteProfileScreen(
     ) { isGranted ->
         hasCameraPermission = isGranted
         if (isGranted) {
-            cameraLauncher.launch(null)
+            cameraLauncher.launch(photoUri)
         } else {
             scope.launch {
                 snackbarHostState.showSnackbar("Permiso de cámara denegado")
@@ -807,7 +819,7 @@ fun PacienteProfileScreen(
                         onClick = {
                             showImageOptions = false
                             if (hasCameraPermission) {
-                                cameraLauncher.launch(null)
+                                cameraLauncher.launch(photoUri)
                             } else {
                                 permissionLauncher.launch(CAMERA)
                             }

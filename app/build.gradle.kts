@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose) // ✅ Incluye Kotlin + Compose
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
@@ -25,9 +24,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // ✅ IMPORTANTE (plan B compatibilidad NDK)
+        // ✅ Soporte para ARM y Emuladores (x86)
         ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
         }
     }
 
@@ -102,7 +101,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.firebase.crashlytics)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -172,7 +171,7 @@ dependencies {
 // 📚 Dokka
 dokka {
     moduleName.set("Amani Android")
-    dokkaSourceSets.named("main") {
+    dokkaSourceSets.configureEach {
         sourceRoots.from(file("src/main/java"))
         includes.from("MODULE.md")
     }

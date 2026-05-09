@@ -366,6 +366,7 @@ fun EmotionalEvolutionChart(
 fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
     val stats = uiState.estadisticas
     val hasData = uiState.chartData.isNotEmpty()
+    val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
@@ -374,14 +375,14 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
         ) {
             MetricCard(
                 title = "Promedio periodo",
-                value = if (hasData) String.format(Locale.getDefault(), "%.1f / 10", stats.promedioPeriodo) else "— / 10",
+                value = if (hasData) String.format(locale, "%.1f / 10", stats.promedioPeriodo) else "— / 10",
                 subtitle = if (hasData) getEmotionalLevel(stats.promedioPeriodo) else "Sin datos",
                 icon = Icons.AutoMirrored.Filled.ShowChart,
                 modifier = Modifier.weight(1f)
             )
             MetricCard(
                 title = "Mejor sesión",
-                value = if (hasData) String.format(Locale.getDefault(), "%d / 10", stats.mejorSesion?.intensidad ?: 0) else "— / 10",
+                value = if (hasData) String.format(locale, "%d / 10", stats.mejorSesion?.intensidad ?: 0) else "— / 10",
                 subtitle = stats.mejorSesion?.fecha.toLocalDateSafe()?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
                 color = AmaniPsicologoColors.Success,
@@ -394,7 +395,7 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
         ) {
             MetricCard(
                 title = "Peor sesión",
-                value = if (hasData) String.format(Locale.getDefault(), "%d / 10", stats.peorSesion?.intensidad ?: 0) else "— / 10",
+                value = if (hasData) String.format(locale, "%d / 10", stats.peorSesion?.intensidad ?: 0) else "— / 10",
                 subtitle = stats.peorSesion?.fecha.toLocalDateSafe()?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
                 icon = Icons.AutoMirrored.Filled.TrendingDown,
                 color = AmaniPsicologoColors.Error,
@@ -416,7 +417,7 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
                 stats.tendenciaPuntos < -1.0 -> "Bajando"
                 else -> "Estable"
             },
-            subtitle = if (hasData) String.format(Locale.getDefault(), "%+.1f puntos", stats.tendenciaPuntos) else "Sin tendencia",
+            subtitle = if (hasData) String.format(locale, "%+.1f puntos", stats.tendenciaPuntos) else "Sin tendencia",
             icon = Icons.Default.Timeline,
             color = when {
                 !hasData -> AmaniPsicologoColors.TextSecondary

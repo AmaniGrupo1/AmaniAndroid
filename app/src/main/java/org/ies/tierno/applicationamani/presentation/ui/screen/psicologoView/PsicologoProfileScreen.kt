@@ -85,6 +85,9 @@ import androidx.compose.ui.text.style.TextAlign
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.koin.compose.koinInject
 
+import androidx.core.content.FileProvider
+import androidx.compose.runtime.mutableLongStateOf
+
 private const val TAG = "PsicologoProfileScreen"
 // Usar la MISMA URL que en Retrofit
 private const val BASE_URL = "http://192.168.1.175:8080"
@@ -248,8 +251,8 @@ fun ProfileContent(
     val context = LocalContext.current
     var showOptions by remember { mutableStateOf(false) }
 
-    // Variable para forzar refresco de la imagen
-    var refreshTrigger by remember { mutableStateOf(0L) }
+    // Variable para forzar refresco de la imagen (Optimizado para evitar autoboxing)
+    var refreshTrigger by remember { mutableLongStateOf(0L) }
 
     // Función para construir la URL completa de la imagen
     fun buildFullImageUrl(relativeUrl: String?): String {
@@ -286,22 +289,26 @@ fun ProfileContent(
         }
     }
 
-    // ========== CÁMARA SIN FILEPROVIDER (CORREGIDO) ==========
+    // Archivo temporal para la cámara
+    val photoFile = remember {
+        File(context.cacheDir, "camera_photo.jpg")
+    }
+    val photoUri = remember(photoFile) {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            photoFile
+        )
+    }
+
+    // ========== CÁMARA CON TAKEPICTURE (RECOMENDADO PARA ALTA RESOLUCIÓN) ==========
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        Log.d(TAG, "Cámara - Bitmap obtenido: ${bitmap?.width}x${bitmap?.height}")
-        bitmap?.let {
-            // Guardar Bitmap en archivo temporal en cacheDir
-            val tempFile = File(context.cacheDir, "camera_photo_${System.currentTimeMillis()}.jpg")
-            Log.d(TAG, "Cámara - Archivo temporal creado: ${tempFile.absolutePath}")
-            java.io.FileOutputStream(tempFile).use { out ->
-                it.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            }
-            val uri = Uri.fromFile(tempFile)
-            Log.d(TAG, "Cámara - URI generada: $uri")
-            Log.d(TAG, "Cámara - ¿URI existe?: ${File(uri.path ?: "").exists()}")
-            onPhotoUpload(uri)
+        contract = ActivityResultContracts.TakePicture()
+    ) { success: Boolean ->
+        Log.d(TAG, "Cámara - Resultado: $success")
+        if (success) {
+            Log.d(TAG, "Cámara - Foto capturada en: ${photoFile.absolutePath}")
+            onPhotoUpload(photoUri)
             // Forzar refresco después del upload
             refreshTrigger = System.currentTimeMillis()
             Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
@@ -325,7 +332,7 @@ fun ProfileContent(
         hasCameraPermission = isGranted
         if (isGranted) {
             Log.d(TAG, "Permiso concedido - lanzando cámara")
-            cameraLauncher.launch(null)
+            cameraLauncher.launch(photoUri)
         } else {
             Log.w(TAG, "Permiso de cámara denegado")
         }
@@ -367,14 +374,12 @@ fun ProfileContent(
                     modifier = Modifier.size(120.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
-                    val imageUrl = if (fullImageUrl.isEmpty()) {
+                    val imageUrl: Any? = if (fullImageUrl.isEmpty()) {
                         Log.d(TAG, "AsyncImage - Usando avatar por defecto (URL vacía)")
                         R.drawable.ic_default_avatar
                     } else {
                         val urlWithTimestamp = "$fullImageUrl?t=$refreshTrigger"
                         Log.d(TAG, "AsyncImage - URL construida: $urlWithTimestamp")
-                        Log.d(TAG, "AsyncImage - URL base: $fullImageUrl")
-                        Log.d(TAG, "AsyncImage - Timestamp: $refreshTrigger")
                         urlWithTimestamp
                     }
 
@@ -395,7 +400,6 @@ fun ProfileContent(
                                 },
                                 onError = { request, throwable ->
                                     Log.e(TAG, "AsyncImage - Error al cargar imagen: ${request.data}")
-                                    Log.e(TAG, "AsyncImage - Error mensaje: ")
                                 }
                             )
                             .build(),
@@ -568,7 +572,7 @@ fun ProfileContent(
                         showOptions = false
                         if (hasCameraPermission) {
                             Log.d(TAG, "Permiso de cámara ya concedido, lanzando cámara")
-                            cameraLauncher.launch(null)
+                            cameraLauncher.launch(photoUri)
                         } else {
                             Log.d(TAG, "Solicitando permiso de cámara")
                             permissionLauncher.launch(android.Manifest.permission.CAMERA)

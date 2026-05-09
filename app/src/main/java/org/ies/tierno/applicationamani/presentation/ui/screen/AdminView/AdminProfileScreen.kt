@@ -55,6 +55,9 @@ import org.koin.compose.koinInject
 import java.io.File
 import java.io.FileOutputStream
 
+import androidx.core.content.FileProvider
+import androidx.compose.runtime.mutableLongStateOf
+
 private const val TAG = "AdminProfileScreen"
 private const val BASE_URL = "http://192.168.1.175:8080"
 
@@ -80,7 +83,7 @@ fun AdminProfileScreen(
     var nombreEdit by remember { mutableStateOf("") }
     var apellidoEdit by remember { mutableStateOf("") }
     var emailEdit by remember { mutableStateOf("") }
-    var refreshTrigger by remember { mutableStateOf(0L) }
+    var refreshTrigger by remember { mutableLongStateOf(0L) }
 
     // Cargar perfil
     LaunchedEffect(adminId) {
@@ -141,19 +144,28 @@ fun AdminProfileScreen(
     ) { uri: Uri? ->
         uri?.let {
             viewModel.uploadFoto(adminId, it, context)
+            refreshTrigger = System.currentTimeMillis()
         }
     }
 
+    // Archivo temporal para la cámara
+    val photoFile = remember {
+        File(context.cacheDir, "camera_photo_admin.jpg")
+    }
+    val photoUri = remember(photoFile) {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            photoFile
+        )
+    }
+
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        bitmap?.let {
-            val tempFile = File(context.cacheDir, "camera_photo_${System.currentTimeMillis()}.jpg")
-            FileOutputStream(tempFile).use { out ->
-                it.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            }
-            val uri = Uri.fromFile(tempFile)
-            viewModel.uploadFoto(adminId, uri, context)
+        contract = ActivityResultContracts.TakePicture()
+    ) { success: Boolean ->
+        if (success) {
+            viewModel.uploadFoto(adminId, photoUri, context)
+            refreshTrigger = System.currentTimeMillis()
         }
     }
 
@@ -162,7 +174,7 @@ fun AdminProfileScreen(
     ) { isGranted ->
         hasCameraPermission = isGranted
         if (isGranted) {
-            cameraLauncher.launch(null)
+            cameraLauncher.launch(photoUri)
         } else {
             scope.launch {
                 snackbarHostState.showSnackbar("Permiso de cámara denegado")
@@ -582,7 +594,7 @@ fun AdminProfileScreen(
                         onClick = {
                             showImageOptions = false
                             if (hasCameraPermission) {
-                                cameraLauncher.launch(null)
+                                cameraLauncher.launch(photoUri)
                             } else {
                                 permissionLauncher.launch(CAMERA)
                             }
