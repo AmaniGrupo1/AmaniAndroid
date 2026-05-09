@@ -67,11 +67,11 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
-}
 
-// ✅ Kotlin moderno
-kotlin {
-    jvmToolchain(17)
+    // ✅ Kotlin moderno
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 dependencies {
