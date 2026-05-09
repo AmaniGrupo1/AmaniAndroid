@@ -54,7 +54,7 @@ fun ListadoPsicologosScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
     pacienteId: Long,
-    viewModel: ListarPsicologosAdminViewModel = koinViewModel()
+    viewModel: ListarPsicologosAdminViewModel
 ) {
     val psicologos by viewModel.psicologos.collectAsState()
     val scope = rememberCoroutineScope()

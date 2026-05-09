@@ -132,7 +132,7 @@ fun MenuAdministrador(
             MenuAdministrador(
                 title = "Listar psicólogos",
                 icon = Icons.Default.Psychology,
-                route = Screens.listarPsicologo.route,
+                route = Screens.listarPsicologoSimple.route,
                 dividerAfter = true
             ),
             MenuAdministrador(

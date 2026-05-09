@@ -27,6 +27,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPs
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosSimpleScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TerapiasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
@@ -58,6 +59,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsA
 import org.ies.tierno.applicationamani.presentation.ui.screen.situacion.SituacionAdminScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
@@ -81,6 +83,7 @@ fun NavGraph(
     val listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val profilePsicolgo : ProfilePsicologoViewModel = koinViewModel()
+    val listaPsicologoSimple : ListarPsicologosAdminViewModel = koinViewModel()
     val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -146,7 +149,8 @@ fun NavGraph(
                 ListadoPsicologosScreen(
                     navController = navController,
                     loginViewModel = loginViewModel,
-                    pacienteId = idPaciente
+                    pacienteId = idPaciente,
+                    listaPsicologoSimple
                 )
             }
             composable(Screens.pacientes.route) {
@@ -190,6 +194,9 @@ fun NavGraph(
 
             composable(Screens.pacienteHome.route) {
                 ViewPacientePrincipalScreen(navController,profilePsicolgo)
+            }
+            composable(Screens.listarPsicologoSimple.route) {
+                ListadoPsicologosSimpleScreen(navController,listaPsicologoSimple)
             }
 
             composable(Screens.chatList.route) {

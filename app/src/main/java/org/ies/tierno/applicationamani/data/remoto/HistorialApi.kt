@@ -18,8 +18,6 @@ interface HistorialApi {
 
     @POST("/api/historial-clinico")
     suspend fun createHistorialClinico(
-
         @Body request: HistorialClinicoRequestDTO
-
     ): HistorialClinicoResponseDTO
 }

@@ -65,6 +65,8 @@
             fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
         }
 
+        object listarPsicologoSimple : Screens("listarPsicologoSimple")
+
         object calendario : Screens("calendario")
 
 
