@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import coil.imageLoader
 import org.ies.tierno.applicationamani.di.appModule
 import org.ies.tierno.applicationamani.di.retrofitModule
 import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
@@ -30,7 +29,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
  * @see appModule
  * @see retrofitModule
  */
-class MyLibraryApplication : Application() {
+class AmaniApplication : Application() {
     /**
      * Se ejecuta antes que cualquier actividad, servicio o receptor.
      *
@@ -52,7 +51,7 @@ class MyLibraryApplication : Application() {
         crearCanalNotificaciones()
 
         startKoin {
-            androidContext(this@MyLibraryApplication)
+            androidContext(this@AmaniApplication)
             workManagerFactory()
             modules(
                 appModule,

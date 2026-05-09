@@ -25,7 +25,7 @@ import timber.log.Timber
  * de la aplicación y del dispositivo.
  *
  * El canal de notificaciones [CANAL_CITAS_ID] se crea en
- * [org.ies.tierno.applicationamani.MyLibraryApplication.onCreate].
+ * [org.ies.tierno.applicationamani.AmaniApplication.onCreate].
  */
 class CitaNotificationWorker(
     context: Context,
