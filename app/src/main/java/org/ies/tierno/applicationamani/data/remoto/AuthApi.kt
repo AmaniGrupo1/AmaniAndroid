@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.data.remoto
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
@@ -53,10 +54,10 @@ interface AuthApi {
     @GET("/api/pacientes/admin")
     suspend fun getPacientes(): Response<List<DatosPacienteAdminDTO>>
 
-    @PUT("/auth/pacientes/{id}/baja")
+    @PUT("auth/pacientes/{id}/baja")
     suspend fun darBajaPaciente(
         @Path("id") id: Long
-    ): Response<String>
+    ): Response<MessageResponse>
 
     //ASIGNAMOS UN PSICÓLOGO
     @POST("/api/admin/psicologos/asignar-psicologo")

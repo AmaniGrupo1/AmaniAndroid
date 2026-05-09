@@ -12,6 +12,7 @@ import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
@@ -283,20 +284,29 @@ class AuthRepository(
         }
 
 
-    suspend fun darBajaPaciente(id: Long): Result<String> {
+    suspend fun darBajaPaciente(id: Long): Result<MessageResponse> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.darBajaPaciente(id)
 
                 if (response.isSuccessful) {
                     val body = response.body()
+
                     if (body != null) {
                         Result.success(body)
                     } else {
                         Result.failure(Exception("Response body is null"))
                     }
                 } else {
-                    Result.failure(HttpException(response))
+                    val errorMessage = when (response.code()) {
+                        401 -> "No autorizado"
+                        403 -> "Acceso denegado"
+                        404 -> "Paciente no encontrado"
+                        500 -> "Error del servidor"
+                        else -> "Error HTTP: ${response.code()}"
+                    }
+
+                    Result.failure(Exception(errorMessage))
                 }
 
             } catch (e: Exception) {

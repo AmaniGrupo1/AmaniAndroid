@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import ListarPacientesViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,15 +62,38 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsico
 @Composable
 fun ListadoPsicologosSimpleScreen(
     navController: NavController,
-    viewModel: ListarPsicologosAdminViewModel
+    viewModel: ListarPsicologosAdminViewModel,
+    listarPaciente : ListarPacientesViewModel
 ) {
     val psicologos by viewModel.psicologos.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
+    var isBajaInProgress by remember { mutableStateOf(false) }
 
     val typography = MaterialTheme.typography
+
+    // Observar el estado de la baja desde el ViewModel
+    val bajaEstado by listarPaciente.bajaEstado.collectAsState()
+
+    // Efecto para manejar el resultado de la baja
+    LaunchedEffect(bajaEstado) {
+        if (bajaEstado != null && isBajaInProgress) {
+            if (bajaEstado!!.isSuccess) {
+                snackbarHostState.showSnackbar(
+                    "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
+                )
+                mostrarDialogoBaja = false
+                psicologoSeleccionado = null
+            } else if (bajaEstado!!.isFailure) {
+                snackbarHostState.showSnackbar(
+                    "Error al dar de baja: ${bajaEstado!!.exceptionOrNull()?.message ?: "Error desconocido"}"
+                )
+            }
+            isBajaInProgress = false
+        }
+    }
 
     Scaffold(
         containerColor = AmaniLoginColors.Background,
@@ -90,9 +116,6 @@ fun ListadoPsicologosSimpleScreen(
                         tint = AmaniLoginColors.Primary
                     )
                 }
-                // El MenuAdministrador ya contiene el título, así que lo ponemos después del botón
-                // Si MenuAdministrador ya incluye su propio Row, deberías ajustarlo.
-                // Por ahora asumimos que MenuAdministrador es solo el título centrado o similar
                 Box(modifier = Modifier.weight(1f)) {
                     MenuAdministrador("Listado de psicólogos", navController)
                 }
@@ -102,7 +125,7 @@ fun ListadoPsicologosSimpleScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                   navController.navigate(Screens.agregarPsicologo.route)
+                    navController.navigate(Screens.agregarPsicologo.route)
                 },
                 containerColor = AmaniLoginColors.Primary,
                 shape = RoundedCornerShape(50.dp)
@@ -170,6 +193,7 @@ fun ListadoPsicologosSimpleScreen(
                             },
                             onEditar = {
                                 // Navegar a editar psicólogo
+                                // navController.navigate("${Screens.editarPsicologo.route}/${psicologo.idPsicologo}")
                             },
                             typography = typography
                         )
@@ -178,9 +202,14 @@ fun ListadoPsicologosSimpleScreen(
             }
         }
 
-        if (mostrarDialogoBaja && psicologoSeleccionado != null) {
+        // ALERT DIALOG CORREGIDO - Solo esto cambió
+        if (mostrarDialogoBaja && psicologoSeleccionado != null && !isBajaInProgress) {
             AlertDialog(
-                onDismissRequest = { mostrarDialogoBaja = false },
+                onDismissRequest = {
+                    if (!isBajaInProgress) {
+                        mostrarDialogoBaja = false
+                    }
+                },
                 title = {
                     Text(
                         text = "Confirmar baja",
@@ -189,7 +218,7 @@ fun ListadoPsicologosSimpleScreen(
                             fontWeight = FontWeight.Bold,
                             color = AmaniLoginColors.TextPrimary
                         ) ?: MaterialTheme.typography.headlineSmall,
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif
+                        fontFamily = FontFamily.Serif
                     )
                 },
                 text = {
@@ -204,19 +233,18 @@ fun ListadoPsicologosSimpleScreen(
                 confirmButton = {
                     Button(
                         onClick = {
-                            scope.launch {
-                                // viewModel.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
-                                mostrarDialogoBaja = false
-                                snackbarHostState.showSnackbar("Psicólogo dado de baja")
-                            }
+                            isBajaInProgress = true
+                            // Llamar directamente al ViewModel (NO es suspend)
+                            listarPaciente.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AmaniLoginColors.Error
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = !isBajaInProgress
                     ) {
                         Text(
-                            "Dar de baja",
+                            if (isBajaInProgress) "Procesando..." else "Dar de baja",
                             style = typography.labelLarge?.copy(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
@@ -227,11 +255,16 @@ fun ListadoPsicologosSimpleScreen(
                 },
                 dismissButton = {
                     OutlinedButton(
-                        onClick = { mostrarDialogoBaja = false },
+                        onClick = {
+                            if (!isBajaInProgress) {
+                                mostrarDialogoBaja = false
+                            }
+                        },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = AmaniLoginColors.Primary
-                        )
+                        ),
+                        enabled = !isBajaInProgress
                     ) {
                         Text(
                             "Cancelar",

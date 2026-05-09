@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
+import ListarPacientesViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
@@ -85,6 +86,7 @@ fun NavGraph(
     val profilePsicolgo : ProfilePsicologoViewModel = koinViewModel()
     val listaPsicologoSimple : ListarPsicologosAdminViewModel = koinViewModel()
     val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
+    val listarPacientesViewModel : ListarPacientesViewModel = koinViewModel()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
  val idiomaViewModel : IdiomaViewModel = koinViewModel()
@@ -150,11 +152,12 @@ fun NavGraph(
                     navController = navController,
                     loginViewModel = loginViewModel,
                     pacienteId = idPaciente,
-                    listaPsicologoSimple
+                    listaPsicologoSimple,
+                    listarPacientesViewModel
                 )
             }
             composable(Screens.pacientes.route) {
-                ListadoPacientesScreen(navController)
+                ListadoPacientesScreen(navController,listarPacientesViewModel)
             }
             composable(Screens.agregarAdmin.route) {
                 AgregarAdministrador(navController, loginViewModel)
@@ -196,7 +199,7 @@ fun NavGraph(
                 ViewPacientePrincipalScreen(navController,profilePsicolgo)
             }
             composable(Screens.listarPsicologoSimple.route) {
-                ListadoPsicologosSimpleScreen(navController,listaPsicologoSimple)
+                ListadoPsicologosSimpleScreen(navController,listaPsicologoSimple, listarPacientesViewModel)
             }
 
             composable(Screens.chatList.route) {
