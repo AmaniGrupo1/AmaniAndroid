@@ -318,6 +318,9 @@ class ChatViewModel(
         }
     }
 
+    private var typingJob: Job? = null
+    private var onlineJob: Job? = null
+
     /**
      * Inicializa las funcionalidades de tiempo real del chat (escritura y presencia).
      */
@@ -330,7 +333,8 @@ class ChatViewModel(
      * Suscribe el ViewModel a los cambios en el estado de escritura del otro usuario.
      */
     private fun initTyping() {
-        observeTypingUseCase(currentUserId, otherUserId)
+        typingJob?.cancel()
+        typingJob = observeTypingUseCase(currentUserId, otherUserId)
             .catch { throwable ->
                 Log.e(TAG, "Error observando typing", throwable)
                 _isOtherTyping.value = false
@@ -345,7 +349,8 @@ class ChatViewModel(
      * Suscribe el ViewModel a los cambios en el estado online del otro usuario.
      */
     private fun initOnlineStatus() {
-        observeUserOnlineUseCase(otherUserId)
+        onlineJob?.cancel()
+        onlineJob = observeUserOnlineUseCase(otherUserId)
             .catch { throwable ->
                 Log.e(TAG, "Error observando estado online", throwable)
                 _psychologistOnline.value = false
@@ -367,11 +372,14 @@ class ChatViewModel(
         }
     }
 
+    private var observeMessagesJob: Job? = null
+
     /**
      * Inicia la observación de los mensajes de la conversación actual.
      */
     fun observeMessages() {
-        viewModelScope.launch {
+        observeMessagesJob?.cancel()
+        observeMessagesJob = viewModelScope.launch {
             _isLoading.value = true
             getMessagesUseCase(currentUserId, otherUserId)
                 .catch { throwable ->
@@ -381,6 +389,7 @@ class ChatViewModel(
                     _isLoading.value = false
                 }
                 .collect { messages ->
+                    _error.value = null
                     _messages.value = messages
                     _isLoading.value = false
                     markMessagesAsRead()

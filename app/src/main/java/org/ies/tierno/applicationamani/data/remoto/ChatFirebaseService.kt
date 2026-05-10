@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.data.remoto
 
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -50,67 +51,112 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
         return result.ifEmpty { null }
     }
 
+    private fun parseMessage(child: DataSnapshot, currentUserId: Long? = null): Message {
+        val idMensaje = child.longValue("idMensaje") ?: 0L
+        val senderId = child.longValue("idSender", "senderId") ?: 0L
+        val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
+        val enviadoEnRaw = child.child("enviadoEn").getValue()
+        val timestamp = when (enviadoEnRaw) {
+            is Long -> enviadoEnRaw
+            is String -> enviadoEnRaw.toLongOrNull() ?: try {
+                java.time.OffsetDateTime.parse(enviadoEnRaw).toInstant().toEpochMilli()
+            } catch (e: Exception) {
+                System.currentTimeMillis()
+            }
+            else -> System.currentTimeMillis()
+        }
+        val leido = child.child("leido").getValue(Boolean::class.java) ?: false
+        val attachmentUrl = child.child("attachmentUrl").getValue(String::class.java)
+        val attachmentType = child.child("attachmentType").getValue(String::class.java)?.let {
+            try {
+                org.ies.tierno.applicationamani.domain.models.AttachmentType.valueOf(it)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
+        val attachmentName = child.child("attachmentName").getValue(String::class.java)
+
+        val readBy = child.longMapValue("readBy")
+        val deliveredAt = if (currentUserId != null) child.longMapValue("deliveredTo")?.get(currentUserId.toString()) else null
+
+        return Message(
+            id = idMensaje.toString(),
+            senderId = senderId.toString(),
+            content = mensaje,
+            timestamp = timestamp,
+            isRead = leido,
+            attachmentUrl = attachmentUrl,
+            attachmentType = attachmentType,
+            attachmentName = attachmentName,
+            deliveredAt = deliveredAt,
+            readBy = readBy
+        )
+    }
+
     fun observeMessages(userId1: Long, userId2: Long): Flow<List<Message>> = callbackFlow {
         val roomId = generateRoomId(userId1, userId2)
         val messagesRef = chatsRef.child(roomId).child("messages")
 
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val messages = mutableListOf<Message>()
-                for (child in snapshot.children) {
-                    val idMensaje = child.longValue("idMensaje") ?: 0L
-                    val senderId = child.longValue("idSender", "senderId") ?: 0L
-                    val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
-                    val enviadoEnRaw = child.child("enviadoEn").getValue()
-                    val timestamp = when (enviadoEnRaw) {
-                        is Long -> enviadoEnRaw
-                        is String -> enviadoEnRaw.toLongOrNull() ?: try {
-                            // Intento de parseo de ISO 8601 si es necesario
-                            java.time.OffsetDateTime.parse(enviadoEnRaw).toInstant().toEpochMilli()
-                        } catch (e: Exception) {
-                            System.currentTimeMillis()
-                        }
-                        else -> System.currentTimeMillis()
-                    }
-                    val leido = child.child("leido").getValue(Boolean::class.java) ?: false
-                    val attachmentUrl = child.child("attachmentUrl").getValue(String::class.java)
-                    val attachmentType = child.child("attachmentType").getValue(String::class.java)?.let {
-                        try {
-                            org.ies.tierno.applicationamani.domain.models.AttachmentType.valueOf(it)
-                        } catch (e: IllegalArgumentException) {
-                            null
-                        }
-                    }
-                    val attachmentName = child.child("attachmentName").getValue(String::class.java)
+        val messagesMap = LinkedHashMap<String, Message>()
 
-                    val readBy = child.longMapValue("readBy")
-                    val deliveredAt = child.longMapValue("deliveredTo")?.get(userId1.toString())
+        fun emitList() {
+            trySend(messagesMap.values.sortedBy { it.timestamp })
+        }
 
-                    messages.add(
-                        Message(
-                            id = idMensaje.toString(),
-                            senderId = senderId.toString(),
-                            content = mensaje,
-                            timestamp = timestamp,
-                            isRead = leido,
-                            attachmentUrl = attachmentUrl,
-                            attachmentType = attachmentType,
-                            attachmentName = attachmentName,
-                            deliveredAt = deliveredAt,
-                            readBy = readBy
-                        )
-                    )
-                }
-                trySend(messages.sortedBy { it.timestamp })
+        val listener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val msg = parseMessage(snapshot, userId1)
+                messagesMap[snapshot.key ?: msg.id] = msg
+                emitList()
             }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val msg = parseMessage(snapshot, userId1)
+                messagesMap[snapshot.key ?: msg.id] = msg
+                emitList()
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                messagesMap.remove(snapshot.key)
+                emitList()
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
 
             override fun onCancelled(error: DatabaseError) {
                 close(error.toException())
             }
         }
 
-        messagesRef.addValueEventListener(listener)
+        messagesRef.addChildEventListener(listener)
         awaitClose { messagesRef.removeEventListener(listener) }
+    }
+
+    suspend fun updateMessageAttachment(
+        senderId: Long,
+        receiverId: Long,
+        messageId: Long,
+        attachmentUrl: String,
+        attachmentType: String?,
+        attachmentName: String?
+    ): Result<Unit> {
+        return try {
+            val roomId = generateRoomId(senderId, receiverId)
+            val messagesRef = chatsRef.child(roomId).child("messages")
+            
+            val query = messagesRef.orderByChild("idMensaje").equalTo(messageId.toDouble())
+            val snapshot = query.get().await()
+            
+            for (child in snapshot.children) {
+                val updateMap = mutableMapOf<String, Any>("attachmentUrl" to attachmentUrl)
+                attachmentType?.let { updateMap["attachmentType"] = it }
+                attachmentName?.let { updateMap["attachmentName"] = it }
+                child.ref.updateChildren(updateMap).await()
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     suspend fun sendMessage(
@@ -151,16 +197,14 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
         return try {
             val roomId = generateRoomId(currentUserId, otherUserId)
             val messagesRef = chatsRef.child(roomId).child("messages")
-            val snapshot = messagesRef.get().await()
+            
+            val query = messagesRef.orderByChild("leido").equalTo(false)
+            val snapshot = query.get().await()
 
             for (child in snapshot.children) {
                 val senderIdValue = child.longValue("idSender", "senderId") ?: 0L
-                val leido = child.child("leido").getValue(Boolean::class.java) ?: false
-
-                // Marcar como leído los mensajes que NO fueron enviados por el usuario actual
-                // (es decir, los mensajes que el usuario recibió)
-                if (senderIdValue != currentUserId && !leido) {
-                    messagesRef.child(child.key ?: "").child("leido").setValue(true).await()
+                if (senderIdValue != currentUserId) {
+                    child.ref.child("leido").setValue(true).await()
                 }
             }
             Result.success(Unit)
@@ -177,38 +221,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
 
             val messages = mutableListOf<Message>()
             for (child in snapshot.children) {
-                val idMensaje = child.child("idMensaje").getValue(Long::class.java) ?: 0L
-                val senderId = child.longValue("idSender", "senderId")
-                val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
-                val leido = child.child("leido").getValue(Boolean::class.java) ?: false
-                val enviadoEn = child.child("enviadoEn").getValue(String::class.java)
-                val attachmentUrl = child.child("attachmentUrl").getValue(String::class.java)
-                val attachmentType = child.child("attachmentType").getValue(String::class.java)?.let {
-                    try {
-                        org.ies.tierno.applicationamani.domain.models.AttachmentType.valueOf(it)
-                    } catch (e: IllegalArgumentException) {
-                        null
-                    }
-                }
-                val attachmentName = child.child("attachmentName").getValue(String::class.java)
-
-                val readBy = child.longMapValue("readBy")
-                val deliveredAt = child.longMapValue("deliveredTo")?.get(userId1.toString())
-
-                messages.add(
-                    Message(
-                        id = idMensaje.toString(),
-                        senderId = senderId?.toString() ?: "",
-                        content = mensaje,
-                        timestamp = enviadoEn?.toLongOrNull() ?: System.currentTimeMillis(),
-                        isRead = leido,
-                        attachmentUrl = attachmentUrl,
-                        attachmentType = attachmentType,
-                        attachmentName = attachmentName,
-                        deliveredAt = deliveredAt,
-                        readBy = readBy
-                    )
-                )
+                messages.add(parseMessage(child, userId1))
             }
             Result.success(messages.sortedBy { it.timestamp })
         } catch (e: Exception) {
@@ -242,7 +255,9 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
     suspend fun startTyping(senderId: Long, receiverId: Long): Result<Unit> {
         return try {
             val roomId = generateRoomId(senderId, receiverId)
-            typingRef.child(roomId).child(senderId.toString()).setValue(true).await()
+            val ref = typingRef.child(roomId).child(senderId.toString())
+            ref.setValue(true).await()
+            ref.onDisconnect().removeValue()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -252,7 +267,9 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
     suspend fun stopTyping(senderId: Long, receiverId: Long): Result<Unit> {
         return try {
             val roomId = generateRoomId(senderId, receiverId)
-            typingRef.child(roomId).child(senderId.toString()).removeValue().await()
+            val ref = typingRef.child(roomId).child(senderId.toString())
+            ref.removeValue().await()
+            ref.onDisconnect().cancel()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -271,7 +288,8 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                val errorDetails = "Error observando estado online de usuario: ${error.message} (Code: ${error.code})"
+                close(Exception(errorDetails, error.toException()))
             }
         }
 
@@ -281,7 +299,13 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
 
     suspend fun updateUserOnline(userId: Long, isOnline: Boolean): Result<Unit> {
         return try {
-            usersRef.child(userId.toString()).child("isOnline").setValue(isOnline).await()
+            val ref = usersRef.child(userId.toString()).child("isOnline")
+            ref.setValue(isOnline).await()
+            if (isOnline) {
+                ref.onDisconnect().setValue(false)
+            } else {
+                ref.onDisconnect().cancel()
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -300,32 +324,23 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
     // ==================== DELIVERY & READ RECEIPTS ====================
 
     suspend fun markMessageDelivered(messageId: Long, receiverId: Long): Result<Unit> {
-        return try {
-            // Buscar todos los mensajes en todos los rooms es costoso en Firebase
-            // Simplificación: usar la estructura de datos existente
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return Result.success(Unit)
     }
 
     suspend fun markMessageAsRead(messageId: Long, receiverId: Long): Result<Unit> {
-        return try {
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return Result.success(Unit)
     }
 
     fun observeMessageDelivery(messageId: Long, receiverId: Long): Flow<Boolean> = callbackFlow {
-        // Simplificación: no implementado por ahora
         trySend(false)
         awaitClose {}
     }
 
     fun observeMessageRead(messageId: Long, receiverId: Long): Flow<Boolean> = callbackFlow {
-        // Simplificación: no implementado por ahora
         trySend(false)
         awaitClose {}
+    }
+}
+awaitClose {}
     }
 }

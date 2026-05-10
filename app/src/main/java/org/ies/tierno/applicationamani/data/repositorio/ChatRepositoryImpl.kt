@@ -24,16 +24,37 @@ class ChatRepositoryImpl(
         attachmentName: String?
     ): Result<Unit> {
         return try {
+            val finalContent = if (content.isBlank() && attachmentType != null) {
+                when (attachmentType) {
+                    org.ies.tierno.applicationamani.domain.models.AttachmentType.IMAGE -> "📸 Imagen"
+                    org.ies.tierno.applicationamani.domain.models.AttachmentType.DOCUMENT -> "📄 Documento"
+                    org.ies.tierno.applicationamani.domain.models.AttachmentType.AUDIO -> "🎙️ Nota de voz"
+                }
+            } else {
+                content
+            }
+
             val response = chatApi.sendMessage(
                 SendMessageRequest(
                     idSender = senderId,
                     idReceiver = receiverId,
-                    mensaje = content,
+                    mensaje = finalContent,
                     idCita = null
                 )
             )
             if (response.isSuccessful) {
                 android.util.Log.d("ChatRepository", "Mensaje enviado OK — HTTP ${response.code()}")
+                val body = response.body()
+                if (body != null && attachmentUrl != null) {
+                    chatFirebaseService.updateMessageAttachment(
+                        senderId,
+                        receiverId,
+                        body.idMensaje,
+                        attachmentUrl,
+                        attachmentType?.name,
+                        attachmentName
+                    )
+                }
                 Result.success(Unit)
             } else {
                 android.util.Log.e("ChatRepository", "Error enviando mensaje — HTTP ${response.code()}: ${response.message()}. Body: ${response.errorBody()?.string()}")

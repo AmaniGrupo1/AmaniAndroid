@@ -1,6 +1,27 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "chats": {
+      "$room_id": {
+        ".read": "auth != null && ($room_id.matches('^' + auth.uid + '_[0-9]+$') || $room_id.matches('^[0-9]+_' + auth.uid + '$'))",
+        ".write": "auth != null && ($room_id.matches('^' + auth.uid + '_[0-9]+$') || $room_id.matches('^[0-9]+_' + auth.uid + '$'))",
+        "messages": {
+          "$message_id": {
+            ".indexOn": ["enviadoEn", "idMensaje", "leido"]
+          }
+        }
+      }
+    },
+    "typing": {
+      "$room_id": {
+        ".read": "auth != null && ($room_id.matches('^' + auth.uid + '_[0-9]+$') || $room_id.matches('^[0-9]+_' + auth.uid + '$'))",
+        ".write": "auth != null && ($room_id.matches('^' + auth.uid + '_[0-9]+$') || $room_id.matches('^[0-9]+_' + auth.uid + '$'))"
+      }
+    },
+    "users": {
+      "$user_id": {
+        ".read": "auth != null",
+        ".write": "auth != null && $user_id === auth.uid"
+      }
+    }
   }
 }

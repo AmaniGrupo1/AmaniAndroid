@@ -11,9 +11,17 @@ data class SendMessageRequest(
     val idCita: Long? = null
 )
 
+data class SendMessageResponse(
+    val idMensaje: Long,
+    val idSender: Long,
+    val idReceiver: Long,
+    val mensaje: String,
+    val leido: Boolean
+)
+
 interface ChatApi {
     @POST("/api/chats/messages")
     suspend fun sendMessage(
         @Body request: SendMessageRequest
-    ): Response<Any> // We use Any or a specific DTO if we care about the response body, Any is fine to just check success.
+    ): Response<SendMessageResponse>
 }
