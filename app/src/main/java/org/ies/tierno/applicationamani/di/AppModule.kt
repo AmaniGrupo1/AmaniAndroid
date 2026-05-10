@@ -190,6 +190,7 @@ val appModule = module {
             observeUserOnlineUseCase = get(),
             updateUserOnlineUseCase = get(),
             profileUseCaseGeneral = get(),
+            authRepository = get(),
             appContext = androidContext()
         )
     }

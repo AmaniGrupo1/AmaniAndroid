@@ -46,9 +46,16 @@ class ChatRepositoryImplTest {
     @Test
     fun `sendMessage should return success when API service succeeds`() = runTest {
         // Given
+        val response = org.ies.tierno.applicationamani.data.remoto.SendMessageResponse(
+            idMensaje = 1L,
+            idSender = 1L,
+            idReceiver = 2L,
+            mensaje = "Hello",
+            leido = false
+        )
         coEvery {
             chatApi.sendMessage(any())
-        } returns Response.success(Unit)
+        } returns Response.success(response)
 
         // When
         val result = chatRepository.sendMessage(1L, 2L, "Hello")

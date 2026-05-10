@@ -36,6 +36,7 @@ class ChatViewModelTest {
     private val observeUserOnlineUseCase: ObserveUserOnlineUseCase = mockk(relaxed = true)
     private val updateUserOnlineUseCase: UpdateUserOnlineUseCase = mockk(relaxed = true)
     private val profileUseCaseGeneral: ProfileUseCaseGeneral = mockk(relaxed = true)
+    private val authRepository: org.ies.tierno.applicationamani.data.AuthRepository = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
 
     private lateinit var viewModel: ChatViewModel
@@ -71,6 +72,7 @@ class ChatViewModelTest {
         every { observeUserOnlineUseCase(any()) } returns flowOf(false)
         every { getMessagesUseCase(any(), any()) } returns flowOf(emptyList())
         coEvery { profileUseCaseGeneral.getPsicologoById(any()) } returns Result.success(mockk(relaxed = true))
+        coEvery { authRepository.ensureFirebaseAuthenticated() } returns Unit
 
         viewModel = createViewModel()
     }
@@ -86,7 +88,7 @@ class ChatViewModelTest {
         sendMessageUseCase, getMessagesUseCase, markMessagesAsReadUseCase,
         markMessageDeliveredUseCase, fileStorageService, startTypingUseCase,
         stopTypingUseCase, observeTypingUseCase, observeUserOnlineUseCase,
-        updateUserOnlineUseCase, profileUseCaseGeneral, context
+        updateUserOnlineUseCase, profileUseCaseGeneral, authRepository, context
     )
 
     @Test

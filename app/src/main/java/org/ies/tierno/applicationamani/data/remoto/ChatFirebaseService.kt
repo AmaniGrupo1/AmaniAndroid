@@ -124,6 +124,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
 
             override fun onCancelled(error: DatabaseError) {
+                android.util.Log.e("ChatFirebaseService", "Error Firebase (Room: $roomId): ${error.message} (Code: ${error.code})")
                 close(error.toException())
             }
         }
@@ -244,6 +245,7 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
             }
 
             override fun onCancelled(error: DatabaseError) {
+                android.util.Log.e("ChatFirebaseService", "Error Firebase (Room: $roomId): ${error.message} (Code: ${error.code})")
                 close(error.toException())
             }
         }
@@ -339,8 +341,5 @@ class ChatFirebaseService(private val firebaseInstance: FirebaseInstance) {
     fun observeMessageRead(messageId: Long, receiverId: Long): Flow<Boolean> = callbackFlow {
         trySend(false)
         awaitClose {}
-    }
-}
-awaitClose {}
     }
 }

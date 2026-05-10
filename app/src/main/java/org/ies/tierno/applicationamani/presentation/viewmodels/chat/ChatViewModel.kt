@@ -131,6 +131,7 @@ class ChatViewModel(
     private val observeUserOnlineUseCase: ObserveUserOnlineUseCase,
     private val updateUserOnlineUseCase: UpdateUserOnlineUseCase,
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
+    private val authRepository: org.ies.tierno.applicationamani.data.AuthRepository,
     appContext: Context
 ) : ViewModel() {
     companion object {
@@ -260,6 +261,9 @@ class ChatViewModel(
         } else {
             viewModelScope.launch {
                 initPlayer()
+                // Asegurar autenticación Firebase antes de iniciar listeners
+                authRepository.ensureFirebaseAuthenticated()
+                
                 runCatching { initChatFeatures() }
                     .onFailure { throwable ->
                         Log.e(TAG, "Error iniciando features de chat", throwable)
@@ -269,8 +273,8 @@ class ChatViewModel(
                     .onFailure { throwable ->
                         Log.e(TAG, "Error cargando info de interlocutor", throwable)
                     }
+                observeMessages()
             }
-            observeMessages()
         }
     }
 

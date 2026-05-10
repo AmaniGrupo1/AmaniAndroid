@@ -22,6 +22,12 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 
+import com.google.firebase.auth.FirebaseAuth
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import org.junit.After
+
 class AuthRepositoryTest {
 
     private lateinit var api: AuthApi
@@ -31,10 +37,19 @@ class AuthRepositoryTest {
 
     @Before
     fun setUp() {
+        mockkStatic(FirebaseAuth::class)
+        val firebaseAuth = mockk<FirebaseAuth>(relaxed = true)
+        every { FirebaseAuth.getInstance() } returns firebaseAuth
+
         api = mockk()
         tokenDataStore = mockk(relaxed = true)
         userSessionDataStore = mockk(relaxed = true)
         repository = AuthRepository(api, tokenDataStore, userSessionDataStore)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     @Test

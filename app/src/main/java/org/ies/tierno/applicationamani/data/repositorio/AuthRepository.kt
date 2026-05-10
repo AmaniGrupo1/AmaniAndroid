@@ -366,9 +366,43 @@ class AuthRepository(
     }
 
     /**
+     * Asegura que el usuario esté autenticado en Firebase.
+     * Si no hay un usuario actual en Firebase pero sí hay una sesión activa,
+     * intenta obtener un token de Firebase y realizar el inicio de sesión.
+     */
+    suspend fun ensureFirebaseAuthenticated() {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        if (firebaseAuth.currentUser != null) {
+            android.util.Log.d("AuthRepository", "Firebase ya autenticado: ${firebaseAuth.currentUser?.uid}")
+            return
+        }
+
+        android.util.Log.d("AuthRepository", "Firebase no autenticado, intentando sign-in con custom token...")
+        try {
+            val response = api.getFirebaseToken()
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                val rawToken = responseBody?.get("firebaseToken")
+                if (rawToken != null) {
+                    val sanitizedToken = rawToken.trim().replace("\"", "")
+                    if (sanitizedToken.isNotEmpty()) {
+                        firebaseAuth.signInWithCustomToken(sanitizedToken).await()
+                        android.util.Log.d("AuthRepository", "Firebase sign-in exitoso tras reintento")
+                    }
+                }
+            } else {
+                android.util.Log.e("AuthRepository", "Error al obtener Firebase token: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("AuthRepository", "Excepción al asegurar autenticación Firebase", e)
+        }
+    }
+
+    /**
      * Cierra la sesión actual eliminando el token y los datos de sesión almacenados.
      */
     suspend fun logout() {
+        FirebaseAuth.getInstance().signOut()
         tokenDataStore.clearToken()
         userSessionDataStore.clearSession()
     }
