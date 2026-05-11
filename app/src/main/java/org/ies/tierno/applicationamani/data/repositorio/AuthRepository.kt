@@ -14,6 +14,7 @@ import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
@@ -81,12 +82,12 @@ class AuthRepository(
                             if (firebaseTokenResponse.isSuccessful) {
                                 val responseBody = firebaseTokenResponse.body()
                                 val rawToken = responseBody?.get("firebaseToken")
-                                
+
                                 if (rawToken != null) {
                                     // Limpiar el token de posibles comillas, espacios o saltos de línea
                                     val sanitizedToken = rawToken.trim().replace("\"", "")
                                     android.util.Log.d("AuthRepository", "Sanitized Firebase token length: ${sanitizedToken.length}, starts: ${sanitizedToken.take(20)}")
-                                    
+
                                     if (sanitizedToken.isNotEmpty()) {
                                         FirebaseAuth.getInstance().signInWithCustomToken(sanitizedToken).await()
                                         android.util.Log.d("AuthRepository", "Firebase sign-in OK")
@@ -119,9 +120,9 @@ class AuthRepository(
 
             } catch (e: Exception) {
                 val errorMsg = when {
-                    e.message?.contains("Connection", ignoreCase = true) == true -> 
+                    e.message?.contains("Connection", ignoreCase = true) == true ->
                         "No se puede conectar al servidor. Verifica que el backend este ejecutandose en http://10.0.2.2:8080"
-                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+                    e.message?.contains("timeout", ignoreCase = true) == true ->
                         "Tiempo de espera agotado. Intenta de nuevo."
                     else -> e.message ?: "Error de conexion"
                 }
@@ -338,27 +339,29 @@ class AuthRepository(
             emit(emptyList())
         }
 
-
-    /**
-     * Da de baja a un paciente en el sistema.
-     *
-     * @param id Identificador del paciente a dar de baja.
-     * @return [Result] con el mensaje de confirmación del servidor.
-     */
-    suspend fun darBajaPaciente(id: Long): Result<String> {
+    suspend fun darBajaPaciente(id: Long): Result<MessageResponse> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.darBajaPaciente(id)
 
                 if (response.isSuccessful) {
                     val body = response.body()
+
                     if (body != null) {
                         Result.success(body)
                     } else {
                         Result.failure(Exception("Response body is null"))
                     }
                 } else {
-                    Result.failure(HttpException(response))
+                    val errorMessage = when (response.code()) {
+                        401 -> "No autorizado"
+                        403 -> "Acceso denegado"
+                        404 -> "Paciente no encontrado"
+                        500 -> "Error del servidor"
+                        else -> "Error HTTP: ${response.code()}"
+                    }
+
+                    Result.failure(Exception(errorMessage))
                 }
 
             } catch (e: Exception) {

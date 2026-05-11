@@ -278,6 +278,7 @@ fun EmptySituacionesScreen(onAddClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SituacionDialog(
+
     situacion: SituacionDTO?,
     onDismiss: () -> Unit,
     onConfirm: (nombre: String, categoria: String, descripcion: String) -> Unit

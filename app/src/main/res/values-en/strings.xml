@@ -290,6 +290,7 @@
     <string name="registra_informacion_clinica">Register the patient\'s clinical information</string>
     <string name="guardar_historial_clinico">Save Medical History</string>
     <string name="guardando">Saving...</string>
+
     <!-- Navigation -->
     <string name="nav_inicio">Home</string>
     <string name="nav_citas">Appointments</string>
@@ -320,4 +321,57 @@
     <string name="menu_selecciona_opcion">Select an option</string>
     <string name="menu_cerrar_sesion">Log out</string>
 
+    <!-- ==================== LEGAL DOCUMENTS MANAGEMENT ==================== -->
+    <string name="crear_politica_privacidad">Policies &amp; Privacy</string>
+    <string name="gestionar_politica">Manage legal documents</string>
+    <string name="gestion_documentos">Document Management</string>
+    <string name="documentos_legales">Legal Documents</string>
+    <string name="crear_documento">Create Document</string>
+    <string name="editar_documento">Edit Document</string>
+    <string name="eliminar_documento">Delete Document</string>
+    <string name="titulo_documento">Document title</string>
+    <string name="tipo_documento">Legal document type</string>
+    <string name="contenido_documento">Document content</string>
+    <string name="version_documento">Version</string>
+    <string name="orden_visualizacion">Display order</string>
+    <string name="icono_documento">Icon (optional)</string>
+    <string name="documento_activo">Active document (visible to users)</string>
+    <string name="creado_en">Created</string>
+    <string name="actualizado_en">Updated</string>
+    <string name="fecha_no_disponible">Date not available</string>
+    <string name="documento_inactivo">Inactive document</string>
+    <string name="terminos_condiciones_titulo">Terms and Conditions</string>
+    <string name="politica_privacidad_titulo">Privacy Policy</string>
+    <string name="terminos_condiciones_desc">📜 Terms and Conditions of Use</string>
+    <string name="politica_privacidad_desc">🔒 Privacy and Data Protection Policy</string>
+    <string name="no_hay_documentos">No documents created</string>
+    <string name="crea_documentos_legales">Create security policies, terms and conditions,\n or any legal documents for your patients</string>
+    <string name="crear_primer_documento">Create first document</string>
+    <string name="documento_creado_exitosamente">✅ Document created successfully</string>
+    <string name="documento_actualizado_exitosamente">✏️ Document updated successfully</string>
+    <string name="documento_eliminado_exitosamente">🗑️ Document deleted successfully</string>
+    <string name="error_crear_documento">Error creating document</string>
+    <string name="error_actualizar_documento">Error updating document</string>
+    <string name="error_eliminar_documento">Error deleting document</string>
+    <string name="confirmar_eliminar_documento">Are you sure you want to delete the document "%s"?\n\nThis action cannot be undone.</string>
+
+    <!-- Legal document types -->
+    <string name="tipo_terminos">Terms and Conditions</string>
+    <string name="tipo_privacidad">Privacy Policy</string>
+
+    <!-- Therapy info in appointments -->
+    <string name="info_terapia">🎯 Therapy Information</string>
+    <string name="duracion_sesion">⏰ Session duration</string>
+    <string name="sesion_estandar">Standard one-hour session</string>
+    <string name="sesion_extendida">Extended session for deeper work</string>
+    <string name="recomendaciones">💡 Recommendations</string>
+    <string name="recomendaciones_texto">• Arrive 5 minutes early to prepare\n• Have your ID ready\n• Prepare your questions or topics to discuss\n• Find a quiet place if online</string>
+    <string name="entendido">Got it</string>
+    <string name="confirmar_cita">Confirm appointment</string>
+    <string name="seleccionar_terapia">Select therapy type</string>
+    <string name="metodo_pago">Payment method</string>
+    <string name="presencial">In-person</string>
+    <string name="online">Online</string>
+    <string name="modalidad">Modality</string>
+    <string name="llamada">Call</string>
 </resources>

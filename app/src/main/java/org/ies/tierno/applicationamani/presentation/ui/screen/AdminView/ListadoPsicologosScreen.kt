@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import ListarPacientesViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,13 +55,15 @@ fun ListadoPsicologosScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
     pacienteId: Long,
-    viewModel: ListarPsicologosAdminViewModel = koinViewModel()
+    viewModel: ListarPsicologosAdminViewModel,
+    listarPacientesViewModel: ListarPacientesViewModel
 ) {
     val psicologos by viewModel.psicologos.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
+    var isBajaInProgress by remember { mutableStateOf(false) } // Estado para evitar múltiples clics
 
     val roboto = Roboto
     val balow = BarlowCondensed
@@ -70,6 +73,23 @@ fun ListadoPsicologosScreen(
     val primaryColor = Color(0xFF6C63FF)
     val deleteColor = Color(0xFFD32F2F)
 
+    // Observar el estado de la baja desde el ViewModel
+    val bajaEstado by listarPacientesViewModel.bajaEstado.collectAsState()
+
+    // Efecto para manejar el resultado de la baja
+    LaunchedEffect(bajaEstado) {
+        if (bajaEstado != null) {
+            if (bajaEstado!!.isSuccess) {
+                snackbarHostState.showSnackbar("Psicólogo dado de baja correctamente")
+                mostrarDialogoBaja = false
+                psicologoSeleccionado = null
+            } else if (bajaEstado!!.isFailure) {
+                snackbarHostState.showSnackbar("Error: ${bajaEstado!!.exceptionOrNull()?.message ?: "Error desconocido"}")
+            }
+            isBajaInProgress = false
+        }
+    }
+
     Scaffold(
         containerColor = backgroundColor,
         topBar = { MenuAdministrador("Listado de psicólogos", navController) },
@@ -78,7 +98,7 @@ fun ListadoPsicologosScreen(
             FloatingActionButton(
                 onClick = {
                     //navController.navigate(Screens.agregarPsicologoAdmin.route)
-                    },
+                },
                 containerColor = primaryColor,
                 shape = RoundedCornerShape(50.dp)
             ) {
@@ -159,7 +179,7 @@ fun ListadoPsicologosScreen(
                         Button(
                             onClick = {
                                 scope.launch {
-                                        loginViewModel.asignarPaciente(pacienteId, psicologo.idPsicologo)
+                                    loginViewModel.asignarPaciente(pacienteId, psicologo.idPsicologo)
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
@@ -168,11 +188,10 @@ fun ListadoPsicologosScreen(
                             Text("Asignar a paciente", color = Color.White, fontFamily = roboto)
                         }
 
-// Observa cambios y muestra Snackbar automáticamente
                         LaunchedEffect(asignarSuccess, asignarError) {
                             if (asignarSuccess == true) {
                                 snackbarHostState.showSnackbar("Psicólogo asignado correctamente")
-                                loginViewModel.clearAsignarPsicologoResult() // limpia los flujos
+                                loginViewModel.clearAsignarPsicologoResult()
                             } else if (asignarError != null) {
                                 snackbarHostState.showSnackbar("Error: $asignarError")
                                 loginViewModel.clearAsignarPsicologoResult()
@@ -183,31 +202,47 @@ fun ListadoPsicologosScreen(
             }
         }
 
-        if (mostrarDialogoBaja && psicologoSeleccionado != null) {
+        // ALERT DIALOG CORREGIDO para dar de baja
+        if (mostrarDialogoBaja && psicologoSeleccionado != null && !isBajaInProgress) {
             AlertDialog(
-                onDismissRequest = { mostrarDialogoBaja = false },
+                onDismissRequest = {
+                    if (!isBajaInProgress) {
+                        mostrarDialogoBaja = false
+                    }
+                },
                 title = { Text("Confirmar baja", fontFamily = balow) },
                 text = {
                     Text(
-                        "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre}?",
+                        "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
                         fontFamily = roboto
                     )
                 },
                 confirmButton = {
                     Button(
                         onClick = {
-                            scope.launch {
-                                // viewModel.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
-                                mostrarDialogoBaja = false
-                                snackbarHostState.showSnackbar("Psicólogo dado de baja")
-                            }
-                        }
+                            isBajaInProgress = true
+                            // Llamar al método del ViewModel (es suspend, pero ya está manejado internamente)
+                            listarPacientesViewModel.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
+                        },
+                        enabled = !isBajaInProgress,
+                        colors = ButtonDefaults.buttonColors(containerColor = deleteColor)
                     ) {
-                        Text("Dar de baja", fontFamily = roboto)
+                        Text(
+                            if (isBajaInProgress) "Procesando..." else "Dar de baja",
+                            fontFamily = roboto,
+                            color = Color.White
+                        )
                     }
                 },
                 dismissButton = {
-                    OutlinedButton(onClick = { mostrarDialogoBaja = false }) {
+                    OutlinedButton(
+                        onClick = {
+                            if (!isBajaInProgress) {
+                                mostrarDialogoBaja = false
+                            }
+                        },
+                        enabled = !isBajaInProgress
+                    ) {
                         Text("Cancelar", fontFamily = roboto)
                     }
                 }

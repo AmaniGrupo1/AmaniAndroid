@@ -65,18 +65,20 @@ sealed class Screens(val route: String) {
     object settingsPsicologo : Screens("settingsPsicologo")
     object estadisticasPsicologo : Screens("estadisticasPsicologo")
 
-    object listarPsicologo : Screens("listarPsicologo/{pacienteId}"){
+    object listarPsicologo : Screens("listarPsicologo/{pacienteId}") {
         fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
     }
 
+    object listarPsicologoSimple : Screens("listarPsicologoSimple")
+
     object calendario : Screens("calendario")
 
-    object perfilPsicologo : Screens("perfilPsicologo/{psicologoId}"){
+    object perfilPsicologo : Screens("perfilPsicologo/{psicologoId}") {
         fun createRoute(psicologoId: Long?) = "perfilPsicologo/$psicologoId"
     }
 
     object chatList : Screens("chatList")
-    object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}"){
+    object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}") {
         fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String): String {
             val encodedName = Uri.encode(otherUserName)
             return "chat/$currentUserId/$otherUserId/$encodedName"
@@ -101,24 +103,24 @@ sealed class Screens(val route: String) {
     }
     object misTickets : Screens("misTickets")
 
-    // New from login branch
     object settingsAdmin : Screens("settingsAdmin")
-    object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}"){
+    object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}") {
         fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
     }
     object settingPsicologo : Screens("settingPsicologo")
     object terapias : Screens("terapias")
     object crearSituaciones : Screens("crearSituaciones")
-    object historialClinico : Screens("historialClinico/{pacienteId}"){
+    object politicaPrivacidad : Screens("politicaPrivacidad")
+    object historialClinico : Screens("historialClinico/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
     }
-    object profileAdmin : Screens("profileAdmin/{adminId}"){
+    object profileAdmin : Screens("profileAdmin/{adminId}") {
         fun createRoute(adminId: Long?) = "profileAdmin/$adminId"
     }
-    object perfilPaciente : Screens("perfilPaciente/{pacienteId}"){
+    object perfilPaciente : Screens("perfilPaciente/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "perfilPaciente/$pacienteId"
     }
-    object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}"){
+    object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
     }
 }

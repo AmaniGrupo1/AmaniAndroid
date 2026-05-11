@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.domain.usecases.adminUseCase
 
 import org.ies.tierno.applicationamani.data.AuthRepository
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 
 /**
  * Caso de uso para dar de baja a un paciente.
@@ -21,7 +22,7 @@ class DarBajaPacienteUseCase(val repository: AuthRepository) {
      * @return [Result.success] con mensaje de confirmación,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend operator fun invoke(id: Long): Result<String> {
+    suspend operator fun invoke(id: Long): Result<MessageResponse> {
         return repository.darBajaPaciente(id)
     }
 }

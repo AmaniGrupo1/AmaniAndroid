@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
 import android.net.Uri
+import ListarPacientesViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -30,9 +31,11 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPs
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosSimpleScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TerapiasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal.GestionPoliticasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
@@ -44,6 +47,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScree
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.diario.DiarioEmocionalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal.GestionDocumentosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.ViewPacientePrincipalScreen
@@ -64,6 +68,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsA
 import org.ies.tierno.applicationamani.presentation.ui.screen.situacion.SituacionAdminScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
@@ -87,7 +92,9 @@ fun NavGraph(
     val listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
     val profilePsicolgo : ProfilePsicologoViewModel = koinViewModel()
+    val listaPsicologoSimple : ListarPsicologosAdminViewModel = koinViewModel()
     val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
+    val listarPacientesViewModel : ListarPacientesViewModel = koinViewModel()
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val idiomaViewModel : IdiomaViewModel = koinViewModel()
@@ -170,11 +177,13 @@ fun NavGraph(
                 ListadoPsicologosScreen(
                     navController = navController,
                     loginViewModel = loginViewModel,
-                    pacienteId = idPaciente
+                    pacienteId = idPaciente,
+                    listaPsicologoSimple,
+                    listarPacientesViewModel
                 )
             }
             composable(Screens.pacientes.route) {
-                ListadoPacientesScreen(navController)
+                ListadoPacientesScreen(navController,listarPacientesViewModel)
             }
             composable(Screens.agregarAdmin.route) {
                 AgregarAdministrador(navController, loginViewModel)
@@ -212,6 +221,9 @@ fun NavGraph(
 
             composable(Screens.pacienteHome.route) {
                 ViewPacientePrincipalScreen(navController, profilePsicolgo)
+            }
+            composable(Screens.listarPsicologoSimple.route) {
+                ListadoPsicologosSimpleScreen(navController,listaPsicologoSimple, listarPacientesViewModel)
             }
 
             composable(Screens.chatList.route) {
@@ -346,6 +358,9 @@ fun NavGraph(
             }
             composable(Screens.crearSituaciones.route){
                 SituacionAdminScreen(navController, situacionViewModel)
+            }
+            composable(Screens.politicaPrivacidad.route){
+                GestionPoliticasScreen(navController)
             }
             composable(
                 route = Screens.profileAdmin.route,

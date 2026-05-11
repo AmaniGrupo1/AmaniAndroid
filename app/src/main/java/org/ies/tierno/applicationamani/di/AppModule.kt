@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.di
 
 import EditProfilePsicologoViewModel
+import ListarPacientesViewModel
 import androidx.room.Room
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
@@ -20,6 +21,7 @@ import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepository
 import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
+import org.ies.tierno.applicationamani.data.repositorio.DocumentoLegalRepository
 import org.ies.tierno.applicationamani.data.repositorio.HistorialRepository
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
@@ -57,7 +59,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireView
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
-import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
@@ -72,11 +73,13 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
@@ -115,6 +118,7 @@ val appModule = module {
     single { SoporteTicketRepository(get()) }
     single { AjustesRepository(get()) }
     single { HistorialRepository(get()) }
+    single { DocumentoLegalRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -136,6 +140,7 @@ val appModule = module {
     factory { GetPacientesSinPsicologoUseCase(get()) }
     factory { ListarPacientesByPsicologo(get()) }
     factory { HistorialClinicoUseCase(get()) }
+    factory { DocumentoLegalUseCase(get()) }
 
     factory { SendMessageUseCase(get()) }
     factory { GetMessagesUseCase(get()) }
@@ -207,4 +212,5 @@ val appModule = module {
     viewModel { ProfileAdminViewModel(get()) }
     viewModel { ProfilePacienteViewModel(get()) }
     viewModel { HistorialClinicoPacienteViewModel(get()) }
+    viewModel { DocumentoLegalViewModel(get()) }
 }

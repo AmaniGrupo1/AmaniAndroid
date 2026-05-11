@@ -1,7 +1,9 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -65,7 +68,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
@@ -80,11 +82,19 @@ fun AgregaPsicologoScreen(
     onBack: () -> Unit,
     loginViewModel: LoginViewModel
 ) {
-    val primaryColor = Color(0xFF6B4E71) // Amani Primary
-    val backgroundColor = Color(0xFFFDF8F9) // Amani Background
-    val errorColor = Color(0xFFE57373) // Amani Error
+    // Paleta de colores profesional AMANI
+    val primaryColor = Color(0xFF6C63FF) // Púrpura moderno
+    val primaryDark = Color(0xFF5A52D6)
+    val primaryLight = Color(0xFF8B84FF)
+    val backgroundColor = Color(0xFFF8F9FA)
+    val surfaceColor = Color.White
+    val errorColor = Color(0xFFE57373)
+    val successColor = Color(0xFF81C784)
+    val textPrimary = Color(0xFF2C3E50)
+    val textSecondary = Color(0xFF7F8C8D)
+    val dividerColor = Color(0xFFECF0F1)
 
-    // Fuente Roboto correctamente configurada
+    // Fuentes profesionales
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
         Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
@@ -136,6 +146,8 @@ fun AgregaPsicologoScreen(
         "Psicología de la Salud",
         "Psicología Forense",
         "Psicología Social",
+        "Neuropsicología",
+        "Terapia de Pareja",
         "Otro"
     )
 
@@ -148,7 +160,7 @@ fun AgregaPsicologoScreen(
 
     LaunchedEffect(registerSuccess) {
         if (registerSuccess) {
-            snackbarHostState.showSnackbar("Psicólogo registrado exitosamente")
+            snackbarHostState.showSnackbar("✓ Psicólogo registrado exitosamente")
             scope.launch {
                 delay(1500)
                 loginViewModel.limpiarFormularioPsicologo()
@@ -159,341 +171,623 @@ fun AgregaPsicologoScreen(
 
     Scaffold(
         containerColor = backgroundColor,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFF8F9FA),
+                            Color(0xFFF0F2F5)
+                        )
+                    )
+                )
+        ) {
+            // Top Bar Mejorada
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = primaryColor,
-                shadowElevation = 4.dp,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                color = Color.White,
+                shadowElevation = 8.dp,
+                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(horizontal = 20.dp, vertical = 20.dp)
                 ) {
-                    IconButton(onClick = onBack) {
+                    // Botón de retroceso
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .shadow(4.dp, RoundedCornerShape(12.dp))
+                    ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White,
+                            tint = primaryColor,
                             modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    Text(
-                        text = "REGISTRAR PSICÓLOGO",
-                        color = Color.White,
-                        fontFamily = roboto,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
-
-                    // Espaciador para balancear el ícono de navegación
-                    Spacer(modifier = Modifier.width(48.dp))
-                }
-            }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            val textFieldShape = RoundedCornerShape(12.dp)
-
-            // ==================== SECCIÓN 1: DATOS PERSONALES ====================
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Datos Personales",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Nombre
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { loginViewModel.setNombre(it) },
-                        label = { Text("Nombre *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                    Text(
+                        text = "Registrar Nuevo Psicólogo",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = roboto,
+                        color = textPrimary,
+                        letterSpacing = (-0.5).sp
                     )
 
-                    // Apellido
-                    OutlinedTextField(
-                        value = surname,
-                        onValueChange = { loginViewModel.setApellido(it) },
-                        label = { Text("Apellido *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                    Text(
+                        text = "Completa la información profesional",
+                        fontSize = 14.sp,
+                        fontFamily = roboto,
+                        color = textSecondary,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
+                }
+            }
 
-                    // Email
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { loginViewModel.setEmail(it) },
-                        label = { Text("Email *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        isError = emailError != null,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = if (emailError != null) errorColor else primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        ),
-                        supportingText = {
-                            if (emailError != null) {
-                                Text(emailError!!, fontFamily = roboto, color = errorColor)
-                            }
-                        }
-                    )
+            // Contenido principal
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                val textFieldShape = RoundedCornerShape(12.dp)
 
-                    // Contraseña
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { loginViewModel.setRegPassword(it) },
-                        label = { Text("Contraseña *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        isError = passwordError != null,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = if (passwordError != null) errorColor else primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        ),
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                // ==================== SECCIÓN 1: DATOS PERSONALES ====================
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(4.dp, RoundedCornerShape(20.dp)),
+                    colors = CardDefaults.cardColors(containerColor = surfaceColor),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        brush = Brush.linearGradient(
+                                            colors = listOf(primaryColor, primaryLight)
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Icon(
-                                    imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
-                        },
-                        supportingText = {
-                            if (passwordError != null) {
-                                Text(passwordError!!, fontFamily = roboto, color = errorColor)
-                            } else if (password.isNotBlank() && password.length < 8) {
-                                Text("Mínimo 8 caracteres", fontFamily = roboto, color = errorColor)
-                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "Información Personal",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = roboto,
+                                color = textPrimary
+                            )
                         }
-                    )
 
-                    // Fecha de Nacimiento con DatePicker
-                    OutlinedTextField(
-                        value = dateOfBirth?.format(dateFormatter) ?: "",
-                        onValueChange = {},
-                        label = { Text("Fecha de Nacimiento *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { loginViewModel.setShowDatePicker(true) },
-                        readOnly = true,
-                        shape = textFieldShape,
-                        trailingIcon = {
-                            IconButton(onClick = { loginViewModel.setShowDatePicker(true) }) {
-                                Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha")
-                            }
-                        },
-                        isError = dateError != null,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = if (dateError != null) errorColor else primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        ),
-                        supportingText = {
-                            if (dateError != null) {
-                                Text(dateError!!, fontFamily = roboto, color = errorColor)
-                            }
-                        }
-                    )
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    // Teléfono
-                    OutlinedTextField(
-                        value = telefono,
-                        onValueChange = { loginViewModel.setTelefonoPsicologo(it.filter { c -> c.isDigit() }) },
-                        label = { Text("Teléfono *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        isError = phoneError != null,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = if (phoneError != null) errorColor else primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        ),
-                        supportingText = {
-                            if (phoneError != null) {
-                                Text(phoneError!!, fontFamily = roboto, color = errorColor)
-                            } else if (telefono.isNotBlank() && telefono.length != 9) {
-                                Text("Debe tener 9 dígitos", fontFamily = roboto, color = errorColor)
-                            }
-                        }
-                    )
-                }
-            }
-
-            // ==================== SECCIÓN 2: DATOS PROFESIONALES ====================
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.MedicalServices, contentDescription = null, tint = primaryColor)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Datos Profesionales",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Especialidad (Dropdown)
-                    ExposedDropdownMenuBox(
-                        expanded = expandedEspecialidad,
-                        onExpandedChange = { expandedEspecialidad = it }
-                    ) {
+                        // Nombre
                         OutlinedTextField(
-                            value = especialidad,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Especialidad *", fontFamily = roboto, fontWeight = FontWeight.SemiBold) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                            value = name,
+                            onValueChange = { loginViewModel.setNombre(it) },
+                            label = {
+                                Text(
+                                    "Nombre completo",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "Ej: María",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedEspecialidad) },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = primaryColor,
+                                cursorColor = primaryColor
                             )
                         )
-                        ExposedDropdownMenu(
-                            expanded = expandedEspecialidad,
-                            onDismissRequest = { expandedEspecialidad = false }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Apellido
+                        OutlinedTextField(
+                            value = surname,
+                            onValueChange = { loginViewModel.setApellido(it) },
+                            label = {
+                                Text(
+                                    "Apellidos",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "Ej: González Pérez",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = primaryColor,
+                                cursorColor = primaryColor
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Email
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = { loginViewModel.setEmail(it) },
+                            label = {
+                                Text(
+                                    "Correo electrónico",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "psicologo@amani.com",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            isError = emailError != null,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (emailError != null) errorColor else primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = if (emailError != null) errorColor else primaryColor,
+                                cursorColor = primaryColor
+                            ),
+                            supportingText = {
+                                if (emailError != null) {
+                                    Text(
+                                        emailError!!,
+                                        fontFamily = roboto,
+                                        color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Contraseña
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { loginViewModel.setRegPassword(it) },
+                            label = {
+                                Text(
+                                    "Contraseña",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "••••••••",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            isError = passwordError != null,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (passwordError != null) errorColor else primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = if (passwordError != null) errorColor else primaryColor,
+                                cursorColor = primaryColor
+                            ),
+                            trailingIcon = {
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                        tint = textSecondary
+                                    )
+                                }
+                            },
+                            supportingText = {
+                                if (passwordError != null) {
+                                    Text(
+                                        passwordError!!,
+                                        fontFamily = roboto,
+                                        color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                } else if (password.isNotBlank() && password.length < 8) {
+                                    Text(
+                                        "Mínimo 8 caracteres",
+                                        fontFamily = roboto,
+                                        color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Fecha de Nacimiento
+                        OutlinedTextField(
+                            value = dateOfBirth?.format(dateFormatter) ?: "",
+                            onValueChange = {},
+                            label = {
+                                Text(
+                                    "Fecha de nacimiento",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "DD/MM/AAAA",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { loginViewModel.setShowDatePicker(true) },
+                            readOnly = true,
+                            shape = textFieldShape,
+                            trailingIcon = {
+                                IconButton(onClick = { loginViewModel.setShowDatePicker(true) }) {
+                                    Icon(
+                                        Icons.Default.CalendarToday,
+                                        contentDescription = "Seleccionar fecha",
+                                        tint = textSecondary
+                                    )
+                                }
+                            },
+                            isError = dateError != null,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (dateError != null) errorColor else primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = if (dateError != null) errorColor else primaryColor,
+                                cursorColor = primaryColor
+                            ),
+                            supportingText = {
+                                if (dateError != null) {
+                                    Text(
+                                        dateError!!,
+                                        fontFamily = roboto,
+                                        color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Teléfono
+                        OutlinedTextField(
+                            value = telefono,
+                            onValueChange = { loginViewModel.setTelefonoPsicologo(it.filter { c -> c.isDigit() }) },
+                            label = {
+                                Text(
+                                    "Teléfono de contacto",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "123456789",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            isError = phoneError != null,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (phoneError != null) errorColor else primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = if (phoneError != null) errorColor else primaryColor,
+                                cursorColor = primaryColor
+                            ),
+                            supportingText = {
+                                if (phoneError != null) {
+                                    Text(
+                                        phoneError!!,
+                                        fontFamily = roboto,
+                                        color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                } else if (telefono.isNotBlank() && telefono.length != 9) {
+                                    Text(
+                                        "Debe tener 9 dígitos",
+                                        fontFamily = roboto,
+                                        color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+
+                // ==================== SECCIÓN 2: DATOS PROFESIONALES ====================
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(4.dp, RoundedCornerShape(20.dp)),
+                    colors = CardDefaults.cardColors(containerColor = surfaceColor),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 12.dp)
                         ) {
-                            listaEspecialidades.forEach { opcion ->
-                                DropdownMenuItem(
-                                    text = { Text(opcion, fontFamily = roboto) },
-                                    onClick = {
-                                        loginViewModel.setRegistroEspecialidad(opcion)
-                                        expandedEspecialidad = false
-                                    }
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        brush = Brush.linearGradient(
+                                            colors = listOf(primaryColor, primaryLight)
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.MedicalServices,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "Información Profesional",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = roboto,
+                                color = textPrimary
+                            )
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Especialidad (Dropdown)
+                        ExposedDropdownMenuBox(
+                            expanded = expandedEspecialidad,
+                            onExpandedChange = { expandedEspecialidad = it }
+                        ) {
+                            OutlinedTextField(
+                                value = especialidad,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = {
+                                    Text(
+                                        "Especialidad",
+                                        fontFamily = roboto,
+                                        color = textSecondary
+                                    )
+                                },
+                                placeholder = {
+                                    Text(
+                                        "Selecciona una especialidad",
+                                        fontFamily = roboto,
+                                        color = textSecondary.copy(alpha = 0.5f)
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                shape = textFieldShape,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                        expanded = expandedEspecialidad
+                                    )
+                                },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = primaryColor,
+                                    unfocusedBorderColor = dividerColor,
+                                    focusedLabelColor = primaryColor,
+                                    cursorColor = primaryColor
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedEspecialidad,
+                                onDismissRequest = { expandedEspecialidad = false }
+                            ) {
+                                listaEspecialidades.forEach { opcion ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                opcion,
+                                                fontFamily = roboto,
+                                                color = textPrimary
+                                            )
+                                        },
+                                        onClick = {
+                                            loginViewModel.setRegistroEspecialidad(opcion)
+                                            expandedEspecialidad = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Experiencia
+                        OutlinedTextField(
+                            value = experiencia?.toString() ?: "",
+                            onValueChange = { loginViewModel.setRegistroExperiencia(it.toIntOrNull()) },
+                            label = {
+                                Text(
+                                    "Años de experiencia",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "Ej: 5",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = primaryColor,
+                                cursorColor = primaryColor
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Descripción
+                        OutlinedTextField(
+                            value = descripcion ?: "",
+                            onValueChange = { loginViewModel.setRegistroDescripcion(it) },
+                            label = {
+                                Text(
+                                    "Descripción profesional",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "Describe tu enfoque terapéutico...",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            minLines = 3,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = primaryColor,
+                                cursorColor = primaryColor
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Licencia
+                        OutlinedTextField(
+                            value = licencia ?: "",
+                            onValueChange = { loginViewModel.setRegistroLicencia(it) },
+                            label = {
+                                Text(
+                                    "Número de licencia",
+                                    fontFamily = roboto,
+                                    color = textSecondary
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "Ej: COP-12345",
+                                    fontFamily = roboto,
+                                    color = textSecondary.copy(alpha = 0.5f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = textFieldShape,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = dividerColor,
+                                focusedLabelColor = primaryColor,
+                                cursorColor = primaryColor
+                            )
+                        )
                     }
-
-                    // Experiencia
-                    OutlinedTextField(
-                        value = experiencia?.toString() ?: "",
-                        onValueChange = { loginViewModel.setRegistroExperiencia(it.toIntOrNull()) },
-                        label = { Text("Experiencia (años)", fontFamily = roboto) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
-                    )
-
-                    // Descripción
-                    OutlinedTextField(
-                        value = descripcion ?: "",
-                        onValueChange = { loginViewModel.setRegistroDescripcion(it) },
-                        label = { Text("Descripción", fontFamily = roboto) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
-                    )
-
-                    // Licencia
-                    OutlinedTextField(
-                        value = licencia ?: "",
-                        onValueChange = { loginViewModel.setRegistroLicencia(it) },
-                        label = { Text("Licencia Colegiada", fontFamily = roboto) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
-                    )
                 }
-            }
 
-            // ==================== BOTÓN REGISTRAR ====================
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                enabled = !isRegistering,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = primaryColor,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
-                ),
-                shape = RoundedCornerShape(16.dp),
-                onClick = { loginViewModel.registrarPsicologo() }
-            ) {
-                if (isRegistering) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Registrando...",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = roboto
-                    )
-                } else {
-                    Text(
-                        "📝 Crear Cuenta",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = roboto
-                    )
+                // ==================== BOTÓN REGISTRAR ====================
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+                    enabled = !isRegistering,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = primaryColor,
+                        contentColor = Color.White,
+                        disabledContainerColor = textSecondary.copy(alpha = 0.5f)
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = { loginViewModel.registrarPsicologo() }
+                ) {
+                    if (isRegistering) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            "Registrando...",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = roboto,
+                            letterSpacing = 0.5.sp
+                        )
+                    } else {
+                        Text(
+                            "CREAR CUENTA PROFESIONAL",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = roboto,
+                            letterSpacing = 1.sp
+                        )
+                    }
                 }
-            }
 
-            // Spacer para evitar que el botón quede oculto por el teclado
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
+            }
         }
     }
 
@@ -517,12 +811,12 @@ fun AgregaPsicologoScreen(
                         }
                     }
                 }) {
-                    Text("Aceptar", fontFamily = roboto)
+                    Text("Aceptar", fontFamily = roboto, color = primaryColor)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { loginViewModel.setShowDatePicker(false) }) {
-                    Text("Cancelar", fontFamily = roboto)
+                    Text("Cancelar", fontFamily = roboto, color = textSecondary)
                 }
             }
         ) {

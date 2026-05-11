@@ -322,4 +322,58 @@
     <string name="menu_selecciona_opcion">Selecciona una opción</string>
     <string name="menu_cerrar_sesion">Cerrar sesión</string>
 
+    <!-- ==================== GESTIÓN DE DOCUMENTOS LEGALES ==================== -->
+    <string name="crear_politica_privacidad">Políticas y Privacidad</string>
+    <string name="gestionar_politica">Gestionar documentos legales</string>
+    <string name="gestion_documentos">Gestión de Documentos</string>
+    <string name="documentos_legales">Documentos Legales</string>
+    <string name="crear_documento">Crear Documento</string>
+    <string name="editar_documento">Editar Documento</string>
+    <string name="eliminar_documento">Eliminar Documento</string>
+    <string name="titulo_documento">Título del documento</string>
+    <string name="tipo_documento">Tipo de documento legal</string>
+    <string name="contenido_documento">Contenido del documento</string>
+    <string name="version_documento">Versión</string>
+    <string name="orden_visualizacion">Orden de visualización</string>
+    <string name="icono_documento">Ícono (opcional)</string>
+    <string name="documento_activo">Documento activo (visible para usuarios)</string>
+    <string name="creado_en">Creado</string>
+    <string name="actualizado_en">Actualizado</string>
+    <string name="fecha_no_disponible">Fecha no disponible</string>
+    <string name="documento_inactivo">Documento inactivo</string>
+    <string name="terminos_condiciones_titulo">Términos y Condiciones</string>
+    <string name="politica_privacidad_titulo">Política de Privacidad</string>
+    <string name="terminos_condiciones_desc">📜 Términos y Condiciones de Uso</string>
+    <string name="politica_privacidad_desc">🔒 Política de Privacidad y Protección de Datos</string>
+    <string name="no_hay_documentos">No hay documentos creados</string>
+    <string name="crea_documentos_legales">Crea políticas de seguridad, términos y condiciones,\n o cualquier documento legal para tus pacientes</string>
+    <string name="crear_primer_documento">Crear primer documento</string>
+    <string name="documento_creado_exitosamente">✅ Documento creado exitosamente</string>
+    <string name="documento_actualizado_exitosamente">✏️ Documento actualizado exitosamente</string>
+    <string name="documento_eliminado_exitosamente">🗑️ Documento eliminado exitosamente</string>
+    <string name="error_crear_documento">Error al crear el documento</string>
+    <string name="error_actualizar_documento">Error al actualizar el documento</string>
+    <string name="error_eliminar_documento">Error al eliminar el documento</string>
+    <string name="confirmar_eliminar_documento">¿Estás seguro de que quieres eliminar el documento "%s"?\n\nEsta acción no se puede deshacer.</string>
+
+    <!-- Tipos de documentos legales -->
+    <string name="tipo_terminos">Términos y Condiciones</string>
+    <string name="tipo_privacidad">Política de Privacidad</string>
+
+    <!-- Información de la terapia en citas -->
+    <string name="info_terapia">🎯 Información de la Terapia</string>
+    <string name="duracion_sesion">⏰ Duración de la sesión</string>
+    <string name="sesion_estandar">Sesión estándar de una hora</string>
+    <string name="sesion_extendida">Sesión extendida para mayor profundidad</string>
+    <string name="recomendaciones">💡 Recomendaciones</string>
+    <string name="recomendaciones_texto">• Llega 5 minutos antes para prepararte\n• Ten lista tu identificación\n• Prepara tus preguntas o temas a tratar\n• Busca un lugar tranquilo si es online</string>
+    <string name="entendido">Entendido</string>
+    <string name="confirmar_cita">Confirmar cita</string>
+    <string name="seleccionar_terapia">Selecciona el tipo de terapia</string>
+    <string name="metodo_pago">Método de pago</string>
+    <string name="presencial">Presencial</string>
+    <string name="online">Online</string>
+    <string name="modalidad">Modalidad</string>
+    <string name="llamada">Llamada</string>
+
 </resources>
