@@ -292,4 +292,34 @@
     <string name="guardar_historial_clinico">Guardar Historial Clínico</string>
     <string name="guardando">Guardando...</string>
 
+    <!-- Navegación -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_citas">Citas</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_diario">Diario</string>
+    <string name="nav_ajustes">Ajustes</string>
+    <string name="nav_pacientes">Pacientes</string>
+    <string name="nav_psicologos">Psicólogos</string>
+    <string name="nav_tests">Tests</string>
+    <string name="nav_mas">Más</string>
+    <string name="nav_agenda">Agenda</string>
+    <string name="nav_estadisticas">Estadísticas</string>
+    <string name="nav_perfil">Perfil</string>
+    <string name="nav_calendario">Calendario</string>
+    <string name="nav_mensajes">Mensajes</string>
+    <string name="nav_documentos">Documentos</string>
+
+    <!-- Menús -->
+    <string name="menu_inicia_sesion">Inicia sesión</string>
+    <string name="menu_registrate">Regístrate</string>
+    <string name="menu_volver_principal">Volver a la principal</string>
+    <string name="menu_registrar_psicologo">Registrar psicólogo</string>
+    <string name="menu_registrar_paciente">Registrar paciente</string>
+    <string name="menu_registrar_admin">Registrar administrador</string>
+    <string name="menu_listar_pacientes">Listar pacientes</string>
+    <string name="menu_listar_psicologos">Listar psicólogos</string>
+    <string name="menu_admin_titulo">Menú de administración</string>
+    <string name="menu_selecciona_opcion">Selecciona una opción</string>
+    <string name="menu_cerrar_sesion">Cerrar sesión</string>
+
 </resources>

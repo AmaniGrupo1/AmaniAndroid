@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.psicologo
 
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,25 +18,27 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.AmaniPsicologoColors
 
-enum class PsicologoNavItem(val route: String, val icon: @Composable () -> Unit, val label: String) {
+enum class PsicologoNavItem(val route: String, val icon: @Composable () -> Unit, @StringRes val labelRes: Int) {
     MIS_PACIENTES(
         route = Screens.psicologoHome.route,
-        icon = { Icon(Icons.Default.People, contentDescription = "Mis Pacientes") },
-        label = "Pacientes"
+        icon = { Icon(Icons.Default.People, contentDescription = stringResource(R.string.nav_pacientes)) },
+        labelRes = R.string.nav_pacientes
     ),
     AGENDA(
         route = Screens.psicologoAgenda.route,
-        icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Agenda") },
-        label = "Agenda"
+        icon = { Icon(Icons.Default.CalendarToday, contentDescription = stringResource(R.string.nav_agenda)) },
+        labelRes = R.string.nav_agenda
     ),
     PERFIL(
         route = Screens.perfilPsicologo.route,
-        icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
-        label = "Perfil"
+        icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.nav_perfil)) },
+        labelRes = R.string.nav_perfil
     )
 }
 
@@ -60,7 +63,7 @@ fun BarraNavegationInferiorPsicologo(
                     }
                 },
                 icon = item.icon,
-                label = { Text(item.label) }
+                label = { Text(stringResource(item.labelRes)) }
             )
         }
     }
@@ -80,7 +83,7 @@ fun MenuPsicologo(
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.volver))
                 }
             }
         },

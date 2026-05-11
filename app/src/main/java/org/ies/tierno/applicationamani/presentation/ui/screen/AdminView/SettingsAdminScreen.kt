@@ -56,18 +56,20 @@ fun SettingsAdminScreen(
     // 📍 LOG: Ver idioma actual en cada recomposición
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
 
-    // Control de recreación para evitar loops
-    var previousLanguage by remember { mutableStateOf(currentLanguage) }
+    // Bug 2 Fix: Control de recreación para evitar loops
+    // Inicializamos con null para detectar el primer valor real sin recrear
+    var previousLanguage by remember { mutableStateOf<String?>(null) }
     var isRecreating by remember { mutableStateOf(false) }
 
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
     LaunchedEffect(currentLanguage) {
         Log.d(TAG, "🚀 [LaunchedEffect] currentLanguage=$currentLanguage, previousLanguage=$previousLanguage, isRecreating=$isRecreating")
 
-        if (!isRecreating && previousLanguage != currentLanguage) {
+        // Solo recreamos si ya teníamos un idioma previo (no es la primera carga)
+        // y este ha cambiado realmente.
+        if (previousLanguage != null && previousLanguage != currentLanguage && !isRecreating) {
             Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage' - Recreando Activity")
 
-            previousLanguage = currentLanguage
             isRecreating = true
 
             // Pequeño delay para evitar conflictos con el ciclo de vida
@@ -76,6 +78,9 @@ fun SettingsAdminScreen(
             // Recrear la Activity para aplicar el nuevo idioma
             (context as? Activity)?.recreate()
         }
+        
+        // Siempre actualizamos el idioma previo al final
+        previousLanguage = currentLanguage
     }
 
     val primaryColor = Color(0xFF6C63FF)

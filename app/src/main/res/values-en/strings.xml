@@ -290,4 +290,34 @@
     <string name="registra_informacion_clinica">Register the patient\'s clinical information</string>
     <string name="guardar_historial_clinico">Save Medical History</string>
     <string name="guardando">Saving...</string>
+    <!-- Navigation -->
+    <string name="nav_inicio">Home</string>
+    <string name="nav_citas">Appointments</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_diario">Diary</string>
+    <string name="nav_ajustes">Settings</string>
+    <string name="nav_pacientes">Patients</string>
+    <string name="nav_psicologos">Psychologists</string>
+    <string name="nav_tests">Tests</string>
+    <string name="nav_mas">More</string>
+    <string name="nav_agenda">Schedule</string>
+    <string name="nav_estadisticas">Statistics</string>
+    <string name="nav_perfil">Profile</string>
+    <string name="nav_calendario">Calendar</string>
+    <string name="nav_mensajes">Messages</string>
+    <string name="nav_documentos">Documents</string>
+
+    <!-- Menus -->
+    <string name="menu_inicia_sesion">Login</string>
+    <string name="menu_registrate">Register</string>
+    <string name="menu_volver_principal">Back to main</string>
+    <string name="menu_registrar_psicologo">Register psychologist</string>
+    <string name="menu_registrar_paciente">Register patient</string>
+    <string name="menu_registrar_admin">Register administrator</string>
+    <string name="menu_listar_pacientes">List patients</string>
+    <string name="menu_listar_psicologos">List psychologists</string>
+    <string name="menu_admin_titulo">Admin Menu</string>
+    <string name="menu_selecciona_opcion">Select an option</string>
+    <string name="menu_cerrar_sesion">Log out</string>
+
 </resources>

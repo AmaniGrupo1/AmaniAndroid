@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.outlined.CalendarToday
@@ -14,9 +15,11 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 enum class AdminNavItem {
@@ -35,7 +38,7 @@ fun BarraNavegationInferiorAdmin(
 ) {
     data class NavDest(
         val item: AdminNavItem,
-        val label: String,
+        @StringRes val labelRes: Int,
         val icon: ImageVector,
         val route: String? = null
     )
@@ -43,19 +46,19 @@ fun BarraNavegationInferiorAdmin(
     val destinations = listOf(
         NavDest(
             AdminNavItem.DOCUMENTOS,
-            "Inicio",
+            R.string.nav_documentos,
             Icons.Outlined.Description,
             Screens.adminHome.route
         ),
-        NavDest(AdminNavItem.MENSAJES, "Mensajes", Icons.Outlined.ChatBubbleOutline),
+        NavDest(AdminNavItem.MENSAJES, R.string.nav_mensajes, Icons.Outlined.ChatBubbleOutline),
         NavDest(
             AdminNavItem.CALENDARIO,
-            "Calendario",
+            R.string.nav_calendario,
             Icons.Outlined.CalendarToday,
             Screens.psicologoAgenda.route
         ),
-        NavDest(AdminNavItem.ESTADISTICAS, "Estadísticas", Icons.AutoMirrored.Outlined.ShowChart),
-        NavDest(AdminNavItem.CONFIGURACION, "Ajustes", Icons.Outlined.Settings)
+        NavDest(AdminNavItem.ESTADISTICAS, R.string.nav_estadisticas, Icons.AutoMirrored.Outlined.ShowChart),
+        NavDest(AdminNavItem.CONFIGURACION, R.string.nav_ajustes, Icons.Outlined.Settings)
     )
 
     NavigationBar(
@@ -69,9 +72,9 @@ fun BarraNavegationInferiorAdmin(
                     onItemSelected(dest.item)
                     dest.route?.let { navController.navigate(it) }
                 },
-                icon = { Icon(dest.icon, contentDescription = dest.label) },
+                icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
                 label = {
-                    Text(dest.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(stringResource(dest.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primaryContainer,

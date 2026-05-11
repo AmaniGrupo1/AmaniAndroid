@@ -25,6 +25,9 @@ class SituacionViewModel(
     private val _situacionSeleccionada = MutableStateFlow<SituacionDTO?>(null)
     val situacionSeleccionada: StateFlow<SituacionDTO?> = _situacionSeleccionada
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     init {
         cargarSituaciones()
     }
@@ -39,7 +42,7 @@ class SituacionViewModel(
                     _situaciones.value = lista
                 }
             } catch (e: Exception) {
-                println("DEBUG: error en SituacionViewModel = ${e.message}")
+                _error.value = e.message
             }
         }
     }
@@ -50,19 +53,19 @@ class SituacionViewModel(
     fun obtenerPorId(id: Long) {
         viewModelScope.launch {
             val result = useCase.getSituacionById(id)
-            result.onSuccess {
-                _situacionSeleccionada.value = it
-            }
+            result
+                .onSuccess { _situacionSeleccionada.value = it }
+                .onFailure { _error.value = it.message }
         }
     }
 
     // =========================
     // CREATE
     // =========================
-    fun crearSituacion(request: SituacionRequest, onResult: (Boolean) -> Unit = {}) {
+    fun crearSituacion(request: SituacionRequest, onResult: (Boolean, String?) -> Unit = { _, _ -> }) {
         viewModelScope.launch {
             val result = useCase.createSituacion(request)
-            onResult(result.isSuccess)
+            onResult(result.isSuccess, result.exceptionOrNull()?.message)
 
             if (result.isSuccess) {
                 cargarSituaciones() // refrescar lista
@@ -73,10 +76,10 @@ class SituacionViewModel(
     // =========================
     // UPDATE
     // =========================
-    fun actualizarSituacion(id: Long, request: SituacionRequest, onResult: (Boolean) -> Unit = {}) {
+    fun actualizarSituacion(id: Long, request: SituacionRequest, onResult: (Boolean, String?) -> Unit = { _, _ -> }) {
         viewModelScope.launch {
             val result = useCase.updateSituacion(id, request)
-            onResult(result.isSuccess)
+            onResult(result.isSuccess, result.exceptionOrNull()?.message)
 
             if (result.isSuccess) {
                 cargarSituaciones()
@@ -87,10 +90,10 @@ class SituacionViewModel(
     // =========================
     // DELETE
     // =========================
-    fun eliminarSituacion(id: Long, onResult: (Boolean) -> Unit = {}) {
+    fun eliminarSituacion(id: Long, onResult: (Boolean, String?) -> Unit = { _, _ -> }) {
         viewModelScope.launch {
             val result = useCase.deleteSituacion(id)
-            onResult(result.isSuccess)
+            onResult(result.isSuccess, result.exceptionOrNull()?.message)
 
             if (result.isSuccess) {
                 cargarSituaciones()
@@ -99,9 +102,13 @@ class SituacionViewModel(
     }
 
     // =========================
-    // LIMPIAR SELECCIÓN
+    // LIMPIAR SELECCIÓN Y ERROR
     // =========================
     fun limpiarSeleccion() {
         _situacionSeleccionada.value = null
+    }
+
+    fun limpiarError() {
+        _error.value = null
     }
 }

@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.idioma
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,6 +38,12 @@ class IdiomaViewModel(
             userSessionDataStore.saveSession(
                 session.copy(idioma = nuevoIdioma)
             )
+
+            // Bug 4 Fix: Soporte para API 33+ (Tiramisu)
+            // En Android 13+, el sistema gestiona los locales por aplicación de forma diferente.
+            // Usamos AppCompatDelegate para notificar al sistema del cambio de forma persistente.
+            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(nuevoIdioma)
+            AppCompatDelegate.setApplicationLocales(appLocale)
         }
     }
 }

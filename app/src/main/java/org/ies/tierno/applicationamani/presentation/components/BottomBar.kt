@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.components
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Book
@@ -15,19 +16,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import org.ies.tierno.applicationamani.R
 
 /**
  * Representa un destino de navegación en la barra inferior.
  *
  * @param route La ruta de navegación asociada con el destino.
- * @param label La etiqueta de texto que se muestra para el destino.
+ * @param labelRes El recurso de etiqueta de texto que se muestra para el destino.
  * @param icon El icono que representa el destino.
  */
 private data class BottomBarDestination(
     val route: String,
-    val label: String,
+    @StringRes val labelRes: Int,
     val icon: ImageVector
 )
 
@@ -57,18 +60,18 @@ fun BottomBar(navController: NavController) {
     val currentRoute by navController.currentBackStackEntryAsState()
 
     val destinations = listOf(
-        BottomBarDestination(Routes.HOME, "Inicio", Icons.Default.Home),
-        BottomBarDestination(Routes.CHAT, "Chat", Icons.AutoMirrored.Filled.Chat),
-        BottomBarDestination(Routes.CITAS, "Citas", Icons.Default.DateRange),
-        BottomBarDestination(Routes.DIARIO, "Diario", Icons.Default.Book),
-        BottomBarDestination(Routes.SETTINGS, "Ajustes", Icons.Default.Settings)
+        BottomBarDestination(Routes.HOME, R.string.nav_inicio, Icons.Default.Home),
+        BottomBarDestination(Routes.CHAT, R.string.nav_chat, Icons.AutoMirrored.Filled.Chat),
+        BottomBarDestination(Routes.CITAS, R.string.nav_citas, Icons.Default.DateRange),
+        BottomBarDestination(Routes.DIARIO, R.string.nav_diario, Icons.Default.Book),
+        BottomBarDestination(Routes.SETTINGS, R.string.nav_ajustes, Icons.Default.Settings)
     )
 
     NavigationBar {
         destinations.forEach { destination ->
             NavigationBarItem(
-                icon = { Icon(destination.icon, contentDescription = destination.label) },
-                label = { Text(destination.label) },
+                icon = { Icon(destination.icon, contentDescription = stringResource(destination.labelRes)) },
+                label = { Text(stringResource(destination.labelRes)) },
                 selected = currentRoute?.destination?.route == destination.route,
                 onClick = {
                     navController.navigate(destination.route) {

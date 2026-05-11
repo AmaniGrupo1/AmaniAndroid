@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
@@ -65,7 +66,7 @@ fun MenuPrincipal(navController: NavController) {
         navigationIcon = {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),
-                contentDescription = "Logo",
+                contentDescription = stringResource(R.string.nav_inicio),
                 modifier = Modifier.size(40.dp)
             )
         },
@@ -79,7 +80,7 @@ fun MenuPrincipal(navController: NavController) {
             ) {
                 val imagen = if (expanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
                 Icon(
-                    imagen, contentDescription = "Desplegue", tint = colors.onPrimary
+                    imagen, contentDescription = stringResource(R.string.nav_mas), tint = colors.onPrimary
                 )
             }
 
@@ -89,7 +90,7 @@ fun MenuPrincipal(navController: NavController) {
             ) {
 
                 DropdownMenuItem(
-                    text = { Text("Inicia sesión",
+                    text = { Text(stringResource(R.string.menu_inicia_sesion),
                         style = typography.labelLarge) },
                     onClick = {
                         expanded = false
@@ -98,7 +99,7 @@ fun MenuPrincipal(navController: NavController) {
                 )
 
                 DropdownMenuItem(
-                    text = { Text("Regístrate",
+                    text = { Text(stringResource(R.string.menu_registrate),
                         style = typography.labelLarge) },
                     onClick = {
                         expanded = false
@@ -125,7 +126,7 @@ fun MenuPrincipal(navController: NavController) {
 //                )
 
                 DropdownMenuItem(
-                    text = { Text("Volver a la principal",
+                    text = { Text(stringResource(R.string.menu_volver_principal),
                         style = typography.labelLarge) },
                     onClick = {
                         expanded = false
@@ -136,4 +137,3 @@ fun MenuPrincipal(navController: NavController) {
         }
     )
 }
-

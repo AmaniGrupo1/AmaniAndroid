@@ -23,13 +23,18 @@ import org.ies.tierno.applicationamani.data.local.LanguageManager
 class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
-        val session = runBlocking {
-            UserSessionDataStore(newBase).sessionFlow.firstOrNull()
+        // Bug 1 Fix: Leer de DataStore con manejo de errores y fallback explícito
+        // attachBaseContext ocurre muy temprano, por lo que runBlocking es necesario aquí
+        val lang = runBlocking {
+            try {
+                UserSessionDataStore(newBase).sessionFlow
+                    .firstOrNull()?.idioma ?: "es" // Fallback a español si no hay valor
+            } catch (e: Exception) {
+                "es" // Fallback de seguridad en caso de error de lectura
+            }
         }
 
-        val lang = session?.idioma ?: "es"
         val context = LanguageManager.setLocale(newBase, lang)
-
         super.attachBaseContext(context)
     }
 

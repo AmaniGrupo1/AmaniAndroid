@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -127,7 +128,7 @@ fun SituacionAdminScreen(
                     onClick = {
                         viewModel.eliminarSituacion(
                             id = situacionAEliminar!!.idSituacion,
-                            onResult = { success ->
+                            onResult = { success, _ ->
                                 if (success) {
                                     scope.launch { snackbarHostState.showSnackbar("Situación eliminada correctamente") }
                                 } else {
@@ -167,7 +168,7 @@ fun SituacionAdminScreen(
                 if (situacionEditando == null) {
                     viewModel.crearSituacion(
                         request = request,
-                        onResult = { success ->
+                        onResult = { success, _ ->
                             val msg = if (success) "Situación creada correctamente" else "Error al crear la situación"
                             scope.launch { snackbarHostState.showSnackbar(msg) }
                         }
@@ -176,7 +177,7 @@ fun SituacionAdminScreen(
                     viewModel.actualizarSituacion(
                         id = situacionEditando!!.idSituacion,
                         request = request,
-                        onResult = { success ->
+                        onResult = { success, _ ->
                             val msg = if (success) "Situación actualizada correctamente" else "Error al actualizar la situación"
                             scope.launch { snackbarHostState.showSnackbar(msg) }
                         }
@@ -260,7 +261,7 @@ fun EmptySituacionesScreen(onAddClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(80.dp), tint = AmaniPrimary.copy(alpha = 0.4f))
+        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(80.dp), tint = AmaniPrimary.copy(alpha = 0.4f))
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "No hay situaciones disponibles", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = AmaniTextPrimary)
         Spacer(modifier = Modifier.height(8.dp))

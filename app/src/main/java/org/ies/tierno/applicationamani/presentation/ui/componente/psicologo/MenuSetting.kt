@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
@@ -51,7 +52,7 @@ fun MenuSetting(
         navigationIcon = {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),
-                contentDescription = "Logo",
+                contentDescription = stringResource(R.string.nav_inicio),
                 modifier = Modifier.size(40.dp)
             )
         },
@@ -60,7 +61,7 @@ fun MenuSetting(
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(
                     Icons.Default.Menu,
-                    contentDescription = "Menu",
+                    contentDescription = stringResource(R.string.nav_mas),
                     tint = colors.onPrimary
                 )
             }
@@ -70,7 +71,7 @@ fun MenuSetting(
                 onDismissRequest = { expanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Mi Perfil", style = typography.labelLarge) },
+                    text = { Text(stringResource(R.string.nav_perfil), style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.perfilPsicologo.createRoute(idPsicologo))
@@ -78,7 +79,7 @@ fun MenuSetting(
                 )
 
                 DropdownMenuItem(
-                    text = { Text("Ajustes", style = typography.labelLarge) },
+                    text = { Text(stringResource(R.string.nav_ajustes), style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.settingsPsicologo.route)
@@ -86,7 +87,7 @@ fun MenuSetting(
                 )
 
                 DropdownMenuItem(
-                    text = { Text("Sign out", style = typography.labelLarge) },
+                    text = { Text(stringResource(R.string.menu_cerrar_sesion), style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.login.route)

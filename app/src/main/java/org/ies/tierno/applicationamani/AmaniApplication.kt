@@ -15,6 +15,12 @@ import timber.log.Timber
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
+import android.content.Context
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+import org.ies.tierno.applicationamani.data.local.LanguageManager
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+
 /**
  * Clase [Application] personalizada para la aplicación Amani.
  *
@@ -30,6 +36,21 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
  * @see retrofitModule
  */
 class AmaniApplication : Application() {
+
+    // Bug 3 Fix: Envolver el applicationContext con el Locale personalizado
+    // Esto asegura que los componentes que usen applicationContext tengan recursos localizados
+    override fun attachBaseContext(base: Context) {
+        val lang = runBlocking {
+            try {
+                UserSessionDataStore(base).sessionFlow.firstOrNull()?.idioma ?: "es"
+            } catch (e: Exception) {
+                "es"
+            }
+        }
+        val context = LanguageManager.setLocale(base, lang)
+        super.attachBaseContext(context)
+    }
+
     /**
      * Se ejecuta antes que cualquier actividad, servicio o receptor.
      *

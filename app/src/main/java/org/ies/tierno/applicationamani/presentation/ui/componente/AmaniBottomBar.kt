@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -31,23 +32,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 /**
  * Representa un elemento de navegación en [AmaniBottomBar].
  *
  * @property route Ruta de destino. Si es `null`, el ítem aparece deshabilitado (próximamente).
- * @property label Texto mostrado bajo el icono.
+ * @property labelRes Recurso de texto mostrado bajo el icono.
  * @property selectedIcon Icono cuando el ítem está activo.
  * @property unselectedIcon Icono cuando el ítem está inactivo.
  */
 data class AmaniBottomBarItem(
     val route: String?,
-    val label: String,
+    @StringRes val labelRes: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector = selectedIcon
 )
@@ -69,7 +72,7 @@ sealed interface BottomBarConfig {
 private fun pacienteItems() = listOf(
     AmaniBottomBarItem(
         route = Screens.pacienteHome.route,
-        label = "Inicio",
+        labelRes = R.string.nav_inicio,
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     ),
@@ -77,24 +80,24 @@ private fun pacienteItems() = listOf(
 
     AmaniBottomBarItem(
         route = Screens.agendaCitaScreen.route,
-        label = "Citas",
+        labelRes = R.string.nav_citas,
         selectedIcon = Icons.Filled.DateRange,
         unselectedIcon = Icons.Outlined.DateRange
     ),
     AmaniBottomBarItem(
         route = Screens.chatList.route,
-        label = "Chat",
+        labelRes = R.string.nav_chat,
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
     AmaniBottomBarItem(
         route = Screens.diarioEmocional.route,
-        label = "Diario",
+        labelRes = R.string.nav_diario,
         selectedIcon = Icons.Filled.Book,
         unselectedIcon = Icons.Outlined.Book
     ),
     AmaniBottomBarItem(
         route = Screens.settingsCliente.route,
-        label = "Ajustes",
+        labelRes = R.string.nav_ajustes,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
@@ -103,31 +106,31 @@ private fun pacienteItems() = listOf(
 private fun adminItems() = listOf(
     AmaniBottomBarItem(
         route = Screens.adminHome.route,
-        label = "Inicio",
+        labelRes = R.string.nav_inicio,
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     ),
     AmaniBottomBarItem(
         route = Screens.pacientesSinPsicologo.route,
-        label = "Pacientes",
+        labelRes = R.string.nav_pacientes,
         selectedIcon = Icons.Filled.People,
         unselectedIcon = Icons.Outlined.People
     ),
     AmaniBottomBarItem(
         route = Screens.agregarPsicologo.route,
-        label = "Psicólogos",
+        labelRes = R.string.nav_psicologos,
         selectedIcon = Icons.Filled.Psychology,
         unselectedIcon = Icons.Outlined.Psychology
     ),
     AmaniBottomBarItem(
         route = Screens.settingsAdmin.route,
-        label = "Ajustes",
+        labelRes = R.string.nav_ajustes,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     ),
     AmaniBottomBarItem(
         route = null,
-        label = "Más",
+        labelRes = R.string.nav_mas,
         selectedIcon = Icons.Filled.MoreVert
     )
 )
@@ -135,29 +138,29 @@ private fun adminItems() = listOf(
 private fun psicologoItems() = listOf(
     AmaniBottomBarItem(
         route = Screens.psicologoAgenda.route,
-        label = "Agenda",
+        labelRes = R.string.nav_agenda,
         selectedIcon = Icons.Filled.CalendarMonth,
         unselectedIcon = Icons.Outlined.CalendarMonth
     ),
     AmaniBottomBarItem(
         route = Screens.psicologoHome.route,
-        label = "Pacientes",
+        labelRes = R.string.nav_pacientes,
         selectedIcon = Icons.Filled.People,
         unselectedIcon = Icons.Outlined.People
     ),
     AmaniBottomBarItem(
         route = Screens.estadisticasPsicologo.route,
-        label = "Estadísticas",
+        labelRes = R.string.nav_estadisticas,
         selectedIcon = Icons.AutoMirrored.Filled.ShowChart
     ),
     AmaniBottomBarItem(
         route = Screens.chatList.route,
-        label = "Chat",
+        labelRes = R.string.nav_chat,
         selectedIcon = Icons.AutoMirrored.Filled.Chat
     ),
     AmaniBottomBarItem(
         route = Screens.settingPsicologo.route,
-        label = "Ajustes",
+        labelRes = R.string.nav_ajustes,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
@@ -222,12 +225,12 @@ fun AmaniBottomBar(
                 icon = {
                     Icon(
                         imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.label
+                        contentDescription = stringResource(item.labelRes)
                     )
                 },
                 label = {
                     Text(
-                        text = item.label,
+                        text = stringResource(item.labelRes),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.labelSmall

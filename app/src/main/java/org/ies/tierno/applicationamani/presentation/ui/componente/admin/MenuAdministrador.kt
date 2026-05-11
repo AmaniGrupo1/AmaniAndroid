@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -64,6 +65,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -76,7 +78,7 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
  * Modelo de datos para los items del menú
  */
 data class MenuAdministrador(
-    val title: String,
+    @StringRes val titleRes: Int,
     val icon: ImageVector,
     val route: String,
     val isDanger: Boolean = false,
@@ -108,57 +110,55 @@ fun MenuAdministrador(
     val colors = MaterialTheme.colorScheme
 
     // Definición de items del menú
-    val menuItems = remember {
-        listOf(
+    val menuItems = listOf(
             MenuAdministrador(
-                title = "Registrar psicólogo",
+                titleRes = R.string.menu_registrar_psicologo,
                 icon = Icons.Default.Psychology,
                 route = Screens.agregarPsicologo.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Registrar paciente",
+                titleRes = R.string.menu_registrar_paciente,
                 icon = Icons.Default.Psychology,
                 route = Screens.registro.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Listar pacientes",
+                titleRes = R.string.menu_listar_pacientes,
                 icon = Icons.Default.People,
                 route = Screens.pacientes.route
             ),
             MenuAdministrador(
-                title = "Listar psicólogos",
+                titleRes = R.string.menu_listar_psicologos,
                 icon = Icons.Default.Psychology,
                 route = Screens.listarPsicologo.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Registrar administrador",
+                titleRes = R.string.menu_registrar_admin,
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.agregarAdmin.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Citas",
+                titleRes = R.string.nav_citas,
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.citas.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Calendario",
+                titleRes = R.string.nav_calendario,
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.psicologoAgenda.route,
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Cerrar sesión",
+                titleRes = R.string.menu_cerrar_sesion,
                 icon = Icons.AutoMirrored.Filled.Logout,
                 route = Screens.login.route,
                 isDanger = true
             )
         )
-    }
 
     TopAppBar(
         modifier = Modifier
@@ -178,7 +178,7 @@ fun MenuAdministrador(
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver"
+                        contentDescription = stringResource(R.string.volver)
                     )
                 }
             }
@@ -249,7 +249,7 @@ fun MenuAdministrador(
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Menú de navegación",
+                    contentDescription = stringResource(R.string.menu_admin_titulo),
                     tint = colors.onPrimary
                 )
             }
@@ -271,13 +271,13 @@ fun MenuAdministrador(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Menú de administración",
+                                text = stringResource(R.string.menu_admin_titulo),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Selecciona una opción",
+                                text = stringResource(R.string.menu_selecciona_opcion),
                                 fontSize = 10.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -317,7 +317,7 @@ fun MenuAdministrador(
                                         MaterialTheme.colorScheme.primary
                                 )
                                 Text(
-                                    text = item.title,
+                                    text = stringResource(item.titleRes),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = if (item.isDanger)
@@ -329,7 +329,7 @@ fun MenuAdministrador(
                         },
                         onClick = {
                             expanded = false
-                            if (item.title == "Cerrar sesión") {
+                            if (item.titleRes == R.string.menu_cerrar_sesion) {
                                 onLogout?.invoke()
                                 navController.navigate(item.route) {
                                     popUpTo(Screens.adminHome.route) { inclusive = true }
@@ -378,7 +378,7 @@ fun MenuAdministradorSimple(
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver"
+                        contentDescription = stringResource(R.string.volver)
                     )
                 }
             }
@@ -418,7 +418,7 @@ fun MenuAdministradorSimple(
                 IconButton(onClick = it) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Más opciones"
+                        contentDescription = stringResource(R.string.nav_mas)
                     )
                 }
             }
@@ -436,13 +436,13 @@ fun MenuLateralAdministrador(
     currentRoute: String
 ) {
     val menuItems = listOf(
-        Triple(Icons.Default.Home, "Inicio", Screens.adminHome.route),
-        Triple(Icons.Default.People, "Pacientes", Screens.pacientes.route),
-        Triple(Icons.Default.Psychology, "Psicólogos", Screens.listarPsicologo.route),
-        Triple(Icons.Default.Quiz, "Tests", Screens.test.route),
-        Triple(Icons.Default.Edit, "Crear preguntas", Screens.test.route),
-        Triple(Icons.Default.AdminPanelSettings, "Registrar admin", Screens.agregarAdmin.route),
-        Triple(Icons.AutoMirrored.Filled.Logout, "Cerrar sesión", Screens.login.route)
+        Triple(Icons.Default.Home, R.string.nav_inicio, Screens.adminHome.route),
+        Triple(Icons.Default.People, R.string.nav_pacientes, Screens.pacientes.route),
+        Triple(Icons.Default.Psychology, R.string.nav_psicologos, Screens.listarPsicologo.route),
+        Triple(Icons.Default.Quiz, R.string.nav_tests, Screens.test.route),
+        Triple(Icons.Default.Edit, R.string.menu_registrar_psicologo, Screens.test.route),
+        Triple(Icons.Default.AdminPanelSettings, R.string.menu_registrar_admin, Screens.agregarAdmin.route),
+        Triple(Icons.AutoMirrored.Filled.Logout, R.string.menu_cerrar_sesion, Screens.login.route)
     )
 
     ModalNavigationDrawer(
@@ -480,7 +480,7 @@ fun MenuLateralAdministrador(
                 }
 
                 // Items del menú
-                menuItems.forEach { (icon, title, route) ->
+                menuItems.forEach { (icon, titleRes, route) ->
                     NavigationDrawerItem(
                         icon = {
                             Icon(
@@ -491,14 +491,14 @@ fun MenuLateralAdministrador(
                         },
                         label = {
                             Text(
-                                text = title,
+                                text = stringResource(titleRes),
                                 fontSize = 14.sp,
                                 fontWeight = if (currentRoute == route) FontWeight.Bold else FontWeight.Normal
                             )
                         },
                         selected = currentRoute == route,
                         onClick = {
-                            if (title == "Cerrar sesión") {
+                            if (titleRes == R.string.menu_cerrar_sesion) {
                                 onLogout()
                                 navController.navigate(route) {
                                     popUpTo(Screens.adminHome.route) { inclusive = true }
