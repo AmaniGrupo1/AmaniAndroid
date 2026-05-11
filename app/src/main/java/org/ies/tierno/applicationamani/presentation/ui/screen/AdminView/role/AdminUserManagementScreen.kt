@@ -56,6 +56,10 @@ fun AdminUserManagementScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedUser by remember { mutableStateOf<UsuarioDTO?>(null) }
 
+    // Estado para la alerta de confirmación
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var pendingRol by remember { mutableStateOf<Rol?>(null) }
+
     // Estado de refresco automático
     var refreshTrigger by remember { mutableStateOf(false) }
 
@@ -98,6 +102,20 @@ fun AdminUserManagementScreen(
     fun refreshUsers() {
         refreshTrigger = !refreshTrigger
         adminUserViewModel.cargarUsuarios()
+    }
+
+    // Función para confirmar el cambio de rol
+    fun confirmRoleChange() {
+        pendingRol?.let { nuevoRol ->
+            adminRoleViewModel.cambiarRol(
+                idUsuario = selectedUser!!.idUsuario ?: 0,
+                nuevoRol = nuevoRol
+            )
+        }
+        showConfirmDialog = false
+        showBottomSheet = false
+        pendingRol = null
+        selectedUser = null
     }
 
     Scaffold(
@@ -313,17 +331,104 @@ fun AdminUserManagementScreen(
         }
     }
 
+    // Diálogo de confirmación
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showConfirmDialog = false
+                pendingRol = null
+            },
+            title = {
+                Text(
+                    "Confirmar cambio de rol",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AmaniAdminColors.Primary
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        "¿Estás seguro de que quieres cambiar el rol de?",
+                        fontSize = 14.sp,
+                        color = AmaniAdminColors.TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "${selectedUser?.nombre ?: ""} ${selectedUser?.apellido ?: ""}".trim(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AmaniAdminColors.Primary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = selectedUser?.email ?: "",
+                        fontSize = 13.sp,
+                        color = AmaniAdminColors.TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Rol actual: ${when (selectedUser?.rol) {
+                            Rol.admin -> "👑 Administrador"
+                            Rol.psicologo -> "🧠 Psicólogo"
+                            else -> "👤 Paciente"
+                        }}",
+                        fontSize = 13.sp,
+                        color = AmaniAdminColors.TextSecondary
+                    )
+                    Text(
+                        text = "Nuevo rol: ${when (pendingRol) {
+                            Rol.admin -> "👑 Administrador"
+                            Rol.psicologo -> "🧠 Psicólogo"
+                            else -> "👤 Paciente"
+                        }}",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = when (pendingRol) {
+                            Rol.admin -> Color(0xFFE53935)
+                            Rol.psicologo -> Color(0xFF43A047)
+                            else -> AmaniAdminColors.Primary
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { confirmRoleChange() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AmaniAdminColors.Primary
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Sí, cambiar rol", color = Color.White)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        pendingRol = null
+                    },
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Cancelar")
+                }
+            },
+            containerColor = AmaniAdminColors.Surface,
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
     if (showBottomSheet && selectedUser != null) {
         BottomSheetCambiarRol(
             user = selectedUser!!,
-            onDismiss = { showBottomSheet = false },
-            onConfirm = { nuevoRol ->
-                adminRoleViewModel.cambiarRol(
-                    idUsuario = selectedUser!!.idUsuario ?: 0,
-                    nuevoRol = nuevoRol
-                )
+            onDismiss = {
                 showBottomSheet = false
-                // La actualización automática ocurre en el LaunchedEffect de adminRoleViewModel.success
+                selectedUser = null
+            },
+            onConfirm = { nuevoRol ->
+                pendingRol = nuevoRol
+                showConfirmDialog = true
             }
         )
     }
