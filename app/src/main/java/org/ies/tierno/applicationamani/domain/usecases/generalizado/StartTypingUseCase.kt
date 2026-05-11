@@ -1,6 +1,5 @@
-package org.ies.tierno.applicationamani.domain.usecases
+package org.ies.tierno.applicationamani.domain.usecases.generalizado
 
-import kotlinx.coroutines.flow.Flow
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 
 class StartTypingUseCase(private val chatRepository: ChatRepository) {

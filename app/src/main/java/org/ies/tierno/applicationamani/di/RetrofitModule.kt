@@ -7,6 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import okhttp3.logging.HttpLoggingInterceptor
 import org.ies.tierno.applicationamani.data.remoto.AjustesApi
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
@@ -18,6 +19,8 @@ import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
+import org.ies.tierno.applicationamani.BuildConfig
+import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,10 +52,19 @@ val retrofitModule = module {
 
     // ✅ Proveer el OkHttpClient como singleton
     single<okhttp3.OkHttpClient> {
-        okhttp3.OkHttpClient.Builder()
+        val builder = okhttp3.OkHttpClient.Builder()
             .addInterceptor(get<AuthInterceptor>())
             .addInterceptor(get<TokenRefreshInterceptor>())
-            .build()
+
+        // Añadir logging en modo debug para inspeccionar cabeceras (incluye Authorization)
+        if (BuildConfig.DEBUG) {
+            val logging = HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }
+            builder.addInterceptor(logging)
+        }
+
+        builder.build()
     }
 
     // ✅ Proveer el ImageLoader usando el OkHttpClient
@@ -94,9 +106,9 @@ val retrofitModule = module {
             .create()
 
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+            // .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
 
-            //  .baseUrl("http://192.168.1.175:8080/")
+             .baseUrl("http://192.168.1.175:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(get<okhttp3.OkHttpClient>())  // Usar el mismo cliente
             .build()
@@ -112,4 +124,5 @@ val retrofitModule = module {
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
     single<HistorialApi> { get<Retrofit>().create(HistorialApi::class.java) }
     single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }
+    single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
 }

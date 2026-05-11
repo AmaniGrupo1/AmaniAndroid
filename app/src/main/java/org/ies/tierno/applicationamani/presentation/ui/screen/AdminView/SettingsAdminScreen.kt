@@ -420,6 +420,9 @@ fun SettingsOptionRow(
                     "politica_privacidad" -> {
                         navController.navigate(Screens.politicaPrivacidad.route)
                     }
+                    "roles"->{
+                        navController.navigate(Screens.cambiarRol.route)
+                    }
                 }
             }
             .padding(vertical = 8.dp),

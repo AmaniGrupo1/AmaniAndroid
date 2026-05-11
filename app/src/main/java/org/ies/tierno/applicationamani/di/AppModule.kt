@@ -21,10 +21,11 @@ import org.ies.tierno.applicationamani.data.repositorio.HistorialRepository
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
-import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
+import org.ies.tierno.applicationamani.data.repositorio.role.AdminRepository
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
-import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
@@ -54,17 +55,19 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePs
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
-import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
-import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
+import org.ies.tierno.applicationamani.domain.usecases.role.GetUsuariosUseCase
+import org.ies.tierno.applicationamani.domain.usecases.role.RoleAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
@@ -73,6 +76,8 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaView
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.ProfileAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente.ProfilePacienteViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -83,7 +88,7 @@ val appModule = module {
     single { AuthEventChannel() }
     single { UserSessionDataStore(get()) }
 
-    single { AuthRepository(get(), get(), get()) }
+    single { AuthRepository(get(), get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
@@ -92,6 +97,7 @@ val appModule = module {
     single { AjustesRepository(get()) }
     single { HistorialRepository(get()) }
     single { DocumentoLegalRepository(get()) }
+    single { AdminRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -128,15 +134,18 @@ val appModule = module {
     factory { UpdateUserOnlineUseCase(get()) }
     factory { IdiomaUseCase(get()) }
     factory { TerapiasGeneralUseCase(get()) }
+    factory { GetUsuariosUseCase(get()) }
+    factory { RoleAdminUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get(), get()) }
+
+    viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
-    viewModel { ListarPacientesViewModel(get(), get()) }
-    viewModel { ListarPsicologosAdminViewModel(get()) }
+    viewModel { ListarPacientesViewModel(get(), get(), get()) }
+    viewModel { ListarPsicologosAdminViewModel(get(), get()) }
     viewModel { PrincipalClienteViewModel() }
     viewModel { SettingsClienteViewModel() }
-    viewModel { SituacionViewModel(get()) }
+    viewModel { SituacionViewModel(get(), get()) }
     viewModel { CitasViewModel(get(), get(), get()) }
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(),get(),get()) }
@@ -147,6 +156,8 @@ val appModule = module {
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get(), get()) }
     viewModel { ListarCitasViewModel(get(), get()) }
+    viewModel { AdminRoleViewModel(get()) }
+    viewModel { AdminUserViewModel(get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
     viewModel { (currentUserId: Long, otherUserId: Long) ->

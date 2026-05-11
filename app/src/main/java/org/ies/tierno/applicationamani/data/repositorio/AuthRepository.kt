@@ -22,10 +22,12 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.AsignarPacienteAlPsic
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
+import timber.log.Timber
 
 class AuthRepository(
     private val api: AuthApi,
     private val tokenDataStore: TokenDataStore,
+    private val tokenHolder: org.ies.tierno.applicationamani.data.local.TokenHolder,
     private val userSessionDataStore: UserSessionDataStore
 ) {
 
@@ -41,6 +43,10 @@ class AuthRepository(
 
                         // GUARDAR TOKEN
                         tokenDataStore.saveToken(body.token)
+                        // Actualizar cache en memoria inmediatamente para evitar condiciones de carrera
+                        tokenHolder.setToken(body.token)
+                        // Log para depuración: confirmar token guardado
+                        timber.log.Timber.d("Saved token: %s", body.token)
 
                         // GUARDAR SESION
                         userSessionDataStore.saveSession(
@@ -214,15 +220,19 @@ class AuthRepository(
             if (response.isSuccessful) {
                 emit(response.body() ?: emptyList())
             } else {
-                // No ocultar errores 401 - dejar que el interceptor los maneje
+                // Si backend responde 401, emitimos lista vacía y dejamos que
+                // el TokenRefreshInterceptor notifique la sesión no autorizada.
                 if (response.code() == 401) {
-                    throw HttpException(response)
+                    Timber.w("getPacientesConPsicologo - received 401, emitting empty list")
+                    emit(emptyList())
+                } else {
+                    emit(emptyList())
                 }
-                emit(emptyList())
             }
         } catch (e: HttpException) {
-            // Re-lanzar excepciones HTTP para que el interceptor las maneje
-            if (e.code() == 401) throw e
+            // No propagar HttpException para evitar crash en collectors; ya
+            // TokenRefreshInterceptor detectará 401.
+            Timber.e(e, "HTTP exception while fetching pacientes con psicologo")
             emit(emptyList())
         } catch (e: Exception) {
             emit(emptyList())
@@ -235,15 +245,15 @@ class AuthRepository(
             if (response.isSuccessful) {
                 emit(response.body() ?: emptyList())
             } else {
-                // No ocultar errores 401 - dejar que el interceptor los maneje
                 if (response.code() == 401) {
-                    throw HttpException(response)
+                    Timber.w("getPaciente - received 401, emitting empty list")
+                    emit(emptyList())
+                } else {
+                    emit(emptyList())
                 }
-                emit(emptyList())
             }
         } catch (e: HttpException) {
-            // Re-lanzar excepciones HTTP 401 para que el interceptor las maneje
-            if (e.code() == 401) throw e
+            Timber.e(e, "HTTP exception while fetching paciente")
             emit(emptyList())
         } catch (e: Exception) {
             emit(emptyList())
@@ -256,32 +266,39 @@ class AuthRepository(
             if (response.isSuccessful) {
                 emit(response.body() ?: emptyList())
             } else {
-                // No ocultar errores 401 - dejar que el interceptor los maneje
                 if (response.code() == 401) {
-                    throw HttpException(response)
+                    Timber.w("getPsicologos - received 401, emitting empty list")
+                    emit(emptyList())
+                } else {
+                    emit(emptyList())
                 }
-                emit(emptyList())
             }
         } catch (e: HttpException) {
-            // Re-lanzar excepciones HTTP 401 para que el interceptor las maneje
-            if (e.code() == 401) throw e
+            Timber.e(e, "HTTP exception while fetching psicologos")
             emit(emptyList())
         } catch (_: Exception) {
             emit(emptyList())
         }
     }
 
-    fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> =
-        flow {
+    fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> = flow {
+        try {
             val response = api.getPacientesByPsicologo()
             if (response.isSuccessful) {
                 emit(response.body() ?: emptyList())
             } else {
-                throw HttpException(response)
+                if (response.code() == 401) {
+                    Timber.w("getPacientesByPsicologo - received 401, emitting empty list")
+                    emit(emptyList())
+                } else {
+                    emit(emptyList())
+                }
             }
-        }.catch {
+        } catch (e: Exception) {
+            Timber.e(e, "Exception in getPacientesByPsicologo")
             emit(emptyList())
         }
+    }
 
 
     suspend fun darBajaPaciente(id: Long): Result<MessageResponse> {
@@ -362,8 +379,12 @@ class AuthRepository(
             if (response.isSuccessful) {
                 emit(response.body() ?: emptyList())
             } else {
-                if (response.code() == 401) throw HttpException(response)
-                emit(emptyList())
+                if (response.code() == 401) {
+                    Timber.w("getPacientesSinPsicologo - received 401, emitting empty list")
+                    emit(emptyList())
+                } else {
+                    emit(emptyList())
+                }
             }
 
         } catch (e: Exception) {

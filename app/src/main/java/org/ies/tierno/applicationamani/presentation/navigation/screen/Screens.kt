@@ -104,6 +104,7 @@
         object crearSituaciones : Screens("crearSituaciones")
 
         object politicaPrivacidad : Screens("politicaPrivacidad")
+        object cambiarRol : Screens("cambiarRol")
 
         object historialClinico : Screens("historialClinico/{pacienteId}"){
             fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"

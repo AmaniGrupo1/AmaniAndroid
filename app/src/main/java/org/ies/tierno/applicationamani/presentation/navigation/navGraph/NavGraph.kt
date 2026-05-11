@@ -33,6 +33,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPa
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TerapiasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal.GestionPoliticasScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role.AdminUserManagementScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.Principal
 import org.ies.tierno.applicationamani.presentation.ui.screen.PrincipalClienteScreen
@@ -158,6 +159,10 @@ fun NavGraph(
             }
             composable(Screens.pacientes.route) {
                 ListadoPacientesScreen(navController,listarPacientesViewModel)
+            }
+            composable(Screens.cambiarRol.route) {
+                // Pasar lambda de navegación para que el botón de volver funcione correctamente
+                AdminUserManagementScreen(onNavigateBack = { navController.popBackStack() })
             }
             composable(Screens.agregarAdmin.route) {
                 AgregarAdministrador(navController, loginViewModel)

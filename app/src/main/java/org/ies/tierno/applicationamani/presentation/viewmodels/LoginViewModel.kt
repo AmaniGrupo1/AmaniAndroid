@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
+import timber.log.Timber
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
@@ -34,7 +35,8 @@ class LoginViewModel(
     private val loginUseCase: LoginUseCase,
     private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase,
     private val userSessionDataStore: UserSessionDataStore,
-    private val tokenDataStore: TokenDataStore
+    private val tokenDataStore: TokenDataStore,
+    private val tokenHolder: TokenHolder
 ) : ViewModel() {
 
     // ── Login ──
@@ -95,6 +97,9 @@ class LoginViewModel(
 
                 result.onSuccess { loginResponse ->
                     tokenDataStore.saveToken(loginResponse.token)
+                    // Actualizar caché en memoria inmediatamente para evitar condiciones de carrera
+                    tokenHolder.setToken(loginResponse.token)
+                    Timber.d("Login: token saved and cached in memory")
                     // ✅ GUARDAR LA SESIÓN INMEDIATAMENTE DESPUÉS DEL LOGIN EXITOSO
                     saveUserSession(loginResponse)
                     _loginResult.value = Result.success(loginResponse)
