@@ -24,6 +24,8 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
 
+import timber.log.Timber
+
 /**
  * Repositorio encargado de la gestión de autenticación y usuarios.
  *
@@ -366,18 +368,27 @@ class AuthRepository(
     }
 
     /**
-     * Asegura que el usuario esté autenticado en Firebase.
-     * Si no hay un usuario actual en Firebase pero sí hay una sesión activa,
-     * intenta obtener un token de Firebase y realizar el inicio de sesión.
+     * Asegura que el usuario esté autenticado en Firebase y que el token sea válido.
+     * Si el usuario ya existe, fuerza un refresco del token.
+     * Si no hay un usuario actual, intenta obtener un nuevo token del backend.
      */
     suspend fun ensureFirebaseAuthenticated() {
         val firebaseAuth = FirebaseAuth.getInstance()
-        if (firebaseAuth.currentUser != null) {
-            android.util.Log.d("AuthRepository", "Firebase ya autenticado: ${firebaseAuth.currentUser?.uid}")
-            return
+        val user = firebaseAuth.currentUser
+
+        if (user != null) {
+            try {
+                // Forzar refresco del token para evitar errores 403 por token expirado
+                user.getIdToken(true).await()
+                Timber.d("Token de Firebase refrescado correctamente para UID: ${user.uid}")
+                return
+            } catch (e: Exception) {
+                Timber.w(e, "No se pudo refrescar el token, intentando re-login...")
+                // Si falla el refresco, continuamos para intentar re-login con custom token
+            }
         }
 
-        android.util.Log.d("AuthRepository", "Firebase no autenticado, intentando sign-in con custom token...")
+        Timber.d("Intentando sign-in con custom token...")
         try {
             val response = api.getFirebaseToken()
             if (response.isSuccessful) {
@@ -387,14 +398,14 @@ class AuthRepository(
                     val sanitizedToken = rawToken.trim().replace("\"", "")
                     if (sanitizedToken.isNotEmpty()) {
                         firebaseAuth.signInWithCustomToken(sanitizedToken).await()
-                        android.util.Log.d("AuthRepository", "Firebase sign-in exitoso tras reintento")
+                        Timber.i("Firebase sign-in exitoso. UID: ${firebaseAuth.currentUser?.uid}")
                     }
                 }
             } else {
-                android.util.Log.e("AuthRepository", "Error al obtener Firebase token: ${response.code()}")
+                Timber.e("Error al obtener Firebase token: ${response.code()} - ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
-            android.util.Log.e("AuthRepository", "Excepción al asegurar autenticación Firebase", e)
+            Timber.e(e, "Excepción al asegurar autenticación Firebase")
         }
     }
 

@@ -36,6 +36,7 @@ import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -587,9 +588,17 @@ class ChatViewModel(
             _error.value = null
             stopTyping()
 
+            Timber.d("Iniciando flujo de subida de adjunto. Uri: $uri")
+            
+            // Asegurar que la sesión de Firebase esté activa y fresca antes de subir
+            authRepository.ensureFirebaseAuthenticated()
+
             val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
+            
+            Timber.d("Subiendo archivo a Storage... Room: $conversationId")
             when (val result = fileStorageService.uploadFile(uri, conversationId)) {
                 is FileStorageService.UploadResult.Success -> {
+                    Timber.d("Subida exitosa: ${result.url}")
                     sendMessageUseCase(
                         senderId = currentUserId,
                         receiverId = otherUserId,
@@ -650,9 +659,17 @@ class ChatViewModel(
         viewModelScope.launch {
             _error.value = null
 
+            Timber.d("Iniciando subida de nota de voz: ${file.name}")
+
+            // Asegurar que la sesión de Firebase esté activa y fresca antes de subir
+            authRepository.ensureFirebaseAuthenticated()
+
             val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
+            
+            Timber.d("Subiendo nota de voz a Storage... Room: $conversationId")
             when (val result = fileStorageService.uploadVoiceNote(file, conversationId)) {
                 is FileStorageService.UploadResult.Success -> {
+                    Timber.d("Subida de nota de voz exitosa: ${result.url}")
                     sendMessageUseCase(
                         senderId = currentUserId,
                         receiverId = otherUserId,

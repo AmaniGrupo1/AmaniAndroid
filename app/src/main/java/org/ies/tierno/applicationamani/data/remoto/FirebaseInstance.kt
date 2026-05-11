@@ -25,6 +25,8 @@ object FirebaseInstance {
             if (USE_EMULATOR) {
                 android.util.Log.d("FirebaseInstance", "MODO DESARROLLO: Usando emulador Storage en 10.0.2.2:9199")
                 useEmulator("10.0.2.2", 9199)
+            } else {
+                android.util.Log.d("FirebaseInstance", "MODO PRODUCCIÓN: Usando bucket por defecto de google-services.json")
             }
         }
     }

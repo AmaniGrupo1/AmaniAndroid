@@ -92,57 +92,89 @@ fun MessageBubble(
             modifier = Modifier.widthIn(max = (screenWidth * 0.78f).dp)
         ) {
             Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                when (message.attachmentType) {
-                    AttachmentType.IMAGE -> {
-                        AttachmentImage(
+                // Priorizar el contenido multimedia (adjuntos)
+                if (message.attachmentUrl != null) {
+                    when (message.attachmentType) {
+                        AttachmentType.IMAGE -> {
+                            AttachmentImage(
+                                message = message,
+                                isOwn = isOwn
+                            )
+                        }
+                        AttachmentType.DOCUMENT -> {
+                            AttachmentDocument(
+                                message = message,
+                                isOwn = isOwn
+                            )
+                        }
+                        AttachmentType.AUDIO -> {
+                            AudioBubble(
+                                message = message,
+                                isOwn = isOwn,
+                                audioUiState = audioUiState,
+                                onPlayPause = onPlayPause
+                            )
+                        }
+                        else -> {
+                            // Por si acaso hay un adjunto sin tipo claro, mostrar algo
+                            AttachmentDocument(message = message, isOwn = isOwn)
+                        }
+                    }
+                    
+                    // Si hay texto acompañando al adjunto, poner un pequeño espacio
+                    if (message.content.isNotBlank() && 
+                        message.content != "📸 Imagen" && 
+                        message.content != "📄 Documento" && 
+                        message.content != "🎙️ Nota de voz") {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        MessageWithTimestamp(
                             message = message,
                             isOwn = isOwn
                         )
-                        if (message.content.isNotBlank()) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            MessageWithTimestamp(
-                                message = message,
-                                isOwn = isOwn
-                            )
-                        }
+                    } else {
+                        // Si no hay texto extra (o solo es el placeholder), poner solo el timestamp
+                        Spacer(modifier = Modifier.height(4.dp))
+                        TimestampOnly(message = message, isOwn = isOwn)
                     }
-                    AttachmentType.DOCUMENT -> {
-                        AttachmentDocument(
+                } else {
+                    // Mensaje de texto puro
+                    if (message.content.isNotBlank()) {
+                        MessageWithTimestamp(
                             message = message,
                             isOwn = isOwn
                         )
-                        if (message.content.isNotBlank()) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            MessageWithTimestamp(
-                                message = message,
-                                isOwn = isOwn
-                            )
-                        }
-                    }
-                    AttachmentType.AUDIO -> {
-                        if (message.content.isNotBlank()) {
-                            MessageWithTimestamp(
-                                message = message,
-                                isOwn = isOwn
-                            )
-                        }
-                        AudioBubble(
-                            message = message,
-                            isOwn = isOwn,
-                            audioUiState = audioUiState,
-                            onPlayPause = onPlayPause
-                        )
-                    }
-                    else -> {
-                        if (message.content.isNotBlank()) {
-                            MessageWithTimestamp(
-                                message = message,
-                                isOwn = isOwn
-                            )
-                        }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TimestampOnly(
+    message: Message,
+    isOwn: Boolean
+) {
+    val timestampColor = if (isOwn)
+        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+    else
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+
+    val timestampText = formatTimestamp(message.timestamp)
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = timestampText,
+            style = MaterialTheme.typography.labelSmall,
+            color = timestampColor
+        )
+        if (isOwn) {
+            Spacer(modifier = Modifier.width(4.dp))
+            StatusIcon(isRead = message.isRead, isDelivered = message.isDelivered, tint = timestampColor)
         }
     }
 }

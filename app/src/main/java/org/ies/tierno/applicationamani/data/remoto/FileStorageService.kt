@@ -17,6 +17,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 
+import com.google.firebase.auth.FirebaseAuth
+import timber.log.Timber
+
 class FileStorageService(
     private val firebaseInstance: FirebaseInstance,
     private val context: Context
@@ -30,6 +33,15 @@ class FileStorageService(
 
     suspend fun uploadFile(uri: Uri, conversationId: String): UploadResult = withContext(Dispatchers.IO) {
         try {
+            val user = FirebaseAuth.getInstance().currentUser
+            val bucketName = storageRef.bucket
+            Timber.d("🪣 Firebase Storage Bucket: $bucketName")
+            Timber.d("👤 Firebase Auth UID: ${user?.uid}")
+            
+            if (user == null) {
+                return@withContext UploadResult.Error("Usuario no autenticado en Firebase")
+            }
+
             val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
             val attachmentType = when {
                 mimeType.startsWith("image/") -> AttachmentType.IMAGE
@@ -40,20 +52,27 @@ class FileStorageService(
             val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
             val fileName = "${UUID.randomUUID()}.$extension"
             val path = "amani-chat/attachments/$conversationId/$fileName"
+            
+            Timber.d("📁 Intentando subir a path: $path")
 
             val fileRef = storageRef.child(path)
+
+            val metadata = storageMetadata {
+                this.contentType = mimeType
+                setCustomMetadata("uploadedBy", user.uid)
+            }
 
             val uploadTask: UploadTask = if (attachmentType == AttachmentType.IMAGE) {
                 val compressedUri = compressImage(uri)
                 val inputStream = context.contentResolver.openInputStream(compressedUri)
                     ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
                 
-                fileRef.putStream(inputStream)
+                fileRef.putStream(inputStream, metadata)
             } else {
                 val inputStream = context.contentResolver.openInputStream(uri)
                     ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
                 
-                fileRef.putStream(inputStream)
+                fileRef.putStream(inputStream, metadata)
             }
             
             val taskSnapshot = uploadTask.await()
@@ -71,6 +90,11 @@ class FileStorageService(
 
     suspend fun uploadVoiceNote(audioFile: File, conversationId: String): UploadResult = withContext(Dispatchers.IO) {
         try {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user == null) {
+                return@withContext UploadResult.Error("Usuario no autenticado en Firebase")
+            }
+
             if (!audioFile.exists() || audioFile.length() <= 0L) {
                 return@withContext UploadResult.Error("La nota de voz está vacía o no se encontró")
             }
@@ -78,6 +102,9 @@ class FileStorageService(
             val extension = audioFile.extension
             val fileName = "voice_${UUID.randomUUID()}.$extension"
             val path = "amani-chat/attachments/$conversationId/$fileName"
+            
+            Timber.d("🎙️ Intentando subir nota de voz a path: $path")
+            
             val fileRef = storageRef.child(path)
             val contentType = when (extension) {
                 "ogg" -> "audio/ogg"
@@ -87,6 +114,7 @@ class FileStorageService(
             }
             val metadata = storageMetadata {
                 this.contentType = contentType
+                setCustomMetadata("uploadedBy", user.uid)
             }
 
             val taskSnapshot = audioFile.inputStream().use { inputStream ->
