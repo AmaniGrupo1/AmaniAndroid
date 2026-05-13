@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 
 class IdiomaViewModel(
@@ -36,6 +37,35 @@ class IdiomaViewModel(
             userSessionDataStore.saveSession(
                 session.copy(idioma = nuevoIdioma)
             )
+        }
+    }
+
+    val tema = userSessionDataStore.sessionFlow
+        .map { it?.tema ?: TemaApp.SYSTEM }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = TemaApp.SYSTEM
+        )
+
+    fun cambiarTema(nuevoTema: TemaApp) {
+        viewModelScope.launch {
+
+            val session = userSessionDataStore.getSession() ?: return@launch
+
+            if (session.tema == nuevoTema) return@launch
+
+            idiomaUseCase.actualizarTema(nuevoTema)
+                .onSuccess {
+
+                    userSessionDataStore.saveSession(
+                        session.copy(tema = nuevoTema)
+                    )
+                }
+                .onFailure {
+                    // Manejar el error
+                    print("Error al actualizar tema: ${it.message}")
+                }
         }
     }
 }

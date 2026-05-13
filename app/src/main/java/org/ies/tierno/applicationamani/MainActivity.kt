@@ -1,4 +1,3 @@
-
 package org.ies.tierno.applicationamani
 
 import android.content.Context
@@ -11,9 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
-
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.LanguageManager
@@ -39,7 +38,13 @@ class MainActivity : ComponentActivity() {
             val userSessionDataStore = UserSessionDataStore(this)
             val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-            ApplicationAmaniTheme {
+            val darkThemeOverride = when (session?.tema) {
+                TemaApp.DARK -> true   // Negro
+                TemaApp.LIGHT -> false // Blanco
+                else -> null           // Defecto/SYSTEM -> null para que lea automáticamente
+            }
+
+            ApplicationAmaniTheme(darkThemeOverride = darkThemeOverride) {
                 val navController = rememberNavController()
                 NavGraph(navController = navController)
             }

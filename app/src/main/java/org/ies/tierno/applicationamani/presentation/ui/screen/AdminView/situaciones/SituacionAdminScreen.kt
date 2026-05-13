@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,14 +24,18 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 
-// Colores de la marca Amani
-private val AmaniPrimary = Color(0xFF9B87F5)
-private val AmaniBackground = Color(0xFFFDF8FF)
-private val AmaniCardBackground = Color.White
-private val AmaniTextPrimary = Color(0xFF2D2D35)
-private val AmaniTextSecondary = Color(0xFF6B6B7A)
-private val AmaniDivider = Color(0xFFE8E2F3)
+// Colores originales para el modo DEFECTO (Amani)
+private val AmaniDefaultPrimary = Color(0xFF9B87F5)
+private val AmaniDefaultBackground = Color(0xFFFDF8FF)
+private val AmaniDefaultCardBackground = Color.White
+private val AmaniDefaultTextPrimary = Color(0xFF2D2D35)
+private val AmaniDefaultTextSecondary = Color(0xFF6B6B7A)
+private val AmaniDefaultDivider = Color(0xFFE8E2F3)
+private val AmaniDefaultError = Color(0xFFE57373)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +43,7 @@ fun SituacionAdminScreen(
     navController: NavController,
     viewModel: SituacionViewModel
 ) {
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val situaciones by viewModel.situaciones.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -45,8 +52,22 @@ fun SituacionAdminScreen(
     var situacionEditando by remember { mutableStateOf<SituacionDTO?>(null) }
     var situacionAEliminar by remember { mutableStateOf<SituacionDTO?>(null) }
 
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniDefaultPrimary
+    val backgroundColor = if (isDark) screenColors.background else AmaniDefaultBackground
+    val cardBackgroundColor = if (isDark) cardColors.cardBackground else AmaniDefaultCardBackground
+    val textPrimaryColor = if (isDark) cardColors.cardContent else AmaniDefaultTextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDefaultTextSecondary
+    val dividerColor = if (isDark) cardColors.cardContent.copy(alpha = 0.2f) else AmaniDefaultDivider
+    val errorColor = AmaniDefaultError
+
     Scaffold(
-        containerColor = AmaniBackground,
+        containerColor = backgroundColor,
         topBar = {
             TopAppBar(
                 title = {
@@ -54,15 +75,22 @@ fun SituacionAdminScreen(
                         text = stringResource(R.string.gestion_situaciones),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
+                        fontFamily = roboto
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = AmaniPrimary)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = primaryColor
+                )
             )
         },
         floatingActionButton = {
@@ -71,8 +99,8 @@ fun SituacionAdminScreen(
                     situacionEditando = null
                     showDialog = true
                 },
-                containerColor = AmaniPrimary,
-                contentColor = Color.White
+                containerColor = primaryColor,
+                contentColor = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_situacion))
             }
@@ -86,10 +114,17 @@ fun SituacionAdminScreen(
         ) {
             when {
                 situaciones.isEmpty() -> {
-                    EmptySituacionesScreen(onAddClick = {
-                        situacionEditando = null
-                        showDialog = true
-                    })
+                    EmptySituacionesScreen(
+                        onAddClick = {
+                            situacionEditando = null
+                            showDialog = true
+                        },
+                        primaryColor = primaryColor,
+                        textPrimaryColor = textPrimaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        roboto = roboto,
+                        isDark = isDark
+                    )
                 }
                 else -> {
                     LazyColumn(
@@ -107,7 +142,15 @@ fun SituacionAdminScreen(
                                     situacionEditando = situacion
                                     showDialog = true
                                 },
-                                onDeleteClick = { situacionAEliminar = situacion }
+                                onDeleteClick = { situacionAEliminar = situacion },
+                                primaryColor = primaryColor,
+                                cardBackgroundColor = cardBackgroundColor,
+                                textPrimaryColor = textPrimaryColor,
+                                textSecondaryColor = textSecondaryColor,
+                                dividerColor = dividerColor,
+                                errorColor = errorColor,
+                                roboto = roboto,
+                                isDark = isDark
                             )
                         }
                     }
@@ -120,8 +163,22 @@ fun SituacionAdminScreen(
     if (situacionAEliminar != null) {
         AlertDialog(
             onDismissRequest = { situacionAEliminar = null },
-            title = { Text("Confirmar eliminación", fontWeight = FontWeight.Bold, color = AmaniTextPrimary) },
-            text = { Text("¿Estás seguro de que quieres eliminar la situación \"${situacionAEliminar!!.nombre}\"?\n\nEsta acción no se puede deshacer.", color = AmaniTextSecondary) },
+            containerColor = cardBackgroundColor,
+            title = {
+                Text(
+                    text = "Confirmar eliminación",
+                    fontWeight = FontWeight.Bold,
+                    color = textPrimaryColor,
+                    fontFamily = roboto
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Estás seguro de que quieres eliminar la situación \"${situacionAEliminar!!.nombre}\"?\n\nEsta acción no se puede deshacer.",
+                    color = textSecondaryColor,
+                    fontFamily = roboto
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
@@ -137,14 +194,20 @@ fun SituacionAdminScreen(
                         )
                         situacionAEliminar = null
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = Color.White)
-                ) { Text("Eliminar") }
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = errorColor,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Eliminar", fontFamily = roboto)
+                }
             },
             dismissButton = {
-                TextButton(onClick = { situacionAEliminar = null }) { Text("Cancelar") }
+                TextButton(onClick = { situacionAEliminar = null }) {
+                    Text("Cancelar", fontFamily = roboto, color = primaryColor)
+                }
             },
-            shape = RoundedCornerShape(16.dp),
-            containerColor = AmaniCardBackground
+            shape = RoundedCornerShape(16.dp)
         )
     }
 
@@ -184,7 +247,13 @@ fun SituacionAdminScreen(
                 }
                 showDialog = false
                 situacionEditando = null
-            }
+            },
+            primaryColor = primaryColor,
+            cardBackgroundColor = cardBackgroundColor,
+            textPrimaryColor = textPrimaryColor,
+            textSecondaryColor = textSecondaryColor,
+            roboto = roboto,
+            isDark = isDark
         )
     }
 }
@@ -193,13 +262,21 @@ fun SituacionAdminScreen(
 fun TarjetaSituacion(
     situacion: SituacionDTO,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    primaryColor: Color,
+    cardBackgroundColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    dividerColor: Color,
+    errorColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = AmaniCardBackground)
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
@@ -211,14 +288,15 @@ fun TarjetaSituacion(
                     text = situacion.nombre,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = AmaniPrimary
+                    color = primaryColor,
+                    fontFamily = roboto
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = onEditClick, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = AmaniPrimary)
+                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = primaryColor)
                     }
                     IconButton(onClick = onDeleteClick, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color(0xFFE57373))
+                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = errorColor)
                     }
                 }
             }
@@ -231,45 +309,79 @@ fun TarjetaSituacion(
                         Icons.Default.Category,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
-                        tint = AmaniTextSecondary
+                        tint = textSecondaryColor
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = situacion.categoria,
                         fontSize = 12.sp,
-                        color = AmaniPrimary,
-                        fontWeight = FontWeight.Medium
+                        color = primaryColor,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = roboto
                     )
                 }
             }
 
             if (!situacion.descripcion.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(thickness = 1.dp, color = AmaniDivider)
+                HorizontalDivider(thickness = 1.dp, color = dividerColor)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = situacion.descripcion, fontSize = 14.sp, color = AmaniTextSecondary, maxLines = 3)
+                Text(
+                    text = situacion.descripcion,
+                    fontSize = 14.sp,
+                    color = textSecondaryColor,
+                    maxLines = 3,
+                    fontFamily = roboto
+                )
             }
         }
     }
 }
 
 @Composable
-fun EmptySituacionesScreen(onAddClick: () -> Unit) {
+fun EmptySituacionesScreen(
+    onAddClick: () -> Unit,
+    primaryColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(80.dp), tint = AmaniPrimary.copy(alpha = 0.4f))
+        Icon(
+            Icons.Default.List,
+            contentDescription = null,
+            modifier = Modifier.size(80.dp),
+            tint = primaryColor.copy(alpha = 0.4f)
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "No hay situaciones disponibles", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = AmaniTextPrimary)
+        Text(
+            text = "No hay situaciones disponibles",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = textPrimaryColor,
+            fontFamily = roboto
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Presiona el botón + para agregar una situación", fontSize = 14.sp, color = AmaniTextSecondary)
+        Text(
+            text = "Presiona el botón + para agregar una situación",
+            fontSize = 14.sp,
+            color = textSecondaryColor,
+            fontFamily = roboto
+        )
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = onAddClick, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = AmaniPrimary)) {
+        Button(
+            onClick = onAddClick,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
+        ) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Agregar Situación")
+            Text("Agregar Situación", fontFamily = roboto)
         }
     }
 }
@@ -279,7 +391,13 @@ fun EmptySituacionesScreen(onAddClick: () -> Unit) {
 fun SituacionDialog(
     situacion: SituacionDTO?,
     onDismiss: () -> Unit,
-    onConfirm: (nombre: String, categoria: String, descripcion: String) -> Unit
+    onConfirm: (nombre: String, categoria: String, descripcion: String) -> Unit,
+    primaryColor: Color,
+    cardBackgroundColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
     var nombre by remember(situacion) { mutableStateOf(situacion?.nombre ?: "") }
     var categoria by remember(situacion) { mutableStateOf(situacion?.categoria ?: "") }
@@ -291,34 +409,64 @@ fun SituacionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = titulo, fontWeight = FontWeight.Bold, color = AmaniPrimary, fontSize = 20.sp) },
+        containerColor = cardBackgroundColor,
+        title = {
+            Text(
+                text = titulo,
+                fontWeight = FontWeight.Bold,
+                color = primaryColor,
+                fontSize = 20.sp,
+                fontFamily = roboto
+            )
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = nombre,
                     onValueChange = { nombre = it },
-                    label = { Text("Nombre de la situación") },
+                    label = { Text("Nombre de la situación", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AmaniPrimary, focusedLabelColor = AmaniPrimary)
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = primaryColor,
+                        focusedLabelColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
+                    )
                 )
                 OutlinedTextField(
                     value = categoria,
                     onValueChange = { categoria = it },
-                    label = { Text("Categoría") },
+                    label = { Text("Categoría", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AmaniPrimary, focusedLabelColor = AmaniPrimary),
-                    placeholder = { Text("Ej: Personal, Laboral, Social...", color = AmaniTextSecondary.copy(alpha = 0.5f)) }
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = primaryColor,
+                        focusedLabelColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
+                    ),
+                    placeholder = {
+                        Text(
+                            "Ej: Personal, Laboral, Social...",
+                            color = textSecondaryColor.copy(alpha = 0.5f),
+                            fontFamily = roboto
+                        )
+                    }
                 )
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { descripcion = it },
-                    label = { Text("Descripción (opcional)") },
+                    label = { Text("Descripción (opcional)", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AmaniPrimary, focusedLabelColor = AmaniPrimary)
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = primaryColor,
+                        focusedLabelColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
+                    )
                 )
             }
         },
@@ -330,14 +478,17 @@ fun SituacionDialog(
                     }
                 },
                 enabled = nombre.isNotBlank() && categoria.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = AmaniPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                 shape = RoundedCornerShape(10.dp)
-            ) { Text(botonTexto) }
+            ) {
+                Text(botonTexto, fontFamily = roboto, color = if (isDark) Color.Black else Color.White)
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar", fontFamily = roboto, color = primaryColor)
+            }
         },
-        shape = RoundedCornerShape(20.dp),
-        containerColor = AmaniCardBackground
+        shape = RoundedCornerShape(20.dp)
     )
 }

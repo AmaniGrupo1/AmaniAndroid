@@ -28,8 +28,12 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import android.app.Activity
@@ -54,14 +58,31 @@ fun SettingsPsychologistScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
+    // Obtener estado del tema para la UI
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Colores dinámicos para la UI
+    val backgroundColor = if (isDark) screenColors.background else MaterialTheme.colorScheme.background
+    val surfaceColor = if (isDark) cardColors.cardBackground else MaterialTheme.colorScheme.surface
+    val textColor = if (isDark) cardColors.cardContent else MaterialTheme.colorScheme.onSurface
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
+
+    // Obtener el tema actual del ViewModel
+    val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
 
     // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
+    Log.d(TAG, "🎨 [Recomposición] Tema actual: $currentTema")
 
     // Control de recreación para evitar loops
     var previousLanguage by remember { mutableStateOf(currentLanguage) }
@@ -77,10 +98,6 @@ fun SettingsPsychologistScreen(
             (context as? Activity)?.recreate()
         }
     }
-
-    val primaryColor = Color(0xFF6C63FF)
-    val backgroundColor = Color(0xFFF5F5F5)
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
     Scaffold(
         containerColor = backgroundColor,
@@ -103,7 +120,12 @@ fun SettingsPsychologistScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "mi_perfil",
@@ -137,7 +159,12 @@ fun SettingsPsychologistScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "language",
@@ -157,7 +184,7 @@ fun SettingsPsychologistScreen(
                         SettingsOption(
                             id = "tema",
                             title = stringResource(R.string.tema),
-                            subtitle = stringResource(R.string.tema_oscuro_claro),
+                            subtitle = getCurrentThemeSubtitle(currentTema),
                             icon = Icons.Default.BrightnessMedium
                         )
                     )
@@ -174,7 +201,12 @@ fun SettingsPsychologistScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "duracion_cita",
@@ -208,7 +240,12 @@ fun SettingsPsychologistScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "version",
@@ -235,6 +272,15 @@ fun SettingsPsychologistScreen(
     }
 }
 
+// Función auxiliar para obtener el subtítulo del tema actual
+private fun getCurrentThemeSubtitle(currentTheme: TemaApp): String {
+    return when (currentTheme) {
+        TemaApp.LIGHT -> "Claro"
+        TemaApp.DARK -> "Oscuro"
+        TemaApp.SYSTEM -> "Sistema"
+    }
+}
+
 @Composable
 fun SettingsCategoryCardPsychologist(
     title: String,
@@ -245,12 +291,17 @@ fun SettingsCategoryCardPsychologist(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    idiomaViewModel: IdiomaViewModel
+    currentTema: TemaApp,
+    idiomaViewModel: IdiomaViewModel,
+    surfaceColor: Color,
+    textColor: Color,
+    textSecondaryColor: Color,
+    primaryColor: Color
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -280,7 +331,7 @@ fun SettingsCategoryCardPsychologist(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = Color(0xFF333333)
+                    color = textColor
                 )
             }
 
@@ -289,7 +340,7 @@ fun SettingsCategoryCardPsychologist(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = Color.LightGray.copy(alpha = 0.3f)
+                        color = textColor.copy(alpha = 0.12f)
                     )
                 }
 
@@ -299,7 +350,11 @@ fun SettingsCategoryCardPsychologist(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
-                    idiomaViewModel = idiomaViewModel
+                    currentTema = currentTema,
+                    idiomaViewModel = idiomaViewModel,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    primaryColor = primaryColor
                 )
             }
         }
@@ -313,17 +368,23 @@ fun SettingsOptionRowPsychologist(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    idiomaViewModel: IdiomaViewModel
+    currentTema: TemaApp,
+    idiomaViewModel: IdiomaViewModel,
+    textColor: Color,
+    textSecondaryColor: Color,
+    primaryColor: Color
 ) {
     val scope = rememberCoroutineScope()
-    var expanded by remember { mutableStateOf(false) }
+    var expandedLanguage by remember { mutableStateOf(false) }
+    var expandedTheme by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 when (option.id) {
-                    "language" -> expanded = true
+                    "language" -> expandedLanguage = true
+                    "tema" -> expandedTheme = true
                     "mi_perfil" -> {
                         val identificador = session?.idPsicologo
                         if (identificador != null && identificador > 0L) {
@@ -333,29 +394,19 @@ fun SettingsOptionRowPsychologist(
                         }
                     }
                     "horario" -> {
-                        // TODO: Implementar navegación a pantalla de horario
                         Log.d(TAG, "📅 Navegar a horario del psicólogo")
-                        // navController.navigate(Screens.horarioPsicologo)
                     }
                     "especialidad" -> {
-                        // TODO: Implementar navegación a pantalla de especialidades
                         Log.d(TAG, "🏷️ Navegar a especialidades del psicólogo")
-                        // navController.navigate(Screens.especialidadesPsicologo)
                     }
                     "notificaciones" -> {
-                        // TODO: Implementar navegación a configuración de notificaciones
                         Log.d(TAG, "🔔 Navegar a notificaciones")
-                        // navController.navigate(Screens.notificaciones)
                     }
                     "terminos" -> {
-                        // TODO: Implementar navegación a términos y condiciones
                         Log.d(TAG, "📄 Navegar a términos y condiciones")
-                        // navController.navigate(Screens.terminos)
                     }
                     "privacidad" -> {
-                        // TODO: Implementar navegación a política de privacidad
                         Log.d(TAG, "🔒 Navegar a política de privacidad")
-                        // navController.navigate(Screens.privacidad)
                     }
                 }
             }
@@ -370,7 +421,7 @@ fun SettingsOptionRowPsychologist(
             Icon(
                 option.icon,
                 contentDescription = null,
-                tint = Color(0xFF6C63FF),
+                tint = primaryColor,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -381,63 +432,105 @@ fun SettingsOptionRowPsychologist(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
-                    color = Color(0xFF333333)
+                    color = textColor
                 )
 
-                val displaySubtitle = if (option.id == "language") {
-                    if (currentLanguage == "es") stringResource(R.string.espanol)
-                    else stringResource(R.string.ingles)
-                } else {
-                    option.subtitle
+                val displaySubtitle = when (option.id) {
+                    "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                    "tema" -> getCurrentThemeSubtitle(currentTema)
+                    else -> option.subtitle
                 }
 
                 Text(
                     text = displaySubtitle,
                     fontFamily = roboto,
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = textSecondaryColor
                 )
             }
         }
 
-        if (option.id == "language") {
-            Box {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.espanol)) },
-                        onClick = {
-                            Log.d(TAG, "🇪🇸 Psicólogo seleccionó ESPAÑOL")
-                            scope.launch {
-                                idiomaViewModel.cambiarIdioma("es")
+        when (option.id) {
+            "language" -> {
+                Box {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = primaryColor)
+                    DropdownMenu(
+                        expanded = expandedLanguage,
+                        onDismissRequest = { expandedLanguage = false },
+                        containerColor = if (isDarkTheme()) Color.DarkGray else Color.White
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.espanol), color = textColor) },
+                            onClick = {
+                                Log.d(TAG, "🇪🇸 Psicólogo seleccionó ESPAÑOL")
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("es")
+                                }
+                                expandedLanguage = false
                             }
-                            expanded = false
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.ingles)) },
-                        onClick = {
-                            Log.d(TAG, "🇬🇧 Psicólogo seleccionó INGLÉS")
-                            scope.launch {
-                                idiomaViewModel.cambiarIdioma("en")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.ingles), color = textColor) },
+                            onClick = {
+                                Log.d(TAG, "🇬🇧 Psicólogo seleccionó INGLÉS")
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("en")
+                                }
+                                expandedLanguage = false
                             }
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        } else {
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = "Ir",
-                tint = Color.Gray,
-                modifier = Modifier.size(20.dp)
-            )
+            "tema" -> {
+                Box {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = primaryColor)
+                    DropdownMenu(
+                        expanded = expandedTheme,
+                        onDismissRequest = { expandedTheme = false },
+                        containerColor = if (isDarkTheme()) Color.DarkGray else Color.White
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Sistema", color = textColor) },
+                            onClick = {
+                                Log.d(TAG, "🎨 Psicólogo seleccionó TEMA SISTEMA")
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
+                                }
+                                expandedTheme = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Claro", color = textColor) },
+                            onClick = {
+                                Log.d(TAG, "🎨 Psicólogo seleccionó TEMA CLARO")
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
+                                }
+                                expandedTheme = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Oscuro", color = textColor) },
+                            onClick = {
+                                Log.d(TAG, "🎨 Psicólogo seleccionó TEMA OSCURO")
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                }
+                                expandedTheme = false
+                            }
+                        )
+                    }
+                }
+            }
+            else -> {
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = "Ir",
+                    tint = textSecondaryColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }

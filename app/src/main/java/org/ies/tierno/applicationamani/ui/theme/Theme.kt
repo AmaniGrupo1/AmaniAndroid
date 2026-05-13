@@ -1,13 +1,3 @@
-/**
- * Configuración del tema visual de la aplicación Amani.
- *
- * Incluye los esquemas de color claro y oscuro de Material 3, los colores
- * extra propios de Amani expuestos mediante [LocalAmaniColors], y la
- * función composable [ApplicationAmaniTheme] que envuelve toda la interfaz.
- *
- * @see Color
- * @see Type
- */
 package org.ies.tierno.applicationamani.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -18,72 +8,59 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.koin.java.KoinJavaComponent
 
 // ── Material 3 color schemes ──────────────────────────────────
-/**
- * Esquema de colores para el modo claro.
- *
- * Mapea los tokens de [Color.kt] a los slots de Material 3 (primary,
- * onPrimary, background, surface, etc.).
- */
+
 private val LightColorScheme = lightColorScheme(
-    primary            = AmaniPurple,
-    onPrimary          = AmaniBlack,
-    primaryContainer   = AmaniPurple,
+    primary = AmaniPurple,
+    onPrimary = AmaniBlack,
+    primaryContainer = AmaniPurple,
     onPrimaryContainer = AmaniBlack,
-    secondary          = AmaniPurpleDark,
-    onSecondary        = AmaniWhite,
-    background         = AmaniSurface,
-    onBackground       = AmaniOnSurface,
-    surface            = AmaniSurface,
-    onSurface          = AmaniOnSurface,
-    surfaceVariant     = AmaniWhite,
-    outline            = AmaniBlack,
+    secondary = AmaniPurpleDark,
+    onSecondary = AmaniWhite,
+    background = AmaniSurface,
+    onBackground = AmaniOnSurface,
+    surface = AmaniSurface,
+    onSurface = AmaniOnSurface,
+    surfaceVariant = AmaniWhite,
+    outline = AmaniBlack,
 )
 
-/**
- * Esquema de colores para el modo oscuro.
- *
- * Intercambia las variantes claras y oscuras de la paleta para
- * garantizar contraste adecuado sobre fondos oscuros.
- */
 private val DarkColorScheme = darkColorScheme(
-    primary            = AmaniPurpleDark,
-    onPrimary          = AmaniWhite,
-    primaryContainer   = AmaniPurpleDark,
-    onPrimaryContainer = AmaniWhite,
-    secondary          = AmaniPurple,
-    onSecondary        = AmaniBlack,
-    background         = Color(0xFF1C1B1F),
-    onBackground       = AmaniWhite,
-    surface            = Color(0xFF1C1B1F),
-    onSurface          = AmaniWhite,
-    surfaceVariant     = Color(0xFF49454F),
-    outline            = AmaniWhite,
+    primary = Color.White,
+    onPrimary = Color.Black,
+    primaryContainer = Color.DarkGray,
+    onPrimaryContainer = Color.White,
+    secondary = Color.Gray,
+    onSecondary = Color.White,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = Color.Black,
+    onSurface = Color.White,
+    surfaceVariant = Color.DarkGray,
+    outline = Color.White,
 )
 
-// ── Colores extra de Amani (no cubiertos por Material 3) ──────
-/**
- * Colores adicionales de Amani que no están cubiertos por los slots de Material 3.
- *
- * Se proporcionan a través de [LocalAmaniColors] y se consumen desde
- * cualquier composable con `LocalAmaniColors.current`.
- *
- * @property screenBackground Color de fondo para pantallas de autenticación.
- * @property textFieldContainer Color del contenedor de los campos de texto.
- * @property buttonBorder Color del borde de los botones con contorno.
- * @property citaConfirmada Color verde para citas confirmadas.
- * @property citaPendiente Color naranja para citas pendientes.
- * @property citaCancelada Color rojo para citas canceladas.
- */
+// ── Colores extra de Amani ────────────────────────────────────
+
 @Immutable
 data class AmaniExtraColors(
-    val screenBackground: Color = AmaniBackground,
-    val textFieldContainer: Color = AmaniWhite,
-    val buttonBorder: Color = AmaniBlack,
+    val screenBackground: Color,
+    val textFieldContainer: Color,
+    val buttonBorder: Color,
+    val cardBackground: Color,
+    val cardContent: Color,
+    val cardBorder: Color,
     val citaLibre: Color = AmaniCitaLibre,
     val citaOcupada: Color = AmaniCitaOcupada,
     val citaOcupadaBg: Color = AmaniCitaOcupadaBg,
@@ -93,47 +70,74 @@ data class AmaniExtraColors(
     val calendarioBg: Color = AmaniCalendarioBg,
 )
 
-/**
- * [CompositionLocal] que provee una instancia de [AmaniExtraColors].
- *
- * Permite a cualquier composable descendiente acceder a los colores
- * extra de la app sin necesidad de pasarlos como parámetros.
- */
-val LocalAmaniColors = staticCompositionLocalOf { AmaniExtraColors() }
+val LocalAmaniColors = staticCompositionLocalOf {
+    AmaniExtraColors(
+        screenBackground = AmaniBackground,
+        textFieldContainer = AmaniWhite,
+        buttonBorder = AmaniBlack,
+        cardBackground = AmaniWhite,
+        cardContent = AmaniOnSurface,
+        cardBorder = AmaniBlack,
+    )
+}
 
 private val AmaniShapes = Shapes(
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(24.dp),
+    small = RoundedCornerShape(0.dp),
+    medium = RoundedCornerShape(0.dp),
+    large = RoundedCornerShape(0.dp),
 )
 
 /**
  * Tema principal de la aplicación Amani.
- *
- * Configura [MaterialTheme] con el esquema de color adecuado según la
- * preferencia de tema del sistema y provee [AmaniExtraColors] mediante
- * [CompositionLocalProvider].
- *
- * Debe envolver todo el contenido de la app (normalmente en `setContent`).
- *
- * @param darkTheme Indica si se debe usar el tema oscuro. Por defecto
- *   sigue la configuración del sistema.
- * @param content Contenido composable que se renderizará dentro del tema.
+ * @param darkThemeOverride true para tema oscuro (negro/blanco), false para tema claro (colores originales)
+ *   Si es null, se lee automáticamente de la sesión.
  */
 @Composable
 fun ApplicationAmaniTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkThemeOverride: Boolean? = null,
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
+
+    val darkTheme = if (darkThemeOverride != null) {
+        darkThemeOverride
+    } else {
+        val store = try {
+            KoinJavaComponent.getKoin().get<UserSessionDataStore>()
+        } catch (e: Exception) {
+            UserSessionDataStore(context)
+        }
+        val session by store.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+
+        when (session?.tema) {
+            TemaApp.DARK -> true   // Negro
+            TemaApp.LIGHT -> false // Blanco
+            else -> false          // Defecto/SYSTEM -> colores originales
+        }
+    }
+
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
     val extraColors = if (darkTheme) {
+        // Modo NEGRO: solo negro y blanco
         AmaniExtraColors(
-            screenBackground = colorScheme.background,
-            textFieldContainer = colorScheme.surfaceVariant,
-            buttonBorder = colorScheme.outline
+            screenBackground = Color.Black,
+            textFieldContainer = Color.DarkGray,
+            buttonBorder = Color.White,
+            cardBackground = Color.Black,
+            cardContent = Color.White,
+            cardBorder = Color.White,
         )
     } else {
-        AmaniExtraColors()
+        // Modo DEFECTO o BLANCO: colores originales de Amani
+        AmaniExtraColors(
+            screenBackground = AmaniBackground,
+            textFieldContainer = AmaniWhite,
+            buttonBorder = AmaniBlack,
+            cardBackground = AmaniWhite,
+            cardContent = AmaniOnSurface,
+            cardBorder = AmaniBlack,
+        )
     }
 
     androidx.compose.runtime.CompositionLocalProvider(
@@ -147,3 +151,49 @@ fun ApplicationAmaniTheme(
         )
     }
 }
+
+// ── Helpers para consumir colores ─────────────────────────────
+
+@Composable
+@ReadOnlyComposable
+fun isDarkTheme(): Boolean = MaterialTheme.colorScheme.background == Color.Black
+
+@Composable
+fun getCardColors(): CardColors {
+    val amaniColors = LocalAmaniColors.current
+    return CardColors(
+        cardBackground = amaniColors.cardBackground,
+        cardContent = amaniColors.cardContent,
+        cardBorder = amaniColors.cardBorder
+    )
+}
+
+data class CardColors(
+    val cardBackground: Color,
+    val cardContent: Color,
+    val cardBorder: Color
+)
+
+@Composable
+fun getScreenColors(): ScreenColors {
+    val amaniColors = LocalAmaniColors.current
+    val materialColors = MaterialTheme.colorScheme
+
+    return ScreenColors(
+        background = amaniColors.screenBackground,
+        surface = materialColors.surface,
+        onSurface = materialColors.onSurface,
+        primary = materialColors.primary,
+        onPrimary = materialColors.onPrimary
+    )
+}
+
+data class ScreenColors(
+    val background: Color,
+    val surface: Color,
+    val onSurface: Color,
+    val primary: Color,
+    val onPrimary: Color
+)
+
+

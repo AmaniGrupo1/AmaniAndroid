@@ -10,6 +10,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 
 private val Context.userSessionDataStore: DataStore<Preferences> by preferencesDataStore(
     name = "user_session_prefs"
@@ -21,7 +22,8 @@ data class UserSession(
     val rol: String,
     val idPsicologo: Long? = null,
     val idPaciente: Long? = null,
-    val idioma : String? = "es" // Valor por defecto a español
+    val idioma : String? = "es", // Valor por defecto a español
+    val tema: TemaApp = TemaApp.SYSTEM
 )
 
 class UserSessionDataStore(private val context: Context) {
@@ -35,6 +37,8 @@ class UserSessionDataStore(private val context: Context) {
         val PATIENT_ID_KEY = longPreferencesKey("patient_id")
 
         val LANGUAGE_KEY = stringPreferencesKey("language")
+
+        val THEME_KEY = stringPreferencesKey("theme")
     }
 
     val sessionFlow: Flow<UserSession?> = context.userSessionDataStore.data.map { preferences ->
@@ -44,6 +48,12 @@ class UserSessionDataStore(private val context: Context) {
         val idPsicologo = preferences[PSYCHOLOGIST_ID_KEY]
         val idPaciente = preferences[PATIENT_ID_KEY]
         val idioma = preferences[LANGUAGE_KEY]
+        val tema = try {
+            preferences[THEME_KEY]?.let { TemaApp.valueOf(it) } ?: TemaApp.SYSTEM
+        } catch (e: Exception) {
+            TemaApp.SYSTEM
+        }
+
 
         // Normalizar valores: si el id del psicólogo existe pero es 0 -> tratar como null
         val normalizedPsychologistId = when (idPsicologo) {
@@ -60,7 +70,8 @@ class UserSessionDataStore(private val context: Context) {
                 rol = rol,
                 idPsicologo = normalizedPsychologistId,
                 idPaciente = idPaciente,
-                idioma = idioma
+                idioma = idioma,
+                tema = tema
             )
         } else {
             null
@@ -97,6 +108,12 @@ class UserSessionDataStore(private val context: Context) {
                 preferences[LANGUAGE_KEY] = session.idioma
             } else {
                 preferences.remove(LANGUAGE_KEY)
+            }
+
+            if (session.tema != null) {
+                preferences[THEME_KEY] = session.tema.name
+            } else {
+                preferences.remove(THEME_KEY)
             }
         }
     }

@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -35,11 +34,14 @@ import org.ies.tierno.applicationamani.domain.models.enumm.TipoDocumentoLegal
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-// Colores corporativos AMANI (mismos del login)
+// Colores originales para el modo DEFECTO (Amani)
 object AmaniPoliticasColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
@@ -56,7 +58,7 @@ object AmaniPoliticasColors {
     val Info = Color(0xFF64B5F6)
 }
 
-// Fuente Roboto (misma del login)
+// Fuente Roboto
 val robotoFontFamily = FontFamily(
     Font(R.font.roboto_variablefont_wdth_wght)
 )
@@ -77,6 +79,23 @@ fun GestionPoliticasScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val backgroundColor = if (isDark) screenColors.background else AmaniPoliticasColors.Background
+    val surfaceColor = if (isDark) cardColors.cardBackground else AmaniPoliticasColors.Surface
+    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniPoliticasColors.Primary
+    val primaryLightColor = if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) else AmaniPoliticasColors.PrimaryLight
+    val accentColor = if (isDark) cardColors.cardBackground else AmaniPoliticasColors.Accent
+    val textPrimaryColor = if (isDark) cardColors.cardContent else AmaniPoliticasColors.TextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniPoliticasColors.TextSecondary
+    val successColor = AmaniPoliticasColors.Success
+    val warningColor = AmaniPoliticasColors.Warning
+    val errorColor = AmaniPoliticasColors.Error
 
     // Cargar documentos al iniciar
     LaunchedEffect(Unit) {
@@ -101,7 +120,8 @@ fun GestionPoliticasScreen(
                         text = "📋 Políticas y Privacidad",
                         fontFamily = robotoFontFamily,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
                     )
                 },
                 navigationIcon = {
@@ -109,19 +129,17 @@ fun GestionPoliticasScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AmaniPoliticasColors.Primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = primaryColor
                 )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = AmaniPoliticasColors.Background
+        containerColor = backgroundColor
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -130,11 +148,20 @@ fun GestionPoliticasScreen(
         ) {
             when {
                 isLoading -> {
-                    LoadingState()
+                    LoadingState(
+                        primaryColor = primaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        robotoFontFamily = robotoFontFamily
+                    )
                 }
 
                 documentos.isEmpty() -> {
-                    EmptyPoliticasState()
+                    EmptyPoliticasState(
+                        primaryColor = primaryColor,
+                        textPrimaryColor = textPrimaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        robotoFontFamily = robotoFontFamily
+                    )
                 }
 
                 else -> {
@@ -150,7 +177,15 @@ fun GestionPoliticasScreen(
                                     documentoEditando = documento
                                     mostrarDialogoEditar = true
                                 },
-                                onView = { documentoSeleccionado = documento }
+                                onView = { documentoSeleccionado = documento },
+                                primaryColor = primaryColor,
+                                primaryLightColor = primaryLightColor,
+                                surfaceColor = surfaceColor,
+                                textPrimaryColor = textPrimaryColor,
+                                textSecondaryColor = textSecondaryColor,
+                                warningColor = warningColor,
+                                robotoFontFamily = robotoFontFamily,
+                                isDark = isDark
                             )
                         }
                     }
@@ -174,7 +209,13 @@ fun GestionPoliticasScreen(
                     mostrarDialogoEditar = false
                     documentoEditando = null
                 }
-            }
+            },
+            primaryColor = primaryColor,
+            surfaceColor = surfaceColor,
+            textPrimaryColor = textPrimaryColor,
+            textSecondaryColor = textSecondaryColor,
+            robotoFontFamily = robotoFontFamily,
+            isDark = isDark
         )
     }
 
@@ -187,13 +228,26 @@ fun GestionPoliticasScreen(
                 documentoEditando = documentoSeleccionado
                 documentoSeleccionado = null
                 mostrarDialogoEditar = true
-            }
+            },
+            primaryColor = primaryColor,
+            surfaceColor = surfaceColor,
+            accentColor = accentColor,
+            textPrimaryColor = textPrimaryColor,
+            textSecondaryColor = textSecondaryColor,
+            successColor = successColor,
+            errorColor = errorColor,
+            robotoFontFamily = robotoFontFamily,
+            isDark = isDark
         )
     }
 }
 
 @Composable
-fun LoadingState() {
+fun LoadingState(
+    primaryColor: Color,
+    textSecondaryColor: Color,
+    robotoFontFamily: FontFamily
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -204,7 +258,7 @@ fun LoadingState() {
         ) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
-                color = AmaniPoliticasColors.Primary,
+                color = primaryColor,
                 strokeWidth = 3.dp
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -212,14 +266,19 @@ fun LoadingState() {
                 text = "Cargando políticas...",
                 fontFamily = robotoFontFamily,
                 fontSize = 14.sp,
-                color = AmaniPoliticasColors.TextSecondary
+                color = textSecondaryColor
             )
         }
     }
 }
 
 @Composable
-fun EmptyPoliticasState() {
+fun EmptyPoliticasState(
+    primaryColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    robotoFontFamily: FontFamily
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -232,14 +291,14 @@ fun EmptyPoliticasState() {
             Surface(
                 modifier = Modifier.size(100.dp),
                 shape = RoundedCornerShape(50.dp),
-                color = AmaniPoliticasColors.Primary.copy(alpha = 0.1f)
+                color = primaryColor.copy(alpha = 0.1f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = AmaniPoliticasColors.Primary
+                        tint = primaryColor
                     )
                 }
             }
@@ -251,7 +310,7 @@ fun EmptyPoliticasState() {
                 fontFamily = robotoFontFamily,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = AmaniPoliticasColors.TextPrimary
+                color = textPrimaryColor
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -260,7 +319,7 @@ fun EmptyPoliticasState() {
                 text = "Las políticas de privacidad y términos\nse crearán automáticamente desde el sistema",
                 fontFamily = robotoFontFamily,
                 fontSize = 14.sp,
-                color = AmaniPoliticasColors.TextSecondary,
+                color = textSecondaryColor,
                 textAlign = TextAlign.Center
             )
         }
@@ -271,7 +330,15 @@ fun EmptyPoliticasState() {
 fun PoliticaCard(
     documento: DocumentoLegalResponseDTO,
     onEdit: () -> Unit,
-    onView: () -> Unit
+    onView: () -> Unit,
+    primaryColor: Color,
+    primaryLightColor: Color,
+    surfaceColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    warningColor: Color,
+    robotoFontFamily: FontFamily,
+    isDark: Boolean
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaTexto = try {
@@ -295,10 +362,7 @@ fun PoliticaCard(
     }
 
     val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            AmaniPoliticasColors.Primary,
-            AmaniPoliticasColors.PrimaryLight
-        )
+        colors = listOf(primaryColor, primaryLightColor)
     )
 
     Card(
@@ -307,7 +371,7 @@ fun PoliticaCard(
             .clickable { onView() }
             .shadow(8.dp, RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = AmaniPoliticasColors.Surface),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
@@ -351,12 +415,14 @@ fun PoliticaCard(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = robotoFontFamily
                             )
                             Text(
                                 text = tipoNombre,
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.9f)
+                                color = Color.White.copy(alpha = 0.9f),
+                                fontFamily = robotoFontFamily
                             )
                         }
                     }
@@ -393,13 +459,14 @@ fun PoliticaCard(
                             Icons.Default.Info,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = AmaniPoliticasColors.TextSecondary
+                            tint = textSecondaryColor
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Versión ${documento.version ?: "1.0"}",
                             fontSize = 11.sp,
-                            color = AmaniPoliticasColors.TextSecondary
+                            color = textSecondaryColor,
+                            fontFamily = robotoFontFamily
                         )
                     }
 
@@ -408,26 +475,28 @@ fun PoliticaCard(
                             Icons.Default.CalendarToday,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = AmaniPoliticasColors.TextSecondary
+                            tint = textSecondaryColor
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = fechaTexto,
                             fontSize = 11.sp,
-                            color = AmaniPoliticasColors.TextSecondary
+                            color = textSecondaryColor,
+                            fontFamily = robotoFontFamily
                         )
                     }
 
                     if (!documento.activo) {
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = AmaniPoliticasColors.Warning.copy(alpha = 0.2f)
+                            color = warningColor.copy(alpha = 0.2f)
                         ) {
                             Text(
                                 text = "Inactivo",
                                 fontSize = 10.sp,
-                                color = AmaniPoliticasColors.Warning,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                color = warningColor,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                fontFamily = robotoFontFamily
                             )
                         }
                     }
@@ -439,10 +508,11 @@ fun PoliticaCard(
                 Text(
                     text = documento.contenido.take(120) + if (documento.contenido.length > 120) "..." else "",
                     fontSize = 13.sp,
-                    color = AmaniPoliticasColors.TextSecondary,
+                    color = textSecondaryColor,
                     lineHeight = 18.sp,
                     maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontFamily = robotoFontFamily
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -456,14 +526,15 @@ fun PoliticaCard(
                     Text(
                         text = "Ver detalles completos",
                         fontSize = 11.sp,
-                        color = AmaniPoliticasColors.Primary,
-                        fontWeight = FontWeight.Medium
+                        color = primaryColor,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = robotoFontFamily
                     )
                     Icon(
                         Icons.Default.ChevronRight,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = AmaniPoliticasColors.Primary
+                        tint = primaryColor
                     )
                 }
             }
@@ -476,7 +547,13 @@ fun PoliticaCard(
 fun DialogoEditarPolitica(
     documento: DocumentoLegalResponseDTO,
     onDismiss: () -> Unit,
-    onSave: (DocumentoLegalRequestDTO) -> Unit
+    onSave: (DocumentoLegalRequestDTO) -> Unit,
+    primaryColor: Color,
+    surfaceColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    robotoFontFamily: FontFamily,
+    isDark: Boolean
 ) {
     var titulo by remember { mutableStateOf(documento.titulo) }
     var contenido by remember { mutableStateOf(documento.contenido) }
@@ -485,7 +562,7 @@ fun DialogoEditarPolitica(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = AmaniPoliticasColors.Surface,
+        containerColor = surfaceColor,
         shape = RoundedCornerShape(24.dp),
         title = {
             Column {
@@ -493,13 +570,13 @@ fun DialogoEditarPolitica(
                     text = "✏️ Editar ${if (documento.tipo == TipoDocumentoLegal.terminos) "Términos y Condiciones" else "Política de Privacidad"}",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AmaniPoliticasColors.Primary,
+                    color = primaryColor,
                     fontFamily = robotoFontFamily
                 )
                 Text(
                     text = "Modifica el contenido del documento legal",
                     fontSize = 13.sp,
-                    color = AmaniPoliticasColors.TextSecondary,
+                    color = textSecondaryColor,
                     fontFamily = robotoFontFamily
                 )
             }
@@ -516,13 +593,15 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
-                    label = { Text("Título del documento") },
+                    label = { Text("Título del documento", fontFamily = robotoFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniPoliticasColors.Primary,
-                        unfocusedBorderColor = AmaniPoliticasColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniPoliticasColors.Primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -530,14 +609,16 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = version,
                     onValueChange = { version = it },
-                    label = { Text("Versión") },
-                    placeholder = { Text("Ej: 2.0, 2.1, 2024") },
+                    label = { Text("Versión", fontFamily = robotoFontFamily) },
+                    placeholder = { Text("Ej: 2.0, 2.1, 2024", fontFamily = robotoFontFamily) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniPoliticasColors.Primary,
-                        unfocusedBorderColor = AmaniPoliticasColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniPoliticasColors.Primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -545,15 +626,17 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = { contenido = it },
-                    label = { Text("Contenido del documento") },
+                    label = { Text("Contenido del documento", fontFamily = robotoFontFamily) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniPoliticasColors.Primary,
-                        unfocusedBorderColor = AmaniPoliticasColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniPoliticasColors.Primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -565,14 +648,14 @@ fun DialogoEditarPolitica(
                         checked = activo,
                         onCheckedChange = { activo = it },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = AmaniPoliticasColors.Primary
+                            checkedColor = primaryColor
                         )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Documento activo (visible para usuarios)",
                         fontSize = 13.sp,
-                        color = AmaniPoliticasColors.TextPrimary,
+                        color = textPrimaryColor,
                         fontFamily = robotoFontFamily
                     )
                 }
@@ -598,12 +681,16 @@ fun DialogoEditarPolitica(
                 },
                 enabled = titulo.isNotBlank() && contenido.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniPoliticasColors.Primary
+                    containerColor = primaryColor
                 ),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("💾 Guardar cambios", fontFamily = robotoFontFamily)
+                Text(
+                    "💾 Guardar cambios",
+                    fontFamily = robotoFontFamily,
+                    color = if (isDark) Color.Black else Color.White
+                )
             }
         },
         dismissButton = {
@@ -611,7 +698,7 @@ fun DialogoEditarPolitica(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cancelar", color = AmaniPoliticasColors.TextSecondary, fontFamily = robotoFontFamily)
+                Text("Cancelar", color = textSecondaryColor, fontFamily = robotoFontFamily)
             }
         }
     )
@@ -621,7 +708,16 @@ fun DialogoEditarPolitica(
 fun DialogoVerPolitica(
     documento: DocumentoLegalResponseDTO,
     onDismiss: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    primaryColor: Color,
+    surfaceColor: Color,
+    accentColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    successColor: Color,
+    errorColor: Color,
+    robotoFontFamily: FontFamily,
+    isDark: Boolean
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaCreacion = try {
@@ -653,7 +749,7 @@ fun DialogoVerPolitica(
                 .fillMaxHeight(0.85f)
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = AmaniPoliticasColors.Surface)
+            colors = CardDefaults.cardColors(containerColor = surfaceColor)
         ) {
             Column(
                 modifier = Modifier
@@ -673,14 +769,14 @@ fun DialogoVerPolitica(
                     ) {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = AmaniPoliticasColors.Primary.copy(alpha = 0.1f),
+                            color = primaryColor.copy(alpha = 0.1f),
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     if (documento.tipo == TipoDocumentoLegal.terminos) Icons.Default.Gavel else Icons.Default.Lock,
                                     contentDescription = null,
-                                    tint = AmaniPoliticasColors.Primary,
+                                    tint = primaryColor,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -691,13 +787,13 @@ fun DialogoVerPolitica(
                                 text = documento.titulo,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = AmaniPoliticasColors.Primary,
+                                color = primaryColor,
                                 fontFamily = robotoFontFamily
                             )
                             Text(
                                 text = tipoNombre,
                                 fontSize = 12.sp,
-                                color = AmaniPoliticasColors.Primary,
+                                color = primaryColor,
                                 fontFamily = robotoFontFamily
                             )
                         }
@@ -708,14 +804,14 @@ fun DialogoVerPolitica(
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = "Editar",
-                                tint = AmaniPoliticasColors.Primary
+                                tint = primaryColor
                             )
                         }
                         IconButton(onClick = onDismiss) {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = "Cerrar",
-                                tint = AmaniPoliticasColors.TextSecondary
+                                tint = textSecondaryColor
                             )
                         }
                     }
@@ -727,7 +823,7 @@ fun DialogoVerPolitica(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = AmaniPoliticasColors.Accent
+                    color = accentColor
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -740,26 +836,26 @@ fun DialogoVerPolitica(
                             Text(
                                 text = "📌 Versión: ${documento.version ?: "1.0"}",
                                 fontSize = 11.sp,
-                                color = AmaniPoliticasColors.TextSecondary,
+                                color = textSecondaryColor,
                                 fontFamily = robotoFontFamily
                             )
                             Text(
                                 text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
                                 fontSize = 11.sp,
-                                color = if (documento.activo) AmaniPoliticasColors.Success else AmaniPoliticasColors.Error,
+                                color = if (documento.activo) successColor else errorColor,
                                 fontFamily = robotoFontFamily
                             )
                         }
                         Text(
                             text = "📅 Creado: $fechaCreacion",
                             fontSize = 11.sp,
-                            color = AmaniPoliticasColors.TextSecondary,
+                            color = textSecondaryColor,
                             fontFamily = robotoFontFamily
                         )
                         Text(
                             text = "🔄 Actualizado: $fechaActualizacion",
                             fontSize = 11.sp,
-                            color = AmaniPoliticasColors.TextSecondary,
+                            color = textSecondaryColor,
                             fontFamily = robotoFontFamily
                         )
                     }
@@ -767,7 +863,7 @@ fun DialogoVerPolitica(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                HorizontalDivider(color = AmaniPoliticasColors.Accent)
+                HorizontalDivider(color = accentColor)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -776,7 +872,7 @@ fun DialogoVerPolitica(
                     text = documento.contenido,
                     fontSize = 13.sp,
                     lineHeight = 20.sp,
-                    color = AmaniPoliticasColors.TextPrimary,
+                    color = textPrimaryColor,
                     fontFamily = robotoFontFamily
                 )
 
@@ -790,7 +886,7 @@ fun DialogoVerPolitica(
                         onClick = onEdit,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = AmaniPoliticasColors.Primary
+                            contentColor = primaryColor
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -803,11 +899,11 @@ fun DialogoVerPolitica(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AmaniPoliticasColors.Primary
+                            containerColor = primaryColor
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Cerrar", fontFamily = robotoFontFamily)
+                        Text("Cerrar", fontFamily = robotoFontFamily, color = if (isDark) Color.Black else Color.White)
                     }
                 }
             }

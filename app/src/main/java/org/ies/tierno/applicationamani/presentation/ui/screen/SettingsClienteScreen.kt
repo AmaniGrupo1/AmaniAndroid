@@ -37,6 +37,15 @@ import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
+import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.presentation.ui.components.ThemeModeSelector
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Pantalla de ajustes del perfil del cliente (paciente).
@@ -50,7 +59,7 @@ import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
  * @param viewModel ViewModel que gestiona el estado del formulario de perfil.
  */
 @Composable
-fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClienteViewModel = viewModel()) {
+fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClienteViewModel = koinViewModel()) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val amaniColors = LocalAmaniColors.current
@@ -98,7 +107,7 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = colors.surface),
+                colors = CardDefaults.cardColors(containerColor = amaniColors.cardBackground),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
@@ -199,6 +208,40 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                 Text("Eliminar cuenta", color = colors.error)
             }
 
+            // Nuevo bloque: preferencia de tema (Blanco/Negro/Defecto)
+            val userSessionDataStore: UserSessionDataStore = try {
+                org.koin.java.KoinJavaComponent.getKoin().get()
+            } catch (e: Exception) {
+                UserSessionDataStore(LocalContext.current)
+            }
+            val sessionState = userSessionDataStore.sessionFlow.collectAsState(initial = null)
+            val session = sessionState.value
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = amaniColors.cardBackground),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("Apariencia", style = typography.titleMedium, color = colors.onSurface)
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Fila de selección de tema
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = stringResource(id = R.string.tema_oscuro_claro), style = typography.bodyLarge, color = colors.onSurface)
+                        ThemeModeSelector(
+                            currentTema = session?.tema ?: TemaApp.SYSTEM,
+                            userSessionDataStore = userSessionDataStore,
+                            session = session
+                        )
+                    }
+                }
+            }
+
         }
     }
 
@@ -231,7 +274,7 @@ fun TextFieldCustom(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.small,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = colors.primary,
                 unfocusedBorderColor = colors.outline,

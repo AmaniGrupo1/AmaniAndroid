@@ -5,12 +5,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -62,8 +64,10 @@ fun TerapiasScreen(
         }
     }
 
+    val amaniColors = LocalAmaniColors.current
+
     Scaffold(
-        containerColor = AmaniBackground,
+        containerColor = amaniColors.screenBackground,
         topBar = {
             TopAppBar(
                 title = {
@@ -77,7 +81,7 @@ fun TerapiasScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.volver),
                             tint = Color.White
                         )
@@ -182,7 +186,7 @@ fun TerapiasScreen(
                 }
             },
             shape = RoundedCornerShape(16.dp),
-            containerColor = AmaniCardBackground
+            containerColor = amaniColors.cardBackground
         )
     }
 
@@ -217,7 +221,7 @@ fun TarjetaTerapia(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = LocalAmaniColors.current.cardBackground)
     ) {
         Column(
             modifier = Modifier

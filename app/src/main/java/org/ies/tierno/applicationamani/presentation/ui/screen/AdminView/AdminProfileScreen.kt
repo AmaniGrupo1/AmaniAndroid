@@ -36,6 +36,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,7 +50,9 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.presentation.ui.screen.AmaniLoginColors
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.ProfileAdminViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -58,17 +62,78 @@ import java.io.FileOutputStream
 private const val TAG = "AdminProfileScreen"
 private const val BASE_URL = "http://192.168.1.175:8080"
 
+// Colores originales para el modo DEFECTO (Amani)
+object AdminProfileDefaultColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Error = Color(0xFFE57373)
+    val Success = Color(0xFF81C784)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminProfileScreen(
     adminId: Long,
     navController: NavController,
-    viewModel: ProfileAdminViewModel= koinViewModel()
+    viewModel: ProfileAdminViewModel = koinViewModel()
 ) {
     val imageLoader = koinInject<coil.ImageLoader>()
-    val colors = AmaniLoginColors
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val colors = if (isDark) {
+        // Modo NEGRO: fondo negro, texto blanco
+        AdminProfileThemeColors(
+            primary = Color.White,
+            primaryLight = Color.White.copy(alpha = 0.7f),
+            primaryDark = Color.DarkGray,
+            secondary = Color.Gray,
+            accent = cardColors.cardBackground,
+            background = screenColors.background,
+            surface = cardColors.cardBackground,
+            textPrimary = cardColors.cardContent,
+            textSecondary = cardColors.cardContent.copy(alpha = 0.7f),
+            error = AdminProfileDefaultColors.Error,
+            success = AdminProfileDefaultColors.Success,
+            textFieldContainer = Color.DarkGray,
+            textFieldText = Color.White,
+            textFieldLabel = Color.White.copy(alpha = 0.8f),
+            textFieldBorder = Color.White
+        )
+    } else {
+        // Modo DEFECTO o BLANCO: colores originales de Amani
+        AdminProfileThemeColors(
+            primary = AdminProfileDefaultColors.Primary,
+            primaryLight = AdminProfileDefaultColors.PrimaryLight,
+            primaryDark = AdminProfileDefaultColors.PrimaryDark,
+            secondary = AdminProfileDefaultColors.Secondary,
+            accent = AdminProfileDefaultColors.Accent,
+            background = AdminProfileDefaultColors.Background,
+            surface = AdminProfileDefaultColors.Surface,
+            textPrimary = AdminProfileDefaultColors.TextPrimary,
+            textSecondary = AdminProfileDefaultColors.TextSecondary,
+            error = AdminProfileDefaultColors.Error,
+            success = AdminProfileDefaultColors.Success,
+            textFieldContainer = Color.White,
+            textFieldText = Color.Black,
+            textFieldLabel = AdminProfileDefaultColors.Primary,
+            textFieldBorder = AdminProfileDefaultColors.Primary
+        )
+    }
 
     val perfil by viewModel.perfil.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -128,7 +193,7 @@ fun AdminProfileScreen(
         }
     }
 
-    // ========== CÁMARA Y GALERÍA (REUTILIZADO DEL PSICÓLOGO) ==========
+    // ========== CÁMARA Y GALERÍA ==========
     var showImageOptions by remember { mutableStateOf(false) }
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -182,7 +247,7 @@ fun AdminProfileScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = colors.Background,
+        containerColor = colors.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -190,16 +255,21 @@ fun AdminProfileScreen(
                         text = "Mi Perfil",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        color = if (isDark) Color.Black else Color.White,
+                        fontFamily = roboto
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.Primary
+                    containerColor = colors.primary
                 )
             )
         }
@@ -210,7 +280,11 @@ fun AdminProfileScreen(
                 .padding(paddingValues)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(colors.Accent, Color.White)
+                        colors = if (isDark) {
+                            listOf(colors.background, colors.background)
+                        } else {
+                            listOf(colors.accent, Color.White)
+                        }
                     )
                 )
         ) {
@@ -220,7 +294,7 @@ fun AdminProfileScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = colors.Primary)
+                        CircularProgressIndicator(color = colors.primary)
                     }
                 }
                 perfil != null -> {
@@ -238,7 +312,7 @@ fun AdminProfileScreen(
                                 .padding(bottom = 24.dp),
                             shape = RoundedCornerShape(24.dp),
                             elevation = CardDefaults.cardElevation(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = colors.Surface)
+                            colors = CardDefaults.cardColors(containerColor = colors.surface)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -250,7 +324,8 @@ fun AdminProfileScreen(
                                     text = "Foto de Perfil",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = colors.Primary,
+                                    color = colors.primary,
+                                    fontFamily = roboto,
                                     modifier = Modifier.padding(bottom = 16.dp)
                                 )
 
@@ -277,7 +352,7 @@ fun AdminProfileScreen(
                                             .fillMaxSize()
                                             .clip(CircleShape)
                                             .border(
-                                                BorderStroke(3.dp, colors.Primary),
+                                                BorderStroke(3.dp, colors.primary),
                                                 CircleShape
                                             ),
                                         contentScale = ContentScale.Crop
@@ -286,8 +361,8 @@ fun AdminProfileScreen(
                                     FloatingActionButton(
                                         onClick = { showImageOptions = true },
                                         modifier = Modifier.size(40.dp),
-                                        containerColor = colors.Primary,
-                                        contentColor = Color.White,
+                                        containerColor = colors.primary,
+                                        contentColor = if (isDark) Color.Black else Color.White,
                                         shape = CircleShape,
                                         elevation = FloatingActionButtonDefaults.elevation(4.dp)
                                     ) {
@@ -303,14 +378,16 @@ fun AdminProfileScreen(
                                     text = "${perfil!!.nombre} ${perfil!!.apellido ?: ""}",
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colors.TextPrimary,
+                                    color = colors.textPrimary,
+                                    fontFamily = roboto,
                                     modifier = Modifier.padding(top = 16.dp)
                                 )
 
                                 Text(
                                     text = perfil!!.email,
                                     fontSize = 14.sp,
-                                    color = colors.TextSecondary
+                                    color = colors.textSecondary,
+                                    fontFamily = roboto
                                 )
                             }
                         }
@@ -320,7 +397,7 @@ fun AdminProfileScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(24.dp),
                             elevation = CardDefaults.cardElevation(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = colors.Surface)
+                            colors = CardDefaults.cardColors(containerColor = colors.surface)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -336,22 +413,24 @@ fun AdminProfileScreen(
                                         text = "Información Personal",
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = colors.Primary
+                                        color = colors.primary,
+                                        fontFamily = roboto
                                     )
                                     if (!isEditing) {
                                         TextButton(
                                             onClick = { isEditing = true },
                                             colors = ButtonDefaults.textButtonColors(
-                                                contentColor = colors.Primary
+                                                contentColor = colors.primary
                                             )
                                         ) {
                                             Icon(
                                                 Icons.Default.Edit,
                                                 contentDescription = "Editar",
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
+                                                tint = colors.primary
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Editar", fontSize = 14.sp)
+                                            Text("Editar", fontSize = 14.sp, fontFamily = roboto)
                                         }
                                     }
                                 }
@@ -363,18 +442,20 @@ fun AdminProfileScreen(
                                     OutlinedTextField(
                                         value = nombreEdit,
                                         onValueChange = { nombreEdit = it },
-                                        label = { Text("Nombre", color = colors.TextSecondary) },
+                                        label = { Text("Nombre", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.TextPrimary,
-                                            unfocusedTextColor = colors.TextPrimary,
-                                            focusedBorderColor = colors.Primary,
-                                            unfocusedBorderColor = colors.TextSecondary.copy(alpha = 0.3f),
-                                            focusedLabelColor = colors.Primary,
-                                            unfocusedLabelColor = colors.TextSecondary,
-                                            cursorColor = colors.Primary
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
+                                            focusedBorderColor = colors.primary,
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
+                                            focusedLabelColor = colors.primary,
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -383,18 +464,20 @@ fun AdminProfileScreen(
                                     OutlinedTextField(
                                         value = apellidoEdit,
                                         onValueChange = { apellidoEdit = it },
-                                        label = { Text("Apellido (opcional)", color = colors.TextSecondary) },
+                                        label = { Text("Apellido (opcional)", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.TextPrimary,
-                                            unfocusedTextColor = colors.TextPrimary,
-                                            focusedBorderColor = colors.Primary,
-                                            unfocusedBorderColor = colors.TextSecondary.copy(alpha = 0.3f),
-                                            focusedLabelColor = colors.Primary,
-                                            unfocusedLabelColor = colors.TextSecondary,
-                                            cursorColor = colors.Primary
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
+                                            focusedBorderColor = colors.primary,
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
+                                            focusedLabelColor = colors.primary,
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -403,18 +486,20 @@ fun AdminProfileScreen(
                                     OutlinedTextField(
                                         value = emailEdit,
                                         onValueChange = { emailEdit = it },
-                                        label = { Text("Correo electrónico", color = colors.TextSecondary) },
+                                        label = { Text("Correo electrónico", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.TextPrimary,
-                                            unfocusedTextColor = colors.TextPrimary,
-                                            focusedBorderColor = colors.Primary,
-                                            unfocusedBorderColor = colors.TextSecondary.copy(alpha = 0.3f),
-                                            focusedLabelColor = colors.Primary,
-                                            unfocusedLabelColor = colors.TextSecondary,
-                                            cursorColor = colors.Primary
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
+                                            focusedBorderColor = colors.primary,
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
+                                            focusedLabelColor = colors.primary,
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -436,7 +521,7 @@ fun AdminProfileScreen(
                                             },
                                             modifier = Modifier.weight(1f).height(48.dp),
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = colors.Primary
+                                                containerColor = colors.primary
                                             ),
                                             shape = RoundedCornerShape(14.dp),
                                             elevation = ButtonDefaults.buttonElevation(4.dp)
@@ -445,21 +530,27 @@ fun AdminProfileScreen(
                                                 Icons.Default.Save,
                                                 contentDescription = "Guardar",
                                                 modifier = Modifier.size(18.dp),
-                                                tint = Color.White
+                                                tint = if (isDark) Color.Black else Color.White
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Guardar", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                                            Text(
+                                                "Guardar",
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                fontFamily = roboto,
+                                                color = if (isDark) Color.Black else Color.White
+                                            )
                                         }
 
                                         OutlinedButton(
                                             onClick = { isEditing = false },
                                             modifier = Modifier.weight(1f).height(48.dp),
                                             colors = ButtonDefaults.outlinedButtonColors(
-                                                contentColor = colors.TextSecondary
+                                                contentColor = colors.textSecondary
                                             ),
                                             shape = RoundedCornerShape(14.dp)
                                         ) {
-                                            Text("Cancelar", fontSize = 14.sp)
+                                            Text("Cancelar", fontSize = 14.sp, fontFamily = roboto)
                                         }
                                     }
                                 } else {
@@ -468,7 +559,8 @@ fun AdminProfileScreen(
                                         icon = Icons.Default.Person,
                                         label = "Nombre completo",
                                         value = "${perfil!!.nombre} ${perfil!!.apellido ?: ""}".trim(),
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -477,7 +569,8 @@ fun AdminProfileScreen(
                                         icon = Icons.Default.Email,
                                         label = "Correo electrónico",
                                         value = perfil!!.email,
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -486,7 +579,8 @@ fun AdminProfileScreen(
                                         icon = Icons.Default.Badge,
                                         label = "Rol",
                                         value = "Administrador",
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -495,7 +589,8 @@ fun AdminProfileScreen(
                                         icon = Icons.Default.Lock,
                                         label = "ID de usuario",
                                         value = perfil!!.idUsuario.toString(),
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
                                 }
                             }
@@ -509,7 +604,7 @@ fun AdminProfileScreen(
                             shape = RoundedCornerShape(24.dp),
                             elevation = CardDefaults.cardElevation(4.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = colors.PrimaryLight.copy(alpha = 0.1f)
+                                containerColor = colors.primaryLight.copy(alpha = 0.1f)
                             )
                         ) {
                             Column(
@@ -520,20 +615,23 @@ fun AdminProfileScreen(
                                     text = "💜 AMANI Psicología",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colors.Primary
+                                    color = colors.primary,
+                                    fontFamily = roboto
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "Plataforma de gestión terapéutica",
                                     fontSize = 12.sp,
-                                    color = colors.TextSecondary,
-                                    textAlign = TextAlign.Center
+                                    color = colors.textSecondary,
+                                    textAlign = TextAlign.Center,
+                                    fontFamily = roboto
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Versión 1.0.0",
                                     fontSize = 11.sp,
-                                    color = colors.TextSecondary
+                                    color = colors.textSecondary,
+                                    fontFamily = roboto
                                 )
                             }
                         }
@@ -545,7 +643,8 @@ fun AdminProfileScreen(
                     ErrorContentAdmin(
                         error = error!!,
                         onRetry = { viewModel.fetchProfile(adminId) },
-                        colors = colors
+                        colors = colors,
+                        roboto = roboto
                     )
                 }
             }
@@ -556,21 +655,23 @@ fun AdminProfileScreen(
     if (showImageOptions) {
         AlertDialog(
             onDismissRequest = { showImageOptions = false },
-            containerColor = colors.Surface,
+            containerColor = colors.surface,
             shape = RoundedCornerShape(24.dp),
             title = {
                 Text(
                     text = "Cambiar foto de perfil",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colors.TextPrimary
+                    color = colors.textPrimary,
+                    fontFamily = roboto
                 )
             },
             text = {
                 Text(
                     text = "Selecciona una opción para obtener la imagen",
                     fontSize = 14.sp,
-                    color = colors.TextSecondary
+                    color = colors.textSecondary,
+                    fontFamily = roboto
                 )
             },
             confirmButton = {
@@ -588,12 +689,22 @@ fun AdminProfileScreen(
                             }
                         },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = colors.Primary),
+                        colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = "Cámara", modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = "Cámara",
+                            modifier = Modifier.size(16.dp),
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Cámara", fontSize = 12.sp)
+                        Text(
+                            "Cámara",
+                            fontSize = 12.sp,
+                            fontFamily = roboto,
+                            color = if (isDark) Color.Black else Color.White
+                        )
                     }
                     Button(
                         onClick = {
@@ -601,18 +712,28 @@ fun AdminProfileScreen(
                             galleryLauncher.launch("image/*")
                         },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = colors.PrimaryLight),
+                        colors = ButtonDefaults.buttonColors(containerColor = colors.primaryLight),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.PhotoLibrary, contentDescription = "Galería", modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.PhotoLibrary,
+                            contentDescription = "Galería",
+                            modifier = Modifier.size(16.dp),
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Galería", fontSize = 12.sp)
+                        Text(
+                            "Galería",
+                            fontSize = 12.sp,
+                            fontFamily = roboto,
+                            color = if (isDark) Color.Black else Color.White
+                        )
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showImageOptions = false }) {
-                    Text("Cancelar", color = colors.TextSecondary)
+                    Text("Cancelar", color = colors.textSecondary, fontFamily = roboto)
                 }
             }
         )
@@ -629,18 +750,19 @@ fun AdminProfileScreen(
         ) {
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = colors.Surface)
+                colors = CardDefaults.cardColors(containerColor = colors.surface)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgressIndicator(color = colors.Primary)
+                    CircularProgressIndicator(color = colors.primary)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Subiendo foto...",
                         fontSize = 14.sp,
-                        color = colors.TextPrimary
+                        color = colors.textPrimary,
+                        fontFamily = roboto
                     )
                 }
             }
@@ -653,7 +775,8 @@ fun InfoRowAdmin(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
     value: String,
-    colors: AmaniLoginColors
+    colors: AdminProfileThemeColors,
+    roboto: FontFamily
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -663,20 +786,22 @@ fun InfoRowAdmin(
             icon,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            tint = colors.Primary
+            tint = colors.primary
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 fontSize = 12.sp,
-                color = colors.TextSecondary
+                color = colors.textSecondary,
+                fontFamily = roboto
             )
             Text(
                 text = value.ifEmpty { "No especificado" },
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = colors.TextPrimary
+                color = colors.textPrimary,
+                fontFamily = roboto
             )
         }
     }
@@ -686,7 +811,8 @@ fun InfoRowAdmin(
 fun ErrorContentAdmin(
     error: String,
     onRetry: () -> Unit,
-    colors: AmaniLoginColors
+    colors: AdminProfileThemeColors,
+    roboto: FontFamily
 ) {
     Column(
         modifier = Modifier
@@ -699,31 +825,60 @@ fun ErrorContentAdmin(
             imageVector = Icons.Default.Error,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = colors.Error
+            tint = colors.error
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Error al cargar el perfil",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = colors.TextPrimary
+            color = colors.textPrimary,
+            fontFamily = roboto
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = error,
             fontSize = 14.sp,
-            color = colors.TextSecondary,
-            textAlign = TextAlign.Center
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center,
+            fontFamily = roboto
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(containerColor = colors.Primary),
+            colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Icon(Icons.Default.Refresh, contentDescription = null)
+            Icon(
+                Icons.Default.Refresh,
+                contentDescription = null,
+                tint = if (isDarkTheme()) Color.Black else Color.White
+            )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Reintentar")
+            Text(
+                "Reintentar",
+                fontFamily = roboto,
+                color = if (isDarkTheme()) Color.Black else Color.White
+            )
         }
     }
 }
+
+// Clase auxiliar para los colores del tema
+data class AdminProfileThemeColors(
+    val primary: Color,
+    val primaryLight: Color,
+    val primaryDark: Color,
+    val secondary: Color,
+    val accent: Color,
+    val background: Color,
+    val surface: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val error: Color,
+    val success: Color,
+    val textFieldContainer: Color,
+    val textFieldText: Color,
+    val textFieldLabel: Color,
+    val textFieldBorder: Color
+)

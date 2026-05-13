@@ -64,8 +64,11 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 
+// Mantenemos AmaniLoginColors para compatibilidad con el modo SYSTEM
 object AmaniLoginColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
@@ -130,9 +133,11 @@ fun LoginScreen(
     }
 
     val typography = MaterialTheme.typography
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
 
     Scaffold(
-        containerColor = AmaniLoginColors.Background,
+        containerColor = if (isDark) screenColors.background else AmaniLoginColors.Background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         LoginScreenContent(
@@ -148,7 +153,8 @@ fun LoginScreen(
                 loginViewModel.resetLoginState()
                 navController.navigate(Screens.registro.route)
             },
-            typography = typography
+            typography = typography,
+            isDarkTheme = isDark
         )
     }
 }
@@ -164,20 +170,60 @@ fun LoginScreenContent(
     isLoginEnabled: Boolean,
     onLogin: () -> Unit,
     onRegisterClick: () -> Unit,
-    typography: androidx.compose.material3.Typography
+    typography: androidx.compose.material3.Typography,
+    isDarkTheme: Boolean = false
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    val amaniColors = LocalAmaniColors.current
+
+    // Determinar colores según el tema
+    val loginColors = if (isDarkTheme) {
+        // Modo OSCURO (Negro)
+        LoginThemeColors(
+            backgroundBrush = listOf(
+                amaniColors.screenBackground,
+                amaniColors.screenBackground
+            ),
+            cardContainerColor = amaniColors.cardBackground,
+            textPrimary = amaniColors.cardContent,
+            textSecondary = amaniColors.cardContent.copy(alpha = 0.7f),
+            primary = MaterialTheme.colorScheme.primary,
+            primaryLight = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+            surface = amaniColors.cardBackground,
+            error = AmaniLoginColors.Error,
+            textFieldContainer = amaniColors.cardBackground,
+            textFieldText = amaniColors.cardContent,
+            textFieldLabel = amaniColors.cardContent.copy(alpha = 0.8f),
+            textFieldBorder = amaniColors.cardBorder
+        )
+    } else {
+        // Modo CLARO (Blanco o SYSTEM)
+        // SYSTEM usa los colores originales de AmaniLoginColors
+        // BLANCO usa los colores del tema claro
+        LoginThemeColors(
+            backgroundBrush = listOf(
+                AmaniLoginColors.Accent,
+                Color.White
+            ),
+            cardContainerColor = AmaniLoginColors.Surface,
+            textPrimary = AmaniLoginColors.TextPrimary,
+            textSecondary = AmaniLoginColors.TextSecondary,
+            primary = AmaniLoginColors.Primary,
+            primaryLight = AmaniLoginColors.PrimaryLight,
+            surface = AmaniLoginColors.Surface,
+            error = AmaniLoginColors.Error,
+            textFieldContainer = Color.White,
+            textFieldText = Color.Black,
+            textFieldLabel = AmaniLoginColors.Primary,
+            textFieldBorder = AmaniLoginColors.Primary
+        )
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        AmaniLoginColors.Accent,
-                        Color.White
-                    )
-                )
+                brush = Brush.verticalGradient(colors = loginColors.backgroundBrush)
             )
     ) {
         Column(
@@ -212,7 +258,7 @@ fun LoginScreenContent(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
                 ) ?: MaterialTheme.typography.displayLarge,
-                color = AmaniLoginColors.Primary
+                color = loginColors.primary
             )
 
             Text(
@@ -221,7 +267,7 @@ fun LoginScreenContent(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
                 ) ?: MaterialTheme.typography.titleMedium,
-                color = AmaniLoginColors.PrimaryLight,
+                color = loginColors.primaryLight,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
@@ -231,7 +277,7 @@ fun LoginScreenContent(
                     .fillMaxWidth()
                     .shadow(12.dp, RoundedCornerShape(28.dp)),
                 shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = AmaniLoginColors.Surface),
+                colors = CardDefaults.cardColors(containerColor = loginColors.cardContainerColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
@@ -250,14 +296,14 @@ fun LoginScreenContent(
                             style = typography.headlineSmall?.copy(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = AmaniLoginColors.TextPrimary
+                                color = loginColors.textPrimary
                             ) ?: MaterialTheme.typography.headlineSmall
                         )
                         Text(
                             text = "Accede a tu espacio terapéutico",
                             style = typography.bodyMedium?.copy(
                                 fontSize = 14.sp,
-                                color = AmaniLoginColors.TextSecondary
+                                color = loginColors.textSecondary
                             ) ?: MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
@@ -265,7 +311,7 @@ fun LoginScreenContent(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Campo de email - CORREGIDO
+                    // Campo de email
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = username,
@@ -282,7 +328,7 @@ fun LoginScreenContent(
                                 "usuario@amani.com",
                                 style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                     ?: MaterialTheme.typography.bodyMedium,
-                                color = AmaniLoginColors.TextSecondary
+                                color = loginColors.textSecondary
                             )
                         },
                         isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
@@ -292,7 +338,7 @@ fun LoginScreenContent(
                                     text = "Introduce un correo electrónico válido",
                                     style = typography.bodySmall?.copy(fontSize = 12.sp)
                                         ?: MaterialTheme.typography.bodySmall,
-                                    color = AmaniLoginColors.Error
+                                    color = loginColors.error
                                 )
                             }
                         },
@@ -300,28 +346,22 @@ fun LoginScreenContent(
                         enabled = !isLoggingIn,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            // TEXTO PRINCIPAL - NEGRO VISIBLE
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            // LABEL
-                            focusedLabelColor = AmaniLoginColors.Primary,
-                            unfocusedLabelColor = AmaniLoginColors.TextSecondary,
-                            // PLACEHOLDER
-                            focusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            unfocusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            // CURSOR
-                            cursorColor = AmaniLoginColors.Primary,
-                            // BORDES
-                            focusedBorderColor = AmaniLoginColors.Primary,
-                            unfocusedBorderColor = AmaniLoginColors.TextSecondary.copy(alpha = 0.3f),
-                            errorBorderColor = AmaniLoginColors.Error,
-                            // FONDO
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
+                            focusedTextColor = loginColors.textFieldText,
+                            unfocusedTextColor = loginColors.textFieldText,
+                            focusedLabelColor = loginColors.textFieldLabel,
+                            unfocusedLabelColor = loginColors.textSecondary,
+                            focusedPlaceholderColor = loginColors.textSecondary,
+                            unfocusedPlaceholderColor = loginColors.textSecondary,
+                            cursorColor = loginColors.primary,
+                            focusedBorderColor = loginColors.textFieldBorder,
+                            unfocusedBorderColor = loginColors.textSecondary.copy(alpha = 0.3f),
+                            errorBorderColor = loginColors.error,
+                            focusedContainerColor = loginColors.textFieldContainer,
+                            unfocusedContainerColor = loginColors.textFieldContainer
                         )
                     )
 
-                    // Campo de contraseña - CORREGIDO
+                    // Campo de contraseña
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = password,
@@ -338,7 +378,7 @@ fun LoginScreenContent(
                                 "••••••",
                                 style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                     ?: MaterialTheme.typography.bodyMedium,
-                                color = AmaniLoginColors.TextSecondary
+                                color = loginColors.textSecondary
                             )
                         },
                         isError = password.isNotBlank() && password.length < 6,
@@ -348,7 +388,7 @@ fun LoginScreenContent(
                                     text = "La contraseña debe tener al menos 6 caracteres",
                                     style = typography.bodySmall?.copy(fontSize = 12.sp)
                                         ?: MaterialTheme.typography.bodySmall,
-                                    color = AmaniLoginColors.Error
+                                    color = loginColors.error
                                 )
                             }
                         },
@@ -361,7 +401,7 @@ fun LoginScreenContent(
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                     contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                                    tint = AmaniLoginColors.Primary
+                                    tint = loginColors.primary
                                 )
                             }
                         },
@@ -369,24 +409,18 @@ fun LoginScreenContent(
                         enabled = !isLoggingIn,
                         shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            // TEXTO PRINCIPAL - NEGRO VISIBLE
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            // LABEL
-                            focusedLabelColor = AmaniLoginColors.Primary,
-                            unfocusedLabelColor = AmaniLoginColors.TextSecondary,
-                            // PLACEHOLDER
-                            focusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            unfocusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            // CURSOR
-                            cursorColor = AmaniLoginColors.Primary,
-                            // BORDES
-                            focusedBorderColor = AmaniLoginColors.Primary,
-                            unfocusedBorderColor = AmaniLoginColors.TextSecondary.copy(alpha = 0.3f),
-                            errorBorderColor = AmaniLoginColors.Error,
-                            // FONDO
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
+                            focusedTextColor = loginColors.textFieldText,
+                            unfocusedTextColor = loginColors.textFieldText,
+                            focusedLabelColor = loginColors.textFieldLabel,
+                            unfocusedLabelColor = loginColors.textSecondary,
+                            focusedPlaceholderColor = loginColors.textSecondary,
+                            unfocusedPlaceholderColor = loginColors.textSecondary,
+                            cursorColor = loginColors.primary,
+                            focusedBorderColor = loginColors.textFieldBorder,
+                            unfocusedBorderColor = loginColors.textSecondary.copy(alpha = 0.3f),
+                            errorBorderColor = loginColors.error,
+                            focusedContainerColor = loginColors.textFieldContainer,
+                            unfocusedContainerColor = loginColors.textFieldContainer
                         )
                     )
 
@@ -399,9 +433,9 @@ fun LoginScreenContent(
                         onClick = onLogin,
                         enabled = isLoginEnabled,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AmaniLoginColors.Primary,
+                            containerColor = loginColors.primary,
                             contentColor = Color.White,
-                            disabledContainerColor = AmaniLoginColors.PrimaryLight.copy(alpha = 0.5f),
+                            disabledContainerColor = loginColors.primaryLight.copy(alpha = 0.5f),
                             disabledContentColor = Color.White.copy(alpha = 0.7f)
                         ),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
@@ -444,13 +478,13 @@ fun LoginScreenContent(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(1.dp)
-                                .background(AmaniLoginColors.TextSecondary.copy(alpha = 0.2f))
+                                .background(loginColors.textSecondary.copy(alpha = 0.2f))
                         )
                         Text(
                             text = "¿Nuevo en AMANI?",
                             style = typography.bodySmall?.copy(
                                 fontSize = 12.sp,
-                                color = AmaniLoginColors.TextSecondary
+                                color = loginColors.textSecondary
                             ) ?: MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
@@ -458,7 +492,7 @@ fun LoginScreenContent(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(1.dp)
-                                .background(AmaniLoginColors.TextSecondary.copy(alpha = 0.2f))
+                                .background(loginColors.textSecondary.copy(alpha = 0.2f))
                         )
                     }
 
@@ -473,7 +507,7 @@ fun LoginScreenContent(
                             style = typography.bodyLarge?.copy(
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = if (!isLoggingIn) AmaniLoginColors.Primary else AmaniLoginColors.TextSecondary
+                                color = if (!isLoggingIn) loginColors.primary else loginColors.textSecondary
                             ) ?: MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -486,7 +520,7 @@ fun LoginScreenContent(
                 text = "💜 Tu bienestar comienza aquí",
                 style = typography.bodySmall?.copy(
                     fontSize = 12.sp,
-                    color = AmaniLoginColors.TextSecondary,
+                    color = loginColors.textSecondary,
                     textAlign = TextAlign.Center
                 ) ?: MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth()
@@ -494,3 +528,19 @@ fun LoginScreenContent(
         }
     }
 }
+
+// Clase auxiliar para los colores del tema de login
+data class LoginThemeColors(
+    val backgroundBrush: List<Color>,
+    val cardContainerColor: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val primary: Color,
+    val primaryLight: Color,
+    val surface: Color,
+    val error: Color,
+    val textFieldContainer: Color,
+    val textFieldText: Color,
+    val textFieldLabel: Color,
+    val textFieldBorder: Color
+)

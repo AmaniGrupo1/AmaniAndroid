@@ -39,7 +39,9 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.ui.theme.BarlowCondensed
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.ui.theme.Roboto
+import org.ies.tierno.applicationamani.ui.theme.rememberAdminThemeTokens
 
 
 /**
@@ -59,8 +61,8 @@ fun AgregarAdministrador(
 
     var currentRoute by remember { mutableStateOf("pacientes") }
 
-    val backgroundColor = Color(0xFFCCC0E4)
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
+    val tokens = rememberAdminThemeTokens()
+    val amani = LocalAmaniColors.current
 
     val roboto = Roboto
     val balow = BarlowCondensed
@@ -74,7 +76,7 @@ fun AgregarAdministrador(
     var existe by remember { mutableStateOf(true) } // visibilidad password sigue en UI
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = tokens.screenBackground,
         topBar = {
             MenuAdministrador( "Agregar administrador",navController)
         }
@@ -93,17 +95,18 @@ fun AgregarAdministrador(
             // Nombre
             TextField(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
+                    .fillMaxWidth(),
                 value = name,
                 onValueChange = { loginViewModel.setNombre(it) },
-                placeholder = { Text("Nombre", fontFamily = roboto) },
+                placeholder = { Text("Nombre", fontFamily = roboto, color = amani.cardContent.copy(alpha = 0.6f)) },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black
+                    focusedContainerColor = tokens.cardBackground,
+                    unfocusedContainerColor = tokens.cardBackground,
+                    focusedIndicatorColor = tokens.primary,
+                    cursorColor = tokens.primary,
+                    focusedTextColor = tokens.cardContent,
+                    unfocusedTextColor = tokens.cardContent
                 )
             )
 
@@ -178,11 +181,11 @@ fun AgregarAdministrador(
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(2.dp, Color.Black),
+                border = BorderStroke(2.dp, tokens.cardContent),
                 onClick = { loginViewModel.registrarAdmin() },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(colorButton)
+                    containerColor = tokens.primary,
+                    contentColor = tokens.onPrimary
                 )
             ) {
                 Text(
@@ -204,8 +207,8 @@ fun AgregarAdministrador(
                 border = BorderStroke(2.dp, Color.Black),
                 onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(colorButton)
+                    containerColor = tokens.cardBackground,
+                    contentColor = tokens.cardContent
                 )
             ) {
                 Text(
