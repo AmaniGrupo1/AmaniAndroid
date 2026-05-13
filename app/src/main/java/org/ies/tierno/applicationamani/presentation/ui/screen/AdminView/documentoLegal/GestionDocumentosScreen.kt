@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,21 +83,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 // Colores corporativos AMANI
-object AmaniDocumentColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Background = Color(0xFFFDF8F9)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Success = Color(0xFF81C784)
-    val Warning = Color(0xFFFFB74D)
-    val Error = Color(0xFFE57373)
-    val Info = Color(0xFF64B5F6)
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -151,7 +137,7 @@ fun GestionDocumentosScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AmaniDocumentColors.Primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White,
                     actionIconContentColor = Color.White
@@ -159,7 +145,7 @@ fun GestionDocumentosScreen(
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = AmaniDocumentColors.Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -178,14 +164,14 @@ fun GestionDocumentosScreen(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(48.dp),
-                                color = AmaniDocumentColors.Primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 strokeWidth = 3.dp
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "Cargando documentos...",
                                 fontSize = 14.sp,
-                                color = AmaniDocumentColors.TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -269,14 +255,14 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Surface(
                 modifier = Modifier.size(100.dp),
                 shape = RoundedCornerShape(50.dp),
-                color = AmaniDocumentColors.Primary.copy(alpha = 0.1f)
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = AmaniDocumentColors.Primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -287,7 +273,7 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
                 text = "No hay documentos creados",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = AmaniDocumentColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -295,7 +281,7 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Text(
                 text = "Crea políticas de seguridad, términos y condiciones,\n o cualquier documento legal para tus pacientes",
                 fontSize = 14.sp,
-                color = AmaniDocumentColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
 
@@ -304,7 +290,7 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Button(
                 onClick = onCreateClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniDocumentColors.Primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -349,10 +335,9 @@ fun DocumentoCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .shadow(4.dp, RoundedCornerShape(16.dp)),
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = AmaniDocumentColors.Surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -368,14 +353,14 @@ fun DocumentoCard(
                 ) {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = AmaniDocumentColors.Primary.copy(alpha = 0.1f),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                         modifier = Modifier.size(48.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 tipoIcono,
                                 contentDescription = null,
-                                tint = AmaniDocumentColors.Primary,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -386,13 +371,13 @@ fun DocumentoCard(
                             text = documento.titulo,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = AmaniDocumentColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = tipoNombre,
                             fontSize = 12.sp,
-                            color = AmaniDocumentColors.Primary,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(
                                 horizontal = 8.dp,
                                 vertical = 2.dp
@@ -402,14 +387,14 @@ fun DocumentoCard(
                         Text(
                             text = "📅 $fechaTexto",
                             fontSize = 11.sp,
-                            color = AmaniDocumentColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         if (!documento.activo) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "⚠️ Documento inactivo",
                                 fontSize = 10.sp,
-                                color = AmaniDocumentColors.Warning
+                                color = MaterialTheme.colorScheme.tertiary
                             )
                         }
                     }
@@ -427,7 +412,7 @@ fun DocumentoCard(
                             Icons.Default.Edit,
                             contentDescription = "Editar",
                             modifier = Modifier.size(18.dp),
-                            tint = AmaniDocumentColors.Primary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -439,7 +424,7 @@ fun DocumentoCard(
                             Icons.Default.Delete,
                             contentDescription = "Eliminar",
                             modifier = Modifier.size(18.dp),
-                            tint = AmaniDocumentColors.Error
+                            tint = MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -451,7 +436,7 @@ fun DocumentoCard(
             Text(
                 text = documento.contenido.take(100) + if (documento.contenido.length > 100) "..." else "",
                 fontSize = 13.sp,
-                color = AmaniDocumentColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -484,7 +469,7 @@ fun DialogoCrearEditarDocumento(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = AmaniDocumentColors.Surface,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(24.dp),
         title = {
             Column {
@@ -492,12 +477,12 @@ fun DialogoCrearEditarDocumento(
                     if (esEdicion) "✏️ Editar Documento" else "📝 Nuevo Documento",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AmaniDocumentColors.Primary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     if (esEdicion) "Modifica la información del documento" else "Crea un nuevo documento legal",
                     fontSize = 13.sp,
-                    color = AmaniDocumentColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
@@ -518,9 +503,9 @@ fun DialogoCrearEditarDocumento(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniDocumentColors.Primary,
-                        unfocusedBorderColor = AmaniDocumentColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniDocumentColors.Primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
@@ -540,9 +525,9 @@ fun DialogoCrearEditarDocumento(
                             .menuAnchor(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AmaniDocumentColors.Primary,
-                            unfocusedBorderColor = AmaniDocumentColors.TextSecondary.copy(alpha = 0.3f),
-                            cursorColor = AmaniDocumentColors.Primary
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                            cursorColor = MaterialTheme.colorScheme.primary
                         )
                     )
                     ExposedDropdownMenu(
@@ -570,9 +555,9 @@ fun DialogoCrearEditarDocumento(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniDocumentColors.Primary,
-                        unfocusedBorderColor = AmaniDocumentColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniDocumentColors.Primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
@@ -587,9 +572,9 @@ fun DialogoCrearEditarDocumento(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniDocumentColors.Primary,
-                        unfocusedBorderColor = AmaniDocumentColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniDocumentColors.Primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
@@ -602,9 +587,9 @@ fun DialogoCrearEditarDocumento(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniDocumentColors.Primary,
-                        unfocusedBorderColor = AmaniDocumentColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniDocumentColors.Primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
@@ -619,9 +604,9 @@ fun DialogoCrearEditarDocumento(
                         .height(200.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniDocumentColors.Primary,
-                        unfocusedBorderColor = AmaniDocumentColors.TextSecondary.copy(alpha = 0.3f),
-                        cursorColor = AmaniDocumentColors.Primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
@@ -633,14 +618,14 @@ fun DialogoCrearEditarDocumento(
                         checked = activo,
                         onCheckedChange = { activo = it },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = AmaniDocumentColors.Primary
+                            checkedColor = MaterialTheme.colorScheme.primary
                         )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Documento activo (visible para usuarios)",
                         fontSize = 13.sp,
-                        color = AmaniDocumentColors.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -664,7 +649,7 @@ fun DialogoCrearEditarDocumento(
                 },
                 enabled = titulo.isNotBlank() && contenido.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniDocumentColors.Primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -677,7 +662,7 @@ fun DialogoCrearEditarDocumento(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cancelar", color = AmaniDocumentColors.TextSecondary)
+                Text("Cancelar", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     )
@@ -723,7 +708,7 @@ fun DialogoVerDocumento(
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = AmaniDocumentColors.Surface)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(
                 modifier = Modifier
@@ -744,14 +729,14 @@ fun DialogoVerDocumento(
                     ) {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = AmaniDocumentColors.Primary.copy(alpha = 0.1f),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     tipoIcono,
                                     contentDescription = null,
-                                    tint = AmaniDocumentColors.Primary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -762,12 +747,12 @@ fun DialogoVerDocumento(
                                 text = documento.titulo,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = AmaniDocumentColors.Primary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = tipoNombre,
                                 fontSize = 12.sp,
-                                color = AmaniDocumentColors.Primary
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -783,7 +768,7 @@ fun DialogoVerDocumento(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = AmaniDocumentColors.Accent
+                    color = MaterialTheme.colorScheme.surfaceContainerLow
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -792,31 +777,31 @@ fun DialogoVerDocumento(
                         Text(
                             text = "📅 Creado: $fechaCreacion",
                             fontSize = 11.sp,
-                            color = AmaniDocumentColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "🔄 Actualizado: $fechaActualizacion",
                             fontSize = 11.sp,
-                            color = AmaniDocumentColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         if (documento.version != null) {
                             Text(
                                 text = "📌 Versión: ${documento.version}",
                                 fontSize = 11.sp,
-                                color = AmaniDocumentColors.TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Text(
                             text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
                             fontSize = 11.sp,
-                            color = if (documento.activo) AmaniDocumentColors.Success else AmaniDocumentColors.Error
+                            color = if (documento.activo) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                HorizontalDivider(color = AmaniDocumentColors.Accent)
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerLow)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -825,7 +810,7 @@ fun DialogoVerDocumento(
                     text = documento.contenido,
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
-                    color = AmaniDocumentColors.TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -834,7 +819,7 @@ fun DialogoVerDocumento(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AmaniDocumentColors.Primary
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {

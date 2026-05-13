@@ -63,7 +63,7 @@ fun BarraNavegationInferiorAdmin(
 
     NavigationBar(
         tonalElevation = 3.dp,
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: surfaceContainer per spec
     ) {
         destinations.forEach { dest ->
             NavigationBarItem(

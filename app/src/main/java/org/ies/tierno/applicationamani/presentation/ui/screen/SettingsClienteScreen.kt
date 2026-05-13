@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
@@ -64,12 +63,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -102,11 +98,10 @@ fun SettingsClienteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Configuración", fontWeight = FontWeight.Bold) },
+                title = { Text("Mi Configuración", style = typography.titleLarge) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = colors.surface, // M3: Surface for top bar
+                    titleContentColor = colors.onSurface
                 )
             )
         }
@@ -134,7 +129,7 @@ fun SettingsClienteScreen(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(CircleShape)
-                                    .background(colors.primaryContainer)
+                                    .background(colors.surfaceContainerHigh) // M3: surfaceContainerHigh for depth
                                     .border(2.dp, colors.primary, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -153,21 +148,20 @@ fun SettingsClienteScreen(
                                         .padding(6.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
+                                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = colors.onPrimary)
                                 }
                             }
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "${viewModel.nombre} ${viewModel.apellidos}",
-                                style = typography.titleLarge,
-                                fontWeight = FontWeight.Bold
+                                style = typography.titleLarge
                             )
                         }
                     }
 
                     // Sección: Información Personal
                     SettingsSection(title = "Información Personal", icon = Icons.Default.Badge) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             TextFieldCustom(
                                 "Nombre",
                                 viewModel.nombre,
@@ -188,8 +182,8 @@ fun SettingsClienteScreen(
                         Column {
                             Text(
                                 text = "Género",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = typography.labelMedium,
+                                color = colors.onSurfaceVariant,
                                 modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
                             )
                             ExposedDropdownMenuBox(
@@ -205,13 +199,7 @@ fun SettingsClienteScreen(
                                         .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                     leadingIcon = { Icon(Icons.Default.Transgender, contentDescription = null) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
-                                    shape = RoundedCornerShape(14.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedContainerColor = colors.surface,
-                                        unfocusedContainerColor = colors.surface,
-                                        focusedBorderColor = colors.primary,
-                                        unfocusedBorderColor = colors.outlineVariant
-                                    )
+                                    colors = OutlinedTextFieldDefaults.colors() // M3: No hardcoded colors
                                 )
                                 ExposedDropdownMenu(
                                     expanded = genderExpanded,
@@ -258,25 +246,25 @@ fun SettingsClienteScreen(
 
                     // Sección: Documentación
                     SettingsSection(title = "Documentación Legal", icon = Icons.Default.Description) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedButton(
                                 onClick = { consentimientoLauncher.launch("application/pdf") },
                                 modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp)
+                                shape = CircleShape // M3: Pill shape
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.UploadFile, contentDescription = null)
-                                    Text("Consentimiento", fontSize = 12.sp)
+                                    Text("Consentimiento", style = typography.labelSmall)
                                 }
                             }
                             OutlinedButton(
                                 onClick = { proteccionDatosLauncher.launch("application/pdf") },
                                 modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp)
+                                shape = CircleShape
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.GppGood, contentDescription = null)
-                                    Text("Prot. Datos", fontSize = 12.sp)
+                                    Text("Prot. Datos", style = typography.labelSmall)
                                 }
                             }
                         }
@@ -285,21 +273,19 @@ fun SettingsClienteScreen(
                     // Botón Guardar
                     Button(
                         onClick = { viewModel.guardarUsuario() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = ButtonDefaults.elevatedButtonElevation()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = CircleShape, // M3: Pill shape
+                        colors = ButtonDefaults.buttonColors() // M3: No hardcoded colors
                     ) {
-                        Icon(Icons.Default.Save, contentDescription = null)
+                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Guardar cambios", fontWeight = FontWeight.Bold)
+                        Text("Guardar cambios", style = typography.labelLarge)
                     }
 
                     // Sección: Soporte
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
+                        shape = MaterialTheme.shapes.medium, // M3: Medium for cards
                         colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.4f))
                     ) {
                         Column(
@@ -308,7 +294,7 @@ fun SettingsClienteScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
-                            Text("¿Necesitas ayuda?", style = typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text("¿Necesitas ayuda?", style = typography.titleMedium)
                             Text(
                                 "Reporta un bug o envía una sugerencia al equipo de soporte.",
                                 style = typography.bodySmall,
@@ -317,9 +303,10 @@ fun SettingsClienteScreen(
                             Button(
                                 onClick = onNavigateToSupport,
                                 modifier = Modifier.fillMaxWidth(),
+                                shape = CircleShape,
                                 colors = ButtonDefaults.buttonColors(containerColor = colors.secondary)
                             ) {
-                                Text("Abrir ticket de soporte")
+                                Text("Abrir ticket de soporte", style = typography.labelLarge)
                             }
                         }
                     }
@@ -331,7 +318,7 @@ fun SettingsClienteScreen(
                     ) {
                         Icon(Icons.Default.DeleteForever, contentDescription = null, tint = colors.error)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Eliminar mi cuenta", color = colors.error, fontWeight = FontWeight.Medium)
+                        Text("Eliminar mi cuenta", color = colors.error, style = typography.labelLarge)
                     }
 
                     // Mensaje de Error
@@ -358,29 +345,28 @@ fun SettingsSection(
     icon: ImageVector,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(start = 4.dp)
         ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            shape = MaterialTheme.shapes.medium, // M3: Medium for cards
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer), // M3: surfaceContainer for filled cards
+            elevation = CardDefaults.cardElevation()
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
                 content = content
             )
         }
@@ -407,14 +393,9 @@ fun TextFieldCustom(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp)) },
-            shape = RoundedCornerShape(14.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-            )
+            leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp)) },
+            colors = OutlinedTextFieldDefaults.colors() // M3: No hardcoded colors
         )
     }
 }
+

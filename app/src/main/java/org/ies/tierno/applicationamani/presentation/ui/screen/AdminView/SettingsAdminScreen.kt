@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.settings
 
 import android.app.Activity
+import androidx.compose.material3.MaterialTheme
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -383,7 +384,7 @@ fun SettingsCategoryCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -422,7 +423,7 @@ fun SettingsCategoryCard(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = Color.LightGray.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
                 }
 
@@ -512,7 +513,7 @@ fun SettingsOptionRow(
                     text = displaySubtitle,
                     fontFamily = roboto,
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -552,7 +553,7 @@ fun SettingsOptionRow(
             Icon(
                 Icons.Default.ChevronRight,
                 contentDescription = "Ir",
-                tint = Color.Gray,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp)
             )
         }

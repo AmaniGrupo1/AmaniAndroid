@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,15 +34,8 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
  * a la derecha que permite al usuario navegar a las pantallas de inicio
  * de sesión, registro o volver a la pantalla principal.
  *
- * Utiliza los colores del tema ([MaterialTheme.colorScheme]) para el
- * fondo y los iconos, y [MaterialTheme.typography] para los textos del
- * menú desplegable.
- *
  * @param navController Controlador de navegación utilizado para cambiar
  *   de pantalla al seleccionar una opción del menú.
- *
- * @see Screens
- * @see Principal
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,11 +47,11 @@ fun MenuPrincipal(navController: NavController) {
     val typography = MaterialTheme.typography
 
     TopAppBar(
-        modifier = Modifier.shadow(elevation = 8.dp),
-
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.primary,
-            titleContentColor = colors.onPrimary
+            containerColor = colors.surface, // M3: Surface for top bar
+            titleContentColor = colors.onSurface,
+            navigationIconContentColor = colors.onSurface,
+            actionIconContentColor = colors.onSurface
         ),
 
         // LOGO A LA IZQUIERDA
@@ -80,7 +72,8 @@ fun MenuPrincipal(navController: NavController) {
             ) {
                 val imagen = if (expanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
                 Icon(
-                    imagen, contentDescription = stringResource(R.string.nav_mas), tint = colors.onPrimary
+                    imageVector = imagen, 
+                    contentDescription = stringResource(R.string.nav_mas)
                 )
             }
 
@@ -90,8 +83,12 @@ fun MenuPrincipal(navController: NavController) {
             ) {
 
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_inicia_sesion),
-                        style = typography.labelLarge) },
+                    text = { 
+                        Text(
+                            text = stringResource(R.string.menu_inicia_sesion),
+                            style = typography.labelLarge
+                        ) 
+                    },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.login.route)
@@ -99,35 +96,25 @@ fun MenuPrincipal(navController: NavController) {
                 )
 
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_registrate),
-                        style = typography.labelLarge) },
+                    text = { 
+                        Text(
+                            text = stringResource(R.string.menu_registrate),
+                            style = typography.labelLarge
+                        ) 
+                    },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.registro.route)
                     }
                 )
 
-//                DropdownMenuItem(
-//                    text = { Text("Más Info",
-//                        style = typography.labelLarge) },
-//                    onClick = {
-//                        expanded = false
-//                        navController.navigate("info")
-//                    }
-//                )
-
-//                DropdownMenuItem(
-//                    text = { Text("Política de privacidad",
-//                        style = typography.labelLarge) },
-//                    onClick = {
-//                        expanded = false
-//                        navController.navigate("privacidad")
-//                    }
-//                )
-
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_volver_principal),
-                        style = typography.labelLarge) },
+                    text = { 
+                        Text(
+                            text = stringResource(R.string.menu_volver_principal),
+                            style = typography.labelLarge
+                        ) 
+                    },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.principal.route)
@@ -137,3 +124,4 @@ fun MenuPrincipal(navController: NavController) {
         }
     )
 }
+

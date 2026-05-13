@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -59,20 +60,6 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
-
-object AmaniLoginColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Background = Color(0xFFFDF8F9)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Error = Color(0xFFE57373)
-    val Success = Color(0xFF81C784)
-}
 
 /**
  * Pantalla de inicio de sesión profesional de AMANI Psicología.
@@ -123,10 +110,8 @@ fun LoginScreen(
         }
     }
 
-    val typography = MaterialTheme.typography
-
     Scaffold(
-        containerColor = AmaniLoginColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         LoginScreenContent(
@@ -141,8 +126,7 @@ fun LoginScreen(
             onRegisterClick = {
                 loginViewModel.resetLoginState()
                 navController.navigate(Screens.registro.route)
-            },
-            typography = typography
+            }
         )
     }
 }
@@ -157,8 +141,7 @@ fun LoginScreenContent(
     isLoggingIn: Boolean,
     isLoginEnabled: Boolean,
     onLogin: () -> Unit,
-    onRegisterClick: () -> Unit,
-    typography: androidx.compose.material3.Typography
+    onRegisterClick: () -> Unit
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -168,8 +151,8 @@ fun LoginScreenContent(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        AmaniLoginColors.Accent,
-                        Color.White
+                        MaterialTheme.colorScheme.surfaceContainerLow,
+                        MaterialTheme.colorScheme.surface
                     )
                 )
             )
@@ -183,11 +166,12 @@ fun LoginScreenContent(
             verticalArrangement = Arrangement.Center
         ) {
             // Logo con elevación tonal
-            androidx.compose.material3.Surface(
+            // M3: Using Material3 Surface with correct elevation
+            Surface(
                 modifier = Modifier
                     .size(140.dp)
                     .imePadding(),
-                shape = androidx.compose.foundation.shape.CircleShape,
+                shape = CircleShape,
                 tonalElevation = 2.dp,
                 shadowElevation = 1.dp
             ) {
@@ -207,31 +191,29 @@ fun LoginScreenContent(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
                 ),
-                color = AmaniLoginColors.Primary
+                color = MaterialTheme.colorScheme.primary
             )
 
             Text(
                 text = "Psicología y Bienestar",
-                style = typography.titleMedium?.copy(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium
-                ) ?: MaterialTheme.typography.titleMedium,
-                color = AmaniLoginColors.PrimaryLight,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary, // M3: Secondary role for subtitles
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
             // Tarjeta de inicio de sesión
-            androidx.compose.material3.ElevatedCard(
+            // M3: Cards use medium shape (12dp) by default
+            ElevatedCard(
                 modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.extraLarge,
-                colors = CardDefaults.elevatedCardColors(containerColor = AmaniLoginColors.Surface),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                shape = MaterialTheme.shapes.medium, // M3: Medium shape for cards
+                colors = CardDefaults.elevatedCardColors(), // M3: Default colors
+                elevation = CardDefaults.elevatedCardElevation() // M3: Default elevation
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.spacedBy(24.dp) // M3: Spacing multiple of 8
                 ) {
                     // Título
                     Column(
@@ -240,108 +222,64 @@ fun LoginScreenContent(
                     ) {
                         Text(
                             text = "Bienvenido de vuelta",
-                            style = typography.headlineSmall?.copy(
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AmaniLoginColors.TextPrimary
-                            ) ?: MaterialTheme.typography.headlineSmall
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "Accede a tu espacio terapéutico",
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 14.sp,
-                                color = AmaniLoginColors.TextSecondary
-                            ) ?: MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Campo de email - CORREGIDO
+                    // Campo de email
+                    // M3: OutlinedTextField with default shape and colors
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = username,
                         onValueChange = onUsernameChange,
                         label = {
-                            Text(
-                                "Correo electrónico",
-                                style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                    ?: MaterialTheme.typography.bodyMedium
-                            )
+                            Text("Correo electrónico") // M3: label style is automatic
                         },
                         placeholder = {
-                            Text(
-                                "usuario@amani.com",
-                                style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                    ?: MaterialTheme.typography.bodyMedium,
-                                color = AmaniLoginColors.TextSecondary
-                            )
+                            Text("usuario@amani.com")
                         },
                         isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         supportingText = {
                             if (username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
                                 Text(
                                     text = "Introduce un correo electrónico válido",
-                                    style = typography.bodySmall?.copy(fontSize = 12.sp)
-                                        ?: MaterialTheme.typography.bodySmall,
-                                    color = AmaniLoginColors.Error
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         },
                         singleLine = true,
                         enabled = !isLoggingIn,
-                        shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            // TEXTO PRINCIPAL
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            // LABEL
-                            focusedLabelColor = AmaniLoginColors.Primary,
-                            unfocusedLabelColor = AmaniLoginColors.TextSecondary,
-                            // PLACEHOLDER
-                            focusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            unfocusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            // CURSOR
-                            cursorColor = AmaniLoginColors.Primary,
-                            // BORDES
-                            focusedBorderColor = AmaniLoginColors.Primary,
-                            unfocusedBorderColor = AmaniLoginColors.TextSecondary.copy(alpha = 0.3f),
-                            errorBorderColor = AmaniLoginColors.Error,
-                            // FONDO
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
+                        colors = OutlinedTextFieldDefaults.colors() // M3: No hardcoded colors
                     )
 
-                    // Campo de contraseña - CORREGIDO
+                    // Campo de contraseña
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = password,
                         onValueChange = onPasswordChange,
                         label = {
-                            Text(
-                                "Contraseña",
-                                style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                    ?: MaterialTheme.typography.bodyMedium
-                            )
+                            Text("Contraseña")
                         },
                         placeholder = {
-                            Text(
-                                "••••••",
-                                style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                    ?: MaterialTheme.typography.bodyMedium,
-                                color = AmaniLoginColors.TextSecondary
-                            )
+                            Text("••••••")
                         },
                         isError = password.isNotBlank() && password.length < 6,
                         supportingText = {
                             if (password.isNotBlank() && password.length < 6) {
                                 Text(
                                     text = "La contraseña debe tener al menos 6 caracteres",
-                                    style = typography.bodySmall?.copy(fontSize = 12.sp)
-                                        ?: MaterialTheme.typography.bodySmall,
-                                    color = AmaniLoginColors.Error
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         },
@@ -353,51 +291,23 @@ fun LoginScreenContent(
                             ) {
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                                    tint = AmaniLoginColors.Primary
+                                    contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
                                 )
                             }
                         },
                         singleLine = true,
                         enabled = !isLoggingIn,
-                        shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            // TEXTO PRINCIPAL
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            // LABEL
-                            focusedLabelColor = AmaniLoginColors.Primary,
-                            unfocusedLabelColor = AmaniLoginColors.TextSecondary,
-                            // PLACEHOLDER
-                            focusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            unfocusedPlaceholderColor = AmaniLoginColors.TextSecondary,
-                            // CURSOR
-                            cursorColor = AmaniLoginColors.Primary,
-                            // BORDES
-                            focusedBorderColor = AmaniLoginColors.Primary,
-                            unfocusedBorderColor = AmaniLoginColors.TextSecondary.copy(alpha = 0.3f),
-                            errorBorderColor = AmaniLoginColors.Error,
-                            // FONDO
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
+                        colors = OutlinedTextFieldDefaults.colors() // M3: No hardcoded colors
                     )
 
                     // Botón de inicio de sesión
+                    // M3: Button with CircleShape (pill) and default elevation
                     Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(26.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = CircleShape, // M3: Buttons should be pill-shaped
                         onClick = onLogin,
                         enabled = isLoginEnabled,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AmaniLoginColors.Primary,
-                            contentColor = Color.White,
-                            disabledContainerColor = AmaniLoginColors.PrimaryLight.copy(alpha = 0.5f),
-                            disabledContentColor = Color.White.copy(alpha = 0.7f)
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        colors = ButtonDefaults.buttonColors() // M3: No hardcoded colors
                     ) {
                         if (isLoggingIn) {
                             Row(
@@ -405,24 +315,20 @@ fun LoginScreenContent(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(18.dp), // M3: 18dp for icons in buttons
                                     strokeWidth = 2.dp,
                                     color = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     "Iniciando sesión...",
-                                    style = typography.labelLarge?.copy(fontSize = 15.sp)
-                                        ?: MaterialTheme.typography.labelLarge
+                                    style = MaterialTheme.typography.labelLarge
                                 )
                             }
                         } else {
                             Text(
                                 "Iniciar sesión",
-                                style = typography.labelLarge?.copy(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                ) ?: MaterialTheme.typography.labelLarge
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
@@ -437,21 +343,19 @@ fun LoginScreenContent(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(1.dp)
-                                .background(AmaniLoginColors.TextSecondary.copy(alpha = 0.2f))
+                                .background(MaterialTheme.colorScheme.outlineVariant) // M3: Use outlineVariant for dividers
                         )
                         Text(
                             text = "¿Nuevo en AMANI?",
-                            style = typography.bodySmall?.copy(
-                                fontSize = 12.sp,
-                                color = AmaniLoginColors.TextSecondary
-                            ) ?: MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(1.dp)
-                                .background(AmaniLoginColors.TextSecondary.copy(alpha = 0.2f))
+                                .background(MaterialTheme.colorScheme.outlineVariant)
                         )
                     }
 
@@ -463,11 +367,8 @@ fun LoginScreenContent(
                     ) {
                         Text(
                             text = "Crear cuenta nueva",
-                            style = typography.bodyLarge?.copy(
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = if (!isLoggingIn) AmaniLoginColors.Primary else AmaniLoginColors.TextSecondary
-                            ) ?: MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.labelLarge, // M3: labelLarge for buttons
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -477,11 +378,9 @@ fun LoginScreenContent(
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = "💜 Tu bienestar comienza aquí",
-                style = typography.bodySmall?.copy(
-                    fontSize = 12.sp,
-                    color = AmaniLoginColors.TextSecondary,
-                    textAlign = TextAlign.Center
-                ) ?: MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
         }

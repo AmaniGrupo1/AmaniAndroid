@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.SelfImprovement
@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,18 +49,6 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPrincipal
 
 // Colores corporativos AMANI Psicología
-object AmaniPrincipalColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Gold = Color(0xFFD4AF37)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Surface = Color(0xFFFFFFFF)
-}
-
 // Función para obtener las frases según el idioma actual
 fun getFrasesMotivacionales(context: Context): List<String> {
     val resources = context.resources
@@ -145,7 +132,7 @@ fun Principal(
         topBar = {
             MenuPrincipal(navController)
         },
-        containerColor = AmaniPrincipalColors.Accent
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -154,8 +141,8 @@ fun Principal(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            AmaniPrincipalColors.Accent,
-                            Color.White
+                            MaterialTheme.colorScheme.surfaceContainerLow,
+                            MaterialTheme.colorScheme.surface
                         )
                     )
                 )
@@ -165,22 +152,18 @@ fun Principal(
         ) {
             Text(
                 text = stringResource(R.string.amani),
-                style = typography.displayLarge?.copy(
-                    fontSize = 56.sp,
+                style = MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
-                ) ?: MaterialTheme.typography.displayLarge,
-                color = AmaniPrincipalColors.Primary,
+                ),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Text(
                 text = stringResource(R.string.psicologia_bienestar),
-                style = typography.titleMedium?.copy(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium
-                ) ?: MaterialTheme.typography.titleMedium,
-                color = AmaniPrincipalColors.PrimaryLight,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary, // M3: Secondary for subtitles
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
@@ -188,11 +171,11 @@ fun Principal(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                shape = RoundedCornerShape(24.dp),
+                shape = MaterialTheme.shapes.medium, // M3: Medium for cards
                 colors = CardDefaults.cardColors(
-                    containerColor = AmaniPrincipalColors.Surface
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation() // M3: Default elevation
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -201,24 +184,21 @@ fun Principal(
                     Icon(
                         imageVector = Icons.Default.SelfImprovement,
                         contentDescription = "Cambiar frase",
-                        tint = AmaniPrincipalColors.Primary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(48.dp) // Large icon is fine for illustration
                             .clickable { cambiarFrase() }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
                         text = fraseActual,
-                        style = typography.bodyLarge?.copy(
-                            fontSize = 18.sp,
-                            lineHeight = 28.sp
-                        ) ?: MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
-                        color = AmaniPrincipalColors.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -227,22 +207,20 @@ fun Principal(
                     ) {
                         Text(
                             text = "🔄",
-                            fontSize = 14.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.clickable { cambiarFrase() }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.tap_nueva_frase),
-                            style = typography.labelSmall?.copy(
-                                fontSize = 12.sp,
-                                color = AmaniPrincipalColors.TextSecondary
-                            ) ?: MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "⏱️",
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
@@ -251,32 +229,23 @@ fun Principal(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
+                modifier = Modifier.fillMaxWidth(),
+                shape = CircleShape, // M3: Pill shape
                 onClick = {
                     consejoActual = consejosLista.random()
                     mostrarConsejo = true
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniPrincipalColors.Primary,
-                    contentColor = Color.White
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                colors = ButtonDefaults.buttonColors() // M3: No hardcoded colors
             ) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp) // M3: 18dp for icons in buttons
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.recibir_consejo),
-                    style = typography.labelLarge?.copy(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
 
@@ -286,40 +255,33 @@ fun Principal(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { mostrarConsejo = false },
-                    shape = RoundedCornerShape(20.dp),
+                    shape = MaterialTheme.shapes.medium, // M3: Medium for cards
                     colors = CardDefaults.cardColors(
-                        containerColor = AmaniPrincipalColors.Secondary.copy(alpha = 0.3f)
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
                     ),
-                    border = BorderStroke(1.dp, AmaniPrincipalColors.PrimaryLight)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = stringResource(R.string.consejo_dia),
-                            style = typography.titleSmall?.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = AmaniPrincipalColors.Primary
-                            ) ?: MaterialTheme.typography.titleSmall
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = consejoActual,
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 16.sp,
-                                lineHeight = 24.sp
-                            ) ?: MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
-                            color = AmaniPrincipalColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = stringResource(R.string.tap_cerrar),
-                            style = typography.labelSmall?.copy(
-                                fontSize = 12.sp,
-                                color = AmaniPrincipalColors.TextSecondary
-                            ) ?: MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

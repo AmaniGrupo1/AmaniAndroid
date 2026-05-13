@@ -17,12 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.AmaniPsicologoColors
 
 enum class PsicologoNavItem(val route: String, val icon: @Composable () -> Unit, @StringRes val labelRes: Int) {
     MIS_PACIENTES(
@@ -48,7 +48,9 @@ fun BarraNavegationInferiorPsicologo(
     selectedItem: PsicologoNavItem,
     onItemSelected: (PsicologoNavItem) -> Unit
 ) {
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: surfaceContainer per spec
+    ) {
         PsicologoNavItem.values().forEach { item ->
             NavigationBarItem(
                 selected = selectedItem == item,
@@ -63,7 +65,12 @@ fun BarraNavegationInferiorPsicologo(
                     }
                 },
                 icon = item.icon,
-                label = { Text(stringResource(item.labelRes)) }
+                label = { Text(
+                    text = stringResource(item.labelRes),
+                    style = MaterialTheme.typography.labelMedium // M3: labelMedium per spec
+                ) },
+                alwaysShowLabel = true, // M3: recommended for 3-5 items
+                colors = NavigationBarItemDefaults.colors() // M3: default semantic colors
             )
         }
     }
@@ -89,10 +96,10 @@ fun MenuPsicologo(
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = AmaniPsicologoColors.Primary,
-            titleContentColor = Color.White,
-            navigationIconContentColor = Color.White,
-            actionIconContentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primary, // M3: use theme primary
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         )
     )
 }

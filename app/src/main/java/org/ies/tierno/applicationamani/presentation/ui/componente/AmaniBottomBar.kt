@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DateRange
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material.icons.outlined.Settings
@@ -32,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import org.ies.tierno.applicationamani.R
@@ -50,7 +52,7 @@ data class AmaniBottomBarItem(
     val route: String?,
     @StringRes val labelRes: Int,
     val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector = selectedIcon
+    val unselectedIcon: ImageVector
 )
 
 /**
@@ -74,8 +76,6 @@ private fun pacienteItems() = listOf(
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     ),
-
-
     AmaniBottomBarItem(
         route = Screens.agendaCitaScreen.route,
         labelRes = R.string.nav_citas,
@@ -85,7 +85,8 @@ private fun pacienteItems() = listOf(
     AmaniBottomBarItem(
         route = Screens.chatList.route,
         labelRes = R.string.nav_chat,
-        selectedIcon = Icons.AutoMirrored.Filled.Chat
+        selectedIcon = Icons.AutoMirrored.Filled.Chat,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Chat
     ),
     AmaniBottomBarItem(
         route = Screens.diarioEmocional.route,
@@ -129,7 +130,8 @@ private fun adminItems() = listOf(
     AmaniBottomBarItem(
         route = null,
         labelRes = R.string.nav_mas,
-        selectedIcon = Icons.Filled.MoreVert
+        selectedIcon = Icons.Filled.MoreVert,
+        unselectedIcon = Icons.Outlined.MoreVert
     )
 )
 
@@ -149,12 +151,14 @@ private fun psicologoItems() = listOf(
     AmaniBottomBarItem(
         route = Screens.estadisticasPsicologo.route,
         labelRes = R.string.nav_estadisticas,
-        selectedIcon = Icons.AutoMirrored.Filled.ShowChart
+        selectedIcon = Icons.AutoMirrored.Filled.ShowChart,
+        unselectedIcon = Icons.AutoMirrored.Outlined.ShowChart
     ),
     AmaniBottomBarItem(
         route = Screens.chatList.route,
         labelRes = R.string.nav_chat,
-        selectedIcon = Icons.AutoMirrored.Filled.Chat
+        selectedIcon = Icons.AutoMirrored.Filled.Chat,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Chat
     ),
     AmaniBottomBarItem(
         route = Screens.settingPsicologo.route,
@@ -170,16 +174,10 @@ private fun psicologoItems() = listOf(
  * Barra de navegación inferior unificada, responsive y accesible para Amani.
  *
  * Utiliza [NavigationBar] de Material 3 con [NavigationBarItem] para cada
- * destino. Se adapta automáticamente a diferentes tamaños de pantalla gracias
- * al comportamiento nativo de Material 3 (los ítems se expanden para ocupar
- * el espacio disponible de manera equitativa).
- *
- * Ítems con `route == null` aparecen deshabilitados visualmente indicando
- * funcionalidad próxima.
+ * destino.
  *
  * @param navController Controlador de navegación.
- * @param config Variante según el rol: [BottomBarConfig.Paciente],
- *   [BottomBarConfig.Admin] o [BottomBarConfig.Psicologo].
+ * @param config Variante según el rol.
  * @param modifier Modificador externo opcional.
  */
 @Composable
@@ -199,8 +197,7 @@ fun AmaniBottomBar(
 
     NavigationBar(
         modifier = modifier.navigationBarsPadding(),
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 3.dp
+        containerColor = MaterialTheme.colorScheme.surfaceContainer // M3: surfaceContainer per spec
     ) {
         items.forEach { item ->
             val isSelected = item.route != null && currentRoute == item.route
@@ -221,29 +218,25 @@ fun AmaniBottomBar(
                     }
                 },
                 icon = {
+                    // M3: Use selected icon (Filled) and unselected icon (Outlined)
                     Icon(
                         imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
                         contentDescription = stringResource(item.labelRes)
                     )
                 },
                 label = {
+                    // M3: label style is labelMedium
                     Text(
                         text = stringResource(item.labelRes),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelMedium
                     )
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor       = MaterialTheme.colorScheme.primaryContainer,
-                    selectedIconColor    = MaterialTheme.colorScheme.primary,
-                    selectedTextColor    = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor  = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor  = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledIconColor    = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    disabledTextColor    = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                )
+                alwaysShowLabel = true, // M3: Recommended for 3-5 items
+                colors = NavigationBarItemDefaults.colors() // M3: No hardcoded colors
             )
         }
     }
 }
+

@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -56,7 +57,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
@@ -238,15 +238,10 @@ fun PacienteExpandableCard(
     roboto: FontFamily
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                clip = false
-            ),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
@@ -270,7 +265,6 @@ fun PacienteExpandableCard(
                     Box(
                         modifier = Modifier
                             .size(48.dp)
-                            .shadow(8.dp, RoundedCornerShape(24.dp))
                             .background(
                                 color = primaryColor.copy(alpha = 0.1f),
                                 shape = RoundedCornerShape(24.dp)

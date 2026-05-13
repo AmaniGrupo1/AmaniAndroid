@@ -1,6 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
 import androidx.compose.foundation.background
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,7 +64,6 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
-import org.ies.tierno.applicationamani.presentation.ui.screen.AmaniLoginColors
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -75,7 +76,7 @@ fun HistorialClinicoScreen(
     idPaciente: Long,
     viewModel: HistorialClinicoPacienteViewModel
 ) {
-    val colors = AmaniLoginColors
+    val colors = MaterialTheme.colorScheme
     val scope = rememberCoroutineScope()
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
@@ -106,7 +107,7 @@ fun HistorialClinicoScreen(
     }
 
     Scaffold(
-        containerColor = colors.Background,
+        containerColor = colors.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -123,7 +124,7 @@ fun HistorialClinicoScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.Primary
+                    containerColor = colors.primary
                 )
             )
         }
@@ -134,7 +135,7 @@ fun HistorialClinicoScreen(
                 .padding(paddingValues)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(colors.Accent, Color.White)
+                        colors = listOf(colors.surfaceContainerLow, Color.White)
                     )
                 )
         ) {
@@ -148,12 +149,12 @@ fun HistorialClinicoScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            CircularProgressIndicator(color = colors.Primary)
+                            CircularProgressIndicator(color = colors.primary)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Cargando historial clínico...",
                                 fontSize = 14.sp,
-                                color = colors.TextSecondary,
+                                color = colors.onSurfaceVariant,
                                 fontFamily = roboto
                             )
                         }
@@ -174,14 +175,14 @@ fun HistorialClinicoScreen(
                                 Icons.Default.History,
                                 contentDescription = null,
                                 modifier = Modifier.size(80.dp),
-                                tint = colors.Primary.copy(alpha = 0.3f)
+                                tint = colors.primary.copy(alpha = 0.3f)
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(
                                 text = "No hay registros en tu historial clínico",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.TextPrimary,
+                                color = colors.onSurface,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -189,7 +190,7 @@ fun HistorialClinicoScreen(
                             Text(
                                 text = "Las consultas con tu psicólogo aparecerán aquí",
                                 fontSize = 14.sp,
-                                color = colors.TextSecondary,
+                                color = colors.onSurfaceVariant,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -211,14 +212,14 @@ fun HistorialClinicoScreen(
                                 Icons.Default.Error,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = colors.Error
+                                tint = colors.error
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Error al cargar el historial",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colors.TextPrimary,
+                                color = colors.onSurface,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -226,7 +227,7 @@ fun HistorialClinicoScreen(
                             Text(
                                 text = error ?: "Error desconocido",
                                 fontSize = 14.sp,
-                                color = colors.TextSecondary,
+                                color = colors.onSurfaceVariant,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -238,7 +239,7 @@ fun HistorialClinicoScreen(
                                         viewModel.cargarHistorialClinico(idPaciente, "Bearer $token")
                                     }
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = colors.Primary),
+                                colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Reintentar")
@@ -279,7 +280,7 @@ fun HistorialCard(
     item: HistorialClinicoResponseDTO,
     isExpanded: Boolean,
     onCardClick: () -> Unit,
-    colors: AmaniLoginColors,
+    colors: ColorScheme,
     roboto: FontFamily,
     formatFecha: (String) -> String
 ) {
@@ -289,7 +290,7 @@ fun HistorialCard(
             .clickable { onCardClick() },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.Surface)
+        colors = CardDefaults.cardColors(containerColor = colors.surface)
     ) {
         Column(
             modifier = Modifier
@@ -309,7 +310,7 @@ fun HistorialCard(
                         text = item.titulo,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colors.Primary,
+                        color = colors.primary,
                         fontFamily = roboto
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -320,13 +321,13 @@ fun HistorialCard(
                             Icons.Default.DateRange,
                             contentDescription = "Fecha",
                             modifier = Modifier.size(14.dp),
-                            tint = colors.TextSecondary
+                            tint = colors.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = formatFecha(item.creadoEn),
                             fontSize = 12.sp,
-                            color = colors.TextSecondary,
+                            color = colors.onSurfaceVariant,
                             fontFamily = roboto
                         )
                     }
@@ -339,7 +340,7 @@ fun HistorialCard(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = colors.Primary.copy(alpha = 0.1f)
+                color = colors.primary.copy(alpha = 0.1f)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -349,14 +350,14 @@ fun HistorialCard(
                             Icons.Default.Healing,
                             contentDescription = "Diagnóstico",
                             modifier = Modifier.size(16.dp),
-                            tint = colors.Primary
+                            tint = colors.primary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Diagnóstico",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
-                            color = colors.Primary,
+                            color = colors.primary,
                             fontFamily = roboto
                         )
                     }
@@ -364,7 +365,7 @@ fun HistorialCard(
                     Text(
                         text = item.diagnostico.ifEmpty { "No especificado" },
                         fontSize = 14.sp,
-                        color = colors.TextPrimary,
+                        color = colors.onSurface,
                         fontFamily = roboto,
                         lineHeight = 20.sp
                     )
@@ -379,7 +380,7 @@ fun HistorialCard(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = colors.Primary.copy(alpha = 0.05f)
+                    color = colors.primary.copy(alpha = 0.05f)
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp)
@@ -389,14 +390,14 @@ fun HistorialCard(
                                 Icons.Default.Favorite,
                                 contentDescription = "Tratamiento",
                                 modifier = Modifier.size(16.dp),
-                                tint = colors.PrimaryLight
+                                tint = colors.primaryContainer
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Tratamiento",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.PrimaryLight,
+                                color = colors.primaryContainer,
                                 fontFamily = roboto
                             )
                         }
@@ -404,7 +405,7 @@ fun HistorialCard(
                         Text(
                             text = item.tratamiento.ifEmpty { "No especificado" },
                             fontSize = 14.sp,
-                            color = colors.TextPrimary,
+                            color = colors.onSurface,
                             fontFamily = roboto,
                             lineHeight = 20.sp
                         )
@@ -417,7 +418,7 @@ fun HistorialCard(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = colors.Accent.copy(alpha = 0.2f)
+                    color = colors.surfaceContainerLow.copy(alpha = 0.2f)
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp)
@@ -427,14 +428,14 @@ fun HistorialCard(
                                 Icons.Default.Note,
                                 contentDescription = "Observaciones",
                                 modifier = Modifier.size(16.dp),
-                                tint = colors.TextSecondary
+                                tint = colors.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Observaciones",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.TextSecondary,
+                                color = colors.onSurfaceVariant,
                                 fontFamily = roboto
                             )
                         }
@@ -442,7 +443,7 @@ fun HistorialCard(
                         Text(
                             text = item.observaciones.ifEmpty { "No hay observaciones registradas" },
                             fontSize = 14.sp,
-                            color = colors.TextSecondary,
+                            color = colors.onSurfaceVariant,
                             fontFamily = roboto,
                             lineHeight = 20.sp
                         )

@@ -169,6 +169,7 @@ dependencies {
 }
 
 // 📚 Dokka
+
 dokka {
     moduleName.set("Amani Android")
     dokkaSourceSets.configureEach {

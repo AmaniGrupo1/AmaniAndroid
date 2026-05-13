@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.admin
 
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,20 +63,6 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 
 // Paleta de colores unificada con las demás pantallas
-object AmaniColorsListado {
-    val Primary = Color(0xFF6C63FF)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFCCC0E4)
-    val Surface = Color(0xFFFFFFFF)
-    val Background = Color(0xFFCCC0E4)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Success = Color(0xFF81C784)
-    val Warning = Color(0xFFFFB74D)
-    val Error = Color(0xFFE57373)
-}
 
 /**
  * Pantalla de listado de pacientes con opciones de gestión.
@@ -99,11 +86,11 @@ fun ListadoPacientesScreen(
     )
 
     Scaffold(
-        containerColor = AmaniColorsListado.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = AmaniColorsListado.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 shadowElevation = 4.dp,
                 shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
             ) {
@@ -118,14 +105,14 @@ fun ListadoPacientesScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
 
                     Text(
                         text = "LISTADO DE PACIENTES",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontFamily = roboto,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -144,14 +131,14 @@ fun ListadoPacientesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(Screens.registro.route) },
-                containerColor = AmaniColorsListado.Primary,
+                containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(50.dp),
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
             ) {
                 Icon(
                     Icons.Default.People,
                     contentDescription = "Agregar paciente",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -173,17 +160,17 @@ fun ListadoPacientesScreen(
                         imageVector = Icons.Default.People,
                         contentDescription = "Sin pacientes",
                         modifier = Modifier.size(80.dp),
-                        tint = AmaniColorsListado.PrimaryLight.copy(alpha = 0.5f)
+                        tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                     )
                     Text(
                         text = "No hay pacientes registrados",
                         fontFamily = roboto,
                         fontSize = 16.sp,
-                        color = AmaniColorsListado.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Button(
                         onClick = { navController.navigate(Screens.registro.route) },
-                        colors = ButtonDefaults.buttonColors(containerColor = AmaniColorsListado.Primary),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Agregar primer paciente", fontFamily = roboto)
@@ -230,7 +217,7 @@ fun PacienteCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = AmaniColorsListado.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -247,14 +234,14 @@ fun PacienteCard(
                 Surface(
                     modifier = Modifier.size(50.dp),
                     shape = RoundedCornerShape(25.dp),
-                    color = AmaniColorsListado.Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     shadowElevation = 2.dp
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(
                             text = paciente.nombreUsuario.take(1).uppercase() +
                                     paciente.apellidoUsuario.take(1).uppercase(),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
                             fontFamily = roboto
@@ -267,14 +254,14 @@ fun PacienteCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${paciente.nombreUsuario} ${paciente.apellidoUsuario}",
-                        color = AmaniColorsListado.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = roboto,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "ID: ${paciente.idPaciente}",
-                        color = AmaniColorsListado.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontFamily = roboto,
                         fontSize = 12.sp
                     )
@@ -286,7 +273,7 @@ fun PacienteCard(
             // Línea divisoria
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = AmaniColorsListado.Accent,
+                color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(2.dp)
             ) {
                 Spacer(modifier = Modifier.height(1.dp))
@@ -299,7 +286,7 @@ fun PacienteCard(
                 icon = Icons.Default.Email,
                 label = "Email",
                 value = paciente.emailUsuario,
-                iconColor = AmaniColorsListado.Primary,
+                iconColor = MaterialTheme.colorScheme.primary,
                 roboto = roboto
             )
 
@@ -308,7 +295,7 @@ fun PacienteCard(
                 icon = Icons.Default.Phone,
                 label = "Teléfono",
                 value = paciente.telefono,
-                iconColor = AmaniColorsListado.Primary,
+                iconColor = MaterialTheme.colorScheme.primary,
                 roboto = roboto
             )
 
@@ -324,7 +311,7 @@ fun PacienteCard(
                     icon = Icons.Default.Cake,
                     label = "Fecha de Nacimiento",
                     value = paciente.fechaNacimiento,
-                    iconColor = AmaniColorsListado.Primary,
+                    iconColor = MaterialTheme.colorScheme.primary,
                     roboto = roboto,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -334,7 +321,7 @@ fun PacienteCard(
                     icon = Icons.Default.Wc,
                     label = "Género",
                     value = paciente.genero,
-                    iconColor = AmaniColorsListado.Primary,
+                    iconColor = MaterialTheme.colorScheme.primary,
                     roboto = roboto,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -348,7 +335,7 @@ fun PacienteCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 paciente.direccion.forEach { direccion ->
@@ -357,7 +344,7 @@ fun PacienteCard(
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
                         shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFFF8F9FA)
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     ) {
                         Column(
                             modifier = Modifier
@@ -369,14 +356,14 @@ fun PacienteCard(
                                 fontFamily = roboto,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = Color.Black
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             if (direccion.ciudad != null || direccion.provincia != null) {
                                 Text(
                                     text = listOfNotNull(direccion.ciudad, direccion.provincia).joinToString(", "),
                                     fontFamily = roboto,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             if (direccion.codigoPostal != null || direccion.pais != null) {
@@ -384,7 +371,7 @@ fun PacienteCard(
                                     text = listOfNotNull(direccion.codigoPostal, direccion.pais).joinToString(" - "),
                                     fontFamily = roboto,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -400,7 +387,7 @@ fun PacienteCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 paciente.tutores.forEach { tutor ->
@@ -409,7 +396,7 @@ fun PacienteCard(
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
                         shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFFF8F9FA)
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     ) {
                         Column(
                             modifier = Modifier
@@ -421,26 +408,26 @@ fun PacienteCard(
                                 fontFamily = roboto,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = Color.Black
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = "Tel: ${tutor.telefono}",
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 text = "Email: ${tutor.email}",
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             if (tutor.dni.isNotBlank()) {
                                 Text(
                                     text = "DNI: ${tutor.dni}",
                                     fontFamily = roboto,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -456,7 +443,7 @@ fun PacienteCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -466,13 +453,13 @@ fun PacienteCard(
                     paciente.situaciones.forEach { situacion ->
                         Surface(
                             shape = RoundedCornerShape(16.dp),
-                            color = Color(0xFFE3F2FD)
+                            color = MaterialTheme.colorScheme.primaryContainer
                         ) {
                             Text(
                                 text = situacion.descripcion ?: situacion.nombre,
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
-                                color = Color(0xFF1976D2),
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
                         }
@@ -486,9 +473,9 @@ fun PacienteCard(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 color = when (metodoPagoStr) {
-                    "ONLINE" -> Color(0xFFE3F2FD)
-                    "PRESENCIAL" -> Color(0xFFFFF3E0)
-                    else -> Color(0xFFF5F5F5)
+                    "ONLINE" -> MaterialTheme.colorScheme.primaryContainer
+                    "PRESENCIAL" -> MaterialTheme.colorScheme.tertiaryContainer
+                    else -> MaterialTheme.colorScheme.surfaceVariant
                 }
             ) {
                 Row(
@@ -501,16 +488,16 @@ fun PacienteCard(
                         imageVector = metodoIcono,
                         contentDescription = "Método de pago",
                         tint = when (metodoPagoStr) {
-                            "ONLINE" -> Color(0xFF1976D2)
-                            "PRESENCIAL" -> Color(0xFFE67E22)
-                            else -> Color.Gray
+                            "ONLINE" -> MaterialTheme.colorScheme.primary
+                            "PRESENCIAL" -> MaterialTheme.colorScheme.tertiary
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
                         },
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Método de pago:",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontFamily = roboto,
                         fontSize = 13.sp
                     )
@@ -518,9 +505,9 @@ fun PacienteCard(
                     Text(
                         text = metodoTexto,
                         color = when (metodoPagoStr) {
-                            "ONLINE" -> Color(0xFF1976D2)
-                            "PRESENCIAL" -> Color(0xFFE67E22)
-                            else -> Color.Black
+                            "ONLINE" -> MaterialTheme.colorScheme.primary
+                            "PRESENCIAL" -> MaterialTheme.colorScheme.tertiary
+                            else -> MaterialTheme.colorScheme.onSurface
                         },
                         fontFamily = roboto,
                         fontSize = 14.sp,
@@ -533,14 +520,14 @@ fun PacienteCard(
             if (paciente.createdAt.isNotBlank()) {
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = Color(0xFFE0E0E0)
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 InfoRowCompact(
                     icon = Icons.Default.DateRange,
                     label = "Fecha de Registro",
                     value = paciente.createdAt.split("T")[0],
-                    iconColor = AmaniColorsListado.TextSecondary,
+                    iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     roboto = roboto,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -551,7 +538,7 @@ fun PacienteCard(
             // Botón Editar
             Button(
                 onClick = onEditar,
-                colors = ButtonDefaults.buttonColors(containerColor = AmaniColorsListado.Primary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
@@ -560,12 +547,12 @@ fun PacienteCard(
                     Icons.Default.Edit,
                     contentDescription = "Editar",
                     modifier = Modifier.size(18.dp),
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Editar datos",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp
@@ -596,7 +583,7 @@ fun InfoRow(
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "$label:",
-            color = AmaniColorsListado.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontFamily = roboto,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -604,7 +591,7 @@ fun InfoRow(
         )
         Text(
             text = value,
-            color = AmaniColorsListado.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontFamily = roboto,
             fontSize = 14.sp,
             modifier = Modifier.weight(1f)
@@ -634,7 +621,7 @@ fun InfoRowCompact(
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "$label:",
-            color = AmaniColorsListado.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontFamily = roboto,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
@@ -642,7 +629,7 @@ fun InfoRowCompact(
         )
         Text(
             text = value.ifEmpty { "No especificado" },
-            color = AmaniColorsListado.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontFamily = roboto,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,

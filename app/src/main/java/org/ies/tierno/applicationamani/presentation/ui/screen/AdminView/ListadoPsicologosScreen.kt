@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,10 +67,10 @@ fun ListadoPsicologosScreen(
     val roboto = Roboto
     val balow = BarlowCondensed
 
-    val backgroundColor = Color(0xFFF5F5F5)
-    val cardColor = Color.White
-    val primaryColor = Color(0xFF6C63FF)
-    val deleteColor = Color(0xFFD32F2F)
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val cardColor = MaterialTheme.colorScheme.surface
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val deleteColor = MaterialTheme.colorScheme.error
 
     // Observar el estado de la baja desde el ViewModel
     val bajaEstado by listarPacientesViewModel.bajaEstado.collectAsState()
@@ -100,7 +101,7 @@ fun ListadoPsicologosScreen(
                 containerColor = primaryColor,
                 shape = RoundedCornerShape(50.dp)
             ) {
-                Icon(Icons.Default.Person, contentDescription = "Psicólogo", tint = Color.White)
+                Icon(Icons.Default.Person, contentDescription = "Psicólogo", tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
     ) { padding ->
@@ -121,22 +122,22 @@ fun ListadoPsicologosScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             "Nombre: ${psicologo.nombre} ${psicologo.apellido}",
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontFamily = roboto
                         )
                         Text(
                             "Especialidad: ${psicologo.especialidad}",
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontFamily = roboto
                         )
                         Text(
                             "Descripción: ${psicologo.descripcion ?: "-"}",
-                            color = Color.DarkGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontFamily = roboto
                         )
                         Text(
                             "Licencia: ${psicologo.licencia ?: "-"}",
-                            color = Color.DarkGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontFamily = roboto
                         )
 
@@ -154,7 +155,7 @@ fun ListadoPsicologosScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Dar de baja", color = Color.White, fontFamily = roboto)
+                                Text("Dar de baja", color = MaterialTheme.colorScheme.onPrimary, fontFamily = roboto)
                             }
 
                             Button(
@@ -165,7 +166,7 @@ fun ListadoPsicologosScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Editar", color = Color.White, fontFamily = roboto)
+                                Text("Editar", color = MaterialTheme.colorScheme.onPrimary, fontFamily = roboto)
                             }
                         }
 
@@ -183,7 +184,7 @@ fun ListadoPsicologosScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Asignar a paciente", color = Color.White, fontFamily = roboto)
+                            Text("Asignar a paciente", color = MaterialTheme.colorScheme.onPrimary, fontFamily = roboto)
                         }
 
                         LaunchedEffect(asignarSuccess, asignarError) {
@@ -228,7 +229,7 @@ fun ListadoPsicologosScreen(
                         Text(
                             if (isBajaInProgress) "Procesando..." else "Dar de baja",
                             fontFamily = roboto,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },

@@ -61,7 +61,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -69,7 +68,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
@@ -161,8 +159,7 @@ fun MenuAdministrador(
         )
 
     TopAppBar(
-        modifier = Modifier
-            .shadow(elevation = 4.dp, shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp)),
+        modifier = Modifier,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = colors.primary,
             titleContentColor = colors.onPrimary,
@@ -204,8 +201,7 @@ fun MenuAdministrador(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = titleValue,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge,
                             color = colors.onPrimary,
                             maxLines = 1
                         )
@@ -213,8 +209,7 @@ fun MenuAdministrador(
                 } else {
                     Text(
                         text = titleValue,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleLarge,
                         color = colors.onPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -234,7 +229,7 @@ fun MenuAdministrador(
                     containerColor = colors.error,
                     modifier = Modifier.offset(x = (-4).dp, y = 4.dp)
                 ) {
-                    Text("3", fontSize = 10.sp)
+                    Text("3", style = MaterialTheme.typography.labelSmall)
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
@@ -259,8 +254,6 @@ fun MenuAdministrador(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .shadow(elevation = 8.dp)
-                    .clip(RoundedCornerShape(12.dp))
                     .width(280.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -272,13 +265,12 @@ fun MenuAdministrador(
                         ) {
                             Text(
                                 text = stringResource(R.string.menu_admin_titulo),
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = stringResource(R.string.menu_selecciona_opcion),
-                                fontSize = 10.sp,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -318,8 +310,7 @@ fun MenuAdministrador(
                                 )
                                 Text(
                                     text = stringResource(item.titleRes),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = if (item.isDanger)
                                         MaterialTheme.colorScheme.error
                                     else
@@ -366,7 +357,7 @@ fun MenuAdministradorSimple(
     val colors = MaterialTheme.colorScheme
 
     TopAppBar(
-        modifier = Modifier.shadow(elevation = 4.dp),
+        modifier = Modifier,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = colors.primary,
             titleContentColor = colors.onPrimary,
@@ -397,16 +388,14 @@ fun MenuAdministradorSimple(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = title,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleMedium,
                         color = colors.onPrimary
                     )
                 }
             } else {
                 Text(
                     text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.titleMedium,
                     color = colors.onPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -467,14 +456,13 @@ fun MenuLateralAdministrador(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Panel Admin",
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
                             text = "Gestión de usuarios",
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                            fontSize = 12.sp
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -492,7 +480,7 @@ fun MenuLateralAdministrador(
                         label = {
                             Text(
                                 text = stringResource(titleRes),
-                                fontSize = 14.sp,
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = if (currentRoute == route) FontWeight.Bold else FontWeight.Normal
                             )
                         },

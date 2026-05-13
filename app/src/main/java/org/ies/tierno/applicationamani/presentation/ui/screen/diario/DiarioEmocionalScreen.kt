@@ -205,7 +205,7 @@ fun EmotionWheel(
     Box(
         modifier = modifier
             .size(300.dp)
-            .shadow(4.dp, shape = CircleShape)
+            
             .clip(CircleShape)
             .background(Color.White)
             .semantics { contentDescription = accessibilityLabel }

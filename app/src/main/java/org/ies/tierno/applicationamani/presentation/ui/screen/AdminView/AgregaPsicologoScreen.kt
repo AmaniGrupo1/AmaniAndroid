@@ -1,4 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+import androidx.compose.material3.MaterialTheme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,9 +55,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -80,16 +79,16 @@ fun AgregaPsicologoScreen(
     loginViewModel: LoginViewModel
 ) {
     // Paleta de colores profesional AMANI
-    val primaryColor = Color(0xFF6C63FF) // Púrpura moderno
-    val primaryDark = Color(0xFF5A52D6)
-    val primaryLight = Color(0xFF8B84FF)
-    val backgroundColor = Color(0xFFF8F9FA)
-    val surfaceColor = Color.White
-    val errorColor = Color(0xFFE57373)
-    val successColor = Color(0xFF81C784)
-    val textPrimary = Color(0xFF2C3E50)
-    val textSecondary = Color(0xFF7F8C8D)
-    val dividerColor = Color(0xFFECF0F1)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val primaryDark = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+    val primaryLight = MaterialTheme.colorScheme.primaryContainer
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val errorColor = MaterialTheme.colorScheme.error
+    val successColor = MaterialTheme.colorScheme.tertiary
+    val textPrimary = MaterialTheme.colorScheme.onSurface
+    val textSecondary = MaterialTheme.colorScheme.onSurfaceVariant
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
 
     // Fuentes profesionales
     val roboto = FontFamily(
@@ -177,8 +176,8 @@ fun AgregaPsicologoScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFF8F9FA),
-                            Color(0xFFF0F2F5)
+                            MaterialTheme.colorScheme.surface,
+                            MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
                 )
@@ -186,7 +185,7 @@ fun AgregaPsicologoScreen(
             // Top Bar Mejorada
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 shadowElevation = 8.dp,
                 shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
             ) {
@@ -198,9 +197,7 @@ fun AgregaPsicologoScreen(
                     // Botón de retroceso
                     IconButton(
                         onClick = onBack,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .shadow(4.dp, RoundedCornerShape(12.dp))
+                        modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -243,9 +240,7 @@ fun AgregaPsicologoScreen(
 
                 // ==================== SECCIÓN 1: DATOS PERSONALES ====================
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(4.dp, RoundedCornerShape(20.dp)),
+                    modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = surfaceColor),
                     shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -269,7 +264,7 @@ fun AgregaPsicologoScreen(
                                 Icon(
                                     Icons.Default.Person,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -547,9 +542,7 @@ fun AgregaPsicologoScreen(
 
                 // ==================== SECCIÓN 2: DATOS PROFESIONALES ====================
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(4.dp, RoundedCornerShape(20.dp)),
+                    modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = surfaceColor),
                     shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -573,7 +566,7 @@ fun AgregaPsicologoScreen(
                                 Icon(
                                     Icons.Default.MedicalServices,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -747,12 +740,11 @@ fun AgregaPsicologoScreen(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+                        .height(56.dp),
                     enabled = !isRegistering,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = primaryColor,
-                        contentColor = Color.White,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         disabledContainerColor = textSecondary.copy(alpha = 0.5f)
                     ),
                     shape = RoundedCornerShape(16.dp),
@@ -761,7 +753,7 @@ fun AgregaPsicologoScreen(
                     if (isRegistering) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(12.dp))

@@ -54,7 +54,6 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
-import org.ies.tierno.applicationamani.presentation.ui.screen.AmaniLoginColors
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,12 +94,12 @@ fun ListadoPsicologosSimpleScreen(
     }
 
     Scaffold(
-        containerColor = AmaniLoginColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(AmaniLoginColors.Surface)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -112,7 +111,7 @@ fun ListadoPsicologosSimpleScreen(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver atrás",
-                        tint = AmaniLoginColors.Primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Box(modifier = Modifier.weight(1f)) {
@@ -126,13 +125,13 @@ fun ListadoPsicologosSimpleScreen(
                 onClick = {
                     navController.navigate(Screens.agregarPsicologo.route)
                 },
-                containerColor = AmaniLoginColors.Primary,
+                containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(50.dp)
             ) {
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Agregar psicólogo",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -144,8 +143,8 @@ fun ListadoPsicologosSimpleScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            AmaniLoginColors.Accent,
-                            Color.White
+                            MaterialTheme.colorScheme.surfaceContainerLow,
+                            MaterialTheme.colorScheme.onPrimary
                         )
                     )
                 )
@@ -162,7 +161,7 @@ fun ListadoPsicologosSimpleScreen(
                         text = "📋 No hay psicólogos registrados",
                         style = typography.titleMedium?.copy(
                             fontSize = 18.sp,
-                            color = AmaniLoginColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         ) ?: MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
@@ -171,7 +170,7 @@ fun ListadoPsicologosSimpleScreen(
                         text = "Presiona el botón + para agregar uno",
                         style = typography.bodyMedium?.copy(
                             fontSize = 14.sp,
-                            color = AmaniLoginColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         ) ?: MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -215,7 +214,7 @@ fun ListadoPsicologosSimpleScreen(
                         style = typography.headlineSmall?.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = AmaniLoginColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         ) ?: MaterialTheme.typography.headlineSmall,
                         fontFamily = FontFamily.Serif
                     )
@@ -225,7 +224,7 @@ fun ListadoPsicologosSimpleScreen(
                         text = "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
                         style = typography.bodyMedium?.copy(
                             fontSize = 14.sp,
-                            color = AmaniLoginColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         ) ?: MaterialTheme.typography.bodyMedium
                     )
                 },
@@ -237,7 +236,7 @@ fun ListadoPsicologosSimpleScreen(
                             listarPaciente.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AmaniLoginColors.Error
+                            containerColor = MaterialTheme.colorScheme.error
                         ),
                         shape = RoundedCornerShape(12.dp),
                         enabled = !isBajaInProgress
@@ -248,7 +247,7 @@ fun ListadoPsicologosSimpleScreen(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             ) ?: MaterialTheme.typography.labelLarge,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
@@ -261,7 +260,7 @@ fun ListadoPsicologosSimpleScreen(
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = AmaniLoginColors.Primary
+                            contentColor = MaterialTheme.colorScheme.primary
                         ),
                         enabled = !isBajaInProgress
                     ) {
@@ -290,8 +289,8 @@ fun PsicologoCard(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(8.dp, RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(containerColor = AmaniLoginColors.Surface),
+            ,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -301,7 +300,7 @@ fun PsicologoCard(
                 style = typography.titleLarge?.copy(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AmaniLoginColors.Primary
+                    color = MaterialTheme.colorScheme.primary
                 ) ?: MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -315,7 +314,7 @@ fun PsicologoCard(
                     text = "Especialidad:",
                     style = typography.bodyMedium?.copy(
                         fontSize = 13.sp,
-                        color = AmaniLoginColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     ) ?: MaterialTheme.typography.bodyMedium
                 )
@@ -323,7 +322,7 @@ fun PsicologoCard(
                     text = psicologo.especialidad,
                     style = typography.bodyMedium?.copy(
                         fontSize = 13.sp,
-                        color = AmaniLoginColors.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     ) ?: MaterialTheme.typography.bodyMedium
                 )
             }
@@ -340,7 +339,7 @@ fun PsicologoCard(
                         text = "Licencia:",
                         style = typography.bodyMedium?.copy(
                             fontSize = 13.sp,
-                            color = AmaniLoginColors.TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Medium
                         ) ?: MaterialTheme.typography.bodyMedium
                     )
@@ -348,7 +347,7 @@ fun PsicologoCard(
                         text = psicologo.licencia,
                         style = typography.bodyMedium?.copy(
                             fontSize = 13.sp,
-                            color = AmaniLoginColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         ) ?: MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -361,7 +360,7 @@ fun PsicologoCard(
                     text = "Descripción:",
                     style = typography.bodyMedium?.copy(
                         fontSize = 12.sp,
-                        color = AmaniLoginColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     ) ?: MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
@@ -370,7 +369,7 @@ fun PsicologoCard(
                     text = psicologo.descripcion,
                     style = typography.bodySmall?.copy(
                         fontSize = 12.sp,
-                        color = AmaniLoginColors.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     ) ?: MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 2.dp)
                 )
@@ -386,7 +385,7 @@ fun PsicologoCard(
                 Button(
                     onClick = onDarBaja,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AmaniLoginColors.Error
+                        containerColor = MaterialTheme.colorScheme.error
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
@@ -397,14 +396,14 @@ fun PsicologoCard(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         ) ?: MaterialTheme.typography.labelMedium,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
                 Button(
                     onClick = onEditar,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AmaniLoginColors.Primary
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
@@ -415,7 +414,7 @@ fun PsicologoCard(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         ) ?: MaterialTheme.typography.labelMedium,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
