@@ -66,4 +66,25 @@ class DocumentoLegalRepository(val documentoLegalApi: DocumentoLegalApi) {
         }
     }
 
+    suspend fun getDocumentoByTipo(
+        tipo: String
+    ): Result<DocumentoLegalResponseDTO> {
+
+        return try {
+
+            val response =
+                documentoLegalApi.getDocumentoByTipo(tipo)
+
+            Result.success(response)
+
+        } catch (e: Exception) {
+
+            Result.failure(
+                Exception(
+                    "Error al obtener documento por tipo: ${e.message}",
+                    e
+                )
+            )
+        }
+    }
 }

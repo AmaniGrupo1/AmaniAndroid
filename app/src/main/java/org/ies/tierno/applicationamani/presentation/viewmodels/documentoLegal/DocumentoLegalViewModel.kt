@@ -54,28 +54,6 @@ class DocumentoLegalViewModel(
     }
 
     // =========================
-    // OBTENER POR ID
-    // =========================
-    fun getDocumentoById(idDocumento: Long) {
-        viewModelScope.launch {
-            _loading.value = true
-            _error.value = null
-
-            val result = useCase.getDocumentoById(idDocumento)
-
-            result
-                .onSuccess {
-                    _documentoSeleccionado.value = it
-                }
-                .onFailure {
-                    _error.value = it.message
-                }
-
-            _loading.value = false
-        }
-    }
-
-    // =========================
     // CREAR
     // =========================
     fun crearDocumento(request: DocumentoLegalRequestDTO) {
@@ -140,6 +118,28 @@ class DocumentoLegalViewModel(
                     _error.value = it.message
                 }
 
+            _loading.value = false
+        }
+    }
+
+    // =========================
+// OBTENER POR TIPO
+// =========================
+    fun getDocumentoByTipo(tipo: String) {
+        viewModelScope.launch {
+            _loading.value = true
+            _error.value = null
+            val result =
+                useCase.getDocumentoByTipo(tipo)
+            result
+                .onSuccess {
+
+                    _documentoSeleccionado.value = it
+                }
+                .onFailure {
+
+                    _error.value = it.message
+                }
             _loading.value = false
         }
     }

@@ -746,16 +746,16 @@ fun DialogoVerPolitica(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.85f)
-                .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+                .fillMaxHeight(0.9f)  // Aumentado de 0.85f a 0.9f para mejor visibilidad
+                .padding(8.dp),  // Reducido de 16.dp a 8.dp
+            shape = RoundedCornerShape(20.dp),  // Reducido de 24.dp a 20.dp
             colors = CardDefaults.cardColors(containerColor = surfaceColor)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp)
+                    .padding(12.dp)  // Reducido de 24.dp a 12.dp
             ) {
                 // Header
                 Row(
@@ -765,19 +765,19 @@ fun DialogoVerPolitica(
                 ) {
                     Row(
                         modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)  // Reducido de 12.dp a 8.dp
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(10.dp),  // Reducido de 12.dp a 10.dp
                             color = primaryColor.copy(alpha = 0.1f),
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(40.dp)  // Reducido de 48.dp a 40.dp
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     if (documento.tipo == TipoDocumentoLegal.terminos) Icons.Default.Gavel else Icons.Default.Lock,
                                     contentDescription = null,
                                     tint = primaryColor,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(20.dp)  // Reducido de 24.dp a 20.dp
                                 )
                             }
                         }
@@ -785,14 +785,14 @@ fun DialogoVerPolitica(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = documento.titulo,
-                                fontSize = 18.sp,
+                                fontSize = 16.sp,  // Reducido de 18.sp a 16.sp
                                 fontWeight = FontWeight.Bold,
                                 color = primaryColor,
                                 fontFamily = robotoFontFamily
                             )
                             Text(
                                 text = tipoNombre,
-                                fontSize = 12.sp,
+                                fontSize = 11.sp,  // Reducido de 12.sp a 11.sp
                                 color = primaryColor,
                                 fontFamily = robotoFontFamily
                             )
@@ -800,110 +800,112 @@ fun DialogoVerPolitica(
                     }
 
                     Row {
-                        IconButton(onClick = onEdit) {
+                        IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {  // Añadido tamaño fijo
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = "Editar",
-                                tint = primaryColor
+                                tint = primaryColor,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
-                        IconButton(onClick = onDismiss) {
+                        IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = "Cerrar",
-                                tint = textSecondaryColor
+                                tint = textSecondaryColor,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))  // Reducido de 16.dp a 8.dp
 
                 // Metadatos
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(10.dp),  // Reducido de 12.dp a 10.dp
                     color = accentColor
                 ) {
                     Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier.padding(8.dp),  // Reducido de 12.dp a 8.dp
+                        verticalArrangement = Arrangement.spacedBy(2.dp)  // Reducido de 4.dp a 2.dp
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)  // Reducido de 16.dp a 12.dp
                         ) {
                             Text(
                                 text = "📌 Versión: ${documento.version ?: "1.0"}",
-                                fontSize = 11.sp,
+                                fontSize = 10.sp,  // Reducido de 11.sp a 10.sp
                                 color = textSecondaryColor,
                                 fontFamily = robotoFontFamily
                             )
                             Text(
                                 text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
-                                fontSize = 11.sp,
+                                fontSize = 10.sp,
                                 color = if (documento.activo) successColor else errorColor,
                                 fontFamily = robotoFontFamily
                             )
                         }
                         Text(
                             text = "📅 Creado: $fechaCreacion",
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             color = textSecondaryColor,
                             fontFamily = robotoFontFamily
                         )
                         Text(
                             text = "🔄 Actualizado: $fechaActualizacion",
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             color = textSecondaryColor,
                             fontFamily = robotoFontFamily
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))  // Reducido de 16.dp a 8.dp
 
-                HorizontalDivider(color = accentColor)
+                HorizontalDivider(color = accentColor, modifier = Modifier.padding(vertical = 4.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Contenido
                 Text(
                     text = documento.contenido,
-                    fontSize = 13.sp,
-                    lineHeight = 20.sp,
+                    fontSize = 12.sp,  // Reducido de 13.sp a 12.sp
+                    lineHeight = 18.sp,  // Reducido de 20.sp a 18.sp
                     color = textPrimaryColor,
                     fontFamily = robotoFontFamily
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(12.dp))  // Reducido de 24.dp a 12.dp
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)  // Reducido de 12.dp a 8.dp
                 ) {
                     OutlinedButton(
                         onClick = onEdit,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).height(36.dp),  // Reducido de altura por defecto a 36.dp
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = primaryColor
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(10.dp)  // Reducido de 12.dp a 10.dp
                     ) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Editar", fontFamily = robotoFontFamily)
+                        Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Editar", fontFamily = robotoFontFamily, fontSize = 12.sp)
                     }
 
                     Button(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).height(36.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = primaryColor
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(10.dp)
                     ) {
-                        Text("Cerrar", fontFamily = robotoFontFamily, color = if (isDark) Color.Black else Color.White)
+                        Text("Cerrar", fontFamily = robotoFontFamily, fontSize = 12.sp, color = if (isDark) Color.Black else Color.White)
                     }
                 }
             }

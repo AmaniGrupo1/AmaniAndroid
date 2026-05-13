@@ -121,5 +121,8 @@
             fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
         }
 
+        object documentoLegalDetail : Screens("documento_legal_detail/{tipo}") {
+            fun createRoute(tipo: String) = "documento_legal_detail/$tipo"
+        }
     }
 

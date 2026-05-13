@@ -270,6 +270,18 @@ fun SettingsAdminScreen(
                             title = stringResource(R.string.notificacion_sms),
                             subtitle = stringResource(R.string.desactivado),
                             icon = Icons.Default.Sms
+                        ),
+                        SettingsOption(
+                            id = "terminos",
+                            title = stringResource(R.string.terminos_condiciones),
+                            subtitle = stringResource(R.string.leer_terminos),
+                            icon = Icons.Default.Description
+                        ),
+                        SettingsOption(
+                            id = "privacidad",
+                            title = stringResource(R.string.politica_privacidad),
+                            subtitle = stringResource(R.string.ver_politica),
+                            icon = Icons.Default.Lock
                         )
                     )
                 )
