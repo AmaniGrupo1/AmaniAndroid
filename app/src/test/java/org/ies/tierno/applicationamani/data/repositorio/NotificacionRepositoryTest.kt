@@ -4,7 +4,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.dto.notificacion.NotificacionResponseDTO
 import org.junit.Assert.assertEquals

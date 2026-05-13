@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -15,9 +14,9 @@ import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

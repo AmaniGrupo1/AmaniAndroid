@@ -46,7 +46,6 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.FiltroTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TicketSoporte
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.koin.androidx.compose.koinViewModel
 

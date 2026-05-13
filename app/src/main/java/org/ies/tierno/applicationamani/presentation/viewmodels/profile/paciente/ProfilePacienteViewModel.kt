@@ -13,7 +13,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import java.io.File
 

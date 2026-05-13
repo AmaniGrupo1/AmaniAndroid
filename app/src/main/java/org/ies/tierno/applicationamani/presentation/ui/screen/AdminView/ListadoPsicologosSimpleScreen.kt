@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-import ListarPacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador

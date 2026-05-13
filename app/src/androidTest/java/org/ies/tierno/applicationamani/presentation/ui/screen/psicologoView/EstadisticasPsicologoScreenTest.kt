@@ -1,8 +1,16 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import io.mockk.*
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
 import org.ies.tierno.applicationamani.domain.models.psicologo.EstadisticasEmocionales
@@ -16,7 +24,6 @@ import org.junit.Test
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
-import java.util.*
 
 class EstadisticasPsicologoScreenTest {
 

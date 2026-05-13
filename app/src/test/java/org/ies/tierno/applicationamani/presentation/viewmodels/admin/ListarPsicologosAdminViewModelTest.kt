@@ -13,7 +13,8 @@ import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicologoAdminUseCase
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

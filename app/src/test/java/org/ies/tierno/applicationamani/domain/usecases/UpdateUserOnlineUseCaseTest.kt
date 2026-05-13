@@ -5,7 +5,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test

@@ -3,8 +3,6 @@ package org.ies.tierno.applicationamani.data.remoto
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 
-import org.ies.tierno.applicationamani.BuildConfig
-
 object FirebaseInstance {
     private const val RTDB_URL = "https://amani-160bf-default-rtdb.europe-west1.firebasedatabase.app"
     private const val USE_EMULATOR = false

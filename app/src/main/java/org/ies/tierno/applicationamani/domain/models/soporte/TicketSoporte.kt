@@ -1,7 +1,7 @@
 package org.ies.tierno.applicationamani.domain.models.soporte
 
-import com.google.gson.annotations.SerializedName
 import androidx.compose.ui.graphics.Color
+import com.google.gson.annotations.SerializedName
 
 /**
  * Modelo de dominio para un ticket de soporte.

@@ -2,8 +2,8 @@ package org.ies.tierno.applicationamani.presentation.screens.profile
 
 import android.Manifest.permission.CAMERA
 import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -57,6 +57,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,25 +69,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
-import android.util.Log
-import androidx.compose.ui.text.style.TextAlign
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.koin.compose.koinInject
-
-import androidx.core.content.FileProvider
-import androidx.compose.runtime.mutableLongStateOf
 
 private const val TAG = "PsicologoProfileScreen"
 // Usar la MISMA URL que en Retrofit

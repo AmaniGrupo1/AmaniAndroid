@@ -1,7 +1,10 @@
 package org.ies.tierno.applicationamani.quality
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavController
 import io.mockk.mockk
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen

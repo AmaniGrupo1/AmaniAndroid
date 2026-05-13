@@ -5,6 +5,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.AuthRepository
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -23,12 +24,12 @@ class DarBajaPacienteUseCaseTest {
 
     @Test
     fun `invoke should return success when repository succeeds`() = runTest {
-        coEvery { repository.darBajaPaciente(1L) } returns Result.success("Baja correcta")
+        coEvery { repository.darBajaPaciente(1L) } returns Result.success(MessageResponse("Baja correcta"))
 
         val result = useCase(1L)
 
         assertTrue(result.isSuccess)
-        assertEquals("Baja correcta", result.getOrNull())
+        assertEquals("Baja correcta", result.getOrNull()?.message)
         coVerify { repository.darBajaPaciente(1L) }
     }
 

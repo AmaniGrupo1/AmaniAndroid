@@ -5,7 +5,6 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.remoto.TestApi
-import org.ies.tierno.applicationamani.domain.models.test.RespuestasRequestDTO
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.PreguntaRequest
 import org.junit.Assert.assertEquals

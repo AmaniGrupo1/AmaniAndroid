@@ -1,24 +1,58 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
@@ -27,29 +61,23 @@ import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.column.columnChart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
-import com.patrykandpatrick.vico.compose.style.currentChartStyle
-import com.patrykandpatrick.vico.core.chart.column.ColumnChart
+import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.LineComponent
 import com.patrykandpatrick.vico.core.component.shape.Shapes
+import com.patrykandpatrick.vico.compose.component.shape.shader.fromBrush
+import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.core.entry.entryOf
-import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
-import androidx.compose.ui.platform.testTag
-import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.AmaniPsicologoColors
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoViewModel
+import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
-
-
-import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +125,10 @@ fun EstadisticasPsicologoScreen(
             }
 
             item {
-                ChartCard(chartData = uiState.chartData)
+                ChartCard(
+                    chartData = uiState.chartData,
+                    vistaSeleccionada = uiState.vistaSeleccionada
+                )
             }
 
             item {
@@ -247,7 +278,10 @@ fun FiltersSection(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ChartCard(chartData: List<Pair<LocalDate, Float>>) {
+fun ChartCard(
+    chartData: List<Pair<LocalDate, Float>>,
+    vistaSeleccionada: String
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -264,12 +298,13 @@ fun ChartCard(chartData: List<Pair<LocalDate, Float>>) {
                 color = AmaniPsicologoColors.TextSecondary
             )
             Spacer(modifier = Modifier.height(16.dp))
-            
-            if (chartData.isEmpty()) {
-                EmptyStateContent()
-            } else {
-                EmotionalEvolutionChart(
+
+            when {
+                chartData.isEmpty() -> EmptyStateContent()
+                chartData.size == 1 -> SinglePointChart(chartData.first())
+                else -> EmotionalEvolutionChart(
                     chartData = chartData,
+                    vistaSeleccionada = vistaSeleccionada,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -313,6 +348,7 @@ private fun EmptyStateContent() {
 @Composable
 fun EmotionalEvolutionChart(
     chartData: List<Pair<LocalDate, Float>>,
+    vistaSeleccionada: String = "Línea",
     modifier: Modifier = Modifier
 ) {
     val modelProducer = remember { ChartEntryModelProducer() }
@@ -330,35 +366,93 @@ fun EmotionalEvolutionChart(
         modelProducer.setEntries(entries)
     }
 
-    Chart(
-        chart = columnChart(
+    val chart = if (vistaSeleccionada == "Barras") {
+        columnChart(
             columns = listOf(
                 LineComponent(
                     color = primaryColor.toArgb(),
-                    thicknessDp = 16f,
+                    thicknessDp = (200f / maxOf(chartData.size, 1)).coerceIn(8f, 24f),
                     shape = Shapes.pillShape
                 )
             ),
             axisValuesOverrider = com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider.fixed(
-                minY = 0f,
-                maxY = 10f
+                minY = 0f, maxY = 10f
             )
-        ),
+        )
+    } else {
+        lineChart(
+            lines = listOf(
+                LineChart.LineSpec(
+                    lineColor = primaryColor.toArgb(),
+                    lineThicknessDp = 2f,
+                    lineBackgroundShader = DynamicShaders.fromBrush(
+                        Brush.verticalGradient(
+                            listOf(
+                                primaryColor.copy(alpha = 0.3f),
+                                primaryColor.copy(alpha = 0.0f)
+                            )
+                        )
+                    ),
+                    point = null,
+                    pointSizeDp = 6f
+                )
+            ),
+            axisValuesOverrider = com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider.fixed(
+                minY = 0f, maxY = 10f
+            )
+        )
+    }
+
+    Chart(
+        chart = chart,
         chartModelProducer = modelProducer,
         startAxis = rememberStartAxis(
             valueFormatter = { value, _ -> value.toInt().toString() },
-            itemPlacer = AxisItemPlacer.Vertical.default(maxItemCount = 6) // Muestra 0, 2, 4, 6, 8, 10
+            itemPlacer = AxisItemPlacer.Vertical.default(maxItemCount = 6)
         ),
         bottomAxis = rememberBottomAxis(
             valueFormatter = { value, _ ->
                 val index = value.toInt()
                 if (index in dateLabels.indices) dateLabels[index] else ""
             },
-            itemPlacer = AxisItemPlacer.Horizontal.default(spacing = 1)
+            itemPlacer = AxisItemPlacer.Horizontal.default(
+                spacing = maxOf(1, chartData.size / 6)
+            )
         ),
         modifier = modifier,
         chartScrollState = rememberChartScrollState()
     )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun SinglePointChart(point: Pair<LocalDate, Float>) {
+    val formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("es"))
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = point.second.toInt().toString(),
+            style = MaterialTheme.typography.displayMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "/ 10  ·  ${point.first.format(formatter)}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Solo hay una entrada registrada en este periodo.",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

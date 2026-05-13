@@ -8,7 +8,6 @@ import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.PreguntaRequest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 

@@ -1,9 +1,13 @@
 package org.ies.tierno.applicationamani.data
 
 import app.cash.turbine.test
+import com.google.firebase.auth.FirebaseAuth
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -13,20 +17,15 @@ import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
-
-import com.google.firebase.auth.FirebaseAuth
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
-import org.junit.After
 
 class AuthRepositoryTest {
 
@@ -195,12 +194,12 @@ class AuthRepositoryTest {
 
     @Test
     fun `darBajaPaciente should return success when api succeeds`() = runTest {
-        coEvery { api.darBajaPaciente(1L) } returns Response.success("Baja correcta")
+        coEvery { api.darBajaPaciente(1L) } returns Response.success(MessageResponse("Baja correcta"))
 
         val result = repository.darBajaPaciente(1L)
 
         assertTrue(result.isSuccess)
-        assertEquals("Baja correcta", result.getOrNull())
+        assertEquals("Baja correcta", result.getOrNull()?.message)
     }
 
     @Test

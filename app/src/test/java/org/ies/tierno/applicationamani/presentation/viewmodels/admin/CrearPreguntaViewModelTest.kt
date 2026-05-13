@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.admin
 
-import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -12,9 +11,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
 import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
-import org.ies.tierno.applicationamani.dto.opcionAdminDTO.PreguntaRequest
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

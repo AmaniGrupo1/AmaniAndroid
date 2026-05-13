@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.webkit.MimeTypeMap
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.storageMetadata
@@ -12,13 +13,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.ies.tierno.applicationamani.domain.models.AttachmentType
+import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
-
-import com.google.firebase.auth.FirebaseAuth
-import timber.log.Timber
 
 class FileStorageService(
     private val firebaseInstance: FirebaseInstance,

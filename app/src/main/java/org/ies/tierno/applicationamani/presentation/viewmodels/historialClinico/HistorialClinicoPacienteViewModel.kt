@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch

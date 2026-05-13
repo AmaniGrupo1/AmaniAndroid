@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.citas
 
-import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -17,12 +16,10 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
-import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

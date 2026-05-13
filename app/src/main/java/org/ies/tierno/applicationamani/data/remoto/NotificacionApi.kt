@@ -4,7 +4,10 @@ package org.ies.tierno.applicationamani.data.remoto
 import org.ies.tierno.applicationamani.dto.notificacion.NotificacionConfigDTO
 import org.ies.tierno.applicationamani.dto.notificacion.NotificacionResponseDTO
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface NotificacionApi {
 

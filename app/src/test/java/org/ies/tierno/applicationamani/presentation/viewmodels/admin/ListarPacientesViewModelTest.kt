@@ -13,8 +13,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
+import org.ies.tierno.applicationamani.dto.admin.MessageResponse
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
-import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -67,44 +67,46 @@ class ListarPacientesViewModelTest {
     }
 
     @Test
-    fun `darBajaPaciente success marks patient as inactive`() = runTest {
+    fun `darBajaPsicologo success marks patient as inactive`() = runTest {
         every { listarPacientesUseCase() } returns flowOf(listOf(testPaciente))
-        coEvery { darBajaPacienteUseCase(1L) } returns Result.success("Baja correcta")
+        coEvery { darBajaPacienteUseCase(1L) } returns Result.success(MessageResponse("Baja correcta"))
 
         val viewModel = ListarPacientesViewModel(listarPacientesUseCase, darBajaPacienteUseCase)
         advanceUntilIdle()
 
-        val result = viewModel.darBajaPaciente(1L)
+        viewModel.darBajaPsicologo(1L)
         advanceUntilIdle()
 
-        assertTrue(result.isSuccess)
+        assertTrue(viewModel.bajaEstado.value?.isSuccess == true)
         assertEquals(false, viewModel.paciente.value[0].activo)
     }
 
     @Test
-    fun `darBajaPaciente failure returns error`() = runTest {
+    fun `darBajaPsicologo failure returns error`() = runTest {
         every { listarPacientesUseCase() } returns flowOf(listOf(testPaciente))
         coEvery { darBajaPacienteUseCase(1L) } returns Result.failure(Exception("Error"))
 
         val viewModel = ListarPacientesViewModel(listarPacientesUseCase, darBajaPacienteUseCase)
         advanceUntilIdle()
 
-        val result = viewModel.darBajaPaciente(1L)
+        viewModel.darBajaPsicologo(1L)
         advanceUntilIdle()
 
-        assertTrue(result.isFailure)
+        assertTrue(viewModel.bajaEstado.value?.isFailure == true)
         assertEquals(true, viewModel.paciente.value[0].activo)
     }
 
     @Test
-    fun `darBajaPaciente non-existent patient still returns result`() = runTest {
+    fun `darBajaPsicologo non-existent patient still returns result`() = runTest {
         every { listarPacientesUseCase() } returns flowOf(emptyList())
-        coEvery { darBajaPacienteUseCase(99L) } returns Result.success("Baja correcta")
+        coEvery { darBajaPacienteUseCase(99L) } returns Result.success(MessageResponse("Baja correcta"))
 
         val viewModel = ListarPacientesViewModel(listarPacientesUseCase, darBajaPacienteUseCase)
         advanceUntilIdle()
 
-        val result = viewModel.darBajaPaciente(99L)
-        assertTrue(result.isSuccess)
+        viewModel.darBajaPsicologo(99L)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.bajaEstado.value?.isSuccess == true)
     }
 }

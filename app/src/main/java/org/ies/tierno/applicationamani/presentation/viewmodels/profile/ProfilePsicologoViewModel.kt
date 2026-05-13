@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.profile
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,6 @@ import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUse
 import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import java.io.File
-import java.io.FileOutputStream
 
 class ProfilePsicologoViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral

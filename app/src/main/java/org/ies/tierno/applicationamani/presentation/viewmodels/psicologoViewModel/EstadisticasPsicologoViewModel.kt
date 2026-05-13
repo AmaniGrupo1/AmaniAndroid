@@ -12,11 +12,8 @@ import org.ies.tierno.applicationamani.data.remoto.DiarioRemoteRepository
 import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
 import org.ies.tierno.applicationamani.domain.models.psicologo.EstadisticasEmocionales
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-
 import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
+import java.time.LocalDate
 
 data class EstadisticasPsicologoUiState(
     val pacientes: List<PacientePsicologoResponseDTO> = emptyList(),
@@ -105,18 +102,13 @@ class EstadisticasPsicologoViewModel(
         }.sortedBy { it.fecha }
     }
 
-    /**
-     * Transforma las entradas en una lista de puntos (Fecha, Promedio Intensidad) para el gráfico.
-     */
     private fun transformarParaGrafico(entradas: List<DiarioEmocionResponseDTO>): List<Pair<LocalDate, Float>> {
         return entradas
-            .groupBy { it.fecha.toLocalDateSafe() }
-            .mapNotNull { (fecha, entradasDelDia) ->
-                if (fecha == null) return@mapNotNull null
-                val promedio = entradasDelDia.map { it.intensidad }.average().toFloat()
-                fecha to promedio
+            .sortedBy { it.fecha }
+            .mapNotNull { entrada ->
+                val fecha = entrada.fecha.toLocalDateSafe() ?: return@mapNotNull null
+                fecha to entrada.intensidad.toFloat()
             }
-            .sortedBy { it.first }
     }
 
     private fun calcularEstadisticas(entradas: List<DiarioEmocionResponseDTO>): EstadisticasEmocionales {
@@ -127,18 +119,19 @@ class EstadisticasPsicologoViewModel(
         val peor = entradas.minByOrNull { it.intensidad }
         val total = entradas.size
 
-        // Tendencia (comparar última mitad con primera mitad)
-        val mitad = entradas.size / 2
-        val tendencia = if (mitad > 0) {
-            val segundaMitad = entradas.takeLast(mitad).map { it.intensidad }.average()
-            val primeraMitad = entradas.take(mitad).map { it.intensidad }.average()
-            segundaMitad - primeraMitad
+        val tendencia = if (entradas.size >= 2) {
+            val mid = entradas.size / 2
+            val primera = entradas.take(mid).map { it.intensidad }.average()
+            val segunda = entradas.drop(mid).map { it.intensidad }.average()
+            segunda - primera
         } else 0.0
 
         val observacion = when {
-            tendencia > 1.0 -> "Se observa una tendencia general positiva en el estado emocional del paciente, con mejoras significativas en las últimas semanas."
-            tendencia < -1.0 -> "Se observa una tendencia a la baja en el estado emocional. Se recomienda profundizar en las causas en la próxima sesión."
-            else -> "El estado emocional se mantiene estable dentro del periodo seleccionado."
+            promedio >= 8 -> "El paciente muestra niveles muy positivos de bienestar emocional."
+            promedio >= 6 -> "El paciente presenta un estado emocional positivo."
+            promedio >= 4 -> "El paciente mantiene un estado emocional neutro. Seguimiento recomendado."
+            promedio >= 2 -> "El paciente presenta señales de malestar emocional. Atención prioritaria."
+            else -> "Sin datos suficientes para generar una observación."
         }
 
         return EstadisticasEmocionales(

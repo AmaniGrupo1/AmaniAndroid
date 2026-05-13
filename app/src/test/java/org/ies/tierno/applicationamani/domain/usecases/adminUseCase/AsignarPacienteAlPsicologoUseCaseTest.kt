@@ -3,7 +3,6 @@ package org.ies.tierno.applicationamani.domain.usecases.adminUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.junit.Assert.assertEquals

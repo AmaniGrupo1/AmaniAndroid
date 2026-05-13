@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase
 
-import org.ies.tierno.applicationamani.data.remoto.AjustesApi
 import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
 
 class IdiomaUseCase(private val ajustesRepository: AjustesRepository) {

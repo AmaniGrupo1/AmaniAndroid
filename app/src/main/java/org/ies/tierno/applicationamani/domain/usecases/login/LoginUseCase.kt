@@ -6,7 +6,6 @@ import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 
 /**

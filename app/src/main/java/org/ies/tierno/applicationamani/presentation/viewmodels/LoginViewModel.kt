@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
-import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago

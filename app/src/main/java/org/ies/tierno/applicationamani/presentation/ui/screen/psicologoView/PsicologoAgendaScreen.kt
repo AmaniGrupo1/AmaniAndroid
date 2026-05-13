@@ -59,6 +59,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -67,7 +68,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
@@ -110,12 +110,11 @@ import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
 import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.FranjaDisponibilidadResponse
-import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
-import org.koin.androidx.compose.koinViewModel
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime

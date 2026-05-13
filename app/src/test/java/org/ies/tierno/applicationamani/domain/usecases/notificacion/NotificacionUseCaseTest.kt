@@ -4,7 +4,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.junit.Assert.assertEquals
 import org.junit.Before

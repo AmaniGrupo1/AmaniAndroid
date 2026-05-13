@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-import ListarPacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,13 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.ui.theme.BarlowCondensed
 import org.ies.tierno.applicationamani.ui.theme.Roboto
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

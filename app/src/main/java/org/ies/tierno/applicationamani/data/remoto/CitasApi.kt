@@ -6,9 +6,9 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
-import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaRequest
+import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE

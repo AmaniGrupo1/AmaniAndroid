@@ -1,3 +1,5 @@
+package org.ies.tierno.applicationamani.presentation.viewmodels.admin
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow

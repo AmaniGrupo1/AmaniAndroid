@@ -2,14 +2,14 @@ package org.ies.tierno.applicationamani.data.remoto
 
 
 import okhttp3.MultipartBody
-import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.AdminDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.AdminResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart

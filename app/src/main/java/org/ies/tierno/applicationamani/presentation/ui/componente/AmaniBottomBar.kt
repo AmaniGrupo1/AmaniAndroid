@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -20,7 +19,6 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Psychology
-import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme

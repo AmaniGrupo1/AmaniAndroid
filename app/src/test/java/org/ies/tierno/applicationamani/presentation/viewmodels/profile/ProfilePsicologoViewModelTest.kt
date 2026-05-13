@@ -13,7 +13,11 @@ import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUse
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.UsuarioProfileResponseDTO
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

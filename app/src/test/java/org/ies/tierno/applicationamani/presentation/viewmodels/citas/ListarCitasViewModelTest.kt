@@ -7,15 +7,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
-import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarCitasUseCase
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
+import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarCitasUseCase
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

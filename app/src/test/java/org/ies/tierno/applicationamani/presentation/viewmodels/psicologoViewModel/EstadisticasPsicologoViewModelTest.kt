@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel
 
-import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -17,7 +16,11 @@ import org.ies.tierno.applicationamani.data.remoto.DiarioRemoteRepository
 import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

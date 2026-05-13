@@ -16,7 +16,9 @@ import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

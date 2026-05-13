@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
-import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
