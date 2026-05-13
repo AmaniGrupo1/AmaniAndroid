@@ -1,8 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
 import androidx.compose.foundation.background
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,10 +62,28 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
+// Colores originales para el modo DEFECTO
+object HistorialClinicoDefaultColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Error = Color(0xFFE57373)
+    val Success = Color(0xFF81C784)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +92,46 @@ fun HistorialClinicoScreen(
     idPaciente: Long,
     viewModel: HistorialClinicoPacienteViewModel
 ) {
-    val colors = MaterialTheme.colorScheme
     val scope = rememberCoroutineScope()
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-
     val context = LocalContext.current
     val tokenDataStore = remember { TokenDataStore(context) }
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val colors = if (isDark) {
+        HistorialClinicoThemeColors(
+            primary = Color.White,
+            primaryLight = Color.White.copy(alpha = 0.7f),
+            primaryDark = Color.DarkGray,
+            secondary = Color.Gray,
+            accent = cardColors.cardBackground,
+            background = screenColors.background,
+            surface = cardColors.cardBackground,
+            textPrimary = cardColors.cardContent,
+            textSecondary = cardColors.cardContent.copy(alpha = 0.7f),
+            error = HistorialClinicoDefaultColors.Error,
+            success = HistorialClinicoDefaultColors.Success
+        )
+    } else {
+        HistorialClinicoThemeColors(
+            primary = HistorialClinicoDefaultColors.Primary,
+            primaryLight = HistorialClinicoDefaultColors.PrimaryLight,
+            primaryDark = HistorialClinicoDefaultColors.PrimaryDark,
+            secondary = HistorialClinicoDefaultColors.Secondary,
+            accent = HistorialClinicoDefaultColors.Accent,
+            background = HistorialClinicoDefaultColors.Background,
+            surface = HistorialClinicoDefaultColors.Surface,
+            textPrimary = HistorialClinicoDefaultColors.TextPrimary,
+            textSecondary = HistorialClinicoDefaultColors.TextSecondary,
+            error = HistorialClinicoDefaultColors.Error,
+            success = HistorialClinicoDefaultColors.Success
+        )
+    }
 
     val historial by viewModel.historial
     val isLoading by viewModel.isLoading
@@ -115,12 +165,17 @@ fun HistorialClinicoScreen(
                         text = "Historial Clínico",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        color = if (isDark) Color.Black else Color.White,
+                        fontFamily = roboto
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -135,7 +190,11 @@ fun HistorialClinicoScreen(
                 .padding(paddingValues)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(colors.surfaceContainerLow, Color.White)
+                        colors = if (isDark) {
+                            listOf(colors.background, colors.background)
+                        } else {
+                            listOf(colors.accent, Color.White)
+                        }
                     )
                 )
         ) {
@@ -154,7 +213,7 @@ fun HistorialClinicoScreen(
                             Text(
                                 text = "Cargando historial clínico...",
                                 fontSize = 14.sp,
-                                color = colors.onSurfaceVariant,
+                                color = colors.textSecondary,
                                 fontFamily = roboto
                             )
                         }
@@ -182,7 +241,7 @@ fun HistorialClinicoScreen(
                                 text = "No hay registros en tu historial clínico",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.onSurface,
+                                color = colors.textPrimary,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -190,7 +249,7 @@ fun HistorialClinicoScreen(
                             Text(
                                 text = "Las consultas con tu psicólogo aparecerán aquí",
                                 fontSize = 14.sp,
-                                color = colors.onSurfaceVariant,
+                                color = colors.textSecondary,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -219,7 +278,7 @@ fun HistorialClinicoScreen(
                                 text = "Error al cargar el historial",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = colors.onSurface,
+                                color = colors.textPrimary,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -227,7 +286,7 @@ fun HistorialClinicoScreen(
                             Text(
                                 text = error ?: "Error desconocido",
                                 fontSize = 14.sp,
-                                color = colors.onSurfaceVariant,
+                                color = colors.textSecondary,
                                 fontFamily = roboto,
                                 textAlign = TextAlign.Center
                             )
@@ -242,9 +301,18 @@ fun HistorialClinicoScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(Icons.Default.Refresh, contentDescription = "Reintentar")
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = "Reintentar",
+                                    tint = if (isDark) Color.Black else Color.White
+                                )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Reintentar", fontSize = 14.sp)
+                                Text(
+                                    "Reintentar",
+                                    fontSize = 14.sp,
+                                    color = if (isDark) Color.Black else Color.White,
+                                    fontFamily = roboto
+                                )
                             }
                         }
                     }
@@ -265,7 +333,8 @@ fun HistorialClinicoScreen(
                                 },
                                 colors = colors,
                                 roboto = roboto,
-                                formatFecha = { formatFecha(it) }
+                                formatFecha = { formatFecha(it) },
+                                isDark = isDark
                             )
                         }
                     }
@@ -280,9 +349,10 @@ fun HistorialCard(
     item: HistorialClinicoResponseDTO,
     isExpanded: Boolean,
     onCardClick: () -> Unit,
-    colors: ColorScheme,
+    colors: HistorialClinicoThemeColors,
     roboto: FontFamily,
-    formatFecha: (String) -> String
+    formatFecha: (String) -> String,
+    isDark: Boolean
 ) {
     Card(
         modifier = Modifier
@@ -321,13 +391,13 @@ fun HistorialCard(
                             Icons.Default.DateRange,
                             contentDescription = "Fecha",
                             modifier = Modifier.size(14.dp),
-                            tint = colors.onSurfaceVariant
+                            tint = colors.textSecondary
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = formatFecha(item.creadoEn),
                             fontSize = 12.sp,
-                            color = colors.onSurfaceVariant,
+                            color = colors.textSecondary,
                             fontFamily = roboto
                         )
                     }
@@ -365,7 +435,7 @@ fun HistorialCard(
                     Text(
                         text = item.diagnostico.ifEmpty { "No especificado" },
                         fontSize = 14.sp,
-                        color = colors.onSurface,
+                        color = colors.textPrimary,
                         fontFamily = roboto,
                         lineHeight = 20.sp
                     )
@@ -390,14 +460,14 @@ fun HistorialCard(
                                 Icons.Default.Favorite,
                                 contentDescription = "Tratamiento",
                                 modifier = Modifier.size(16.dp),
-                                tint = colors.primaryContainer
+                                tint = colors.primaryLight
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Tratamiento",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.primaryContainer,
+                                color = colors.primaryLight,
                                 fontFamily = roboto
                             )
                         }
@@ -405,7 +475,7 @@ fun HistorialCard(
                         Text(
                             text = item.tratamiento.ifEmpty { "No especificado" },
                             fontSize = 14.sp,
-                            color = colors.onSurface,
+                            color = colors.textPrimary,
                             fontFamily = roboto,
                             lineHeight = 20.sp
                         )
@@ -418,7 +488,7 @@ fun HistorialCard(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = colors.surfaceContainerLow.copy(alpha = 0.2f)
+                    color = colors.accent.copy(alpha = 0.2f)
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp)
@@ -428,14 +498,14 @@ fun HistorialCard(
                                 Icons.Default.Note,
                                 contentDescription = "Observaciones",
                                 modifier = Modifier.size(16.dp),
-                                tint = colors.onSurfaceVariant
+                                tint = colors.textSecondary
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Observaciones",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.onSurfaceVariant,
+                                color = colors.textSecondary,
                                 fontFamily = roboto
                             )
                         }
@@ -443,7 +513,7 @@ fun HistorialCard(
                         Text(
                             text = item.observaciones.ifEmpty { "No hay observaciones registradas" },
                             fontSize = 14.sp,
-                            color = colors.onSurfaceVariant,
+                            color = colors.textSecondary,
                             fontFamily = roboto,
                             lineHeight = 20.sp
                         )
@@ -453,3 +523,18 @@ fun HistorialCard(
         }
     }
 }
+
+// Clase auxiliar para los colores del tema
+data class HistorialClinicoThemeColors(
+    val primary: Color,
+    val primaryLight: Color,
+    val primaryDark: Color,
+    val secondary: Color,
+    val accent: Color,
+    val background: Color,
+    val surface: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val error: Color,
+    val success: Color
+)

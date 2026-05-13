@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -46,6 +45,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,8 +56,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.koin.java.KoinJavaComponent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -77,20 +85,41 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.koin.androidx.compose.koinViewModel
 
+// Colores originales para el modo SYSTEM (igual que antes)
+object AmaniDefaultColors {
+    val Primary = Color(0xFF6C63FF)
+    val Background = Color(0xFFF5F5F5)
+    val TextPrimary = Color(0xFF333333)
+    val TextSecondary = Color.Gray
+    val Success = Color(0xFF27AE60)
+    val Warning = Color(0xFFE67E22)
+    val Info = Color(0xFF2196F3)
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ListarPacienteSinPsicologos(
     navController: NavController,
     pacientesViewModel: PacientesViewModel = koinViewModel()
 ) {
-    val primaryColor = Color(0xFF6C63FF)
-    val backgroundColor = Color(0xFFF5F5F5)
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores segun el tema
+    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniDefaultColors.Primary
+    val titleOnPrimary = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+    val backgroundColor = if (isDark) screenColors.background else AmaniDefaultColors.Background
+    val textColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDefaultColors.TextSecondary
 
     val pacientes by pacientesViewModel.pacientes.collectAsStateWithLifecycle()
     val loading by pacientesViewModel.loading.collectAsStateWithLifecycle()
 
-    // Expansión de tarjetas
+    // Expansion de tarjetas
     var expandedCardId by remember { mutableStateOf<Long?>(null) }
 
     // Cargar pacientes al entrar en la pantalla
@@ -124,8 +153,8 @@ fun ListarPacienteSinPsicologos(
                     }
 
                     Text(
-                        text = "PACIENTES SIN PSICÓLOGO",
-                        color = Color.White,
+                        "Pacientes sin Psicologo",
+                        color = titleOnPrimary,
                         fontFamily = roboto,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -141,7 +170,7 @@ fun ListarPacienteSinPsicologos(
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = "Refrescar",
-                            tint = Color.White
+                            tint = titleOnPrimary
                         )
                     }
                 }
@@ -177,20 +206,20 @@ fun ListarPacienteSinPsicologos(
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
-                                tint = Color.Gray.copy(alpha = 0.5f),
+                                tint = textSecondaryColor.copy(alpha = 0.5f),
                                 modifier = Modifier.size(80.dp)
                             )
                             Text(
                                 text = "No hay pacientes sin asignar",
                                 fontFamily = roboto,
                                 fontSize = 16.sp,
-                                color = Color.Gray
+                                color = textColor
                             )
                             Text(
-                                text = "Todos los pacientes ya tienen psicólogo asignado",
+                                text = "Todos los pacientes ya tienen psicologo asignado",
                                 fontFamily = roboto,
                                 fontSize = 14.sp,
-                                color = Color.Gray.copy(alpha = 0.7f)
+                                color = textSecondaryColor
                             )
                         }
                     }
@@ -216,8 +245,8 @@ fun ListarPacienteSinPsicologos(
                                     navController.navigate(Screens.listarPsicologo.createRoute(paciente.idPaciente))
                                 },
                                 primaryColor = primaryColor,
-                                roboto = roboto
-
+                                roboto = roboto,
+                                isDark = isDark
                             )
                         }
                     }
@@ -235,20 +264,29 @@ fun PacienteExpandableCard(
     onExpandClick: () -> Unit,
     onAsignarClick: () -> Unit,
     primaryColor: Color,
-    roboto: FontFamily
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
+    val amaniColors = LocalAmaniColors.current
+    val cardColors = getCardColors()
+
+    // Colores dinamicos
+    val cardBackgroundColor = if (isDark) cardColors.cardBackground else Color.White
+    val textColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDefaultColors.TextSecondary
+    val detailLabelColor = if (isDark) cardColors.cardContent.copy(alpha = 0.6f) else Color.Gray
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .animateContentSize()
         ) {
-            // Header: Información básica (siempre visible)
+            // Header: Informacion basica (siempre visible)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -288,7 +326,7 @@ fun PacienteExpandableCard(
                             fontFamily = roboto,
                             fontWeight = Bold,
                             fontSize = 16.sp,
-                            color = Color(0xFF333333)
+                            color = textColor
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Row(
@@ -297,7 +335,7 @@ fun PacienteExpandableCard(
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = null,
-                                tint = Color.Gray,
+                                tint = textSecondaryColor,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -305,13 +343,13 @@ fun PacienteExpandableCard(
                                 text = paciente.email,
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = textSecondaryColor
                             )
                         }
                     }
                 }
 
-                // Icono de expansión con animación
+                // Icono de expansion con animacion
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (isExpanded) "Contraer" else "Expandir",
@@ -339,7 +377,7 @@ fun PacienteExpandableCard(
                         .padding(bottom = 16.dp)
                 ) {
                     HorizontalDivider(
-                        color = Color.LightGray,
+                        color = textSecondaryColor.copy(alpha = 0.12f),
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
@@ -348,28 +386,34 @@ fun PacienteExpandableCard(
                         title = "Datos Personales",
                         icon = Icons.Default.Person,
                         iconColor = primaryColor,
-                        roboto = roboto
+                        roboto = roboto,
+                        textColor = textColor,
+                        isDark = isDark
                     ) {
-                        DetailRow("DNI", paciente.dni ?: "No especificado", roboto)
-                        DetailRow("Teléfono", paciente.telefono ?: "No especificado", roboto)
-                        DetailRow("Género", paciente.genero ?: "No especificado", roboto)
-                        DetailRow("Fecha Nacimiento", paciente.fechaNacimiento ?: "No especificado", roboto)
+                        DetailRow("DNI", paciente.dni ?: "No especificado", roboto, detailLabelColor, textColor)
+                        DetailRow("Telefono", paciente.telefono ?: "No especificado", roboto, detailLabelColor, textColor)
+                        DetailRow("Genero", paciente.genero ?: "No especificado", roboto, detailLabelColor, textColor)
+                        DetailRow("Fecha Nacimiento", paciente.fechaNacimiento ?: "No especificado", roboto, detailLabelColor, textColor)
                     }
-                    // Situaciones (AQUÍ debe ir, NO en el header)
+
+                    // Situaciones
                     if (!paciente.situaciones.isNullOrEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         SubSection(
                             title = "Situaciones",
                             icon = Icons.Default.Info,
-                            iconColor = Color(0xFF27AE60),
-                            roboto = roboto
+                            iconColor = AmaniDefaultColors.Success,
+                            roboto = roboto,
+                            textColor = textColor,
+                            isDark = isDark
                         ) {
                             paciente.situaciones!!.forEachIndexed { index, situacion ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
-                                SituacionCard(situacion, roboto)
+                                SituacionCard(situacion, roboto, isDark)
                             }
                         }
                     }
+
                     // Direcciones
                     if (!paciente.direcciones.isNullOrEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
@@ -377,11 +421,13 @@ fun PacienteExpandableCard(
                             title = "Direcciones",
                             icon = Icons.Default.LocationOn,
                             iconColor = primaryColor,
-                            roboto = roboto
+                            roboto = roboto,
+                            textColor = textColor,
+                            isDark = isDark
                         ) {
                             paciente.direcciones!!.forEachIndexed { index, direccion ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
-                                DireccionCard(direccion, roboto)
+                                DireccionCard(direccion, roboto, isDark)
                             }
                         }
                     }
@@ -392,19 +438,21 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Tutores",
                             icon = Icons.Default.People,
-                            iconColor = Color(0xFFE67E22),
-                            roboto = roboto
+                            iconColor = AmaniDefaultColors.Warning,
+                            roboto = roboto,
+                            textColor = textColor,
+                            isDark = isDark
                         ) {
                             paciente.tutores!!.forEachIndexed { index, tutor ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
-                                TutorCard(tutor, roboto)
+                                TutorCard(tutor, roboto, isDark)
                             }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Botón Asignar Psicólogo
+                    // Boton Asignar Psicologo
                     Button(
                         onClick = onAsignarClick,
                         modifier = Modifier
@@ -412,20 +460,21 @@ fun PacienteExpandableCard(
                             .height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryColor
+                            containerColor = primaryColor,
+                            contentColor = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
                         )
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.AssignmentInd,
                                 contentDescription = null,
-                                tint = Color.White,
+                                tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Asignar Psicólogo",
-                                color = Color.White,
+                                "Asignar Psicologo",
+                                color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
                                 fontFamily = roboto,
                                 fontWeight = FontWeight.Medium
                             )
@@ -443,6 +492,8 @@ fun SubSection(
     icon: ImageVector,
     iconColor: Color,
     roboto: FontFamily,
+    textColor: Color,
+    isDark: Boolean,
     content: @Composable () -> Unit
 ) {
     Column {
@@ -473,7 +524,9 @@ fun SubSection(
 fun DetailRow(
     label: String,
     value: String,
-    roboto: FontFamily
+    roboto: FontFamily,
+    labelColor: Color,
+    valueColor: Color
 ) {
     Row(
         modifier = Modifier
@@ -485,14 +538,14 @@ fun DetailRow(
             text = label,
             fontFamily = roboto,
             fontSize = 13.sp,
-            color = Color.Gray
+            color = labelColor
         )
         Text(
             text = value,
             fontFamily = roboto,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF333333)
+            color = valueColor
         )
     }
 }
@@ -500,30 +553,36 @@ fun DetailRow(
 @Composable
 fun DireccionCard(
     direccion: DireccionResponseDTO,
-    roboto: FontFamily
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
+    val cardColors = getCardColors()
+    val cardBackground = if (isDark) cardColors.cardBackground else Color.White
+    val labelColor = if (isDark) cardColors.cardContent.copy(alpha = 0.6f) else Color.Gray
+    val valueColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
+        colors = CardDefaults.cardColors(containerColor = cardBackground)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
             if (!direccion.calle.isNullOrBlank()) {
-                DetailRow("Calle", direccion.calle, roboto)
+                DetailRow("Calle", direccion.calle, roboto, labelColor, valueColor)
             }
             if (!direccion.ciudad.isNullOrBlank()) {
-                DetailRow("Ciudad", direccion.ciudad, roboto)
+                DetailRow("Ciudad", direccion.ciudad, roboto, labelColor, valueColor)
             }
             if (!direccion.provincia.isNullOrBlank()) {
-                DetailRow("Provincia", direccion.provincia, roboto)
+                DetailRow("Provincia", direccion.provincia, roboto, labelColor, valueColor)
             }
             if (!direccion.codigoPostal.isNullOrBlank()) {
-                DetailRow("Código Postal", direccion.codigoPostal, roboto)
+                DetailRow("Codigo Postal", direccion.codigoPostal, roboto, labelColor, valueColor)
             }
             if (!direccion.pais.isNullOrBlank()) {
-                DetailRow("País", direccion.pais, roboto)
+                DetailRow("Pais", direccion.pais, roboto, labelColor, valueColor)
             }
         }
     }
@@ -532,30 +591,36 @@ fun DireccionCard(
 @Composable
 fun TutorCard(
     tutor: TutorResponseDTO,
-    roboto: FontFamily
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
+    val cardColors = getCardColors()
+    val cardBackground = if (isDark) cardColors.cardBackground else Color.White
+    val labelColor = if (isDark) cardColors.cardContent.copy(alpha = 0.6f) else Color.Gray
+    val valueColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8F0))
+        colors = CardDefaults.cardColors(containerColor = cardBackground)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
             if (!tutor.nombre.isNullOrBlank()) {
-                DetailRow("Nombre", tutor.nombre, roboto)
+                DetailRow("Nombre", tutor.nombre, roboto, labelColor, valueColor)
             }
             if (!tutor.tipo.isNullOrBlank()) {
-                DetailRow("Parentesco", tutor.tipo, roboto)
+                DetailRow("Parentesco", tutor.tipo, roboto, labelColor, valueColor)
             }
             if (!tutor.telefono.isNullOrBlank()) {
-                DetailRow("Teléfono", tutor.telefono, roboto)
+                DetailRow("Telefono", tutor.telefono, roboto, labelColor, valueColor)
             }
             if (!tutor.email.isNullOrBlank()) {
-                DetailRow("Email", tutor.email, roboto)
+                DetailRow("Email", tutor.email, roboto, labelColor, valueColor)
             }
             if (!tutor.dni.isNullOrBlank()) {
-                DetailRow("DNI", tutor.dni, roboto)
+                DetailRow("DNI", tutor.dni, roboto, labelColor, valueColor)
             }
         }
     }
@@ -564,17 +629,23 @@ fun TutorCard(
 @Composable
 fun SituacionCard(
     situacion: SituacionDTO,
-    roboto: FontFamily
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
+    val cardColors = getCardColors()
+    val cardBackground = if (isDark) cardColors.cardBackground else Color.White
+    val textColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
+    val descripcionColor = if (isDark) cardColors.cardContent.copy(alpha = 0.8f) else Color(0xFF555555)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FFF4))  // Verde muy claro
+        colors = CardDefaults.cardColors(containerColor = cardBackground)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            // Nombre de la situación (siempre visible)
+            // Nombre de la situacion (siempre visible)
             if (!situacion.nombre.isNullOrBlank()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -586,18 +657,18 @@ fun SituacionCard(
                         fontFamily = roboto,
                         fontSize = 14.sp,
                         fontWeight = Bold,
-                        color = Color(0xFF27AE60)
+                        color = AmaniDefaultColors.Success
                     )
                     if (!situacion.categoria.isNullOrBlank()) {
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = Color(0xFF27AE60).copy(alpha = 0.1f)
+                            color = AmaniDefaultColors.Success.copy(alpha = 0.1f)
                         ) {
                             Text(
                                 text = situacion.categoria,
                                 fontFamily = roboto,
                                 fontSize = 11.sp,
-                                color = Color(0xFF27AE60),
+                                color = AmaniDefaultColors.Success,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                             )
                         }
@@ -605,14 +676,14 @@ fun SituacionCard(
                 }
             }
 
-            // Descripción (si existe)
+            // Descripcion (si existe)
             if (!situacion.descripcion.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = situacion.descripcion,
                     fontFamily = roboto,
                     fontSize = 12.sp,
-                    color = Color(0xFF555555),
+                    color = descripcionColor,
                     lineHeight = 16.sp
                 )
             }

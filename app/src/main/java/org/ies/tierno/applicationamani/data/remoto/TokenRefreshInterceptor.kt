@@ -40,7 +40,6 @@ class TokenRefreshInterceptor(
                 }
             }
         }
-
         return response
     }
 }

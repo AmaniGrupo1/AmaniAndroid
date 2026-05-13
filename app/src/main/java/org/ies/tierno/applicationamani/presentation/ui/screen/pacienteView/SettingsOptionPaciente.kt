@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
-
 import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.background
@@ -85,12 +84,33 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 
 private const val TAG = "SettingsPaciente"
 
-// ✅ Definir SettingsOption localmente para paciente
+// Colores originales para el modo DEFECTO
+object SettingsPacienteDefaultColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val IconColor = Color(0xFF6B4E71)
+    val CategoriaPerfil = Color(0xFF6B4E71)
+    val CategoriaPreferencias = Color(0xFFE67E22)
+    val CategoriaCitas = Color(0xFF27AE60)
+    val CategoriaFacturacion = Color(0xFF3498DB)
+    val CategoriaSoporte = Color(0xFFE74C3C)
+    val CategoriaSistema = Color(0xFF9B59B6)
+}
+
+// Definir SettingsOption localmente para paciente
 data class SettingsOptionPaciente(
     val id: String,
     val title: String,
@@ -107,6 +127,23 @@ fun SettingsPacienteScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Obtener el tema actual del ViewModel
+    val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
+
+    // Determinar colores según el tema
+    val backgroundColor = if (isDark) screenColors.background else SettingsPacienteDefaultColors.Background
+    val surfaceColor = if (isDark) cardColors.cardBackground else SettingsPacienteDefaultColors.Surface
+    val textColor = if (isDark) cardColors.cardContent else SettingsPacienteDefaultColors.TextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else SettingsPacienteDefaultColors.TextSecondary
+    val primaryColor = if (isDark) Color.White else SettingsPacienteDefaultColors.Primary
+    val iconColor = if (isDark) Color.White else SettingsPacienteDefaultColors.IconColor
 
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
@@ -116,9 +153,8 @@ fun SettingsPacienteScreen(
 
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
 
-    // Bug 2 Fix: Control de recreación para evitar loops
-    // Inicializamos con null para ignorar la primera asignación automática
-    var previousLanguage by remember { mutableStateOf<String?>(null) }
+    // Control de recreación para evitar loops
+    var previousLanguage by remember { mutableStateOf(currentLanguage) }
     var isRecreating by remember { mutableStateOf(false) }
 
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
@@ -132,10 +168,6 @@ fun SettingsPacienteScreen(
         previousLanguage = currentLanguage
     }
 
-    val primaryColor = Color(0xFF6B4E71) // Color AMANI
-    val backgroundColor = Color(0xFFFDF8F9) // Fondo suave AMANI
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
@@ -145,12 +177,17 @@ fun SettingsPacienteScreen(
                         text = stringResource(R.string.configuracion),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        color = if (isDark) Color.Black else Color.White,
+                        fontFamily = roboto
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -172,12 +209,18 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.perfil),
                     icon = Icons.Outlined.Person,
-                    iconColor = primaryColor,
+                    iconColor = SettingsPacienteDefaultColors.CategoriaPerfil,
                     roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColor,
+                    isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "mi_perfil",
@@ -206,12 +249,18 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.preferencias),
                     icon = Icons.Outlined.Settings,
-                    iconColor = Color(0xFFE67E22),
+                    iconColor = SettingsPacienteDefaultColors.CategoriaPreferencias,
                     roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColor,
+                    isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "language",
@@ -237,7 +286,11 @@ fun SettingsPacienteScreen(
                         SettingsOptionPaciente(
                             id = "tema",
                             title = stringResource(R.string.tema),
-                            subtitle = stringResource(R.string.tema_oscuro_claro),
+                            subtitle = when (currentTema) {
+                                TemaApp.LIGHT -> "Blanco"
+                                TemaApp.DARK -> "Negro"
+                                TemaApp.SYSTEM -> "Defecto"
+                            },
                             icon = Icons.Default.BrightnessMedium
                         )
                     )
@@ -249,12 +302,18 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.mis_citas),
                     icon = Icons.Outlined.CalendarMonth,
-                    iconColor = Color(0xFF27AE60),
+                    iconColor = SettingsPacienteDefaultColors.CategoriaCitas,
                     roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColor,
+                    isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "proximas_citas",
@@ -283,12 +342,18 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.facturacion),
                     icon = Icons.Outlined.Receipt,
-                    iconColor = Color(0xFF3498DB),
+                    iconColor = SettingsPacienteDefaultColors.CategoriaFacturacion,
                     roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColor,
+                    isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "metodos_pago",
@@ -317,12 +382,18 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.soporte),
                     icon = Icons.Outlined.SupportAgent,
-                    iconColor = Color(0xFFE74C3C),
+                    iconColor = SettingsPacienteDefaultColors.CategoriaSoporte,
                     roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColor,
+                    isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "ayuda",
@@ -351,12 +422,18 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.sistema),
                     icon = Icons.Outlined.Storage,
-                    iconColor = Color(0xFF9B59B6),
+                    iconColor = SettingsPacienteDefaultColors.CategoriaSistema,
                     roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColor,
+                    isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "version",
@@ -399,12 +476,18 @@ fun SettingsCategoryCardPaciente(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    idiomaViewModel: IdiomaViewModel
+    currentTema: TemaApp,
+    idiomaViewModel: IdiomaViewModel,
+    surfaceColor: Color,
+    textColor: Color,
+    textSecondaryColor: Color,
+    iconColorGeneral: Color,
+    isDark: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -434,7 +517,7 @@ fun SettingsCategoryCardPaciente(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = Color(0xFF333333)
+                    color = textColor
                 )
             }
 
@@ -443,7 +526,7 @@ fun SettingsCategoryCardPaciente(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = Color.LightGray.copy(alpha = 0.3f)
+                        color = textColor.copy(alpha = 0.12f)
                     )
                 }
 
@@ -453,7 +536,12 @@ fun SettingsCategoryCardPaciente(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
-                    idiomaViewModel = idiomaViewModel
+                    currentTema = currentTema,
+                    idiomaViewModel = idiomaViewModel,
+                    textColor = textColor,
+                    textSecondaryColor = textSecondaryColor,
+                    iconColorGeneral = iconColorGeneral,
+                    isDark = isDark
                 )
             }
         }
@@ -467,10 +555,16 @@ fun SettingsOptionRowPaciente(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    idiomaViewModel: IdiomaViewModel
+    currentTema: TemaApp,
+    idiomaViewModel: IdiomaViewModel,
+    textColor: Color,
+    textSecondaryColor: Color,
+    iconColorGeneral: Color,
+    isDark: Boolean
 ) {
     val scope = rememberCoroutineScope()
-    var expanded by remember { mutableStateOf(false) }
+    var expandedIdioma by remember { mutableStateOf(false) }
+    var expandedTema by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Row(
@@ -478,7 +572,8 @@ fun SettingsOptionRowPaciente(
             .fillMaxWidth()
             .clickable {
                 when (option.id) {
-                    "language" -> expanded = true
+                    "language" -> expandedIdioma = true
+                    "tema" -> expandedTema = true
 
                     "mi_perfil" -> {
                         val identificador = session?.idPaciente
@@ -490,100 +585,64 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "mi_psicologo" -> {
-                        // TODO: Navegar a pantalla de información del psicólogo
                         Log.d(TAG, "👨‍⚕️ Navegar a información del psicólogo")
-                        // navController.navigate(Screens.infoPsicologo)
                     }
 
                     "historial" -> {
-
                         val pacienteId = session?.idPaciente
-
                         Log.d(TAG, "📌 CLICK HISTORIAL CLÍNICO")
-                        Log.d(TAG, "👤 Session completa: $session")
-                        Log.d(TAG, "🆔 idPaciente obtenido: $pacienteId")
 
                         if (pacienteId != null && pacienteId > 0L) {
-
-                            Log.d(TAG, "🚀 Navegando a historial con idPaciente = $pacienteId")
-
                             navController.navigate(
                                 Screens.historialClinico.createRoute(pacienteId)
                             )
-
                         } else {
-
                             Log.e(TAG, "❌ ERROR: idPaciente es NULL o inválido")
                         }
                     }
 
                     "notificaciones" -> {
-                        // TODO: Navegar a configuración de notificaciones
                         Log.d(TAG, "🔔 Navegar a notificaciones")
-                        // navController.navigate(Screens.notificaciones)
                     }
 
                     "recordatorios" -> {
-                        // TODO: Navegar a configuración de recordatorios
                         Log.d(TAG, "⏰ Navegar a recordatorios")
-                        // navController.navigate(Screens.recordatorios)
                     }
 
                     "proximas_citas" -> {
-                        // TODO: Navegar a próximas citas
                         Log.d(TAG, "📅 Navegar a próximas citas")
-                        // navController.navigate(Screens.proximasCitas)
                     }
 
                     "historial_citas" -> {
-                        // TODO: Navegar a historial de citas
                         Log.d(TAG, "📋 Navegar a historial de citas")
-                        // navController.navigate(Screens.historialCitas)
                     }
 
                     "metodos_pago" -> {
-                        // TODO: Navegar a métodos de pago
                         Log.d(TAG, "💳 Navegar a métodos de pago")
-                        // navController.navigate(Screens.metodosPago)
                     }
 
                     "historial_pagos" -> {
-                        // TODO: Navegar a historial de pagos
                         Log.d(TAG, "💰 Navegar a historial de pagos")
-                        // navController.navigate(Screens.historialPagos)
                     }
 
                     "ayuda" -> {
-                        // TODO: Navegar a ayuda / preguntas frecuentes
                         Log.d(TAG, "❓ Navegar a ayuda")
-                        // navController.navigate(Screens.ayuda)
                     }
 
                     "contacto" -> {
-                        // TODO: Navegar a contacto con soporte
                         Log.d(TAG, "📧 Navegar a contacto")
-                        // navController.navigate(Screens.contactoSoporte)
                     }
 
                     "terminos" -> {
-                        // TODO: Navegar a términos y condiciones
                         Log.d(TAG, "📄 Navegar a términos y condiciones")
-                        // navController.navigate(Screens.terminos)
                     }
 
                     "privacidad" -> {
-                        // TODO: Navegar a política de privacidad
                         Log.d(TAG, "🔒 Navegar a política de privacidad")
-                        // navController.navigate(Screens.privacidad)
                     }
 
                     "cerrar_sesion" -> {
-                        // TODO: Cerrar sesión
                         Log.d(TAG, "🚪 Cerrar sesión")
-                        // userSessionDataStore.clearSession()
-                        // navController.navigate(Screens.login.route) {
-                        //     popUpTo(0) { inclusive = true }
-                        // }
                     }
                 }
             }
@@ -598,7 +657,7 @@ fun SettingsOptionRowPaciente(
             Icon(
                 option.icon,
                 contentDescription = null,
-                tint = Color(0xFF6B4E71), // Color AMANI
+                tint = iconColorGeneral,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -609,63 +668,107 @@ fun SettingsOptionRowPaciente(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
-                    color = Color(0xFF333333)
+                    color = textColor
                 )
 
-                val displaySubtitle = if (option.id == "language") {
-                    if (currentLanguage == "es") stringResource(R.string.espanol)
-                    else stringResource(R.string.ingles)
-                } else {
-                    option.subtitle
+                val displaySubtitle = when (option.id) {
+                    "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                    "tema" -> when (currentTema) {
+                        TemaApp.LIGHT -> "Blanco"
+                        TemaApp.DARK -> "Negro"
+                        TemaApp.SYSTEM -> "Defecto"
+                    }
+                    else -> option.subtitle
                 }
 
                 Text(
                     text = displaySubtitle,
                     fontFamily = roboto,
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = textSecondaryColor
                 )
             }
         }
 
-        if (option.id == "language") {
-            Box {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+        when (option.id) {
+            "language" -> {
+                Box {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = iconColorGeneral)
 
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.espanol)) },
-                        onClick = {
-                            Log.d(TAG, "🇪🇸 Paciente seleccionó ESPAÑOL")
-                            scope.launch {
-                                idiomaViewModel.cambiarIdioma("es")
+                    DropdownMenu(
+                        expanded = expandedIdioma,
+                        onDismissRequest = { expandedIdioma = false },
+                        containerColor = if (isDark) Color.DarkGray else Color.White
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.espanol), color = textColor) },
+                            onClick = {
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("es")
+                                }
+                                expandedIdioma = false
                             }
-                            expanded = false
-                        }
-                    )
+                        )
 
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.ingles)) },
-                        onClick = {
-                            Log.d(TAG, "🇬🇧 Paciente seleccionó INGLÉS")
-                            scope.launch {
-                                idiomaViewModel.cambiarIdioma("en")
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.ingles), color = textColor) },
+                            onClick = {
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("en")
+                                }
+                                expandedIdioma = false
                             }
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        } else {
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = "Ir",
-                tint = Color.Gray,
-                modifier = Modifier.size(20.dp)
-            )
+            "tema" -> {
+                Box {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = iconColorGeneral)
+
+                    DropdownMenu(
+                        expanded = expandedTema,
+                        onDismissRequest = { expandedTema = false },
+                        containerColor = if (isDark) Color.DarkGray else Color.White
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Defecto", color = textColor) },
+                            onClick = {
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
+                                }
+                                expandedTema = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Blanco", color = textColor) },
+                            onClick = {
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
+                                }
+                                expandedTema = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Negro", color = textColor) },
+                            onClick = {
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                }
+                                expandedTema = false
+                            }
+                        )
+                    }
+                }
+            }
+            else -> {
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = "Ir",
+                    tint = textSecondaryColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }

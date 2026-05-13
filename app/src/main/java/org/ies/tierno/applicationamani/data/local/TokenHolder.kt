@@ -48,6 +48,14 @@ class TokenHolder(private val tokenDataStore: TokenDataStore) {
         _token = null
     }
 
+    /**
+     * Establece el token en la caché en memoria inmediatamente.
+     * Útil para evitar condiciones de carrera justo después de guardar en DataStore.
+     */
+    fun setToken(token: String) {
+        _token = token
+    }
+
     suspend fun getTokenSuspend(): String? {
         return tokenDataStore.getToken()
     }

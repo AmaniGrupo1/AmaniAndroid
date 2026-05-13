@@ -16,8 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -57,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -72,7 +73,7 @@ import java.math.BigDecimal
 // Colores de la marca Amani
 private val AmaniPrimary = Color(0xFF9B87F5)      // Morado suave
 private val AmaniPrimaryLight = Color(0xFFEDE7FF) // Morado muy claro para fondos
-private val AmaniSecondary = Color(0xFF7E69D6)    // Morado más oscuro para acentos
+private val AmaniSecondary = Color(0xFF7E69D6)    // Morado mas oscuro para acentos
 private val AmaniBackground = Color(0xFFFDF8FF)   // Fondo blanco con tono lila muy suave
 private val AmaniCardBackground = Color.White
 private val AmaniTextPrimary = Color(0xFF2D2D35)
@@ -93,7 +94,7 @@ fun TerapiasScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Estado para el diálogo de confirmación de eliminación
+    // Estado para el dialogo de confirmacion de eliminacion
     var terapiaAEliminar by remember { mutableStateOf<TerapiaResponseDTO?>(null) }
 
     LaunchedEffect(error) {
@@ -108,8 +109,10 @@ fun TerapiasScreen(
         }
     }
 
+    val amaniColors = LocalAmaniColors.current
+
     Scaffold(
-        containerColor = AmaniBackground,
+        containerColor = amaniColors.screenBackground,
         topBar = {
             TopAppBar(
                 title = {
@@ -123,7 +126,7 @@ fun TerapiasScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.volver),
                             tint = Color.White
                         )
@@ -185,7 +188,7 @@ fun TerapiasScreen(
         }
     }
 
-    // Diálogo de confirmación para eliminar
+    // Dialogo de confirmacion para eliminar
     if (terapiaAEliminar != null) {
         AlertDialog(
             onDismissRequest = { terapiaAEliminar = null },
@@ -228,7 +231,7 @@ fun TerapiasScreen(
                 }
             },
             shape = RoundedCornerShape(16.dp),
-            containerColor = AmaniCardBackground
+            containerColor = amaniColors.cardBackground
         )
     }
 
@@ -263,7 +266,7 @@ fun TarjetaTerapia(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = LocalAmaniColors.current.cardBackground)
     ) {
         Column(
             modifier = Modifier
@@ -471,7 +474,7 @@ fun TerapiaDialog(
                     label = { Text(stringResource(R.string.precio_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    leadingIcon = { Text("€", color = AmaniTextSecondary) },
+                    leadingIcon = { Text("EUR", color = AmaniTextSecondary) },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
                     ),

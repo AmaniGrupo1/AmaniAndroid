@@ -16,15 +16,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +48,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -59,10 +62,28 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 
+// Mantenemos AmaniLoginColors para compatibilidad con el modo SYSTEM
+object AmaniLoginColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Error = Color(0xFFE57373)
+    val Success = Color(0xFF81C784)
+}
+
 /**
- * Pantalla de inicio de sesión profesional de AMANI Psicología.
+ * Pantalla de inicio de sesion profesional de AMANI Psicologia.
  */
 @Composable
 fun LoginScreen(
@@ -80,7 +101,7 @@ fun LoginScreen(
     LaunchedEffect(loginError) {
         if (!loginError.isNullOrBlank()) {
             snackbarHostState.showSnackbar(
-                message = loginError ?: "Error al iniciar sesión",
+                message = loginError ?: "Error al iniciar sesion",
                 duration = SnackbarDuration.Short
             )
         }
@@ -92,8 +113,8 @@ fun LoginScreen(
         result.onSuccess { response ->
             val rol = response.rol
             val rolNormalizado = rol.lowercase().trim()
-                .replace("ó", "o")
-                .replace("á", "a")
+                .replace("o", "o")
+                .replace("a", "a")
 
             val destination = when (rolNormalizado) {
                 "admin", "administrador" -> Screens.pacientesSinPsicologo.route
@@ -110,8 +131,12 @@ fun LoginScreen(
         }
     }
 
+    val typography = MaterialTheme.typography
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = if (isDark) screenColors.background else AmaniLoginColors.Background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         LoginScreenContent(
@@ -126,7 +151,9 @@ fun LoginScreen(
             onRegisterClick = {
                 loginViewModel.resetLoginState()
                 navController.navigate(Screens.registro.route)
-            }
+            },
+            typography = typography,
+            isDarkTheme = isDark
         )
     }
 }
@@ -141,20 +168,59 @@ fun LoginScreenContent(
     isLoggingIn: Boolean,
     isLoginEnabled: Boolean,
     onLogin: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    typography: androidx.compose.material3.Typography,
+    isDarkTheme: Boolean = false
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    val amaniColors = LocalAmaniColors.current
+
+    // Determinar colores segun el tema
+    val loginColors = if (isDarkTheme) {
+        // Modo OSCURO (Negro)
+        LoginThemeColors(
+            backgroundBrush = listOf(
+                amaniColors.screenBackground,
+                amaniColors.screenBackground
+            ),
+            cardContainerColor = amaniColors.cardBackground,
+            textPrimary = amaniColors.cardContent,
+            textSecondary = amaniColors.cardContent.copy(alpha = 0.7f),
+            primary = MaterialTheme.colorScheme.primary,
+            primaryLight = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+            surface = amaniColors.cardBackground,
+            error = AmaniLoginColors.Error,
+            textFieldContainer = amaniColors.cardBackground,
+            textFieldText = amaniColors.cardContent,
+            textFieldLabel = amaniColors.cardContent.copy(alpha = 0.8f),
+            textFieldBorder = amaniColors.cardBorder
+        )
+    } else {
+        // Modo CLARO (Blanco o SYSTEM)
+        LoginThemeColors(
+            backgroundBrush = listOf(
+                AmaniLoginColors.Accent,
+                Color.White
+            ),
+            cardContainerColor = AmaniLoginColors.Surface,
+            textPrimary = AmaniLoginColors.TextPrimary,
+            textSecondary = AmaniLoginColors.TextSecondary,
+            primary = AmaniLoginColors.Primary,
+            primaryLight = AmaniLoginColors.PrimaryLight,
+            surface = AmaniLoginColors.Surface,
+            error = AmaniLoginColors.Error,
+            textFieldContainer = Color.White,
+            textFieldText = Color.Black,
+            textFieldLabel = AmaniLoginColors.Primary,
+            textFieldBorder = AmaniLoginColors.Primary
+        )
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.surfaceContainerLow,
-                        MaterialTheme.colorScheme.surface
-                    )
-                )
+                brush = Brush.verticalGradient(colors = loginColors.backgroundBrush)
             )
     ) {
         Column(
@@ -165,8 +231,7 @@ fun LoginScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo con elevación tonal
-            // M3: Using Material3 Surface with correct elevation
+            // Logo con elevacion tonal
             Surface(
                 modifier = Modifier
                     .size(140.dp)
@@ -177,7 +242,7 @@ fun LoginScreenContent(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo de Amani Psicología",
+                    contentDescription = "Logo de Amani Psicologia",
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -187,48 +252,57 @@ fun LoginScreenContent(
             // Nombre de la marca
             Text(
                 text = "AMANI",
-                style = MaterialTheme.typography.displayLarge.copy(
+                style = typography.displayLarge?.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
-                ),
-                color = MaterialTheme.colorScheme.primary
+                ) ?: MaterialTheme.typography.displayLarge,
+                color = loginColors.primary
             )
 
             Text(
-                text = "Psicología y Bienestar",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary, // M3: Secondary role for subtitles
+                text = "Psicologia y Bienestar",
+                style = typography.titleMedium?.copy(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
+                ) ?: MaterialTheme.typography.titleMedium,
+                color = loginColors.primaryLight,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Tarjeta de inicio de sesión
-            // M3: Cards use medium shape (12dp) by default
-            ElevatedCard(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium, // M3: Medium shape for cards
-                colors = CardDefaults.elevatedCardColors(), // M3: Default colors
-                elevation = CardDefaults.elevatedCardElevation() // M3: Default elevation
+            // Tarjeta de inicio de sesion
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(12.dp, RoundedCornerShape(28.dp)),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = loginColors.cardContainerColor),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp) // M3: Spacing multiple of 8
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // Título
+                    // Titulo
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = "Bienvenido de vuelta",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = typography.headlineSmall?.copy(
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = loginColors.textPrimary
+                            ) ?: MaterialTheme.typography.headlineSmall
                         )
                         Text(
-                            text = "Accede a tu espacio terapéutico",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            text = "Accede a tu espacio terapeutico",
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 14.sp,
+                                color = loginColors.textSecondary
+                            ) ?: MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -236,50 +310,75 @@ fun LoginScreenContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Campo de email
-                    // M3: OutlinedTextField with default shape and colors
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = username,
                         onValueChange = onUsernameChange,
                         label = {
-                            Text("Correo electrónico") // M3: label style is automatic
+                            Text("Correo electronico")
                         },
                         placeholder = {
-                            Text("usuario@amani.com")
+                            Text(
+                                "usuario@amani.com",
+                                style = typography.bodyMedium?.copy(fontSize = 14.sp)
+                                    ?: MaterialTheme.typography.bodyMedium,
+                                color = loginColors.textSecondary
+                            )
                         },
                         isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         supportingText = {
                             if (username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
                                 Text(
-                                    text = "Introduce un correo electrónico válido",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    text = "Introduce un correo electronico valido",
+                                    style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                        ?: MaterialTheme.typography.bodySmall,
+                                    color = loginColors.error
                                 )
                             }
                         },
                         singleLine = true,
                         enabled = !isLoggingIn,
-                        colors = OutlinedTextFieldDefaults.colors() // M3: No hardcoded colors
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = loginColors.textFieldText,
+                            unfocusedTextColor = loginColors.textFieldText,
+                            focusedLabelColor = loginColors.textFieldLabel,
+                            unfocusedLabelColor = loginColors.textSecondary,
+                            focusedPlaceholderColor = loginColors.textSecondary,
+                            unfocusedPlaceholderColor = loginColors.textSecondary,
+                            cursorColor = loginColors.primary,
+                            focusedBorderColor = loginColors.textFieldBorder,
+                            unfocusedBorderColor = loginColors.textSecondary.copy(alpha = 0.3f),
+                            errorBorderColor = loginColors.error,
+                            focusedContainerColor = loginColors.textFieldContainer,
+                            unfocusedContainerColor = loginColors.textFieldContainer
+                        )
                     )
 
-                    // Campo de contraseña
+                    // Campo de contrasena
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = password,
                         onValueChange = onPasswordChange,
                         label = {
-                            Text("Contraseña")
+                            Text("Contrasena")
                         },
                         placeholder = {
-                            Text("••••••")
+                            Text(
+                                "......",
+                                style = typography.bodyMedium?.copy(fontSize = 14.sp)
+                                    ?: MaterialTheme.typography.bodyMedium,
+                                color = loginColors.textSecondary
+                            )
                         },
                         isError = password.isNotBlank() && password.length < 6,
                         supportingText = {
                             if (password.isNotBlank() && password.length < 6) {
                                 Text(
-                                    text = "La contraseña debe tener al menos 6 caracteres",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    text = "La contrasena debe tener al menos 6 caracteres",
+                                    style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                        ?: MaterialTheme.typography.bodySmall,
+                                    color = loginColors.error
                                 )
                             }
                         },
@@ -291,23 +390,43 @@ fun LoginScreenContent(
                             ) {
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                                    contentDescription = if (isPasswordVisible) "Ocultar contrasena" else "Mostrar contrasena",
+                                    tint = loginColors.primary
                                 )
                             }
                         },
                         singleLine = true,
                         enabled = !isLoggingIn,
-                        colors = OutlinedTextFieldDefaults.colors() // M3: No hardcoded colors
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = loginColors.textFieldText,
+                            unfocusedTextColor = loginColors.textFieldText,
+                            focusedLabelColor = loginColors.textFieldLabel,
+                            unfocusedLabelColor = loginColors.textSecondary,
+                            focusedPlaceholderColor = loginColors.textSecondary,
+                            unfocusedPlaceholderColor = loginColors.textSecondary,
+                            cursorColor = loginColors.primary,
+                            focusedBorderColor = loginColors.textFieldBorder,
+                            unfocusedBorderColor = loginColors.textSecondary.copy(alpha = 0.3f),
+                            errorBorderColor = loginColors.error,
+                            focusedContainerColor = loginColors.textFieldContainer,
+                            unfocusedContainerColor = loginColors.textFieldContainer
+                        )
                     )
 
-                    // Botón de inicio de sesión
-                    // M3: Button with CircleShape (pill) and default elevation
+                    // Boton de inicio de sesion
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = CircleShape, // M3: Buttons should be pill-shaped
+                        shape = CircleShape,
                         onClick = onLogin,
                         enabled = isLoginEnabled,
-                        colors = ButtonDefaults.buttonColors() // M3: No hardcoded colors
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = loginColors.primary,
+                            contentColor = Color.White,
+                            disabledContainerColor = loginColors.primaryLight.copy(alpha = 0.5f),
+                            disabledContentColor = Color.White.copy(alpha = 0.7f)
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
                         if (isLoggingIn) {
                             Row(
@@ -315,25 +434,25 @@ fun LoginScreenContent(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(18.dp), // M3: 18dp for icons in buttons
+                                    modifier = Modifier.size(18.dp),
                                     strokeWidth = 2.dp,
                                     color = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    "Iniciando sesión...",
+                                    "Iniciando sesion...",
                                     style = MaterialTheme.typography.labelLarge
                                 )
                             }
                         } else {
                             Text(
-                                "Iniciar sesión",
+                                "Iniciar sesion",
                                 style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
 
-                    // Línea divisoria
+                    // Linea divisoria
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -343,23 +462,25 @@ fun LoginScreenContent(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(1.dp)
-                                .background(MaterialTheme.colorScheme.outlineVariant) // M3: Use outlineVariant for dividers
+                                .background(loginColors.textSecondary.copy(alpha = 0.2f))
                         )
                         Text(
-                            text = "¿Nuevo en AMANI?",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            text = "?Nuevo en AMANI?",
+                            style = typography.bodySmall?.copy(
+                                fontSize = 12.sp,
+                                color = loginColors.textSecondary
+                            ) ?: MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(1.dp)
-                                .background(MaterialTheme.colorScheme.outlineVariant)
+                                .background(loginColors.textSecondary.copy(alpha = 0.2f))
                         )
                     }
 
-                    // Botón de registro
+                    // Boton de registro
                     TextButton(
                         onClick = onRegisterClick,
                         enabled = !isLoggingIn,
@@ -367,8 +488,11 @@ fun LoginScreenContent(
                     ) {
                         Text(
                             text = "Crear cuenta nueva",
-                            style = MaterialTheme.typography.labelLarge, // M3: labelLarge for buttons
-                            color = MaterialTheme.colorScheme.primary
+                            style = typography.bodyLarge?.copy(
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (!isLoggingIn) loginColors.primary else loginColors.textSecondary
+                            ) ?: MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
@@ -377,12 +501,30 @@ fun LoginScreenContent(
             // Texto de ayuda
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "💜 Tu bienestar comienza aquí",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
+                text = "? Tu bienestar comienza aqui",
+                style = typography.bodySmall?.copy(
+                    fontSize = 12.sp,
+                    color = loginColors.textSecondary,
+                    textAlign = TextAlign.Center
+                ) ?: MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth()
             )
         }
     }
 }
+
+// Clase auxiliar para los colores del tema de login
+data class LoginThemeColors(
+    val backgroundBrush: List<Color>,
+    val cardContainerColor: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val primary: Color,
+    val primaryLight: Color,
+    val surface: Color,
+    val error: Color,
+    val textFieldContainer: Color,
+    val textFieldText: Color,
+    val textFieldLabel: Color,
+    val textFieldBorder: Color
+)

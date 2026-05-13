@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.settings
 
 import android.app.Activity
-import androidx.compose.material3.MaterialTheme
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,6 +54,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -80,6 +80,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
@@ -97,46 +98,53 @@ fun SettingsAdminScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
 
-    // También necesitamos la sesión completa para otros datos (idPsicologo, etc)
+    // Obtener el tema actual del ViewModel (esto es clave para que la UI se actualice)
+    val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
+
+    // Tambien necesitamos la sesion completa para otros datos (idPsicologo, etc)
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    // 📍 LOG: Ver idioma actual en cada recomposición
-    Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
+    // Colores de la UI usando MaterialTheme (que ya refleja el tema actual)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
 
-    // Bug 2 Fix: Control de recreación para evitar loops
-    // Inicializamos con null para detectar el primer valor real sin recrear
-    var previousLanguage by remember { mutableStateOf<String?>(null) }
+    // LOG: Ver idioma y tema actual
+    Log.d(TAG, "[Recomposicion] Idioma actual: $currentLanguage")
+    Log.d(TAG, "[Recomposicion] Tema actual: $currentTema")
+
+    // Control de recreacion para evitar loops (SOLO para idioma)
+    var previousLanguage by remember { mutableStateOf(currentLanguage) }
     var isRecreating by remember { mutableStateOf(false) }
 
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
     LaunchedEffect(currentLanguage) {
-        Log.d(TAG, "🚀 [LaunchedEffect] currentLanguage=$currentLanguage, previousLanguage=$previousLanguage, isRecreating=$isRecreating")
+        Log.d(TAG, "[LaunchedEffect] currentLanguage=$currentLanguage, previousLanguage=$previousLanguage")
 
-        // Solo recreamos si ya teníamos un idioma previo (no es la primera carga)
+        // Solo recreamos si ya teniamos un idioma previo (no es la primera carga)
         // y este ha cambiado realmente.
         if (previousLanguage != null && previousLanguage != currentLanguage && !isRecreating) {
-            Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage' - Recreando Activity")
+            Log.w(TAG, "[Cambio detectado] De '$previousLanguage' a '$currentLanguage' - Recreando Activity")
 
             isRecreating = true
 
-            // Pequeño delay para evitar conflictos con el ciclo de vida
             delay(150)
-
-            // Recrear la Activity para aplicar el nuevo idioma
             (context as? Activity)?.recreate()
         }
-        
+
         // Siempre actualizamos el idioma previo al final
         previousLanguage = currentLanguage
     }
 
-    val primaryColor = Color(0xFF6C63FF)
-    val backgroundColor = Color(0xFFF5F5F5)
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+    // Cuando cambia el tema, NO recreamos la Activity, el tema se aplica automaticamente
+    // porque MaterialTheme ya esta observando los cambios
 
     Scaffold(
         containerColor = backgroundColor,
@@ -158,7 +166,12 @@ fun SettingsAdminScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    onSurfaceColor = onSurfaceColor,
+                    onSurfaceVariant = onSurfaceVariant,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "perfil",
@@ -220,7 +233,7 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "dark_mode",
                             title = stringResource(R.string.tema_oscuro_claro),
-                            subtitle = stringResource(R.string.claro),
+                            subtitle = getCurrentThemeSubtitle(currentTema),
                             icon = Icons.Default.BrightnessMedium
                         )
                     )
@@ -236,7 +249,12 @@ fun SettingsAdminScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    onSurfaceColor = onSurfaceColor,
+                    onSurfaceVariant = onSurfaceVariant,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "appointment_duration",
@@ -275,7 +293,12 @@ fun SettingsAdminScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    onSurfaceColor = onSurfaceColor,
+                    onSurfaceVariant = onSurfaceVariant,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "send_reminder",
@@ -314,7 +337,12 @@ fun SettingsAdminScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    onSurfaceColor = onSurfaceColor,
+                    onSurfaceVariant = onSurfaceVariant,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "roles",
@@ -341,7 +369,12 @@ fun SettingsAdminScreen(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
+                    currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
+                    surfaceColor = surfaceColor,
+                    onSurfaceColor = onSurfaceColor,
+                    onSurfaceVariant = onSurfaceVariant,
+                    primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
                             id = "backup",
@@ -362,6 +395,15 @@ fun SettingsAdminScreen(
     }
 }
 
+// Funcion auxiliar para obtener el subtitulo del tema actual
+private fun getCurrentThemeSubtitle(currentTheme: TemaApp): String {
+    return when (currentTheme) {
+        TemaApp.LIGHT -> "Claro"
+        TemaApp.DARK -> "Oscuro"
+        TemaApp.SYSTEM -> "Sistema"
+    }
+}
+
 data class SettingsOption(
     val id: String,
     val title: String,
@@ -379,12 +421,17 @@ fun SettingsCategoryCard(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    idiomaViewModel: IdiomaViewModel
+    currentTema: TemaApp,
+    idiomaViewModel: IdiomaViewModel,
+    surfaceColor: Color,
+    onSurfaceColor: Color,
+    onSurfaceVariant: Color,
+    primaryColor: Color
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -414,7 +461,7 @@ fun SettingsCategoryCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = Color(0xFF333333)
+                    color = onSurfaceColor
                 )
             }
 
@@ -423,7 +470,7 @@ fun SettingsCategoryCard(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = onSurfaceColor.copy(alpha = 0.12f)
                     )
                 }
 
@@ -433,7 +480,11 @@ fun SettingsCategoryCard(
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
-                    idiomaViewModel = idiomaViewModel
+                    currentTema = currentTema,
+                    idiomaViewModel = idiomaViewModel,
+                    onSurfaceColor = onSurfaceColor,
+                    onSurfaceVariant = onSurfaceVariant,
+                    primaryColor = primaryColor
                 )
             }
         }
@@ -447,17 +498,24 @@ fun SettingsOptionRow(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    idiomaViewModel: IdiomaViewModel
+    currentTema: TemaApp,
+    idiomaViewModel: IdiomaViewModel,
+    onSurfaceColor: Color,
+    onSurfaceVariant: Color,
+    primaryColor: Color
 ) {
     val scope = rememberCoroutineScope()
-    var expanded by remember { mutableStateOf(false) }
+    var expandedLanguage by remember { mutableStateOf(false) }
+    var expandedTheme by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 when (option.id) {
-                    "language" -> expanded = true
+                    "language" -> expandedLanguage = true
+                    "dark_mode" -> expandedTheme = true
                     "perfil" -> {
                         val identificador = session?.idUsuario
                         if (identificador != null && identificador > 0L) {
@@ -475,6 +533,9 @@ fun SettingsOptionRow(
                     "politica_privacidad" -> {
                         navController.navigate(Screens.politicaPrivacidad.route)
                     }
+                    "roles" -> {
+                        navController.navigate(Screens.cambiarRol.route)
+                    }
                 }
             }
             .padding(vertical = 8.dp),
@@ -488,7 +549,7 @@ fun SettingsOptionRow(
             Icon(
                 option.icon,
                 contentDescription = null,
-                tint = Color(0xFF6C63FF),
+                tint = primaryColor,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -499,63 +560,110 @@ fun SettingsOptionRow(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
-                    color = Color(0xFF333333)
+                    color = onSurfaceColor
                 )
 
-                val displaySubtitle = if (option.id == "language") {
-                    if (currentLanguage == "es") stringResource(R.string.espanol)
-                    else stringResource(R.string.ingles)
-                } else {
-                    option.subtitle
+                val displaySubtitle = when {
+                    option.id == "language" -> {
+                        if (currentLanguage == "es") stringResource(R.string.espanol)
+                        else stringResource(R.string.ingles)
+                    }
+                    option.id == "dark_mode" -> {
+                        getCurrentThemeSubtitle(currentTema)
+                    }
+                    else -> option.subtitle
                 }
 
                 Text(
                     text = displaySubtitle,
                     fontFamily = roboto,
                     fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = onSurfaceVariant
                 )
             }
         }
 
-        if (option.id == "language") {
-            Box {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.espanol)) },
-                        onClick = {
-                            Log.d(TAG, "🇪🇸 Usuario seleccionó ESPAÑOL")
-                            scope.launch {
-                                idiomaViewModel.cambiarIdioma("es")
+        when (option.id) {
+            "language" -> {
+                Box {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = primaryColor)
+                    DropdownMenu(
+                        expanded = expandedLanguage,
+                        onDismissRequest = { expandedLanguage = false },
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.espanol), color = onSurfaceColor) },
+                            onClick = {
+                                Log.d(TAG, "Usuario selecciono ESPANOL")
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("es")
+                                }
+                                expandedLanguage = false
                             }
-                            expanded = false
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.ingles)) },
-                        onClick = {
-                            Log.d(TAG, "🇬🇧 Usuario seleccionó INGLÉS")
-                            scope.launch {
-                                idiomaViewModel.cambiarIdioma("en")
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.ingles), color = onSurfaceColor) },
+                            onClick = {
+                                Log.d(TAG, "Usuario selecciono INGLES")
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("en")
+                                }
+                                expandedLanguage = false
                             }
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        } else {
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = "Ir",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(20.dp)
-            )
+            "dark_mode" -> {
+                Box {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = primaryColor)
+                    DropdownMenu(
+                        expanded = expandedTheme,
+                        onDismissRequest = { expandedTheme = false },
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Sistema", color = onSurfaceColor) },
+                            onClick = {
+                                Log.d(TAG, "Usuario selecciono TEMA SISTEMA")
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
+                                }
+                                expandedTheme = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Claro", color = onSurfaceColor) },
+                            onClick = {
+                                Log.d(TAG, "Usuario selecciono TEMA CLARO")
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
+                                }
+                                expandedTheme = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Oscuro", color = onSurfaceColor) },
+                            onClick = {
+                                Log.d(TAG, "Usuario selecciono TEMA OSCURO")
+                                scope.launch {
+                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                }
+                                expandedTheme = false
+                            }
+                        )
+                    }
+                }
+            }
+            else -> {
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = "Ir",
+                    tint = onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }

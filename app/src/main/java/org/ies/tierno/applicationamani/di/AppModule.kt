@@ -28,15 +28,16 @@ import org.ies.tierno.applicationamani.data.repositorio.PaymentRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
-import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
-import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.data.repositorio.role.AdminRepository
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.GetMessagesUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.SendMessageUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
@@ -57,6 +58,8 @@ import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUse
 import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
+import org.ies.tierno.applicationamani.domain.usecases.role.GetUsuariosUseCase
+import org.ies.tierno.applicationamani.domain.usecases.role.RoleAdminUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
@@ -86,6 +89,8 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
@@ -106,7 +111,7 @@ val appModule = module {
     }
     single { get<AmaniDatabase>().diarioEmocionalDao() }
 
-    single { AuthRepository(get(), get(), get()) }
+    single { AuthRepository(get(), get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get()) }
@@ -119,6 +124,7 @@ val appModule = module {
     single { AjustesRepository(get()) }
     single { HistorialRepository(get()) }
     single { DocumentoLegalRepository(get()) }
+    single { AdminRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -154,15 +160,18 @@ val appModule = module {
     factory { UpdateUserOnlineUseCase(get()) }
     factory { IdiomaUseCase(get()) }
     factory { TerapiasGeneralUseCase(get()) }
+    factory { GetUsuariosUseCase(get()) }
+    factory { RoleAdminUseCase(get()) }
 
-    viewModel { LoginViewModel(get(), get(), get(), get()) }
+
+    viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
-    viewModel { ListarPacientesViewModel(get(), get()) }
-    viewModel { ListarPsicologosAdminViewModel(get()) }
+    viewModel { ListarPacientesViewModel(get(), get(), get()) }
+    viewModel { ListarPsicologosAdminViewModel(get(), get()) }
     viewModel { PrincipalClienteViewModel() }
-    viewModel { SettingsClienteViewModel(get(), get()) }
-    viewModel { SituacionViewModel(get()) }
+    viewModel { SettingsClienteViewModel() }
+    viewModel { SituacionViewModel(get(), get()) }
     viewModel { CitasViewModel(get(), get(), get()) }
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(),get(),get()) }
@@ -175,6 +184,8 @@ val appModule = module {
     viewModel { ListarTerapiasViewModel(get(), get()) }
     viewModel { ListarCitasViewModel(get(), get()) }
     viewModel { DiarioEmocionalViewModel(get()) }
+    viewModel { AdminRoleViewModel(get()) }
+    viewModel { AdminUserViewModel(get()) }
 
     worker { SyncDiarioWorker(get(), get(), get()) }
 

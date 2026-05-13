@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,30 +44,66 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
+
+// Colores originales para el modo DEFECTO (como LoginScreen)
+object AdminViewDefaultColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Error = Color(0xFFE57373)
+    val Success = Color(0xFF81C784)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosSimpleScreen(
     navController: NavController,
     viewModel: ListarPsicologosAdminViewModel,
-    listarPaciente : ListarPacientesViewModel
+    listarPaciente: ListarPacientesViewModel
 ) {
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val psicologos by viewModel.psicologos.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
     var isBajaInProgress by remember { mutableStateOf(false) }
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores segun el tema
+    val backgroundColor = if (isDark) screenColors.background else AdminViewDefaultColors.Background
+    val surfaceColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Surface
+    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AdminViewDefaultColors.Primary
+    val accentColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Accent
+    val textPrimaryColor = if (isDark) cardColors.cardContent else AdminViewDefaultColors.TextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AdminViewDefaultColors.TextSecondary
+    val errorColor = AdminViewDefaultColors.Error
 
     val typography = MaterialTheme.typography
 
@@ -80,7 +115,7 @@ fun ListadoPsicologosSimpleScreen(
         if (bajaEstado != null && isBajaInProgress) {
             if (bajaEstado!!.isSuccess) {
                 snackbarHostState.showSnackbar(
-                    "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
+                    "Psicologo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
                 )
                 mostrarDialogoBaja = false
                 psicologoSeleccionado = null
@@ -94,12 +129,12 @@ fun ListadoPsicologosSimpleScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = backgroundColor,
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(surfaceColor)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -110,12 +145,12 @@ fun ListadoPsicologosSimpleScreen(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver atrás",
-                        tint = MaterialTheme.colorScheme.primary
+                        contentDescription = "Volver atras",
+                        tint = primaryColor
                     )
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    MenuAdministrador("Listado de psicólogos", navController)
+                    MenuAdministrador("Listado de psicologos", navController)
                 }
             }
         },
@@ -125,12 +160,12 @@ fun ListadoPsicologosSimpleScreen(
                 onClick = {
                     navController.navigate(Screens.agregarPsicologo.route)
                 },
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = primaryColor,
                 shape = RoundedCornerShape(50.dp)
             ) {
                 Icon(
                     Icons.Default.Person,
-                    contentDescription = "Agregar psicólogo",
+                    contentDescription = "Agregar psicologo",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -142,10 +177,17 @@ fun ListadoPsicologosSimpleScreen(
                 .padding(paddingValues)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surfaceContainerLow,
-                            MaterialTheme.colorScheme.onPrimary
-                        )
+                        colors = if (isDark) {
+                            listOf(
+                                screenColors.background,
+                                screenColors.background
+                            )
+                        } else {
+                            listOf(
+                                accentColor,
+                                Color.White
+                            )
+                        }
                     )
                 )
         ) {
@@ -158,21 +200,23 @@ fun ListadoPsicologosSimpleScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "📋 No hay psicólogos registrados",
+                        text = "No hay psicologos registrados",
                         style = typography.titleMedium?.copy(
                             fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = textSecondaryColor
                         ) ?: MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = roboto
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Presiona el botón + para agregar uno",
+                        text = "Presiona el boton + para agregar uno",
                         style = typography.bodyMedium?.copy(
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = textSecondaryColor
                         ) ?: MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = roboto
                     )
                 }
             } else {
@@ -190,17 +234,24 @@ fun ListadoPsicologosSimpleScreen(
                                 mostrarDialogoBaja = true
                             },
                             onEditar = {
-                                // Navegar a editar psicólogo
+                                // Navegar a editar psicologo
                                 // navController.navigate("${Screens.editarPsicologo.route}/${psicologo.idPsicologo}")
                             },
-                            typography = typography
+                            typography = typography,
+                            isDark = isDark,
+                            primaryColor = primaryColor,
+                            surfaceColor = surfaceColor,
+                            textPrimaryColor = textPrimaryColor,
+                            textSecondaryColor = textSecondaryColor,
+                            errorColor = errorColor,
+                            roboto = roboto
                         )
                     }
                 }
             }
         }
 
-        // ALERT DIALOG CORREGIDO - Solo esto cambió
+        // ALERT DIALOG
         if (mostrarDialogoBaja && psicologoSeleccionado != null && !isBajaInProgress) {
             AlertDialog(
                 onDismissRequest = {
@@ -208,35 +259,36 @@ fun ListadoPsicologosSimpleScreen(
                         mostrarDialogoBaja = false
                     }
                 },
+                containerColor = surfaceColor,
                 title = {
                     Text(
                         text = "Confirmar baja",
                         style = typography.headlineSmall?.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = textPrimaryColor
                         ) ?: MaterialTheme.typography.headlineSmall,
-                        fontFamily = FontFamily.Serif
+                        fontFamily = roboto
                     )
                 },
                 text = {
                     Text(
-                        text = "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
+                        text = "Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
                         style = typography.bodyMedium?.copy(
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ) ?: MaterialTheme.typography.bodyMedium
+                            color = textSecondaryColor
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
                     )
                 },
                 confirmButton = {
                     Button(
                         onClick = {
                             isBajaInProgress = true
-                            // Llamar directamente al ViewModel (NO es suspend)
                             listarPaciente.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
+                            containerColor = errorColor
                         ),
                         shape = RoundedCornerShape(12.dp),
                         enabled = !isBajaInProgress
@@ -247,7 +299,8 @@ fun ListadoPsicologosSimpleScreen(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             ) ?: MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = Color.White,
+                            fontFamily = roboto
                         )
                     }
                 },
@@ -260,7 +313,7 @@ fun ListadoPsicologosSimpleScreen(
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = primaryColor
                         ),
                         enabled = !isBajaInProgress
                     ) {
@@ -269,7 +322,8 @@ fun ListadoPsicologosSimpleScreen(
                             style = typography.labelLarge?.copy(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.labelLarge
+                            ) ?: MaterialTheme.typography.labelLarge,
+                            fontFamily = roboto
                         )
                     }
                 }
@@ -283,14 +337,21 @@ fun PsicologoCard(
     psicologo: PsicologoSelfResponseDTO,
     onDarBaja: () -> Unit,
     onEditar: () -> Unit,
-    typography: androidx.compose.material3.Typography
+    typography: androidx.compose.material3.Typography,
+    isDark: Boolean,
+    primaryColor: Color,
+    surfaceColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    errorColor: Color,
+    roboto: FontFamily
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
-            ,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .shadow(8.dp, RoundedCornerShape(20.dp)),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -300,9 +361,10 @@ fun PsicologoCard(
                 style = typography.titleLarge?.copy(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = primaryColor
                 ) ?: MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
+                fontFamily = roboto
             )
 
             // Especialidad
@@ -314,16 +376,18 @@ fun PsicologoCard(
                     text = "Especialidad:",
                     style = typography.bodyMedium?.copy(
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = textSecondaryColor,
                         fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.bodyMedium
+                    ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto
                 )
                 Text(
                     text = psicologo.especialidad,
                     style = typography.bodyMedium?.copy(
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ) ?: MaterialTheme.typography.bodyMedium
+                        color = textPrimaryColor
+                    ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto
                 )
             }
 
@@ -339,45 +403,49 @@ fun PsicologoCard(
                         text = "Licencia:",
                         style = typography.bodyMedium?.copy(
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = textSecondaryColor,
                             fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
                     )
                     Text(
                         text = psicologo.licencia,
                         style = typography.bodyMedium?.copy(
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        ) ?: MaterialTheme.typography.bodyMedium
+                            color = textPrimaryColor
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
             }
 
-            // Descripción
+            // Descripcion
             if (!psicologo.descripcion.isNullOrBlank()) {
                 Text(
-                    text = "Descripción:",
+                    text = "Descripcion:",
                     style = typography.bodyMedium?.copy(
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = textSecondaryColor,
                         fontWeight = FontWeight.Medium
                     ) ?: MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
+                    fontFamily = roboto
                 )
                 Text(
                     text = psicologo.descripcion,
                     style = typography.bodySmall?.copy(
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = textSecondaryColor
                     ) ?: MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 2.dp)
+                    modifier = Modifier.padding(top = 2.dp),
+                    fontFamily = roboto
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botones de acción
+            // Botones de accion
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -385,7 +453,7 @@ fun PsicologoCard(
                 Button(
                     onClick = onDarBaja,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
+                        containerColor = errorColor
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
@@ -396,14 +464,15 @@ fun PsicologoCard(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         ) ?: MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White,
+                        fontFamily = roboto
                     )
                 }
 
                 Button(
                     onClick = onEditar,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = primaryColor
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
@@ -414,7 +483,8 @@ fun PsicologoCard(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         ) ?: MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White,
+                        fontFamily = roboto
                     )
                 }
             }

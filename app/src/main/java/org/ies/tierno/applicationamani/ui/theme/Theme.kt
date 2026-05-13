@@ -12,10 +12,16 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.koin.java.KoinJavaComponent
 
 // ── Material 3 color scheme: light ─────────────────────────────────
 
@@ -88,6 +94,9 @@ data class AmaniExtraColors(
     val screenBackground: Color = AmaniBackground,
     val textFieldContainer: Color = AmaniWhite,
     val buttonBorder: Color = AmaniBlack,
+    val cardBackground: Color = AmaniWhite,
+    val cardContent: Color = AmaniOnSurface,
+    val cardBorder: Color = AmaniBlack,
     val citaLibre: Color = AmaniCitaLibre,
     val citaLibreBg: Color = AmaniCalendarioBg,
     val citaOcupada: Color = AmaniCitaOcupada,
@@ -116,27 +125,61 @@ private val AmaniShapes = Shapes(
 
 // ── Theme composable ───────────────────────────────────────────────
 
+/**
+ * Tema principal de la aplicación Amani.
+ *
+ * Soporta Material 3 dynamic color en Android 12+ y permite al usuario
+ * seleccionar un tema fijo (LIGHT, DARK) o SYSTEM a través de [TemaApp].
+ *
+ * @param darkTheme Define si se usa tema oscuro cuando [TemaApp] es SYSTEM o null.
+ * @param dynamicColor Habilita colores dinámicos en Android 12+ cuando [TemaApp] es SYSTEM o null.
+ * @param content Contenido de la UI.
+ */
 @Composable
 fun ApplicationAmaniTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true, // M3: dynamic color on Android 12+
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val context = LocalContext.current
+
+    // Leer preferencia de tema desde la sesión
+    val store = try {
+        KoinJavaComponent.getKoin().get<UserSessionDataStore>()
+    } catch (e: Exception) {
+        UserSessionDataStore(context)
+    }
+    val session by store.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+
+    // TemaApp del usuario tiene prioridad sobre darkTheme del sistema
+    val effectiveDarkTheme = when (session?.tema) {
+        TemaApp.DARK  -> true
+        TemaApp.LIGHT -> false
+        else          -> darkTheme  // SYSTEM o null: respetar tema del sistema
     }
 
-    // M3: derive extra colors from scheme so they track dynamic color
-    val extraColors = if (darkTheme) {
+    // Dynamic color solo cuando el usuario no ha fijado LIGHT o DARK
+    val useDynamicColor = dynamicColor
+            && (session?.tema == null || session?.tema == TemaApp.SYSTEM)
+
+    val colorScheme = when {
+        useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (effectiveDarkTheme) dynamicDarkColorScheme(context)
+            else dynamicLightColorScheme(context)
+        }
+        effectiveDarkTheme -> DarkColorScheme
+        else               -> LightColorScheme
+    }
+
+    // Derivar colores extra desde el esquema activo
+    val extraColors = if (effectiveDarkTheme) {
         AmaniExtraColors(
             screenBackground = colorScheme.background,
             textFieldContainer = colorScheme.surfaceVariant,
             buttonBorder = colorScheme.outline,
+            cardBackground = colorScheme.surface,
+            cardContent = colorScheme.onSurface,
+            cardBorder = colorScheme.outline,
             citaLibre = colorScheme.primary,
             citaLibreBg = colorScheme.primaryContainer,
             citaOcupada = colorScheme.tertiary,
@@ -154,6 +197,9 @@ fun ApplicationAmaniTheme(
             screenBackground = AmaniBackground,
             textFieldContainer = AmaniWhite,
             buttonBorder = AmaniBlack,
+            cardBackground = AmaniWhite,
+            cardContent = AmaniOnSurface,
+            cardBorder = AmaniBlack,
             citaLibre = colorScheme.primary,
             citaLibreBg = colorScheme.primaryContainer,
             citaOcupada = colorScheme.tertiary,
@@ -179,3 +225,47 @@ fun ApplicationAmaniTheme(
         )
     }
 }
+
+// ── Helpers para consumir colores ─────────────────────────────
+
+@Composable
+@ReadOnlyComposable
+fun isDarkTheme(): Boolean = MaterialTheme.colorScheme.background == Color.Black
+
+@Composable
+fun getCardColors(): CardColors {
+    val amaniColors = LocalAmaniColors.current
+    return CardColors(
+        cardBackground = amaniColors.cardBackground,
+        cardContent = amaniColors.cardContent,
+        cardBorder = amaniColors.cardBorder
+    )
+}
+
+data class CardColors(
+    val cardBackground: Color,
+    val cardContent: Color,
+    val cardBorder: Color
+)
+
+@Composable
+fun getScreenColors(): ScreenColors {
+    val amaniColors = LocalAmaniColors.current
+    val materialColors = MaterialTheme.colorScheme
+
+    return ScreenColors(
+        background = amaniColors.screenBackground,
+        surface = materialColors.surface,
+        onSurface = materialColors.onSurface,
+        primary = materialColors.primary,
+        onPrimary = materialColors.onPrimary
+    )
+}
+
+data class ScreenColors(
+    val background: Color,
+    val surface: Color,
+    val onSurface: Color,
+    val primary: Color,
+    val onPrimary: Color
+)

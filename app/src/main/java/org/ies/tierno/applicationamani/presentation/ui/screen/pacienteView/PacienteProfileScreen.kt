@@ -82,6 +82,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -99,6 +101,9 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.perfil.UsuarioUpdateDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente.ProfilePacienteViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -111,6 +116,21 @@ import java.util.Locale
 private const val TAG = "PacienteProfileScreen"
 private const val BASE_URL = "http://192.168.1.175:8080"
 
+// Colores originales para el modo DEFECTO
+object PacienteProfileDefaultColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Error = Color(0xFFE57373)
+    val Success = Color(0xFF81C784)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PacienteProfileScreen(
@@ -119,9 +139,53 @@ fun PacienteProfileScreen(
     viewModel: ProfilePacienteViewModel = koinViewModel()
 ) {
     val imageLoader = koinInject<coil.ImageLoader>()
-    val colors = MaterialTheme.colorScheme
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val colors = if (isDark) {
+        PacienteProfileThemeColors(
+            primary = Color.White,
+            primaryLight = Color.White.copy(alpha = 0.7f),
+            primaryDark = Color.DarkGray,
+            secondary = Color.Gray,
+            accent = cardColors.cardBackground,
+            background = screenColors.background,
+            surface = cardColors.cardBackground,
+            textPrimary = cardColors.cardContent,
+            textSecondary = cardColors.cardContent.copy(alpha = 0.7f),
+            error = PacienteProfileDefaultColors.Error,
+            success = PacienteProfileDefaultColors.Success,
+            textFieldContainer = Color.DarkGray,
+            textFieldText = Color.White,
+            textFieldLabel = Color.White.copy(alpha = 0.8f),
+            textFieldBorder = Color.White
+        )
+    } else {
+        PacienteProfileThemeColors(
+            primary = PacienteProfileDefaultColors.Primary,
+            primaryLight = PacienteProfileDefaultColors.PrimaryLight,
+            primaryDark = PacienteProfileDefaultColors.PrimaryDark,
+            secondary = PacienteProfileDefaultColors.Secondary,
+            accent = PacienteProfileDefaultColors.Accent,
+            background = PacienteProfileDefaultColors.Background,
+            surface = PacienteProfileDefaultColors.Surface,
+            textPrimary = PacienteProfileDefaultColors.TextPrimary,
+            textSecondary = PacienteProfileDefaultColors.TextSecondary,
+            error = PacienteProfileDefaultColors.Error,
+            success = PacienteProfileDefaultColors.Success,
+            textFieldContainer = Color.White,
+            textFieldText = Color.Black,
+            textFieldLabel = PacienteProfileDefaultColors.Primary,
+            textFieldBorder = PacienteProfileDefaultColors.Primary
+        )
+    }
 
     // Obtener el store de sesión para limpiar datos
     val userSessionDataStore: UserSessionDataStore = getKoin().get()
@@ -307,12 +371,17 @@ fun PacienteProfileScreen(
                         text = "Mi Perfil",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        color = if (isDark) Color.Black else Color.White,
+                        fontFamily = roboto
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -327,7 +396,11 @@ fun PacienteProfileScreen(
                 .padding(paddingValues)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(colors.surfaceContainerLow, Color.White)
+                        colors = if (isDark) {
+                            listOf(colors.background, colors.background)
+                        } else {
+                            listOf(colors.accent, Color.White)
+                        }
                     )
                 )
         ) {
@@ -368,6 +441,7 @@ fun PacienteProfileScreen(
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = colors.primary,
+                                    fontFamily = roboto,
                                     modifier = Modifier.padding(bottom = 16.dp)
                                 )
 
@@ -404,7 +478,7 @@ fun PacienteProfileScreen(
                                         onClick = { showImageOptions = true },
                                         modifier = Modifier.size(40.dp),
                                         containerColor = colors.primary,
-                                        contentColor = Color.White,
+                                        contentColor = if (isDark) Color.Black else Color.White,
                                         shape = CircleShape,
                                         elevation = FloatingActionButtonDefaults.elevation(4.dp)
                                     ) {
@@ -420,14 +494,16 @@ fun PacienteProfileScreen(
                                     text = "${perfil!!.usuario?.nombre ?: ""} ${perfil!!.usuario?.apellido ?: ""}".trim(),
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colors.onSurface,
+                                    color = colors.textPrimary,
+                                    fontFamily = roboto,
                                     modifier = Modifier.padding(top = 16.dp)
                                 )
 
                                 Text(
                                     text = perfil!!.usuario?.email ?: "Email no disponible",
                                     fontSize = 14.sp,
-                                    color = colors.onSurfaceVariant
+                                    color = colors.textSecondary,
+                                    fontFamily = roboto
                                 )
                             }
                         }
@@ -453,7 +529,8 @@ fun PacienteProfileScreen(
                                         text = "Información Personal",
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = colors.primary
+                                        color = colors.primary,
+                                        fontFamily = roboto
                                     )
                                     if (!isEditing) {
                                         TextButton(
@@ -465,10 +542,11 @@ fun PacienteProfileScreen(
                                             Icon(
                                                 Icons.Default.Edit,
                                                 contentDescription = "Editar",
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
+                                                tint = colors.primary
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Editar", fontSize = 14.sp)
+                                            Text("Editar", fontSize = 14.sp, fontFamily = roboto)
                                         }
                                     }
                                 }
@@ -480,18 +558,20 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = nombreEdit,
                                         onValueChange = { nombreEdit = it },
-                                        label = { Text("Nombre", color = colors.onSurfaceVariant) },
+                                        label = { Text("Nombre", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.onSurface,
-                                            unfocusedTextColor = colors.onSurface,
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
                                             focusedBorderColor = colors.primary,
-                                            unfocusedBorderColor = colors.onSurfaceVariant.copy(alpha = 0.3f),
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
                                             focusedLabelColor = colors.primary,
-                                            unfocusedLabelColor = colors.onSurfaceVariant,
-                                            cursorColor = colors.primary
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -500,18 +580,20 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = apellidoEdit,
                                         onValueChange = { apellidoEdit = it },
-                                        label = { Text("Apellido (opcional)", color = colors.onSurfaceVariant) },
+                                        label = { Text("Apellido (opcional)", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.onSurface,
-                                            unfocusedTextColor = colors.onSurface,
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
                                             focusedBorderColor = colors.primary,
-                                            unfocusedBorderColor = colors.onSurfaceVariant.copy(alpha = 0.3f),
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
                                             focusedLabelColor = colors.primary,
-                                            unfocusedLabelColor = colors.onSurfaceVariant,
-                                            cursorColor = colors.primary
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -520,18 +602,20 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = emailEdit,
                                         onValueChange = { emailEdit = it },
-                                        label = { Text("Correo electrónico", color = colors.onSurfaceVariant) },
+                                        label = { Text("Correo electrónico", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.onSurface,
-                                            unfocusedTextColor = colors.onSurface,
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
                                             focusedBorderColor = colors.primary,
-                                            unfocusedBorderColor = colors.onSurfaceVariant.copy(alpha = 0.3f),
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
                                             focusedLabelColor = colors.primary,
-                                            unfocusedLabelColor = colors.onSurfaceVariant,
-                                            cursorColor = colors.primary
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -540,18 +624,20 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = telefonoEdit,
                                         onValueChange = { telefonoEdit = it },
-                                        label = { Text("Teléfono", color = colors.onSurfaceVariant) },
+                                        label = { Text("Teléfono", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.onSurface,
-                                            unfocusedTextColor = colors.onSurface,
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
                                             focusedBorderColor = colors.primary,
-                                            unfocusedBorderColor = colors.onSurfaceVariant.copy(alpha = 0.3f),
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
                                             focusedLabelColor = colors.primary,
-                                            unfocusedLabelColor = colors.onSurfaceVariant,
-                                            cursorColor = colors.primary
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -560,18 +646,20 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = fechaNacimientoEdit,
                                         onValueChange = { fechaNacimientoEdit = it },
-                                        label = { Text("Fecha de nacimiento (YYYY-MM-DD)", color = colors.onSurfaceVariant) },
+                                        label = { Text("Fecha de nacimiento (YYYY-MM-DD)", color = colors.textSecondary, fontFamily = roboto) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = RoundedCornerShape(14.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedTextColor = colors.onSurface,
-                                            unfocusedTextColor = colors.onSurface,
+                                            focusedTextColor = colors.textFieldText,
+                                            unfocusedTextColor = colors.textFieldText,
                                             focusedBorderColor = colors.primary,
-                                            unfocusedBorderColor = colors.onSurfaceVariant.copy(alpha = 0.3f),
+                                            unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
                                             focusedLabelColor = colors.primary,
-                                            unfocusedLabelColor = colors.onSurfaceVariant,
-                                            cursorColor = colors.primary
+                                            unfocusedLabelColor = colors.textSecondary,
+                                            cursorColor = colors.primary,
+                                            focusedContainerColor = colors.textFieldContainer,
+                                            unfocusedContainerColor = colors.textFieldContainer
                                         )
                                     )
 
@@ -586,7 +674,7 @@ fun PacienteProfileScreen(
                                             value = generoEdit,
                                             onValueChange = {},
                                             readOnly = true,
-                                            label = { Text("Género", color = colors.onSurfaceVariant) },
+                                            label = { Text("Género", color = colors.textSecondary, fontFamily = roboto) },
                                             trailingIcon = {
                                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = showGeneroDropdown)
                                             },
@@ -595,13 +683,15 @@ fun PacienteProfileScreen(
                                                 .menuAnchor(),
                                             shape = RoundedCornerShape(14.dp),
                                             colors = OutlinedTextFieldDefaults.colors(
-                                                focusedTextColor = colors.onSurface,
-                                                unfocusedTextColor = colors.onSurface,
+                                                focusedTextColor = colors.textFieldText,
+                                                unfocusedTextColor = colors.textFieldText,
                                                 focusedBorderColor = colors.primary,
-                                                unfocusedBorderColor = colors.onSurfaceVariant.copy(alpha = 0.3f),
+                                                unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
                                                 focusedLabelColor = colors.primary,
-                                                unfocusedLabelColor = colors.onSurfaceVariant,
-                                                cursorColor = colors.primary
+                                                unfocusedLabelColor = colors.textSecondary,
+                                                cursorColor = colors.primary,
+                                                focusedContainerColor = colors.textFieldContainer,
+                                                unfocusedContainerColor = colors.textFieldContainer
                                             )
                                         )
                                         ExposedDropdownMenu(
@@ -610,7 +700,7 @@ fun PacienteProfileScreen(
                                         ) {
                                             generoOptions.forEach { opcion ->
                                                 DropdownMenuItem(
-                                                    text = { Text(opcion, color = colors.onSurface) },
+                                                    text = { Text(opcion, color = colors.textPrimary, fontFamily = roboto) },
                                                     onClick = {
                                                         generoEdit = opcion
                                                         showGeneroDropdown = false
@@ -640,19 +730,16 @@ fun PacienteProfileScreen(
                                                     )
                                                 )
 
-                                                // Mostrar loading mientras se actualiza
                                                 viewModel.updateProfile(pacienteId, updateDto) { success ->
                                                     if (success) {
                                                         isEditing = false
                                                         if (emailCambiado) {
-                                                            // Mostrar mensaje de correo actualizado
                                                             scope.launch {
                                                                 snackbarHostState.showSnackbar(
                                                                     message = "✅ Correo electrónico actualizado correctamente. Serás redirigido al inicio de sesión.",
                                                                     duration = SnackbarDuration.Long
                                                                 )
                                                             }
-                                                            // Activar redirección al login
                                                             isRedirecting = true
                                                         } else {
                                                             scope.launch {
@@ -682,7 +769,7 @@ fun PacienteProfileScreen(
                                             if (viewModel.isLoading.collectAsState().value) {
                                                 CircularProgressIndicator(
                                                     modifier = Modifier.size(20.dp),
-                                                    color = Color.White,
+                                                    color = if (isDark) Color.Black else Color.White,
                                                     strokeWidth = 2.dp
                                                 )
                                             } else {
@@ -691,10 +778,16 @@ fun PacienteProfileScreen(
                                                         Icons.Default.Save,
                                                         contentDescription = "Guardar",
                                                         modifier = Modifier.size(18.dp),
-                                                        tint = Color.White
+                                                        tint = if (isDark) Color.Black else Color.White
                                                     )
                                                     Spacer(modifier = Modifier.width(6.dp))
-                                                    Text("Guardar", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                                                    Text(
+                                                        "Guardar",
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        fontFamily = roboto,
+                                                        color = if (isDark) Color.Black else Color.White
+                                                    )
                                                 }
                                             }
                                         }
@@ -702,7 +795,6 @@ fun PacienteProfileScreen(
                                         OutlinedButton(
                                             onClick = {
                                                 isEditing = false
-                                                // Restaurar valores originales
                                                 perfil?.let {
                                                     nombreEdit = it.usuario?.nombre ?: ""
                                                     apellidoEdit = it.usuario?.apellido ?: ""
@@ -714,11 +806,11 @@ fun PacienteProfileScreen(
                                             },
                                             modifier = Modifier.weight(1f).height(48.dp),
                                             colors = ButtonDefaults.outlinedButtonColors(
-                                                contentColor = colors.onSurfaceVariant
+                                                contentColor = colors.textSecondary
                                             ),
                                             shape = RoundedCornerShape(14.dp)
                                         ) {
-                                            Text("Cancelar", fontSize = 14.sp)
+                                            Text("Cancelar", fontSize = 14.sp, fontFamily = roboto)
                                         }
                                     }
                                 } else {
@@ -727,7 +819,8 @@ fun PacienteProfileScreen(
                                         icon = Icons.Default.Person,
                                         label = "Nombre completo",
                                         value = "${perfil!!.usuario?.nombre ?: ""} ${perfil!!.usuario?.apellido ?: ""}".trim(),
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -736,7 +829,8 @@ fun PacienteProfileScreen(
                                         icon = Icons.Default.Email,
                                         label = "Correo electrónico",
                                         value = perfil!!.usuario?.email ?: "No especificado",
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -745,7 +839,8 @@ fun PacienteProfileScreen(
                                         icon = Icons.Default.Phone,
                                         label = "Teléfono",
                                         value = perfil!!.telefono ?: "No especificado",
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -754,7 +849,8 @@ fun PacienteProfileScreen(
                                         icon = Icons.Default.Cake,
                                         label = "Fecha de nacimiento",
                                         value = formatFecha(perfil!!.fechaNacimiento),
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -763,7 +859,8 @@ fun PacienteProfileScreen(
                                         icon = Icons.Default.Face,
                                         label = "Género",
                                         value = perfil!!.genero ?: "No especificado",
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -772,7 +869,8 @@ fun PacienteProfileScreen(
                                         icon = Icons.Default.Badge,
                                         label = "ID de paciente",
                                         value = perfil!!.idPaciente?.toString() ?: "No disponible",
-                                        colors = colors
+                                        colors = colors,
+                                        roboto = roboto
                                     )
                                 }
                             }
@@ -786,7 +884,7 @@ fun PacienteProfileScreen(
                             shape = RoundedCornerShape(24.dp),
                             elevation = CardDefaults.cardElevation(4.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = colors.primaryContainer.copy(alpha = 0.1f)
+                                containerColor = colors.primaryLight.copy(alpha = 0.1f)
                             )
                         ) {
                             Column(
@@ -797,20 +895,23 @@ fun PacienteProfileScreen(
                                     text = "💜 AMANI Psicología",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = colors.primary
+                                    color = colors.primary,
+                                    fontFamily = roboto
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "Tu bienestar es nuestra prioridad",
                                     fontSize = 12.sp,
-                                    color = colors.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                                    color = colors.textSecondary,
+                                    textAlign = TextAlign.Center,
+                                    fontFamily = roboto
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Versión 1.0.0",
                                     fontSize = 11.sp,
-                                    color = colors.onSurfaceVariant
+                                    color = colors.textSecondary,
+                                    fontFamily = roboto
                                 )
                             }
                         }
@@ -822,7 +923,9 @@ fun PacienteProfileScreen(
                     ErrorContentPaciente(
                         error = error!!,
                         onRetry = { viewModel.fetchProfile(pacienteId) },
-                        colors = colors
+                        colors = colors,
+                        roboto = roboto,
+                        isDark = isDark
                     )
                 }
             }
@@ -840,14 +943,16 @@ fun PacienteProfileScreen(
                     text = "Cambiar foto de perfil",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colors.onSurface
+                    color = colors.textPrimary,
+                    fontFamily = roboto
                 )
             },
             text = {
                 Text(
                     text = "Selecciona una opción para obtener la imagen",
                     fontSize = 14.sp,
-                    color = colors.onSurfaceVariant
+                    color = colors.textSecondary,
+                    fontFamily = roboto
                 )
             },
             confirmButton = {
@@ -868,9 +973,19 @@ fun PacienteProfileScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = "Cámara", modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = "Cámara",
+                            modifier = Modifier.size(16.dp),
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Cámara", fontSize = 12.sp)
+                        Text(
+                            "Cámara",
+                            fontSize = 12.sp,
+                            fontFamily = roboto,
+                            color = if (isDark) Color.Black else Color.White
+                        )
                     }
                     Button(
                         onClick = {
@@ -878,18 +993,28 @@ fun PacienteProfileScreen(
                             galleryLauncher.launch("image/*")
                         },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = colors.primaryContainer),
+                        colors = ButtonDefaults.buttonColors(containerColor = colors.primaryLight),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.PhotoLibrary, contentDescription = "Galería", modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.PhotoLibrary,
+                            contentDescription = "Galería",
+                            modifier = Modifier.size(16.dp),
+                            tint = if (isDark) Color.Black else Color.White
+                        )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Galería", fontSize = 12.sp)
+                        Text(
+                            "Galería",
+                            fontSize = 12.sp,
+                            fontFamily = roboto,
+                            color = if (isDark) Color.Black else Color.White
+                        )
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showImageOptions = false }) {
-                    Text("Cancelar", color = colors.onSurfaceVariant)
+                    Text("Cancelar", color = colors.textSecondary, fontFamily = roboto)
                 }
             }
         )
@@ -906,7 +1031,8 @@ fun PacienteProfileScreen(
                     text = "Correo actualizado",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colors.primary
+                    color = colors.primary,
+                    fontFamily = roboto
                 )
             },
             text = {
@@ -923,15 +1049,17 @@ fun PacienteProfileScreen(
                     Text(
                         text = "Tu correo electrónico ha sido actualizado correctamente.",
                         fontSize = 14.sp,
-                        color = colors.onSurface,
-                        textAlign = TextAlign.Center
+                        color = colors.textPrimary,
+                        textAlign = TextAlign.Center,
+                        fontFamily = roboto
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Serás redirigido al inicio de sesión para que ingreses con tu nuevo correo.",
                         fontSize = 12.sp,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center
+                        color = colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                        fontFamily = roboto
                     )
                 }
             },
@@ -949,11 +1077,16 @@ fun PacienteProfileScreen(
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(16.dp),
-                            color = Color.White,
+                            color = if (isDark) Color.Black else Color.White,
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Redirigiendo...", fontSize = 14.sp)
+                        Text(
+                            "Redirigiendo...",
+                            fontSize = 14.sp,
+                            fontFamily = roboto,
+                            color = if (isDark) Color.Black else Color.White
+                        )
                     }
                 }
             }
@@ -982,7 +1115,8 @@ fun PacienteProfileScreen(
                     Text(
                         text = "Subiendo foto...",
                         fontSize = 14.sp,
-                        color = colors.onSurface
+                        color = colors.textPrimary,
+                        fontFamily = roboto
                     )
                 }
             }
@@ -995,7 +1129,8 @@ fun InfoRowPaciente(
     icon: ImageVector,
     label: String,
     value: String,
-    colors: ColorScheme
+    colors: PacienteProfileThemeColors,
+    roboto: FontFamily
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -1012,13 +1147,15 @@ fun InfoRowPaciente(
             Text(
                 text = label,
                 fontSize = 12.sp,
-                color = colors.onSurfaceVariant
+                color = colors.textSecondary,
+                fontFamily = roboto
             )
             Text(
                 text = value.ifEmpty { "No especificado" },
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = colors.onSurface
+                color = colors.textPrimary,
+                fontFamily = roboto
             )
         }
     }
@@ -1028,7 +1165,9 @@ fun InfoRowPaciente(
 fun ErrorContentPaciente(
     error: String,
     onRetry: () -> Unit,
-    colors: ColorScheme
+    colors: PacienteProfileThemeColors,
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -1048,23 +1187,53 @@ fun ErrorContentPaciente(
             text = "Error al cargar el perfil",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = colors.onSurface
+            color = colors.textPrimary,
+            fontFamily = roboto
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = error,
             fontSize = 14.sp,
-            color = colors.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center,
+            fontFamily = roboto
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
+            colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Icon(Icons.Default.Refresh, contentDescription = null)
+            Icon(
+                Icons.Default.Refresh,
+                contentDescription = null,
+                tint = if (isDark) Color.Black else Color.White
+            )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Reintentar")
+            Text(
+                "Reintentar",
+                fontFamily = roboto,
+                color = if (isDark) Color.Black else Color.White
+            )
         }
     }
 }
+
+// Clase auxiliar para los colores del tema
+data class PacienteProfileThemeColors(
+    val primary: Color,
+    val primaryLight: Color,
+    val primaryDark: Color,
+    val secondary: Color,
+    val accent: Color,
+    val background: Color,
+    val surface: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val error: Color,
+    val success: Color,
+    val textFieldContainer: Color,
+    val textFieldText: Color,
+    val textFieldLabel: Color,
+    val textFieldBorder: Color
+)

@@ -1,4 +1,4 @@
-package org.ies.tierno.applicationamani.domain.usecases
+package org.ies.tierno.applicationamani.domain.usecases.generalizado
 
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
 

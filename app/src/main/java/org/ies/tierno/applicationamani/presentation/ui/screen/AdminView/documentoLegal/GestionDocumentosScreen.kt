@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +43,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -65,6 +65,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -74,15 +76,34 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.TipoDocumentoLegal
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-// Colores corporativos AMANI
+// Colores originales para el modo DEFECTO (Amani)
+object AmaniDocumentColors {
+    val Primary = Color(0xFF6B4E71)
+    val PrimaryLight = Color(0xFF9B7E9F)
+    val PrimaryDark = Color(0xFF4A2B50)
+    val Secondary = Color(0xFFE8B4B8)
+    val Accent = Color(0xFFF5E6E8)
+    val Background = Color(0xFFFDF8F9)
+    val Surface = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF2D1B30)
+    val TextSecondary = Color(0xFF7A6B7E)
+    val Success = Color(0xFF81C784)
+    val Warning = Color(0xFFFFB74D)
+    val Error = Color(0xFFE57373)
+    val Info = Color(0xFF64B5F6)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,6 +111,7 @@ fun GestionDocumentosScreen(
     navController: NavController,
     viewModel: DocumentoLegalViewModel = koinViewModel()
 ) {
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val documentos by viewModel.documentos.collectAsStateWithLifecycle()
     val isLoading by viewModel.loading.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
@@ -100,6 +122,22 @@ fun GestionDocumentosScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores segun el tema
+    val backgroundColor = if (isDark) screenColors.background else AmaniDocumentColors.Background
+    val surfaceColor = if (isDark) cardColors.cardBackground else AmaniDocumentColors.Surface
+    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniDocumentColors.Primary
+    val accentColor = if (isDark) cardColors.cardBackground else AmaniDocumentColors.Accent
+    val textPrimaryColor = if (isDark) cardColors.cardContent else AmaniDocumentColors.TextPrimary
+    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDocumentColors.TextSecondary
+    val errorColor = AmaniDocumentColors.Error
+    val successColor = AmaniDocumentColors.Success
+    val warningColor = AmaniDocumentColors.Warning
 
     // Cargar documentos al iniciar
     LaunchedEffect(Unit) {
@@ -121,31 +159,38 @@ fun GestionDocumentosScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "📋 Gestión de Documentos",
+                        "Gestion de Documentos",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        fontFamily = roboto,
+                        color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { mostrarDialogoCrear = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "Nuevo documento")
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Nuevo documento",
+                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    containerColor = primaryColor
                 )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = backgroundColor
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -164,14 +209,15 @@ fun GestionDocumentosScreen(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(48.dp),
-                                color = MaterialTheme.colorScheme.primary,
+                                color = primaryColor,
                                 strokeWidth = 3.dp
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "Cargando documentos...",
                                 fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = textSecondaryColor,
+                                fontFamily = roboto
                             )
                         }
                     }
@@ -179,7 +225,12 @@ fun GestionDocumentosScreen(
 
                 documentos.isEmpty() -> {
                     EmptyDocumentState(
-                        onCreateClick = { mostrarDialogoCrear = true }
+                        onCreateClick = { mostrarDialogoCrear = true },
+                        primaryColor = primaryColor,
+                        textPrimaryColor = textPrimaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        roboto = roboto,
+                        isDark = isDark
                     )
                 }
 
@@ -196,10 +247,19 @@ fun GestionDocumentosScreen(
                                 onDelete = {
                                     scope.launch {
                                         viewModel.eliminarDocumento(documento.idDocumento)
-                                        snackbarHostState.showSnackbar("✅ Documento eliminado")
+                                        snackbarHostState.showSnackbar("Documento eliminado")
                                     }
                                 },
-                                onClick = { documentoSeleccionado = documento }
+                                onClick = { documentoSeleccionado = documento },
+                                primaryColor = primaryColor,
+                                surfaceColor = surfaceColor,
+                                textPrimaryColor = textPrimaryColor,
+                                textSecondaryColor = textSecondaryColor,
+                                errorColor = errorColor,
+                                warningColor = warningColor,
+                                successColor = successColor,
+                                roboto = roboto,
+                                isDark = isDark
                             )
                         }
                     }
@@ -208,7 +268,7 @@ fun GestionDocumentosScreen(
         }
     }
 
-    // Diálogo Crear/Editar Documento
+    // Dialogo Crear/Editar Documento
     if (mostrarDialogoCrear || documentoEditando != null) {
         DialogoCrearEditarDocumento(
             documento = documentoEditando,
@@ -220,29 +280,52 @@ fun GestionDocumentosScreen(
                 scope.launch {
                     if (documentoEditando != null) {
                         viewModel.editarDocumento(documentoEditando!!.idDocumento, request)
-                        snackbarHostState.showSnackbar("✏️ Documento actualizado")
+                        snackbarHostState.showSnackbar("Documento actualizado")
                     } else {
                         viewModel.crearDocumento(request)
-                        snackbarHostState.showSnackbar("✅ Documento creado")
+                        snackbarHostState.showSnackbar("Documento creado")
                     }
                     mostrarDialogoCrear = false
                     documentoEditando = null
                 }
-            }
+            },
+            primaryColor = primaryColor,
+            surfaceColor = surfaceColor,
+            textPrimaryColor = textPrimaryColor,
+            textSecondaryColor = textSecondaryColor,
+            successColor = successColor,
+            roboto = roboto,
+            isDark = isDark
         )
     }
 
-    // Diálogo Ver Detalle del Documento
+    // Dialogo Ver Detalle del Documento
     if (documentoSeleccionado != null) {
         DialogoVerDocumento(
             documento = documentoSeleccionado!!,
-            onDismiss = { documentoSeleccionado = null }
+            onDismiss = { documentoSeleccionado = null },
+            primaryColor = primaryColor,
+            surfaceColor = surfaceColor,
+            accentColor = accentColor,
+            textPrimaryColor = textPrimaryColor,
+            textSecondaryColor = textSecondaryColor,
+            successColor = successColor,
+            errorColor = errorColor,
+            roboto = roboto,
+            isDark = isDark
         )
     }
 }
 
 @Composable
-fun EmptyDocumentState(onCreateClick: () -> Unit) {
+fun EmptyDocumentState(
+    onCreateClick: () -> Unit,
+    primaryColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -255,14 +338,14 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Surface(
                 modifier = Modifier.size(100.dp),
                 shape = RoundedCornerShape(50.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                color = primaryColor.copy(alpha = 0.1f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = primaryColor
                     )
                 }
             }
@@ -273,16 +356,18 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
                 text = "No hay documentos creados",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = textPrimaryColor,
+                fontFamily = roboto
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Crea políticas de seguridad, términos y condiciones,\n o cualquier documento legal para tus pacientes",
+                text = "Crea politicas de seguridad, terminos y condiciones,\n o cualquier documento legal para tus pacientes",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                color = textSecondaryColor,
+                textAlign = TextAlign.Center,
+                fontFamily = roboto
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -290,13 +375,13 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Button(
                 onClick = onCreateClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = primaryColor
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Crear")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Crear primer documento")
+                Text("Crear primer documento", fontFamily = roboto)
             }
         }
     }
@@ -307,7 +392,16 @@ fun DocumentoCard(
     documento: DocumentoLegalResponseDTO,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    primaryColor: Color,
+    surfaceColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    errorColor: Color,
+    warningColor: Color,
+    successColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaTexto = try {
@@ -320,12 +414,12 @@ fun DocumentoCard(
 
     // Obtener el nombre del tipo de documento
     val tipoNombre = when (documento.tipo) {
-        TipoDocumentoLegal.terminos -> "📜 Términos y Condiciones"
-        TipoDocumentoLegal.privacidad -> "🔒 Política de Privacidad"
-        else -> "📄 Documento Legal"
+        TipoDocumentoLegal.terminos -> "Terminos y Condiciones"
+        TipoDocumentoLegal.privacidad -> "Politica de Privacidad"
+        else -> "Documento Legal"
     }
 
-    // Icono según el tipo
+    // Icono segun el tipo
     val tipoIcono = when (documento.tipo) {
         TipoDocumentoLegal.terminos -> Icons.Default.Gavel
         TipoDocumentoLegal.privacidad -> Icons.Default.Lock
@@ -337,7 +431,7 @@ fun DocumentoCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = surfaceColor)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -353,14 +447,14 @@ fun DocumentoCard(
                 ) {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        color = primaryColor.copy(alpha = 0.1f),
                         modifier = Modifier.size(48.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 tipoIcono,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = primaryColor,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -371,36 +465,40 @@ fun DocumentoCard(
                             text = documento.titulo,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = textPrimaryColor,
+                            fontFamily = roboto
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = tipoNombre,
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = primaryColor,
                             modifier = Modifier.padding(
                                 horizontal = 8.dp,
                                 vertical = 2.dp
-                            )
+                            ),
+                            fontFamily = roboto
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "📅 $fechaTexto",
+                            text = "$fechaTexto",
                             fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = textSecondaryColor,
+                            fontFamily = roboto
                         )
                         if (!documento.activo) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "⚠️ Documento inactivo",
+                                text = "Documento inactivo",
                                 fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.tertiary
+                                color = warningColor,
+                                fontFamily = roboto
                             )
                         }
                     }
                 }
 
-                // Botones de acción
+                // Botones de accion
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
@@ -412,7 +510,7 @@ fun DocumentoCard(
                             Icons.Default.Edit,
                             contentDescription = "Editar",
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = primaryColor
                         )
                     }
 
@@ -424,7 +522,7 @@ fun DocumentoCard(
                             Icons.Default.Delete,
                             contentDescription = "Eliminar",
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.error
+                            tint = errorColor
                         )
                     }
                 }
@@ -436,9 +534,10 @@ fun DocumentoCard(
             Text(
                 text = documento.contenido.take(100) + if (documento.contenido.length > 100) "..." else "",
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = textSecondaryColor,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                fontFamily = roboto
             )
         }
     }
@@ -449,7 +548,14 @@ fun DocumentoCard(
 fun DialogoCrearEditarDocumento(
     documento: DocumentoLegalResponseDTO?,
     onDismiss: () -> Unit,
-    onSave: (DocumentoLegalRequestDTO) -> Unit
+    onSave: (DocumentoLegalRequestDTO) -> Unit,
+    primaryColor: Color,
+    surfaceColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    successColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
     val esEdicion = documento != null
     var titulo by remember { mutableStateOf(documento?.titulo ?: "") }
@@ -463,26 +569,28 @@ fun DialogoCrearEditarDocumento(
     var tipoExpanded by remember { mutableStateOf(false) }
 
     val tiposDocumento = listOf(
-        TipoDocumentoLegal.terminos to "📜 Términos y Condiciones",
-        TipoDocumentoLegal.privacidad to "🔒 Política de Privacidad"
+        TipoDocumentoLegal.terminos to "Terminos y Condiciones",
+        TipoDocumentoLegal.privacidad to "Politica de Privacidad"
     )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = surfaceColor,
         shape = RoundedCornerShape(24.dp),
         title = {
             Column {
                 Text(
-                    if (esEdicion) "✏️ Editar Documento" else "📝 Nuevo Documento",
+                    if (esEdicion) "Editar Documento" else "Nuevo Documento",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = primaryColor,
+                    fontFamily = roboto
                 )
                 Text(
-                    if (esEdicion) "Modifica la información del documento" else "Crea un nuevo documento legal",
+                    if (esEdicion) "Modifica la informacion del documento" else "Crea un nuevo documento legal",
                     fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = textSecondaryColor,
+                    fontFamily = roboto
                 )
             }
         },
@@ -494,18 +602,20 @@ fun DialogoCrearEditarDocumento(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Campo Título
+                // Campo Titulo
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
-                    label = { Text("Título del documento") },
-                    placeholder = { Text("Ej: Términos y Condiciones de Uso") },
+                    label = { Text("Titulo del documento", fontFamily = roboto) },
+                    placeholder = { Text("Ej: Terminos y Condiciones de Uso", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        cursorColor = MaterialTheme.colorScheme.primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -518,16 +628,18 @@ fun DialogoCrearEditarDocumento(
                         value = tiposDocumento.find { it.first == tipoSeleccionado }?.second ?: "",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Tipo de documento legal") },
+                        label = { Text("Tipo de documento legal", fontFamily = roboto) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tipoExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                            cursorColor = MaterialTheme.colorScheme.primary
+                            focusedBorderColor = primaryColor,
+                            unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                            cursorColor = primaryColor,
+                            focusedTextColor = textPrimaryColor,
+                            unfocusedTextColor = textPrimaryColor
                         )
                     )
                     ExposedDropdownMenu(
@@ -536,7 +648,7 @@ fun DialogoCrearEditarDocumento(
                     ) {
                         tiposDocumento.forEach { (tipo, nombre) ->
                             DropdownMenuItem(
-                                text = { Text(nombre) },
+                                text = { Text(nombre, fontFamily = roboto) },
                                 onClick = {
                                     tipoSeleccionado = tipo
                                     tipoExpanded = false
@@ -546,35 +658,39 @@ fun DialogoCrearEditarDocumento(
                     }
                 }
 
-                // Campo Versión
+                // Campo Version
                 OutlinedTextField(
                     value = version,
                     onValueChange = { version = it },
-                    label = { Text("Versión") },
-                    placeholder = { Text("Ej: 1.0, 2.0, 2024") },
+                    label = { Text("Version", fontFamily = roboto) },
+                    placeholder = { Text("Ej: 1.0, 2.0, 2024", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        cursorColor = MaterialTheme.colorScheme.primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
-                // Campo Orden de Visualización
+                // Campo Orden de Visualizacion
                 OutlinedTextField(
                     value = ordenVisualizacion.toString(),
                     onValueChange = {
                         ordenVisualizacion = it.toIntOrNull() ?: 0
                     },
-                    label = { Text("Orden de visualización") },
-                    placeholder = { Text("Ej: 0, 1, 2...") },
+                    label = { Text("Orden de visualizacion", fontFamily = roboto) },
+                    placeholder = { Text("Ej: 0, 1, 2...", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        cursorColor = MaterialTheme.colorScheme.primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -582,14 +698,16 @@ fun DialogoCrearEditarDocumento(
                 OutlinedTextField(
                     value = icono,
                     onValueChange = { icono = it },
-                    label = { Text("Ícono (opcional)") },
-                    placeholder = { Text("Ej: description, gavel, lock") },
+                    label = { Text("Icono (opcional)", fontFamily = roboto) },
+                    placeholder = { Text("Ej: description, gavel, lock", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        cursorColor = MaterialTheme.colorScheme.primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -597,16 +715,18 @@ fun DialogoCrearEditarDocumento(
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = { contenido = it },
-                    label = { Text("Contenido del documento") },
-                    placeholder = { Text("Escribe aquí el contenido completo del documento legal...") },
+                    label = { Text("Contenido del documento", fontFamily = roboto) },
+                    placeholder = { Text("Escribe aqui el contenido completo del documento legal...", fontFamily = roboto) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                        cursorColor = MaterialTheme.colorScheme.primary
+                        focusedBorderColor = primaryColor,
+                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
+                        cursorColor = primaryColor,
+                        focusedTextColor = textPrimaryColor,
+                        unfocusedTextColor = textPrimaryColor
                     )
                 )
 
@@ -618,14 +738,15 @@ fun DialogoCrearEditarDocumento(
                         checked = activo,
                         onCheckedChange = { activo = it },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primary
+                            checkedColor = primaryColor
                         )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Documento activo (visible para usuarios)",
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = textPrimaryColor,
+                        fontFamily = roboto
                     )
                 }
             }
@@ -649,12 +770,16 @@ fun DialogoCrearEditarDocumento(
                 },
                 enabled = titulo.isNotBlank() && contenido.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = primaryColor
                 ),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (esEdicion) "💾 Guardar cambios" else "✅ Crear documento")
+                Text(
+                    if (esEdicion) "Guardar cambios" else "Crear documento",
+                    fontFamily = roboto,
+                    color = if (isDark) Color.Black else Color.White
+                )
             }
         },
         dismissButton = {
@@ -662,7 +787,7 @@ fun DialogoCrearEditarDocumento(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cancelar", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Cancelar", color = textSecondaryColor, fontFamily = roboto)
             }
         }
     )
@@ -671,7 +796,16 @@ fun DialogoCrearEditarDocumento(
 @Composable
 fun DialogoVerDocumento(
     documento: DocumentoLegalResponseDTO,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    primaryColor: Color,
+    surfaceColor: Color,
+    accentColor: Color,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    successColor: Color,
+    errorColor: Color,
+    roboto: FontFamily,
+    isDark: Boolean
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaCreacion = try {
@@ -691,9 +825,9 @@ fun DialogoVerDocumento(
     }
 
     val tipoNombre = when (documento.tipo) {
-        TipoDocumentoLegal.terminos -> "📜 Términos y Condiciones"
-        TipoDocumentoLegal.privacidad -> "🔒 Política de Privacidad"
-        else -> "📄 Documento Legal"
+        TipoDocumentoLegal.terminos -> "Terminos y Condiciones"
+        TipoDocumentoLegal.privacidad -> "Politica de Privacidad"
+        else -> "Documento Legal"
     }
 
     val tipoIcono = when (documento.tipo) {
@@ -708,7 +842,7 @@ fun DialogoVerDocumento(
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = surfaceColor)
         ) {
             Column(
                 modifier = Modifier
@@ -729,14 +863,14 @@ fun DialogoVerDocumento(
                     ) {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            color = primaryColor.copy(alpha = 0.1f),
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     tipoIcono,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = primaryColor,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -747,18 +881,20 @@ fun DialogoVerDocumento(
                                 text = documento.titulo,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = primaryColor,
+                                fontFamily = roboto
                             )
                             Text(
                                 text = tipoNombre,
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary
+                                color = primaryColor,
+                                fontFamily = roboto
                             )
                         }
                     }
 
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = textSecondaryColor)
                     }
                 }
 
@@ -768,40 +904,44 @@ fun DialogoVerDocumento(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow
+                    color = accentColor
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            text = "📅 Creado: $fechaCreacion",
+                            text = "Creado: $fechaCreacion",
                             fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = textSecondaryColor,
+                            fontFamily = roboto
                         )
                         Text(
-                            text = "🔄 Actualizado: $fechaActualizacion",
+                            text = "Actualizado: $fechaActualizacion",
                             fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = textSecondaryColor,
+                            fontFamily = roboto
                         )
                         if (documento.version != null) {
                             Text(
-                                text = "📌 Versión: ${documento.version}",
+                                text = "Version: ${documento.version}",
                                 fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = textSecondaryColor,
+                                fontFamily = roboto
                             )
                         }
                         Text(
-                            text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
+                            text = if (documento.activo) "Activo" else "Inactivo",
                             fontSize = 11.sp,
-                            color = if (documento.activo) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
+                            color = if (documento.activo) successColor else errorColor,
+                            fontFamily = roboto
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerLow)
+                HorizontalDivider(color = accentColor)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -810,7 +950,8 @@ fun DialogoVerDocumento(
                     text = documento.contenido,
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = textPrimaryColor,
+                    fontFamily = roboto
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -819,11 +960,11 @@ fun DialogoVerDocumento(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = primaryColor
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Cerrar")
+                    Text("Cerrar", fontFamily = roboto, color = if (isDark) Color.Black else Color.White)
                 }
             }
         }

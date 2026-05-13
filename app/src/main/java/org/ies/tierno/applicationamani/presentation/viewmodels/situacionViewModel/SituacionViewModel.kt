@@ -8,9 +8,11 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 
 class SituacionViewModel(
-    private val useCase: SituacionUseCase
+    private val useCase: SituacionUseCase,
+    private val userSessionDataStore: UserSessionDataStore
 ) : ViewModel() {
 
     // =========================
@@ -29,7 +31,22 @@ class SituacionViewModel(
     val error: StateFlow<String?> = _error
 
     init {
-        cargarSituaciones()
+        // Cargar situaciones solo cuando exista sesión válida (token disponible)
+        viewModelScope.launch {
+            val session = userSessionDataStore.getSession()
+            if (session != null) {
+                cargarSituaciones()
+            } else {
+                // esperar hasta que la sesión esté disponible
+                userSessionDataStore.sessionFlow.collect { s ->
+                    if (s != null) {
+                        cargarSituaciones()
+                    } else {
+                        _situaciones.value = emptyList()
+                    }
+                }
+            }
+        }
     }
 
     // =========================

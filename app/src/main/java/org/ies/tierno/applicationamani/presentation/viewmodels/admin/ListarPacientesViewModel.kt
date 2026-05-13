@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.DarBajaPacienteUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
 import org.ies.tierno.applicationamani.dto.admin.MessageResponse
@@ -12,7 +13,8 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 
 class ListarPacientesViewModel(
     val listarPacientesUseCase: TodosLosPacientesUseCase,
-    val darBajaPacienteUseCase: DarBajaPacienteUseCase
+    val darBajaPacienteUseCase: DarBajaPacienteUseCase,
+    private val userSessionDataStore: UserSessionDataStore
 ) : ViewModel() {
 
     private val _paciente = MutableStateFlow<List<DatosPacienteAdminDTO>>(emptyList())
@@ -22,9 +24,26 @@ class ListarPacientesViewModel(
     val bajaEstado: StateFlow<Result<MessageResponse>?> = _bajaEstado
 
     init {
+        // Solo iniciar las llamadas protegidas cuando exista sesión de usuario.
         viewModelScope.launch {
-            listarPacientesUseCase().collect { lista ->
-                _paciente.value = lista
+            // Comprobar sesión actual de forma suspensiva
+            val session = userSessionDataStore.getSession()
+            if (session != null) {
+                // Si ya hay sesión, iniciar colección de pacientes
+                listarPacientesUseCase().collect { lista ->
+                    _paciente.value = lista
+                }
+            } else {
+                // Si no hay sesión todavía, esperar a que se establezca
+                userSessionDataStore.sessionFlow.collect { s ->
+                    if (s != null) {
+                        listarPacientesUseCase().collect { lista ->
+                            _paciente.value = lista
+                        }
+                    } else {
+                        _paciente.value = emptyList()
+                    }
+                }
             }
         }
     }
