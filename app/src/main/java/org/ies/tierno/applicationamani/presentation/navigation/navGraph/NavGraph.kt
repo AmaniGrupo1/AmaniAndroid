@@ -33,6 +33,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoP
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TerapiasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal.DocumentoLegalDetailScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal.GestionPoliticasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role.AdminUserManagementScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.LoginScreen
@@ -413,6 +414,19 @@ fun NavGraph(
                     navController = navController,
                     pacienteId = pacienteId,
                     historialClinicoPacienteViewModel
+                )
+            }
+
+            // En tu NavGraph, añade:
+
+            composable(
+                route = Screens.documentoLegalDetail.route,
+                arguments = listOf(navArgument("tipo") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val tipo = backStackEntry.arguments?.getString("tipo") ?: "terminos"
+                DocumentoLegalDetailScreen(
+                    navController = navController,
+                    tipoDocumento = tipo
                 )
             }
         }

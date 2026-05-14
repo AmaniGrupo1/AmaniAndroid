@@ -235,7 +235,7 @@
     <string name="crear_situacion">Create Situation</string>
     <string name="gestionar_situaciones">Manage situation types</string>
     <string name="europa_madrid">Europe/Madrid</string>
-    <string name="minutos_45">45 minutes</string>
+    <string name="minutos_45">Therapy time depends on the type of session</string>
     <string name="horario_08_18">08:00 - 18:00</string>
     <string name="minutos_10">10 minutes</string>
     <string name="minutos_60">60 minutes</string>
@@ -374,4 +374,22 @@
     <string name="online">Online</string>
     <string name="modalidad">Modality</string>
     <string name="llamada">Call</string>
+
+
+    <!-- ==================== THEME SELECTOR ==================== -->
+    <string name="tema_defecto">Default</string>
+    <string name="tema_claro">Light</string>
+    <string name="tema_oscuro">Dark</string>
+
+    <!-- ==================== LEGAL DOCUMENTS ==================== -->
+
+    <string name="documento_legal_detail">Legal Document</string>
+    <string name="cargando_documento">Loading document...</string>
+    <string name="error_cargar_documento">Error loading document</string>
+    <string name="documento_no_disponible">Document not available</string>
+    <string name="documento_no_disponible_mensaje">The document is not available at this time.</string>
+    <string name="reintentar">Retry</string>
+    <string name="cerrar">Close</string>
+
+
 </resources>

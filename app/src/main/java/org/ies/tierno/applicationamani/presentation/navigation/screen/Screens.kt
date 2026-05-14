@@ -69,6 +69,10 @@ sealed class Screens(val route: String) {
         fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
     }
 
+    object documentoLegalDetail : Screens("documento_legal_detail/{tipo}") {
+        fun createRoute(tipo: String) = "documento_legal_detail/$tipo"
+    }
+
     object listarPsicologoSimple : Screens("listarPsicologoSimple")
 
     object calendario : Screens("calendario")

@@ -49,4 +49,14 @@ class DocumentoLegalUseCase(
     ): Result<Unit> {
         return repository.deleteDocumento(idDocumento)
     }
+
+
+    suspend fun getDocumentoByTipo(
+        tipo: String
+    ): Result<DocumentoLegalResponseDTO> {
+
+        return repository.getDocumentoByTipo(tipo)
+    }
+
+
 }

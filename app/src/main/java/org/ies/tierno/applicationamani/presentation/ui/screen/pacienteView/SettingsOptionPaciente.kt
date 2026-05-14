@@ -583,11 +583,10 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "terminos" -> {
-                        Log.d(TAG, "📄 Navegar a términos y condiciones")
+                        navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
                     }
-
                     "privacidad" -> {
-                        Log.d(TAG, "🔒 Navegar a política de privacidad")
+                        navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
                     }
 
                     "cerrar_sesion" -> {

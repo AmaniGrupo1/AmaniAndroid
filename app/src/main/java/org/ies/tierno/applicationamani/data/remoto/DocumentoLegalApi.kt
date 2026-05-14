@@ -34,4 +34,10 @@ interface DocumentoLegalApi {
     suspend fun eliminarDocumento(
         @Path("id") id: Long
     )
+
+    @GET("api/documentos-legales/tipo/{tipo}")
+    suspend fun getDocumentoByTipo(
+        @Path("tipo") tipo: String
+    ): DocumentoLegalResponseDTO
+
 }

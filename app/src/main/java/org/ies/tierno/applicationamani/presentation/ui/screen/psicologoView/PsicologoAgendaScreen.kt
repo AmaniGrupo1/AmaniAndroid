@@ -145,6 +145,11 @@ fun PsicologoAgendaScreen(
     val horarioActual by viewModel.horarioActual.collectAsStateWithLifecycle()
     val terapias by listarTerapiasViewModel.terapias.collectAsStateWithLifecycle()
 
+    // ✅ MOVIDAS ANTES DEL SCAFFOLD para que estén disponibles
+    val userSession by viewModel.userSession.collectAsStateWithLifecycle()
+    val idPsicologo = userSession?.idPsicologo
+    val isPsicologoReady = idPsicologo != null && idPsicologo > 0L
+
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     var mesVisible by remember { mutableStateOf(YearMonth.now()) }
 
@@ -195,7 +200,6 @@ fun PsicologoAgendaScreen(
     }
 
     val esDiaNoDisponible = fechaSeleccionada?.let { it in diasNoDisponibles } ?: false
-    val userSession by viewModel.userSession.collectAsStateWithLifecycle()
 
     LaunchedEffect(mostrarDialogoHorario) {
         if (mostrarDialogoHorario) {
@@ -233,13 +237,22 @@ fun PsicologoAgendaScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    citaParaEditar = null
-                    mostrarDialogoCrearEditar = true
-                    val fechaParaCargar = fechaSeleccionada ?: LocalDate.now()
-                    viewModel.cargarDisponibilidadDia(fechaParaCargar, 60)
+                    if (isPsicologoReady && fechaSeleccionada != null) {
+                        citaParaEditar = null
+                        mostrarDialogoCrearEditar = true
+                        viewModel.cargarDisponibilidadDia(fechaSeleccionada!!, 60)
+                    } else if (!isPsicologoReady) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Cargando datos del psicólogo...")
+                        }
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("📅 Selecciona primero una fecha en el calendario")
+                        }
+                    }
                 },
-                containerColor = colors.primary,
-                contentColor = colors.onPrimary,
+                containerColor = if (isPsicologoReady) colors.primary else colors.primary.copy(alpha = 0.5f),
+                contentColor = if (isPsicologoReady) colors.onPrimary else colors.onPrimary.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.size(56.dp)
             ) {
@@ -1087,6 +1100,7 @@ fun TarjetaCitaMejorada(
         }
     }
 }
+
 @Composable
 fun DiaNoDisponibleCardMejorado() {
     val colors = MaterialTheme.colorScheme
