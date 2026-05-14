@@ -530,7 +530,7 @@ fun SettingsOptionRowPsychologist(
                     DropdownMenu(
                         expanded = expandedTheme,
                         onDismissRequest = { expandedTheme = false },
-                        containerColor = if (isDarkTheme()) Color.DarkGray else Color.White
+                        containerColor = MaterialTheme.colorScheme.surface
                     ) {
                         DropdownMenuItem(
                             text = { Text("Sistema", color = textColor) },

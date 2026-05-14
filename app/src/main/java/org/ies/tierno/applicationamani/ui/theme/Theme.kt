@@ -230,7 +230,11 @@ fun ApplicationAmaniTheme(
 
 @Composable
 @ReadOnlyComposable
-fun isDarkTheme(): Boolean = MaterialTheme.colorScheme.background == Color.Black
+fun isDarkTheme(): Boolean {
+    val background = MaterialTheme.colorScheme.background
+    // En Amani, el fondo oscuro es AmaniBlack (0xFF1C1B1F) o Color.Black
+    return background == AmaniBlack || background == Color(0xFF1C1B1F) || background == Color.Black
+}
 
 @Composable
 fun getCardColors(): CardColors {

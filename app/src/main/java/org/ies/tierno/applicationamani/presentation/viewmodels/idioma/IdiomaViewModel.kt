@@ -58,21 +58,19 @@ class IdiomaViewModel(
 
     fun cambiarTema(nuevoTema: TemaApp) {
         viewModelScope.launch {
-
             val session = userSessionDataStore.getSession() ?: return@launch
-
             if (session.tema == nuevoTema) return@launch
 
-            idiomaUseCase.actualizarTema(nuevoTema)
-                .onSuccess {
+            // 1. Local (esto es lo que realmente dispara UI inmediatamente)
+            userSessionDataStore.saveSession(
+                session.copy(tema = nuevoTema)
+            )
 
-                    userSessionDataStore.saveSession(
-                        session.copy(tema = nuevoTema)
-                    )
-                }
+            // 2. Backend (intento asíncrono)
+            idiomaUseCase.actualizarTema(nuevoTema)
                 .onFailure {
-                    // Manejar el error
-                    print("Error al actualizar tema: ${it.message}")
+                    // Log error but keep local theme
+                    println("Error al sincronizar tema con backend: ${it.message}")
                 }
         }
     }
