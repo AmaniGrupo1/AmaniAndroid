@@ -1,4 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
+import androidx.compose.foundation.shape.CircleShape
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -91,28 +92,6 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-// Colores originales para el modo DEFECTO (Amani)
-object AmaniPoliticasColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Background = Color(0xFFFDF8F9)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Success = Color(0xFF81C784)
-    val Warning = Color(0xFFFFB74D)
-    val Error = Color(0xFFE57373)
-    val Info = Color(0xFF64B5F6)
-}
-
-// Fuente Roboto
-val robotoFontFamily = FontFamily(
-    Font(R.font.roboto_variablefont_wdth_wght)
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GestionPoliticasScreen(
@@ -129,23 +108,6 @@ fun GestionPoliticasScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
-
-    // Determinar colores segun el tema
-    val backgroundColor = if (isDark) screenColors.background else AmaniPoliticasColors.Background
-    val surfaceColor = if (isDark) cardColors.cardBackground else AmaniPoliticasColors.Surface
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniPoliticasColors.Primary
-    val primaryLightColor = if (isDark) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) else AmaniPoliticasColors.PrimaryLight
-    val accentColor = if (isDark) cardColors.cardBackground else AmaniPoliticasColors.Accent
-    val textPrimaryColor = if (isDark) cardColors.cardContent else AmaniPoliticasColors.TextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniPoliticasColors.TextSecondary
-    val successColor = AmaniPoliticasColors.Success
-    val warningColor = AmaniPoliticasColors.Warning
-    val errorColor = AmaniPoliticasColors.Error
 
     // Cargar documentos al iniciar
     LaunchedEffect(Unit) {
@@ -168,28 +130,26 @@ fun GestionPoliticasScreen(
                 title = {
                     Text(
                         text = "Politicas y Privacidad",
-                        fontFamily = robotoFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                            contentDescription = "Volver"
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = backgroundColor
+        containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -198,20 +158,11 @@ fun GestionPoliticasScreen(
         ) {
             when {
                 isLoading -> {
-                    LoadingState(
-                        primaryColor = primaryColor,
-                        textSecondaryColor = textSecondaryColor,
-                        robotoFontFamily = robotoFontFamily
-                    )
+                    LoadingState()
                 }
 
                 documentos.isEmpty() -> {
-                    EmptyPoliticasState(
-                        primaryColor = primaryColor,
-                        textPrimaryColor = textPrimaryColor,
-                        textSecondaryColor = textSecondaryColor,
-                        robotoFontFamily = robotoFontFamily
-                    )
+                    EmptyPoliticasState()
                 }
 
                 else -> {
@@ -227,15 +178,7 @@ fun GestionPoliticasScreen(
                                     documentoEditando = documento
                                     mostrarDialogoEditar = true
                                 },
-                                onView = { documentoSeleccionado = documento },
-                                primaryColor = primaryColor,
-                                primaryLightColor = primaryLightColor,
-                                surfaceColor = surfaceColor,
-                                textPrimaryColor = textPrimaryColor,
-                                textSecondaryColor = textSecondaryColor,
-                                warningColor = warningColor,
-                                robotoFontFamily = robotoFontFamily,
-                                isDark = isDark
+                                onView = { documentoSeleccionado = documento }
                             )
                         }
                     }
@@ -259,13 +202,7 @@ fun GestionPoliticasScreen(
                     mostrarDialogoEditar = false
                     documentoEditando = null
                 }
-            },
-            primaryColor = primaryColor,
-            surfaceColor = surfaceColor,
-            textPrimaryColor = textPrimaryColor,
-            textSecondaryColor = textSecondaryColor,
-            robotoFontFamily = robotoFontFamily,
-            isDark = isDark
+            }
         )
     }
 
@@ -278,26 +215,13 @@ fun GestionPoliticasScreen(
                 documentoEditando = documentoSeleccionado
                 documentoSeleccionado = null
                 mostrarDialogoEditar = true
-            },
-            primaryColor = primaryColor,
-            surfaceColor = surfaceColor,
-            accentColor = accentColor,
-            textPrimaryColor = textPrimaryColor,
-            textSecondaryColor = textSecondaryColor,
-            successColor = successColor,
-            errorColor = errorColor,
-            robotoFontFamily = robotoFontFamily,
-            isDark = isDark
+            }
         )
     }
 }
 
 @Composable
-fun LoadingState(
-    primaryColor: Color,
-    textSecondaryColor: Color,
-    robotoFontFamily: FontFamily
-) {
+fun LoadingState() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -307,28 +231,20 @@ fun LoadingState(
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
-                color = primaryColor,
-                strokeWidth = 3.dp
+                modifier = Modifier.size(48.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Cargando politicas...",
-                fontFamily = robotoFontFamily,
-                fontSize = 14.sp,
-                color = textSecondaryColor
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
 }
 
 @Composable
-fun EmptyPoliticasState(
-    primaryColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    robotoFontFamily: FontFamily
-) {
+fun EmptyPoliticasState() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -340,15 +256,15 @@ fun EmptyPoliticasState(
         ) {
             Surface(
                 modifier = Modifier.size(100.dp),
-                shape = RoundedCornerShape(50.dp),
-                color = primaryColor.copy(alpha = 0.1f)
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = primaryColor
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -357,19 +273,16 @@ fun EmptyPoliticasState(
 
             Text(
                 text = "No hay politicas creadas",
-                fontFamily = robotoFontFamily,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = textPrimaryColor
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Las politicas de privacidad y terminos\nse crearan automaticamente desde el sistema",
-                fontFamily = robotoFontFamily,
-                fontSize = 14.sp,
-                color = textSecondaryColor,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
@@ -380,15 +293,7 @@ fun EmptyPoliticasState(
 fun PoliticaCard(
     documento: DocumentoLegalResponseDTO,
     onEdit: () -> Unit,
-    onView: () -> Unit,
-    primaryColor: Color,
-    primaryLightColor: Color,
-    surfaceColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    warningColor: Color,
-    robotoFontFamily: FontFamily,
-    isDark: Boolean
+    onView: () -> Unit
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaTexto = try {
@@ -411,26 +316,22 @@ fun PoliticaCard(
         else -> Icons.Default.Description
     }
 
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(primaryColor, primaryLightColor)
-    )
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onView() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Header con degradado
+            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(gradientBrush)
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(16.dp)
             ) {
                 Row(
@@ -443,15 +344,15 @@ fun PoliticaCard(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = Color.White.copy(alpha = 0.2f),
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     tipoIcono,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -460,18 +361,15 @@ fun PoliticaCard(
                         Column {
                             Text(
                                 text = documento.titulo,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = robotoFontFamily
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = tipoNombre,
-                                fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontFamily = robotoFontFamily
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
                     }
@@ -481,13 +379,13 @@ fun PoliticaCard(
                         onClick = onEdit,
                         modifier = Modifier
                             .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color.White.copy(alpha = 0.2f))
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
                     ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Editar",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -508,14 +406,13 @@ fun PoliticaCard(
                             Icons.Default.Info,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = textSecondaryColor
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Version ${documento.version ?: "1.0"}",
-                            fontSize = 11.sp,
-                            color = textSecondaryColor,
-                            fontFamily = robotoFontFamily
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -524,28 +421,26 @@ fun PoliticaCard(
                             Icons.Default.CalendarToday,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = textSecondaryColor
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = fechaTexto,
-                            fontSize = 11.sp,
-                            color = textSecondaryColor,
-                            fontFamily = robotoFontFamily
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
                     if (!documento.activo) {
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = warningColor.copy(alpha = 0.2f)
+                            shape = MaterialTheme.shapes.extraSmall,
+                            color = MaterialTheme.colorScheme.errorContainer
                         ) {
                             Text(
                                 text = "Inactivo",
-                                fontSize = 10.sp,
-                                color = warningColor,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                fontFamily = robotoFontFamily
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
                     }
@@ -556,12 +451,11 @@ fun PoliticaCard(
                 // Vista previa del contenido
                 Text(
                     text = documento.contenido.take(120) + if (documento.contenido.length > 120) "..." else "",
-                    fontSize = 13.sp,
-                    color = textSecondaryColor,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 18.sp,
                     maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    fontFamily = robotoFontFamily
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -574,16 +468,15 @@ fun PoliticaCard(
                 ) {
                     Text(
                         text = "Ver detalles completos",
-                        fontSize = 11.sp,
-                        color = primaryColor,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = robotoFontFamily
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
                     )
                     Icon(
                         Icons.Default.ChevronRight,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = primaryColor
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -596,13 +489,7 @@ fun PoliticaCard(
 fun DialogoEditarPolitica(
     documento: DocumentoLegalResponseDTO,
     onDismiss: () -> Unit,
-    onSave: (DocumentoLegalRequestDTO) -> Unit,
-    primaryColor: Color,
-    surfaceColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    robotoFontFamily: FontFamily,
-    isDark: Boolean
+    onSave: (DocumentoLegalRequestDTO) -> Unit
 ) {
     var titulo by remember { mutableStateOf(documento.titulo) }
     var contenido by remember { mutableStateOf(documento.contenido) }
@@ -611,22 +498,18 @@ fun DialogoEditarPolitica(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = surfaceColor,
-        shape = RoundedCornerShape(24.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         title = {
             Column {
                 Text(
                     text = "Editar ${if (documento.tipo == TipoDocumentoLegal.terminos) "Terminos y Condiciones" else "Politica de Privacidad"}",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = primaryColor,
-                    fontFamily = robotoFontFamily
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "Modifica el contenido del documento legal",
-                    fontSize = 13.sp,
-                    color = textSecondaryColor,
-                    fontFamily = robotoFontFamily
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
@@ -642,51 +525,30 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
-                    label = { Text("Titulo del documento", fontFamily = robotoFontFamily) },
+                    label = { Text("Titulo del documento") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
-                        cursorColor = primaryColor,
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
-                    )
+                    shape = MaterialTheme.shapes.medium
                 )
 
                 // Campo Version
                 OutlinedTextField(
                     value = version,
                     onValueChange = { version = it },
-                    label = { Text("Version", fontFamily = robotoFontFamily) },
-                    placeholder = { Text("Ej: 2.0, 2.1, 2024", fontFamily = robotoFontFamily) },
+                    label = { Text("Version") },
+                    placeholder = { Text("Ej: 2.0, 2.1, 2024") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
-                        cursorColor = primaryColor,
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
-                    )
+                    shape = MaterialTheme.shapes.medium
                 )
 
                 // Campo Contenido
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = { contenido = it },
-                    label = { Text("Contenido del documento", fontFamily = robotoFontFamily) },
+                    label = { Text("Contenido del documento") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
-                        cursorColor = primaryColor,
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
-                    )
+                    shape = MaterialTheme.shapes.medium
                 )
 
                 // Checkbox Activo
@@ -695,17 +557,13 @@ fun DialogoEditarPolitica(
                 ) {
                     Checkbox(
                         checked = activo,
-                        onCheckedChange = { activo = it },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = primaryColor
-                        )
+                        onCheckedChange = { activo = it }
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Documento activo (visible para usuarios)",
-                        fontSize = 13.sp,
-                        color = textPrimaryColor,
-                        fontFamily = robotoFontFamily
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -729,25 +587,18 @@ fun DialogoEditarPolitica(
                     }
                 },
                 enabled = titulo.isNotBlank() && contenido.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = primaryColor
-                ),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    "Guardar cambios",
-                    fontFamily = robotoFontFamily,
-                    color = if (isDark) Color.Black else Color.White
-                )
+                Text("Guardar cambios")
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Cancelar", color = textSecondaryColor, fontFamily = robotoFontFamily)
+                Text("Cancelar")
             }
         }
     )
@@ -757,16 +608,7 @@ fun DialogoEditarPolitica(
 fun DialogoVerPolitica(
     documento: DocumentoLegalResponseDTO,
     onDismiss: () -> Unit,
-    onEdit: () -> Unit,
-    primaryColor: Color,
-    surfaceColor: Color,
-    accentColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    successColor: Color,
-    errorColor: Color,
-    robotoFontFamily: FontFamily,
-    isDark: Boolean
+    onEdit: () -> Unit
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaCreacion = try {
@@ -797,8 +639,9 @@ fun DialogoVerPolitica(
                 .fillMaxWidth()
                 .fillMaxHeight(0.85f)
                 .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = surfaceColor)
+            shape = MaterialTheme.shapes.extraLarge,
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -817,15 +660,15 @@ fun DialogoVerPolitica(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = primaryColor.copy(alpha = 0.1f),
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     if (documento.tipo == TipoDocumentoLegal.terminos) Icons.Default.Gavel else Icons.Default.Lock,
                                     contentDescription = null,
-                                    tint = primaryColor,
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -834,16 +677,13 @@ fun DialogoVerPolitica(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = documento.titulo,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = primaryColor,
-                                fontFamily = robotoFontFamily
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = tipoNombre,
-                                fontSize = 12.sp,
-                                color = primaryColor,
-                                fontFamily = robotoFontFamily
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
@@ -853,14 +693,13 @@ fun DialogoVerPolitica(
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = "Editar",
-                                tint = primaryColor
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                         IconButton(onClick = onDismiss) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Cerrar",
-                                tint = textSecondaryColor
+                                contentDescription = "Cerrar"
                             )
                         }
                     }
@@ -871,8 +710,8 @@ fun DialogoVerPolitica(
                 // Metadatos
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    color = accentColor
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -884,45 +723,40 @@ fun DialogoVerPolitica(
                         ) {
                             Text(
                                 text = "Version: ${documento.version ?: "1.0"}",
-                                fontSize = 11.sp,
-                                color = textSecondaryColor,
-                                fontFamily = robotoFontFamily
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 text = if (documento.activo) "Activo" else "Inactivo",
-                                fontSize = 11.sp,
-                                color = if (documento.activo) successColor else errorColor,
-                                fontFamily = robotoFontFamily
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (documento.activo) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                             )
                         }
                         Text(
                             text = "Creado: $fechaCreacion",
-                            fontSize = 11.sp,
-                            color = textSecondaryColor,
-                            fontFamily = robotoFontFamily
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "Actualizado: $fechaActualizacion",
-                            fontSize = 11.sp,
-                            color = textSecondaryColor,
-                            fontFamily = robotoFontFamily
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                HorizontalDivider(color = accentColor)
+                HorizontalDivider()
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Contenido
                 Text(
                     text = documento.contenido,
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     lineHeight = 20.sp,
-                    color = textPrimaryColor,
-                    fontFamily = robotoFontFamily
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -934,25 +768,19 @@ fun DialogoVerPolitica(
                     OutlinedButton(
                         onClick = onEdit,
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = primaryColor
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Editar", fontFamily = robotoFontFamily)
+                        Text("Editar")
                     }
 
                     Button(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryColor
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = MaterialTheme.shapes.medium
                     ) {
-                        Text("Cerrar", fontFamily = robotoFontFamily, color = if (isDark) Color.Black else Color.White)
+                        Text("Cerrar")
                     }
                 }
             }

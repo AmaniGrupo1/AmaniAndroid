@@ -393,7 +393,7 @@ fun EmptySituacionesScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            Icons.Default.List,
+            Icons.AutoMirrored.Filled.List,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
             tint = primaryColor.copy(alpha = 0.4f)

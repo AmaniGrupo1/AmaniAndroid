@@ -1,8 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
@@ -70,7 +70,6 @@ import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.entryOf
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
-import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.AmaniPsicologoColors
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoViewModel
 import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
@@ -86,6 +85,7 @@ fun EstadisticasPsicologoScreen(
     viewModel: EstadisticasPsicologoViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val colorScheme = MaterialTheme.colorScheme
 
     Scaffold(
         topBar = {
@@ -93,22 +93,23 @@ fun EstadisticasPsicologoScreen(
                 title = {
                     Text(
                         "Estadísticas de Bienestar",
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colorScheme.onPrimary
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AmaniPsicologoColors.Primary
+                    containerColor = colorScheme.primary
                 )
             )
         },
-        containerColor = AmaniPsicologoColors.Background
+        containerColor = colorScheme.background
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .testTag("stats_list"), // FIX: Added testTag for scrolling in tests
+                .testTag("stats_list"),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -155,9 +156,9 @@ fun FiltersSection(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -179,8 +180,8 @@ fun FiltersSection(
                     modifier = Modifier
                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
-                        .testTag("dropdown_paciente"), // FIX: Added testTag
-                    shape = RoundedCornerShape(12.dp)
+                        .testTag("dropdown_paciente"),
+                    shape = MaterialTheme.shapes.small
                 )
                 ExposedDropdownMenu(
                     expanded = expandedPaciente,
@@ -218,8 +219,8 @@ fun FiltersSection(
                         },
                         modifier = Modifier
                             .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .testTag("dropdown_periodo"), // FIX: Added testTag
-                        shape = RoundedCornerShape(12.dp)
+                            .testTag("dropdown_periodo"),
+                        shape = MaterialTheme.shapes.small
                     )
                     ExposedDropdownMenu(
                         expanded = expandedPeriodo,
@@ -254,7 +255,7 @@ fun FiltersSection(
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedVista)
                         },
                         modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = MaterialTheme.shapes.small
                     )
                     ExposedDropdownMenu(
                         expanded = expandedVista,
@@ -286,16 +287,16 @@ fun ChartCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(350.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 "Evolución emocional",
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = AmaniPsicologoColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -337,8 +338,7 @@ private fun EmptyStateContent() {
             text = "Este paciente no tiene registros en el periodo seleccionado",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Normal,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
     }
@@ -352,7 +352,8 @@ fun EmotionalEvolutionChart(
     modifier: Modifier = Modifier
 ) {
     val modelProducer = remember { ChartEntryModelProducer() }
-    val primaryColor = MaterialTheme.colorScheme.primary
+    val colorScheme = MaterialTheme.colorScheme
+    val primaryColor = colorScheme.primary
 
     val dateLabels = remember(chartData) {
         val formatter = DateTimeFormatter.ofPattern("d MMM", Locale.forLanguageTag("es"))
@@ -460,6 +461,7 @@ private fun SinglePointChart(point: Pair<LocalDate, Float>) {
 fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
     val stats = uiState.estadisticas
     val hasData = uiState.chartData.isNotEmpty()
+    val colorScheme = MaterialTheme.colorScheme
     val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -479,7 +481,7 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
                 value = if (hasData) String.format(locale, "%d / 10", stats.mejorSesion?.intensidad ?: 0) else "— / 10",
                 subtitle = stats.mejorSesion?.fecha.toLocalDateSafe()?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
-                color = AmaniPsicologoColors.Success,
+                color = Color(0xFF4CAF50),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -492,7 +494,7 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
                 value = if (hasData) String.format(locale, "%d / 10", stats.peorSesion?.intensidad ?: 0) else "— / 10",
                 subtitle = stats.peorSesion?.fecha.toLocalDateSafe()?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
                 icon = Icons.AutoMirrored.Filled.TrendingDown,
-                color = AmaniPsicologoColors.Error,
+                color = colorScheme.error,
                 modifier = Modifier.weight(1f)
             )
             MetricCard(
@@ -514,10 +516,10 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
             subtitle = if (hasData) String.format(locale, "%+.1f puntos", stats.tendenciaPuntos) else "Sin tendencia",
             icon = Icons.Default.Timeline,
             color = when {
-                !hasData -> AmaniPsicologoColors.TextSecondary
-                stats.tendenciaPuntos > 1.0 -> AmaniPsicologoColors.Success
-                stats.tendenciaPuntos < -1.0 -> AmaniPsicologoColors.Error
-                else -> AmaniPsicologoColors.TextSecondary
+                !hasData -> colorScheme.onSurfaceVariant
+                stats.tendenciaPuntos > 1.0 -> Color(0xFF4CAF50)
+                stats.tendenciaPuntos < -1.0 -> colorScheme.error
+                else -> colorScheme.onSurfaceVariant
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -530,14 +532,14 @@ fun MetricCard(
     value: String,
     subtitle: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: Color = AmaniPsicologoColors.Primary,
+    color: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -550,22 +552,22 @@ fun MetricCard(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     title,
-                    fontSize = 12.sp,
-                    color = AmaniPsicologoColors.TextSecondary
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 value,
-                fontSize = 22.sp,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = color
             )
             Text(
                 subtitle,
-                fontSize = 11.sp,
-                color = if (color != AmaniPsicologoColors.Primary) color
-                else AmaniPsicologoColors.Success
+                style = MaterialTheme.typography.labelSmall,
+                color = if (color != MaterialTheme.colorScheme.primary) color
+                else Color(0xFF4CAF50)
             )
         }
     }
@@ -575,8 +577,11 @@ fun MetricCard(
 fun ObservationCard(observacion: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3E5F5)),
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.2f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -585,22 +590,23 @@ fun ObservationCard(observacion: String) {
             Icon(
                 Icons.Default.Psychology,
                 contentDescription = null,
-                tint = AmaniPsicologoColors.Primary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
                     "Observación",
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = AmaniPsicologoColors.Primary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     observacion,
-                    fontSize = 13.sp,
-                    color = AmaniPsicologoColors.TextPrimary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 18.sp,
-                    modifier = Modifier.testTag("observation_text") // FIX: Added testTag
+                    modifier = Modifier.testTag("observation_text")
                 )
             }
         }

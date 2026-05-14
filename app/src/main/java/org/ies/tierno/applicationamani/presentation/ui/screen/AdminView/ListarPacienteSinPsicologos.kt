@@ -1,4 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+import androidx.compose.foundation.shape.CircleShape
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -85,37 +86,12 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.koin.androidx.compose.koinViewModel
 
-// Colores originales para el modo SYSTEM (igual que antes)
-object AmaniDefaultColors {
-    val Primary = Color(0xFF6C63FF)
-    val Background = Color(0xFFF5F5F5)
-    val TextPrimary = Color(0xFF333333)
-    val TextSecondary = Color.Gray
-    val Success = Color(0xFF27AE60)
-    val Warning = Color(0xFFE67E22)
-    val Info = Color(0xFF2196F3)
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ListarPacienteSinPsicologos(
     navController: NavController,
     pacientesViewModel: PacientesViewModel = koinViewModel()
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
-
-    // Determinar colores segun el tema
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniDefaultColors.Primary
-    val titleOnPrimary = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
-    val backgroundColor = if (isDark) screenColors.background else AmaniDefaultColors.Background
-    val textColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDefaultColors.TextSecondary
-
     val pacientes by pacientesViewModel.pacientes.collectAsStateWithLifecycle()
     val loading by pacientesViewModel.loading.collectAsStateWithLifecycle()
 
@@ -128,11 +104,11 @@ fun ListarPacienteSinPsicologos(
     }
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = primaryColor,
+                color = MaterialTheme.colorScheme.primary,
                 shadowElevation = 4.dp,
                 shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
             ) {
@@ -147,18 +123,15 @@ fun ListarPacienteSinPsicologos(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
 
                     Text(
                         "Pacientes sin Psicologo",
-                        color = titleOnPrimary,
-                        fontFamily = roboto,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
@@ -170,7 +143,7 @@ fun ListarPacienteSinPsicologos(
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = "Refrescar",
-                            tint = titleOnPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -189,7 +162,6 @@ fun ListarPacienteSinPsicologos(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = primaryColor,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -206,20 +178,18 @@ fun ListarPacienteSinPsicologos(
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
-                                tint = textSecondaryColor.copy(alpha = 0.5f),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                 modifier = Modifier.size(80.dp)
                             )
                             Text(
                                 text = "No hay pacientes sin asignar",
-                                fontFamily = roboto,
-                                fontSize = 16.sp,
-                                color = textColor
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = "Todos los pacientes ya tienen psicologo asignado",
-                                fontFamily = roboto,
-                                fontSize = 14.sp,
-                                color = textSecondaryColor
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -243,10 +213,7 @@ fun ListarPacienteSinPsicologos(
                                 },
                                 onAsignarClick = {
                                     navController.navigate(Screens.listarPsicologo.createRoute(paciente.idPaciente))
-                                },
-                                primaryColor = primaryColor,
-                                roboto = roboto,
-                                isDark = isDark
+                                }
                             )
                         }
                     }
@@ -262,24 +229,13 @@ fun PacienteExpandableCard(
     paciente: PacienteBasicoResponseDTO,
     isExpanded: Boolean,
     onExpandClick: () -> Unit,
-    onAsignarClick: () -> Unit,
-    primaryColor: Color,
-    roboto: FontFamily,
-    isDark: Boolean
+    onAsignarClick: () -> Unit
 ) {
-    val amaniColors = LocalAmaniColors.current
-    val cardColors = getCardColors()
-
-    // Colores dinamicos
-    val cardBackgroundColor = if (isDark) cardColors.cardBackground else Color.White
-    val textColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDefaultColors.TextSecondary
-    val detailLabelColor = if (isDark) cardColors.cardContent.copy(alpha = 0.6f) else Color.Gray
-
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -304,17 +260,15 @@ fun PacienteExpandableCard(
                         modifier = Modifier
                             .size(48.dp)
                             .background(
-                                color = primaryColor.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(24.dp)
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = paciente.nombre.take(1) + paciente.apellido.take(1),
-                            color = primaryColor,
-                            fontFamily = roboto,
-                            fontWeight = Bold,
-                            fontSize = 18.sp
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
 
@@ -323,10 +277,8 @@ fun PacienteExpandableCard(
                     Column {
                         Text(
                             text = "${paciente.nombre} ${paciente.apellido}",
-                            fontFamily = roboto,
-                            fontWeight = Bold,
-                            fontSize = 16.sp,
-                            color = textColor
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Row(
@@ -335,15 +287,14 @@ fun PacienteExpandableCard(
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = null,
-                                tint = textSecondaryColor,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = paciente.email,
-                                fontFamily = roboto,
-                                fontSize = 12.sp,
-                                color = textSecondaryColor
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -353,7 +304,7 @@ fun PacienteExpandableCard(
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (isExpanded) "Contraer" else "Expandir",
-                    tint = primaryColor,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -377,7 +328,6 @@ fun PacienteExpandableCard(
                         .padding(bottom = 16.dp)
                 ) {
                     HorizontalDivider(
-                        color = textSecondaryColor.copy(alpha = 0.12f),
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
@@ -385,15 +335,12 @@ fun PacienteExpandableCard(
                     SubSection(
                         title = "Datos Personales",
                         icon = Icons.Default.Person,
-                        iconColor = primaryColor,
-                        roboto = roboto,
-                        textColor = textColor,
-                        isDark = isDark
+                        iconColor = MaterialTheme.colorScheme.primary
                     ) {
-                        DetailRow("DNI", paciente.dni ?: "No especificado", roboto, detailLabelColor, textColor)
-                        DetailRow("Telefono", paciente.telefono ?: "No especificado", roboto, detailLabelColor, textColor)
-                        DetailRow("Genero", paciente.genero ?: "No especificado", roboto, detailLabelColor, textColor)
-                        DetailRow("Fecha Nacimiento", paciente.fechaNacimiento ?: "No especificado", roboto, detailLabelColor, textColor)
+                        DetailRow("DNI", paciente.dni ?: "No especificado")
+                        DetailRow("Telefono", paciente.telefono ?: "No especificado")
+                        DetailRow("Genero", paciente.genero ?: "No especificado")
+                        DetailRow("Fecha Nacimiento", paciente.fechaNacimiento ?: "No especificado")
                     }
 
                     // Situaciones
@@ -402,14 +349,11 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Situaciones",
                             icon = Icons.Default.Info,
-                            iconColor = AmaniDefaultColors.Success,
-                            roboto = roboto,
-                            textColor = textColor,
-                            isDark = isDark
+                            iconColor = MaterialTheme.colorScheme.secondary
                         ) {
                             paciente.situaciones!!.forEachIndexed { index, situacion ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
-                                SituacionCard(situacion, roboto, isDark)
+                                SituacionCard(situacion)
                             }
                         }
                     }
@@ -420,14 +364,11 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Direcciones",
                             icon = Icons.Default.LocationOn,
-                            iconColor = primaryColor,
-                            roboto = roboto,
-                            textColor = textColor,
-                            isDark = isDark
+                            iconColor = MaterialTheme.colorScheme.primary
                         ) {
                             paciente.direcciones!!.forEachIndexed { index, direccion ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
-                                DireccionCard(direccion, roboto, isDark)
+                                DireccionCard(direccion)
                             }
                         }
                     }
@@ -438,14 +379,11 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Tutores",
                             icon = Icons.Default.People,
-                            iconColor = AmaniDefaultColors.Warning,
-                            roboto = roboto,
-                            textColor = textColor,
-                            isDark = isDark
+                            iconColor = MaterialTheme.colorScheme.tertiary
                         ) {
                             paciente.tutores!!.forEachIndexed { index, tutor ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
-                                TutorCard(tutor, roboto, isDark)
+                                TutorCard(tutor)
                             }
                         }
                     }
@@ -458,25 +396,18 @@ fun PacienteExpandableCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryColor,
-                            contentColor = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
-                        )
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.AssignmentInd,
                                 contentDescription = null,
-                                tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 "Asignar Psicologo",
-                                color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
-                                fontFamily = roboto,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
@@ -491,9 +422,6 @@ fun SubSection(
     title: String,
     icon: ImageVector,
     iconColor: Color,
-    roboto: FontFamily,
-    textColor: Color,
-    isDark: Boolean,
     content: @Composable () -> Unit
 ) {
     Column {
@@ -510,9 +438,7 @@ fun SubSection(
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = title,
-                fontFamily = roboto,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.titleSmall,
                 color = iconColor
             )
         }
@@ -523,10 +449,7 @@ fun SubSection(
 @Composable
 fun DetailRow(
     label: String,
-    value: String,
-    roboto: FontFamily,
-    labelColor: Color,
-    valueColor: Color
+    value: String
 ) {
     Row(
         modifier = Modifier
@@ -536,53 +459,44 @@ fun DetailRow(
     ) {
         Text(
             text = label,
-            fontFamily = roboto,
-            fontSize = 13.sp,
-            color = labelColor
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
-            fontFamily = roboto,
-            fontSize = 13.sp,
+            style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
-            color = valueColor
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
 @Composable
 fun DireccionCard(
-    direccion: DireccionResponseDTO,
-    roboto: FontFamily,
-    isDark: Boolean
+    direccion: DireccionResponseDTO
 ) {
-    val cardColors = getCardColors()
-    val cardBackground = if (isDark) cardColors.cardBackground else Color.White
-    val labelColor = if (isDark) cardColors.cardContent.copy(alpha = 0.6f) else Color.Gray
-    val valueColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
-
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackground)
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
             if (!direccion.calle.isNullOrBlank()) {
-                DetailRow("Calle", direccion.calle, roboto, labelColor, valueColor)
+                DetailRow("Calle", direccion.calle)
             }
             if (!direccion.ciudad.isNullOrBlank()) {
-                DetailRow("Ciudad", direccion.ciudad, roboto, labelColor, valueColor)
+                DetailRow("Ciudad", direccion.ciudad)
             }
             if (!direccion.provincia.isNullOrBlank()) {
-                DetailRow("Provincia", direccion.provincia, roboto, labelColor, valueColor)
+                DetailRow("Provincia", direccion.provincia)
             }
             if (!direccion.codigoPostal.isNullOrBlank()) {
-                DetailRow("Codigo Postal", direccion.codigoPostal, roboto, labelColor, valueColor)
+                DetailRow("Codigo Postal", direccion.codigoPostal)
             }
             if (!direccion.pais.isNullOrBlank()) {
-                DetailRow("Pais", direccion.pais, roboto, labelColor, valueColor)
+                DetailRow("Pais", direccion.pais)
             }
         }
     }
@@ -590,37 +504,30 @@ fun DireccionCard(
 
 @Composable
 fun TutorCard(
-    tutor: TutorResponseDTO,
-    roboto: FontFamily,
-    isDark: Boolean
+    tutor: TutorResponseDTO
 ) {
-    val cardColors = getCardColors()
-    val cardBackground = if (isDark) cardColors.cardBackground else Color.White
-    val labelColor = if (isDark) cardColors.cardContent.copy(alpha = 0.6f) else Color.Gray
-    val valueColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
-
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackground)
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
             if (!tutor.nombre.isNullOrBlank()) {
-                DetailRow("Nombre", tutor.nombre, roboto, labelColor, valueColor)
+                DetailRow("Nombre", tutor.nombre)
             }
             if (!tutor.tipo.isNullOrBlank()) {
-                DetailRow("Parentesco", tutor.tipo, roboto, labelColor, valueColor)
+                DetailRow("Parentesco", tutor.tipo)
             }
             if (!tutor.telefono.isNullOrBlank()) {
-                DetailRow("Telefono", tutor.telefono, roboto, labelColor, valueColor)
+                DetailRow("Telefono", tutor.telefono)
             }
             if (!tutor.email.isNullOrBlank()) {
-                DetailRow("Email", tutor.email, roboto, labelColor, valueColor)
+                DetailRow("Email", tutor.email)
             }
             if (!tutor.dni.isNullOrBlank()) {
-                DetailRow("DNI", tutor.dni, roboto, labelColor, valueColor)
+                DetailRow("DNI", tutor.dni)
             }
         }
     }
@@ -628,19 +535,12 @@ fun TutorCard(
 
 @Composable
 fun SituacionCard(
-    situacion: SituacionDTO,
-    roboto: FontFamily,
-    isDark: Boolean
+    situacion: SituacionDTO
 ) {
-    val cardColors = getCardColors()
-    val cardBackground = if (isDark) cardColors.cardBackground else Color.White
-    val textColor = if (isDark) cardColors.cardContent else AmaniDefaultColors.TextPrimary
-    val descripcionColor = if (isDark) cardColors.cardContent.copy(alpha = 0.8f) else Color(0xFF555555)
-
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackground)
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -654,21 +554,19 @@ fun SituacionCard(
                 ) {
                     Text(
                         text = situacion.nombre,
-                        fontFamily = roboto,
-                        fontSize = 14.sp,
-                        fontWeight = Bold,
-                        color = AmaniDefaultColors.Success
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     if (!situacion.categoria.isNullOrBlank()) {
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = AmaniDefaultColors.Success.copy(alpha = 0.1f)
+                            shape = MaterialTheme.shapes.extraSmall,
+                            color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
                             Text(
                                 text = situacion.categoria,
-                                fontFamily = roboto,
-                                fontSize = 11.sp,
-                                color = AmaniDefaultColors.Success,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                             )
                         }
@@ -681,9 +579,8 @@ fun SituacionCard(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = situacion.descripcion,
-                    fontFamily = roboto,
-                    fontSize = 12.sp,
-                    color = descripcionColor,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 16.sp
                 )
             }

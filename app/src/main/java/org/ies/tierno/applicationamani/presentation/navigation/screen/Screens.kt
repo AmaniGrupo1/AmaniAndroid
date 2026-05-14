@@ -104,6 +104,7 @@ sealed class Screens(val route: String) {
     object misTickets : Screens("misTickets")
 
     object settingsAdmin : Screens("settingsAdmin")
+    object cambiarRol : Screens("cambiarRol")
     object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}") {
         fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
     }

@@ -89,23 +89,6 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-// Colores originales para el modo DEFECTO
-object AmaniPsicologoDefaultColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Surface = Color(0xFFFFFFFF)
-    val Background = Color(0xFFFDF8F9)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Success = Color(0xFF81C784)
-    val Warning = Color(0xFFFFB74D)
-    val Error = Color(0xFFE57373)
-    val Info = Color(0xFF64B5F6)
-}
-
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -115,47 +98,8 @@ fun ViewPsicologoPrincipal(
     viewModel: ListarPacientesByPsicologoViewModel = koinViewModel(),
     profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel()
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
-
-    // Determinar colores según el tema
-    val colors = if (isDark) {
-        PsicologoThemeColors(
-            primary = MaterialTheme.colorScheme.primary,
-            primaryLight = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-            primaryDark = Color.DarkGray,
-            secondary = Color.Gray,
-            accent = cardColors.cardBackground,
-            surface = cardColors.cardBackground,
-            background = screenColors.background,
-            textPrimary = cardColors.cardContent,
-            textSecondary = cardColors.cardContent.copy(alpha = 0.7f),
-            success = AmaniPsicologoDefaultColors.Success,
-            warning = AmaniPsicologoDefaultColors.Warning,
-            error = AmaniPsicologoDefaultColors.Error,
-            info = AmaniPsicologoDefaultColors.Info
-        )
-    } else {
-        PsicologoThemeColors(
-            primary = AmaniPsicologoDefaultColors.Primary,
-            primaryLight = AmaniPsicologoDefaultColors.PrimaryLight,
-            primaryDark = AmaniPsicologoDefaultColors.PrimaryDark,
-            secondary = AmaniPsicologoDefaultColors.Secondary,
-            accent = AmaniPsicologoDefaultColors.Accent,
-            surface = AmaniPsicologoDefaultColors.Surface,
-            background = AmaniPsicologoDefaultColors.Background,
-            textPrimary = AmaniPsicologoDefaultColors.TextPrimary,
-            textSecondary = AmaniPsicologoDefaultColors.TextSecondary,
-            success = AmaniPsicologoDefaultColors.Success,
-            warning = AmaniPsicologoDefaultColors.Warning,
-            error = AmaniPsicologoDefaultColors.Error,
-            info = AmaniPsicologoDefaultColors.Info
-        )
-    }
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
 
     val pacientes by viewModel.pacientes.collectAsState()
     var isLoadingData by remember { mutableStateOf(true) }
@@ -184,7 +128,7 @@ fun ViewPsicologoPrincipal(
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
-                color = colors.primary,
+                color = colorScheme.primary,
                 strokeWidth = 3.dp
             )
         }
@@ -198,33 +142,31 @@ fun ViewPsicologoPrincipal(
                     imageVector = Icons.Default.Error,
                     contentDescription = null,
                     modifier = Modifier.size(64.dp),
-                    tint = colors.error
+                    tint = colorScheme.error
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.error_sesion),
-                    fontSize = 18.sp,
+                    style = typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = colors.textPrimary,
-                    fontFamily = roboto
+                    color = colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.no_encontrado_id_psicologo),
-                    fontSize = 14.sp,
-                    color = colors.textSecondary,
-                    fontFamily = roboto
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { navController.navigate(Screens.login.route) },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.primary,
-                        contentColor = if (isDark) Color.Black else Color.White
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onPrimary
                     )
                 ) {
-                    Text(stringResource(R.string.volver_login), fontFamily = roboto)
+                    Text(stringResource(R.string.volver_login), style = typography.labelLarge)
                 }
             }
         }
@@ -233,14 +175,14 @@ fun ViewPsicologoPrincipal(
 
     Scaffold(
         topBar = { MenuSetting(navController = navController, idPsicologo = idPsicologo) },
-        containerColor = colors.background,
+        containerColor = colorScheme.background,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screens.registroPacienteDesdePsicologo.route)
                 },
-                containerColor = colors.primary,
-                contentColor = if (isDark) Color.Black else Color.White
+                containerColor = colorScheme.primary,
+                contentColor = colorScheme.onPrimary
             ) {
                 Icon(
                     Icons.Default.Add,
@@ -255,14 +197,12 @@ fun ViewPsicologoPrincipal(
                 .padding(innerPadding)
         ) {
             when {
-                isLoading -> LoadingState(colors, roboto)
-                pacientes.isEmpty() -> EmptyState(colors, roboto)
+                isLoading -> LoadingState()
+                pacientes.isEmpty() -> EmptyState()
                 else -> PacientesList(
                     pacientes = pacientes,
                     listState = listState,
-                    navController = navController,
-                    colors = colors,
-                    isDark = isDark
+                    navController = navController
                 )
             }
         }
@@ -270,34 +210,36 @@ fun ViewPsicologoPrincipal(
 }
 
 @Composable
-private fun LoadingState(colors: PsicologoThemeColors, roboto: FontFamily) {
+private fun LoadingState() {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
-                color = colors.primary,
+                color = colorScheme.primary,
                 strokeWidth = 3.dp
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.cargando_pacientes),
-                color = colors.textSecondary,
-                fontSize = 14.sp,
-                fontFamily = roboto
+                color = colorScheme.onSurfaceVariant,
+                style = typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.puede_tomar_segundos),
-                color = colors.textSecondary.copy(alpha = 0.7f),
-                fontSize = 12.sp,
-                fontFamily = roboto
+                color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                style = typography.labelSmall
             )
         }
     }
 }
 
 @Composable
-private fun EmptyState(colors: PsicologoThemeColors, roboto: FontFamily) {
+private fun EmptyState() {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -307,23 +249,21 @@ private fun EmptyState(colors: PsicologoThemeColors, roboto: FontFamily) {
                 imageVector = Icons.Default.People,
                 contentDescription = null,
                 modifier = Modifier.size(80.dp),
-                tint = colors.primaryLight.copy(alpha = 0.5f)
+                tint = colorScheme.primary.copy(alpha = 0.5f)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.no_tienes_pacientes),
-                fontSize = 18.sp,
+                style = typography.headlineSmall,
                 fontWeight = FontWeight.Medium,
-                color = colors.textPrimary,
-                fontFamily = roboto
+                color = colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.cuando_asignen_pacientes),
-                fontSize = 14.sp,
-                color = colors.textSecondary,
-                textAlign = TextAlign.Center,
-                fontFamily = roboto
+                style = typography.bodyMedium,
+                color = colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -334,9 +274,7 @@ private fun EmptyState(colors: PsicologoThemeColors, roboto: FontFamily) {
 private fun PacientesList(
     pacientes: List<PacientePsicologoResponseDTO>,
     listState: LazyListState,
-    navController: NavController,
-    colors: PsicologoThemeColors,
-    isDark: Boolean
+    navController: NavController
 ) {
     LazyColumn(
         state = listState,
@@ -347,7 +285,7 @@ private fun PacientesList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            HeaderStats(pacientes.size, colors)
+            HeaderStats(pacientes.size)
         }
 
         items(
@@ -356,9 +294,7 @@ private fun PacientesList(
         ) { paciente ->
             PacienteCard(
                 paciente = paciente,
-                navController = navController,
-                colors = colors,
-                isDark = isDark
+                navController = navController
             )
         }
 
@@ -367,11 +303,14 @@ private fun PacientesList(
 }
 
 @Composable
-private fun HeaderStats(totalPacientes: Int, colors: PsicologoThemeColors) {
+private fun HeaderStats(totalPacientes: Int) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.primary),
+        shape = shapes.large,
+        colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -384,25 +323,25 @@ private fun HeaderStats(totalPacientes: Int, colors: PsicologoThemeColors) {
             Column {
                 Text(
                     text = stringResource(R.string.total_pacientes),
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    style = typography.labelLarge,
+                    color = colorScheme.onPrimary.copy(alpha = 0.9f)
                 )
                 Text(
                     text = "$totalPacientes",
-                    fontSize = 32.sp,
+                    style = typography.displayMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = colorScheme.onPrimary
                 )
                 Text(
                     text = stringResource(R.string.asignados_consulta),
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    style = typography.labelSmall,
+                    color = colorScheme.onPrimary.copy(alpha = 0.8f)
                 )
             }
             Icon(
                 imageVector = Icons.Default.People,
                 contentDescription = null,
-                tint = Color.White,
+                tint = colorScheme.onPrimary,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -413,24 +352,24 @@ private fun HeaderStats(totalPacientes: Int, colors: PsicologoThemeColors) {
 @Composable
 fun PacienteCard(
     paciente: PacientePsicologoResponseDTO,
-    navController: NavController,
-    colors: PsicologoThemeColors,
-    isDark: Boolean
+    navController: NavController
 ) {
     var expanded by remember { mutableStateOf(false) }
     val esMenor = esMenorDeEdad(paciente.fechaNacimiento)
+    val colorScheme = MaterialTheme.colorScheme
+    val shapes = MaterialTheme.shapes
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = !expanded }
             .animateContentSize(),
-        shape = RoundedCornerShape(20.dp),
+        shape = shapes.medium,
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp,
             pressedElevation = 6.dp
         ),
-        colors = CardDefaults.cardColors(containerColor = colors.surface)
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -438,9 +377,7 @@ fun PacienteCard(
             PacienteHeader(
                 paciente = paciente,
                 esMenor = esMenor,
-                navController = navController,
-                colors = colors,
-                isDark = isDark
+                navController = navController
             )
 
             AnimatedVisibility(
@@ -454,9 +391,7 @@ fun PacienteCard(
             ) {
                 ExpandedContent(
                     paciente = paciente,
-                    esMenor = esMenor,
-                    colors = colors,
-                    isDark = isDark
+                    esMenor = esMenor
                 )
             }
         }
@@ -468,15 +403,15 @@ fun PacienteCard(
 fun PacienteHeader(
     paciente: PacientePsicologoResponseDTO,
     esMenor: Boolean,
-    navController: NavController,
-    colors: PsicologoThemeColors,
-    isDark: Boolean
+    navController: NavController
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = colors.surface
+        color = colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -498,8 +433,8 @@ fun PacienteHeader(
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(
-                                    colors.primary,
-                                    colors.primaryLight
+                                    colorScheme.primary,
+                                    colorScheme.primaryContainer
                                 )
                             )
                         ),
@@ -507,10 +442,9 @@ fun PacienteHeader(
                 ) {
                     Text(
                         text = "${paciente.nombre?.take(1) ?: "?"}${paciente.apellido?.take(1) ?: "?"}",
-                        fontSize = 20.sp,
+                        style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontFamily = roboto
+                        color = colorScheme.onPrimary
                     )
                 }
 
@@ -523,16 +457,15 @@ fun PacienteHeader(
                     ) {
                         Text(
                             text = "${paciente.nombre ?: stringResource(R.string.sin_nombre)} ${paciente.apellido ?: ""}".trim(),
-                            fontSize = 16.sp,
+                            style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = colors.textPrimary,
-                            fontFamily = roboto
+                            color = colorScheme.onSurface
                         )
 
                         if (esMenor) {
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = colors.warning.copy(alpha = 0.2f)
+                                shape = shapes.small,
+                                color = colorScheme.errorContainer
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -543,14 +476,13 @@ fun PacienteHeader(
                                         imageVector = Icons.Default.Warning,
                                         contentDescription = stringResource(R.string.menor),
                                         modifier = Modifier.size(12.dp),
-                                        tint = colors.warning
+                                        tint = colorScheme.onErrorContainer
                                     )
                                     Text(
                                         text = stringResource(R.string.menor),
-                                        fontSize = 10.sp,
+                                        style = typography.labelSmall,
                                         fontWeight = FontWeight.Medium,
-                                        color = colors.warning,
-                                        fontFamily = roboto
+                                        color = colorScheme.onErrorContainer
                                     )
                                 }
                             }
@@ -567,15 +499,14 @@ fun PacienteHeader(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colors.textSecondary
+                            tint = colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = paciente.email ?: stringResource(R.string.email_no_disponible),
-                            fontSize = 12.sp,
-                            color = colors.textSecondary,
+                            style = typography.bodySmall,
+                            color = colorScheme.onSurfaceVariant,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontFamily = roboto
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -587,13 +518,12 @@ fun PacienteHeader(
                             imageVector = Icons.Outlined.Phone,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colors.textSecondary
+                            tint = colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = paciente.telefono ?: stringResource(R.string.telefono_no_disponible),
-                            fontSize = 12.sp,
-                            color = colors.textSecondary,
-                            fontFamily = roboto
+                            style = typography.bodySmall,
+                            color = colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -613,7 +543,7 @@ fun PacienteHeader(
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = stringResource(R.string.crear_historial_clinico),
-                    tint = colors.primary,
+                    tint = colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -625,24 +555,22 @@ fun PacienteHeader(
 @Composable
 fun ExpandedContent(
     paciente: PacientePsicologoResponseDTO,
-    esMenor: Boolean,
-    colors: PsicologoThemeColors,
-    isDark: Boolean
+    esMenor: Boolean
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colors.accent)
+            .background(colorScheme.surfaceVariant.copy(alpha = 0.5f))
             .padding(16.dp)
     ) {
         Text(
             text = stringResource(R.string.informacion_detallada),
-            fontSize = 14.sp,
+            style = typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
-            color = colors.textPrimary,
-            fontFamily = roboto,
+            color = colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
@@ -652,7 +580,6 @@ fun ExpandedContent(
             InfoSection(
                 title = stringResource(R.string.datos_personales),
                 icon = Icons.Default.Person,
-                colors = colors,
                 items = listOf(
                     stringResource(R.string.nombre_completo) to "${paciente.nombre ?: stringResource(R.string.no_disponible)} ${paciente.apellido ?: ""}".trim(),
                     stringResource(R.string.dni) to (paciente.dni ?: stringResource(R.string.no_registrado)),
@@ -674,14 +601,13 @@ fun ExpandedContent(
 
             val tutores = paciente.tutor ?: emptyList()
             if (esMenor && tutores.isNotEmpty()) {
-                TutorInfoSection(tutores = tutores, colors = colors, isDark = isDark)
+                TutorInfoSection(tutores = tutores)
             }
 
             paciente.direccion?.let { direccion ->
                 InfoSection(
                     title = stringResource(R.string.direccion),
                     icon = Icons.Default.Person,
-                    colors = colors,
                     items = listOf(
                         stringResource(R.string.calle) to (direccion.calle ?: stringResource(R.string.no_disponible)),
                         stringResource(R.string.ciudad) to (direccion.ciudad ?: stringResource(R.string.no_disponible)),
@@ -697,17 +623,16 @@ fun ExpandedContent(
 
 @Composable
 fun TutorInfoSection(
-    tutores: List<TutorResponseDTO>,
-    colors: PsicologoThemeColors,
-    isDark: Boolean
+    tutores: List<TutorResponseDTO>
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val surfaceColor = if (isDark) colors.surface else Color.White
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        shape = shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
@@ -723,14 +648,13 @@ fun TutorInfoSection(
                     imageVector = Icons.Default.People,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
-                    tint = colors.warning
+                    tint = colorScheme.secondary
                 )
                 Text(
                     text = stringResource(R.string.datos_tutor_responsable),
-                    fontSize = 14.sp,
+                    style = typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = colors.warning,
-                    fontFamily = roboto
+                    color = colorScheme.secondary
                 )
             }
 
@@ -745,10 +669,9 @@ fun TutorInfoSection(
                     if (tutores.size > 1) {
                         Text(
                             text = "${stringResource(R.string.tutor)} ${index + 1}",
-                            fontSize = 12.sp,
+                            style = typography.labelMedium,
                             fontWeight = FontWeight.Medium,
-                            color = colors.primary,
-                            fontFamily = roboto
+                            color = colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
@@ -761,21 +684,19 @@ fun TutorInfoSection(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = colors.textSecondary
+                            tint = colorScheme.onSurfaceVariant
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = tutor.nombre,
-                                fontSize = 13.sp,
+                                style = typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.textPrimary,
-                                fontFamily = roboto
+                                color = colorScheme.onSurface
                             )
                             Text(
                                 text = "${stringResource(R.string.dni)}: ${tutor.dni}",
-                                fontSize = 11.sp,
-                                color = colors.textSecondary,
-                                fontFamily = roboto
+                                style = typography.labelSmall,
+                                color = colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -790,13 +711,12 @@ fun TutorInfoSection(
                             imageVector = Icons.Outlined.Phone,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colors.textSecondary
+                            tint = colorScheme.onSurfaceVariant
                         )
                         Text(
                             tutor.telefono ?: stringResource(R.string.no_disponible),
-                            fontSize = 12.sp,
-                            color = colors.textPrimary,
-                            fontFamily = roboto
+                            style = typography.bodySmall,
+                            color = colorScheme.onSurface
                         )
                     }
 
@@ -808,13 +728,12 @@ fun TutorInfoSection(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colors.textSecondary
+                            tint = colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = tutor.email ?: stringResource(R.string.no_disponible),
-                            fontSize = 12.sp,
-                            color = colors.textPrimary,
-                            fontFamily = roboto
+                            style = typography.bodySmall,
+                            color = colorScheme.onSurface
                         )
                     }
 
@@ -826,13 +745,12 @@ fun TutorInfoSection(
                             imageVector = Icons.Outlined.Badge,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colors.textSecondary
+                            tint = colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "${stringResource(R.string.parentesco)}: ${tutor.tipo}",
-                            fontSize = 12.sp,
-                            color = colors.textPrimary,
-                            fontFamily = roboto
+                            style = typography.bodySmall,
+                            color = colorScheme.onSurface
                         )
                     }
                 }
@@ -841,7 +759,7 @@ fun TutorInfoSection(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = 0.5.dp,
-                        color = colors.accent
+                        color = colorScheme.outlineVariant
                     )
                 }
             }
@@ -853,17 +771,16 @@ fun TutorInfoSection(
 fun InfoSection(
     title: String,
     icon: ImageVector,
-    colors: PsicologoThemeColors,
     items: List<Pair<String, String>>
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val isDark = isDarkTheme()
-    val surfaceColor = if (isDark) colors.surface else Color.White
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        shape = shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
@@ -879,14 +796,13 @@ fun InfoSection(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
-                    tint = colors.primary
+                    tint = colorScheme.primary
                 )
                 Text(
                     text = title,
-                    fontSize = 14.sp,
+                    style = typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = colors.textPrimary,
-                    fontFamily = roboto
+                    color = colorScheme.onSurface
                 )
             }
 
@@ -900,22 +816,20 @@ fun InfoSection(
                 ) {
                     Text(
                         text = label,
-                        fontSize = 11.sp,
-                        color = colors.textSecondary,
-                        fontFamily = roboto
+                        style = typography.labelSmall,
+                        color = colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = value.ifEmpty { stringResource(R.string.no_disponible) },
-                        fontSize = 13.sp,
+                        style = typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = colors.textPrimary,
-                        fontFamily = roboto
+                        color = colorScheme.onSurface
                     )
                     if (index != items.size - 1) {
                         HorizontalDivider(
                             modifier = Modifier.padding(top = 4.dp),
                             thickness = 0.5.dp,
-                            color = colors.accent
+                            color = colorScheme.outlineVariant
                         )
                     }
                 }
@@ -956,20 +870,3 @@ private fun formatearFechaDesdeString(fechaStr: String?): String {
         fechaStr
     }
 }
-
-// Clase auxiliar para los colores del tema
-data class PsicologoThemeColors(
-    val primary: Color,
-    val primaryLight: Color,
-    val primaryDark: Color,
-    val secondary: Color,
-    val accent: Color,
-    val surface: Color,
-    val background: Color,
-    val textPrimary: Color,
-    val textSecondary: Color,
-    val success: Color,
-    val warning: Color,
-    val error: Color,
-    val info: Color
-)

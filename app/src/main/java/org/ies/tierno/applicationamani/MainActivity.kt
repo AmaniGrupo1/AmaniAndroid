@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.LanguageManager
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 class MainActivity : ComponentActivity() {
@@ -40,16 +39,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val userSessionDataStore = UserSessionDataStore(this)
-            val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
-
-            val darkThemeOverride = when (session?.tema) {
-                TemaApp.DARK -> true   // Negro
-                TemaApp.LIGHT -> false // Blanco
-                else -> null           // Defecto/SYSTEM -> null para que lea automáticamente
-            }
-
-            ApplicationAmaniTheme(darkThemeOverride = darkThemeOverride) {
+            ApplicationAmaniTheme {
                 val navController = rememberNavController()
                 NavGraph(navController = navController)
             }

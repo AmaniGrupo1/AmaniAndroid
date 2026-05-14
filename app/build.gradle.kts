@@ -90,7 +90,7 @@ dependencies {
     implementation(libs.koin.androidx.workmanager)
 
     // Networking
-    implementation(libs.retrofit.v290)
+    implementation(libs.retrofit)
     implementation(libs.converter.gson)
     // Logging interceptor para inspección de headers en debug
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")

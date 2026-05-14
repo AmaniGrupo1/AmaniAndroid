@@ -26,8 +26,6 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
 import timber.log.Timber
 
-import timber.log.Timber
-
 /**
  * Repositorio encargado de la gestión de autenticación y usuarios.
  *
@@ -262,28 +260,24 @@ class AuthRepository(
      * @return [Flow] que emite la lista de emparejamientos paciente-psicólogo.
      */
     fun getPacientesConPsicologo(): Flow<List<ListaPacientesAndPsicologo>> = flow {
-        try {
-            val response = api.getPacientesConPsicologo()
-            if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
-            } else {
-                // Si backend responde 401, emitimos lista vacía y dejamos que
-                // el TokenRefreshInterceptor notifique la sesión no autorizada.
-                if (response.code() == 401) {
-                    Timber.w("getPacientesConPsicologo - received 401, emitting empty list")
-                    emit(emptyList())
-                } else {
-                    emit(emptyList())
-                }
+        val response = api.getPacientesConPsicologo()
+        if (response.isSuccessful) {
+            emit(response.body() ?: emptyList())
+        } else {
+            // Si backend responde 401, emitimos lista vacía y dejamos que
+            // el TokenRefreshInterceptor notifique la sesión no autorizada.
+            if (response.code() == 401) {
+                Timber.w("getPacientesConPsicologo - received 401, emitting empty list")
             }
-        } catch (e: HttpException) {
-            // No propagar HttpException para evitar crash en collectors; ya
-            // TokenRefreshInterceptor detectará 401.
-            Timber.e(e, "HTTP exception while fetching pacientes con psicologo")
-            emit(emptyList())
-        } catch (e: Exception) {
             emit(emptyList())
         }
+    }.catch { e ->
+        if (e is HttpException) {
+            Timber.e(e, "HTTP exception while fetching pacientes con psicologo")
+        } else {
+            Timber.e(e, "Unexpected exception in getPacientesConPsicologo")
+        }
+        emit(emptyList())
     }
 
     /**
@@ -292,24 +286,22 @@ class AuthRepository(
      * @return [Flow] que emite la lista de datos administrativos de los pacientes.
      */
     fun getPaciente(): Flow<List<DatosPacienteAdminDTO>> = flow {
-        try {
-            val response = api.getPacientes()
-            if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
-            } else {
-                if (response.code() == 401) {
-                    Timber.w("getPaciente - received 401, emitting empty list")
-                    emit(emptyList())
-                } else {
-                    emit(emptyList())
-                }
+        val response = api.getPacientes()
+        if (response.isSuccessful) {
+            emit(response.body() ?: emptyList())
+        } else {
+            if (response.code() == 401) {
+                Timber.w("getPaciente - received 401, emitting empty list")
             }
-        } catch (e: HttpException) {
-            Timber.e(e, "HTTP exception while fetching paciente")
-            emit(emptyList())
-        } catch (e: Exception) {
             emit(emptyList())
         }
+    }.catch { e ->
+        if (e is HttpException) {
+            Timber.e(e, "HTTP exception while fetching paciente")
+        } else {
+            Timber.e(e, "Unexpected exception in getPaciente")
+        }
+        emit(emptyList())
     }
 
     /**
@@ -318,24 +310,20 @@ class AuthRepository(
      * @return [Flow] que emite la lista de perfiles de psicólogos.
      */
     fun getPsicologos(): Flow<List<PsicologoSelfResponseDTO>> = flow {
-        try {
-            val response = api.getPsicologos()
-            if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
-            } else {
-                if (response.code() == 401) {
-                    Timber.w("getPsicologos - received 401, emitting empty list")
-                    emit(emptyList())
-                } else {
-                    emit(emptyList())
-                }
+        val response = api.getPsicologos()
+        if (response.isSuccessful) {
+            emit(response.body() ?: emptyList())
+        } else {
+            if (response.code() == 401) {
+                Timber.w("getPsicologos - received 401, emitting empty list")
             }
-        } catch (e: HttpException) {
-            Timber.e(e, "HTTP exception while fetching psicologos")
-            emit(emptyList())
-        } catch (_: Exception) {
             emit(emptyList())
         }
+    }.catch { e ->
+        if (e is HttpException) {
+            Timber.e(e, "HTTP exception while fetching psicologos")
+        }
+        emit(emptyList())
     }
 
     /**
@@ -344,22 +332,18 @@ class AuthRepository(
      * @return [Flow] que emite la lista de pacientes del psicólogo.
      */
     fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> = flow {
-        try {
-            val response = api.getPacientesByPsicologo()
-            if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
-            } else {
-                if (response.code() == 401) {
-                    Timber.w("getPacientesByPsicologo - received 401, emitting empty list")
-                    emit(emptyList())
-                } else {
-                    emit(emptyList())
-                }
+        val response = api.getPacientesByPsicologo()
+        if (response.isSuccessful) {
+            emit(response.body() ?: emptyList())
+        } else {
+            if (response.code() == 401) {
+                Timber.w("getPacientesByPsicologo - received 401, emitting empty list")
             }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception in getPacientesByPsicologo")
             emit(emptyList())
         }
+    }.catch { e ->
+        Timber.e(e, "Exception in getPacientesByPsicologo")
+        emit(emptyList())
     }
 
     suspend fun darBajaPaciente(id: Long): Result<MessageResponse> {
@@ -490,22 +474,18 @@ class AuthRepository(
      * @return [Flow] que emite la lista de pacientes sin psicólogo.
      */
     fun getPacientesSinPsicologo(): Flow<List<PacienteBasicoResponseDTO>> = flow {
-        try {
-            val response = api.getPacientesSinPsicologo()
+        val response = api.getPacientesSinPsicologo()
 
-            if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
-            } else {
-                if (response.code() == 401) {
-                    Timber.w("getPacientesSinPsicologo - received 401, emitting empty list")
-                    emit(emptyList())
-                } else {
-                    emit(emptyList())
-                }
+        if (response.isSuccessful) {
+            emit(response.body() ?: emptyList())
+        } else {
+            if (response.code() == 401) {
+                Timber.w("getPacientesSinPsicologo - received 401, emitting empty list")
             }
-
-        } catch (e: Exception) {
             emit(emptyList())
         }
+    }.catch { e ->
+        Timber.e(e, "Error in getPacientesSinPsicologo")
+        emit(emptyList())
     }
 }

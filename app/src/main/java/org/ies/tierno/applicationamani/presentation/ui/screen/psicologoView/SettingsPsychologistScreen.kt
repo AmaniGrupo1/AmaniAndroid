@@ -44,6 +44,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -106,7 +107,7 @@ fun SettingsPsychologistScreen(
     val cardColors = getCardColors()
 
     // Colores dinámicos para la UI
-    val backgroundColor = if (isDark) screenColors.background else MaterialTheme.colorScheme.background
+    val backgroundColor: Color = if (isDark) screenColors.background else MaterialTheme.colorScheme.background
     val surfaceColor = if (isDark) cardColors.cardBackground else MaterialTheme.colorScheme.surface
     val textColor = if (isDark) cardColors.cardContent else MaterialTheme.colorScheme.onSurface
     val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant

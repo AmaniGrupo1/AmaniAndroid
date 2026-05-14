@@ -31,7 +31,6 @@ retrofit = "3.0.0"
 navigationRuntimeKtx = "2.9.7"
 googleGmsGoogleServices = "4.4.4"
 firebaseFirestore = "26.1.1"
-retrofitVersion = "2.9.0"
 detekt = "1.23.8"
 ktlint = "14.2.0"
 sonarqube = "7.2.3.7755"
@@ -91,7 +90,6 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
-retrofit-v290 = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
 stripe-android = { module = "com.stripe:stripe-android", version.ref = "stripeAndroid" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

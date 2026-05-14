@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -32,20 +33,6 @@ import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 
 // Paleta de colores profesional (alineada con LoginScreen)
-object AmaniAdminColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Background = Color(0xFFFDF8F9)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Error = Color(0xFFE57373)
-    val Success = Color(0xFF81C784)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminUserManagementScreen(
@@ -66,8 +53,9 @@ fun AdminUserManagementScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
     var pendingRol by remember { mutableStateOf<Rol?>(null) }
 
-    // Estado de refresco automático
-    var refreshTrigger by remember { mutableStateOf(false) }
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     // Manejo de errores con Log
     LaunchedEffect(error) {
@@ -78,7 +66,7 @@ fun AdminUserManagementScreen(
     }
 
     // Éxito al cambiar rol - Refresca automáticamente
-    LaunchedEffect(adminRoleViewModel.success, refreshTrigger) {
+    LaunchedEffect(adminRoleViewModel.success) {
         adminRoleViewModel.success?.let { message ->
             Log.d("AdminScreen", "Success: $message")
             adminRoleViewModel.clearMessages()
@@ -104,56 +92,14 @@ fun AdminUserManagementScreen(
         adminUserViewModel.filtrarUsuarios(rol = selectedRol, dni = searchDni)
     }
 
-    // Obtener la preferencia de tema para decidir si usar los colores por defecto
-    val userSessionDataStore: UserSessionDataStore = try {
-        // Intentar obtener desde Koin si está registrado (usa la API Java para evitar problemas en algunos entornos)
-        org.koin.java.KoinJavaComponent.getKoin().get()
-    } catch (e: Exception) {
-        // Fallback para previews/tests
-        UserSessionDataStore(LocalContext.current)
-    }
-
-    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
-    val isSystemTema = session?.tema == TemaApp.SYSTEM
-    val amaniColorsLocal = LocalAmaniColors.current
-    // Mapear colores: si el usuario dejó "Defecto" (SYSTEM) usar la paleta actual definida aquí,
-    // en caso contrario usar los tokens de tema global (`LocalAmaniColors`).
-    val primaryColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary
-    val titleOnPrimary = if (isSystemTema) Color.White else MaterialTheme.colorScheme.onPrimary
-    val cardBackground = if (isSystemTema) AmaniAdminColors.Surface else amaniColorsLocal.cardBackground
-    val cardContent = if (isSystemTema) AmaniAdminColors.TextPrimary else amaniColorsLocal.cardContent
-    val secondaryText = if (isSystemTema) AmaniAdminColors.TextSecondary else amaniColorsLocal.cardContent.copy(alpha = 0.8f)
-
-    // Función para refrescar manualmente si es necesario
-    fun refreshUsers() {
-        refreshTrigger = !refreshTrigger
-        adminUserViewModel.cargarUsuarios()
-    }
-
-    // Función para confirmar el cambio de rol
-    fun confirmRoleChange() {
-        pendingRol?.let { nuevoRol ->
-            adminRoleViewModel.cambiarRol(
-                idUsuario = selectedUser!!.idUsuario ?: 0,
-                nuevoRol = nuevoRol
-            )
-        }
-        showConfirmDialog = false
-        showBottomSheet = false
-        pendingRol = null
-        selectedUser = null
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         "Gestión de Usuarios",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
-                        color = titleOnPrimary
+                        style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = colorScheme.onPrimary
                     )
                 },
                 navigationIcon = {
@@ -161,19 +107,19 @@ fun AdminUserManagementScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = titleOnPrimary
+                            tint = colorScheme.onPrimary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor,
-                    titleContentColor = titleOnPrimary,
-                    navigationIconContentColor = titleOnPrimary
+                    containerColor = colorScheme.primary,
+                    titleContentColor = colorScheme.onPrimary,
+                    navigationIconContentColor = colorScheme.onPrimary
                 ),
                 actions = {
                     // Botón de refresco manual
-                    IconButton(onClick = { refreshUsers() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refrescar", tint = titleOnPrimary)
+                    IconButton(onClick = { adminUserViewModel.cargarUsuarios() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refrescar", tint = colorScheme.onPrimary)
                     }
                 }
             )
@@ -186,8 +132,8 @@ fun AdminUserManagementScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            if (isSystemTema) AmaniAdminColors.Accent.copy(alpha = 0.3f) else amaniColorsLocal.cardBackground.copy(alpha = 0.18f),
-                            if (isSystemTema) AmaniAdminColors.Background else amaniColorsLocal.screenBackground
+                            colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            colorScheme.background
                         )
                     )
                 )
@@ -200,45 +146,44 @@ fun AdminUserManagementScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .shadow(4.dp, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = cardBackground),
+                        .shadow(4.dp, shapes.medium),
+                    shape = shapes.medium,
+                    colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
                                 "Filtros",
-                                    fontSize = 18.sp,
+                                    style = typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = primaryColor,
-                                    letterSpacing = 0.5.sp
+                                    color = colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
                         OutlinedTextField(
                             value = searchDni,
                             onValueChange = { searchDni = it },
-                            label = { Text("Buscar por DNI o Nombre", color = secondaryText) },
+                            label = { Text("Buscar por DNI o Nombre") },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Search,
                                     contentDescription = null,
-                                    tint = if (isSystemTema) AmaniAdminColors.PrimaryLight else MaterialTheme.colorScheme.primary
+                                    tint = colorScheme.primary
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = if (isSystemTema) AmaniAdminColors.TextPrimary else MaterialTheme.colorScheme.onSurface,
-                                unfocusedTextColor = if (isSystemTema) AmaniAdminColors.TextPrimary else MaterialTheme.colorScheme.onSurface,
-                                focusedBorderColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = if (isSystemTema) AmaniAdminColors.TextSecondary.copy(alpha = 0.3f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
-                                focusedLabelColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary,
-                                unfocusedLabelColor = secondaryText,
-                                cursorColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary,
-                                focusedContainerColor = if (isSystemTema) Color.White else amaniColorsLocal.textFieldContainer,
-                                unfocusedContainerColor = if (isSystemTema) Color.White else amaniColorsLocal.textFieldContainer
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                cursorColor = colorScheme.primary,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
 
@@ -246,9 +191,8 @@ fun AdminUserManagementScreen(
 
                         Text(
                                 "Filtrar por Rol:",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = cardContent
+                                    style = typography.labelLarge,
+                                    color = colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -259,50 +203,49 @@ fun AdminUserManagementScreen(
                             FilterChip(
                                 selected = selectedRol == null,
                                 onClick = { selectedRol = null },
-                                label = { Text("Todos", color = if (selectedRol == null) titleOnPrimary else cardContent) },
+                                label = { Text("Todos") },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = primaryColor,
-                                    selectedLabelColor = titleOnPrimary,
-                                    disabledSelectedContainerColor = if (isSystemTema) AmaniAdminColors.PrimaryLight else MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                                    containerColor = cardBackground,
-                                    labelColor = secondaryText
+                                    selectedContainerColor = colorScheme.primary,
+                                    selectedLabelColor = colorScheme.onPrimary,
+                                    containerColor = colorScheme.surface,
+                                    labelColor = colorScheme.onSurfaceVariant
                                 )
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.admin,
                                 onClick = { selectedRol = Rol.admin },
-                                label = { Text("👑 Admins", color = if (selectedRol == Rol.admin) titleOnPrimary else cardContent) },
+                                label = { Text("👑 Admins") },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = primaryColor,
-                                    selectedLabelColor = titleOnPrimary,
-                                    containerColor = cardBackground,
-                                    labelColor = secondaryText
+                                    selectedContainerColor = colorScheme.primary,
+                                    selectedLabelColor = colorScheme.onPrimary,
+                                    containerColor = colorScheme.surface,
+                                    labelColor = colorScheme.onSurfaceVariant
                                 )
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.psicologo,
                                 onClick = { selectedRol = Rol.psicologo },
-                                label = { Text("🧠 Psicólogos", color = if (selectedRol == Rol.psicologo) titleOnPrimary else cardContent) },
+                                label = { Text("🧠 Psicólogos") },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = primaryColor,
-                                    selectedLabelColor = titleOnPrimary,
-                                    containerColor = cardBackground,
-                                    labelColor = secondaryText
+                                    selectedContainerColor = colorScheme.primary,
+                                    selectedLabelColor = colorScheme.onPrimary,
+                                    containerColor = colorScheme.surface,
+                                    labelColor = colorScheme.onSurfaceVariant
                                 )
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.paciente,
                                 onClick = { selectedRol = Rol.paciente },
-                                label = { Text("👤 Pacientes", color = if (selectedRol == Rol.paciente) titleOnPrimary else cardContent) },
+                                label = { Text("👤 Pacientes") },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = primaryColor,
-                                    selectedLabelColor = titleOnPrimary,
-                                    containerColor = cardBackground,
-                                    labelColor = secondaryText
+                                    selectedContainerColor = colorScheme.primary,
+                                    selectedLabelColor = colorScheme.onPrimary,
+                                    containerColor = colorScheme.surface,
+                                    labelColor = colorScheme.onSurfaceVariant
                                 )
                             )
                         }
@@ -312,7 +255,7 @@ fun AdminUserManagementScreen(
                 // Lista de usuarios
                 if (isLoading) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = primaryColor)
+                        CircularProgressIndicator(color = colorScheme.primary)
                     }
                 } else if (usuarios.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -321,19 +264,18 @@ fun AdminUserManagementScreen(
                                 Icons.Default.People,
                                 contentDescription = null,
                                 modifier = Modifier.size(72.dp),
-                                tint = if (isSystemTema) AmaniAdminColors.TextSecondary.copy(alpha = 0.5f) else amaniColorsLocal.cardContent.copy(alpha = 0.5f)
+                                tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "No se encontraron usuarios",
-                                fontSize = 16.sp,
-                                color = secondaryText,
-                                fontWeight = FontWeight.Medium
+                                style = typography.titleMedium,
+                                color = colorScheme.onSurfaceVariant
                             )
                             Text(
                                 "Prueba con otros filtros",
-                                fontSize = 13.sp,
-                                color = secondaryText.copy(alpha = 0.85f)
+                                style = typography.bodySmall,
+                                color = colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
                             )
                         }
                     }
@@ -349,10 +291,7 @@ fun AdminUserManagementScreen(
                                 onCambiarRol = {
                                     selectedUser = user
                                     showBottomSheet = true
-                                },
-                                cardBackground = cardBackground,
-                                cardContent = cardContent,
-                                primaryColor = primaryColor
+                                }
                             )
                         }
                     }
@@ -371,30 +310,30 @@ fun AdminUserManagementScreen(
             title = {
                 Text(
                     "Confirmar cambio de rol",
-                    fontSize = 20.sp,
+                    style = typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = primaryColor
+                    color = colorScheme.primary
                 )
             },
             text = {
                 Column {
                     Text(
                         "¿Estás seguro de que quieres cambiar el rol de?",
-                        fontSize = 14.sp,
-                        color = cardContent
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "${selectedUser?.nombre ?: ""} ${selectedUser?.apellido ?: ""}".trim(),
-                        fontSize = 16.sp,
+                        style = typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = primaryColor
+                        color = colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = selectedUser?.email ?: "",
-                        fontSize = 13.sp,
-                        color = secondaryText
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
@@ -403,8 +342,8 @@ fun AdminUserManagementScreen(
                             Rol.psicologo -> "🧠 Psicólogo"
                             else -> "👤 Paciente"
                         }}",
-                        fontSize = 13.sp,
-                        color = secondaryText
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "Nuevo rol: ${when (pendingRol) {
@@ -412,25 +351,36 @@ fun AdminUserManagementScreen(
                             Rol.psicologo -> "🧠 Psicólogo"
                             else -> "👤 Paciente"
                         }}",
-                        fontSize = 13.sp,
+                        style = typography.bodySmall,
                         fontWeight = FontWeight.Bold,
                         color = when (pendingRol) {
-                            Rol.admin -> Color(0xFFE53935)
-                            Rol.psicologo -> Color(0xFF43A047)
-                            else -> primaryColor
+                            Rol.admin -> colorScheme.error
+                            Rol.psicologo -> colorScheme.secondary
+                            else -> colorScheme.primary
                         }
                     )
                 }
             },
             confirmButton = {
                 Button(
-                    onClick = { confirmRoleChange() },
+                    onClick = {
+                        pendingRol?.let { nuevoRol ->
+                            adminRoleViewModel.cambiarRol(
+                                idUsuario = selectedUser!!.idUsuario ?: 0,
+                                nuevoRol = nuevoRol
+                            )
+                        }
+                        showConfirmDialog = false
+                        showBottomSheet = false
+                        pendingRol = null
+                        selectedUser = null
+                    },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = primaryColor
+                        containerColor = colorScheme.primary
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = shapes.small
                 ) {
-                    Text("Sí, cambiar rol", color = titleOnPrimary)
+                    Text("Sí, cambiar rol", color = colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -439,13 +389,13 @@ fun AdminUserManagementScreen(
                         showConfirmDialog = false
                         pendingRol = null
                     },
-                    shape = RoundedCornerShape(8.dp)
+                    shape = shapes.small
                 ) {
                     Text("Cancelar")
                 }
             },
-            containerColor = cardBackground,
-            shape = RoundedCornerShape(16.dp)
+            containerColor = colorScheme.surface,
+            shape = shapes.extraLarge
         )
     }
 
@@ -467,23 +417,20 @@ fun AdminUserManagementScreen(
 @Composable
 fun UserCard(
     user: UsuarioDTO,
-    onCambiarRol: () -> Unit,
-    cardBackground: Color = AmaniAdminColors.Surface,
-    cardContent: Color = AmaniAdminColors.TextPrimary,
-    primaryColor: Color = AmaniAdminColors.Primary
+    onCambiarRol: () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+
     // Colores según rol
     val roleColor = when (user.rol) {
-        Rol.admin -> Color(0xFFE53935)
-        Rol.psicologo -> Color(0xFF43A047)
-        else -> AmaniAdminColors.Primary
+        Rol.admin -> colorScheme.error
+        Rol.psicologo -> colorScheme.tertiary
+        else -> colorScheme.primary
     }
 
-    val roleBgColor = when (user.rol) {
-        Rol.admin -> roleColor.copy(alpha = 0.1f)
-        Rol.psicologo -> roleColor.copy(alpha = 0.1f)
-        else -> roleColor.copy(alpha = 0.08f)
-    }
+    val roleBgColor = roleColor.copy(alpha = 0.1f)
 
     val roleLabel = when (user.rol) {
         Rol.admin -> "👑 Administrador"
@@ -500,9 +447,9 @@ fun UserCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(2.dp, RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackground),
+            .shadow(2.dp, shapes.medium),
+        shape = shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -526,10 +473,9 @@ fun UserCard(
                     )
                     Text(
                         text = "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
-                        fontSize = 16.sp,
+                        style = typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = cardContent,
-                        letterSpacing = 0.3.sp
+                        color = colorScheme.onSurface
                     )
                 }
 
@@ -538,16 +484,16 @@ fun UserCard(
                 // Email
                 Text(
                     text = user.email ?: "",
-                    fontSize = 13.sp,
-                    color = cardContent.copy(alpha = 0.85f)
+                    style = typography.bodySmall,
+                    color = colorScheme.onSurfaceVariant
                 )
 
                 // DNI si existe
                 if (!user.dni.isNullOrEmpty()) {
                     Text(
                         text = "DNI: ${user.dni}",
-                        fontSize = 12.sp,
-                        color = cardContent.copy(alpha = 0.7f)
+                        style = typography.labelSmall,
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
 
@@ -555,17 +501,16 @@ fun UserCard(
 
                 // Badge de rol
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = CircleShape,
                     color = roleBgColor,
                     modifier = Modifier
                 ) {
                     Text(
                         text = roleLabel,
-                        fontSize = 11.sp,
+                        style = typography.labelSmall,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-                        color = roleColor,
-                        letterSpacing = 0.3.sp
+                        color = roleColor
                     )
                 }
             }
@@ -579,7 +524,7 @@ fun UserCard(
                     Icons.Default.SwapHoriz,
                     contentDescription = "Cambiar rol",
                     modifier = Modifier.size(24.dp),
-                    tint = primaryColor.copy(alpha = 0.8f)
+                    tint = colorScheme.primary.copy(alpha = 0.8f)
                 )
             }
         }

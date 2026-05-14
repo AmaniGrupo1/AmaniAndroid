@@ -26,6 +26,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
 import org.ies.tierno.applicationamani.dto.tutor.TutorRequestDTO
+import retrofit2.HttpException
 import java.time.LocalDate
 import java.time.Period
 
@@ -105,7 +106,7 @@ class LoginViewModel(
                 }.onFailure { error ->
                     _loginResult.value = Result.failure(error)
                     _loginError.value = when (error) {
-                        is retrofit2.HttpException -> {
+                        is HttpException -> {
                             when (error.code()) {
                                 401 -> "Credenciales incorrectas"
                                 404 -> "Usuario no encontrado"

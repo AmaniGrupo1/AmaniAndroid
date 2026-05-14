@@ -1,4 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
+import androidx.compose.material3.ColorScheme
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 
 import android.app.Activity
 import android.util.Log
@@ -93,23 +96,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaView
 
 private const val TAG = "SettingsPaciente"
 
-// Colores originales para el modo DEFECTO
-object SettingsPacienteDefaultColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val Background = Color(0xFFFDF8F9)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val IconColor = Color(0xFF6B4E71)
-    val CategoriaPerfil = Color(0xFF6B4E71)
-    val CategoriaPreferencias = Color(0xFFE67E22)
-    val CategoriaCitas = Color(0xFF27AE60)
-    val CategoriaFacturacion = Color(0xFF3498DB)
-    val CategoriaSoporte = Color(0xFFE74C3C)
-    val CategoriaSistema = Color(0xFF9B59B6)
-}
-
 // Definir SettingsOption localmente para paciente
 data class SettingsOptionPaciente(
     val id: String,
@@ -127,23 +113,14 @@ fun SettingsPacienteScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
-    // Obtener estado del tema
+    // Usar MaterialTheme directamente
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
     val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
 
     // Obtener el tema actual del ViewModel
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
-
-    // Determinar colores según el tema
-    val backgroundColor = if (isDark) screenColors.background else SettingsPacienteDefaultColors.Background
-    val surfaceColor = if (isDark) cardColors.cardBackground else SettingsPacienteDefaultColors.Surface
-    val textColor = if (isDark) cardColors.cardContent else SettingsPacienteDefaultColors.TextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else SettingsPacienteDefaultColors.TextSecondary
-    val primaryColor = if (isDark) Color.White else SettingsPacienteDefaultColors.Primary
-    val iconColor = if (isDark) Color.White else SettingsPacienteDefaultColors.IconColor
 
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
@@ -169,16 +146,15 @@ fun SettingsPacienteScreen(
     }
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = stringResource(R.string.configuracion),
-                        fontSize = 20.sp,
+                        style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) Color.Black else Color.White,
-                        fontFamily = roboto
+                        color = if (isDark) colorScheme.onSurface else Color.White
                     )
                 },
                 navigationIcon = {
@@ -186,12 +162,12 @@ fun SettingsPacienteScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = if (isDark) Color.Black else Color.White
+                            tint = if (isDark) colorScheme.onSurface else Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor
+                    containerColor = colorScheme.primary
                 )
             )
         }
@@ -200,7 +176,7 @@ fun SettingsPacienteScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(backgroundColor),
+                .background(colorScheme.background),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -209,17 +185,14 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.perfil),
                     icon = Icons.Outlined.Person,
-                    iconColor = SettingsPacienteDefaultColors.CategoriaPerfil,
-                    roboto = roboto,
+                    iconColor = colorScheme.primary,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    surfaceColor = surfaceColor,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColor,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
@@ -249,17 +222,14 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.preferencias),
                     icon = Icons.Outlined.Settings,
-                    iconColor = SettingsPacienteDefaultColors.CategoriaPreferencias,
-                    roboto = roboto,
+                    iconColor = colorScheme.secondary,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    surfaceColor = surfaceColor,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColor,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
@@ -302,17 +272,14 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.mis_citas),
                     icon = Icons.Outlined.CalendarMonth,
-                    iconColor = SettingsPacienteDefaultColors.CategoriaCitas,
-                    roboto = roboto,
+                    iconColor = colorScheme.tertiary,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    surfaceColor = surfaceColor,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColor,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
@@ -342,17 +309,14 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.facturacion),
                     icon = Icons.Outlined.Receipt,
-                    iconColor = SettingsPacienteDefaultColors.CategoriaFacturacion,
-                    roboto = roboto,
+                    iconColor = colorScheme.primary,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    surfaceColor = surfaceColor,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColor,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
@@ -382,17 +346,14 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.soporte),
                     icon = Icons.Outlined.SupportAgent,
-                    iconColor = SettingsPacienteDefaultColors.CategoriaSoporte,
-                    roboto = roboto,
+                    iconColor = colorScheme.secondary,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    surfaceColor = surfaceColor,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColor,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
@@ -422,17 +383,14 @@ fun SettingsPacienteScreen(
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.sistema),
                     icon = Icons.Outlined.Storage,
-                    iconColor = SettingsPacienteDefaultColors.CategoriaSistema,
-                    roboto = roboto,
+                    iconColor = colorScheme.tertiary,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    surfaceColor = surfaceColor,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColor,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark,
                     options = listOf(
                         SettingsOptionPaciente(
@@ -471,23 +429,20 @@ fun SettingsCategoryCardPaciente(
     title: String,
     icon: ImageVector,
     iconColor: Color,
-    roboto: FontFamily,
     options: List<SettingsOptionPaciente>,
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
     currentTema: TemaApp,
     idiomaViewModel: IdiomaViewModel,
-    surfaceColor: Color,
-    textColor: Color,
-    textSecondaryColor: Color,
-    iconColorGeneral: Color,
+    colorScheme: ColorScheme,
+    typography: androidx.compose.material3.Typography,
     isDark: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -500,7 +455,7 @@ fun SettingsCategoryCardPaciente(
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(MaterialTheme.shapes.small)
                         .background(iconColor.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -514,10 +469,9 @@ fun SettingsCategoryCardPaciente(
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = title,
-                    fontFamily = roboto,
+                    style = typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = textColor
+                    color = colorScheme.onSurface
                 )
             }
 
@@ -526,21 +480,19 @@ fun SettingsCategoryCardPaciente(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = textColor.copy(alpha = 0.12f)
+                        color = colorScheme.outlineVariant
                     )
                 }
 
                 SettingsOptionRowPaciente(
                     option = option,
-                    roboto = roboto,
                     navController = navController,
                     session = session,
                     currentLanguage = currentLanguage,
                     currentTema = currentTema,
                     idiomaViewModel = idiomaViewModel,
-                    textColor = textColor,
-                    textSecondaryColor = textSecondaryColor,
-                    iconColorGeneral = iconColorGeneral,
+                    colorScheme = colorScheme,
+                    typography = typography,
                     isDark = isDark
                 )
             }
@@ -551,21 +503,18 @@ fun SettingsCategoryCardPaciente(
 @Composable
 fun SettingsOptionRowPaciente(
     option: SettingsOptionPaciente,
-    roboto: FontFamily,
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
     currentTema: TemaApp,
     idiomaViewModel: IdiomaViewModel,
-    textColor: Color,
-    textSecondaryColor: Color,
-    iconColorGeneral: Color,
+    colorScheme: ColorScheme,
+    typography: androidx.compose.material3.Typography,
     isDark: Boolean
 ) {
     val scope = rememberCoroutineScope()
     var expandedIdioma by remember { mutableStateOf(false) }
     var expandedTema by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     Row(
         modifier = Modifier
@@ -657,7 +606,7 @@ fun SettingsOptionRowPaciente(
             Icon(
                 option.icon,
                 contentDescription = null,
-                tint = iconColorGeneral,
+                tint = colorScheme.primary,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -665,10 +614,9 @@ fun SettingsOptionRowPaciente(
             Column {
                 Text(
                     text = option.title,
-                    fontFamily = roboto,
+                    style = typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 15.sp,
-                    color = textColor
+                    color = colorScheme.onSurface
                 )
 
                 val displaySubtitle = when (option.id) {
@@ -683,9 +631,8 @@ fun SettingsOptionRowPaciente(
 
                 Text(
                     text = displaySubtitle,
-                    fontFamily = roboto,
-                    fontSize = 13.sp,
-                    color = textSecondaryColor
+                    style = typography.bodySmall,
+                    color = colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -693,15 +640,15 @@ fun SettingsOptionRowPaciente(
         when (option.id) {
             "language" -> {
                 Box {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = iconColorGeneral)
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = colorScheme.onSurfaceVariant)
 
                     DropdownMenu(
                         expanded = expandedIdioma,
                         onDismissRequest = { expandedIdioma = false },
-                        containerColor = if (isDark) Color.DarkGray else Color.White
+                        containerColor = colorScheme.surfaceContainerHigh
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.espanol), color = textColor) },
+                            text = { Text(stringResource(R.string.espanol), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarIdioma("es")
@@ -711,7 +658,7 @@ fun SettingsOptionRowPaciente(
                         )
 
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.ingles), color = textColor) },
+                            text = { Text(stringResource(R.string.ingles), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarIdioma("en")
@@ -724,15 +671,15 @@ fun SettingsOptionRowPaciente(
             }
             "tema" -> {
                 Box {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = iconColorGeneral)
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = colorScheme.onSurfaceVariant)
 
                     DropdownMenu(
                         expanded = expandedTema,
                         onDismissRequest = { expandedTema = false },
-                        containerColor = if (isDark) Color.DarkGray else Color.White
+                        containerColor = colorScheme.surfaceContainerHigh
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Defecto", color = textColor) },
+                            text = { Text("Defecto", style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
@@ -741,7 +688,7 @@ fun SettingsOptionRowPaciente(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Blanco", color = textColor) },
+                            text = { Text("Blanco", style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarTema(TemaApp.LIGHT)
@@ -750,7 +697,7 @@ fun SettingsOptionRowPaciente(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Negro", color = textColor) },
+                            text = { Text("Negro", style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarTema(TemaApp.DARK)
@@ -765,7 +712,7 @@ fun SettingsOptionRowPaciente(
                 Icon(
                     Icons.Default.ChevronRight,
                     contentDescription = "Ir",
-                    tint = textSecondaryColor,
+                    tint = colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
             }

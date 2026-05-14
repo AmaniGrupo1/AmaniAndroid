@@ -21,6 +21,8 @@ import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.SoporteTicketApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
+import org.ies.tierno.applicationamani.data.remoto.ChatApi
+import org.ies.tierno.applicationamani.data.remoto.PaymentApiService
 import org.ies.tierno.applicationamani.BuildConfig
 import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.koin.dsl.module
@@ -110,7 +112,7 @@ val retrofitModule = module {
         Retrofit.Builder()
             // .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
 
-             .baseUrl("http://192.168.1.175:8080/")
+             .baseUrl("http://10.0.2.2:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(get<okhttp3.OkHttpClient>())  // Usar el mismo cliente
             .build()
@@ -125,8 +127,8 @@ val retrofitModule = module {
     single<DiarioApi> { get<Retrofit>().create(DiarioApi::class.java) }
     single<NotificacionApi> { get<Retrofit>().create(NotificacionApi::class.java) }
     single<SoporteTicketApi> { get<Retrofit>().create(SoporteTicketApi::class.java) }
-    single<org.ies.tierno.applicationamani.data.remoto.ChatApi> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.ChatApi::class.java) }
-    single<org.ies.tierno.applicationamani.data.remoto.PaymentApiService> { get<Retrofit>().create(org.ies.tierno.applicationamani.data.remoto.PaymentApiService::class.java) }
+    single<ChatApi> { get<Retrofit>().create(ChatApi::class.java) }
+    single<PaymentApiService> { get<Retrofit>().create(PaymentApiService::class.java) }
     single<AjustesApi> { get<Retrofit>().create(AjustesApi::class.java) }
     single<HistorialApi> { get<Retrofit>().create(HistorialApi::class.java) }
     single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }

@@ -123,7 +123,7 @@ fun CrearHistorialClinicoScreen(
     val typography = MaterialTheme.typography
 
     Scaffold(
-        containerColor = HistorialClinicoColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -158,7 +158,7 @@ fun CrearHistorialClinicoScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HistorialClinicoColors.Primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -190,7 +190,7 @@ fun CrearHistorialClinicoScreen(
                     style = typography.headlineSmall?.copy(
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = HistorialClinicoColors.Primary
+                        color = MaterialTheme.colorScheme.primary
                     ) ?: MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -202,7 +202,7 @@ fun CrearHistorialClinicoScreen(
                     text = "Registra la información clínica del paciente",
                     style = typography.bodyMedium?.copy(
                         fontSize = 14.sp,
-                        color = HistorialClinicoColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     ) ?: MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
@@ -213,8 +213,8 @@ fun CrearHistorialClinicoScreen(
                 // Card principal
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(containerColor = HistorialClinicoColors.Surface),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
@@ -240,7 +240,7 @@ fun CrearHistorialClinicoScreen(
                                     "Ej: Sesión de terapia inicial",
                                     style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                         ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             isError = titulo.isBlank() && historialCreado != null,
@@ -250,24 +250,24 @@ fun CrearHistorialClinicoScreen(
                                         text = "El título es obligatorio",
                                         style = typography.bodySmall?.copy(fontSize = 12.sp)
                                             ?: MaterialTheme.typography.bodySmall,
-                                        color = HistorialClinicoColors.Error
+                                        color = MaterialTheme.colorScheme.error
                                     )
                                 }
                             },
                             singleLine = true,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                cursorColor = MaterialTheme.colorScheme.primary,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                errorBorderColor = MaterialTheme.colorScheme.error,
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
                             )
@@ -290,24 +290,24 @@ fun CrearHistorialClinicoScreen(
                                     "Descripción del diagnóstico clínico",
                                     style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                         ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             minLines = 3,
                             maxLines = 5,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                cursorColor = MaterialTheme.colorScheme.primary,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                errorBorderColor = MaterialTheme.colorScheme.error,
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
                             )
@@ -330,24 +330,24 @@ fun CrearHistorialClinicoScreen(
                                     "Tratamiento recomendado o en curso",
                                     style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                         ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             minLines = 3,
                             maxLines = 5,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                cursorColor = MaterialTheme.colorScheme.primary,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                errorBorderColor = MaterialTheme.colorScheme.error,
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
                             )
@@ -370,24 +370,24 @@ fun CrearHistorialClinicoScreen(
                                     "Notas adicionales sobre el paciente",
                                     style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                         ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
                             minLines = 4,
                             maxLines = 8,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                cursorColor = MaterialTheme.colorScheme.primary,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                errorBorderColor = MaterialTheme.colorScheme.error,
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White
                             )
@@ -414,9 +414,9 @@ fun CrearHistorialClinicoScreen(
                             },
                             enabled = !isLoading && titulo.isNotBlank(),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = HistorialClinicoColors.Primary,
+                                containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = Color.White,
-                                disabledContainerColor = HistorialClinicoColors.PrimaryLight.copy(alpha = 0.5f),
+                                disabledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                                 disabledContentColor = Color.White.copy(alpha = 0.7f)
                             ),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
@@ -457,7 +457,7 @@ fun CrearHistorialClinicoScreen(
                     text = "💜 Registra la información con precisión y empatía",
                     style = typography.bodySmall?.copy(
                         fontSize = 12.sp,
-                        color = HistorialClinicoColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     ) ?: MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth()

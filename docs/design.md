@@ -12,6 +12,7 @@ Este documento establece los estándares visuales, de interacción y de arquitec
 4.  [Elevación y Sombras (Elevation)](#4-elevación-y-sombras-elevation)
 5.  [Formas (Shape System)](#5-formas-shape-system)
 6.  [Espaciado y Grid](#6-espaciado-y-grid)
+7. 
 7.  [Iconografía](#7-iconografía)
 8.  [Componentes (Component Inventory)](#8-componentes-component-inventory)
 9.  [Movimiento y Animación (Motion)](#9-movimiento-y-animación-motion)
