@@ -13,6 +13,7 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -20,11 +21,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
+
+// Colores para validaciones
+private val SuccessColor = Color(0xFF81C784)
+private val ErrorColor = Color(0xFFE57373)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,8 +42,19 @@ fun RegistrarPacientePsicologoScreen(
     loginViewModel: LoginViewModel,
     situacionViewModel: SituacionViewModel
 ) {
-    val primaryColor = Color(0xFF6C63FF)
-    val backgroundColor = Color(0xFFCCC0E4)
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Colores dinámicos según el tema
+    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else Color(0xFF6C63FF)
+    val backgroundColor = if (isDark) screenColors.background else Color(0xFFCCC0E4)
+    val surfaceColor = if (isDark) cardColors.cardBackground else Color.White
+    val textColor = if (isDark) cardColors.cardContent else Color.Black
+    val textFieldBorderColor = if (isDark) Color.White else Color.Gray
+    val tutorCardColor = if (isDark) cardColors.cardBackground.copy(alpha = 0.8f) else Color(0xFFFFF3E0)
+
     val snackbarHostState = remember { SnackbarHostState() }
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
@@ -78,10 +98,20 @@ fun RegistrarPacientePsicologoScreen(
     var expandedSituacion by remember { mutableStateOf(false) }
     var expandedTipoTutor by remember { mutableStateOf(false) }
 
-    // Estado para el diálogo de alerta
+    // Estado para los diálogos
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    // Estados para campos tocados (validaciones)
+    var emailTouched by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
+    var telefonoTouched by remember { mutableStateOf(false) }
+    var dniTouched by remember { mutableStateOf(false) }
+    var fechaTouched by remember { mutableStateOf(false) }
+    var tutorEmailTouched by remember { mutableStateOf(false) }
+    var tutorTelefonoTouched by remember { mutableStateOf(false) }
+    var tutorDniTouched by remember { mutableStateOf(false) }
 
     val listaGeneros = listOf("MASCULINO", "FEMENINO", "OTRO", "PREFIERO_NO_DECIR")
     val listaTiposTutor = listOf("PADRE", "MADRE", "TUTOR LEGAL", "ABUELO", "OTRO")
@@ -91,14 +121,20 @@ fun RegistrarPacientePsicologoScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.registrar_paciente), color = Color.White) },
+                title = {
+                    Text(
+                        stringResource(R.string.registrar_paciente),
+                        color = if (isDark) Color.Black else Color.White,
+                        fontFamily = roboto
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.volver),
-                            tint = Color.White
+                            tint = if (isDark) Color.Black else Color.White
                         )
                     }
                 }
@@ -118,7 +154,7 @@ fun RegistrarPacientePsicologoScreen(
             // ==================== SECCIÓN 1: DATOS PERSONALES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = surfaceColor),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
@@ -135,97 +171,245 @@ fun RegistrarPacientePsicologoScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Nombre
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { loginViewModel.setNombre(it) },
-                        label = { Text(stringResource(R.string.nombre), fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.nombre), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
                             focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
                         )
                     )
 
+                    // Apellido
                     OutlinedTextField(
                         value = apellido,
                         onValueChange = { loginViewModel.setApellido(it) },
-                        label = { Text(stringResource(R.string.apellido), fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.apellido), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
                             focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
                         )
                     )
 
+                    // DNI
                     OutlinedTextField(
                         value = dni,
-                        onValueChange = { loginViewModel.setDni(it.uppercase()) },
-                        label = { Text(stringResource(R.string.dni_label), fontFamily = roboto) },
-                        placeholder = { Text(stringResource(R.string.placeholder_dni), fontFamily = roboto) },
+                        onValueChange = {
+                            loginViewModel.setDni(it.uppercase())
+                            dniTouched = true
+                        },
+                        label = { Text(stringResource(R.string.dni_label), fontFamily = roboto, color = textColor) },
+                        placeholder = { Text(stringResource(R.string.placeholder_dni), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
-                        supportingText = {
-                            if (dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
-                                Text(
-                                    stringResource(R.string.formato_dni_invalido),
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
+                        isError = dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
                             focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
+                        ),
+                        supportingText = {
+                            when {
+                                !dniTouched && dni.isBlank() -> {
+                                    Text(
+                                        "🆔 Introduce el DNI",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                    Text(
+                                        "❌ Formato inválido (8 números + 1 letra)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                dniTouched && dni.isNotBlank() && dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                    Text(
+                                        "✅ DNI válido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
+                    // Email
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { loginViewModel.setEmail(it) },
-                        label = { Text(stringResource(R.string.email_label), fontFamily = roboto) },
+                        onValueChange = {
+                            loginViewModel.setEmail(it)
+                            emailTouched = true
+                        },
+                        label = { Text(stringResource(R.string.email_label), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
+                        isError = emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
                             focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
+                        ),
+                        supportingText = {
+                            when {
+                                !emailTouched && email.isBlank() -> {
+                                    Text(
+                                        "📧 Introduce el correo electrónico",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        "❌ Formato de correo inválido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                emailTouched && email.isNotBlank() && email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        "✅ Correo válido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
+                    // Contraseña
                     OutlinedTextField(
                         value = regPassword,
-                        onValueChange = { loginViewModel.setRegPassword(it) },
-                        label = { Text(stringResource(R.string.contrasena), fontFamily = roboto) },
+                        onValueChange = {
+                            loginViewModel.setRegPassword(it)
+                            passwordTouched = true
+                        },
+                        label = { Text(stringResource(R.string.contrasena), fontFamily = roboto, color = textColor) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
+                        isError = passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
+                            focusedBorderColor = if (passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8)) ErrorColor else primaryColor,
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
+                        ),
+                        supportingText = {
+                            when {
+                                !passwordTouched && regPassword.isBlank() -> {
+                                    Text(
+                                        "🔒 Introduce una contraseña",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                passwordTouched && regPassword.isNotBlank() && regPassword.length < 8 -> {
+                                    Text(
+                                        "⚠️ La contraseña debe tener al menos 8 caracteres",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword) -> {
+                                    Text(
+                                        "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                passwordTouched && regPassword.isNotBlank() && loginViewModel.isValidPassword(regPassword) -> {
+                                    Text(
+                                        "✅ Contraseña válida",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
+                    // Teléfono
                     OutlinedTextField(
                         value = telefono,
-                        onValueChange = { loginViewModel.setTelefono(it) },
-                        label = { Text(stringResource(R.string.telefono_label), fontFamily = roboto) },
-                        placeholder = { Text(stringResource(R.string.placeholder_telefono), fontFamily = roboto) },
+                        onValueChange = {
+                            loginViewModel.setTelefono(it)
+                            telefonoTouched = true
+                        },
+                        label = { Text(stringResource(R.string.telefono_label), fontFamily = roboto, color = textColor) },
+                        placeholder = { Text(stringResource(R.string.placeholder_telefono), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
-                        supportingText = {
-                            if (telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) {
-                                Text(
-                                    stringResource(R.string.telefono_9_digitos),
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
+                        isError = telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
+                            focusedBorderColor = if (telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else primaryColor,
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
+                        ),
+                        supportingText = {
+                            when {
+                                !telefonoTouched && telefono.isBlank() -> {
+                                    Text(
+                                        "📞 Introduce el número de teléfono",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")) -> {
+                                    Text(
+                                        "❌ El teléfono debe tener 9 dígitos",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                telefonoTouched && telefono.isNotBlank() && telefono.matches(Regex("^[0-9]{9}$")) -> {
+                                    Text(
+                                        "✅ Teléfono válido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
                     // Dropdown Género
@@ -237,15 +421,19 @@ fun RegistrarPacientePsicologoScreen(
                             value = genero,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text(stringResource(R.string.genero_label), fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.genero_label), fontFamily = roboto, color = textColor) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
                                 focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
+                                unfocusedLabelColor = textColor
                             )
                         )
                         ExposedDropdownMenu(
@@ -254,7 +442,7 @@ fun RegistrarPacientePsicologoScreen(
                         ) {
                             listaGeneros.forEach { opcion ->
                                 DropdownMenuItem(
-                                    text = { Text(opcion, fontFamily = roboto) },
+                                    text = { Text(opcion, fontFamily = roboto, color = textColor) },
                                     onClick = {
                                         loginViewModel.setGenero(opcion)
                                         expandedGenero = false
@@ -264,26 +452,54 @@ fun RegistrarPacientePsicologoScreen(
                         }
                     }
 
+                    // Fecha de nacimiento
                     OutlinedTextField(
                         value = fechaNacimiento,
-                        onValueChange = { loginViewModel.setFechaNacimiento(it) },
-                        label = { Text(stringResource(R.string.fecha_nacimiento_label), fontFamily = roboto) },
-                        placeholder = { Text(stringResource(R.string.placeholder_fecha), fontFamily = roboto) },
+                        onValueChange = {
+                            loginViewModel.setFechaNacimiento(it)
+                            fechaTouched = true
+                        },
+                        label = { Text(stringResource(R.string.fecha_nacimiento_label), fontFamily = roboto, color = textColor) },
+                        placeholder = { Text(stringResource(R.string.placeholder_fecha), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
-                        supportingText = {
-                            if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
-                                Text(
-                                    stringResource(R.string.formato_fecha_invalido),
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
+                        isError = fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
+                            focusedBorderColor = if (fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) ErrorColor else primaryColor,
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
+                        ),
+                        supportingText = {
+                            when {
+                                !fechaTouched && fechaNacimiento.isBlank() -> {
+                                    Text(
+                                        "📅 Introduce la fecha (YYYY-MM-DD)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
+                                    Text(
+                                        "❌ Formato inválido (YYYY-MM-DD)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                fechaTouched && fechaNacimiento.isNotBlank() && fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
+                                    Text(
+                                        "✅ Fecha válida",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -292,7 +508,7 @@ fun RegistrarPacientePsicologoScreen(
             if (esMenor && fechaNacimiento.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                    colors = CardDefaults.cardColors(containerColor = tutorCardColor),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
@@ -319,90 +535,170 @@ fun RegistrarPacientePsicologoScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        // Nombre del tutor
                         OutlinedTextField(
                             value = tutorNombre,
                             onValueChange = { loginViewModel.setTutorNombre(it) },
-                            label = { Text(stringResource(R.string.nombre_completo_tutor), fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.nombre_completo_tutor), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
                                 focusedBorderColor = Color(0xFFE67E22),
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = Color(0xFFE67E22),
+                                unfocusedLabelColor = textColor
                             )
                         )
 
+                        // Teléfono del tutor
                         OutlinedTextField(
                             value = tutorTelefono,
-                            onValueChange = { loginViewModel.setTutorTelefono(it) },
-                            label = { Text(stringResource(R.string.telefono_tutor), fontFamily = roboto) },
-                            placeholder = { Text(stringResource(R.string.placeholder_telefono), fontFamily = roboto) },
+                            onValueChange = {
+                                loginViewModel.setTutorTelefono(it)
+                                tutorTelefonoTouched = true
+                            },
+                            label = { Text(stringResource(R.string.telefono_tutor), fontFamily = roboto, color = textColor) },
+                            placeholder = { Text(stringResource(R.string.placeholder_telefono), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$")),
-                            supportingText = {
-                                if (tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$"))
-                                ) {
-                                    Text(
-                                        stringResource(R.string.telefono_9_digitos),
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
+                            isError = tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE67E22),
-                                unfocusedBorderColor = Color.Gray
-                            )
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
+                                focusedBorderColor = if (tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else Color(0xFFE67E22),
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = Color(0xFFE67E22),
+                                unfocusedLabelColor = textColor
+                            ),
+                            supportingText = {
+                                when {
+                                    !tutorTelefonoTouched && tutorTelefono.isBlank() -> {
+                                        Text(
+                                            "📞 Introduce el teléfono del tutor",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = textColor.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                    tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
+                                        Text(
+                                            "❌ El teléfono debe tener 9 dígitos",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = ErrorColor
+                                        )
+                                    }
+                                    tutorTelefonoTouched && tutorTelefono.isNotBlank() && tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
+                                        Text(
+                                            "✅ Teléfono válido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = SuccessColor
+                                        )
+                                    }
+                                }
+                            }
                         )
 
+                        // Email del tutor
                         OutlinedTextField(
                             value = tutorEmail,
-                            onValueChange = { loginViewModel.setTutorEmail(it) },
-                            label = { Text(stringResource(R.string.email_tutor), fontFamily = roboto) },
+                            onValueChange = {
+                                loginViewModel.setTutorEmail(it)
+                                tutorEmailTouched = true
+                            },
+                            label = { Text(stringResource(R.string.email_tutor), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
-                            supportingText = {
-                                if (tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))
-                                ) {
-                                    Text(
-                                        stringResource(R.string.formato_email_invalido),
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
+                            isError = tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE67E22),
-                                unfocusedBorderColor = Color.Gray
-                            )
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
+                                focusedBorderColor = if (tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) ErrorColor else Color(0xFFE67E22),
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = Color(0xFFE67E22),
+                                unfocusedLabelColor = textColor
+                            ),
+                            supportingText = {
+                                when {
+                                    !tutorEmailTouched && tutorEmail.isBlank() -> {
+                                        Text(
+                                            "📧 Introduce el email del tutor",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = textColor.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                    tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                        Text(
+                                            "❌ Formato de email inválido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = ErrorColor
+                                        )
+                                    }
+                                    tutorEmailTouched && tutorEmail.isNotBlank() && tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                        Text(
+                                            "✅ Email válido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = SuccessColor
+                                        )
+                                    }
+                                }
+                            }
                         )
 
+                        // DNI del tutor
                         OutlinedTextField(
                             value = tutorDni,
-                            onValueChange = { loginViewModel.setTutorDni(it.uppercase()) },
-                            label = { Text(stringResource(R.string.dni_tutor), fontFamily = roboto) },
-                            placeholder = { Text(stringResource(R.string.placeholder_dni), fontFamily = roboto) },
+                            onValueChange = {
+                                loginViewModel.setTutorDni(it.uppercase())
+                                tutorDniTouched = true
+                            },
+                            label = { Text(stringResource(R.string.dni_tutor), fontFamily = roboto, color = textColor) },
+                            placeholder = { Text(stringResource(R.string.placeholder_dni), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
-                            supportingText = {
-                                if (tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))
-                                ) {
-                                    Text(
-                                        stringResource(R.string.formato_dni_invalido),
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
+                            isError = tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE67E22),
-                                unfocusedBorderColor = Color.Gray
-                            )
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
+                                focusedBorderColor = if (tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) ErrorColor else Color(0xFFE67E22),
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = Color(0xFFE67E22),
+                                unfocusedLabelColor = textColor
+                            ),
+                            supportingText = {
+                                when {
+                                    !tutorDniTouched && tutorDni.isBlank() -> {
+                                        Text(
+                                            "🆔 Introduce el DNI del tutor",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = textColor.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                    tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                        Text(
+                                            "❌ Formato inválido (8 números + 1 letra)",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = ErrorColor
+                                        )
+                                    }
+                                    tutorDniTouched && tutorDni.isNotBlank() && tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                        Text(
+                                            "✅ DNI válido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = SuccessColor
+                                        )
+                                    }
+                                }
+                            }
                         )
 
                         // Dropdown Tipo de Tutor
@@ -414,15 +710,19 @@ fun RegistrarPacientePsicologoScreen(
                                 value = tutorTipo,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text(stringResource(R.string.parentesco_label), fontFamily = roboto) },
+                                label = { Text(stringResource(R.string.parentesco_label), fontFamily = roboto, color = textColor) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                                 shape = textFieldShape,
                                 colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = textColor,
+                                    unfocusedTextColor = textColor,
                                     focusedBorderColor = Color(0xFFE67E22),
-                                    unfocusedBorderColor = Color.Gray
+                                    unfocusedBorderColor = textFieldBorderColor,
+                                    focusedLabelColor = Color(0xFFE67E22),
+                                    unfocusedLabelColor = textColor
                                 )
                             )
                             ExposedDropdownMenu(
@@ -431,7 +731,7 @@ fun RegistrarPacientePsicologoScreen(
                             ) {
                                 listaTiposTutor.forEach { tipo ->
                                     DropdownMenuItem(
-                                        text = { Text(tipo, fontFamily = roboto) },
+                                        text = { Text(tipo, fontFamily = roboto, color = textColor) },
                                         onClick = {
                                             loginViewModel.setTutorTipo(tipo)
                                             expandedTipoTutor = false
@@ -447,7 +747,7 @@ fun RegistrarPacientePsicologoScreen(
             // ==================== SECCIÓN 3: DIRECCIÓN ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = surfaceColor),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
@@ -471,12 +771,16 @@ fun RegistrarPacientePsicologoScreen(
                     OutlinedTextField(
                         value = calle,
                         onValueChange = { loginViewModel.setCalle(it) },
-                        label = { Text(stringResource(R.string.calle_numero), fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.calle_numero), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
                             focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
+                            unfocusedBorderColor = textFieldBorderColor,
+                            focusedLabelColor = primaryColor,
+                            unfocusedLabelColor = textColor
                         )
                     )
 
@@ -487,23 +791,31 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = ciudad,
                             onValueChange = { loginViewModel.setCiudad(it) },
-                            label = { Text(stringResource(R.string.ciudad_label), fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.ciudad_label), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
                                 focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
+                                unfocusedLabelColor = textColor
                             )
                         )
                         OutlinedTextField(
                             value = provincia,
                             onValueChange = { loginViewModel.setProvincia(it) },
-                            label = { Text(stringResource(R.string.provincia_label), fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.provincia_label), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
                                 focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
+                                unfocusedLabelColor = textColor
                             )
                         )
                     }
@@ -515,23 +827,31 @@ fun RegistrarPacientePsicologoScreen(
                         OutlinedTextField(
                             value = codigoPostal,
                             onValueChange = { loginViewModel.setCodigoPostal(it) },
-                            label = { Text(stringResource(R.string.codigo_postal_label), fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.codigo_postal_label), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
                                 focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
+                                unfocusedLabelColor = textColor
                             )
                         )
                         OutlinedTextField(
                             value = pais,
                             onValueChange = { loginViewModel.setPais(it) },
-                            label = { Text(stringResource(R.string.pais_label), fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.pais_label), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
                                 focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color.Gray
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
+                                unfocusedLabelColor = textColor
                             )
                         )
                     }
@@ -541,7 +861,7 @@ fun RegistrarPacientePsicologoScreen(
             // ==================== SECCIÓN 4: SITUACIONES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = surfaceColor),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
@@ -560,7 +880,7 @@ fun RegistrarPacientePsicologoScreen(
                         stringResource(R.string.seleccione_situaciones),
                         style = MaterialTheme.typography.bodySmall,
                         fontFamily = roboto,
-                        color = Color.Gray
+                        color = textColor.copy(alpha = 0.7f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -575,7 +895,8 @@ fun RegistrarPacientePsicologoScreen(
                                 IconButton(onClick = { expandedSituacion = !expandedSituacion }) {
                                     Icon(
                                         if (expandedSituacion) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                                        contentDescription = null
+                                        contentDescription = null,
+                                        tint = textColor
                                     )
                                 }
                             },
@@ -585,8 +906,12 @@ fun RegistrarPacientePsicologoScreen(
                             shape = textFieldShape,
                             isError = situacionesIds.isEmpty(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = if (situacionesIds.isEmpty()) Color.Red else Color.Gray
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor,
+                                focusedBorderColor = if (situacionesIds.isEmpty()) ErrorColor else primaryColor,
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
+                                unfocusedLabelColor = textColor
                             )
                         )
 
@@ -595,14 +920,16 @@ fun RegistrarPacientePsicologoScreen(
                             onDismissRequest = { expandedSituacion = false },
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
-                                .heightIn(max = 400.dp)
+                                .heightIn(max = 400.dp),
+                            containerColor = surfaceColor
                         ) {
                             if (listaSituaciones.isEmpty()) {
                                 DropdownMenuItem(
                                     text = {
                                         Text(
                                             stringResource(R.string.no_hay_situaciones),
-                                            fontFamily = roboto
+                                            fontFamily = roboto,
+                                            color = textColor
                                         )
                                     },
                                     onClick = { expandedSituacion = false },
@@ -629,12 +956,14 @@ fun RegistrarPacientePsicologoScreen(
                                                         loginViewModel.situacionesIds.value = currentIds
                                                         expandedSituacion = false
                                                     },
-                                                    modifier = Modifier.size(24.dp)
+                                                    modifier = Modifier.size(24.dp),
+                                                    colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                                                 )
                                                 Spacer(modifier = Modifier.width(12.dp))
                                                 Text(
                                                     situacion.nombre,
                                                     fontFamily = roboto,
+                                                    color = textColor,
                                                     modifier = Modifier.weight(1f)
                                                 )
                                             }
@@ -651,7 +980,7 @@ fun RegistrarPacientePsicologoScreen(
             // ==================== SECCIÓN 5: CONSENTIMIENTOS ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = surfaceColor),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
@@ -684,6 +1013,7 @@ fun RegistrarPacientePsicologoScreen(
                         Text(
                             stringResource(R.string.acepto_terminos),
                             fontFamily = roboto,
+                            color = textColor,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaTerminos.value = !aceptaTerminos
                             }
@@ -702,6 +1032,7 @@ fun RegistrarPacientePsicologoScreen(
                         Text(
                             stringResource(R.string.acepto_videoconferencia),
                             fontFamily = roboto,
+                            color = textColor,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaVideoconferencia.value =
                                     !aceptaVideoconferencia
@@ -721,6 +1052,7 @@ fun RegistrarPacientePsicologoScreen(
                         Text(
                             stringResource(R.string.acepto_comunicaciones),
                             fontFamily = roboto,
+                            color = textColor,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaComunicacion.value = !aceptaComunicacion
                             }
@@ -787,13 +1119,15 @@ fun RegistrarPacientePsicologoScreen(
                 Text(
                     stringResource(R.string.registro_exitoso),
                     fontFamily = roboto,
-                    fontWeight = Bold
+                    fontWeight = Bold,
+                    color = textColor
                 )
             },
             text = {
                 Text(
                     stringResource(R.string.paciente_registrado_correctamente),
-                    fontFamily = roboto
+                    fontFamily = roboto,
+                    color = textColor.copy(alpha = 0.8f)
                 )
             },
             confirmButton = {
@@ -807,7 +1141,7 @@ fun RegistrarPacientePsicologoScreen(
                 }
             },
             shape = RoundedCornerShape(16.dp),
-            containerColor = Color.White
+            containerColor = surfaceColor
         )
     }
 
@@ -827,13 +1161,15 @@ fun RegistrarPacientePsicologoScreen(
                 Text(
                     stringResource(R.string.error_registro),
                     fontFamily = roboto,
-                    fontWeight = Bold
+                    fontWeight = Bold,
+                    color = textColor
                 )
             },
             text = {
                 Text(
                     text = errorMessage.ifBlank { stringResource(R.string.error_registro_mensaje) },
-                    fontFamily = roboto
+                    fontFamily = roboto,
+                    color = textColor.copy(alpha = 0.8f)
                 )
             },
             confirmButton = {
@@ -844,7 +1180,7 @@ fun RegistrarPacientePsicologoScreen(
                 }
             },
             shape = RoundedCornerShape(16.dp),
-            containerColor = Color.White
+            containerColor = surfaceColor
         )
     }
 }

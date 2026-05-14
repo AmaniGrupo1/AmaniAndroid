@@ -387,6 +387,7 @@ fun CitaCardAmani(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Cabecera con fecha y estado
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -429,6 +430,7 @@ fun CitaCardAmani(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Horario y Duración
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -469,8 +471,88 @@ fun CitaCardAmani(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
+            // ✅ NUEVO: Método de pago (solo si existe)
+            if (cita.metodoPago != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        when (cita.metodoPago.name) {
+                            "EFECTIVO" -> Icons.Default.Money
+                            "TARJETA" -> Icons.Default.CreditCard
+                            else -> Icons.Default.Payment
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = colors.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (cita.metodoPago.name) {
+                            "EFECTIVO" -> "💰 Pago en efectivo"
+                            "TARJETA" -> "💳 Pago con tarjeta"
+                            else -> "Método de pago: ${cita.metodoPago.name}"
+                        },
+                        fontSize = 12.sp,
+                        color = colors.textSecondary,
+                        fontFamily = roboto
+                    )
+                }
+            }
+
+            // ✅ NUEVO: Estado del pago (solo si existe)
+            if (cita.estadoPago != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        when (cita.estadoPago.name) {
+                            "PAGADO" -> Icons.Default.CheckCircle
+                            "PENDIENTE" -> Icons.Default.Schedule
+                            "FALLIDO" -> Icons.Default.Error
+                            "REEMBOLSADO" -> Icons.Default.Info
+                            else -> Icons.Default.Info
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = when (cita.estadoPago.name) {
+                            "PAGADO" -> colors.success
+                            "PENDIENTE" -> colors.warning
+                            "FALLIDO" -> colors.error
+                            "REEMBOLSADO" -> colors.primary
+                            else -> colors.textSecondary
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (cita.estadoPago.name) {
+                            "PAGADO" -> "✅ Pagado"
+                            "PENDIENTE" -> "⏳ Pendiente de pago"
+                            "FALLIDO" -> "❌ Pago fallido"
+                            "REEMBOLSADO" -> "🔄 Reembolsado"
+                            else -> "Estado: ${cita.estadoPago.name}"
+                        },
+                        fontSize = 12.sp,
+                        color = when (cita.estadoPago.name) {
+                            "PAGADO" -> colors.success
+                            "PENDIENTE" -> colors.warning
+                            "FALLIDO" -> colors.error
+                            "REEMBOLSADO" -> colors.primary
+                            else -> colors.textSecondary
+                        },
+                        fontFamily = roboto,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Tipo de terapia y modalidad
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -520,6 +602,7 @@ fun CitaCardAmani(
                 }
             }
 
+            // Motivo
             cita.motivo?.let { motivo ->
                 if (motivo.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -534,6 +617,7 @@ fun CitaCardAmani(
                 }
             }
 
+            // Botones de acción (solo si no está cancelada/completada)
             if (cita.estado?.lowercase() !in listOf("cancelada", "completada")) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Row(

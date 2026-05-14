@@ -339,7 +339,7 @@ fun NavGraph(
                 )
             ) { backStackEntry ->
                 val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-                HistorialClinicoScreen(navController, pacienteId, historialClinicoPacienteViewModel)
+                HistorialClinicoScreen(navController, pacienteId, historialClinicoPacienteViewModel, userSessionDataStore)
             }
 
             composable(

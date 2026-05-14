@@ -1,12 +1,18 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,16 +31,27 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
+import org.ies.tierno.applicationamani.presentation.ui.screen.generacionPDFhISTORIAL.HistorialPDFGenerator
+import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-// Colores originales para el modo DEFECTO
+fun Context.findActivity(): Activity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    return null
+}
+
 object HistorialClinicoDefaultColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
@@ -54,19 +71,21 @@ object HistorialClinicoDefaultColors {
 fun HistorialClinicoScreen(
     navController: NavController,
     idPaciente: Long,
-    viewModel: HistorialClinicoPacienteViewModel
+    viewModel: HistorialClinicoPacienteViewModel = koinViewModel(),
+    userSessionDataStore: UserSessionDataStore
 ) {
     val scope = rememberCoroutineScope()
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val context = LocalContext.current
     val tokenDataStore = remember { TokenDataStore(context) }
 
-    // Obtener estado del tema
     val isDark = isDarkTheme()
     val screenColors = getScreenColors()
     val cardColors = getCardColors()
 
-    // Determinar colores según el tema
+    val session by userSessionDataStore.sessionFlow.collectAsState(initial = null)
+    val nombrePaciente = session?.nombre ?: "Paciente"
+
     val colors = if (isDark) {
         HistorialClinicoThemeColors(
             primary = Color.White,
@@ -103,13 +122,16 @@ fun HistorialClinicoScreen(
 
     var expandedCardId by remember { mutableStateOf<Long?>(null) }
 
-    // Cargar historial al iniciar
     LaunchedEffect(idPaciente) {
-        val token = tokenDataStore.getToken() ?: ""
+        val token = tokenDataStore.getToken()
+        if (token.isNullOrEmpty()) {
+            Toast.makeText(context, "Error: No hay sesión activa", Toast.LENGTH_LONG).show()
+            navController.navigateUp()
+            return@LaunchedEffect
+        }
         viewModel.cargarHistorialClinico(idPaciente, "Bearer $token")
     }
 
-    // Formateador de fechas
     fun formatFecha(fechaStr: String): String {
         return try {
             val fecha = LocalDateTime.parse(fechaStr)
@@ -125,18 +147,79 @@ fun HistorialClinicoScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Historial Clínico",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) Color.Black else Color.White,
-                        fontFamily = roboto
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Historial Clínico",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isDark) Color.Black else Color.White,
+                            fontFamily = roboto,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = "Compartir PDF",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable {
+                                    scope.launch {
+                                        if (historial.isNotEmpty()) {
+                                            try {
+                                                val loadingToast = Toast.makeText(
+                                                    context,
+                                                    "Generando PDF...",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                loadingToast.show()
+
+                                                val pdfFile = HistorialPDFGenerator.generarPDF(
+                                                    context = context,
+                                                    historial = historial,
+                                                    nombrePaciente = nombrePaciente
+                                                )
+
+                                                loadingToast.cancel()
+
+                                                if (!pdfFile.exists() || pdfFile.length() == 0L) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Error: No se pudo generar el PDF",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                    return@launch
+                                                }
+
+                                                // ✅ Usar el método del HistorialPDFGenerator, no crear uno nuevo
+                                                HistorialPDFGenerator.compartirPDF(context, pdfFile)
+
+                                            } catch (e: Exception) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Error: ${e.message}",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "No hay datos para compartir",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                },
+                            tint = if (isDark) Color.Black else Color.White
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                             tint = if (isDark) Color.Black else Color.White
                         )
@@ -331,7 +414,6 @@ fun HistorialCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Cabecera con título y fecha
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -370,7 +452,6 @@ fun HistorialCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Diagnóstico (siempre visible)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -406,11 +487,9 @@ fun HistorialCard(
                 }
             }
 
-            // Contenido expandido
             if (isExpanded) {
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Tratamiento
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -448,7 +527,6 @@ fun HistorialCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Observaciones
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -488,7 +566,6 @@ fun HistorialCard(
     }
 }
 
-// Clase auxiliar para los colores del tema
 data class HistorialClinicoThemeColors(
     val primary: Color,
     val primaryLight: Color,

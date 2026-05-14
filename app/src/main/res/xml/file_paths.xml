@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-
+    <!-- Para el cacheDir donde guardamos el PDF -->
     <cache-path
         name="cache"
-        path="." />
+        path="/" />
 
     <files-path
         name="files"
-        path="." />
+        path="/" />
 
     <external-files-path
         name="external_files"
-        path="." />
+        path="/" />
 
     <external-cache-path
         name="external_cache"
-        path="." />
-
+        path="/" />
 </paths>

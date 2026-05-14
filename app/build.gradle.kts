@@ -68,6 +68,12 @@ kotlin {
 
 dependencies {
 
+    // PDF Generation
+    implementation("com.itextpdf:itext7-core:7.2.5")
+
+    // Para imprimir
+    implementation("androidx.print:print:1.0.0")
+
     // ✅ CameraX ACTUALIZADO (CRÍTICO)
     implementation("androidx.camera:camera-camera2:1.4.0")
     implementation("androidx.camera:camera-lifecycle:1.4.0")

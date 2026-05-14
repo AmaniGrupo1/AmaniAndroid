@@ -1,6 +1,8 @@
 package org.ies.tierno.applicationamani.dto
 
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import java.time.LocalDate
 import java.time.LocalTime
@@ -16,7 +18,9 @@ data class CitaPacienteViewResponseDTO(
     val motivo: String?,
     val tipoTerapia: String?,
     val minutosRestantes: Long?,
-    val esProxima: Boolean?
+    val esProxima: Boolean?,
+    val metodoPago: MetodoPago?,
+    val estadoPago: EstadoPago?
 )
 
 // Información de contacto del psicólogo

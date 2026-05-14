@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +14,6 @@ import org.ies.tierno.applicationamani.data.local.TokenHolder
 import timber.log.Timber
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
@@ -212,7 +210,7 @@ class LoginViewModel(
     val aceptaTerminos = MutableStateFlow(false)
     val aceptaVideoconferencia = MutableStateFlow(false)
     val aceptaComunicacion = MutableStateFlow(false)
-    val metodoPago = MutableStateFlow<MetodoPago>(MetodoPago.PRESENCIAL)
+    val metodoPago = MutableStateFlow<MetodoPago>(MetodoPago.EFECTIVO)
     val situacionesIds = MutableStateFlow<List<Long>>(emptyList())
 
     // ── Tutor ──
@@ -526,7 +524,7 @@ class LoginViewModel(
         tutorEmail.value = ""
         tutorDni.value = ""
         tutorTipo.value = "PADRE"
-        metodoPago.value = MetodoPago.PRESENCIAL
+        metodoPago.value = MetodoPago.EFECTIVO
         situacionesIds.value = emptyList()
         calle.value = ""
         ciudad.value = ""

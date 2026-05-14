@@ -629,7 +629,7 @@ fun DialogoGestionCitaAmani(
     var fechaSeleccionada by remember { mutableStateOf(fechaInicial) }
     var motivo by remember { mutableStateOf(citaExistente?.motivo ?: "") }
 
-    var metodoPagoSeleccionado by remember { mutableStateOf(MetodoPago.PRESENCIAL) }
+    var metodoPagoSeleccionado by remember { mutableStateOf(MetodoPago.EFECTIVO) }
     var estadoPagoSeleccionado by remember { mutableStateOf(EstadoPago.PENDIENTE) }
     var modalidadSeleccionada by remember { mutableStateOf(ModalidadCita.PRESENCIAL) }
     var modalidadDropdownExpanded by remember { mutableStateOf(false) }
@@ -660,12 +660,12 @@ fun DialogoGestionCitaAmani(
     LaunchedEffect(terapiaSeleccionada) {
         terapiaSeleccionada?.let { terapia ->
             duracionMinutos = terapia.duracionMinutos
-            montoCalculado = if (metodoPagoSeleccionado == MetodoPago.ONLINE) terapia.precio else BigDecimal.ZERO
+            montoCalculado = if (metodoPagoSeleccionado == MetodoPago.TARJETA) terapia.precio else BigDecimal.ZERO
         }
     }
 
     LaunchedEffect(metodoPagoSeleccionado, terapiaSeleccionada) {
-        if (metodoPagoSeleccionado == MetodoPago.ONLINE && terapiaSeleccionada != null) {
+        if (metodoPagoSeleccionado == MetodoPago.TARJETA && terapiaSeleccionada != null) {
             montoCalculado = terapiaSeleccionada!!.precio
         } else {
             montoCalculado = BigDecimal.ZERO
@@ -973,16 +973,16 @@ fun DialogoGestionCitaAmani(
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
-                                    selected = metodoPagoSeleccionado == MetodoPago.PRESENCIAL,
-                                    onClick = { metodoPagoSeleccionado = MetodoPago.PRESENCIAL },
+                                    selected = metodoPagoSeleccionado == MetodoPago.EFECTIVO,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO },
                                     colors = RadioButtonDefaults.colors(selectedColor = colors.primary)
                                 )
                                 Text("Presencial", color = colors.textPrimary, fontFamily = roboto)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
-                                    selected = metodoPagoSeleccionado == MetodoPago.ONLINE,
-                                    onClick = { metodoPagoSeleccionado = MetodoPago.ONLINE },
+                                    selected = metodoPagoSeleccionado == MetodoPago.TARJETA,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA },
                                     colors = RadioButtonDefaults.colors(selectedColor = colors.primary)
                                 )
                                 Text("Online", color = colors.textPrimary, fontFamily = roboto)
@@ -1011,8 +1011,8 @@ fun DialogoGestionCitaAmani(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             when (metodoPagoSeleccionado) {
-                                MetodoPago.ONLINE -> "💳 El pago se procesará online al momento de agendar la cita"
-                                MetodoPago.PRESENCIAL -> "💰 El pago se realizará en consulta el día de la cita"
+                                MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"
+                                MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
                             },
                             fontSize = 12.sp,
                             color = colors.textSecondary,

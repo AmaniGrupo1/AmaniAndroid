@@ -480,7 +480,7 @@ class PsicologoAgendaViewModel(
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = estadoPago,  // ← USAR EL ESTADO RECIBIDO
-            monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
+            monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
             motivo = motivo.ifBlank { "Consulta psicológica" },
             idTipoTerapia = idTipoTerapia,
             estado = EstadoCita.pendiente,
@@ -550,7 +550,7 @@ class PsicologoAgendaViewModel(
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = estadoPago,
-            monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
+            monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
             motivo = motivo.ifBlank { "Consulta psicológica" },
             idTipoTerapia = idTipoTerapia,
             modalidad = modalidad
