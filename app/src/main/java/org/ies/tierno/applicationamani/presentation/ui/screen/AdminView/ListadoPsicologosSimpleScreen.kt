@@ -100,10 +100,13 @@ fun ListadoPsicologosSimpleScreen(
     // Determinar colores según el tema
     val backgroundColor = if (isDark) screenColors.background else AdminViewDefaultColors.Background
     val surfaceColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Surface
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AdminViewDefaultColors.Primary
+    val primaryColor =
+        if (isDark) MaterialTheme.colorScheme.primary else AdminViewDefaultColors.Primary
     val accentColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Accent
-    val textPrimaryColor = if (isDark) cardColors.cardContent else AdminViewDefaultColors.TextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AdminViewDefaultColors.TextSecondary
+    val textPrimaryColor =
+        if (isDark) cardColors.cardContent else AdminViewDefaultColors.TextPrimary
+    val textSecondaryColor =
+        if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AdminViewDefaultColors.TextSecondary
     val errorColor = AdminViewDefaultColors.Error
 
     val typography = MaterialTheme.typography
@@ -132,27 +135,10 @@ fun ListadoPsicologosSimpleScreen(
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(surfaceColor)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {
-                        navController.popBackStack()
-                    }
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver atrás",
-                        tint = primaryColor
-                    )
-                }
-                Box(modifier = Modifier.weight(1f)) {
-                    MenuAdministrador("Listado de psicólogos", navController)
-                }
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically) {
+                MenuAdministrador("Listado de psicólogos", navController)
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -167,7 +153,7 @@ fun ListadoPsicologosSimpleScreen(
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Agregar psicólogo",
-                    tint = Color.White
+                    tint = Color.Blue
                 )
             }
         }

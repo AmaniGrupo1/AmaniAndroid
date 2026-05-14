@@ -37,15 +37,29 @@ import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.stringResource
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.presentation.ui.components.ThemeModeSelector
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.koin.androidx.compose.koinViewModel
+// Añadir imports faltantes
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de ajustes del perfil del cliente (paciente).
@@ -59,10 +73,16 @@ import org.koin.androidx.compose.koinViewModel
  * @param viewModel ViewModel que gestiona el estado del formulario de perfil.
  */
 @Composable
-fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClienteViewModel = koinViewModel()) {
+fun SettingsClienteScreen(
+    navController: NavController,
+    viewModel: SettingsClienteViewModel = koinViewModel(),
+    idiomaViewModel: IdiomaViewModel = koinViewModel()
+) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val amaniColors = LocalAmaniColors.current
+    val isDark = isDarkTheme()
+
     val consentimientoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -77,6 +97,9 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
             // Aquí iria el codigo para guardarlo en la DB
         }
     }
+
+    // Obtener el tema actual del ViewModel
+    val currentTema by idiomaViewModel.tema.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.cargarUsuario()
@@ -119,14 +142,16 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                             "Nombre",
                             viewModel.nombre,
                             { viewModel.nombre = it },
-                            Modifier.weight(1f)
+                            Modifier.weight(1f),
+                            isDark = isDark
                         )
 
                         TextFieldCustom(
                             "Apellidos",
                             viewModel.apellidos,
                             { viewModel.apellidos = it },
-                            Modifier.weight(1f)
+                            Modifier.weight(1f),
+                            isDark = isDark
                         )
                     }
 
@@ -135,14 +160,16 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                             "Género",
                             viewModel.genero,
                             { viewModel.genero = it },
-                            Modifier.weight(1f)
+                            Modifier.weight(1f),
+                            isDark = isDark
                         )
 
                         TextFieldCustom(
                             "Dirección",
                             viewModel.direccion,
                             { viewModel.direccion = it },
-                            Modifier.weight(1f)
+                            Modifier.weight(1f),
+                            isDark = isDark
                         )
                     }
 
@@ -151,14 +178,16 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                             "Teléfono",
                             viewModel.telefono,
                             { viewModel.telefono = it },
-                            Modifier.weight(1f)
+                            Modifier.weight(1f),
+                            isDark = isDark
                         )
 
                         TextFieldCustom(
                             "Código postal",
                             viewModel.codigoPostal,
                             { viewModel.codigoPostal = it },
-                            Modifier.weight(1f)
+                            Modifier.weight(1f),
+                            isDark = isDark
                         )
                     }
                 }
@@ -208,15 +237,7 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
                 Text("Eliminar cuenta", color = colors.error)
             }
 
-            // Nuevo bloque: preferencia de tema (Blanco/Negro/Defecto)
-            val userSessionDataStore: UserSessionDataStore = try {
-                org.koin.java.KoinJavaComponent.getKoin().get()
-            } catch (e: Exception) {
-                UserSessionDataStore(LocalContext.current)
-            }
-            val sessionState = userSessionDataStore.sessionFlow.collectAsState(initial = null)
-            val session = sessionState.value
-
+            // Nuevo bloque: preferencia de tema (Claro/Oscuro)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
@@ -230,21 +251,26 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Fila de selección de tema
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = stringResource(id = R.string.tema_oscuro_claro), style = typography.bodyLarge, color = colors.onSurface)
-                        ThemeModeSelector(
-                            currentTema = session?.tema ?: TemaApp.SYSTEM,
-                            userSessionDataStore = userSessionDataStore,
-                            session = session
+                    // Fila de selección de tema (ahora con booleano)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.tema_oscuro_claro),
+                            style = typography.bodyLarge,
+                            color = colors.onSurface
+                        )
+                        ThemeSelector(
+                            currentTema = currentTema,
+                            idiomaViewModel = idiomaViewModel
                         )
                     }
                 }
             }
-
         }
     }
-
 }
 
 /**
@@ -253,18 +279,24 @@ fun SettingsClienteScreen(navController: NavController, viewModel: SettingsClien
  * @param label Etiqueta descriptiva del campo.
  * @param value Valor actual del campo.
  * @param onValueChange Callback invocado al cambiar el texto.
- * @param color Color de fondo del campo de texto.
  * @param modifier Modificador de diseño.
+ * @param isDark Indica si el tema es oscuro.
  */
 @Composable
 fun TextFieldCustom(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDark: Boolean = false
 ) {
+    val colors = MaterialTheme.colorScheme
+    val amaniColors = LocalAmaniColors.current
+
+    val textFieldContainer = if (isDark) Color.DarkGray else amaniColors.textFieldContainer
+    val textColor = if (isDark) Color.White else amaniColors.cardContent
+
     Column(modifier = modifier) {
-        val colors = MaterialTheme.colorScheme
         Text(label, style = MaterialTheme.typography.bodyMedium, color = colors.onSurface)
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -274,13 +306,81 @@ fun TextFieldCustom(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-                shape = MaterialTheme.shapes.small,
+            shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
                 focusedBorderColor = colors.primary,
                 unfocusedBorderColor = colors.outline,
-                focusedContainerColor = colors.surfaceVariant,
-                unfocusedContainerColor = colors.surfaceVariant
+                focusedContainerColor = textFieldContainer,
+                unfocusedContainerColor = textFieldContainer,
+                focusedLabelColor = colors.primary,
+                unfocusedLabelColor = colors.onSurfaceVariant
             )
         )
     }
 }
+
+/**
+ * Selector de tema (Claro/Oscuro) que usa el IdiomaViewModel.
+ */
+@Composable
+fun ThemeSelector(
+    currentTema: Boolean,
+    idiomaViewModel: IdiomaViewModel
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val amaniColors = LocalAmaniColors.current
+    val isDark = isDarkTheme()
+    val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { expanded = true }
+                .padding(start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if (currentTema) "Oscuro" else "Claro",
+                color = amaniColors.cardContent
+            )
+
+            Icon(
+                Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier.padding(start = 6.dp),
+                tint = amaniColors.cardContent
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = dropdownContainerColor
+        ) {
+            DropdownMenuItem(
+                text = { Text("Claro", color = amaniColors.cardContent) },
+                onClick = {
+                    expanded = false
+                    scope.launch {
+                        idiomaViewModel.cambiarTema(false) // false = claro
+                    }
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text("Oscuro", color = amaniColors.cardContent) },
+                onClick = {
+                    expanded = false
+                    scope.launch {
+                        idiomaViewModel.cambiarTema(true) // true = oscuro
+                    }
+                }
+            )
+        }
+    }
+}
+

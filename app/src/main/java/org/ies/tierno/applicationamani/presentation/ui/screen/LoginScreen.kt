@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,6 +37,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,8 +50,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -83,6 +86,11 @@ object AmaniLoginColors {
     val Success = Color(0xFF81C784)
 }
 
+// Fuente Roboto
+val robotoFont = FontFamily(
+    Font(R.font.roboto_variablefont_wdth_wght)
+)
+
 /**
  * Pantalla de inicio de sesión profesional de AMANI Psicología.
  */
@@ -98,6 +106,10 @@ fun LoginScreen(
     val loginError by loginViewModel.loginError.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Estados para controlar si el usuario ha interactuado con los campos
+    var emailTouched by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
 
     LaunchedEffect(loginError) {
         if (!loginError.isNullOrBlank()) {
@@ -143,9 +155,16 @@ fun LoginScreen(
         LoginScreenContent(
             modifier = Modifier.padding(paddingValues),
             username = username,
-            onUsernameChange = { loginViewModel.setUsername(it) },
+            onUsernameChange = {
+                loginViewModel.setUsername(it)
+                emailTouched = true
+            },
             password = password,
-            onPasswordChange = { loginViewModel.setPassword(it) },
+            onPasswordChange = {
+                loginViewModel.setPassword(it)
+                passwordTouched = true
+            },
+            loginViewModel = loginViewModel,
             isLoggingIn = isLoggingIn,
             isLoginEnabled = !isLoggingIn && loginViewModel.isLoginFormValid(),
             onLogin = { loginViewModel.login() },
@@ -154,7 +173,9 @@ fun LoginScreen(
                 navController.navigate(Screens.registro.route)
             },
             typography = typography,
-            isDarkTheme = isDark
+            isDarkTheme = isDark,
+            emailTouched = emailTouched,
+            passwordTouched = passwordTouched
         )
     }
 }
@@ -167,15 +188,19 @@ fun LoginScreenContent(
     password: String,
     onPasswordChange: (String) -> Unit,
     isLoggingIn: Boolean,
+    loginViewModel: LoginViewModel,
     isLoginEnabled: Boolean,
     onLogin: () -> Unit,
     onRegisterClick: () -> Unit,
-    typography: androidx.compose.material3.Typography,
-    isDarkTheme: Boolean = false
+    typography: Typography,
+    isDarkTheme: Boolean = false,
+    emailTouched: Boolean = false,
+    passwordTouched: Boolean = false
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     val amaniColors = LocalAmaniColors.current
 
+    // Determinar colores según el tema
     // Determinar colores según el tema
     val loginColors = if (isDarkTheme) {
         // Modo OSCURO (Negro)
@@ -187,19 +212,18 @@ fun LoginScreenContent(
             cardContainerColor = amaniColors.cardBackground,
             textPrimary = amaniColors.cardContent,
             textSecondary = amaniColors.cardContent.copy(alpha = 0.7f),
-            primary = MaterialTheme.colorScheme.primary,
-            primaryLight = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+            primary = Color.White,
+            primaryLight = Color.White.copy(alpha = 0.7f),
             surface = amaniColors.cardBackground,
             error = AmaniLoginColors.Error,
-            textFieldContainer = amaniColors.cardBackground,
-            textFieldText = amaniColors.cardContent,
-            textFieldLabel = amaniColors.cardContent.copy(alpha = 0.8f),
-            textFieldBorder = amaniColors.cardBorder
+            success = AmaniLoginColors.Success,  // ✅ AÑADE ESTA LÍNEA
+            textFieldContainer = Color.DarkGray,
+            textFieldText = Color.White,
+            textFieldLabel = Color.White.copy(alpha = 0.8f),
+            textFieldBorder = Color.White
         )
     } else {
         // Modo CLARO (Blanco o SYSTEM)
-        // SYSTEM usa los colores originales de AmaniLoginColors
-        // BLANCO usa los colores del tema claro
         LoginThemeColors(
             backgroundBrush = listOf(
                 AmaniLoginColors.Accent,
@@ -212,6 +236,7 @@ fun LoginScreenContent(
             primaryLight = AmaniLoginColors.PrimaryLight,
             surface = AmaniLoginColors.Surface,
             error = AmaniLoginColors.Error,
+            success = AmaniLoginColors.Success,
             textFieldContainer = Color.White,
             textFieldText = Color.Black,
             textFieldLabel = AmaniLoginColors.Primary,
@@ -258,7 +283,8 @@ fun LoginScreenContent(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
                 ) ?: MaterialTheme.typography.displayLarge,
-                color = loginColors.primary
+                color = loginColors.primary,
+                fontFamily = robotoFont
             )
 
             Text(
@@ -268,6 +294,7 @@ fun LoginScreenContent(
                     fontWeight = FontWeight.Medium
                 ) ?: MaterialTheme.typography.titleMedium,
                 color = loginColors.primaryLight,
+                fontFamily = robotoFont,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
@@ -297,7 +324,8 @@ fun LoginScreenContent(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = loginColors.textPrimary
-                            ) ?: MaterialTheme.typography.headlineSmall
+                            ) ?: MaterialTheme.typography.headlineSmall,
+                            fontFamily = robotoFont
                         )
                         Text(
                             text = "Accede a tu espacio terapéutico",
@@ -305,13 +333,14 @@ fun LoginScreenContent(
                                 fontSize = 14.sp,
                                 color = loginColors.textSecondary
                             ) ?: MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            fontFamily = robotoFont
                         )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Campo de email
+                    // Campo de email - solo muestra error si el usuario ha interactuado
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = username,
@@ -320,26 +349,49 @@ fun LoginScreenContent(
                             Text(
                                 "Correo electrónico",
                                 style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                    ?: MaterialTheme.typography.bodyMedium
+                                    ?: MaterialTheme.typography.bodyMedium,
+                                fontFamily = robotoFont
                             )
                         },
                         placeholder = {
                             Text(
-                                "usuario@amani.com",
+                                "usuario@ejemplo.com",
                                 style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                     ?: MaterialTheme.typography.bodyMedium,
-                                color = loginColors.textSecondary
+                                color = loginColors.textSecondary,
+                                fontFamily = robotoFont
                             )
                         },
-                        isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
+                        isError = emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         supportingText = {
-                            if (username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
-                                Text(
-                                    text = "Introduce un correo electrónico válido",
-                                    style = typography.bodySmall?.copy(fontSize = 12.sp)
-                                        ?: MaterialTheme.typography.bodySmall,
-                                    color = loginColors.error
-                                )
+                            when {
+                                !emailTouched && username.isBlank() -> {
+                                    Text(
+                                        text = "📧 Introduce tu correo electrónico",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.textSecondary,
+                                        fontFamily = robotoFont
+                                    )
+                                }
+                                emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        text = "❌ Formato de correo inválido (ej: usuario@dominio.com)",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.error,
+                                        fontFamily = robotoFont
+                                    )
+                                }
+                                emailTouched && username.isNotBlank() && username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        text = "✅ Correo válido",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.success,
+                                        fontFamily = robotoFont
+                                    )
+                                }
                             }
                         },
                         singleLine = true,
@@ -361,7 +413,7 @@ fun LoginScreenContent(
                         )
                     )
 
-                    // Campo de contraseña
+                    // Campo de contraseña - solo muestra error si el usuario ha interactuado
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = password,
@@ -370,26 +422,58 @@ fun LoginScreenContent(
                             Text(
                                 "Contraseña",
                                 style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                    ?: MaterialTheme.typography.bodyMedium
+                                    ?: MaterialTheme.typography.bodyMedium,
+                                fontFamily = robotoFont
                             )
                         },
                         placeholder = {
                             Text(
-                                "••••••",
+                                "••••••••",
                                 style = typography.bodyMedium?.copy(fontSize = 14.sp)
                                     ?: MaterialTheme.typography.bodyMedium,
-                                color = loginColors.textSecondary
+                                color = loginColors.textSecondary,
+                                fontFamily = robotoFont
                             )
                         },
-                        isError = password.isNotBlank() && password.length < 6,
+                        isError = passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 6),
                         supportingText = {
-                            if (password.isNotBlank() && password.length < 6) {
-                                Text(
-                                    text = "La contraseña debe tener al menos 6 caracteres",
-                                    style = typography.bodySmall?.copy(fontSize = 12.sp)
-                                        ?: MaterialTheme.typography.bodySmall,
-                                    color = loginColors.error
-                                )
+                            when {
+                                !passwordTouched && password.isBlank() -> {
+                                    Text(
+                                        text = "🔒 Introduce tu contraseña",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.textSecondary,
+                                        fontFamily = robotoFont
+                                    )
+                                }
+                                passwordTouched && password.isNotBlank() && password.length < 6 -> {
+                                    Text(
+                                        text = "⚠️ La contraseña debe tener al menos 6 caracteres",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.error,
+                                        fontFamily = robotoFont
+                                    )
+                                }
+                                passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
+                                    Text(
+                                        text = "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.error,
+                                        fontFamily = robotoFont
+                                    )
+                                }
+                                passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
+                                    Text(
+                                        text = "✅ Contraseña válida",
+                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
+                                            ?: MaterialTheme.typography.bodySmall,
+                                        color = loginColors.success,
+                                        fontFamily = robotoFont
+                                    )
+                                }
                             }
                         },
                         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -431,7 +515,7 @@ fun LoginScreenContent(
                             .height(52.dp),
                         shape = RoundedCornerShape(26.dp),
                         onClick = onLogin,
-                        enabled = isLoginEnabled,
+                        enabled = isLoginEnabled && !isLoggingIn,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = loginColors.primary,
                             contentColor = Color.White,
@@ -454,7 +538,9 @@ fun LoginScreenContent(
                                 Text(
                                     "Iniciando sesión...",
                                     style = typography.labelLarge?.copy(fontSize = 15.sp)
-                                        ?: MaterialTheme.typography.labelLarge
+                                        ?: MaterialTheme.typography.labelLarge,
+                                    fontFamily = robotoFont,
+                                    color = Color.White
                                 )
                             }
                         } else {
@@ -463,7 +549,9 @@ fun LoginScreenContent(
                                 style = typography.labelLarge?.copy(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium
-                                ) ?: MaterialTheme.typography.labelLarge
+                                ) ?: MaterialTheme.typography.labelLarge,
+                                fontFamily = robotoFont,
+                                color = Color.White
                             )
                         }
                     }
@@ -486,7 +574,8 @@ fun LoginScreenContent(
                                 fontSize = 12.sp,
                                 color = loginColors.textSecondary
                             ) ?: MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            fontFamily = robotoFont
                         )
                         Box(
                             modifier = Modifier
@@ -508,7 +597,8 @@ fun LoginScreenContent(
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = if (!isLoggingIn) loginColors.primary else loginColors.textSecondary
-                            ) ?: MaterialTheme.typography.bodyLarge
+                            ) ?: MaterialTheme.typography.bodyLarge,
+                            fontFamily = robotoFont
                         )
                     }
                 }
@@ -523,6 +613,7 @@ fun LoginScreenContent(
                     color = loginColors.textSecondary,
                     textAlign = TextAlign.Center
                 ) ?: MaterialTheme.typography.bodySmall,
+                fontFamily = robotoFont,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -539,6 +630,7 @@ data class LoginThemeColors(
     val primaryLight: Color,
     val surface: Color,
     val error: Color,
+    val success: Color,
     val textFieldContainer: Color,
     val textFieldText: Color,
     val textFieldLabel: Color,

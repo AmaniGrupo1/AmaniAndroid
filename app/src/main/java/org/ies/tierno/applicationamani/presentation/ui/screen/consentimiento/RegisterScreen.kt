@@ -31,6 +31,11 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.koin.androidx.compose.koinViewModel
 
+// Colores para validaciones
+private val SuccessColor = Color(0xFF81C784)
+private val ErrorColor = Color(0xFFE57373)
+private val WarningColor = Color(0xFFFF9800)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
@@ -53,7 +58,7 @@ fun RegisterScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Fuente Roboto correctamente configurada
+    // Fuente Roboto
     val roboto = FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
         Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
@@ -98,7 +103,17 @@ fun RegisterScreen(
     // Estados del SituacionViewModel
     val listaSituaciones by situacionViewModel.situaciones.collectAsStateWithLifecycle(emptyList())
 
-    // Estados para UI local
+    // Estados para UI local (campos tocados)
+    var emailTouched by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
+    var telefonoTouched by remember { mutableStateOf(false) }
+    var dniTouched by remember { mutableStateOf(false) }
+    var fechaTouched by remember { mutableStateOf(false) }
+    var tutorEmailTouched by remember { mutableStateOf(false) }
+    var tutorTelefonoTouched by remember { mutableStateOf(false) }
+    var tutorDniTouched by remember { mutableStateOf(false) }
+
+    // Estados para UI local (expansiones)
     var expandedGenero by remember { mutableStateOf(false) }
     var expandedSituacion by remember { mutableStateOf(false) }
     var expandedTipoTutor by remember { mutableStateOf(false) }
@@ -183,6 +198,7 @@ fun RegisterScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Nombre
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { loginViewModel.setNombre(it) },
@@ -199,6 +215,9 @@ fun RegisterScreen(
                         )
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Apellido
                     OutlinedTextField(
                         value = apellido,
                         onValueChange = { loginViewModel.setApellido(it) },
@@ -215,22 +234,20 @@ fun RegisterScreen(
                         )
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // DNI con validación
                     OutlinedTextField(
                         value = dni,
-                        onValueChange = { loginViewModel.setDni(it.uppercase()) },
+                        onValueChange = {
+                            loginViewModel.setDni(it.uppercase())
+                            dniTouched = true
+                        },
                         label = { Text("DNI *", fontFamily = roboto, color = textColor) },
                         placeholder = { Text("12345678A", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
-                        supportingText = {
-                            if (dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
-                                Text(
-                                    "Formato inválido (8 números + 1 letra)",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
+                        isError = dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
@@ -238,15 +255,50 @@ fun RegisterScreen(
                             unfocusedBorderColor = textFieldBorderColor,
                             focusedLabelColor = primaryColor,
                             unfocusedLabelColor = textColor
-                        )
+                        ),
+                        supportingText = {
+                            when {
+                                !dniTouched && dni.isBlank() -> {
+                                    Text(
+                                        "🆔 Introduce el DNI",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                    Text(
+                                        "❌ Formato inválido (8 números + 1 letra)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                dniTouched && dni.isNotBlank() && dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                    Text(
+                                        "✅ DNI válido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Email con validación
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { loginViewModel.setEmail(it) },
+                        onValueChange = {
+                            loginViewModel.setEmail(it)
+                            emailTouched = true
+                        },
                         label = { Text("Email *", fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
+                        isError = emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
@@ -254,51 +306,150 @@ fun RegisterScreen(
                             unfocusedBorderColor = textFieldBorderColor,
                             focusedLabelColor = primaryColor,
                             unfocusedLabelColor = textColor
-                        )
+                        ),
+                        supportingText = {
+                            when {
+                                !emailTouched && email.isBlank() -> {
+                                    Text(
+                                        "📧 Introduce el correo electrónico",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        "❌ Formato de correo inválido (ej: usuario@dominio.com)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                emailTouched && email.isNotBlank() && email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        "✅ Correo válido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Contraseña con validación mejorada
                     OutlinedTextField(
                         value = regPassword,
-                        onValueChange = { loginViewModel.setRegPassword(it) },
+                        onValueChange = {
+                            loginViewModel.setRegPassword(it)
+                            passwordTouched = true
+                        },
                         label = { Text("Contraseña *", fontFamily = roboto, color = textColor) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
+                        isError = passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
+                            focusedBorderColor = if (passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8)) ErrorColor else primaryColor,
                             unfocusedBorderColor = textFieldBorderColor,
                             focusedLabelColor = primaryColor,
                             unfocusedLabelColor = textColor
-                        )
+                        ),
+                        supportingText = {
+                            when {
+                                !passwordTouched && regPassword.isBlank() -> {
+                                    Text(
+                                        "🔒 Introduce una contraseña",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                passwordTouched && regPassword.isNotBlank() && regPassword.length < 8 -> {
+                                    Text(
+                                        "⚠️ La contraseña debe tener al menos 8 caracteres",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = WarningColor
+                                    )
+                                }
+                                passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword) -> {
+                                    Text(
+                                        "❌ La contraseña debe tener letras y números",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                passwordTouched && regPassword.isNotBlank() && loginViewModel.isValidPassword(regPassword) -> {
+                                    Text(
+                                        "✅ Contraseña válida",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Teléfono con validación
                     OutlinedTextField(
                         value = telefono,
-                        onValueChange = { loginViewModel.setTelefono(it) },
+                        onValueChange = {
+                            loginViewModel.setTelefono(it)
+                            telefonoTouched = true
+                        },
                         label = { Text("Teléfono *", fontFamily = roboto, color = textColor) },
                         placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
-                        supportingText = {
-                            if (telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) {
-                                Text(
-                                    "Debe tener 9 dígitos",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
+                        isError = telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
+                            focusedBorderColor = if (telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else primaryColor,
                             unfocusedBorderColor = textFieldBorderColor,
                             focusedLabelColor = primaryColor,
                             unfocusedLabelColor = textColor
-                        )
+                        ),
+                        supportingText = {
+                            when {
+                                !telefonoTouched && telefono.isBlank() -> {
+                                    Text(
+                                        "📞 Introduce el número de teléfono",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")) -> {
+                                    Text(
+                                        "❌ Debe tener 9 dígitos",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                telefonoTouched && telefono.isNotBlank() && telefono.matches(Regex("^[0-9]{9}$")) -> {
+                                    Text(
+                                        "✅ Teléfono válido",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Dropdown Género
                     ExposedDropdownMenuBox(
@@ -315,10 +466,11 @@ fun RegisterScreen(
                                 .fillMaxWidth()
                                 .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                             shape = textFieldShape,
+                            isError = genero.isBlank(),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = primaryColor,
+                                focusedBorderColor = if (genero.isBlank()) ErrorColor else primaryColor,
                                 unfocusedBorderColor = textFieldBorderColor,
                                 focusedLabelColor = primaryColor,
                                 unfocusedLabelColor = textColor
@@ -341,30 +493,56 @@ fun RegisterScreen(
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Fecha de nacimiento
                     OutlinedTextField(
                         value = fechaNacimiento,
-                        onValueChange = { loginViewModel.setFechaNacimiento(it) },
+                        onValueChange = {
+                            loginViewModel.setFechaNacimiento(it)
+                            fechaTouched = true
+                        },
                         label = { Text("Fecha nacimiento *", fontFamily = roboto, color = textColor) },
                         placeholder = { Text("1990-05-15", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
-                        supportingText = {
-                            if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
-                                Text(
-                                    "Formato inválido (YYYY-MM-DD)",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
+                        isError = fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
+                            focusedBorderColor = if (fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) ErrorColor else primaryColor,
                             unfocusedBorderColor = textFieldBorderColor,
                             focusedLabelColor = primaryColor,
                             unfocusedLabelColor = textColor
-                        )
+                        ),
+                        supportingText = {
+                            when {
+                                !fechaTouched && fechaNacimiento.isBlank() -> {
+                                    Text(
+                                        "📅 Introduce la fecha de nacimiento (YYYY-MM-DD)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
+                                    )
+                                }
+                                fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
+                                    Text(
+                                        "❌ Formato inválido (YYYY-MM-DD)",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = ErrorColor
+                                    )
+                                }
+                                fechaTouched && fechaNacimiento.isNotBlank() && fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
+                                    Text(
+                                        "✅ Fecha válida",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = SuccessColor
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -400,6 +578,7 @@ fun RegisterScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        // Nombre del tutor
                         OutlinedTextField(
                             value = tutorNombre,
                             onValueChange = { loginViewModel.setTutorNombre(it) },
@@ -416,91 +595,162 @@ fun RegisterScreen(
                             )
                         )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Teléfono del tutor
                         OutlinedTextField(
                             value = tutorTelefono,
-                            onValueChange = { loginViewModel.setTutorTelefono(it) },
+                            onValueChange = {
+                                loginViewModel.setTutorTelefono(it)
+                                tutorTelefonoTouched = true
+                            },
                             label = { Text("Teléfono *", fontFamily = roboto, color = textColor) },
                             placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$")),
-                            supportingText = {
-                                if (tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$"))
-                                ) {
-                                    Text(
-                                        "Debe tener 9 dígitos",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
+                            isError = tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = Color(0xFFE67E22),
+                                focusedBorderColor = if (tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else Color(0xFFE67E22),
                                 unfocusedBorderColor = textFieldBorderColor,
                                 focusedLabelColor = Color(0xFFE67E22),
                                 unfocusedLabelColor = textColor
-                            )
+                            ),
+                            supportingText = {
+                                when {
+                                    !tutorTelefonoTouched && tutorTelefono.isBlank() -> {
+                                        Text(
+                                            "📞 Introduce el teléfono del tutor",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = textColor.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                    tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
+                                        Text(
+                                            "❌ Debe tener 9 dígitos",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = ErrorColor
+                                        )
+                                    }
+                                    tutorTelefonoTouched && tutorTelefono.isNotBlank() && tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
+                                        Text(
+                                            "✅ Teléfono válido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = SuccessColor
+                                        )
+                                    }
+                                }
+                            }
                         )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Email del tutor
                         OutlinedTextField(
                             value = tutorEmail,
-                            onValueChange = { loginViewModel.setTutorEmail(it) },
+                            onValueChange = {
+                                loginViewModel.setTutorEmail(it)
+                                tutorEmailTouched = true
+                            },
                             label = { Text("Email *", fontFamily = roboto, color = textColor) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
-                            supportingText = {
-                                if (tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))
-                                ) {
-                                    Text(
-                                        "Formato de email inválido",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
+                            isError = tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = Color(0xFFE67E22),
+                                focusedBorderColor = if (tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) ErrorColor else Color(0xFFE67E22),
                                 unfocusedBorderColor = textFieldBorderColor,
                                 focusedLabelColor = Color(0xFFE67E22),
                                 unfocusedLabelColor = textColor
-                            )
+                            ),
+                            supportingText = {
+                                when {
+                                    !tutorEmailTouched && tutorEmail.isBlank() -> {
+                                        Text(
+                                            "📧 Introduce el email del tutor",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = textColor.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                    tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                        Text(
+                                            "❌ Formato de email inválido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = ErrorColor
+                                        )
+                                    }
+                                    tutorEmailTouched && tutorEmail.isNotBlank() && tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                        Text(
+                                            "✅ Email válido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = SuccessColor
+                                        )
+                                    }
+                                }
+                            }
                         )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // DNI del tutor
                         OutlinedTextField(
                             value = tutorDni,
-                            onValueChange = { loginViewModel.setTutorDni(it.uppercase()) },
+                            onValueChange = {
+                                loginViewModel.setTutorDni(it.uppercase())
+                                tutorDniTouched = true
+                            },
                             label = { Text("DNI *", fontFamily = roboto, color = textColor) },
                             placeholder = { Text("12345678A", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
-                            supportingText = {
-                                if (tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))
-                                ) {
-                                    Text(
-                                        "Formato inválido (8 números + 1 letra)",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
+                            isError = tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = Color(0xFFE67E22),
+                                focusedBorderColor = if (tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) ErrorColor else Color(0xFFE67E22),
                                 unfocusedBorderColor = textFieldBorderColor,
                                 focusedLabelColor = Color(0xFFE67E22),
                                 unfocusedLabelColor = textColor
-                            )
+                            ),
+                            supportingText = {
+                                when {
+                                    !tutorDniTouched && tutorDni.isBlank() -> {
+                                        Text(
+                                            "🆔 Introduce el DNI del tutor",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = textColor.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                    tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                        Text(
+                                            "❌ Formato inválido (8 números + 1 letra)",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = ErrorColor
+                                        )
+                                    }
+                                    tutorDniTouched && tutorDni.isNotBlank() && tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
+                                        Text(
+                                            "✅ DNI válido",
+                                            fontSize = 11.sp,
+                                            fontFamily = roboto,
+                                            color = SuccessColor
+                                        )
+                                    }
+                                }
+                            }
                         )
+
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Dropdown Tipo de Tutor
                         ExposedDropdownMenuBox(
@@ -517,10 +767,11 @@ fun RegisterScreen(
                                     .fillMaxWidth()
                                     .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                                 shape = textFieldShape,
+                                isError = tutorTipo.isBlank(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = textColor,
                                     unfocusedTextColor = textColor,
-                                    focusedBorderColor = Color(0xFFE67E22),
+                                    focusedBorderColor = if (tutorTipo.isBlank()) ErrorColor else Color(0xFFE67E22),
                                     unfocusedBorderColor = textFieldBorderColor,
                                     focusedLabelColor = Color(0xFFE67E22),
                                     unfocusedLabelColor = textColor
@@ -570,6 +821,7 @@ fun RegisterScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Calle
                     OutlinedTextField(
                         value = calle,
                         onValueChange = { loginViewModel.setCalle(it) },
@@ -585,6 +837,8 @@ fun RegisterScreen(
                             unfocusedLabelColor = textColor
                         )
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -621,6 +875,8 @@ fun RegisterScreen(
                             )
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -710,8 +966,8 @@ fun RegisterScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = if (situacionesIds.isEmpty()) Color.Red else textFieldBorderColor,
+                                focusedBorderColor = if (situacionesIds.isEmpty()) ErrorColor else primaryColor,
+                                unfocusedBorderColor = textFieldBorderColor,
                                 focusedLabelColor = primaryColor,
                                 unfocusedLabelColor = textColor
                             )

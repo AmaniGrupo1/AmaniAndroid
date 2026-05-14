@@ -39,6 +39,34 @@ class LoginViewModel(
     private val tokenHolder: TokenHolder
 ) : ViewModel() {
 
+    // ==================== VALIDACIONES DE CONTRASEÑA ====================
+
+    companion object {
+        /**
+         * Regex para validar contraseña:
+         * - Mínimo 8 caracteres
+         * - Al menos una letra
+         * - Al menos un número
+         */
+        private val PASSWORD_REGEX = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
+
+        /**
+         * Mensaje de error para la contraseña
+         */
+        fun getPasswordErrorMessage(): String {
+            return "La contraseña debe tener al menos 8 caracteres y contener letras y números"
+        }
+    }
+
+    /**
+     * Valida una contraseña
+     * @param password Contraseña a validar
+     * @return true si la contraseña es válida, false en caso contrario
+     */
+    fun isValidPassword(password: String): Boolean {
+        return PASSWORD_REGEX.matches(password)
+    }
+
     // ── Login ──
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
@@ -63,7 +91,6 @@ class LoginViewModel(
      * Válida los campos antes de realizar la llamada al caso de uso.
      */
     fun login() {
-        // Validaciones previas
         val usernameValue = _username.value
         val passwordValue = _password.value
 
@@ -97,10 +124,8 @@ class LoginViewModel(
 
                 result.onSuccess { loginResponse ->
                     tokenDataStore.saveToken(loginResponse.token)
-                    // Actualizar caché en memoria inmediatamente para evitar condiciones de carrera
                     tokenHolder.setToken(loginResponse.token)
                     Timber.d("Login: token saved and cached in memory")
-                    // ✅ GUARDAR LA SESIÓN INMEDIATAMENTE DESPUÉS DEL LOGIN EXITOSO
                     saveUserSession(loginResponse)
                     _loginResult.value = Result.success(loginResponse)
                     _loginError.value = null
@@ -127,7 +152,10 @@ class LoginViewModel(
     }
 
     /**
-     * ✅ NUEVO MÉTODO: Guarda la sesión del usuario en DataStore
+     * Guarda la sesión del usuario en DataStore
+     */
+    /**
+     * Guarda la sesión del usuario en DataStore
      */
     private suspend fun saveUserSession(loginResponse: LoginResponseDTO) {
         try {
@@ -136,48 +164,42 @@ class LoginViewModel(
                 nombre = loginResponse.nombre,
                 rol = loginResponse.rol,
                 idPsicologo = loginResponse.idPsicologo,
-                idPaciente = loginResponse.idPaciente
+                idPaciente = loginResponse.idPaciente,
+                idioma = loginResponse.idioma ?: "es",
+                tema = loginResponse.tema ?: false
             )
 
             userSessionDataStore.saveSession(session)
 
-            // Debug: verificar que se guardó correctamente
-            val savedSession = userSessionDataStore.getSession()
+            // ✅ Usar la variable 'session' directamente, no leer de nuevo
             println("=== SESIÓN GUARDADA ===")
-            println("ID Usuario: ${savedSession?.idUsuario}")
-            println("Nombre: ${savedSession?.nombre}")
-            println("Rol: ${savedSession?.rol}")
-            println("ID Psicólogo: ${savedSession?.idPsicologo}")
+            println("ID Usuario: ${session.idUsuario}")
+            println("Nombre: ${session.nombre}")
+            println("Rol: ${session.rol}")
+            println("ID Psicólogo: ${session.idPsicologo}")
+
         } catch (e: Exception) {
             println("Error al guardar la sesión: ${e.message}")
         }
     }
 
-    /**
-     * Limpia los campos de usuario y contraseña.
-     */
     fun clearLoginFields() {
         _username.value = ""
         _password.value = ""
     }
 
-    /**
-     * Resetea el estado del login (resultado y errores).
-     */
     fun resetLoginState() {
         _loginResult.value = null
         _loginError.value = null
         _isLoggingIn.value = false
     }
 
-    /**
-     * Válida si el formulario de login es válido para habilitar el botón.
-     */
     fun isLoginFormValid(): Boolean {
         return _username.value.isNotBlank() &&
                 _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
                 _password.value.isNotBlank()
     }
+
     // ── Campos registro básico ──
     val nombre = MutableStateFlow("")
     val apellido = MutableStateFlow("")
@@ -251,13 +273,11 @@ class LoginViewModel(
     fun setTutorDni(value: String) { tutorDni.value = value }
     fun setTutorTipo(value: String) { tutorTipo.value = value }
 
-    // Setters para campos de psicólogo
     fun setRegistroEspecialidad(value: String) { registroEspecialidad.value = value }
     fun setRegistroExperiencia(value: Int?) { registroExperiencia.value = value }
     fun setRegistroDescripcion(value: String?) { registroDescripcion.value = value }
     fun setRegistroLicencia(value: String?) { registroLicencia.value = value }
 
-    // Setters para DatePicker y validaciones
     fun setDateOfBirth(date: LocalDate) { _dateOfBirth.value = date }
     fun setShowDatePicker(show: Boolean) { _showDatePicker.value = show }
     fun setDateError(error: String?) { _dateError.value = error }
@@ -266,7 +286,6 @@ class LoginViewModel(
     fun setPasswordError(error: String?) { _passwordError.value = error }
     fun setTelefonoPsicologo(value: String) { telefono.value = value }
 
-    // Función para resetear estados de registro
     fun resetRegisterState() {
         _isRegistering.value = false
         _registerError.value = null
@@ -293,7 +312,6 @@ class LoginViewModel(
 
     // ── Estados derivados ──
 
-    // Calcular si es menor de edad (para mostrar/ocultar tutor en UI)
     val esMenor: StateFlow<Boolean> = fechaNacimiento.map { f ->
         try {
             val nacimiento = LocalDate.parse(f)
@@ -301,7 +319,6 @@ class LoginViewModel(
         } catch (e: Exception) { false }
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    // Validar datos del tutor SOLO si es menor de edad
     val tutorValido: StateFlow<Boolean> = combine(
         esMenor,
         tutorNombre,
@@ -321,12 +338,13 @@ class LoginViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    // Validar dirección (siempre requerida)
     val direccionValida: StateFlow<Boolean> = combine(calle) { array ->
         array[0].isNotBlank()
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    // Validar campos básicos del paciente
+    /**
+     * Validar campos básicos del paciente con validación de contraseña
+     */
     val formularioValido: StateFlow<Boolean> = combine(
         listOf(nombre, apellido, dni, email, regPassword, telefono, genero, fechaNacimiento, aceptaTerminos)
     ) { values ->
@@ -342,23 +360,21 @@ class LoginViewModel(
 
         val camposCompletos = listOf(n, a, d, e, p, t, g, f).all { it.isNotBlank() }
         val fechaValida = f.matches(Regex("""\d{4}-\d{2}-\d{2}"""))
-        camposCompletos && fechaValida && term
+        val passwordValida = isValidPassword(p)  // ✅ Validación de contraseña
+
+        camposCompletos && fechaValida && term && passwordValida
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    // Validar formulario COMPLETO (incluye tutor solo si es necesario)
-    // TEMP: situaciones deshabilitadas - issue: checkbox selection no se actualiza
     val formularioCompletoValido: StateFlow<Boolean> = combine(
         formularioValido,
         tutorValido,
         direccionValida
-        // situacionesIds  // TEMPORALMENTE DESHABILITADO
-    ) { formValido, tutorVal, dirVal /*, sitIds*/ ->
-        formValido && tutorVal && dirVal // && sitIds.isNotEmpty()
+    ) { formValido, tutorVal, dirVal ->
+        formValido && tutorVal && dirVal
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    // ── Acciones de registro ── Antigua función eliminada - reemplazada por la nueva con validaciones
+    // ── Acciones de registro ──
 
-    // ── Funciones auxiliares ──
     fun limpiarFormularioPsicologo() {
         nombre.value = ""
         apellido.value = ""
@@ -374,7 +390,16 @@ class LoginViewModel(
         resetRegisterState()
     }
 
+    /**
+     * Registrar Administrador con validación de contraseña
+     */
     fun registrarAdmin() {
+        // ✅ Validar contraseña antes de registrar
+        if (!isValidPassword(regPassword.value)) {
+            _registerError.value = getPasswordErrorMessage()
+            return
+        }
+
         _isRegistering.value = true
         _registerError.value = null
         _registerSuccess.value = false
@@ -406,6 +431,9 @@ class LoginViewModel(
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage
 
+    /**
+     * Registrar Paciente con validación de contraseña
+     */
     fun registrarPaciente() {
         if (!formularioCompletoValido.value) {
             _registerError.value = "Complete todos los campos obligatorios"
@@ -481,7 +509,6 @@ class LoginViewModel(
         }
     }
 
-    // ── Funciones auxiliares ──
     fun limpiarFormulario() {
         nombre.value = ""
         apellido.value = ""
@@ -506,8 +533,6 @@ class LoginViewModel(
         provincia.value = ""
         codigoPostal.value = ""
         pais.value = "España"
-
-        // Limpiar campos de psicólogo
         registroEspecialidad.value = ""
         registroExperiencia.value = null
         registroDescripcion.value = null
@@ -541,7 +566,6 @@ class LoginViewModel(
                     _asignarPacienteError.value = error.message ?: "Error al asignar paciente"
                     _asignarPacienteSuccess.value = false
                 }
-
             } catch (e: Exception) {
                 _asignarPacienteError.value = e.message ?: "Error inesperado al asignar paciente"
                 _asignarPacienteSuccess.value = false
@@ -550,51 +574,30 @@ class LoginViewModel(
             }
         }
     }
+
     fun clearAsignarPsicologoResult() {
         _asignarPacienteSuccess.value = false
         _asignarPacienteError.value = null
     }
 
-    // ── Registro de Psicólogo con DatePicker ──
+    // ── Registro de Psicólogo con validación de contraseña ──
 
-    /**
-     * Valida el formato de email
-     */
     private fun isValidEmail(email: String): Boolean {
         return Regex("^[A-Za-z0-9+_.-]+@(.+)$").matches(email)
     }
 
-    /**
-     * Valida que la contraseña tenga al menos 8 caracteres
-     */
-    private fun isValidPassword(password: String): Boolean {
-        return password.length >= 8
-    }
-
-    /**
-     * Valida que el teléfono tenga 9 dígitos
-     */
     private fun isValidPhone(phone: String): Boolean {
         return Regex("^[0-9]{9}$").matches(phone)
     }
 
-    /**
-     * Calcula la edad a partir de la fecha de nacimiento
-     */
     private fun calculateAge(dateOfBirth: LocalDate): Int {
         return Period.between(dateOfBirth, LocalDate.now()).years
     }
 
-    /**
-     * Valida que el psicólogo sea mayor de 18 años
-     */
     private fun isAdult(dateOfBirth: LocalDate): Boolean {
         return calculateAge(dateOfBirth) >= 18
     }
 
-    /**
-     * Limpia todos los errores de validación
-     */
     fun clearAllErrors() {
         _dateError.value = null
         _phoneError.value = null
@@ -603,48 +606,38 @@ class LoginViewModel(
     }
 
     /**
-     * Validar todos los campos antes de registrar
-     * @return Pair<Boolean, String?> donde el primer valor indica si es válido
-     *         y el segundo el nombre del campo con error (null si todos son válidos)
+     * Validar todos los campos antes de registrar psicólogo
+     * Incluye validación de contraseña
      */
     fun validatePsychologistForm(): Pair<Boolean, String?> {
-        // Validar nombre
         if (nombre.value.isBlank()) return Pair(false, "nombre")
-        // Validar apellido
         if (apellido.value.isBlank()) return Pair(false, "apellido")
-        // Validar email
         if (email.value.isBlank()) return Pair(false, "email")
         if (!isValidEmail(email.value)) return Pair(false, "email")
-        // Validar contraseña
+        // ✅ Validar contraseña
         if (regPassword.value.isBlank()) return Pair(false, "password")
         if (!isValidPassword(regPassword.value)) return Pair(false, "password")
-        // Validar fecha de nacimiento
         if (_dateOfBirth.value == null) return Pair(false, "fecha")
         if (!isAdult(_dateOfBirth.value!!)) return Pair(false, "fecha")
-        // Validar teléfono
         if (telefono.value.isBlank()) return Pair(false, "telefono")
         if (!isValidPhone(telefono.value)) return Pair(false, "telefono")
-        // Validar especialidad
         if (registroEspecialidad.value.isBlank()) return Pair(false, "especialidad")
 
         return Pair(true, null)
     }
 
     /**
-     * Ejecuta el proceso de registro de psicólogo.
-     * Validar todos los campos antes de realizar la llamada al caso de uso.
+     * Ejecuta el proceso de registro de psicólogo con validación de contraseña
      */
     fun registrarPsicologo() {
-        // Limpiar errores previos
         clearAllErrors()
 
-        // Validar formulario
         val (isValid, invalidField) = validatePsychologistForm()
         if (!isValid) {
             when (invalidField) {
                 "fecha" -> _dateError.value = "Debes ser mayor de 18 años"
                 "email" -> _emailError.value = "Introduce un correo electrónico válido"
-                "password" -> _passwordError.value = "La contraseña debe tener al menos 8 caracteres"
+                "password" -> _passwordError.value = getPasswordErrorMessage()
                 "telefono" -> _phoneError.value = "El teléfono debe tener 9 dígitos"
                 "nombre" -> _registerError.value = "El nombre es obligatorio"
                 "apellido" -> _registerError.value = "El apellido es obligatorio"
@@ -676,9 +669,7 @@ class LoginViewModel(
                 result.onSuccess { response ->
                     _registerSuccess.value = true
                     _registerError.value = null
-
                 }.onFailure { error ->
-                    // Manejar email duplicado
                     if (error.message?.contains("email", ignoreCase = true) == true) {
                         _emailError.value = "Este correo electrónico ya está registrado"
                     }
@@ -694,7 +685,7 @@ class LoginViewModel(
         }
     }
 
-    // Añade esto en tu LoginViewModel.kt
+    // ── Registrar paciente desde psicólogo con validación de contraseña ──
 
     private val _crearPacienteDesdePsicologoSuccess = MutableStateFlow(false)
     val crearPacienteDesdePsicologoSuccess: StateFlow<Boolean> = _crearPacienteDesdePsicologoSuccess

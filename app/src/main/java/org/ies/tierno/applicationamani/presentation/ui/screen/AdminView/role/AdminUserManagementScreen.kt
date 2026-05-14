@@ -25,13 +25,13 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleVie
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.ui.platform.LocalContext
-// use KoinJavaComponent when needed to obtain singletons from Koin in compose contexts
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 
-// Paleta de colores profesional (alineada con LoginScreen)
+// Colores originales para el modo DEFECTO/CLARO
 object AmaniAdminColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
@@ -69,6 +69,22 @@ fun AdminUserManagementScreen(
     // Estado de refresco automático
     var refreshTrigger by remember { mutableStateOf(false) }
 
+    // Obtener estado del tema
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val primaryColor = if (isDark) Color.White else AmaniAdminColors.Primary
+    val titleOnPrimary = if (isDark) Color.Black else Color.White
+    val cardBackground = if (isDark) cardColors.cardBackground else AmaniAdminColors.Surface
+    val cardContent = if (isDark) cardColors.cardContent else AmaniAdminColors.TextPrimary
+    val secondaryText = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniAdminColors.TextSecondary
+    val backgroundColor = if (isDark) screenColors.background else AmaniAdminColors.Background
+    val accentColor = if (isDark) cardColors.cardBackground else AmaniAdminColors.Accent
+    val textFieldContainer = if (isDark) Color.DarkGray else Color.White
+    val textFieldBorderColor = if (isDark) Color.White else AmaniAdminColors.TextSecondary.copy(alpha = 0.3f)
+
     // Manejo de errores con Log
     LaunchedEffect(error) {
         error?.let {
@@ -103,26 +119,6 @@ fun AdminUserManagementScreen(
     LaunchedEffect(selectedRol, searchDni) {
         adminUserViewModel.filtrarUsuarios(rol = selectedRol, dni = searchDni)
     }
-
-    // Obtener la preferencia de tema para decidir si usar los colores por defecto
-    val userSessionDataStore: UserSessionDataStore = try {
-        // Intentar obtener desde Koin si está registrado (usa la API Java para evitar problemas en algunos entornos)
-        org.koin.java.KoinJavaComponent.getKoin().get()
-    } catch (e: Exception) {
-        // Fallback para previews/tests
-        UserSessionDataStore(LocalContext.current)
-    }
-
-    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
-    val isSystemTema = session?.tema == TemaApp.SYSTEM
-    val amaniColorsLocal = LocalAmaniColors.current
-    // Mapear colores: si el usuario dejó "Defecto" (SYSTEM) usar la paleta actual definida aquí,
-    // en caso contrario usar los tokens de tema global (`LocalAmaniColors`).
-    val primaryColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary
-    val titleOnPrimary = if (isSystemTema) Color.White else MaterialTheme.colorScheme.onPrimary
-    val cardBackground = if (isSystemTema) AmaniAdminColors.Surface else amaniColorsLocal.cardBackground
-    val cardContent = if (isSystemTema) AmaniAdminColors.TextPrimary else amaniColorsLocal.cardContent
-    val secondaryText = if (isSystemTema) AmaniAdminColors.TextSecondary else amaniColorsLocal.cardContent.copy(alpha = 0.8f)
 
     // Función para refrescar manualmente si es necesario
     fun refreshUsers() {
@@ -186,8 +182,8 @@ fun AdminUserManagementScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            if (isSystemTema) AmaniAdminColors.Accent.copy(alpha = 0.3f) else amaniColorsLocal.cardBackground.copy(alpha = 0.18f),
-                            if (isSystemTema) AmaniAdminColors.Background else amaniColorsLocal.screenBackground
+                            if (isDark) cardColors.cardBackground else accentColor.copy(alpha = 0.3f),
+                            if (isDark) screenColors.background else backgroundColor
                         )
                     )
                 )
@@ -207,11 +203,11 @@ fun AdminUserManagementScreen(
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                                "Filtros",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = primaryColor,
-                                    letterSpacing = 0.5.sp
+                            "Filtros",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = primaryColor,
+                            letterSpacing = 0.5.sp
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -223,32 +219,32 @@ fun AdminUserManagementScreen(
                                 Icon(
                                     Icons.Default.Search,
                                     contentDescription = null,
-                                    tint = if (isSystemTema) AmaniAdminColors.PrimaryLight else MaterialTheme.colorScheme.primary
+                                    tint = if (isDark) Color.White else AmaniAdminColors.PrimaryLight
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = if (isSystemTema) AmaniAdminColors.TextPrimary else MaterialTheme.colorScheme.onSurface,
-                                unfocusedTextColor = if (isSystemTema) AmaniAdminColors.TextPrimary else MaterialTheme.colorScheme.onSurface,
-                                focusedBorderColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = if (isSystemTema) AmaniAdminColors.TextSecondary.copy(alpha = 0.3f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
-                                focusedLabelColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary,
+                                focusedTextColor = cardContent,
+                                unfocusedTextColor = cardContent,
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = textFieldBorderColor,
+                                focusedLabelColor = primaryColor,
                                 unfocusedLabelColor = secondaryText,
-                                cursorColor = if (isSystemTema) AmaniAdminColors.Primary else MaterialTheme.colorScheme.primary,
-                                focusedContainerColor = if (isSystemTema) Color.White else amaniColorsLocal.textFieldContainer,
-                                unfocusedContainerColor = if (isSystemTema) Color.White else amaniColorsLocal.textFieldContainer
+                                cursorColor = primaryColor,
+                                focusedContainerColor = textFieldContainer,
+                                unfocusedContainerColor = textFieldContainer
                             )
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                                "Filtrar por Rol:",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = cardContent
+                            "Filtrar por Rol:",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = cardContent
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -264,7 +260,7 @@ fun AdminUserManagementScreen(
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = primaryColor,
                                     selectedLabelColor = titleOnPrimary,
-                                    disabledSelectedContainerColor = if (isSystemTema) AmaniAdminColors.PrimaryLight else MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                    disabledSelectedContainerColor = if (isDark) Color.DarkGray else AmaniAdminColors.PrimaryLight,
                                     containerColor = cardBackground,
                                     labelColor = secondaryText
                                 )
@@ -321,7 +317,7 @@ fun AdminUserManagementScreen(
                                 Icons.Default.People,
                                 contentDescription = null,
                                 modifier = Modifier.size(72.dp),
-                                tint = if (isSystemTema) AmaniAdminColors.TextSecondary.copy(alpha = 0.5f) else amaniColorsLocal.cardContent.copy(alpha = 0.5f)
+                                tint = secondaryText.copy(alpha = 0.5f)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
@@ -352,7 +348,8 @@ fun AdminUserManagementScreen(
                                 },
                                 cardBackground = cardBackground,
                                 cardContent = cardContent,
-                                primaryColor = primaryColor
+                                primaryColor = primaryColor,
+                                isDark = isDark
                             )
                         }
                     }
@@ -468,21 +465,22 @@ fun AdminUserManagementScreen(
 fun UserCard(
     user: UsuarioDTO,
     onCambiarRol: () -> Unit,
-    cardBackground: Color = AmaniAdminColors.Surface,
-    cardContent: Color = AmaniAdminColors.TextPrimary,
-    primaryColor: Color = AmaniAdminColors.Primary
+    cardBackground: Color,
+    cardContent: Color,
+    primaryColor: Color,
+    isDark: Boolean
 ) {
     // Colores según rol
     val roleColor = when (user.rol) {
         Rol.admin -> Color(0xFFE53935)
         Rol.psicologo -> Color(0xFF43A047)
-        else -> AmaniAdminColors.Primary
+        else -> if (isDark) Color.White else AmaniAdminColors.Primary
     }
 
     val roleBgColor = when (user.rol) {
-        Rol.admin -> roleColor.copy(alpha = 0.1f)
-        Rol.psicologo -> roleColor.copy(alpha = 0.1f)
-        else -> roleColor.copy(alpha = 0.08f)
+        Rol.admin -> roleColor.copy(alpha = 0.15f)
+        Rol.psicologo -> roleColor.copy(alpha = 0.15f)
+        else -> roleColor.copy(alpha = if (isDark) 0.2f else 0.08f)
     }
 
     val roleLabel = when (user.rol) {

@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -26,19 +28,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import android.app.Activity
 import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 
 private const val TAG = "SettingsLanguage"
+
+// Función auxiliar para obtener el subtítulo del tema actual
+private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
+    return when (currentTheme) {
+        false -> "Claro"   // false = claro/defecto
+        true -> "Oscuro"   // true = oscuro
+    }
+}
+
+data class SettingsOption(
+    val id: String,
+    val title: String,
+    val subtitle: String,
+    val icon: ImageVector
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,22 +70,27 @@ fun SettingsAdminScreen(
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
 
-    // Obtener el tema actual del ViewModel (esto es clave para que la UI se actualice)
+    // Obtener el tema actual del ViewModel (false = claro/defecto, true = oscuro)
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
 
-    // También necesitamos la sesión completa para otros datos (idPsicologo, etc)
+    // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    // Colores de la UI usando MaterialTheme (que ya refleja el tema actual)
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val backgroundColor = MaterialTheme.colorScheme.background
-    val surfaceColor = MaterialTheme.colorScheme.surface
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    // Obtener estado del tema para la UI
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
 
-    // 📍 LOG: Ver idioma y tema actual
+    // Colores de la UI según el tema
+    val backgroundColor = if (isDark) screenColors.background else Color(0xFFFDF8F9)
+    val surfaceColor = if (isDark) cardColors.cardBackground else Color(0xFFFFFFFF)
+    val onSurfaceColor = if (isDark) cardColors.cardContent else Color(0xFF2D1B30)
+    val onSurfaceVariant = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else Color(0xFF7A6B7E)
+    val primaryColor = if (isDark) Color.White else Color(0xFF6B4E71)
+
+    // LOG: Ver idioma y tema actual
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
-    Log.d(TAG, "🎨 [Recomposición] Tema actual: $currentTema")
+    Log.d(TAG, "🎨 [Recomposición] Tema actual (boolean): $currentTema")
 
     // Control de recreación para evitar loops (SOLO para idioma)
     var previousLanguage by remember { mutableStateOf(currentLanguage) }
@@ -84,14 +105,10 @@ fun SettingsAdminScreen(
 
             previousLanguage = currentLanguage
             isRecreating = true
-
             delay(150)
             (context as? Activity)?.recreate()
         }
     }
-
-    // Cuando cambia el tema, NO recreamos la Activity, el tema se aplica automáticamente
-    // porque MaterialTheme ya está observando los cambios
 
     Scaffold(
         containerColor = backgroundColor,
@@ -104,6 +121,7 @@ fun SettingsAdminScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ==================== SECCIÓN GENERAL ====================
             item {
                 SettingsCategoryCard(
                     title = stringResource(R.string.general),
@@ -187,6 +205,7 @@ fun SettingsAdminScreen(
                 )
             }
 
+            // ==================== SECCIÓN CITAS ====================
             item {
                 SettingsCategoryCard(
                     title = stringResource(R.string.citas),
@@ -231,6 +250,7 @@ fun SettingsAdminScreen(
                 )
             }
 
+            // ==================== SECCIÓN NOTIFICACIONES ====================
             item {
                 SettingsCategoryCard(
                     title = stringResource(R.string.notificaciones),
@@ -270,23 +290,12 @@ fun SettingsAdminScreen(
                             title = stringResource(R.string.notificacion_sms),
                             subtitle = stringResource(R.string.desactivado),
                             icon = Icons.Default.Sms
-                        ),
-                        SettingsOption(
-                            id = "terminos",
-                            title = stringResource(R.string.terminos_condiciones),
-                            subtitle = stringResource(R.string.leer_terminos),
-                            icon = Icons.Default.Description
-                        ),
-                        SettingsOption(
-                            id = "privacidad",
-                            title = stringResource(R.string.politica_privacidad),
-                            subtitle = stringResource(R.string.ver_politica),
-                            icon = Icons.Default.Lock
                         )
                     )
                 )
             }
 
+            // ==================== SECCIÓN ROLES Y PERMISOS ====================
             item {
                 SettingsCategoryCard(
                     title = stringResource(R.string.roles_permisos),
@@ -319,6 +328,7 @@ fun SettingsAdminScreen(
                 )
             }
 
+            // ==================== SECCIÓN SISTEMA ====================
             item {
                 SettingsCategoryCard(
                     title = stringResource(R.string.sistema),
@@ -346,6 +356,18 @@ fun SettingsAdminScreen(
                             title = stringResource(R.string.version),
                             subtitle = stringResource(R.string.version_100),
                             icon = Icons.Default.Info
+                        ),
+                        SettingsOption(
+                            id = "terminos",
+                            title = stringResource(R.string.terminos_condiciones),
+                            subtitle = stringResource(R.string.leer_terminos),
+                            icon = Icons.Default.Description
+                        ),
+                        SettingsOption(
+                            id = "privacidad",
+                            title = stringResource(R.string.politica_privacidad),
+                            subtitle = stringResource(R.string.ver_politica),
+                            icon = Icons.Default.Lock
                         )
                     )
                 )
@@ -353,22 +375,6 @@ fun SettingsAdminScreen(
         }
     }
 }
-
-// Función auxiliar para obtener el subtítulo del tema actual
-private fun getCurrentThemeSubtitle(currentTheme: TemaApp): String {
-    return when (currentTheme) {
-        TemaApp.LIGHT -> "Claro"
-        TemaApp.DARK -> "Oscuro"
-        TemaApp.SYSTEM -> "Sistema"
-    }
-}
-
-data class SettingsOption(
-    val id: String,
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector
-)
 
 @Composable
 fun SettingsCategoryCard(
@@ -380,7 +386,7 @@ fun SettingsCategoryCard(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     surfaceColor: Color,
     onSurfaceColor: Color,
@@ -457,7 +463,7 @@ fun SettingsOptionRow(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     onSurfaceColor: Color,
     onSurfaceVariant: Color,
@@ -467,6 +473,8 @@ fun SettingsOptionRow(
     var expandedLanguage by remember { mutableStateOf(false) }
     var expandedTheme by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val isDark = isDarkTheme()
+    val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
 
     Row(
         modifier = Modifier
@@ -494,6 +502,12 @@ fun SettingsOptionRow(
                     }
                     "roles" -> {
                         navController.navigate(Screens.cambiarRol.route)
+                    }
+                    "terminos" -> {
+                        navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
+                    }
+                    "privacidad" -> {
+                        navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
                     }
                 }
             }
@@ -549,7 +563,7 @@ fun SettingsOptionRow(
                     DropdownMenu(
                         expanded = expandedLanguage,
                         onDismissRequest = { expandedLanguage = false },
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = dropdownContainerColor
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.espanol), color = onSurfaceColor) },
@@ -580,24 +594,14 @@ fun SettingsOptionRow(
                     DropdownMenu(
                         expanded = expandedTheme,
                         onDismissRequest = { expandedTheme = false },
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = dropdownContainerColor
                     ) {
-                        DropdownMenuItem(
-                            text = { Text("Sistema", color = onSurfaceColor) },
-                            onClick = {
-                                Log.d(TAG, "🎨 Usuario seleccionó TEMA SISTEMA")
-                                scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
-                                }
-                                expandedTheme = false
-                            }
-                        )
                         DropdownMenuItem(
                             text = { Text("Claro", color = onSurfaceColor) },
                             onClick = {
                                 Log.d(TAG, "🎨 Usuario seleccionó TEMA CLARO")
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
+                                    idiomaViewModel.cambiarTema(false) // false = claro/defecto
                                 }
                                 expandedTheme = false
                             }
@@ -607,7 +611,7 @@ fun SettingsOptionRow(
                             onClick = {
                                 Log.d(TAG, "🎨 Usuario seleccionó TEMA OSCURO")
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                    idiomaViewModel.cambiarTema(true) // true = oscuro
                                 }
                                 expandedTheme = false
                             }

@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.koin.java.KoinJavaComponent
 
 // ── Material 3 color schemes ──────────────────────────────────
@@ -109,17 +108,19 @@ fun ApplicationAmaniTheme(
         }
         val session by store.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
+        // ✅ CORREGIDO: session?.tema ahora es Boolean
+        // false = claro/defecto, true = oscuro
         when (session?.tema) {
-            TemaApp.DARK -> true   // Negro
-            TemaApp.LIGHT -> false // Blanco
-            else -> false          // Defecto/SYSTEM -> colores originales
+            true -> true   // Negro/Oscuro
+            false -> false // Blanco/Claro
+            else -> false  // Defecto/SYSTEM -> colores originales (claro)
         }
     }
 
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     val extraColors = if (darkTheme) {
-        // Modo NEGRO: solo negro y blanco
+        // Modo OSCURO: solo negro y blanco
         AmaniExtraColors(
             screenBackground = Color.Black,
             textFieldContainer = Color.DarkGray,
@@ -129,7 +130,7 @@ fun ApplicationAmaniTheme(
             cardBorder = Color.White,
         )
     } else {
-        // Modo DEFECTO o BLANCO: colores originales de Amani
+        // Modo CLARO/DEFECTO: colores originales de Amani
         AmaniExtraColors(
             screenBackground = AmaniBackground,
             textFieldContainer = AmaniWhite,
@@ -195,5 +196,3 @@ data class ScreenColors(
     val primary: Color,
     val onPrimary: Color
 )
-
-

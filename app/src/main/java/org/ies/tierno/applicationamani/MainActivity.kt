@@ -6,11 +6,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 import kotlinx.coroutines.flow.firstOrNull
@@ -38,10 +38,12 @@ class MainActivity : ComponentActivity() {
             val userSessionDataStore = UserSessionDataStore(this)
             val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
+            // Determinar el tema basado en la preferencia del usuario
+            // session?.tema es Boolean: false = claro/defecto, true = oscuro
             val darkThemeOverride = when (session?.tema) {
-                TemaApp.DARK -> true   // Negro
-                TemaApp.LIGHT -> false // Blanco
-                else -> null           // Defecto/SYSTEM -> null para que lea automáticamente
+                true -> true   // Negro/Oscuro
+                false -> false // Blanco/Claro
+                else -> null   // Si no hay sesión o es null, usar null para que lea automáticamente
             }
 
             ApplicationAmaniTheme(darkThemeOverride = darkThemeOverride) {

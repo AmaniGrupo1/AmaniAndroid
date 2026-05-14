@@ -5,7 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -28,7 +28,6 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
@@ -38,8 +37,15 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import android.app.Activity
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 private const val TAG = "SettingsPsychologist"
+
+// Función auxiliar para obtener el subtítulo del tema actual
+private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
+    return if (currentTheme) "Oscuro" else "Claro"
+}
 
 // ✅ Definir SettingsOption localmente
 data class SettingsOption(
@@ -65,24 +71,26 @@ fun SettingsPsychologistScreen(
     val screenColors = getScreenColors()
     val cardColors = getCardColors()
 
-    // Colores dinámicos para la UI
-    val backgroundColor = if (isDark) screenColors.background else MaterialTheme.colorScheme.background
-    val surfaceColor = if (isDark) cardColors.cardBackground else MaterialTheme.colorScheme.surface
-    val textColor = if (isDark) cardColors.cardContent else MaterialTheme.colorScheme.onSurface
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
-    val primaryColor = MaterialTheme.colorScheme.primary
+    // Colores dinámicos para la UI (ajustados para máxima visibilidad en modo oscuro)
+    val backgroundColor = if (isDark) screenColors.background else Color(0xFFFDF8F9)
+    val surfaceColor = if (isDark) cardColors.cardBackground else Color(0xFFFFFFFF)
+    val textColor = if (isDark) Color.White else Color(0xFF2D1B30)
+    val textSecondaryColor = if (isDark) Color.White.copy(alpha = 0.7f) else Color(0xFF7A6B7E)
+    val dividerColor = if (isDark) Color.White.copy(alpha = 0.12f) else textColor.copy(alpha = 0.12f)
+    val primaryColor = if (isDark) Color.White else Color(0xFF6B4E71)
+    val iconColor = if (isDark) Color.White else primaryColor
 
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
 
-    // Obtener el tema actual del ViewModel
+    // Obtener el tema actual del ViewModel (Boolean: false=claro, true=oscuro)
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
 
     // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
-    Log.d(TAG, "🎨 [Recomposición] Tema actual: $currentTema")
+    Log.d(TAG, "🎨 [Recomposición] Tema actual (boolean): $currentTema")
 
     // Control de recreación para evitar loops
     var previousLanguage by remember { mutableStateOf(currentLanguage) }
@@ -101,6 +109,31 @@ fun SettingsPsychologistScreen(
 
     Scaffold(
         containerColor = backgroundColor,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Configuración",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (isDark) Color.Black else Color.White,
+                        fontFamily = roboto
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = if (isDark) Color.Black else Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = primaryColor
+                )
+            )
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -115,7 +148,7 @@ fun SettingsPsychologistScreen(
                 SettingsCategoryCardPsychologist(
                     title = stringResource(R.string.perfil),
                     icon = Icons.Outlined.Person,
-                    iconColor = primaryColor,
+                    iconColor = iconColor,
                     roboto = roboto,
                     navController = navController,
                     session = session,
@@ -125,6 +158,7 @@ fun SettingsPsychologistScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
@@ -164,6 +198,7 @@ fun SettingsPsychologistScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
@@ -206,6 +241,7 @@ fun SettingsPsychologistScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
@@ -245,6 +281,7 @@ fun SettingsPsychologistScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     primaryColor = primaryColor,
                     options = listOf(
                         SettingsOption(
@@ -272,15 +309,6 @@ fun SettingsPsychologistScreen(
     }
 }
 
-// Función auxiliar para obtener el subtítulo del tema actual
-private fun getCurrentThemeSubtitle(currentTheme: TemaApp): String {
-    return when (currentTheme) {
-        TemaApp.LIGHT -> "Claro"
-        TemaApp.DARK -> "Oscuro"
-        TemaApp.SYSTEM -> "Sistema"
-    }
-}
-
 @Composable
 fun SettingsCategoryCardPsychologist(
     title: String,
@@ -291,11 +319,12 @@ fun SettingsCategoryCardPsychologist(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     surfaceColor: Color,
     textColor: Color,
     textSecondaryColor: Color,
+    dividerColor: Color,
     primaryColor: Color
 ) {
     Card(
@@ -340,7 +369,7 @@ fun SettingsCategoryCardPsychologist(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = textColor.copy(alpha = 0.12f)
+                        color = dividerColor
                     )
                 }
 
@@ -354,6 +383,7 @@ fun SettingsCategoryCardPsychologist(
                     idiomaViewModel = idiomaViewModel,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     primaryColor = primaryColor
                 )
             }
@@ -368,15 +398,18 @@ fun SettingsOptionRowPsychologist(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     textColor: Color,
     textSecondaryColor: Color,
+    dividerColor: Color,
     primaryColor: Color
 ) {
     val scope = rememberCoroutineScope()
     var expandedLanguage by remember { mutableStateOf(false) }
     var expandedTheme by remember { mutableStateOf(false) }
+    val isDark = isDarkTheme()
+    val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
 
     Row(
         modifier = Modifier
@@ -408,7 +441,6 @@ fun SettingsOptionRowPsychologist(
                     "privacidad" -> {
                         navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
                     }
-
                 }
             }
             .padding(vertical = 8.dp),
@@ -458,7 +490,7 @@ fun SettingsOptionRowPsychologist(
                     DropdownMenu(
                         expanded = expandedLanguage,
                         onDismissRequest = { expandedLanguage = false },
-                        containerColor = if (isDarkTheme()) Color.DarkGray else Color.White
+                        containerColor = dropdownContainerColor
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.espanol), color = textColor) },
@@ -489,24 +521,14 @@ fun SettingsOptionRowPsychologist(
                     DropdownMenu(
                         expanded = expandedTheme,
                         onDismissRequest = { expandedTheme = false },
-                        containerColor = if (isDarkTheme()) Color.DarkGray else Color.White
+                        containerColor = dropdownContainerColor
                     ) {
-                        DropdownMenuItem(
-                            text = { Text("Sistema", color = textColor) },
-                            onClick = {
-                                Log.d(TAG, "🎨 Psicólogo seleccionó TEMA SISTEMA")
-                                scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
-                                }
-                                expandedTheme = false
-                            }
-                        )
                         DropdownMenuItem(
                             text = { Text("Claro", color = textColor) },
                             onClick = {
                                 Log.d(TAG, "🎨 Psicólogo seleccionó TEMA CLARO")
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
+                                    idiomaViewModel.cambiarTema(false) // false = claro
                                 }
                                 expandedTheme = false
                             }
@@ -516,7 +538,7 @@ fun SettingsOptionRowPsychologist(
                             onClick = {
                                 Log.d(TAG, "🎨 Psicólogo seleccionó TEMA OSCURO")
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                    idiomaViewModel.cambiarTema(true) // true = oscuro
                                 }
                                 expandedTheme = false
                             }

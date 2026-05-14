@@ -83,7 +83,7 @@ fun AgregaPsicologoScreen(
     loginViewModel: LoginViewModel
 ) {
     // Paleta de colores profesional AMANI
-    val primaryColor = Color(0xFF6C63FF) // Púrpura moderno
+    val primaryColor = Color(0xFF6C63FF)
     val primaryDark = Color(0xFF5A52D6)
     val primaryLight = Color(0xFF8B84FF)
     val backgroundColor = Color(0xFFF8F9FA)
@@ -124,6 +124,8 @@ fun AgregaPsicologoScreen(
 
     // Estados locales para UI
     var passwordVisible by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
+    var emailTouched by remember { mutableStateOf(false) }
     var expandedEspecialidad by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -346,7 +348,10 @@ fun AgregaPsicologoScreen(
                         // Email
                         OutlinedTextField(
                             value = email,
-                            onValueChange = { loginViewModel.setEmail(it) },
+                            onValueChange = {
+                                loginViewModel.setEmail(it)
+                                emailTouched = true
+                            },
                             label = {
                                 Text(
                                     "Correo electrónico",
@@ -363,21 +368,39 @@ fun AgregaPsicologoScreen(
                             },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = emailError != null,
+                            isError = emailTouched && email.isNotBlank() && emailError != null,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (emailError != null) errorColor else primaryColor,
+                                focusedBorderColor = if (emailTouched && emailError != null) errorColor else primaryColor,
                                 unfocusedBorderColor = dividerColor,
-                                focusedLabelColor = if (emailError != null) errorColor else primaryColor,
+                                focusedLabelColor = if (emailTouched && emailError != null) errorColor else primaryColor,
                                 cursorColor = primaryColor
                             ),
                             supportingText = {
-                                if (emailError != null) {
-                                    Text(
-                                        emailError!!,
-                                        fontFamily = roboto,
-                                        color = errorColor,
-                                        fontSize = 12.sp
-                                    )
+                                when {
+                                    !emailTouched && email.isBlank() -> {
+                                        Text(
+                                            "📧 Introduce el correo electrónico",
+                                            fontFamily = roboto,
+                                            color = textSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    emailTouched && email.isNotBlank() && emailError != null -> {
+                                        Text(
+                                            "❌ $emailError",
+                                            fontFamily = roboto,
+                                            color = errorColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    emailTouched && email.isNotBlank() && emailError == null -> {
+                                        Text(
+                                            "✅ Correo válido",
+                                            fontFamily = roboto,
+                                            color = successColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
                                 }
                             }
                         )
@@ -387,7 +410,10 @@ fun AgregaPsicologoScreen(
                         // Contraseña
                         OutlinedTextField(
                             value = password,
-                            onValueChange = { loginViewModel.setRegPassword(it) },
+                            onValueChange = {
+                                loginViewModel.setRegPassword(it)
+                                passwordTouched = true
+                            },
                             label = {
                                 Text(
                                     "Contraseña",
@@ -405,11 +431,11 @@ fun AgregaPsicologoScreen(
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = passwordError != null,
+                            isError = passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (passwordError != null) errorColor else primaryColor,
+                                focusedBorderColor = if (passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8)) errorColor else primaryColor,
                                 unfocusedBorderColor = dividerColor,
-                                focusedLabelColor = if (passwordError != null) errorColor else primaryColor,
+                                focusedLabelColor = if (passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8)) errorColor else primaryColor,
                                 cursorColor = primaryColor
                             ),
                             trailingIcon = {
@@ -422,20 +448,39 @@ fun AgregaPsicologoScreen(
                                 }
                             },
                             supportingText = {
-                                if (passwordError != null) {
-                                    Text(
-                                        passwordError!!,
-                                        fontFamily = roboto,
-                                        color = errorColor,
-                                        fontSize = 12.sp
-                                    )
-                                } else if (password.isNotBlank() && password.length < 8) {
-                                    Text(
-                                        "Mínimo 8 caracteres",
-                                        fontFamily = roboto,
-                                        color = errorColor,
-                                        fontSize = 12.sp
-                                    )
+                                when {
+                                    !passwordTouched && password.isBlank() -> {
+                                        Text(
+                                            "🔒 Introduce una contraseña",
+                                            fontFamily = roboto,
+                                            color = textSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    passwordTouched && password.isNotBlank() && password.length < 8 -> {
+                                        Text(
+                                            "⚠️ La contraseña debe tener al menos 8 caracteres",
+                                            fontFamily = roboto,
+                                            color = errorColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
+                                        Text(
+                                            "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                            fontFamily = roboto,
+                                            color = errorColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
+                                        Text(
+                                            "✅ Contraseña válida",
+                                            fontFamily = roboto,
+                                            color = successColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
                                 }
                             }
                         )
@@ -484,9 +529,23 @@ fun AgregaPsicologoScreen(
                             supportingText = {
                                 if (dateError != null) {
                                     Text(
-                                        dateError!!,
+                                        "❌ $dateError",
                                         fontFamily = roboto,
                                         color = errorColor,
+                                        fontSize = 12.sp
+                                    )
+                                } else if (dateOfBirth != null) {
+                                    Text(
+                                        "✅ Fecha válida",
+                                        fontFamily = roboto,
+                                        color = successColor,
+                                        fontSize = 12.sp
+                                    )
+                                } else {
+                                    Text(
+                                        "📅 Selecciona tu fecha de nacimiento",
+                                        fontFamily = roboto,
+                                        color = textSecondary,
                                         fontSize = 12.sp
                                     )
                                 }
@@ -515,28 +574,39 @@ fun AgregaPsicologoScreen(
                             },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = phoneError != null,
+                            isError = telefono.isNotBlank() && telefono.length != 9,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (phoneError != null) errorColor else primaryColor,
+                                focusedBorderColor = if (telefono.isNotBlank() && telefono.length != 9) errorColor else primaryColor,
                                 unfocusedBorderColor = dividerColor,
-                                focusedLabelColor = if (phoneError != null) errorColor else primaryColor,
+                                focusedLabelColor = if (telefono.isNotBlank() && telefono.length != 9) errorColor else primaryColor,
                                 cursorColor = primaryColor
                             ),
                             supportingText = {
-                                if (phoneError != null) {
-                                    Text(
-                                        phoneError!!,
-                                        fontFamily = roboto,
-                                        color = errorColor,
-                                        fontSize = 12.sp
-                                    )
-                                } else if (telefono.isNotBlank() && telefono.length != 9) {
-                                    Text(
-                                        "Debe tener 9 dígitos",
-                                        fontFamily = roboto,
-                                        color = errorColor,
-                                        fontSize = 12.sp
-                                    )
+                                when {
+                                    telefono.isBlank() -> {
+                                        Text(
+                                            "📞 Introduce el número de teléfono",
+                                            fontFamily = roboto,
+                                            color = textSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    telefono.length != 9 -> {
+                                        Text(
+                                            "❌ El teléfono debe tener 9 dígitos",
+                                            fontFamily = roboto,
+                                            color = errorColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    telefono.length == 9 -> {
+                                        Text(
+                                            "✅ Teléfono válido",
+                                            fontFamily = roboto,
+                                            color = successColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
                                 }
                             }
                         )
@@ -742,12 +812,21 @@ fun AgregaPsicologoScreen(
                 }
 
                 // ==================== BOTÓN REGISTRAR ====================
+                // Validar que todos los campos estén completos
+                val isFormValid = name.isNotBlank() &&
+                        surname.isNotBlank() &&
+                        email.isNotBlank() &&
+                        loginViewModel.isValidPassword(password) &&
+                        especialidad.isNotBlank() &&
+                        dateOfBirth != null &&
+                        telefono.length == 9
+
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
                         .shadow(8.dp, RoundedCornerShape(16.dp)),
-                    enabled = !isRegistering,
+                    enabled = !isRegistering && isFormValid,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = primaryColor,
                         contentColor = Color.White,
@@ -787,36 +866,56 @@ fun AgregaPsicologoScreen(
     }
 
     // DatePicker Dialog
+    // Reemplaza TODO el bloque del DatePickerDialog por esto:
+
+    // ==================== DATEPICKER DIALOG ====================
     if (showDatePicker) {
-        var year by remember { mutableStateOf(1990) }
-        var month by remember { mutableStateOf(0) }
-        var day by remember { mutableStateOf(1) }
+        // Crear el estado con la fecha inicial si existe
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = dateOfBirth?.let {
+                it.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            }
+        )
 
         DatePickerDialog(
             onDismissRequest = { loginViewModel.setShowDatePicker(false) },
             confirmButton = {
-                TextButton(onClick = {
-                    val selectedDate = LocalDate.of(year, month + 1, day)
-                    val age = Period.between(selectedDate, LocalDate.now()).years
-                    if (age >= 18) {
-                        loginViewModel.setDateOfBirth(selectedDate)
-                        loginViewModel.setDateError(null)
-                        loginViewModel.setShowDatePicker(false)
-                    } else {
-                        loginViewModel.setDateError("Debes ser mayor de 18 años")
+                TextButton(
+                    onClick = {
+                        val selectedDateMillis = datePickerState.selectedDateMillis
+
+                        if (selectedDateMillis != null) {
+                            val selectedDate = java.time.Instant.ofEpochMilli(selectedDateMillis)
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate()
+
+                            val age = Period.between(selectedDate, LocalDate.now()).years
+
+                            if (age >= 18) {
+                                loginViewModel.setDateOfBirth(selectedDate)
+                                loginViewModel.setDateError(null)
+                                loginViewModel.setShowDatePicker(false)
+                            } else {
+                                loginViewModel.setDateError("Debes ser mayor de 18 años")
+                            }
+                        } else {
+                            loginViewModel.setDateError("Selecciona una fecha válida")
+                        }
                     }
-                }) {
+                ) {
                     Text("Aceptar", fontFamily = roboto, color = primaryColor)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { loginViewModel.setShowDatePicker(false) }) {
+                TextButton(
+                    onClick = { loginViewModel.setShowDatePicker(false) }
+                ) {
                     Text("Cancelar", fontFamily = roboto, color = textSecondary)
                 }
             }
         ) {
             DatePicker(
-                state = rememberDatePickerState()
+                state = datePickerState
             )
         }
     }

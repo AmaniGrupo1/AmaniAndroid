@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
@@ -42,7 +41,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 private const val TAG = "SettingsPaciente"
 
-// Colores originales para el modo DEFECTO
+// Colores originales para el modo CLARO/DEFECTO
 object SettingsPacienteDefaultColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
@@ -57,6 +56,11 @@ object SettingsPacienteDefaultColors {
     val CategoriaFacturacion = Color(0xFF3498DB)
     val CategoriaSoporte = Color(0xFFE74C3C)
     val CategoriaSistema = Color(0xFF9B59B6)
+}
+
+// Función auxiliar para obtener el subtítulo del tema actual
+private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
+    return if (currentTheme) "Oscuro" else "Claro"
 }
 
 // Definir SettingsOption localmente para paciente
@@ -83,16 +87,17 @@ fun SettingsPacienteScreen(
     val screenColors = getScreenColors()
     val cardColors = getCardColors()
 
-    // Obtener el tema actual del ViewModel
+    // Obtener el tema actual del ViewModel (Boolean: false=claro, true=oscuro)
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
 
     // Determinar colores según el tema
     val backgroundColor = if (isDark) screenColors.background else SettingsPacienteDefaultColors.Background
     val surfaceColor = if (isDark) cardColors.cardBackground else SettingsPacienteDefaultColors.Surface
-    val textColor = if (isDark) cardColors.cardContent else SettingsPacienteDefaultColors.TextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else SettingsPacienteDefaultColors.TextSecondary
+    val textColor = if (isDark) Color.White else SettingsPacienteDefaultColors.TextPrimary
+    val textSecondaryColor = if (isDark) Color.White.copy(alpha = 0.7f) else SettingsPacienteDefaultColors.TextSecondary
     val primaryColor = if (isDark) Color.White else SettingsPacienteDefaultColors.Primary
     val iconColor = if (isDark) Color.White else SettingsPacienteDefaultColors.IconColor
+    val dividerColor = if (isDark) Color.White.copy(alpha = 0.12f) else textColor.copy(alpha = 0.12f)
 
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
@@ -166,6 +171,7 @@ fun SettingsPacienteScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
                     options = listOf(
@@ -206,6 +212,7 @@ fun SettingsPacienteScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
                     options = listOf(
@@ -233,11 +240,7 @@ fun SettingsPacienteScreen(
                         SettingsOptionPaciente(
                             id = "tema",
                             title = stringResource(R.string.tema),
-                            subtitle = when (currentTema) {
-                                TemaApp.LIGHT -> "Blanco"
-                                TemaApp.DARK -> "Negro"
-                                TemaApp.SYSTEM -> "Defecto"
-                            },
+                            subtitle = getCurrentThemeSubtitle(currentTema),
                             icon = Icons.Default.BrightnessMedium
                         )
                     )
@@ -259,6 +262,7 @@ fun SettingsPacienteScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
                     options = listOf(
@@ -299,6 +303,7 @@ fun SettingsPacienteScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
                     options = listOf(
@@ -339,6 +344,7 @@ fun SettingsPacienteScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
                     options = listOf(
@@ -379,6 +385,7 @@ fun SettingsPacienteScreen(
                     surfaceColor = surfaceColor,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
                     options = listOf(
@@ -423,11 +430,12 @@ fun SettingsCategoryCardPaciente(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     surfaceColor: Color,
     textColor: Color,
     textSecondaryColor: Color,
+    dividerColor: Color,
     iconColorGeneral: Color,
     isDark: Boolean
 ) {
@@ -473,7 +481,7 @@ fun SettingsCategoryCardPaciente(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = textColor.copy(alpha = 0.12f)
+                        color = dividerColor
                     )
                 }
 
@@ -487,6 +495,7 @@ fun SettingsCategoryCardPaciente(
                     idiomaViewModel = idiomaViewModel,
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
+                    dividerColor = dividerColor,
                     iconColorGeneral = iconColorGeneral,
                     isDark = isDark
                 )
@@ -502,10 +511,11 @@ fun SettingsOptionRowPaciente(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     textColor: Color,
     textSecondaryColor: Color,
+    dividerColor: Color,
     iconColorGeneral: Color,
     isDark: Boolean
 ) {
@@ -513,6 +523,7 @@ fun SettingsOptionRowPaciente(
     var expandedIdioma by remember { mutableStateOf(false) }
     var expandedTema by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
 
     Row(
         modifier = Modifier
@@ -619,11 +630,7 @@ fun SettingsOptionRowPaciente(
 
                 val displaySubtitle = when (option.id) {
                     "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
-                    "tema" -> when (currentTema) {
-                        TemaApp.LIGHT -> "Blanco"
-                        TemaApp.DARK -> "Negro"
-                        TemaApp.SYSTEM -> "Defecto"
-                    }
+                    "tema" -> getCurrentThemeSubtitle(currentTema)
                     else -> option.subtitle
                 }
 
@@ -644,7 +651,7 @@ fun SettingsOptionRowPaciente(
                     DropdownMenu(
                         expanded = expandedIdioma,
                         onDismissRequest = { expandedIdioma = false },
-                        containerColor = if (isDark) Color.DarkGray else Color.White
+                        containerColor = dropdownContainerColor
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.espanol), color = textColor) },
@@ -675,31 +682,22 @@ fun SettingsOptionRowPaciente(
                     DropdownMenu(
                         expanded = expandedTema,
                         onDismissRequest = { expandedTema = false },
-                        containerColor = if (isDark) Color.DarkGray else Color.White
+                        containerColor = dropdownContainerColor
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Defecto", color = textColor) },
+                            text = { Text("Claro", color = textColor) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
+                                    idiomaViewModel.cambiarTema(false) // false = claro
                                 }
                                 expandedTema = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Blanco", color = textColor) },
+                            text = { Text("Oscuro", color = textColor) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
-                                }
-                                expandedTema = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Negro", color = textColor) },
-                            onClick = {
-                                scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                    idiomaViewModel.cambiarTema(true) // true = oscuro
                                 }
                                 expandedTema = false
                             }
