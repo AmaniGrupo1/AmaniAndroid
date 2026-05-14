@@ -90,15 +90,15 @@ interface CitasApi {
     suspend fun actualizarDuracion(
         @Path("idPsicologo") idPsicologo: Long,
         @Query("duracion") duracion: Int
-    ): Unit
+    ): Response<Unit>
 
     //Obtengo duracion de cita
-    @GET("/api/citas/psicologo/{idPsicologo}/duracion")
+    @GET("/api/citas/psicologo/{idPsicologo}/duracion-obtenida")
     suspend fun getDuracion(
         @Path("idPsicologo") idPsicologo: Long
     ): Int
 
-    @GET("/api/citas/psicologo/terapias")
+    @GET("/api/citas/psicologo/terapias/get")
     suspend fun getTerapias(): List<TerapiaResponseDTO>
 
 
@@ -134,5 +134,5 @@ interface CitasApi {
     @DELETE("/api/citas/delete/{id}")
     suspend fun eliminarTerapia(
         @Path("id") id: Long
-    ): Unit
+    ): Response<Unit>
 }
