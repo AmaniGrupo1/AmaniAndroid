@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.navigation.navGraph
 
-import ListarPacientesViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
@@ -27,6 +26,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AdminPro
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosBajaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosSimpleScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
@@ -62,6 +62,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsA
 import org.ies.tierno.applicationamani.presentation.ui.screen.situacion.SituacionAdminScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
@@ -89,6 +90,7 @@ fun NavGraph(
     val listaPsicologoSimple : ListarPsicologosAdminViewModel = koinViewModel()
     val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
     val listarPacientesViewModel : ListarPacientesViewModel = koinViewModel()
+
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
  val idiomaViewModel : IdiomaViewModel = koinViewModel()
@@ -160,6 +162,9 @@ fun NavGraph(
             }
             composable(Screens.pacientes.route) {
                 ListadoPacientesScreen(navController,listarPacientesViewModel)
+            }
+            composable(Screens.listarPsicologosBaja.route) {
+                ListadoPsicologosBajaScreen(navController,listaPsicologoSimple, listarPacientesViewModel)
             }
             composable(Screens.cambiarRol.route) {
                 // Pasar lambda de navegación para que el botón de volver funcione correctamente

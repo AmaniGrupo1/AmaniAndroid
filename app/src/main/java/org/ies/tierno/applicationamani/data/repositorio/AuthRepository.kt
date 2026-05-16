@@ -281,6 +281,28 @@ class AuthRepository(
         }
     }
 
+    fun getPsicologosBaja(): Flow<List<PsicologoSelfResponseDTO>> = flow {
+        try {
+            val response = api.getPsicologosBaja()
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                if (response.code() == 401) {
+                    Timber.w("getPsicologos - received 401, emitting empty list")
+                    emit(emptyList())
+                } else {
+                    emit(emptyList())
+                }
+            }
+        } catch (e: HttpException) {
+            Timber.e(e, "HTTP exception while fetching psicologos")
+            emit(emptyList())
+        } catch (_: Exception) {
+            emit(emptyList())
+        }
+    }
+
+
     fun getPacientesByPsicologo(): Flow<List<PacientePsicologoResponseDTO>> = flow {
         try {
             val response = api.getPacientesByPsicologo()
@@ -319,6 +341,40 @@ class AuthRepository(
                         401 -> "No autorizado"
                         403 -> "Acceso denegado"
                         404 -> "Paciente no encontrado"
+                        500 -> "Error del servidor"
+                        else -> "Error HTTP: ${response.code()}"
+                    }
+
+                    Result.failure(Exception(errorMessage))
+                }
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+
+    suspend fun darAltaPsicologo(id: Long): Result<MessageResponse> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.darAltaPsicologo(id)
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+
+                    if (body != null) {
+                        Result.success(body)
+                    } else {
+                        Result.failure(Exception("Response body is null"))
+                    }
+
+                } else {
+
+                    val errorMessage = when (response.code()) {
+                        401 -> "No autorizado"
+                        403 -> "Acceso denegado"
+                        404 -> "Psicólogo no encontrado"
                         500 -> "Error del servidor"
                         else -> "Error HTTP: ${response.code()}"
                     }

@@ -2,7 +2,7 @@ package org.ies.tierno.applicationamani.di
 
 
 import EditProfilePsicologoViewModel
-import ListarPacientesViewModel
+
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.local.AuthEventChannel
@@ -69,6 +69,7 @@ import org.ies.tierno.applicationamani.domain.usecases.notificacion.Notificacion
 import org.ies.tierno.applicationamani.domain.usecases.role.GetUsuariosUseCase
 import org.ies.tierno.applicationamani.domain.usecases.role.RoleAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel

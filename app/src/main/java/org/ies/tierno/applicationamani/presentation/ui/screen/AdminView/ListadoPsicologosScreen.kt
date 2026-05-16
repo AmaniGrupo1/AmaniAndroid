@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-import ListarPacientesViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +43,7 @@ import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.ui.theme.BarlowCondensed
 import org.ies.tierno.applicationamani.ui.theme.Roboto

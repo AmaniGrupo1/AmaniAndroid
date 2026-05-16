@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.admin
 
-import ListarPacientesViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +58,7 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 
 
 // Paleta de colores unificada con las demás pantallas
@@ -84,8 +84,9 @@ object AmaniColorsListado {
 @Composable
 fun ListadoPacientesScreen(
     navController: NavController,
-    viewModel: ListarPacientesViewModel
-) {
+    viewModel: ListarPacientesViewModel,
+
+    ) {
     val pacientes by viewModel.paciente.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
