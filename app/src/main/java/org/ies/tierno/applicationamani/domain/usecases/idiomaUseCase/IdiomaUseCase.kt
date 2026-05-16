@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase
 
 import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.dto.ajuste.AjusteResponseDTO
 
 class IdiomaUseCase(private val ajustesRepository: AjustesRepository) {
@@ -10,7 +9,7 @@ class IdiomaUseCase(private val ajustesRepository: AjustesRepository) {
         ajustesRepository.cambiarIdioma(idUsuario, idioma)
     }
 
-    suspend fun actualizarTema( tema: TemaApp): Result<AjusteResponseDTO> {
+    suspend fun actualizarTema( tema: Boolean): Result<AjusteResponseDTO> {
         return ajustesRepository.actualizarTema(tema)
     }
 }

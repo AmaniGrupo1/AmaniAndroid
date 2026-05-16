@@ -20,6 +20,7 @@
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
 
+
     <application
         android:name=".AmaniApplication"
         android:allowBackup="true"

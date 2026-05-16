@@ -252,7 +252,9 @@ fun PsicologoAgendaScreen(
                     }
                 },
                 containerColor = if (isPsicologoReady) colors.primary else colors.primary.copy(alpha = 0.5f),
-                contentColor = if (isPsicologoReady) colors.onPrimary else colors.onPrimary.copy(alpha = 0.5f),
+                contentColor = if (isPsicologoReady) colors.onPrimary else colors.onPrimary.copy(
+                    alpha = 0.5f
+                ),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.size(56.dp)
             ) {
@@ -820,7 +822,7 @@ fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TarjetaCitaMejorada(
-    scope : CoroutineScope,
+    scope: CoroutineScope,
     cita: AgendaItemDTO,
     onEdit: () -> Unit,
     onCancel: () -> Unit,
@@ -873,7 +875,7 @@ fun TarjetaCitaMejorada(
                     )
                 }
 
-                // Indicador visual del estado actual (solo ícono, sin texto)
+                // Indicador visual del estado actual
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = when (cita.estado?.uppercase()) {
@@ -950,13 +952,11 @@ fun TarjetaCitaMejorada(
                                     Text(label)
                                 }
                             },
-
                             onClick = {
                                 if (estado.name.uppercase() != cita.estado?.uppercase()) {
                                     isUpdating = true
                                     menuExpanded = false
                                     onChangeEstado(estado)
-                                    // Resetear el estado de carga después de un tiempo
                                     scope.launch {
                                         delay(1000)
                                         isUpdating = false
@@ -985,6 +985,76 @@ fun TarjetaCitaMejorada(
                     "${cita.horaInicio.format(formatterHora)} - ${cita.horaFin.format(formatterHora)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.onSurfaceVariant
+                )
+            }
+
+            // ✅ Duración de la terapia
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    Icons.Default.Timer,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = colors.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Duración: ${cita.duracionMinutos ?: 60} min",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // ✅ Modalidad de la cita
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    when (cita.modalidad) {
+                        ModalidadCita.PRESENCIAL -> Icons.Default.LocationOn
+                        ModalidadCita.LLAMADA -> Icons.Default.Phone
+                        null -> Icons.Default.Info
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = colors.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = when (cita.modalidad) {
+                        ModalidadCita.PRESENCIAL -> "Presencial"
+                        ModalidadCita.LLAMADA -> "Llamada"
+                        null -> "Modalidad no especificada"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // ✅ Método de pago
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    when (cita.metodoPago) {
+                        MetodoPago.EFECTIVO -> Icons.Default.Money
+                        MetodoPago.TARJETA -> Icons.Default.CreditCard
+                        null -> Icons.Default.Info
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = colors.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = when (cita.metodoPago) {
+                        MetodoPago.EFECTIVO -> "Pago en efectivo"
+                        MetodoPago.TARJETA -> "Pago con tarjeta"
+                        null -> "Método de pago no especificado"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.primary,
+                    fontWeight = FontWeight.Medium
                 )
             }
 
@@ -1100,7 +1170,6 @@ fun TarjetaCitaMejorada(
         }
     }
 }
-
 @Composable
 fun DiaNoDisponibleCardMejorado() {
     val colors = MaterialTheme.colorScheme
@@ -1476,7 +1545,7 @@ fun DialogoCrearEditarCitaMejorado(
     var duracionMinutos by remember { mutableIntStateOf(citaAEditar?.duracionMinutos ?: 60) }
 
     val metodoPagoInicial =
-        remember(citaAEditar) { citaAEditar?.metodoPago ?: MetodoPago.PRESENCIAL }
+        remember(citaAEditar) { citaAEditar?.metodoPago ?: MetodoPago.EFECTIVO }
     var metodoPagoSeleccionado by remember { mutableStateOf(metodoPagoInicial) }
 
     val estadoPagoInicial =
@@ -1837,8 +1906,8 @@ fun DialogoCrearEditarCitaMejorado(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
-                                    selected = metodoPagoSeleccionado == MetodoPago.PRESENCIAL,
-                                    onClick = { metodoPagoSeleccionado = MetodoPago.PRESENCIAL })
+                                    selected = metodoPagoSeleccionado == MetodoPago.EFECTIVO,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO })
                                 Text("Presencial")
                             }
                             Row(
@@ -1846,8 +1915,8 @@ fun DialogoCrearEditarCitaMejorado(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
-                                    selected = metodoPagoSeleccionado == MetodoPago.ONLINE,
-                                    onClick = { metodoPagoSeleccionado = MetodoPago.ONLINE })
+                                    selected = metodoPagoSeleccionado == MetodoPago.TARJETA,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA })
                                 Text("Online")
                             }
                         }
@@ -1926,7 +1995,7 @@ fun DialogoCrearEditarCitaMejorado(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             when (metodoPagoSeleccionado) {
-                                MetodoPago.ONLINE -> "💳 El pago se procesará online al momento de agendar la cita"; MetodoPago.PRESENCIAL -> "💰 El pago se realizará en consulta el día de la cita"
+                                MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"; MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.onSurfaceVariant
@@ -1942,7 +2011,7 @@ fun DialogoCrearEditarCitaMejorado(
                 onClick = {
                     pacienteSeleccionado?.idPaciente?.let { idPaciente ->
                         val montoDecimal =
-                            if (metodoPagoSeleccionado == MetodoPago.ONLINE) runCatching {
+                            if (metodoPagoSeleccionado == MetodoPago.TARJETA) runCatching {
                                 BigDecimal(monto.replace(",", "."))
                             }.getOrElse(
                                 { terapiaSeleccionada!!.precio }) else BigDecimal.ZERO

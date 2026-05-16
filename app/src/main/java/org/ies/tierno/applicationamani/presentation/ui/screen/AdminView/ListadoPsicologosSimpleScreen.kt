@@ -98,7 +98,7 @@ fun ListadoPsicologosSimpleScreen(
         if (bajaEstado != null && isBajaInProgress) {
             if (bajaEstado!!.isSuccess) {
                 snackbarHostState.showSnackbar(
-                    "Psicologo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
+                    "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
                 )
                 mostrarDialogoBaja = false
                 psicologoSeleccionado = null
@@ -128,12 +128,12 @@ fun ListadoPsicologosSimpleScreen(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver atras",
+                        contentDescription = "Volver atrás",
                         tint = primaryColor
                     )
                 }
                 Box(modifier = Modifier.weight(1f)) {
-                    MenuAdministrador("Listado de psicologos", navController)
+                    MenuAdministrador("Listado de psicólogos", navController)
                 }
             }
         },
@@ -148,7 +148,7 @@ fun ListadoPsicologosSimpleScreen(
             ) {
                 Icon(
                     Icons.Default.Person,
-                    contentDescription = "Agregar psicologo",
+                    contentDescription = "Agregar psicólogo",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -176,7 +176,7 @@ fun ListadoPsicologosSimpleScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "No hay psicologos registrados",
+                        text = "No hay psicólogos registrados",
                         style = typography.titleMedium,
                         color = textSecondaryColor,
                         textAlign = TextAlign.Center,
@@ -184,7 +184,7 @@ fun ListadoPsicologosSimpleScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Presiona el boton + para agregar uno",
+                        text = "Presiona el botón + para agregar uno",
                         style = typography.bodyMedium,
                         color = textSecondaryColor,
                         textAlign = TextAlign.Center,

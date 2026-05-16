@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
@@ -72,9 +73,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.presentation.ui.components.ThemeModeSelector
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.koin.androidx.compose.koinViewModel
 
@@ -86,7 +87,8 @@ import org.koin.androidx.compose.koinViewModel
 fun SettingsClienteScreen(
     navController: NavController,
     onNavigateToSupport: () -> Unit = {},
-    viewModel: SettingsClienteViewModel = koinViewModel()
+    viewModel: SettingsClienteViewModel = koinViewModel(),
+    idiomaViewModel: IdiomaViewModel = koinViewModel()
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -109,7 +111,7 @@ fun SettingsClienteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Configuracion", style = typography.titleLarge) },
+                title = { Text("Mi Configuración", style = typography.titleLarge) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colors.surface,
                     titleContentColor = colors.onSurface
@@ -128,7 +130,7 @@ fun SettingsClienteScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // Seccion de Perfil / Foto
+                    // Sección de Perfil / Foto
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -170,8 +172,8 @@ fun SettingsClienteScreen(
                         }
                     }
 
-                    // Seccion: Informacion Personal
-                    SettingsSection(title = "Informacion Personal", icon = Icons.Default.Badge) {
+                    // Sección: Información Personal
+                    SettingsSection(title = "Información Personal", icon = Icons.Default.Badge) {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             TextFieldCustom(
                                 "Nombre",
@@ -189,10 +191,10 @@ fun SettingsClienteScreen(
                             )
                         }
 
-                        // Selector de Genero
+                        // Selector de Género
                         Column {
                             Text(
-                                text = "Genero",
+                                text = "Género",
                                 style = typography.labelMedium,
                                 color = colors.onSurfaceVariant,
                                 modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
@@ -230,24 +232,24 @@ fun SettingsClienteScreen(
                         }
                     }
 
-                    // Seccion: Contacto
-                    SettingsSection(title = "Contacto y Ubicacion", icon = Icons.Default.ContactPage) {
+                    // Sección: Contacto
+                    SettingsSection(title = "Contacto y Ubicación", icon = Icons.Default.ContactPage) {
                         TextFieldCustom(
-                            "Telefono",
+                            "Teléfono",
                             viewModel.telefono,
                             { viewModel.telefono = it },
                             Icons.Default.Phone,
                             Modifier.fillMaxWidth()
                         )
                         TextFieldCustom(
-                            "Direccion",
+                            "Dirección",
                             viewModel.direccion,
                             { viewModel.direccion = it },
                             Icons.Default.Home,
                             Modifier.fillMaxWidth()
                         )
                         TextFieldCustom(
-                            "Codigo Postal",
+                            "Código Postal",
                             viewModel.codigoPostal,
                             { viewModel.codigoPostal = it },
                             Icons.Default.MarkunreadMailbox,
@@ -255,8 +257,8 @@ fun SettingsClienteScreen(
                         )
                     }
 
-                    // Seccion: Documentacion
-                    SettingsSection(title = "Documentacion Legal", icon = Icons.Default.Description) {
+                    // Sección: Documentación
+                    SettingsSection(title = "Documentación Legal", icon = Icons.Default.Description) {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedButton(
                                 onClick = { consentimientoLauncher.launch("application/pdf") },
@@ -281,7 +283,7 @@ fun SettingsClienteScreen(
                         }
                     }
 
-                    // Boton Guardar
+                    // Botón Guardar
                     Button(
                         onClick = { viewModel.guardarUsuario() },
                         modifier = Modifier.fillMaxWidth(),
@@ -326,15 +328,16 @@ fun SettingsClienteScreen(
                                     color = colors.onSurface
                                 )
                                 ThemeModeSelector(
-                                    currentTema = session?.tema ?: TemaApp.SYSTEM,
+                                    currentTema = session?.tema ?: false,
                                     userSessionDataStore = userSessionDataStore,
-                                    session = session
+                                    session = session,
+                                    idiomaViewModel = idiomaViewModel
                                 )
                             }
                         }
                     }
 
-                    // Seccion: Soporte
+                    // Sección: Soporte
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium,
@@ -346,9 +349,9 @@ fun SettingsClienteScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
-                            Text("?Necesitas ayuda?", style = typography.titleMedium)
+                            Text("¿Necesitas ayuda?", style = typography.titleMedium)
                             Text(
-                                "Reporta un bug o envia una sugerencia al equipo de soporte.",
+                                "Reporta un bug o envía una sugerencia al equipo de soporte.",
                                 style = typography.bodySmall,
                                 textAlign = TextAlign.Center
                             )
@@ -433,6 +436,7 @@ fun TextFieldCustom(
     icon: ImageVector,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
     Column(modifier = modifier) {
         Text(
             text = label,
@@ -446,12 +450,16 @@ fun TextFieldCustom(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp)) },
-            shape = MaterialTheme.shapes.small,
+            shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                focusedTextColor = colors.onSurface,
+                unfocusedTextColor = colors.onSurface,
+                focusedBorderColor = colors.primary,
+                unfocusedBorderColor = colors.outline,
+                focusedContainerColor = colors.surfaceContainerLowest,
+                unfocusedContainerColor = colors.surfaceContainerLowest,
+                focusedLabelColor = colors.primary,
+                unfocusedLabelColor = colors.onSurfaceVariant
             )
         )
     }

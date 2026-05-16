@@ -62,10 +62,11 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Pantalla de inicio de sesion profesional de AMANI Psicologia.
+ * Pantalla de inicio de sesión profesional de AMANI Psicología.
  */
 @Composable
 fun LoginScreen(
@@ -80,10 +81,14 @@ fun LoginScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Estados para controlar si el usuario ha interactuado con los campos
+    var emailTouched by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
+
     LaunchedEffect(loginError) {
         if (!loginError.isNullOrBlank()) {
             snackbarHostState.showSnackbar(
-                message = loginError ?: "Error al iniciar sesion",
+                message = loginError ?: "Error al iniciar sesión",
                 duration = SnackbarDuration.Short
             )
         }
@@ -120,16 +125,25 @@ fun LoginScreen(
         LoginScreenContent(
             modifier = Modifier.padding(paddingValues),
             username = username,
-            onUsernameChange = { loginViewModel.setUsername(it) },
+            onUsernameChange = {
+                loginViewModel.setUsername(it)
+                emailTouched = true
+            },
             password = password,
-            onPasswordChange = { loginViewModel.setPassword(it) },
+            onPasswordChange = {
+                loginViewModel.setPassword(it)
+                passwordTouched = true
+            },
+            loginViewModel = loginViewModel,
             isLoggingIn = isLoggingIn,
             isLoginEnabled = !isLoggingIn && loginViewModel.isLoginFormValid(),
             onLogin = { loginViewModel.login() },
             onRegisterClick = {
                 loginViewModel.resetLoginState()
                 navController.navigate(Screens.registro.route)
-            }
+            },
+            emailTouched = emailTouched,
+            passwordTouched = passwordTouched
         )
     }
 }
@@ -142,9 +156,12 @@ fun LoginScreenContent(
     password: String,
     onPasswordChange: (String) -> Unit,
     isLoggingIn: Boolean,
+    loginViewModel: LoginViewModel,
     isLoginEnabled: Boolean,
     onLogin: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    emailTouched: Boolean = false,
+    passwordTouched: Boolean = false
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     val colorScheme = MaterialTheme.colorScheme
@@ -171,7 +188,7 @@ fun LoginScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo con elevacion tonal
+            // Logo con elevación tonal
             Surface(
                 modifier = Modifier
                     .size(140.dp)
@@ -182,7 +199,7 @@ fun LoginScreenContent(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo de Amani Psicologia",
+                    contentDescription = "Logo de Amani Psicología",
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -200,7 +217,7 @@ fun LoginScreenContent(
             )
 
             Text(
-                text = "Psicologia y Bienestar",
+                text = "Psicología y Bienestar",
                 style = typography.titleMedium.copy(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
@@ -209,7 +226,7 @@ fun LoginScreenContent(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Tarjeta de inicio de sesion
+            // Tarjeta de inicio de sesión
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -224,7 +241,7 @@ fun LoginScreenContent(
                         .padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // Titulo
+                    // Título
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
@@ -237,7 +254,7 @@ fun LoginScreenContent(
                             )
                         )
                         Text(
-                            text = "Accede a tu espacio terapeutico",
+                            text = "Accede a tu espacio terapéutico",
                             style = typography.bodyMedium,
                             color = colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -246,28 +263,44 @@ fun LoginScreenContent(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Campo de email
+                    // Campo de email - solo muestra error si el usuario ha interactuado
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = username,
                         onValueChange = onUsernameChange,
                         label = {
-                            Text("Correo electronico")
+                            Text("Correo electrónico")
                         },
                         placeholder = {
                             Text(
-                                "usuario@amani.com",
+                                "usuario@ejemplo.com",
                                 style = typography.bodyMedium
                             )
                         },
-                        isError = username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
+                        isError = emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         supportingText = {
-                            if (username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) {
-                                Text(
-                                    text = "Introduce un correo electronico valido",
-                                    style = typography.bodySmall,
-                                    color = colorScheme.error
-                                )
+                            when {
+                                !emailTouched && username.isBlank() -> {
+                                    Text(
+                                        text = "📧 Introduce tu correo electrónico",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        text = "❌ Formato de correo inválido (ej: usuario@dominio.com)",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
+                                    )
+                                }
+                                emailTouched && username.isNotBlank() && username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                    Text(
+                                        text = "✅ Correo válido",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary // Usando primary para éxito
+                                    )
+                                }
                             }
                         },
                         singleLine = true,
@@ -289,28 +322,51 @@ fun LoginScreenContent(
                         )
                     )
 
-                    // Campo de contrasena
+                    // Campo de contraseña - solo muestra error si el usuario ha interactuado
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = password,
                         onValueChange = onPasswordChange,
                         label = {
-                            Text("Contrasena")
+                            Text("Contraseña")
                         },
                         placeholder = {
                             Text(
-                                "......",
+                                "••••••••",
                                 style = typography.bodyMedium
                             )
                         },
-                        isError = password.isNotBlank() && password.length < 6,
+                        isError = passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 6),
                         supportingText = {
-                            if (password.isNotBlank() && password.length < 6) {
-                                Text(
-                                    text = "La contrasena debe tener al menos 6 caracteres",
-                                    style = typography.bodySmall,
-                                    color = colorScheme.error
-                                )
+                            when {
+                                !passwordTouched && password.isBlank() -> {
+                                    Text(
+                                        text = "🔒 Introduce tu contraseña",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                passwordTouched && password.isNotBlank() && password.length < 6 -> {
+                                    Text(
+                                        text = "⚠️ La contraseña debe tener al menos 6 caracteres",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
+                                    )
+                                }
+                                passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
+                                    Text(
+                                        text = "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
+                                    )
+                                }
+                                passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
+                                    Text(
+                                        text = "✅ Contraseña válida",
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary // Usando primary para éxito
+                                    )
+                                }
                             }
                         },
                         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -321,7 +377,7 @@ fun LoginScreenContent(
                             ) {
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = if (isPasswordVisible) "Ocultar contrasena" else "Mostrar contrasena",
+                                    contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
                                     tint = colorScheme.primary
                                 )
                             }
@@ -345,12 +401,12 @@ fun LoginScreenContent(
                         )
                     )
 
-                    // Boton de inicio de sesion
+                    // Botón de inicio de sesión
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         shape = CircleShape,
                         onClick = onLogin,
-                        enabled = isLoginEnabled,
+                        enabled = isLoginEnabled && !isLoggingIn,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = colorScheme.primary,
                             contentColor = colorScheme.onPrimary,
@@ -371,19 +427,19 @@ fun LoginScreenContent(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    "Iniciando sesion...",
+                                    "Iniciando sesión...",
                                     style = typography.labelLarge
                                 )
                             }
                         } else {
                             Text(
-                                "Iniciar sesion",
+                                "Iniciar sesión",
                                 style = typography.labelLarge
                             )
                         }
                     }
 
-                    // Linea divisoria
+                    // Línea divisoria
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -396,7 +452,7 @@ fun LoginScreenContent(
                                 .background(colorScheme.outlineVariant)
                         )
                         Text(
-                            text = "?Nuevo en AMANI?",
+                            text = "¿Nuevo en AMANI?",
                             style = typography.bodySmall,
                             color = colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -409,7 +465,7 @@ fun LoginScreenContent(
                         )
                     }
 
-                    // Boton de registro
+                    // Botón de registro
                     TextButton(
                         onClick = onRegisterClick,
                         enabled = !isLoggingIn,
@@ -429,7 +485,7 @@ fun LoginScreenContent(
             // Texto de ayuda
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "? Tu bienestar comienza aqui",
+                text = "💜 Tu bienestar comienza aquí",
                 style = typography.bodySmall,
                 color = colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

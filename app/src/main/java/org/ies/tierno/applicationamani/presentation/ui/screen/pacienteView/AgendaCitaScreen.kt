@@ -1,66 +1,18 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
-import androidx.compose.foundation.shape.CircleShape
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -231,7 +183,7 @@ fun AgendaCitaScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Presiona el boton + para agendar una nueva cita",
+                                text = "Presiona el botón + para agendar una nueva cita",
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto
@@ -299,7 +251,7 @@ fun AgendaCitaScreen(
         )
     }
 
-    // Dialogo de confirmacion de cancelacion
+    // Diálogo de confirmación de cancelación
     if (showCancelDialog && citaToCancel != null) {
         CancelConfirmationDialogAmani(
             cita = citaToCancel!!,
@@ -387,6 +339,7 @@ fun CitaCardAmani(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Cabecera con fecha y estado
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -429,6 +382,7 @@ fun CitaCardAmani(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Horario y Duración
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -469,7 +423,85 @@ fun CitaCardAmani(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ✅ NUEVO: Método de pago (solo si existe)
+            if (cita.metodoPago != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        when (cita.metodoPago.name) {
+                            "EFECTIVO" -> Icons.Default.Payments
+                            "TARJETA" -> Icons.Default.CreditCard
+                            else -> Icons.Default.Payment
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (cita.metodoPago.name) {
+                            "EFECTIVO" -> "💰 Pago en efectivo"
+                            "TARJETA" -> "💳 Pago con tarjeta"
+                            else -> "Método de pago: ${cita.metodoPago.name}"
+                        },
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                        fontFamily = roboto
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            // ✅ NUEVO: Estado del pago (solo si existe)
+            if (cita.estadoPago != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        when (cita.estadoPago.name) {
+                            "PAGADO" -> Icons.Default.CheckCircle
+                            "PENDIENTE" -> Icons.Default.Schedule
+                            "FALLIDO" -> Icons.Default.Error
+                            "REEMBOLSADO" -> Icons.Default.Info
+                            else -> Icons.Default.Info
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = when (cita.estadoPago.name) {
+                            "PAGADO" -> successGreen
+                            "PENDIENTE" -> warningOrange
+                            "FALLIDO" -> colorScheme.error
+                            "REEMBOLSADO" -> colorScheme.primary
+                            else -> colorScheme.onSurfaceVariant
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (cita.estadoPago.name) {
+                            "PAGADO" -> "✅ Pagado"
+                            "PENDIENTE" -> "⏳ Pendiente de pago"
+                            "FALLIDO" -> "❌ Pago fallido"
+                            "REEMBOLSADO" -> "🔄 Reembolsado"
+                            else -> "Estado: ${cita.estadoPago.name}"
+                        },
+                        style = typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                        color = when (cita.estadoPago.name) {
+                            "PAGADO" -> successGreen
+                            "PENDIENTE" -> warningOrange
+                            "FALLIDO" -> colorScheme.error
+                            "REEMBOLSADO" -> colorScheme.primary
+                            else -> colorScheme.onSurfaceVariant
+                        },
+                        fontFamily = roboto
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             // Tipo de terapia y modalidad
             Row(
@@ -520,6 +552,7 @@ fun CitaCardAmani(
                 }
             }
 
+            // Motivo
             cita.motivo?.let { motivo ->
                 if (motivo.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -534,13 +567,14 @@ fun CitaCardAmani(
                 }
             }
 
+            // Botones de acción (solo si no está cancelada/completada)
             if (cita.estado?.lowercase() !in listOf("cancelada", "completada")) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    // Boton Cancelar
+                    // Botón Cancelar
                     OutlinedButton(
                         onClick = onCancelClick,
                         modifier = Modifier.weight(1f).height(44.dp),
@@ -562,7 +596,7 @@ fun CitaCardAmani(
                         Text("Cancelar", style = typography.labelLarge, fontWeight = FontWeight.Medium, fontFamily = roboto)
                     }
 
-                    // Boton Reagendar
+                    // Botón Reagendar
                     Button(
                         onClick = onRescheduleClick,
                         modifier = Modifier.weight(1f).height(44.dp),
@@ -624,7 +658,7 @@ fun TerapiaInfoDialogAmani(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Informacion de la Terapia",
+                        text = "Información de la Terapia",
                         style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.primary,
@@ -705,7 +739,7 @@ fun TerapiaInfoDialogAmani(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Duracion de la sesion",
+                                text = "Duración de la sesión",
                                 style = typography.labelSmall,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto
@@ -719,9 +753,9 @@ fun TerapiaInfoDialogAmani(
                             )
                             Text(
                                 text = if ((cita.durationMinutes ?: 60) <= 60)
-                                    "Sesion estandar de una hora"
+                                    "Sesión estándar de una hora"
                                 else
-                                    "Sesion extendida para mayor profundidad",
+                                    "Sesión extendida para mayor profundidad",
                                 style = typography.bodySmall,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto
@@ -749,7 +783,7 @@ fun TerapiaInfoDialogAmani(
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "- Llega 5 minutos antes para prepararte\n- Ten lista tu identificacion\n- Prepara tus preguntas o temas a tratar\n- Busca un lugar tranquilo si es online",
+                            text = "- Llega 5 minutos antes para prepararte\n- Ten lista tu identificación\n- Prepara tus preguntas o temas a tratar\n- Busca un lugar tranquilo si es online",
                             style = typography.bodySmall,
                             color = colorScheme.onSurfaceVariant,
                             lineHeight = 20.sp,
@@ -813,7 +847,7 @@ fun ContactDialogAmani(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Contacto Amani Psicologia",
+                        text = "Contacto Amani Psicología",
                         style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.primary,
@@ -857,7 +891,7 @@ fun ContactDialogAmani(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Horario de atencion",
+                    text = "Horario de atención",
                     style = typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface,
@@ -872,7 +906,7 @@ fun ContactDialogAmani(
                     fontFamily = roboto
                 )
                 Text(
-                    text = "Sabados: 10:00 - 14:00",
+                    text = "Sábados: 10:00 - 14:00",
                     style = typography.bodyMedium,
                     color = colorScheme.onSurfaceVariant,
                     fontFamily = roboto
@@ -995,7 +1029,7 @@ fun CancelConfirmationDialogAmani(
         text = {
             Column {
                 Text(
-                    text = "Estas seguro de que deseas cancelar esta cita?",
+                    text = "¿Estás seguro de que deseas cancelar esta cita?",
                     style = typography.bodyMedium,
                     color = colorScheme.onSurface,
                     fontFamily = roboto
@@ -1026,7 +1060,7 @@ fun CancelConfirmationDialogAmani(
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "Esta accion no se puede deshacer.",
+                    text = "Esta acción no se puede deshacer.",
                     style = typography.bodySmall,
                     color = colorScheme.error,
                     fontFamily = roboto
@@ -1052,7 +1086,7 @@ fun CancelConfirmationDialogAmani(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-                Text("Si, cancelar", style = typography.labelLarge, fontWeight = FontWeight.Medium, fontFamily = roboto)
+                Text("Sí, cancelar", style = typography.labelLarge, fontWeight = FontWeight.Medium, fontFamily = roboto)
             }
         },
         dismissButton = {
@@ -1068,5 +1102,3 @@ fun CancelConfirmationDialogAmani(
         }
     )
 }
-
-// Clase auxiliar para los colores del tema eliminada, se usa MaterialTheme directamente

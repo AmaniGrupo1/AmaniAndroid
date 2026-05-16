@@ -152,7 +152,7 @@ class CitasViewModel(
             startDatetime = startDatetime,
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
-            estadoPago = if (metodoPago == MetodoPago.ONLINE)
+            estadoPago = if (metodoPago == MetodoPago.TARJETA)
                 EstadoPago.PAGADO
             else
                 EstadoPago.PENDIENTE,

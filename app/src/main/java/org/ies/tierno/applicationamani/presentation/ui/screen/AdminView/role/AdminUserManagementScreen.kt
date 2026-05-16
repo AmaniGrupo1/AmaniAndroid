@@ -26,13 +26,12 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleVie
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.ui.platform.LocalContext
-// use KoinJavaComponent when needed to obtain singletons from Koin in compose contexts
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 
-// Paleta de colores profesional (alineada con LoginScreen)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminUserManagementScreen(
@@ -92,6 +91,20 @@ fun AdminUserManagementScreen(
         adminUserViewModel.filtrarUsuarios(rol = selectedRol, dni = searchDni)
     }
 
+    // Función para confirmar el cambio de rol
+    fun confirmRoleChange() {
+        pendingRol?.let { nuevoRol ->
+            adminRoleViewModel.cambiarRol(
+                idUsuario = selectedUser!!.idUsuario ?: 0,
+                nuevoRol = nuevoRol
+            )
+        }
+        showConfirmDialog = false
+        showBottomSheet = false
+        pendingRol = null
+        selectedUser = null
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -132,7 +145,7 @@ fun AdminUserManagementScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            colorScheme.surfaceContainer.copy(alpha = 0.3f),
                             colorScheme.background
                         )
                     )
@@ -153,10 +166,10 @@ fun AdminUserManagementScreen(
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                                "Filtros",
-                                    style = typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colorScheme.primary
+                            "Filtros",
+                            style = typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -190,9 +203,9 @@ fun AdminUserManagementScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                                "Filtrar por Rol:",
-                                    style = typography.labelLarge,
-                                    color = colorScheme.onSurface
+                            "Filtrar por Rol:",
+                            style = typography.labelLarge,
+                            color = colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -364,16 +377,7 @@ fun AdminUserManagementScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        pendingRol?.let { nuevoRol ->
-                            adminRoleViewModel.cambiarRol(
-                                idUsuario = selectedUser!!.idUsuario ?: 0,
-                                nuevoRol = nuevoRol
-                            )
-                        }
-                        showConfirmDialog = false
-                        showBottomSheet = false
-                        pendingRol = null
-                        selectedUser = null
+                        confirmRoleChange()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorScheme.primary

@@ -87,7 +87,6 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
@@ -95,6 +94,11 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 
 private const val TAG = "SettingsPaciente"
+
+// Función auxiliar para obtener el subtítulo del tema actual
+private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
+    return if (currentTheme) "Oscuro" else "Claro"
+}
 
 // Definir SettingsOption localmente para paciente
 data class SettingsOptionPaciente(
@@ -119,7 +123,7 @@ fun SettingsPacienteScreen(
     val typography = MaterialTheme.typography
     val isDark = isDarkTheme()
 
-    // Obtener el tema actual del ViewModel
+    // Obtener el tema actual del ViewModel (Boolean: false=claro, true=oscuro)
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
 
     // Obtener el idioma actual del ViewModel
@@ -154,7 +158,7 @@ fun SettingsPacienteScreen(
                         text = stringResource(R.string.configuracion),
                         style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) colorScheme.onSurface else Color.White
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
@@ -162,7 +166,7 @@ fun SettingsPacienteScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = if (isDark) colorScheme.onSurface else Color.White
+                            tint = Color.White
                         )
                     }
                 },
@@ -256,11 +260,7 @@ fun SettingsPacienteScreen(
                         SettingsOptionPaciente(
                             id = "tema",
                             title = stringResource(R.string.tema),
-                            subtitle = when (currentTema) {
-                                TemaApp.LIGHT -> "Blanco"
-                                TemaApp.DARK -> "Negro"
-                                TemaApp.SYSTEM -> "Defecto"
-                            },
+                            subtitle = getCurrentThemeSubtitle(currentTema),
                             icon = Icons.Default.BrightnessMedium
                         )
                     )
@@ -433,7 +433,7 @@ fun SettingsCategoryCardPaciente(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     colorScheme: ColorScheme,
     typography: androidx.compose.material3.Typography,
@@ -506,7 +506,7 @@ fun SettingsOptionRowPaciente(
     navController: NavController,
     session: UserSession?,
     currentLanguage: String,
-    currentTema: TemaApp,
+    currentTema: Boolean,
     idiomaViewModel: IdiomaViewModel,
     colorScheme: ColorScheme,
     typography: androidx.compose.material3.Typography,
@@ -620,11 +620,7 @@ fun SettingsOptionRowPaciente(
 
                 val displaySubtitle = when (option.id) {
                     "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
-                    "tema" -> when (currentTema) {
-                        TemaApp.LIGHT -> "Blanco"
-                        TemaApp.DARK -> "Negro"
-                        TemaApp.SYSTEM -> "Defecto"
-                    }
+                    "tema" -> getCurrentThemeSubtitle(currentTema)
                     else -> option.subtitle
                 }
 
@@ -678,28 +674,19 @@ fun SettingsOptionRowPaciente(
                         containerColor = colorScheme.surfaceContainerHigh
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Defecto", style = typography.bodyMedium) },
+                            text = { Text("Claro", style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.SYSTEM)
+                                    idiomaViewModel.cambiarTema(false) // false = claro
                                 }
                                 expandedTema = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Blanco", style = typography.bodyMedium) },
+                            text = { Text("Oscuro", style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.LIGHT)
-                                }
-                                expandedTema = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Negro", style = typography.bodyMedium) },
-                            onClick = {
-                                scope.launch {
-                                    idiomaViewModel.cambiarTema(TemaApp.DARK)
+                                    idiomaViewModel.cambiarTema(true) // true = oscuro
                                 }
                                 expandedTema = false
                             }

@@ -1,8 +1,8 @@
 package org.ies.tierno.applicationamani.domain.models.enumm
 
 enum class MetodoPago {
-    PRESENCIAL,
-    ONLINE
+    EFECTIVO,
+    TARJETA
 }
 
 enum class EstadoPago {

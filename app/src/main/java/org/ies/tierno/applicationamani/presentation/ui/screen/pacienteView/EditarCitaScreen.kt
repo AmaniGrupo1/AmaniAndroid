@@ -145,7 +145,7 @@ fun EditarCitaScreen(
     var horaSeleccionada by remember { mutableStateOf<LocalTime?>(null) }
     var motivo by remember { mutableStateOf("") }
     var terapiaSeleccionada by remember { mutableStateOf<TerapiaResponseDTO?>(null) }
-    var metodoPagoSeleccionado by remember { mutableStateOf(MetodoPago.PRESENCIAL) }
+    var metodoPagoSeleccionado by remember { mutableStateOf(MetodoPago.EFECTIVO) }
     var estadoPagoSeleccionado by remember { mutableStateOf(EstadoPago.PENDIENTE) }
     var modalidadSeleccionada by remember { mutableStateOf(ModalidadCita.PRESENCIAL) }
     var duracionMinutos by remember { mutableIntStateOf(60) }
@@ -202,7 +202,7 @@ fun EditarCitaScreen(
                         horaSeleccionada = citaEncontrada.horaInicio
                         motivo = citaEncontrada.motivo ?: ""
                         modalidadSeleccionada = citaEncontrada.modalidad ?: ModalidadCita.PRESENCIAL
-                        metodoPagoSeleccionado = citaEncontrada.metodoPago ?: MetodoPago.PRESENCIAL
+                        metodoPagoSeleccionado = citaEncontrada.metodoPago ?: MetodoPago.EFECTIVO
                         estadoPagoSeleccionado = citaEncontrada.estadoPago ?: EstadoPago.PENDIENTE
                         duracionMinutos = citaEncontrada.duracionMinutos ?: 60
 

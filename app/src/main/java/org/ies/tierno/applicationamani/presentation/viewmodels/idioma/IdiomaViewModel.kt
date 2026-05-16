@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 
 class IdiomaViewModel(
@@ -17,7 +16,8 @@ class IdiomaViewModel(
     private val userSessionDataStore: UserSessionDataStore
 ) : ViewModel() {
 
-    // Estado observable de idioma (CLAVE)
+    // ================= IDIOMA =================
+
     val idioma = userSessionDataStore.sessionFlow
         .map { it?.idioma ?: "es" }
         .stateIn(
@@ -27,39 +27,58 @@ class IdiomaViewModel(
         )
 
     fun cambiarIdioma(nuevoIdioma: String) {
+
         viewModelScope.launch {
-            val session = userSessionDataStore.getSession() ?: return@launch
 
-            if (session.idioma == nuevoIdioma) return@launch
+            val session = userSessionDataStore.getSession()
+                ?: return@launch
 
-            // 1. Backend
-            idiomaUseCase.actualizarIdioma(session.idUsuario, nuevoIdioma)
+            if (session.idioma == nuevoIdioma) {
+                return@launch
+            }
 
-            // 2. Local (esto es lo que realmente dispara UI)
-            userSessionDataStore.saveSession(
-                session.copy(idioma = nuevoIdioma)
-            )
+            try {
+                // 1. Backend
+                idiomaUseCase.actualizarIdioma(
+                    session.idUsuario,
+                    nuevoIdioma
+                )
 
-            // Bug 4 Fix: Soporte para API 33+ (Tiramisu)
-            // En Android 13+, el sistema gestiona los locales por aplicación de forma diferente.
-            // Usamos AppCompatDelegate para notificar al sistema del cambio de forma persistente.
-            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(nuevoIdioma)
-            AppCompatDelegate.setApplicationLocales(appLocale)
+                // 2. Local (esto es lo que realmente dispara UI)
+                userSessionDataStore.saveSession(
+                    session.copy(idioma = nuevoIdioma)
+                )
+
+                // Bug 4 Fix: Soporte para API 33+ (Tiramisu)
+                val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(nuevoIdioma)
+                AppCompatDelegate.setApplicationLocales(appLocale)
+
+            } catch (e: Exception) {
+                println("Error al cambiar idioma: ${e.message}")
+            }
         }
     }
 
+    // ================= TEMA =================
+
     val tema = userSessionDataStore.sessionFlow
-        .map { it?.tema ?: TemaApp.SYSTEM }
+        .map { it?.tema ?: false } // false = blanco
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = TemaApp.SYSTEM
+            initialValue = false
         )
 
-    fun cambiarTema(nuevoTema: TemaApp) {
+    fun cambiarTema(nuevoTema: Boolean) {
+
         viewModelScope.launch {
-            val session = userSessionDataStore.getSession() ?: return@launch
-            if (session.tema == nuevoTema) return@launch
+
+            val session = userSessionDataStore.getSession()
+                ?: return@launch
+
+            if (session.tema == nuevoTema) {
+                return@launch
+            }
 
             // 1. Local (esto es lo que realmente dispara UI inmediatamente)
             userSessionDataStore.saveSession(

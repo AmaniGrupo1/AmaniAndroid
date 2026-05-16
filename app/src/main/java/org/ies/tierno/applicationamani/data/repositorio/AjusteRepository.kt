@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.AjustesApi
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.ies.tierno.applicationamani.dto.ajuste.AjusteResponseDTO
 import org.ies.tierno.applicationamani.dto.idioma.IdiomaRequestDTO
 import org.ies.tierno.applicationamani.dto.tema.UpdateTemaDTO
@@ -16,7 +15,7 @@ class AjustesRepository(private val api: AjustesApi) {
     }
 
     suspend fun actualizarTema(
-        tema: TemaApp
+        tema: Boolean
     ): Result<AjusteResponseDTO> {
 
         return try {

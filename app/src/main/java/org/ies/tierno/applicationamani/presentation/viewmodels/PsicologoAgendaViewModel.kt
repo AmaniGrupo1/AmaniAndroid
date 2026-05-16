@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,6 +107,23 @@ class PsicologoAgendaViewModel(
     }
 
     fun cargarAgendaMensual(month: YearMonth) {
+        Log.d("PSICOLOGO_AGENDA_VM", "📞 cargarAgendaMensual($month) - INICIO")
+
+        val idPsicologo = userSession.value?.idPsicologo
+        Log.d("PSICOLOGO_AGENDA_VM", "   - idPsicologo obtenido: $idPsicologo")
+
+        if (idPsicologo == null || idPsicologo <= 0) {
+            Log.e(
+                "PSICOLOGO_AGENDA_VM",
+                "❌ idPsicologo inválido: $idPsicologo - NO se hace la petición"
+            )
+            return
+        }
+
+        Log.d(
+            "PSICOLOGO_AGENDA_VM",
+            "✅ idPsicologo válido: $idPsicologo - Haciendo petición al backend"
+        )
         println("📅 Cargando agenda para mes: $month")
         val session = _userSession.value
         val psychologistId = session?.idPsicologo
@@ -221,6 +239,24 @@ class PsicologoAgendaViewModel(
     }
 
     fun cargarDisponibilidadDia(fecha: LocalDate, durationMinutes: Int = _duracionCita.value) {
+
+        Log.d("PSICOLOGO_AGENDA_VM", "📞 cargarDisponibilidadDia($fecha, $duracionCita) - INICIO")
+
+        val idPsicologo = userSession.value?.idPsicologo
+        Log.d("PSICOLOGO_AGENDA_VM", "   - idPsicologo obtenido: $idPsicologo")
+
+        if (idPsicologo == null || idPsicologo <= 0) {
+            Log.e(
+                "PSICOLOGO_AGENDA_VM",
+                "❌ idPsicologo inválido: $idPsicologo - NO se hace la petición"
+            )
+            return
+        }
+
+        Log.d(
+            "PSICOLOGO_AGENDA_VM",
+            "✅ idPsicologo válido: $idPsicologo - Haciendo petición al backend"
+        )
         val psychologistId = _userSession.value?.idPsicologo ?: return
 
         viewModelScope.launch {
@@ -444,7 +480,7 @@ class PsicologoAgendaViewModel(
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = estadoPago,  // ← USAR EL ESTADO RECIBIDO
-            monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
+            monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
             motivo = motivo.ifBlank { "Consulta psicológica" },
             idTipoTerapia = idTipoTerapia,
             estado = EstadoCita.pendiente,
@@ -514,7 +550,7 @@ class PsicologoAgendaViewModel(
             durationMinutes = duracionMinutos,
             metodoPago = metodoPago,
             estadoPago = estadoPago,
-            monto = if (metodoPago == MetodoPago.ONLINE) monto else BigDecimal.ZERO,
+            monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
             motivo = motivo.ifBlank { "Consulta psicológica" },
             idTipoTerapia = idTipoTerapia,
             modalidad = modalidad

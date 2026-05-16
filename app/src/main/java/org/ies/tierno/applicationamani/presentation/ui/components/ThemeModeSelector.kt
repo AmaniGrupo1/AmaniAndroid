@@ -18,15 +18,17 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.koin.androidx.compose.koinViewModel
 import org.koin.java.KoinJavaComponent.getKoin
 
 @Composable
 fun ThemeModeSelector(
-    currentTema: TemaApp,
+    currentTema: Boolean,
     userSessionDataStore: UserSessionDataStore? = null,
-    session: UserSession?
+    session: UserSession?,
+    idiomaViewModel: IdiomaViewModel = koinViewModel()
 ) {
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -39,6 +41,9 @@ fun ThemeModeSelector(
         UserSessionDataStore(context)
     }
 
+    // Determinar el texto a mostrar según el tema actual
+    val currentText = if (currentTema) "Oscuro" else "Claro"
+
     Row(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -48,11 +53,7 @@ fun ThemeModeSelector(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = when (currentTema) {
-                    TemaApp.LIGHT -> "Blanco"
-                    TemaApp.DARK -> "Negro"
-                    TemaApp.SYSTEM -> "Defecto"
-                },
+                text = currentText,
                 color = colors.cardContent
             )
 
@@ -69,56 +70,24 @@ fun ThemeModeSelector(
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Blanco", color = colors.cardContent) },
+                text = { Text("Claro", color = colors.cardContent) },
                 onClick = {
                     expanded = false
                     scope.launch {
-                        saveTemaToSession(store, session, TemaApp.LIGHT)
+                        idiomaViewModel.cambiarTema(false) // false = claro
                     }
                 }
             )
 
             DropdownMenuItem(
-                text = { Text("Negro", color = colors.cardContent) },
+                text = { Text("Oscuro", color = colors.cardContent) },
                 onClick = {
                     expanded = false
                     scope.launch {
-                        saveTemaToSession(store, session, TemaApp.DARK)
-                    }
-                }
-            )
-
-            DropdownMenuItem(
-                text = { Text("Defecto", color = colors.cardContent) },
-                onClick = {
-                    expanded = false
-                    scope.launch {
-                        saveTemaToSession(store, session, TemaApp.SYSTEM)
+                        idiomaViewModel.cambiarTema(true) // true = oscuro
                     }
                 }
             )
         }
-    }
-}
-
-private suspend fun saveTemaToSession(
-    userSessionDataStore: UserSessionDataStore,
-    session: UserSession?,
-    newTema: TemaApp
-) {
-    if (session != null) {
-        val updated = session.copy(tema = newTema)
-        userSessionDataStore.saveSession(updated)
-    } else {
-        val newSession = UserSession(
-            idUsuario = 0L,
-            nombre = null,
-            rol = "guest",
-            idPsicologo = null,
-            idPaciente = null,
-            idioma = "es",
-            tema = newTema
-        )
-        userSessionDataStore.saveSession(newSession)
     }
 }

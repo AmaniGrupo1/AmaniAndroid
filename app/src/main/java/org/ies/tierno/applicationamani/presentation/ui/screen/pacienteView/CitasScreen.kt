@@ -1,8 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
-import androidx.compose.foundation.shape.CircleShape
 
 import android.Manifest
-import androidx.compose.ui.graphics.Color
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,73 +11,20 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.EventBusy
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuBoxScope
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -589,7 +534,7 @@ fun DialogoGestionCitaAmani(
     var fechaSeleccionada by remember { mutableStateOf(fechaInicial) }
     var motivo by remember { mutableStateOf(citaExistente?.motivo ?: "") }
 
-    var metodoPagoSeleccionado by remember { mutableStateOf(MetodoPago.PRESENCIAL) }
+    var metodoPagoSeleccionado by remember { mutableStateOf(MetodoPago.EFECTIVO) }
     var estadoPagoSeleccionado by remember { mutableStateOf(EstadoPago.PENDIENTE) }
     var modalidadSeleccionada by remember { mutableStateOf(ModalidadCita.PRESENCIAL) }
     var modalidadDropdownExpanded by remember { mutableStateOf(false) }
@@ -599,6 +544,8 @@ fun DialogoGestionCitaAmani(
 
     var duracionMinutos by remember { mutableIntStateOf(60) }
     var montoCalculado by remember { mutableStateOf(BigDecimal.ZERO) }
+
+    val colorScheme = MaterialTheme.colorScheme
 
     val horasDisponibles = remember(slotsLibres, citasExistentes, fechaSeleccionada, modoEdicion, citaExistente) {
         val horasLibres = slotsLibres.map { it.hora }.sorted()
@@ -620,12 +567,12 @@ fun DialogoGestionCitaAmani(
     LaunchedEffect(terapiaSeleccionada) {
         terapiaSeleccionada?.let { terapia ->
             duracionMinutos = terapia.duracionMinutos
-            montoCalculado = if (metodoPagoSeleccionado == MetodoPago.ONLINE) terapia.precio else BigDecimal.ZERO
+            montoCalculado = if (metodoPagoSeleccionado == MetodoPago.TARJETA) terapia.precio else BigDecimal.ZERO
         }
     }
 
     LaunchedEffect(metodoPagoSeleccionado, terapiaSeleccionada) {
-        if (metodoPagoSeleccionado == MetodoPago.ONLINE && terapiaSeleccionada != null) {
+        if (metodoPagoSeleccionado == MetodoPago.TARJETA && terapiaSeleccionada != null) {
             montoCalculado = terapiaSeleccionada!!.precio
         } else {
             montoCalculado = BigDecimal.ZERO
@@ -891,17 +838,19 @@ fun DialogoGestionCitaAmani(
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
-                                    selected = metodoPagoSeleccionado == MetodoPago.PRESENCIAL,
-                                    onClick = { metodoPagoSeleccionado = MetodoPago.PRESENCIAL }
+                                    selected = metodoPagoSeleccionado == MetodoPago.EFECTIVO,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO },
+                                    colors = RadioButtonDefaults.colors(selectedColor = colorScheme.primary)
                                 )
-                                Text("Presencial", style = MaterialTheme.typography.bodyMedium)
+                                Text("Efectivo", style = MaterialTheme.typography.bodyMedium)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
-                                    selected = metodoPagoSeleccionado == MetodoPago.ONLINE,
-                                    onClick = { metodoPagoSeleccionado = MetodoPago.ONLINE }
+                                    selected = metodoPagoSeleccionado == MetodoPago.TARJETA,
+                                    onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA },
+                                    colors = RadioButtonDefaults.colors(selectedColor = colorScheme.primary)
                                 )
-                                Text("Online", style = MaterialTheme.typography.bodyMedium)
+                                Text("Tarjeta", style = MaterialTheme.typography.bodyMedium)
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
@@ -919,8 +868,8 @@ fun DialogoGestionCitaAmani(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             when (metodoPagoSeleccionado) {
-                                MetodoPago.ONLINE -> "💳 El pago se procesará online al momento de agendar la cita"
-                                MetodoPago.PRESENCIAL -> "💰 El pago se realizará en consulta el día de la cita"
+                                MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"
+                                MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -936,9 +885,9 @@ fun DialogoGestionCitaAmani(
                     val terapia = terapiaSeleccionada ?: return@Button
                     val hora = horaSeleccionada ?: return@Button
 
-                    if (modoEdicion && citaExistente != null) {
+                    if (modoEdicion && citaEditando != null) {
                         onEditarCita(
-                            citaExistente.id,
+                            citaEditando.id,
                             idPaciente,
                             fechaSeleccionada,
                             hora,
@@ -1076,22 +1025,3 @@ fun CampoFechaAmani(
         }
     }
 }
-// Clase auxiliar para los colores del tema
-data class CitasScreenThemeColors(
-    val primary: Color,
-    val primaryLight: Color,
-    val primaryDark: Color,
-    val secondary: Color,
-    val accent: Color,
-    val background: Color,
-    val surface: Color,
-    val textPrimary: Color,
-    val textSecondary: Color,
-    val error: Color,
-    val success: Color,
-    val warning: Color,
-    val textFieldContainer: Color,
-    val textFieldText: Color,
-    val textFieldLabel: Color,
-    val textFieldBorder: Color
-)

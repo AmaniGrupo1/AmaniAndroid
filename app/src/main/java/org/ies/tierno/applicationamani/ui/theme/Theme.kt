@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.domain.models.enumm.TemaApp
 import org.koin.java.KoinJavaComponent
 
 // ── Material 3 color scheme: light ─────────────────────────────────
@@ -151,16 +150,14 @@ fun ApplicationAmaniTheme(
     }
     val session by store.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    // TemaApp del usuario tiene prioridad sobre darkTheme del sistema
     val effectiveDarkTheme = when (session?.tema) {
-        TemaApp.DARK  -> true
-        TemaApp.LIGHT -> false
-        else          -> darkTheme  // SYSTEM o null: respetar tema del sistema
+        true -> true
+        false -> false
+        else -> darkTheme
     }
 
-    // Dynamic color solo cuando el usuario no ha fijado LIGHT o DARK
-    val useDynamicColor = dynamicColor
-            && (session?.tema == null || session?.tema == TemaApp.SYSTEM)
+    // Dynamic color solo cuando el usuario no ha fijado el tema (o si asumiéramos null como system)
+    val useDynamicColor = dynamicColor && (session?.tema == null)
 
     val colorScheme = when {
         useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -193,6 +190,7 @@ fun ApplicationAmaniTheme(
             calendarioBg = colorScheme.surfaceVariant,
         )
     } else {
+        // Modo CLARO/DEFECTO: colores originales de Amani
         AmaniExtraColors(
             screenBackground = AmaniBackground,
             textFieldContainer = AmaniWhite,
