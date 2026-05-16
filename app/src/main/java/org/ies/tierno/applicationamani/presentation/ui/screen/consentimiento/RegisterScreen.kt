@@ -300,19 +300,7 @@ fun RegisterScreen(
                         placeholder = { Text("12345678A", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-<<<<<<< HEAD
-                        isError = dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
-                        supportingText = {
-                            if (dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) {
-                                Text(
-                                    "Formato invalido (8 numeros + 1 letra)",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
-=======
                         isError = dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
->>>>>>> login
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
@@ -407,16 +395,11 @@ fun RegisterScreen(
                     // Contraseña con validación mejorada
                     OutlinedTextField(
                         value = regPassword,
-<<<<<<< HEAD
-                        onValueChange = { loginViewModel.setRegPassword(it) },
-                        label = { Text("Contrasena *", fontFamily = roboto, color = textColor) },
-=======
                         onValueChange = {
                             loginViewModel.setRegPassword(it)
                             passwordTouched = true
                         },
                         label = { Text("Contraseña *", fontFamily = roboto, color = textColor) },
->>>>>>> login
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -472,22 +455,6 @@ fun RegisterScreen(
                     // Teléfono con validación
                     OutlinedTextField(
                         value = telefono,
-<<<<<<< HEAD
-                        onValueChange = { loginViewModel.setTelefono(it) },
-                        label = { Text("Telefono *", fontFamily = roboto, color = textColor) },
-                        placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
-                        isError = telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
-                        supportingText = {
-                            if (telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) {
-                                Text(
-                                    "Debe tener 9 digitos",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
-=======
                         onValueChange = {
                             loginViewModel.setTelefono(it)
                             telefonoTouched = true
@@ -497,7 +464,6 @@ fun RegisterScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
->>>>>>> login
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
@@ -536,13 +502,9 @@ fun RegisterScreen(
                         }
                     )
 
-<<<<<<< HEAD
-                    // Dropdown Genero
-=======
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Dropdown Género
->>>>>>> login
                     ExposedDropdownMenuBox(
                         expanded = expandedGenero,
                         onExpandedChange = { expandedGenero = it }
@@ -584,13 +546,9 @@ fun RegisterScreen(
                         }
                     }
 
-<<<<<<< HEAD
-                    // Fecha de Nacimiento con DatePicker
-=======
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Fecha de nacimiento
->>>>>>> login
                     OutlinedTextField(
                         value = fechaNacimiento,
                         onValueChange = {
@@ -601,24 +559,12 @@ fun RegisterScreen(
                         placeholder = { Text("1990-05-15", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-<<<<<<< HEAD
                         trailingIcon = {
                             IconButton(onClick = { loginViewModel.setShowDatePicker(true) }) {
                                 Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha")
                             }
                         },
-                        isError = fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
-                        supportingText = {
-                            if (fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) {
-                                Text(
-                                    "Formato invalido (YYYY-MM-DD)",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        },
-=======
                         isError = fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
->>>>>>> login
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
@@ -712,25 +658,6 @@ fun RegisterScreen(
                         // Teléfono del tutor
                         OutlinedTextField(
                             value = tutorTelefono,
-<<<<<<< HEAD
-                            onValueChange = { loginViewModel.setTutorTelefono(it) },
-                            label = { Text("Telefono *", fontFamily = roboto, color = textColor) },
-                            placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = textFieldShape,
-                            isError = tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$")),
-                            supportingText = {
-                                if (tutorTelefono.isNotBlank() &&
-                                    !tutorTelefono.matches(Regex("^[0-9]{9}$"))
-                                ) {
-                                    Text(
-                                        "Debe tener 9 digitos",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
-=======
                             onValueChange = {
                                 loginViewModel.setTutorTelefono(it)
                                 tutorTelefonoTouched = true
@@ -740,7 +667,6 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             isError = tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")),
->>>>>>> login
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
@@ -791,22 +717,7 @@ fun RegisterScreen(
                             label = { Text("Email *", fontFamily = roboto, color = textColor) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-<<<<<<< HEAD
-                            isError = tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
-                            supportingText = {
-                                if (tutorEmail.isNotBlank() &&
-                                    !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))
-                                ) {
-                                    Text(
-                                        "Formato de email invalido",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
-=======
                             isError = tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
->>>>>>> login
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
@@ -858,22 +769,7 @@ fun RegisterScreen(
                             placeholder = { Text("12345678A", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-<<<<<<< HEAD
-                            isError = tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
-                            supportingText = {
-                                if (tutorDni.isNotBlank() &&
-                                    !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))
-                                ) {
-                                    Text(
-                                        "Formato invalido (8 numeros + 1 letra)",
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            },
-=======
                             isError = tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
->>>>>>> login
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,

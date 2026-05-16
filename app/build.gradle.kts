@@ -77,7 +77,10 @@ android {
 dependencies {
 
     // PDF Generation
-    implementation("com.itextpdf:itext7-core:7.2.5")
+    implementation("com.itextpdf:itext7-core:7.2.5") {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
+    }
+    implementation("org.bouncycastle:bcprov-jdk15to18:1.79")
 
     // Para imprimir
     implementation("androidx.print:print:1.0.0")

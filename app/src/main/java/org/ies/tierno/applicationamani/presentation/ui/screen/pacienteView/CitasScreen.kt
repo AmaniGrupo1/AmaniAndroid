@@ -885,9 +885,9 @@ fun DialogoGestionCitaAmani(
                     val terapia = terapiaSeleccionada ?: return@Button
                     val hora = horaSeleccionada ?: return@Button
 
-                    if (modoEdicion && citaEditando != null) {
+                    if (modoEdicion && citaExistente != null) {
                         onEditarCita(
-                            citaEditando.id,
+                            citaExistente.id,
                             idPaciente,
                             fechaSeleccionada,
                             hora,
