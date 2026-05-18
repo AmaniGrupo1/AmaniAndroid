@@ -30,6 +30,9 @@ import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 
 // Colores para validaciones
 private val SuccessColor = Color(0xFF81C784)
@@ -67,6 +70,7 @@ fun RegisterScreen(
     )
 
     val scope = rememberCoroutineScope()
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
@@ -108,7 +112,6 @@ fun RegisterScreen(
     var passwordTouched by remember { mutableStateOf(false) }
     var telefonoTouched by remember { mutableStateOf(false) }
     var dniTouched by remember { mutableStateOf(false) }
-    var fechaTouched by remember { mutableStateOf(false) }
     var tutorEmailTouched by remember { mutableStateOf(false) }
     var tutorTelefonoTouched by remember { mutableStateOf(false) }
     var tutorDniTouched by remember { mutableStateOf(false) }
@@ -117,6 +120,23 @@ fun RegisterScreen(
     var expandedGenero by remember { mutableStateOf(false) }
     var expandedSituacion by remember { mutableStateOf(false) }
     var expandedTipoTutor by remember { mutableStateOf(false) }
+
+    // Estado para el DatePicker
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // Convertir fechaNacimiento String a LocalDate para el DatePicker
+    val selectedDate = remember(fechaNacimiento) {
+        try {
+            if (fechaNacimiento.isNotBlank()) {
+                LocalDate.parse(fechaNacimiento)
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // Estado para error de fecha
+    var dateError by remember { mutableStateOf<String?>(null) }
 
     // Estado para el diálogo de alerta
     var showSuccessDialog by remember { mutableStateOf(false) }
@@ -143,7 +163,12 @@ fun RegisterScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(
+                        onClick = {
+                            loginViewModel.limpiarFormulario()
+                            navController.popBackStack()
+                        }
+                    ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
@@ -495,50 +520,59 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Fecha de nacimiento
+                    // ==================== FECHA DE NACIMIENTO CON DATEPICKER ====================
                     OutlinedTextField(
-                        value = fechaNacimiento,
-                        onValueChange = {
-                            loginViewModel.setFechaNacimiento(it)
-                            fechaTouched = true
-                        },
-                        label = { Text("Fecha nacimiento *", fontFamily = roboto, color = textColor) },
-                        placeholder = { Text("1990-05-15", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
-                        modifier = Modifier.fillMaxWidth(),
+                        value = selectedDate?.format(dateFormatter) ?: "",
+                        onValueChange = {},
+                        label = { Text("Fecha de nacimiento *", fontFamily = roboto, color = textColor) },
+                        placeholder = { Text("DD/MM/AAAA", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showDatePicker = true },
+                        readOnly = true,
                         shape = textFieldShape,
-                        isError = fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(
+                                    Icons.Default.CalendarToday,
+                                    contentDescription = "Seleccionar fecha",
+                                    tint = textColor
+                                )
+                            }
+                        },
+                        isError = dateError != null,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
-                            focusedBorderColor = if (fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) ErrorColor else primaryColor,
+                            focusedBorderColor = if (dateError != null) ErrorColor else primaryColor,
                             unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
+                            focusedLabelColor = if (dateError != null) ErrorColor else primaryColor,
                             unfocusedLabelColor = textColor
                         ),
                         supportingText = {
                             when {
-                                !fechaTouched && fechaNacimiento.isBlank() -> {
+                                dateError != null -> {
                                     Text(
-                                        "📅 Introduce la fecha de nacimiento (YYYY-MM-DD)",
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
-                                    )
-                                }
-                                fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
-                                    Text(
-                                        "❌ Formato inválido (YYYY-MM-DD)",
+                                        "❌ $dateError",
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
-                                fechaTouched && fechaNacimiento.isNotBlank() && fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
+                                selectedDate != null -> {
                                     Text(
                                         "✅ Fecha válida",
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
+                                    )
+                                }
+                                else -> {
+                                    Text(
+                                        "📅 Selecciona tu fecha de nacimiento",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                             }
@@ -548,7 +582,7 @@ fun RegisterScreen(
             }
 
             // ==================== SECCIÓN 2: DATOS DEL TUTOR (SOLO SI ES MENOR) ====================
-            if (esMenor && fechaNacimiento.isNotBlank()) {
+            if (esMenor && selectedDate != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = tutorCardColor),
@@ -1125,16 +1159,29 @@ fun RegisterScreen(
             val registerSuccess by loginViewModel.registerSuccess.collectAsStateWithLifecycle()
             val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
 
+            // Validar que la fecha sea válida y mayor de edad
+            val isDateValid = selectedDate != null && dateError == null
+
             Button(
                 onClick = {
-                    loginViewModel.registrarPaciente()
+                    if (selectedDate != null) {
+                        val age = Period.between(selectedDate, LocalDate.now()).years
+                        if (age >= 18) {
+                            loginViewModel.setFechaNacimiento(selectedDate.toString())
+                            loginViewModel.registrarPaciente()
+                        } else {
+                            dateError = "Debes ser mayor de 18 años"
+                        }
+                    } else {
+                        dateError = "Selecciona una fecha de nacimiento"
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                enabled = formularioCompletoValido
+                enabled = formularioCompletoValido && isDateValid
             ) {
                 Text(
                     text = "📝 Registrar Paciente",
@@ -1155,6 +1202,61 @@ fun RegisterScreen(
                     loginViewModel.resetRegisterState()
                 }
             }
+        }
+    }
+
+    // ==================== DATEPICKER DIALOG ====================
+    if (showDatePicker) {
+        // Crear el estado con la fecha inicial si existe
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedDate?.let {
+                it.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            }
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedDateMillis = datePickerState.selectedDateMillis
+
+                        if (selectedDateMillis != null) {
+                            val newSelectedDate = java.time.Instant.ofEpochMilli(selectedDateMillis)
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate()
+
+                            val age = Period.between(newSelectedDate, LocalDate.now()).years
+
+                            if (age >= 18) {
+                                // Actualizar la fecha en formato String para el ViewModel
+                                loginViewModel.setFechaNacimiento(newSelectedDate.toString())
+                                dateError = null
+                                showDatePicker = false
+                            } else {
+                                dateError = "Debes ser mayor de 18 años"
+                                showDatePicker = false
+                            }
+                        } else {
+                            dateError = "Selecciona una fecha válida"
+                            showDatePicker = false
+                        }
+                    }
+                ) {
+                    Text("Aceptar", fontFamily = roboto, color = primaryColor)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDatePicker = false }
+                ) {
+                    Text("Cancelar", fontFamily = roboto, color = textColor)
+                }
+            }
+        ) {
+            DatePicker(
+                state = datePickerState
+            )
         }
     }
 

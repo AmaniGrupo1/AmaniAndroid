@@ -13,7 +13,6 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -30,6 +29,9 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewMode
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 
 // Colores para validaciones
 private val SuccessColor = Color(0xFF81C784)
@@ -57,6 +59,7 @@ fun RegistrarPacientePsicologoScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
@@ -98,6 +101,23 @@ fun RegistrarPacientePsicologoScreen(
     var expandedSituacion by remember { mutableStateOf(false) }
     var expandedTipoTutor by remember { mutableStateOf(false) }
 
+    // Estado para el DatePicker
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // Convertir fechaNacimiento String a LocalDate para el DatePicker
+    val selectedDate = remember(fechaNacimiento) {
+        try {
+            if (fechaNacimiento.isNotBlank()) {
+                LocalDate.parse(fechaNacimiento)
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // Estado para error de fecha
+    var dateError by remember { mutableStateOf<String?>(null) }
+
     // Estado para los diálogos
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -108,7 +128,6 @@ fun RegistrarPacientePsicologoScreen(
     var passwordTouched by remember { mutableStateOf(false) }
     var telefonoTouched by remember { mutableStateOf(false) }
     var dniTouched by remember { mutableStateOf(false) }
-    var fechaTouched by remember { mutableStateOf(false) }
     var tutorEmailTouched by remember { mutableStateOf(false) }
     var tutorTelefonoTouched by remember { mutableStateOf(false) }
     var tutorDniTouched by remember { mutableStateOf(false) }
@@ -188,6 +207,8 @@ fun RegistrarPacientePsicologoScreen(
                         )
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     // Apellido
                     OutlinedTextField(
                         value = apellido,
@@ -204,6 +225,8 @@ fun RegistrarPacientePsicologoScreen(
                             unfocusedLabelColor = textColor
                         )
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // DNI
                     OutlinedTextField(
@@ -255,6 +278,8 @@ fun RegistrarPacientePsicologoScreen(
                         }
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     // Email
                     OutlinedTextField(
                         value = email,
@@ -303,6 +328,8 @@ fun RegistrarPacientePsicologoScreen(
                             }
                         }
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Contraseña
                     OutlinedTextField(
@@ -362,6 +389,8 @@ fun RegistrarPacientePsicologoScreen(
                         }
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     // Teléfono
                     OutlinedTextField(
                         value = telefono,
@@ -412,6 +441,8 @@ fun RegistrarPacientePsicologoScreen(
                         }
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     // Dropdown Género
                     ExposedDropdownMenuBox(
                         expanded = expandedGenero,
@@ -452,50 +483,61 @@ fun RegistrarPacientePsicologoScreen(
                         }
                     }
 
-                    // Fecha de nacimiento
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // ==================== FECHA DE NACIMIENTO CON DATEPICKER ====================
                     OutlinedTextField(
-                        value = fechaNacimiento,
-                        onValueChange = {
-                            loginViewModel.setFechaNacimiento(it)
-                            fechaTouched = true
-                        },
+                        value = selectedDate?.format(dateFormatter) ?: "",
+                        onValueChange = {},
                         label = { Text(stringResource(R.string.fecha_nacimiento_label), fontFamily = roboto, color = textColor) },
-                        placeholder = { Text(stringResource(R.string.placeholder_fecha), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
-                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("DD/MM/AAAA", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showDatePicker = true },
+                        readOnly = true,
                         shape = textFieldShape,
-                        isError = fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")),
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(
+                                    Icons.Default.CalendarToday,
+                                    contentDescription = "Seleccionar fecha",
+                                    tint = textColor
+                                )
+                            }
+                        },
+                        isError = dateError != null,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
-                            focusedBorderColor = if (fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}"""))) ErrorColor else primaryColor,
+                            focusedBorderColor = if (dateError != null) ErrorColor else primaryColor,
                             unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
+                            focusedLabelColor = if (dateError != null) ErrorColor else primaryColor,
                             unfocusedLabelColor = textColor
                         ),
                         supportingText = {
                             when {
-                                !fechaTouched && fechaNacimiento.isBlank() -> {
+                                dateError != null -> {
                                     Text(
-                                        "📅 Introduce la fecha (YYYY-MM-DD)",
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
-                                    )
-                                }
-                                fechaTouched && fechaNacimiento.isNotBlank() && !fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
-                                    Text(
-                                        "❌ Formato inválido (YYYY-MM-DD)",
+                                        "❌ $dateError",
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
-                                fechaTouched && fechaNacimiento.isNotBlank() && fechaNacimiento.matches(Regex("""\d{4}-\d{2}-\d{2}""")) -> {
+                                selectedDate != null -> {
                                     Text(
                                         "✅ Fecha válida",
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
+                                    )
+                                }
+                                else -> {
+                                    Text(
+                                        "📅 Selecciona tu fecha de nacimiento",
+                                        fontSize = 11.sp,
+                                        fontFamily = roboto,
+                                        color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                             }
@@ -505,7 +547,7 @@ fun RegistrarPacientePsicologoScreen(
             }
 
             // ==================== SECCIÓN 2: DATOS DEL TUTOR (SOLO SI ES MENOR) ====================
-            if (esMenor && fechaNacimiento.isNotBlank()) {
+            if (esMenor && selectedDate != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = tutorCardColor),
@@ -551,6 +593,8 @@ fun RegistrarPacientePsicologoScreen(
                                 unfocusedLabelColor = textColor
                             )
                         )
+
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Teléfono del tutor
                         OutlinedTextField(
@@ -602,6 +646,8 @@ fun RegistrarPacientePsicologoScreen(
                             }
                         )
 
+                        Spacer(modifier = Modifier.height(12.dp))
+
                         // Email del tutor
                         OutlinedTextField(
                             value = tutorEmail,
@@ -650,6 +696,8 @@ fun RegistrarPacientePsicologoScreen(
                                 }
                             }
                         )
+
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // DNI del tutor
                         OutlinedTextField(
@@ -700,6 +748,8 @@ fun RegistrarPacientePsicologoScreen(
                                 }
                             }
                         )
+
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Dropdown Tipo de Tutor
                         ExposedDropdownMenuBox(
@@ -784,6 +834,8 @@ fun RegistrarPacientePsicologoScreen(
                         )
                     )
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -819,6 +871,8 @@ fun RegistrarPacientePsicologoScreen(
                             )
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -1067,16 +1121,29 @@ fun RegistrarPacientePsicologoScreen(
             val registerSuccess by loginViewModel.crearPacienteDesdePsicologoSuccess.collectAsStateWithLifecycle()
             val registerError by loginViewModel.crearPacienteDesdePsicologoError.collectAsStateWithLifecycle()
 
+            // Validar que la fecha sea válida y mayor de edad
+            val isDateValid = selectedDate != null && dateError == null
+
             Button(
                 onClick = {
-                    loginViewModel.registrarPacienteDesdePsicologo()
+                    if (selectedDate != null) {
+                        val age = Period.between(selectedDate, LocalDate.now()).years
+                        if (age >= 18) {
+                            loginViewModel.setFechaNacimiento(selectedDate.toString())
+                            loginViewModel.registrarPacienteDesdePsicologo()
+                        } else {
+                            dateError = "Debes ser mayor de 18 años"
+                        }
+                    } else {
+                        dateError = "Selecciona una fecha de nacimiento"
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                enabled = formularioCompletoValido
+                enabled = formularioCompletoValido && isDateValid
             ) {
                 Text(
                     text = stringResource(R.string.boton_registrar_paciente),
@@ -1097,6 +1164,61 @@ fun RegistrarPacientePsicologoScreen(
                     loginViewModel.resetCrearPacienteDesdePsicologoState()
                 }
             }
+        }
+    }
+
+    // ==================== DATEPICKER DIALOG ====================
+    if (showDatePicker) {
+        // Crear el estado con la fecha inicial si existe
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedDate?.let {
+                it.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            }
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedDateMillis = datePickerState.selectedDateMillis
+
+                        if (selectedDateMillis != null) {
+                            val newSelectedDate = java.time.Instant.ofEpochMilli(selectedDateMillis)
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate()
+
+                            val age = Period.between(newSelectedDate, LocalDate.now()).years
+
+                            if (age >= 18) {
+                                // Actualizar la fecha en formato String para el ViewModel
+                                loginViewModel.setFechaNacimiento(newSelectedDate.toString())
+                                dateError = null
+                                showDatePicker = false
+                            } else {
+                                dateError = "Debes ser mayor de 18 años"
+                                showDatePicker = false
+                            }
+                        } else {
+                            dateError = "Selecciona una fecha válida"
+                            showDatePicker = false
+                        }
+                    }
+                ) {
+                    Text("Aceptar", fontFamily = roboto, color = primaryColor)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDatePicker = false }
+                ) {
+                    Text("Cancelar", fontFamily = roboto, color = textColor)
+                }
+            }
+        ) {
+            DatePicker(
+                state = datePickerState
+            )
         }
     }
 
