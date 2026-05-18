@@ -46,20 +46,6 @@ fun DarAltaPsicologo(
             navigationIconContentColor = colors.onPrimary,
             actionIconContentColor = colors.onPrimary
         ),
-        navigationIcon = {
-            AnimatedVisibility(
-                visible = showBackButton,
-                enter = fadeIn() + slideInHorizontally(),
-                exit = fadeOut() + slideOutHorizontally()
-            ) {
-                IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver"
-                    )
-                }
-            }
-        },
         title = {
             AnimatedContent(
                 targetState = showLogo to title,

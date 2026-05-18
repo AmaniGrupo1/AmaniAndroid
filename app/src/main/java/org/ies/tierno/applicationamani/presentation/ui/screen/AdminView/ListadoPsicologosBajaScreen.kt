@@ -51,7 +51,6 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.DarAltaPsicologo
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
@@ -135,15 +134,16 @@ fun ListadoPsicologosBajaScreen(
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
-            DarAltaPsicologo(
-                title = "Psicólogos Dados de Baja",
-                navController = navController,
-                showBackButton = true,
-                showLogo = false,
-                onLogout = {
-                    // Aquí puedes implementar la lógica de cierre de sesión si la tienes
-                }
-            )
+                Text(
+                    text = "Psicólogos dados de baja",
+                    style = typography.headlineMedium?.copy(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
+                    ) ?: MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(16.dp),
+                    fontFamily = roboto
+                )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
