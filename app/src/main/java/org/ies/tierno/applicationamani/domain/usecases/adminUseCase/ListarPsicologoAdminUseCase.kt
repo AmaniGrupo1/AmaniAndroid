@@ -4,9 +4,17 @@ import kotlinx.coroutines.flow.Flow
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 
+class ListarPsicologoAdminUseCase(
+    private val authRepository: AuthRepository
+) {
 
-class ListarPsicologoAdminUseCase(val authRepository: AuthRepository) {
-     operator fun invoke(): Flow<List<PsicologoSelfResponseDTO>> {
+    // Psicólogos ACTIVOS
+    operator fun invoke(): Flow<List<PsicologoSelfResponseDTO>> {
         return authRepository.getPsicologos()
+    }
+
+    // Psicólogos DADOS DE BAJA
+    fun getPsicologosBaja(): Flow<List<PsicologoSelfResponseDTO>> {
+        return authRepository.getPsicologosBaja()
     }
 }

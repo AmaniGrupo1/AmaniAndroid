@@ -110,9 +110,7 @@ val retrofitModule = module {
             .create()
 
         Retrofit.Builder()
-            // .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
-
-             .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(get<okhttp3.OkHttpClient>())  // Usar el mismo cliente
             .build()

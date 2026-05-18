@@ -28,6 +28,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AdminPro
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosBajaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosSimpleScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
@@ -95,6 +96,7 @@ fun NavGraph(
     val listaPsicologoSimple : ListarPsicologosAdminViewModel = koinViewModel()
     val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
     val listarPacientesViewModel : ListarPacientesViewModel = koinViewModel()
+
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val idiomaViewModel : IdiomaViewModel = koinViewModel()
@@ -184,6 +186,9 @@ fun NavGraph(
             }
             composable(Screens.pacientes.route) {
                 ListadoPacientesScreen(navController,listarPacientesViewModel)
+            }
+            composable(Screens.listarPsicologosBaja.route) {
+                ListadoPsicologosBajaScreen(navController,listaPsicologoSimple, listarPacientesViewModel)
             }
             composable(Screens.cambiarRol.route) {
                 // Pasar lambda de navegación para que el botón de volver funcione correctamente
@@ -306,118 +311,82 @@ fun NavGraph(
             composable(
                 route = Screens.paymentScreen.route,
                 arguments = listOf(
-                    androidx.navigation.navArgument("citaId") { type = androidx.navigation.NavType.LongType },
-                    androidx.navigation.navArgument("psicologoName") { type = androidx.navigation.NavType.StringType },
-                    androidx.navigation.navArgument("fecha") { type = androidx.navigation.NavType.StringType },
-                    androidx.navigation.navArgument("monto") { type = androidx.navigation.NavType.StringType }
+                    navArgument("citaId") { type = NavType.LongType },
+                    navArgument("psicologoName") { type = NavType.StringType },
+                    navArgument("fecha") { type = NavType.StringType },
+                    navArgument("monto") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
                 val citaId = backStackEntry.arguments?.getLong("citaId") ?: 0L
-                val psicologoName = backStackEntry.arguments?.getString("psicologoName") ?: ""
+                val psicologoName = Uri.decode(backStackEntry.arguments?.getString("psicologoName") ?: "")
                 val fecha = backStackEntry.arguments?.getString("fecha") ?: ""
                 val monto = backStackEntry.arguments?.getString("monto") ?: ""
-                val paymentViewModel: PaymentViewModel = org.koin.androidx.compose.koinViewModel()
-                PaymentScreen(
-                    citaId = citaId,
-                    psicologoName = psicologoName,
-                    fecha = fecha,
-                    monto = monto,
-                    viewModel = paymentViewModel,
-                    onPaymentSuccess = { navController.popBackStack() },
-                    onPaymentCanceled = { navController.popBackStack() }
-                )
+
+                val viewModel: PaymentViewModel = koinViewModel()
+                PaymentScreen(navController, citaId, psicologoName, fecha, monto, viewModel)
             }
+
             composable(Screens.misTickets.route) {
                 MisTicketsScreen(navController)
             }
-            composable(Screens.registroPacienteDesdePsicologo.route){
-                RegistrarPacientePsicologoScreen(navController, loginViewModel, situacionViewModel)
-            }
-            composable(Screens.pacientesSinPsicologo.route){
-                ListarPacienteSinPsicologos(navController)
+
+            composable(Screens.settingsAdmin.route) {
+                SettingsAdminScreen(navController)
             }
 
-            composable(Screens.settingsAdmin.route){
-                SettingsAdminScreen(navController, userSessionDataStore, idiomaViewModel)
+            composable(Screens.editProfilePsicologo.route) { backStackEntry ->
+                val identificador = backStackEntry.arguments?.getString("identificador")?.toLongOrNull() ?: 0L
+                EditProfilePsicologoScreen(navController, identificador)
             }
 
-
-            composable(
-                route = Screens.editProfilePsicologo.route,
-                arguments = listOf(
-                    navArgument("identificador") {
-                        type = NavType.LongType
-                    }
-                )
-            ) { backStackEntry ->
-                val idPsicologo = backStackEntry.arguments?.getLong("identificador") ?: 0L
-                EditProfilePsicologoScreen(navController, idPsicologo)
+            composable(Screens.settingPsicologo.route) {
+                val idPsicologo = session?.idPsicologo ?: 0L
+                SettingsPsychologistScreen(idPsicologo, navController)
             }
 
-            composable(Screens.settingPsicologo.route){
-                SettingsPsychologistScreen(navController, userSessionDataStore, idiomaViewModel)
+            composable(Screens.terapias.route) {
+                TerapiasScreen(navController)
             }
-            composable(Screens.terapias.route){
-                TerapiasScreen(navController, listarTerapiasViewModel)
+
+            composable(Screens.crearSituaciones.route) {
+                SituacionAdminScreen(navController)
             }
-            composable(Screens.crearSituaciones.route){
-                SituacionAdminScreen(navController, situacionViewModel)
-            }
-            composable(Screens.politicaPrivacidad.route){
+
+            composable(Screens.politicaPrivacidad.route) {
                 GestionPoliticasScreen(navController)
             }
+
+            composable(
+                route = Screens.historialClinico.route,
+                arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
+                HistorialClinicoScreen(pacienteId, navController, historialClinicoPacienteViewModel)
+            }
+
             composable(
                 route = Screens.profileAdmin.route,
-                arguments = listOf(
-                    navArgument("adminId") {
-                        type = NavType.LongType
-                    }
-                )
+                arguments = listOf(navArgument("adminId") { type = NavType.LongType })
             ) { backStackEntry ->
                 val adminId = backStackEntry.arguments?.getLong("adminId") ?: 0L
                 AdminProfileScreen(adminId, navController)
             }
+
             composable(
                 route = Screens.perfilPaciente.route,
-                arguments = listOf(
-                    navArgument("pacienteId") {
-                        type = NavType.LongType
-                    }
-                )
+                arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
             ) { backStackEntry ->
                 val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
                 PacienteProfileScreen(pacienteId, navController)
             }
 
             composable(
-                route = Screens.historialClinico.route,
-                arguments = listOf(
-                    navArgument("pacienteId") {
-                        type = NavType.LongType
-                    }
-                )
-            ) { backStackEntry ->
-                val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-                HistorialClinicoScreen(navController, pacienteId, historialClinicoPacienteViewModel, userSessionDataStore)
-            }
-
-            composable(
                 route = Screens.crearHistorialClinico.route,
-                arguments = listOf(
-                    navArgument("pacienteId") {
-                        type = NavType.LongType
-                    }
-                )
+                arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
             ) { backStackEntry ->
                 val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: 0L
-                CrearHistorialClinicoScreen(
-                    navController = navController,
-                    pacienteId = pacienteId,
-                    historialClinicoPacienteViewModel
-                )
+                CrearHistorialClinicoScreen(pacienteId, navController)
             }
-
-            // En tu NavGraph, añade:
 
             composable(
                 route = Screens.documentoLegalDetail.route,

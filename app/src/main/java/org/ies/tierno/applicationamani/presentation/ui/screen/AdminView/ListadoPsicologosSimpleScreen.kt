@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -57,7 +56,14 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+<<<<<<< HEAD
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
+=======
+import org.ies.tierno.applicationamani.presentation.ui.componente.admin.DarAltaPsicologo
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+>>>>>>> login
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
@@ -95,18 +101,34 @@ fun ListadoPsicologosSimpleScreen(
 
     // Efecto para manejar el resultado de la baja
     LaunchedEffect(bajaEstado) {
+
         if (bajaEstado != null && isBajaInProgress) {
+
             if (bajaEstado!!.isSuccess) {
+
+                // QUITAR DE LA LISTA LOCAL
+                viewModel.actualizarPsicologoBaja(
+                    psicologoSeleccionado!!.idPsicologo
+                )
+
                 snackbarHostState.showSnackbar(
                     "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
                 )
+
                 mostrarDialogoBaja = false
+
                 psicologoSeleccionado = null
+
             } else if (bajaEstado!!.isFailure) {
+
                 snackbarHostState.showSnackbar(
-                    "Error al dar de baja: ${bajaEstado!!.exceptionOrNull()?.message ?: "Error desconocido"}"
+                    "Error al dar de baja: ${
+                        bajaEstado!!.exceptionOrNull()?.message
+                            ?: "Error desconocido"
+                    }"
                 )
             }
+
             isBajaInProgress = false
         }
     }
@@ -114,6 +136,7 @@ fun ListadoPsicologosSimpleScreen(
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
+<<<<<<< HEAD
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -136,6 +159,18 @@ fun ListadoPsicologosSimpleScreen(
                     MenuAdministrador("Listado de psicólogos", navController)
                 }
             }
+=======
+            // ✅ CORRECCIÓN: Llamar correctamente a DarAltaPsicologo con todos los parámetros necesarios
+            DarAltaPsicologo(
+                title = "Lista de Psicólogos",
+                navController = navController,
+                showBackButton = true,
+                showLogo = false,
+                onLogout = {
+                    // Aquí puedes implementar la lógica de cierre de sesión si la tienes
+                }
+            )
+>>>>>>> login
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
@@ -149,7 +184,11 @@ fun ListadoPsicologosSimpleScreen(
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Agregar psicólogo",
+<<<<<<< HEAD
                     tint = MaterialTheme.colorScheme.onPrimary
+=======
+                    tint = Color.White
+>>>>>>> login
                 )
             }
         }

@@ -116,6 +116,8 @@ sealed class Screens(val route: String) {
     object terapias : Screens("terapias")
     object crearSituaciones : Screens("crearSituaciones")
     object politicaPrivacidad : Screens("politicaPrivacidad")
+    object listarPsicologosBaja : Screens("listarPsicologosBaja")
+
     object historialClinico : Screens("historialClinico/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
     }

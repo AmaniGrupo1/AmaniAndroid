@@ -1,7 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.admin
-
+    
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,18 +24,26 @@ class ListarPacientesViewModel(
     private val _bajaEstado = MutableStateFlow<Result<MessageResponse>?>(null)
     val bajaEstado: StateFlow<Result<MessageResponse>?> = _bajaEstado
 
+    // ============================
+    // ESTADO ALTA PSICOLOGO
+    // ============================
+    private val _altaEstado = MutableStateFlow<Result<MessageResponse>?>(null)
+    val altaEstado: StateFlow<Result<MessageResponse>?> = _altaEstado
+
+    // ============================
+    // RECARGA
+    // ============================
+    private val _recargarLista = MutableStateFlow(false)
+    val recargarLista: StateFlow<Boolean> = _recargarLista
+
     init {
-        // Solo iniciar las llamadas protegidas cuando exista sesión de usuario.
         viewModelScope.launch {
-            // Comprobar sesión actual de forma suspensiva
             val session = userSessionDataStore.getSession()
             if (session != null) {
-                // Si ya hay sesión, iniciar colección de pacientes
                 listarPacientesUseCase().collect { lista ->
                     _paciente.value = lista
                 }
             } else {
-                // Si no hay sesión todavía, esperar a que se establezca
                 userSessionDataStore.sessionFlow.collect { s ->
                     if (s != null) {
                         listarPacientesUseCase().collect { lista ->
@@ -48,27 +57,67 @@ class ListarPacientesViewModel(
         }
     }
 
-    /**
-     * Dar de baja paciente (CORREGIDO)
-     */
+    // =========================================================
+    // DAR BAJA
+    // =========================================================
     fun darBajaPsicologo(id: Long) {
         viewModelScope.launch {
             val result = darBajaPacienteUseCase(id)
-
             _bajaEstado.value = result
-
             if (result.isSuccess) {
                 actualizarPacienteBaja(id)
+                triggerRecarga()
             }
         }
     }
 
-    /**
-     * Actualiza localmente el estado del paciente
-     */
+    // =========================================================
+    // DAR ALTA PSICOLOGO
+    // =========================================================
+    fun darAltaPsicologo(id: Long) {
+        viewModelScope.launch {
+            val result = darBajaPacienteUseCase.darAltaPsicologo(id)
+            _altaEstado.value = result
+            if (result.isSuccess) {
+                triggerRecarga()
+                delay(3000)
+                _altaEstado.value = null
+            }
+        }
+    }
+
+    // =========================================================
+    // RECARGAR UI
+    // =========================================================
+    private fun triggerRecarga() {
+        _recargarLista.value = true
+        viewModelScope.launch {
+            delay(500)
+            _recargarLista.value = false
+        }
+    }
+
+    // =========================================================
+    // ACTUALIZAR LOCALMENTE
+    // =========================================================
     private fun actualizarPacienteBaja(id: Long) {
         _paciente.value = _paciente.value.map {
-            if (it.idPaciente == id) it.copy(activo = false) else it
+            if (it.idPaciente == id) {
+                it.copy(activo = false)
+            } else {
+                it
+            }
         }
+    }
+
+    // =========================================================
+    // LIMPIAR ESTADOS
+    // =========================================================
+    fun limpiarAltaEstado() {
+        _altaEstado.value = null
+    }
+
+    fun limpiarBajaEstado() {
+        _bajaEstado.value = null
     }
 }

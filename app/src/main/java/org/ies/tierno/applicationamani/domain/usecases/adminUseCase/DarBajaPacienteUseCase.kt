@@ -25,4 +25,8 @@ class DarBajaPacienteUseCase(val repository: AuthRepository) {
     suspend operator fun invoke(id: Long): Result<MessageResponse> {
         return repository.darBajaPaciente(id)
     }
+
+    suspend fun darAltaPsicologo(id: Long): Result<MessageResponse> {
+         return repository.darAltaPsicologo(id)
+    }
 }
