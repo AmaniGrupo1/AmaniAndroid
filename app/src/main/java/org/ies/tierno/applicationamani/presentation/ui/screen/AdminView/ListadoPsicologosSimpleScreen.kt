@@ -9,10 +9,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -20,12 +25,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,11 +54,15 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.DarAltaPsicologo
@@ -75,7 +86,6 @@ object AdminViewDefaultColors {
     val Error = Color(0xFFE57373)
     val Success = Color(0xFF81C784)
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosSimpleScreen(
@@ -85,11 +95,44 @@ fun ListadoPsicologosSimpleScreen(
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val psicologos by viewModel.psicologos.collectAsState()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    LaunchedEffect(navBackStackEntry) {
+        viewModel.recargarPsicologos()
+    }
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
+    var mostrarDialogoEdicion by remember { mutableStateOf(false) }
     var isBajaInProgress by remember { mutableStateOf(false) }
+    var isEditInProgress by remember { mutableStateOf(false) }
+
+    // Estados para el formulario de edición
+    var editNombre by remember { mutableStateOf("") }
+    var editApellido by remember { mutableStateOf("") }
+    var editEspecialidad by remember { mutableStateOf("") }
+    var editExperiencia by remember { mutableStateOf("") }
+    var editDescripcion by remember { mutableStateOf("") }
+    var editLicencia by remember { mutableStateOf("") }
+    var editTelefono by remember { mutableStateOf("") }
+    var editEmail by remember { mutableStateOf("") }
+
+    // Cargar datos del psicólogo cuando se abre el diálogo de edición
+    LaunchedEffect(mostrarDialogoEdicion, psicologoSeleccionado) {
+        if (mostrarDialogoEdicion && psicologoSeleccionado != null) {
+            editNombre = psicologoSeleccionado!!.nombre ?: ""
+            editApellido = psicologoSeleccionado!!.apellido ?: ""
+            editEspecialidad = psicologoSeleccionado!!.especialidad ?: ""
+            editExperiencia = psicologoSeleccionado!!.experiencia?.toString() ?: ""
+            editDescripcion = psicologoSeleccionado!!.descripcion ?: ""
+            editLicencia = psicologoSeleccionado!!.licencia ?: ""
+            editTelefono = psicologoSeleccionado!!.telefono ?: ""
+            editEmail = psicologoSeleccionado!!.email ?: ""
+        }
+    }
 
     // Obtener estado del tema
     val isDark = isDarkTheme()
@@ -115,34 +158,19 @@ fun ListadoPsicologosSimpleScreen(
 
     // Efecto para manejar el resultado de la baja
     LaunchedEffect(bajaEstado) {
-
         if (bajaEstado != null && isBajaInProgress) {
-
             if (bajaEstado!!.isSuccess) {
-
-                // QUITAR DE LA LISTA LOCAL
-                viewModel.actualizarPsicologoBaja(
-                    psicologoSeleccionado!!.idPsicologo
-                )
-
+                viewModel.actualizarPsicologoBaja(psicologoSeleccionado!!.idPsicologo)
                 snackbarHostState.showSnackbar(
                     "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de baja exitosamente"
                 )
-
                 mostrarDialogoBaja = false
-
                 psicologoSeleccionado = null
-
             } else if (bajaEstado!!.isFailure) {
-
                 snackbarHostState.showSnackbar(
-                    "Error al dar de baja: ${
-                        bajaEstado!!.exceptionOrNull()?.message
-                            ?: "Error desconocido"
-                    }"
+                    "Error al dar de baja: ${bajaEstado!!.exceptionOrNull()?.message ?: "Error desconocido"}"
                 )
             }
-
             isBajaInProgress = false
         }
     }
@@ -150,15 +178,12 @@ fun ListadoPsicologosSimpleScreen(
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
-            // ✅ CORRECCIÓN: Llamar correctamente a DarAltaPsicologo con todos los parámetros necesarios
             DarAltaPsicologo(
                 title = "Lista de Psicólogos",
                 navController = navController,
                 showBackButton = true,
                 showLogo = false,
-                onLogout = {
-                    // Aquí puedes implementar la lógica de cierre de sesión si la tienes
-                }
+                onLogout = {}
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -185,15 +210,9 @@ fun ListadoPsicologosSimpleScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = if (isDark) {
-                            listOf(
-                                screenColors.background,
-                                screenColors.background
-                            )
+                            listOf(screenColors.background, screenColors.background)
                         } else {
-                            listOf(
-                                accentColor,
-                                Color.White
-                            )
+                            listOf(accentColor, Color.White)
                         }
                     )
                 )
@@ -241,8 +260,8 @@ fun ListadoPsicologosSimpleScreen(
                                 mostrarDialogoBaja = true
                             },
                             onEditar = {
-                                // Navegar a editar psicólogo
-                                // navController.navigate("${Screens.editarPsicologo.route}/${psicologo.idPsicologo}")
+                                psicologoSeleccionado = psicologo
+                                mostrarDialogoEdicion = true
                             },
                             typography = typography,
                             isDark = isDark,
@@ -258,7 +277,7 @@ fun ListadoPsicologosSimpleScreen(
             }
         }
 
-        // ALERT DIALOG
+        // Diálogo de confirmación de baja
         if (mostrarDialogoBaja && psicologoSeleccionado != null && !isBajaInProgress) {
             AlertDialog(
                 onDismissRequest = {
@@ -294,9 +313,7 @@ fun ListadoPsicologosSimpleScreen(
                             isBajaInProgress = true
                             listarPaciente.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = errorColor
-                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = errorColor),
                         shape = RoundedCornerShape(12.dp),
                         enabled = !isBajaInProgress
                     ) {
@@ -319,19 +336,190 @@ fun ListadoPsicologosSimpleScreen(
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = primaryColor
-                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryColor),
                         enabled = !isBajaInProgress
                     ) {
+                        Text("Cancelar", fontFamily = roboto)
+                    }
+                }
+            )
+        }
+
+        // Diálogo de edición de psicólogo
+        if (mostrarDialogoEdicion && psicologoSeleccionado != null && !isEditInProgress) {
+            AlertDialog(
+                onDismissRequest = {
+                    if (!isEditInProgress) {
+                        mostrarDialogoEdicion = false
+                        psicologoSeleccionado = null
+                    }
+                },
+                containerColor = surfaceColor,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            tint = primaryColor,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "Cancelar",
-                            style = typography.labelLarge?.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.labelLarge,
+                            text = "Editar Psicólogo",
+                            style = typography.headlineSmall?.copy(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = textPrimaryColor
+                            ) ?: MaterialTheme.typography.headlineSmall,
                             fontFamily = roboto
                         )
+                    }
+                },
+                text = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 500.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Nombre
+                        OutlinedTextField(
+                            value = editNombre,
+                            onValueChange = { editNombre = it },
+                            label = { Text("Nombre *", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Apellido
+                        OutlinedTextField(
+                            value = editApellido,
+                            onValueChange = { editApellido = it },
+                            label = { Text("Apellido *", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Email
+                        OutlinedTextField(
+                            value = editEmail,
+                            onValueChange = { editEmail = it },
+                            label = { Text("Email", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Teléfono
+                        OutlinedTextField(
+                            value = editTelefono,
+                            onValueChange = { editTelefono = it },
+                            label = { Text("Teléfono", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Especialidad
+                        OutlinedTextField(
+                            value = editEspecialidad,
+                            onValueChange = { editEspecialidad = it },
+                            label = { Text("Especialidad *", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Experiencia
+                        OutlinedTextField(
+                            value = editExperiencia,
+                            onValueChange = { editExperiencia = it },
+                            label = { Text("Años de experiencia", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Licencia
+                        OutlinedTextField(
+                            value = editLicencia,
+                            onValueChange = { editLicencia = it },
+                            label = { Text("Número de licencia", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        // Descripción
+                        OutlinedTextField(
+                            value = editDescripcion,
+                            onValueChange = { editDescripcion = it },
+                            label = { Text("Descripción profesional", fontFamily = roboto) },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 3,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val experienciaInt = if (editExperiencia.isNotBlank()) editExperiencia.toIntOrNull() else null
+
+                            val request = PsicologoRequestDTO(
+                                nombrePsicologo = editNombre,
+                                apellidoPsicologo = editApellido,
+                                email = editEmail,
+                                password = "",
+                                especialidad = editEspecialidad,
+                                experiencia = experienciaInt,
+                                descripcion = editDescripcion.ifBlank { null },
+                                licencia = editLicencia.ifBlank { null },
+                                telefono = editTelefono.ifBlank { null }
+                            )
+
+                            isEditInProgress = true
+                            viewModel.editarPsicologo(psicologoSeleccionado!!.idPsicologo, request)
+
+                            scope.launch {
+                                delay(1000)
+                                isEditInProgress = false
+                                mostrarDialogoEdicion = false
+                                psicologoSeleccionado = null
+                                snackbarHostState.showSnackbar("✓ Psicólogo actualizado exitosamente")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = editNombre.isNotBlank() && editApellido.isNotBlank() && editEspecialidad.isNotBlank() && !isEditInProgress
+                    ) {
+                        if (isEditInProgress) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Guardando...", fontFamily = roboto)
+                        } else {
+                            Text("💾 GUARDAR", fontFamily = roboto, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            if (!isEditInProgress) {
+                                mostrarDialogoEdicion = false
+                                psicologoSeleccionado = null
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
+                        enabled = !isEditInProgress
+                    ) {
+                        Text("Cancelar", fontFamily = roboto)
                     }
                 }
             )
@@ -374,6 +562,59 @@ fun PsicologoCard(
                 fontFamily = roboto
             )
 
+            // Email
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Email:",
+                    style = typography.bodyMedium?.copy(
+                        fontSize = 13.sp,
+                        color = textSecondaryColor,
+                        fontWeight = FontWeight.Medium
+                    ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto
+                )
+                Text(
+                    text = psicologo.email,
+                    style = typography.bodyMedium?.copy(
+                        fontSize = 13.sp,
+                        color = textPrimaryColor
+                    ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Teléfono
+            if (!psicologo.telefono.isNullOrBlank()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Teléfono:",
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                    Text(
+                        text = psicologo.telefono,
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textPrimaryColor
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
             // Especialidad
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -399,6 +640,33 @@ fun PsicologoCard(
             }
 
             Spacer(modifier = Modifier.height(4.dp))
+
+            // Experiencia (NUEVO)
+            if (psicologo.experiencia != null && psicologo.experiencia > 0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Experiencia:",
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                    Text(
+                        text = "${psicologo.experiencia} años",
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textPrimaryColor
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
 
             // Licencia
             if (!psicologo.licencia.isNullOrBlank()) {
@@ -446,6 +714,8 @@ fun PsicologoCard(
                         color = textSecondaryColor
                     ) ?: MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 2.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     fontFamily = roboto
                 )
             }
@@ -459,40 +729,20 @@ fun PsicologoCard(
             ) {
                 Button(
                     onClick = onDarBaja,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = errorColor
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = errorColor),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(
-                        "Dar de baja",
-                        style = typography.labelMedium?.copy(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.labelMedium,
-                        color = Color.White,
-                        fontFamily = roboto
-                    )
+                    Text("Dar de baja", color = Color.White, fontFamily = roboto)
                 }
 
                 Button(
                     onClick = onEditar,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = primaryColor
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(
-                        "Editar",
-                        style = typography.labelMedium?.copy(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.labelMedium,
-                        color = Color.White,
-                        fontFamily = roboto
-                    )
+                    Text("Editar", color = Color.White, fontFamily = roboto)
                 }
             }
         }

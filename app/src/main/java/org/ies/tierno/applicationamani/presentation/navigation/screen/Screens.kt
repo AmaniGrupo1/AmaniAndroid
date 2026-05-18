@@ -96,6 +96,10 @@
             fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
         }
 
+        object editScreenPsicologo : Screens("editScreenPsicologo/{IdPsicologo}"){
+            fun createRoute(IdPsicologo: Long?) = "editProfilePsicologo/$IdPsicologo"
+        }
+
 
         object settingPsicologo : Screens("settingPsicologo")
 

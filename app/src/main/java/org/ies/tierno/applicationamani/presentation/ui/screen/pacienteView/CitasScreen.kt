@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
 import android.Manifest
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -74,8 +75,8 @@ object CitasScreenDefaultColors {
 @Composable
 fun CitasScreen(
     navController: NavController,
-    viewModel: PsicologoAgendaViewModel = koinViewModel(),
-    listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
+    viewModel: PsicologoAgendaViewModel,
+    listarTerapiasViewModel: ListarTerapiasViewModel
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val context = LocalContext.current
@@ -338,37 +339,81 @@ fun CitasScreen(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                         citasDelDia.forEach { cita ->
+                            // Card rediseñado más elegante
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
-                                shape = RoundedCornerShape(20.dp),
+                                    .padding(vertical = 8.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = colors.primaryLight.copy(alpha = 0.15f)
+                                    containerColor = colors.surface
                                 ),
-                                elevation = CardDefaults.cardElevation(2.dp)
+                                elevation = CardDefaults.cardElevation(
+                                    defaultElevation = 2.dp,
+                                    pressedElevation = 4.dp
+                                )
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(16.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column {
-                                        Text(
-                                            text = "🕐 ${cita.horaInicio.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 14.sp,
-                                            color = colors.textPrimary,
-                                            fontFamily = roboto
-                                        )
+                                    // Información principal de la cita
+                                    Column(
+                                        modifier = Modifier.weight(1f),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        // Hora y duración
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.AccessTime,
+                                                contentDescription = "Hora",
+                                                modifier = Modifier.size(18.dp),
+                                                tint = colors.primary
+                                            )
+                                            Text(
+                                                text = "${cita.horaInicio.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp,
+                                                color = colors.textPrimary,
+                                                fontFamily = roboto
+                                            )
+
+                                            // Duración
+                                            Surface(
+                                                shape = RoundedCornerShape(12.dp),
+                                                color = colors.primary.copy(alpha = 0.1f),
+                                                modifier = Modifier.padding(start = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = "${cita.duracionMinutos ?: 60} min",
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = colors.primary,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                                    fontFamily = roboto
+                                                )
+                                            }
+                                        }
+
+                                        // Motivo de la cita (si existe)
                                         if (!cita.motivo.isNullOrBlank()) {
                                             Text(
                                                 text = cita.motivo,
-                                                fontSize = 12.sp,
+                                                fontSize = 13.sp,
                                                 color = colors.textSecondary,
-                                                fontFamily = roboto
+                                                fontFamily = roboto,
+                                                maxLines = 2,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                             )
                                         }
+
+                                        // Estado de la cita
                                         Surface(
                                             shape = RoundedCornerShape(12.dp),
                                             color = when (cita.estado?.lowercase()) {
@@ -378,7 +423,12 @@ fun CitasScreen(
                                             }
                                         ) {
                                             Text(
-                                                text = cita.estado?.replaceFirstChar { it.uppercase() } ?: "Pendiente",
+                                                text = when (cita.estado?.lowercase()) {
+                                                    "confirmada" -> "✓ Confirmada"
+                                                    "cancelada" -> "✗ Cancelada"
+                                                    "pendiente" -> "⏳ Pendiente"
+                                                    else -> cita.estado?.replaceFirstChar { it.uppercase() } ?: "Pendiente"
+                                                },
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Medium,
                                                 color = when (cita.estado?.lowercase()) {
@@ -391,26 +441,49 @@ fun CitasScreen(
                                             )
                                         }
                                     }
-                                    Row {
-                                        IconButton(onClick = {
-                                            navController.navigate(
-                                                Screens.editarCitaScreen.pass(cita.id.toString())
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    // Botón para agregar al calendario
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        IconButton(
+                                            onClick = {
+                                                enviarCitaAlCalendario(
+                                                    context = context,
+                                                    titulo = "Cita en Amani",
+                                                    descripcion = cita.motivo ?: "Cita psicológica",
+                                                    fecha = cita.fecha,
+                                                    hora = cita.horaInicio,
+                                                    duracionMinutos = cita.duracionMinutos ?: 60
+                                                )
+                                            },
+                                            modifier = Modifier
+                                                .size(44.dp)
+                                                .background(
+                                                    brush = Brush.linearGradient(
+                                                        colors = listOf(colors.primary, colors.primaryLight)
+                                                    ),
+                                                    shape = RoundedCornerShape(12.dp)
+                                                )
+                                        ) {
+                                            Icon(
+                                                Icons.Default.CalendarMonth,
+                                                contentDescription = "Agregar a calendario",
+                                                tint = if (isDark) Color.Black else Color.White,
+                                                modifier = Modifier.size(22.dp)
                                             )
-                                        }) {
-                                            Icon(Icons.Default.Edit, contentDescription = "Editar", tint = colors.primary)
                                         }
-                                        IconButton(onClick = {
-                                            enviarCitaAlCalendario(
-                                                context = context,
-                                                titulo = "Cita en Amani",
-                                                descripcion = cita.motivo ?: "Cita psicológica",
-                                                fecha = cita.fecha,
-                                                hora = cita.horaInicio,
-                                                duracionMinutos = cita.duracionMinutos ?: 60
-                                            )
-                                        }) {
-                                            Icon(Icons.Default.CalendarMonth, contentDescription = "Calendario", tint = colors.primary)
-                                        }
+
+                                        Text(
+                                            text = "Calendario",
+                                            fontSize = 10.sp,
+                                            color = colors.textSecondary,
+                                            fontFamily = roboto,
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
                                     }
                                 }
                             }
@@ -513,6 +586,13 @@ fun CitasScreen(
                 viewModel.cargarDisponibilidadDia(nuevaFecha)
             },
             onCrearCita = { idPacienteParam, fecha, hora, duracion, motivo, idTerapia, metodoPago, estadoPago, monto, modalidad ->
+                Log.d("CITAS_SCREEN", "========== CREAR CITA ==========")
+                Log.d("CITAS_SCREEN", "idPaciente: $idPacienteParam")
+                Log.d("CITAS_SCREEN", "fecha: $fecha, hora: $hora")
+                Log.d("CITAS_SCREEN", "duracion: $duracion, motivo: $motivo")
+                Log.d("CITAS_SCREEN", "idTerapia: $idTerapia")
+                Log.d("CITAS_SCREEN", "metodoPago: $metodoPago, estadoPago: $estadoPago")
+                Log.d("CITAS_SCREEN", "monto: $monto, modalidad: $modalidad")
                 scope.launch {
                     val result = viewModel.crearCitaParaPaciente(
                         idPaciente = idPacienteParam,
@@ -526,8 +606,9 @@ fun CitasScreen(
                         monto = monto,
                         modalidad = modalidad
                     )
-
+                    Log.d("CITAS_SCREEN", "Resultado creación cita: ${result.isSuccess}")
                     if (result.isSuccess) {
+                        Log.e("CITAS_SCREEN", "Error: ${result.exceptionOrNull()?.message}")
                         programarConPermiso(fecha, hora)
                         snackbarHostState.showSnackbar("✅ Cita creada correctamente")
                         mostrarDialogo = false

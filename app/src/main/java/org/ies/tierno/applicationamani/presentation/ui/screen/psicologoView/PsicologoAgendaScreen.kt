@@ -1843,7 +1843,7 @@ fun DialogoCrearEditarCitaMejorado(
                                 RadioButton(
                                     selected = metodoPagoSeleccionado == MetodoPago.EFECTIVO,
                                     onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO })
-                                Text("Presencial")
+                                Text("Efectivo")
                             }
                             Row(
                                 modifier = Modifier.weight(1f),
@@ -1852,7 +1852,7 @@ fun DialogoCrearEditarCitaMejorado(
                                 RadioButton(
                                     selected = metodoPagoSeleccionado == MetodoPago.TARJETA,
                                     onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA })
-                                Text("Online")
+                                Text("Tarjeta")
                             }
                         }
 

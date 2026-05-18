@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.data.repositorio
 
 import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
+import org.ies.tierno.applicationamani.domain.models.admin.PsicologoConPacientesDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.AdminDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.AdminResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO
@@ -10,6 +11,7 @@ import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 
 class ProfileRepository(private val api: ProfileApi){
 
@@ -154,5 +156,25 @@ class ProfileRepository(private val api: ProfileApi){
         }
     }
 
+    // =====================================================
+    // 🔵 ACTUALIZAR PSICÓLOGO DESDE ADMIN
+    // =====================================================
+
+    suspend fun updatePerfilPsicologoAdmin(
+        id: Long,
+        dto: PsicologoRequestDTO
+    ): Result<PsicologoConPacientesDTO> {
+
+        return try {
+
+            val response = api.updatePerfilPsicologoAdmin(id, dto)
+
+            Result.success(response)
+
+        } catch (e: Exception) {
+
+            Result.failure(e)
+        }
+    }
 
 }

@@ -143,7 +143,7 @@ val appModule = module {
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { ListarPacientesViewModel(get(), get(), get()) }
-    viewModel { ListarPsicologosAdminViewModel(get(), get()) }
+    viewModel { ListarPsicologosAdminViewModel(get(), get(), get()) }
     viewModel { PrincipalClienteViewModel() }
     viewModel { SettingsClienteViewModel() }
     viewModel { SituacionViewModel(get(), get()) }
