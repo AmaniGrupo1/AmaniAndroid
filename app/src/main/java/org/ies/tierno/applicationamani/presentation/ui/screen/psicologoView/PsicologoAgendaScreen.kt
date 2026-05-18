@@ -1039,8 +1039,8 @@ fun TarjetaCitaMejorada(
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     when (cita.metodoPago) {
-                        MetodoPago.EFECTIVO -> Icons.Default.Payments
-                        MetodoPago.TARJETA -> Icons.Default.CreditCard
+                        MetodoPago.EFECTIVO, MetodoPago.PRESENCIAL -> Icons.Default.Payments
+                        MetodoPago.TARJETA, MetodoPago.ONLINE -> Icons.Default.CreditCard
                         null -> Icons.Default.Info
                     },
                     contentDescription = null,
@@ -1052,6 +1052,8 @@ fun TarjetaCitaMejorada(
                     text = when (cita.metodoPago) {
                         MetodoPago.EFECTIVO -> "Pago en efectivo"
                         MetodoPago.TARJETA -> "Pago con tarjeta"
+                        MetodoPago.PRESENCIAL -> "Pago presencial"
+                        MetodoPago.ONLINE -> "Pago online"
                         null -> "Método de pago no especificado"
                     },
                     style = MaterialTheme.typography.bodySmall,

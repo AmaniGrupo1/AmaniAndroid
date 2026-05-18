@@ -212,11 +212,11 @@ fun AgregarAdministrador(
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
-                isError = passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8),
+                isError = passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = tokens.cardBackground,
                     unfocusedContainerColor = tokens.cardBackground,
-                    focusedBorderColor = if (passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8)) ErrorColor else tokens.primary,
+                    focusedBorderColor = if (passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password)) ErrorColor else tokens.primary,
                     unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
                     cursorColor = tokens.primary,
                     focusedTextColor = tokens.cardContent,
@@ -234,17 +234,9 @@ fun AgregarAdministrador(
                                 color = tokens.cardContent.copy(alpha = 0.6f)
                             )
                         }
-                        passwordTouched && password.isNotBlank() && password.length < 8 -> {
-                            Text(
-                                text = "⚠️ La contraseña debe tener al menos 8 caracteres",
-                                fontSize = 11.sp,
-                                fontFamily = roboto,
-                                color = ErrorColor
-                            )
-                        }
                         passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
                             Text(
-                                text = "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                text = "❌ " + LoginViewModel.getPasswordErrorMessage(),
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
                                 color = ErrorColor

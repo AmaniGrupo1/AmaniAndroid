@@ -80,15 +80,15 @@ dependencies {
     implementation("com.itextpdf:itext7-core:7.2.5") {
         exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
     }
-    implementation("org.bouncycastle:bcprov-jdk15to18:1.79")
+    implementation(libs.bcprov.jdk15to18)
 
     // Para imprimir
-    implementation("androidx.print:print:1.0.0")
+    implementation(libs.androidx.print)
 
     // ✅ CameraX ACTUALIZADO (CRÍTICO)
-    implementation("androidx.camera:camera-camera2:1.4.0")
-    implementation("androidx.camera:camera-lifecycle:1.4.0")
-    implementation("androidx.camera:camera-view:1.4.0")
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // Imágenes
     implementation(libs.coil.compose)
@@ -102,7 +102,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     // Logging interceptor para inspección de headers en debug
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation(libs.logging.interceptor)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)

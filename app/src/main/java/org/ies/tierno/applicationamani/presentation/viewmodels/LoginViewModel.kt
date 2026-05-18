@@ -47,7 +47,7 @@ class LoginViewModel(
          * - Al menos una letra
          * - Al menos un número
          */
-        private val PASSWORD_REGEX = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
+        private val PASSWORD_REGEX = Regex("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")
 
         /**
          * Mensaje de error para la contraseña
@@ -106,6 +106,10 @@ class LoginViewModel(
                 _loginError.value = "La contraseña es obligatoria"
                 return
             }
+            !isValidPassword(passwordValue) -> {
+                _loginError.value = getPasswordErrorMessage()
+                return
+            }
         }
 
         _isLoggingIn.value = true
@@ -135,6 +139,7 @@ class LoginViewModel(
                             when (error.code()) {
                                 401 -> "Credenciales incorrectas"
                                 404 -> "Usuario no encontrado"
+                                500 -> "Error en el servidor: los datos enviados no son válidos"
                                 else -> "Error de conexión: ${error.message()}"
                             }
                         }
@@ -196,7 +201,8 @@ class LoginViewModel(
     fun isLoginFormValid(): Boolean {
         return _username.value.isNotBlank() &&
                 _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
-                _password.value.isNotBlank()
+                _password.value.isNotBlank() &&
+                isValidPassword(_password.value)
     }
 
     // ── Campos registro básico ──

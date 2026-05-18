@@ -336,7 +336,7 @@ fun LoginScreenContent(
                                 style = typography.bodyMedium
                             )
                         },
-                        isError = passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 6),
+                        isError = passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password),
                         supportingText = {
                             when {
                                 !passwordTouched && password.isBlank() -> {
@@ -346,16 +346,9 @@ fun LoginScreenContent(
                                         color = colorScheme.onSurfaceVariant
                                     )
                                 }
-                                passwordTouched && password.isNotBlank() && password.length < 6 -> {
-                                    Text(
-                                        text = "⚠️ La contraseña debe tener al menos 6 caracteres",
-                                        style = typography.bodySmall,
-                                        color = colorScheme.error
-                                    )
-                                }
                                 passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
                                     Text(
-                                        text = "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                        text = "❌ " + LoginViewModel.getPasswordErrorMessage(),
                                         style = typography.bodySmall,
                                         color = colorScheme.error
                                     )

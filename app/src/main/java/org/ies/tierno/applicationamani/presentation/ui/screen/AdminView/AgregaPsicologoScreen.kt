@@ -421,11 +421,11 @@ fun AgregaPsicologoScreen(
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            isError = passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8),
+                            isError = passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8)) errorColor else primaryColor,
+                                focusedBorderColor = if (passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password)) errorColor else primaryColor,
                                 unfocusedBorderColor = dividerColor,
-                                focusedLabelColor = if (passwordTouched && password.isNotBlank() && (!loginViewModel.isValidPassword(password) || password.length < 8)) errorColor else primaryColor,
+                                focusedLabelColor = if (passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password)) errorColor else primaryColor,
                                 cursorColor = primaryColor
                             ),
                             trailingIcon = {
@@ -447,17 +447,9 @@ fun AgregaPsicologoScreen(
                                             fontSize = 12.sp
                                         )
                                     }
-                                    passwordTouched && password.isNotBlank() && password.length < 8 -> {
-                                        Text(
-                                            "⚠️ La contraseña debe tener al menos 8 caracteres",
-                                            fontFamily = roboto,
-                                            color = errorColor,
-                                            fontSize = 12.sp
-                                        )
-                                    }
                                     passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
                                         Text(
-                                            "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                            "❌ " + LoginViewModel.getPasswordErrorMessage(),
                                             fontFamily = roboto,
                                             color = errorColor,
                                             fontSize = 12.sp

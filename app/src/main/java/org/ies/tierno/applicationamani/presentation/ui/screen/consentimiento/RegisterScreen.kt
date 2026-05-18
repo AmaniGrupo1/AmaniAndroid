@@ -403,11 +403,11 @@ fun RegisterScreen(
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        isError = passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8),
+                        isError = passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = textColor,
                             unfocusedTextColor = textColor,
-                            focusedBorderColor = if (passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8)) ErrorColor else primaryColor,
+                            focusedBorderColor = if (passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword)) ErrorColor else primaryColor,
                             unfocusedBorderColor = textFieldBorderColor,
                             focusedLabelColor = primaryColor,
                             unfocusedLabelColor = textColor
@@ -422,17 +422,9 @@ fun RegisterScreen(
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
-                                passwordTouched && regPassword.isNotBlank() && regPassword.length < 8 -> {
-                                    Text(
-                                        "⚠️ La contraseña debe tener al menos 8 caracteres",
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = WarningColor
-                                    )
-                                }
                                 passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword) -> {
                                     Text(
-                                        "❌ La contraseña debe tener letras y números",
+                                        "❌ " + LoginViewModel.getPasswordErrorMessage(),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
