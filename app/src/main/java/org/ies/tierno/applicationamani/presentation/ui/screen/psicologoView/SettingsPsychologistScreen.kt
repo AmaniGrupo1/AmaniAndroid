@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -21,8 +24,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -30,15 +35,16 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import android.app.Activity
 import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 private const val TAG = "SettingsPsychologist"
 
@@ -66,12 +72,29 @@ fun SettingsPsychologistScreen(
     val scope = rememberCoroutineScope()
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
+    // Obtener el idioma actual del ViewModel
+    val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
+
+    // Obtener el tema actual del ViewModel (Boolean: false=claro, true=oscuro)
+    val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
+
+    // Obtener el horario actual del ViewModel
+    val horarioReal by idiomaViewModel.horarioActual.collectAsStateWithLifecycle()
+
+    // Zona horaria
+    val madridZone = ZoneId.of("Europe/Madrid")
+    val offset = ZonedDateTime.now(madridZone).offset.id
+    val zoneText = "Madrid ($offset)"
+
+    // También necesitamos la sesión completa para otros datos
+    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+
     // Obtener estado del tema para la UI
     val isDark = isDarkTheme()
     val screenColors = getScreenColors()
     val cardColors = getCardColors()
 
-    // Colores dinámicos para la UI (ajustados para máxima visibilidad en modo oscuro)
+    // Colores dinámicos para la UI
     val backgroundColor = if (isDark) screenColors.background else Color(0xFFFDF8F9)
     val surfaceColor = if (isDark) cardColors.cardBackground else Color(0xFFFFFFFF)
     val textColor = if (isDark) Color.White else Color(0xFF2D1B30)
@@ -79,15 +102,6 @@ fun SettingsPsychologistScreen(
     val dividerColor = if (isDark) Color.White.copy(alpha = 0.12f) else textColor.copy(alpha = 0.12f)
     val primaryColor = if (isDark) Color.White else Color(0xFF6B4E71)
     val iconColor = if (isDark) Color.White else primaryColor
-
-    // Obtener el idioma actual del ViewModel
-    val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
-
-    // Obtener el tema actual del ViewModel (Boolean: false=claro, true=oscuro)
-    val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
-
-    // También necesitamos la sesión completa para otros datos
-    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
     Log.d(TAG, "🎨 [Recomposición] Tema actual (boolean): $currentTema")
@@ -107,6 +121,10 @@ fun SettingsPsychologistScreen(
         }
     }
 
+    // Estados para el diálogo de horario
+    var mostrarConfigHorario by remember { mutableStateOf(false) }
+    var cargandoHorario by remember { mutableStateOf(false) }
+
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
@@ -120,21 +138,43 @@ fun SettingsPsychologistScreen(
                         fontFamily = roboto
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = if (isDark) Color.Black else Color.White
-                        )
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = primaryColor
                 )
             )
         }
     ) { padding ->
+
+        // Diálogo de horario
+        if (mostrarConfigHorario) {
+            if (cargandoHorario) {
+                Dialog(onDismissRequest = { mostrarConfigHorario = false }) {
+                    Card(
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(32.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Cargando horario...", fontFamily = roboto)
+                        }
+                    }
+                }
+            } else {
+                DialogHorarioSemanalPsychologist(
+                    horarioActual = horarioReal?.franjas,
+                    onDismiss = { mostrarConfigHorario = false },
+                    roboto = roboto,
+                    isDark = isDark
+                )
+            }
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -160,6 +200,16 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
+                    zoneText = zoneText,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "mi_perfil",
@@ -200,6 +250,16 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
+                    zoneText = zoneText,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "language",
@@ -209,6 +269,12 @@ fun SettingsPsychologistScreen(
                             else
                                 stringResource(R.string.ingles),
                             icon = Icons.Default.Language
+                        ),
+                        SettingsOption(
+                            id = "zona_horaria",
+                            title = stringResource(R.string.zona_horaria),
+                            subtitle = zoneText,
+                            icon = Icons.Default.AccessTime
                         ),
                         SettingsOption(
                             id = "notificaciones",
@@ -243,6 +309,16 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
+                    zoneText = zoneText,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "duracion_cita",
@@ -255,6 +331,12 @@ fun SettingsPsychologistScreen(
                             title = stringResource(R.string.tiempo_entre_citas),
                             subtitle = stringResource(R.string.tiempo_minutos, 10),
                             icon = Icons.Default.Timelapse
+                        ),
+                        SettingsOption(
+                            id = "available_days",
+                            title = stringResource(R.string.dias_disponibles),
+                            subtitle = stringResource(R.string.lunes_viernes),
+                            icon = Icons.Default.CalendarToday
                         ),
                         SettingsOption(
                             id = "recordatorios",
@@ -283,6 +365,16 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
+                    zoneText = zoneText,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "version",
@@ -325,7 +417,9 @@ fun SettingsCategoryCardPsychologist(
     textColor: Color,
     textSecondaryColor: Color,
     dividerColor: Color,
-    primaryColor: Color
+    primaryColor: Color,
+    zoneText: String,
+    onOpenHorario: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -384,7 +478,9 @@ fun SettingsCategoryCardPsychologist(
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
-                    primaryColor = primaryColor
+                    primaryColor = primaryColor,
+                    zoneText = zoneText,
+                    onOpenHorario = onOpenHorario
                 )
             }
         }
@@ -403,8 +499,11 @@ fun SettingsOptionRowPsychologist(
     textColor: Color,
     textSecondaryColor: Color,
     dividerColor: Color,
-    primaryColor: Color
+    primaryColor: Color,
+    zoneText: String,
+    onOpenHorario: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var expandedLanguage by remember { mutableStateOf(false) }
     var expandedTheme by remember { mutableStateOf(false) }
@@ -418,6 +517,14 @@ fun SettingsOptionRowPsychologist(
                 when (option.id) {
                     "language" -> expandedLanguage = true
                     "tema" -> expandedTheme = true
+                    "available_days" -> onOpenHorario()
+                    "zona_horaria" -> {
+                        androidx.appcompat.app.AlertDialog.Builder(context)
+                            .setTitle("Zona Horaria")
+                            .setMessage("Zona actual: $zoneText\n\nLa aplicación usa automáticamente la zona horaria de tu dispositivo.")
+                            .setPositiveButton("Entendido", null)
+                            .show()
+                    }
                     "mi_perfil" -> {
                         val identificador = session?.idPsicologo
                         if (identificador != null && identificador > 0L) {
@@ -528,7 +635,7 @@ fun SettingsOptionRowPsychologist(
                             onClick = {
                                 Log.d(TAG, "🎨 Psicólogo seleccionó TEMA CLARO")
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(false) // false = claro
+                                    idiomaViewModel.cambiarTema(false)
                                 }
                                 expandedTheme = false
                             }
@@ -538,7 +645,7 @@ fun SettingsOptionRowPsychologist(
                             onClick = {
                                 Log.d(TAG, "🎨 Psicólogo seleccionó TEMA OSCURO")
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(true) // true = oscuro
+                                    idiomaViewModel.cambiarTema(true)
                                 }
                                 expandedTheme = false
                             }
@@ -553,6 +660,206 @@ fun SettingsOptionRowPsychologist(
                     tint = textSecondaryColor,
                     modifier = Modifier.size(20.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun DialogHorarioSemanalPsychologist(
+    horarioActual: List<FranjaHorarioDTO>?,
+    onDismiss: () -> Unit,
+    roboto: FontFamily,
+    isDark: Boolean
+) {
+    // Mapeo correcto de días (1=Lunes, 7=Domingo)
+    val dayNames = mapOf(
+        1 to "Lunes",
+        2 to "Martes",
+        3 to "Miércoles",
+        4 to "Jueves",
+        5 to "Viernes",
+        6 to "Sábado",
+        7 to "Domingo"
+    )
+
+    // Filtrar y ordenar correctamente los días
+    val diasOrdenados = remember(horarioActual) {
+        horarioActual
+            ?.filter { it.diaSemana in 1..7 }
+            ?.sortedBy { it.diaSemana }
+            ?: emptyList()
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 550.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isDark) Color(0xFF1E1E1E) else Color.White
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "📅 Horario Semanal",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isDark) Color.White else Color(0xFF6B4E71),
+                            fontFamily = roboto
+                        )
+                        Text(
+                            text = "Días y horas de atención disponibles",
+                            fontSize = 13.sp,
+                            color = if (isDark) Color.LightGray else Color.Gray,
+                            fontFamily = roboto,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = if (isDark) Color.White else Color.Gray
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (diasOrdenados.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "⏰", fontSize = 48.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "No hay configuración de horario cargada",
+                                textAlign = TextAlign.Center,
+                                color = if (isDark) Color.LightGray else Color.Gray,
+                                fontFamily = roboto
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(diasOrdenados) { franja ->
+                            val dayName = dayNames[franja.diaSemana.toInt()] ?: "Día ${franja.diaSemana}"
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (franja.activo)
+                                        (if (isDark) Color(0xFF6B4E71).copy(alpha = 0.2f) else Color(0xFF6B4E71).copy(alpha = 0.1f))
+                                    else
+                                        (if (isDark) Color(0xFF444444) else Color(0xFFF5F5F5))
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = dayName,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp,
+                                            fontFamily = roboto,
+                                            color = if (franja.activo)
+                                                (if (isDark) Color.White else Color(0xFF6B4E71))
+                                            else
+                                                (if (isDark) Color.Gray else Color(0xFF999999))
+                                        )
+
+                                        if (franja.activo && franja.horaInicio.isNotBlank() && franja.horaFin.isNotBlank()) {
+                                            Text(
+                                                text = "🕐 ${franja.horaInicio} - ${franja.horaFin}",
+                                                fontSize = 14.sp,
+                                                color = if (isDark) Color.LightGray else Color(0xFF666666),
+                                                fontFamily = roboto,
+                                                modifier = Modifier.padding(top = 4.dp)
+                                            )
+                                        } else if (!franja.activo) {
+                                            Text(
+                                                text = "❌ No disponible",
+                                                fontSize = 13.sp,
+                                                color = if (isDark) Color(0xFFEF9A9A) else Color(0xFFE53935),
+                                                fontFamily = roboto,
+                                                modifier = Modifier.padding(top = 4.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Surface(
+                                        shape = RoundedCornerShape(20.dp),
+                                        color = if (franja.activo)
+                                            Color(0xFF4CAF50).copy(alpha = 0.15f)
+                                        else
+                                            Color(0xFFF44336).copy(alpha = 0.15f),
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = if (franja.activo) "Activo" else "Inactivo",
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                            color = if (franja.activo) Color(0xFF4CAF50) else Color(0xFFF44336),
+                                            fontFamily = roboto,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDark) Color(0xFF6B4E71) else Color(0xFF6B4E71)
+                    )
+                ) {
+                    Text("Cerrar", color = Color.White, fontFamily = roboto, fontWeight = FontWeight.Medium)
+                }
             }
         }
     }

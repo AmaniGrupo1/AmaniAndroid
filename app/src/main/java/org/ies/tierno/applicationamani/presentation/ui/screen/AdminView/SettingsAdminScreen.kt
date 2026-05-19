@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -22,8 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -38,14 +41,17 @@ import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import android.app.Activity
 import android.util.Log
+import org.ies.tierno.applicationamani.dto.agenda.request.FranjaHorarioDTO
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 private const val TAG = "SettingsLanguage"
 
 // Función auxiliar para obtener el subtítulo del tema actual
 private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
     return when (currentTheme) {
-        false -> "Claro"   // false = claro/defecto
-        true -> "Oscuro"   // true = oscuro
+        false -> "Claro"
+        true -> "Oscuro"
     }
 }
 
@@ -70,8 +76,15 @@ fun SettingsAdminScreen(
     // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
 
-    // Obtener el tema actual del ViewModel (false = claro/defecto, true = oscuro)
+    // Obtener el tema actual del ViewModel
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
+
+    // Obtener el horario actual del ViewModel
+    val horarioReal by idiomaViewModel.horarioActual.collectAsStateWithLifecycle()
+
+    val madridZone = ZoneId.of("Europe/Madrid")
+    val offset = ZonedDateTime.now(madridZone).offset.id
+    val zoneText = "Madrid ($offset)"
 
     // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
@@ -110,9 +123,45 @@ fun SettingsAdminScreen(
         }
     }
 
+    // Estados para el diálogo de horario
+    var mostrarConfigHorario by remember { mutableStateOf(false) }
+    var cargandoHorario by remember { mutableStateOf(false) }
+
     Scaffold(
         containerColor = backgroundColor,
     ) { padding ->
+
+        // Diálogo de horario
+        if (mostrarConfigHorario) {
+            if (cargandoHorario) {
+                // Mostrar loading mientras se carga
+                Dialog(onDismissRequest = { mostrarConfigHorario = false }) {
+                    Card(
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(32.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Cargando horario...", fontFamily = roboto)
+                        }
+                    }
+                }
+            } else {
+                DialogHorarioSemanal(
+                    horarioActual = horarioReal?.franjas,
+                    onDismiss = { mostrarConfigHorario = false },
+                    roboto = roboto,
+                    isDark = isDark
+                )
+            }
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -137,6 +186,15 @@ fun SettingsAdminScreen(
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
                     primaryColor = primaryColor,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "perfil",
@@ -180,7 +238,7 @@ fun SettingsAdminScreen(
                         SettingsOption(
                             id = "timezone",
                             title = stringResource(R.string.zona_horaria),
-                            subtitle = stringResource(R.string.europa_madrid),
+                            subtitle = zoneText,
                             icon = Icons.Default.AccessTime
                         ),
                         SettingsOption(
@@ -221,6 +279,15 @@ fun SettingsAdminScreen(
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
                     primaryColor = primaryColor,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "appointment_duration",
@@ -266,6 +333,15 @@ fun SettingsAdminScreen(
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
                     primaryColor = primaryColor,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "send_reminder",
@@ -311,6 +387,15 @@ fun SettingsAdminScreen(
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
                     primaryColor = primaryColor,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "roles",
@@ -344,6 +429,15 @@ fun SettingsAdminScreen(
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
                     primaryColor = primaryColor,
+                    onOpenHorario = {
+                        mostrarConfigHorario = true
+                        scope.launch {
+                            cargandoHorario = true
+                            idiomaViewModel.cargarHorarioActual()
+                            delay(500)
+                            cargandoHorario = false
+                        }
+                    },
                     options = listOf(
                         SettingsOption(
                             id = "backup",
@@ -391,7 +485,8 @@ fun SettingsCategoryCard(
     surfaceColor: Color,
     onSurfaceColor: Color,
     onSurfaceVariant: Color,
-    primaryColor: Color
+    primaryColor: Color,
+    onOpenHorario: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -449,7 +544,8 @@ fun SettingsCategoryCard(
                     idiomaViewModel = idiomaViewModel,
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
-                    primaryColor = primaryColor
+                    primaryColor = primaryColor,
+                    onOpenHorario = onOpenHorario
                 )
             }
         }
@@ -467,12 +563,12 @@ fun SettingsOptionRow(
     idiomaViewModel: IdiomaViewModel,
     onSurfaceColor: Color,
     onSurfaceVariant: Color,
-    primaryColor: Color
+    primaryColor: Color,
+    onOpenHorario: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     var expandedLanguage by remember { mutableStateOf(false) }
     var expandedTheme by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val isDark = isDarkTheme()
     val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
 
@@ -483,6 +579,7 @@ fun SettingsOptionRow(
                 when (option.id) {
                     "language" -> expandedLanguage = true
                     "dark_mode" -> expandedTheme = true
+                    "available_days" -> onOpenHorario()
                     "perfil" -> {
                         val identificador = session?.idUsuario
                         if (identificador != null && identificador > 0L) {
@@ -491,24 +588,12 @@ fun SettingsOptionRow(
                             )
                         }
                     }
-                    "crear_terapia" -> {
-                        navController.navigate(Screens.terapias.route)
-                    }
-                    "crear_situacion" -> {
-                        navController.navigate(Screens.crearSituaciones.route)
-                    }
-                    "politica_privacidad" -> {
-                        navController.navigate(Screens.politicaPrivacidad.route)
-                    }
-                    "roles" -> {
-                        navController.navigate(Screens.cambiarRol.route)
-                    }
-                    "terminos" -> {
-                        navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
-                    }
-                    "privacidad" -> {
-                        navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
-                    }
+                    "crear_terapia" -> navController.navigate(Screens.terapias.route)
+                    "crear_situacion" -> navController.navigate(Screens.crearSituaciones.route)
+                    "politica_privacidad" -> navController.navigate(Screens.politicaPrivacidad.route)
+                    "roles" -> navController.navigate(Screens.cambiarRol.route)
+                    "terminos" -> navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
+                    "privacidad" -> navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
                 }
             }
             .padding(vertical = 8.dp),
@@ -536,14 +621,9 @@ fun SettingsOptionRow(
                     color = onSurfaceColor
                 )
 
-                val displaySubtitle = when {
-                    option.id == "language" -> {
-                        if (currentLanguage == "es") stringResource(R.string.espanol)
-                        else stringResource(R.string.ingles)
-                    }
-                    option.id == "dark_mode" -> {
-                        getCurrentThemeSubtitle(currentTema)
-                    }
+                val displaySubtitle = when (option.id) {
+                    "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                    "dark_mode" -> getCurrentThemeSubtitle(currentTema)
                     else -> option.subtitle
                 }
 
@@ -568,20 +648,14 @@ fun SettingsOptionRow(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.espanol), color = onSurfaceColor) },
                             onClick = {
-                                Log.d(TAG, "🇪🇸 Usuario seleccionó ESPAÑOL")
-                                scope.launch {
-                                    idiomaViewModel.cambiarIdioma("es")
-                                }
+                                scope.launch { idiomaViewModel.cambiarIdioma("es") }
                                 expandedLanguage = false
                             }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.ingles), color = onSurfaceColor) },
                             onClick = {
-                                Log.d(TAG, "🇬🇧 Usuario seleccionó INGLÉS")
-                                scope.launch {
-                                    idiomaViewModel.cambiarIdioma("en")
-                                }
+                                scope.launch { idiomaViewModel.cambiarIdioma("en") }
                                 expandedLanguage = false
                             }
                         )
@@ -599,20 +673,14 @@ fun SettingsOptionRow(
                         DropdownMenuItem(
                             text = { Text("Claro", color = onSurfaceColor) },
                             onClick = {
-                                Log.d(TAG, "🎨 Usuario seleccionó TEMA CLARO")
-                                scope.launch {
-                                    idiomaViewModel.cambiarTema(false) // false = claro/defecto
-                                }
+                                scope.launch { idiomaViewModel.cambiarTema(false) }
                                 expandedTheme = false
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Oscuro", color = onSurfaceColor) },
                             onClick = {
-                                Log.d(TAG, "🎨 Usuario seleccionó TEMA OSCURO")
-                                scope.launch {
-                                    idiomaViewModel.cambiarTema(true) // true = oscuro
-                                }
+                                scope.launch { idiomaViewModel.cambiarTema(true) }
                                 expandedTheme = false
                             }
                         )
@@ -626,6 +694,197 @@ fun SettingsOptionRow(
                     tint = onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun DialogHorarioSemanal(
+    horarioActual: List<FranjaHorarioDTO>?,
+    onDismiss: () -> Unit,
+    roboto: FontFamily,
+    isDark: Boolean
+) {
+    val dayNames = mapOf(
+        1 to "Lunes",
+        2 to "Martes",
+        3 to "Miércoles",
+        4 to "Jueves",
+        5 to "Viernes",
+        6 to "Sábado",
+        7 to "Domingo"
+    )
+
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 550.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isDark) Color(0xFF1E1E1E) else Color.White
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "📅 Horario Semanal",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isDark) Color.White else Color(0xFF6B4E71),
+                            fontFamily = roboto
+                        )
+                        Text(
+                            text = "Días y horas de atención disponibles",
+                            fontSize = 13.sp,
+                            color = if (isDark) Color.LightGray else Color.Gray,
+                            fontFamily = roboto,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = if (isDark) Color.White else Color.Gray
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (horarioActual.isNullOrEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "⏰", fontSize = 48.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "No hay configuración de horario cargada",
+                                textAlign = TextAlign.Center,
+                                color = if (isDark) Color.LightGray else Color.Gray,
+                                fontFamily = roboto
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(horarioActual.sortedBy { it.diaSemana }) { franja ->
+                            val dayName = dayNames[franja.diaSemana.toInt()] ?: ""
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (franja.activo)
+                                        (if (isDark) Color(0xFF6B4E71).copy(alpha = 0.2f) else Color(0xFF6B4E71).copy(alpha = 0.1f))
+                                    else
+                                        (if (isDark) Color(0xFF444444) else Color(0xFFF5F5F5))
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = dayName,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp,
+                                            fontFamily = roboto,
+                                            color = if (franja.activo)
+                                                (if (isDark) Color.White else Color(0xFF6B4E71))
+                                            else
+                                                (if (isDark) Color.Gray else Color(0xFF999999))
+                                        )
+
+                                        if (franja.activo && franja.horaInicio.isNotBlank() && franja.horaFin.isNotBlank()) {
+                                            Text(
+                                                text = "🕐 ${franja.horaInicio} - ${franja.horaFin}",
+                                                fontSize = 14.sp,
+                                                color = if (isDark) Color.LightGray else Color(0xFF666666),
+                                                fontFamily = roboto,
+                                                modifier = Modifier.padding(top = 4.dp)
+                                            )
+                                        } else if (!franja.activo) {
+                                            Text(
+                                                text = "❌ No disponible",
+                                                fontSize = 13.sp,
+                                                color = if (isDark) Color(0xFFEF9A9A) else Color(0xFFE53935),
+                                                fontFamily = roboto,
+                                                modifier = Modifier.padding(top = 4.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Surface(
+                                        shape = RoundedCornerShape(20.dp),
+                                        color = if (franja.activo)
+                                            Color(0xFF4CAF50).copy(alpha = 0.15f)
+                                        else
+                                            Color(0xFFF44336).copy(alpha = 0.15f),
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = if (franja.activo) "Activo" else "Inactivo",
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                            color = if (franja.activo) Color(0xFF4CAF50) else Color(0xFFF44336),
+                                            fontFamily = roboto,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDark) Color(0xFF6B4E71) else Color(0xFF6B4E71)
+                    )
+                ) {
+                    Text("Cerrar", color = Color.White, fontFamily = roboto, fontWeight = FontWeight.Medium)
+                }
             }
         }
     }

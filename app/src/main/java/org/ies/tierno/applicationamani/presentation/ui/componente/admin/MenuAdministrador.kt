@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -142,18 +143,6 @@ fun MenuAdministrador(
                 dividerAfter = true
             ),
             MenuAdministrador(
-                title = "Citas",
-                icon = Icons.Default.AdminPanelSettings,
-                route = Screens.citas.route,
-                dividerAfter = true
-            ),
-            MenuAdministrador(
-                title = "Calendario",
-                icon = Icons.Default.AdminPanelSettings,
-                route = Screens.psicologoAgenda.route,
-                dividerAfter = true
-            ),
-            MenuAdministrador(
                 title = "Cerrar sesión",
                 icon = Icons.AutoMirrored.Filled.Logout,
                 route = Screens.login.route,
@@ -189,7 +178,7 @@ fun MenuAdministrador(
             AnimatedContent(
                 targetState = showLogo to title,
                 transitionSpec = {
-                    fadeIn() with fadeOut()
+                    fadeIn().togetherWith(fadeOut())
                 }
             ) { (showLogoValue, titleValue) ->
                 if (showLogoValue) {

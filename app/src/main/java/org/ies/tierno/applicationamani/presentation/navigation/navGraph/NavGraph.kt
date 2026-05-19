@@ -26,7 +26,6 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AdminPro
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregaPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.AgregarAdministrador
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
-import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.EditarPsicologoAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosBajaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosSimpleScreen
@@ -204,19 +203,6 @@ fun NavGraph(
             ) { backStackEntry ->
                 val idPsicologo = backStackEntry.arguments?.getLong("psicologoId") ?: 0L
                 PsicologoProfileScreen(idPsicologo, navController,profilePsicolgo)
-            }
-
-            // Reutilizamos la misma pantalla de perfil para edición, pero con una ruta diferente
-            composable(
-                route = Screens.editScreenPsicologo.route,
-                arguments = listOf(
-                    navArgument("IdPsicologo") {
-                        type = NavType.LongType
-                    }
-                )
-            ) { backStackEntry ->
-                val IdPsicologo = backStackEntry.arguments?.getLong("IdPsicologo") ?: 0L
-                EditarPsicologoAdminScreen( navController, listaPsicologoSimple,IdPsicologo)
             }
 
 

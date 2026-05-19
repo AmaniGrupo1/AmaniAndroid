@@ -45,7 +45,6 @@
         /** Pantalla para agregar un administrador. */
         object agregarAdmin : Screens("agregarAdmin")
 
-
         /** Pantalla principal del administrador. */
         object adminHome : Screens("home")
 
@@ -69,7 +68,6 @@
 
         object calendario : Screens("calendario")
 
-
         object perfilPsicologo : Screens("perfilPsicologo/{psicologoId}"){
             fun createRoute(psicologoId: Long?) = "perfilPsicologo/$psicologoId"
         }
@@ -85,7 +83,6 @@
             fun pass(citaId: String) = "editarCitaScreen/$citaId"
         }
 
-
         object registroPacienteDesdePsicologo : Screens("registroPacienteDesdePsicologo")
 
         object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
@@ -95,11 +92,6 @@
         object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}"){
             fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
         }
-
-        object editScreenPsicologo : Screens("editScreenPsicologo/{IdPsicologo}"){
-            fun createRoute(IdPsicologo: Long?) = "editProfilePsicologo/$IdPsicologo"
-        }
-
 
         object settingPsicologo : Screens("settingPsicologo")
 

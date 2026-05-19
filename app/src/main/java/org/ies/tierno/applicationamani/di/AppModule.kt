@@ -183,7 +183,7 @@ val appModule = module {
     //NOTIFICACION
     viewModel { NotificacionViewModel(get()) }
     viewModel { PacientesViewModel(get()) }
-    viewModel { IdiomaViewModel(get(), get()) }
+    viewModel { IdiomaViewModel(get(), get(), get()) }
     viewModel { ProfileAdminViewModel(get()) }
     viewModel { ProfilePacienteViewModel(get()) }
     viewModel { HistorialClinicoPacienteViewModel(get()) }

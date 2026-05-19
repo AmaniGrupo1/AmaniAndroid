@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -86,6 +89,7 @@ object AdminViewDefaultColors {
     val Error = Color(0xFFE57373)
     val Success = Color(0xFF81C784)
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosSimpleScreen(
@@ -253,7 +257,7 @@ fun ListadoPsicologosSimpleScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(psicologos) { psicologo ->
-                        PsicologoCard(
+                        PsicologoCardExpandable(
                             psicologo = psicologo,
                             onDarBaja = {
                                 psicologoSeleccionado = psicologo
@@ -528,7 +532,7 @@ fun ListadoPsicologosSimpleScreen(
 }
 
 @Composable
-fun PsicologoCard(
+fun PsicologoCardExpandable(
     psicologo: PsicologoSelfResponseDTO,
     onDarBaja: () -> Unit,
     onEditar: () -> Unit,
@@ -541,208 +545,257 @@ fun PsicologoCard(
     errorColor: Color,
     roboto: FontFamily
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(8.dp, RoundedCornerShape(20.dp)),
+            .shadow(8.dp, RoundedCornerShape(20.dp))
+            .clickable { expanded = !expanded },
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            // Nombre completo
-            Text(
-                text = "${psicologo.nombre} ${psicologo.apellido}",
-                style = typography.titleLarge?.copy(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = primaryColor
-                ) ?: MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp),
-                fontFamily = roboto
-            )
-
-            // Email
+            // Header con nombre y flecha de expansión
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Nombre completo
                 Text(
-                    text = "Email:",
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 13.sp,
-                        color = textSecondaryColor,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto
-                )
-                Text(
-                    text = psicologo.email,
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 13.sp,
-                        color = textPrimaryColor
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Teléfono
-            if (!psicologo.telefono.isNullOrBlank()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Teléfono:",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                    Text(
-                        text = psicologo.telefono,
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-
-            // Especialidad
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Especialidad:",
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 13.sp,
-                        color = textSecondaryColor,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto
-                )
-                Text(
-                    text = psicologo.especialidad,
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 13.sp,
-                        color = textPrimaryColor
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Experiencia (NUEVO)
-            if (psicologo.experiencia != null && psicologo.experiencia > 0) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Experiencia:",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                    Text(
-                        text = "${psicologo.experiencia} años",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-
-            // Licencia
-            if (!psicologo.licencia.isNullOrBlank()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Licencia:",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                    Text(
-                        text = psicologo.licencia,
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-
-            // Descripción
-            if (!psicologo.descripcion.isNullOrBlank()) {
-                Text(
-                    text = "Descripción:",
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 12.sp,
-                        color = textSecondaryColor,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp),
-                    fontFamily = roboto
-                )
-                Text(
-                    text = psicologo.descripcion,
-                    style = typography.bodySmall?.copy(
-                        fontSize = 12.sp,
-                        color = textSecondaryColor
-                    ) ?: MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 2.dp),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    fontFamily = roboto
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Botones de acción
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = onDarBaja,
-                    colors = ButtonDefaults.buttonColors(containerColor = errorColor),
-                    shape = RoundedCornerShape(12.dp),
+                    text = "${psicologo.nombre} ${psicologo.apellido}",
+                    style = typography.titleLarge?.copy(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryColor
+                    ) ?: MaterialTheme.typography.titleLarge,
+                    fontFamily = roboto,
                     modifier = Modifier.weight(1f)
+                )
+
+                // Icono de expandir/colapsar
+                Icon(
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (expanded) "Contraer" else "Expandir",
+                    tint = textSecondaryColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            // Información expandible
+            if (expanded) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Email
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Dar de baja", color = Color.White, fontFamily = roboto)
+                    Text(
+                        text = "Email:",
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                    Text(
+                        text = psicologo.email,
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textPrimaryColor
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
                 }
 
-                Button(
-                    onClick = onEditar,
-                    colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f)
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Teléfono
+                if (!psicologo.telefono.isNullOrBlank()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Teléfono:",
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textSecondaryColor,
+                                fontWeight = FontWeight.Medium
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                            fontFamily = roboto
+                        )
+                        Text(
+                            text = psicologo.telefono,
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textPrimaryColor
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                            fontFamily = roboto
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                // Especialidad
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Editar", color = Color.White, fontFamily = roboto)
+                    Text(
+                        text = "Especialidad:",
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                    Text(
+                        text = psicologo.especialidad,
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textPrimaryColor
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Experiencia
+                if (psicologo.experiencia != null && psicologo.experiencia > 0) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Experiencia:",
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textSecondaryColor,
+                                fontWeight = FontWeight.Medium
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                            fontFamily = roboto
+                        )
+                        Text(
+                            text = "${psicologo.experiencia} años",
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textPrimaryColor
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                            fontFamily = roboto
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                // Licencia
+                if (!psicologo.licencia.isNullOrBlank()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Licencia:",
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textSecondaryColor,
+                                fontWeight = FontWeight.Medium
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                            fontFamily = roboto
+                        )
+                        Text(
+                            text = psicologo.licencia,
+                            style = typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textPrimaryColor
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                            fontFamily = roboto
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                // Descripción
+                if (!psicologo.descripcion.isNullOrBlank()) {
+                    Text(
+                        text = "Descripción:",
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 12.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp),
+                        fontFamily = roboto
+                    )
+                    Text(
+                        text = psicologo.descripcion,
+                        style = typography.bodySmall?.copy(
+                            fontSize = 12.sp,
+                            color = textSecondaryColor
+                        ) ?: MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 2.dp),
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = roboto
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Botones de acción
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = onDarBaja,
+                        colors = ButtonDefaults.buttonColors(containerColor = errorColor),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Dar de baja", color = Color.White, fontFamily = roboto)
+                    }
+
+                    Button(
+                        onClick = onEditar,
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Editar", color = Color.White, fontFamily = roboto)
+                    }
+                }
+            } else {
+                // Cuando está colapsado, solo mostramos los botones
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = onDarBaja,
+                        colors = ButtonDefaults.buttonColors(containerColor = errorColor),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Dar de baja", color = Color.White, fontFamily = roboto)
+                    }
+
+                    Button(
+                        onClick = onEditar,
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Editar", color = Color.Black, fontFamily = roboto)
+                    }
                 }
             }
         }
