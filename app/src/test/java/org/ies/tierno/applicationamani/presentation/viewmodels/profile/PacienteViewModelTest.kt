@@ -21,7 +21,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PacienteViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val profileUseCase: ProfileUseCaseGeneral = mockk()
     private lateinit var viewModel: PacienteViewModel
@@ -45,28 +44,38 @@ class PacienteViewModelTest {
     }
 
     @Test
-    fun `cargarPsicologoAsignado updates state on success`() = runTest {
-        val dto = PsicologoProfileResponseDTO(idPsicologo = 1L, especialidad = "N", experiencia = 5, descripcion = "D", licencia = "123", usuario = null)
-        coEvery { profileUseCase.obtenerPsicologoAsignado(1L) } returns Result.success(dto)
+    fun `cargarPsicologoAsignado updates state on success`() =
+        runTest {
+            val dto =
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 1L,
+                    especialidad = "N",
+                    experiencia = 5,
+                    descripcion = "D",
+                    licencia = "123",
+                    usuario = null,
+                )
+            coEvery { profileUseCase.obtenerPsicologoAsignado(1L) } returns Result.success(dto)
 
-        viewModel.cargarPsicologoAsignado(1L)
-        advanceUntilIdle()
+            viewModel.cargarPsicologoAsignado(1L)
+            advanceUntilIdle()
 
-        assertEquals(dto, viewModel.psicologoAsignado.value)
-        assertNull(viewModel.error.value)
-        assertFalse(viewModel.isLoading.value)
-        coVerify { profileUseCase.obtenerPsicologoAsignado(1L) }
-    }
+            assertEquals(dto, viewModel.psicologoAsignado.value)
+            assertNull(viewModel.error.value)
+            assertFalse(viewModel.isLoading.value)
+            coVerify { profileUseCase.obtenerPsicologoAsignado(1L) }
+        }
 
     @Test
-    fun `cargarPsicologoAsignado updates error on failure`() = runTest {
-        coEvery { profileUseCase.obtenerPsicologoAsignado(1L) } returns Result.failure(Exception("fail"))
+    fun `cargarPsicologoAsignado updates error on failure`() =
+        runTest {
+            coEvery { profileUseCase.obtenerPsicologoAsignado(1L) } returns Result.failure(Exception("fail"))
 
-        viewModel.cargarPsicologoAsignado(1L)
-        advanceUntilIdle()
+            viewModel.cargarPsicologoAsignado(1L)
+            advanceUntilIdle()
 
-        assertNull(viewModel.psicologoAsignado.value)
-        assertEquals("fail", viewModel.error.value)
-        assertFalse(viewModel.isLoading.value)
-    }
+            assertNull(viewModel.psicologoAsignado.value)
+            assertEquals("fail", viewModel.error.value)
+            assertFalse(viewModel.isLoading.value)
+        }
 }

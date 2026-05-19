@@ -30,25 +30,30 @@ fun enviarCitaAlCalendario(
     hora: LocalTime,
     duracionMinutos: Int = 60,
     titulo: String = "Cita – Amani",
-    descripcion: String = ""
+    descripcion: String = "",
 ) {
-    val inicio = fecha.atTime(hora)
-        .atZone(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli()
+    val inicio =
+        fecha
+            .atTime(hora)
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
 
-    val fin = fecha.atTime(hora.plusMinutes(duracionMinutos.toLong()))
-        .atZone(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli()
+    val fin =
+        fecha
+            .atTime(hora.plusMinutes(duracionMinutos.toLong()))
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
 
-    val intent = Intent(Intent.ACTION_INSERT).apply {
-        data = CalendarContract.Events.CONTENT_URI
-        putExtra(CalendarContract.Events.TITLE, titulo)
-        putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
-        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, inicio)
-        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, fin)
-        putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
-    }
+    val intent =
+        Intent(Intent.ACTION_INSERT).apply {
+            data = CalendarContract.Events.CONTENT_URI
+            putExtra(CalendarContract.Events.TITLE, titulo)
+            putExtra(CalendarContract.Events.DESCRIPTION, descripcion)
+            putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, inicio)
+            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, fin)
+            putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
+        }
     context.startActivity(intent)
 }

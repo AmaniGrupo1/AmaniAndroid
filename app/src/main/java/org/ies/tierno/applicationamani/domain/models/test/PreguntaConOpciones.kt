@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.domain.models.test
 
-
 /**
  * Modelo de dominio que agrupa una pregunta con sus opciones de respuesta.
  *
@@ -12,7 +11,7 @@ package org.ies.tierno.applicationamani.domain.models.test
  * @property opciones Lista de [Opcion] disponibles como respuesta.
  */
 data class PreguntaConOpciones(
-     val id: String = "",
+    val id: String = "",
     val textoPregunta: String,
-    val opciones: List<Opcion>
+    val opciones: List<Opcion>,
 )

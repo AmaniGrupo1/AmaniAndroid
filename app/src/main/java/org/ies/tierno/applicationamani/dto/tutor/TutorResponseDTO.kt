@@ -6,5 +6,5 @@ data class TutorResponseDTO(
     val telefono: String,
     val email: String,
     val dni: String,
-    val tipo: String
+    val tipo: String,
 )

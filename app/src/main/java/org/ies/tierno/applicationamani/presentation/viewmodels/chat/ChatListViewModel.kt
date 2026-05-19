@@ -16,13 +16,13 @@ data class ChatPartner(
     val id: Long,
     val nombre: String,
     val rol: String,
-    val photoUrl: String? = null
+    val photoUrl: String? = null,
 )
 
 class ChatListViewModel(
     private val userSessionDataStore: UserSessionDataStore,
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
-    private val listarPacientesByPsicologo: ListarPacientesByPsicologo
+    private val listarPacientesByPsicologo: ListarPacientesByPsicologo,
 ) : ViewModel() {
     companion object {
         private const val TAG = "ChatListViewModel"
@@ -47,11 +47,12 @@ class ChatListViewModel(
         loadCurrentUser()
     }
 
-    private fun normalizeRole(role: String): String {
-        return role.lowercase().trim()
+    private fun normalizeRole(role: String): String =
+        role
+            .lowercase()
+            .trim()
             .replace("ó", "o")
             .replace("á", "a")
-    }
 
     private fun loadCurrentUser() {
         viewModelScope.launch {
@@ -96,26 +97,29 @@ class ChatListViewModel(
     private suspend fun resolveAndAddPaciente(idPaciente: Long) {
         try {
             val result = profileUseCaseGeneral.getPacienteByIdFirebase(idPaciente)
-            result.onSuccess { profile ->
-                if (profile.usuario?.idUsuario != null) {
-                    val nombre = buildString {
-                        profile.usuario.nombre?.let { append(it) }
-                        profile.usuario.apellido?.let {
-                            if (isNotEmpty()) append(" ")
-                            append(it)
-                        }
-                    }.ifEmpty { "Paciente ${profile.usuario.idUsuario}" }
+            result
+                .onSuccess { profile ->
+                    if (profile.usuario?.idUsuario != null) {
+                        val nombre =
+                            buildString {
+                                profile.usuario.nombre?.let { append(it) }
+                                profile.usuario.apellido?.let {
+                                    if (isNotEmpty()) append(" ")
+                                    append(it)
+                                }
+                            }.ifEmpty { "Paciente ${profile.usuario.idUsuario}" }
 
-                    val newPartner = ChatPartner(
-                        id = profile.usuario.idUsuario,
-                        nombre = nombre,
-                        rol = "paciente"
-                    )
-                    _partners.value = (_partners.value + newPartner).distinctBy { it.id }
+                        val newPartner =
+                            ChatPartner(
+                                id = profile.usuario.idUsuario,
+                                nombre = nombre,
+                                rol = "paciente",
+                            )
+                        _partners.value = (_partners.value + newPartner).distinctBy { it.id }
+                    }
+                }.onFailure {
+                    Log.e(TAG, "Error resolviendo paciente $idPaciente para chat", it)
                 }
-            }.onFailure {
-                Log.e(TAG, "Error resolviendo paciente $idPaciente para chat", it)
-            }
         } catch (e: Exception) {
             Log.e(TAG, "Excepción resolviendo paciente $idPaciente", e)
         }
@@ -152,31 +156,34 @@ class ChatListViewModel(
             _partners.value = emptyList()
             try {
                 val result = profileUseCaseGeneral.obtenerPsicologoAsignado(idPaciente)
-                result.onSuccess { profile ->
-                    val psicologoUserId = profile.usuario?.idUsuario ?: profile.idPsicologo
-                    if (psicologoUserId != null) {
-                        val nombre = buildString {
-                            profile.usuario?.nombre?.let { append(it) }
-                            profile.usuario?.apellido?.let {
-                                if (isNotEmpty()) append(" ")
-                                append(it)
-                            }
-                        }.ifEmpty { "Tu Psicólogo" }
+                result
+                    .onSuccess { profile ->
+                        val psicologoUserId = profile.usuario?.idUsuario ?: profile.idPsicologo
+                        if (psicologoUserId != null) {
+                            val nombre =
+                                buildString {
+                                    profile.usuario?.nombre?.let { append(it) }
+                                    profile.usuario?.apellido?.let {
+                                        if (isNotEmpty()) append(" ")
+                                        append(it)
+                                    }
+                                }.ifEmpty { "Tu Psicólogo" }
 
-                        _partners.value = listOf(
-                            ChatPartner(
-                                id = psicologoUserId,
-                                nombre = nombre,
-                                rol = "psicologo"
-                            )
-                        )
-                    } else {
-                        _error.value = "No tienes un psicólogo asignado"
+                            _partners.value =
+                                listOf(
+                                    ChatPartner(
+                                        id = psicologoUserId,
+                                        nombre = nombre,
+                                        rol = "psicologo",
+                                    ),
+                                )
+                        } else {
+                            _error.value = "No tienes un psicólogo asignado"
+                        }
+                    }.onFailure {
+                        Log.e(TAG, "Error resolviendo psicólogo asignado", it)
+                        _error.value = it.message ?: "No se pudo cargar tu psicólogo"
                     }
-                }.onFailure {
-                    Log.e(TAG, "Error resolviendo psicólogo asignado", it)
-                    _error.value = it.message ?: "No se pudo cargar tu psicólogo"
-                }
             } finally {
                 _isLoading.value = false
             }
@@ -189,26 +196,29 @@ class ChatListViewModel(
             _partners.value = emptyList()
             try {
                 val result = profileUseCaseGeneral.getPsicologoById(idUsuarioPsicologo)
-                result.onSuccess { profile ->
-                    val nombre = buildString {
-                        profile.usuario?.nombre?.let { append(it) }
-                        profile.usuario?.apellido?.let {
-                            if (isNotEmpty()) append(" ")
-                            append(it)
-                        }
-                    }.ifEmpty { "Tu Psicólogo" }
+                result
+                    .onSuccess { profile ->
+                        val nombre =
+                            buildString {
+                                profile.usuario?.nombre?.let { append(it) }
+                                profile.usuario?.apellido?.let {
+                                    if (isNotEmpty()) append(" ")
+                                    append(it)
+                                }
+                            }.ifEmpty { "Tu Psicólogo" }
 
-                    _partners.value = listOf(
-                        ChatPartner(
-                            id = idUsuarioPsicologo,
-                            nombre = nombre,
-                            rol = "psicologo"
-                        )
-                    )
-                }.onFailure {
-                    Log.e(TAG, "Error cargando nombre de psicólogo", it)
-                    _error.value = it.message ?: "No se pudo cargar el psicólogo"
-                }
+                        _partners.value =
+                            listOf(
+                                ChatPartner(
+                                    id = idUsuarioPsicologo,
+                                    nombre = nombre,
+                                    rol = "psicologo",
+                                ),
+                            )
+                    }.onFailure {
+                        Log.e(TAG, "Error cargando nombre de psicólogo", it)
+                        _error.value = it.message ?: "No se pudo cargar el psicólogo"
+                    }
             } finally {
                 _isLoading.value = false
             }

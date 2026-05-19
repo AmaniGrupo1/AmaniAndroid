@@ -13,7 +13,6 @@ import org.junit.Test
 import retrofit2.Response
 
 class AjustesRepositoryTest {
-
     private lateinit var api: AjustesApi
     private lateinit var repository: AjustesRepository
 
@@ -24,34 +23,37 @@ class AjustesRepositoryTest {
     }
 
     @Test
-    fun `cambiarIdioma should call api`() = runTest {
-        val id = 1L
-        val idioma = "es"
-        coEvery { api.actualizarIdioma(id, any()) } returns Unit
+    fun `cambiarIdioma should call api`() =
+        runTest {
+            val id = 1L
+            val idioma = "es"
+            coEvery { api.actualizarIdioma(id, any()) } returns Unit
 
-        repository.cambiarIdioma(id, idioma)
+            repository.cambiarIdioma(id, idioma)
 
-        coVerify { api.actualizarIdioma(id, any()) }
-    }
-
-    @Test
-    fun `actualizarTema should return success when api succeeds`() = runTest {
-        val expected = mockk<AjusteResponseDTO>()
-        coEvery { api.actualizarTema(any()) } returns Response.success(expected)
-
-        val result = repository.actualizarTema(true)
-
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
+            coVerify { api.actualizarIdioma(id, any()) }
+        }
 
     @Test
-    fun `actualizarTema should return failure when api returns error`() = runTest {
-        coEvery { api.actualizarTema(any()) } returns Response.error(500, mockk(relaxed = true))
+    fun `actualizarTema should return success when api succeeds`() =
+        runTest {
+            val expected = mockk<AjusteResponseDTO>()
+            coEvery { api.actualizarTema(any()) } returns Response.success(expected)
 
-        val result = repository.actualizarTema(true)
+            val result = repository.actualizarTema(true)
 
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()?.message?.contains("500") == true)
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
+
+    @Test
+    fun `actualizarTema should return failure when api returns error`() =
+        runTest {
+            coEvery { api.actualizarTema(any()) } returns Response.error(500, mockk(relaxed = true))
+
+            val result = repository.actualizarTema(true)
+
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull()?.message?.contains("500") == true)
+        }
 }

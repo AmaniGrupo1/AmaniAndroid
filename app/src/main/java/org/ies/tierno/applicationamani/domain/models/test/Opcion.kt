@@ -13,5 +13,5 @@ package org.ies.tierno.applicationamani.domain.models.test
 data class Opcion(
     val id: String = "",
     val texto: String = "",
-    val valor: Int = 0
+    val valor: Int = 0,
 )

@@ -13,8 +13,9 @@ import timber.log.Timber
  *
  * Se inicializa escuchando el TokenDataStore y mantiene el token actualizado en memoria.
  */
-class TokenHolder(private val tokenDataStore: TokenDataStore) {
-
+class TokenHolder(
+    private val tokenDataStore: TokenDataStore,
+) {
     @Volatile
     private var _token: String? = null
 
@@ -27,8 +28,7 @@ class TokenHolder(private val tokenDataStore: TokenDataStore) {
                 .catch { e ->
                     Timber.e(e, "Error collecting token flow")
                     _token = null
-                }
-                .collect { token ->
+                }.collect { token ->
                     _token = token
                 }
         }
@@ -56,8 +56,5 @@ class TokenHolder(private val tokenDataStore: TokenDataStore) {
         _token = token
     }
 
-    suspend fun getTokenSuspend(): String? {
-        return tokenDataStore.getToken()
-    }
+    suspend fun getTokenSuspend(): String? = tokenDataStore.getToken()
 }
-

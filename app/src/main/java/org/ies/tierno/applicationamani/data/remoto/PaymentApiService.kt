@@ -6,9 +6,8 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface PaymentApiService {
-
     @POST("/api/payments/create-intent")
     suspend fun createPaymentIntent(
-        @Body request: CreatePaymentIntentRequestDTO
+        @Body request: CreatePaymentIntentRequestDTO,
     ): PaymentIntentResponseDTO
 }

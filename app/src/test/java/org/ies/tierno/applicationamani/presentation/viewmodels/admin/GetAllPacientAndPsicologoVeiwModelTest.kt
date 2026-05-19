@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -20,7 +19,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetAllPacientAndPsicologoVeiwModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: GetAllClientAndPsicologoUseCase
     private lateinit var viewModel: GetAllPacientAndPsicologoVeiwModel
@@ -37,18 +35,18 @@ class GetAllPacientAndPsicologoVeiwModelTest {
     }
 
     @Test
-    fun `init loads data from useCase`() = runTest {
-        val expected = listOf(mockk<ListaPacientesAndPsicologo>())
-        every { useCase() } returns flowOf(expected)
+    fun `init loads data from useCase`() =
+        runTest {
+            val expected = listOf(mockk<ListaPacientesAndPsicologo>())
+            every { useCase() } returns flowOf(expected)
 
-        viewModel = GetAllPacientAndPsicologoVeiwModel(useCase)
-        
-        viewModel.paciente.test {
-            // First item is initialValue emptyList()
-            assertEquals(emptyList<ListaPacientesAndPsicologo>(), awaitItem())
-            // Second item should be from useCase
-            assertEquals(expected, awaitItem())
+            viewModel = GetAllPacientAndPsicologoVeiwModel(useCase)
+
+            viewModel.paciente.test {
+                // First item is initialValue emptyList()
+                assertEquals(emptyList<ListaPacientesAndPsicologo>(), awaitItem())
+                // Second item should be from useCase
+                assertEquals(expected, awaitItem())
+            }
         }
-    }
 }
-

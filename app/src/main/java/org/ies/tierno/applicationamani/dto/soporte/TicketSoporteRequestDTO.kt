@@ -15,5 +15,5 @@ data class TicketSoporteRequestDTO(
     val titulo: String,
     val descripcion: String,
     val tipo: TipoTicket,
-    val categoria: CategoriaTicket
+    val categoria: CategoriaTicket,
 )

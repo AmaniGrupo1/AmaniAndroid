@@ -17,7 +17,6 @@ import retrofit2.http.Path
  *   - POST /api/tickets-soporte/          → crear ticket
  */
 interface SoporteTicketApi {
-
     /**
      * Listar los tickets del usuario autenticado.
      */
@@ -31,7 +30,7 @@ interface SoporteTicketApi {
      */
     @GET("api/tickets-soporte/{idTicket}")
     suspend fun getTicketById(
-        @Path("idTicket") idTicket: Long
+        @Path("idTicket") idTicket: Long,
     ): Response<TicketSoporteResponseDTO>
 
     /**
@@ -41,6 +40,6 @@ interface SoporteTicketApi {
      */
     @POST("api/tickets-soporte")
     suspend fun crearTicket(
-        @Body request: TicketSoporteRequestDTO
+        @Body request: TicketSoporteRequestDTO,
     ): Response<TicketSoporteResponseDTO>
 }

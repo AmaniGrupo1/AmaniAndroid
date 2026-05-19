@@ -10,9 +10,8 @@ import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.usecases.role.RoleAdminUseCase
 
 class AdminRoleViewModel(
-    private val roleAdminUseCase: RoleAdminUseCase
+    private val roleAdminUseCase: RoleAdminUseCase,
 ) : ViewModel() {
-
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
@@ -24,22 +23,19 @@ class AdminRoleViewModel(
 
     fun cambiarRol(
         idUsuario: Long,
-        nuevoRol: Rol
+        nuevoRol: Rol,
     ) {
-
         viewModelScope.launch {
-
             _loading.value = true
 
             try {
-
-                val response = roleAdminUseCase(
-                    idUsuario = idUsuario,
-                    nuevoRol = nuevoRol
-                )
+                val response =
+                    roleAdminUseCase(
+                        idUsuario = idUsuario,
+                        nuevoRol = nuevoRol,
+                    )
 
                 if (response.isSuccessful) {
-
                     val body = response.body()
 
                     _success.value =
@@ -47,31 +43,26 @@ class AdminRoleViewModel(
 
                     Log.d(
                         "ADMIN_ROLE",
-                        "Nuevo rol: ${body?.nuevoRol}"
+                        "Nuevo rol: ${body?.nuevoRol}",
                     )
-
                 } else {
                     _error.value =
                         "Error al cambiar rol: ${response.code()}"
 
                     Log.e(
                         "ADMIN_ROLE",
-                        response.errorBody()?.string() ?: "Error desconocido"
+                        response.errorBody()?.string() ?: "Error desconocido",
                     )
                 }
-
             } catch (e: Exception) {
-
                 _error.value =
                     e.message ?: "Error desconocido"
 
                 Log.e(
                     "ADMIN_ROLE",
-                    e.message ?: "Exception"
+                    e.message ?: "Exception",
                 )
-
             } finally {
-
                 _loading.value = false
             }
         }

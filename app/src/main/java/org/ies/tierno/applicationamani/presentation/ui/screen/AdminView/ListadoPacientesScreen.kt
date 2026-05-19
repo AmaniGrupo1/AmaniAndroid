@@ -1,10 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.admin
 
-<<<<<<< HEAD
-import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
-import androidx.compose.material3.MaterialTheme
-=======
->>>>>>> login
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +35,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -65,7 +61,6 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 
-
 // Paleta de colores unificada con las demás pantallas
 
 /**
@@ -76,19 +71,19 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacie
 fun ListadoPacientesScreen(
     navController: NavController,
     viewModel: ListarPacientesViewModel,
-
-    ) {
+) {
     val pacientes by viewModel.paciente.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Fuente Roboto correctamente configurada
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
-    )
+    val roboto =
+        FontFamily(
+            Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
+            Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
+            Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
+            Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold),
+        )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -97,21 +92,22 @@ fun ListadoPacientesScreen(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primary,
                 shadowElevation = 4.dp,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                             tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
 
@@ -124,7 +120,7 @@ fun ListadoPacientesScreen(
                         letterSpacing = 1.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f, fill = false),
                     )
 
                     // Espaciador para balancear el ícono
@@ -138,45 +134,46 @@ fun ListadoPacientesScreen(
                 onClick = { navController.navigate(Screens.registro.route) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(50.dp),
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
             ) {
                 Icon(
                     Icons.Default.People,
                     contentDescription = "Agregar paciente",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
-        }
+        },
     ) { paddingValues ->
 
         // Contenido principal
         if (pacientes.isEmpty()) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Default.People,
                         contentDescription = "Sin pacientes",
                         modifier = Modifier.size(80.dp),
-                        tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                        tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                     )
                     Text(
                         text = "No hay pacientes registrados",
                         fontFamily = roboto,
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Button(
                         onClick = { navController.navigate(Screens.registro.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Text("Agregar primer paciente", fontFamily = roboto)
                     }
@@ -184,12 +181,13 @@ fun ListadoPacientesScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 items(pacientes) { paciente ->
                     PacienteCard(
@@ -197,7 +195,7 @@ fun ListadoPacientesScreen(
                         onEditar = {
                             navController.navigate("editarPaciente/${paciente.idPaciente}")
                         },
-                        roboto = roboto
+                        roboto = roboto,
                     )
                 }
 
@@ -213,43 +211,54 @@ fun ListadoPacientesScreen(
 fun PacienteCard(
     paciente: DatosPacienteAdminDTO,
     onEditar: () -> Unit,
-    roboto: FontFamily
+    roboto: FontFamily,
 ) {
     val metodoPagoStr = paciente.metodoPago
     val metodoIcono = if (metodoPagoStr == "ONLINE") Icons.Default.CreditCard else Icons.Default.Payments
-    val metodoTexto = if (metodoPagoStr == "ONLINE") "Pago Online" else if (metodoPagoStr == "PRESENCIAL") "Pago Presencial" else "No especificado"
+    val metodoTexto =
+        if (metodoPagoStr ==
+            "ONLINE"
+        ) {
+            "Pago Online"
+        } else if (metodoPagoStr == "PRESENCIAL") {
+            "Pago Presencial"
+        } else {
+            "No especificado"
+        }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             // Header - Nombre completo con avatar
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Avatar circular con iniciales
                 Surface(
                     modifier = Modifier.size(50.dp),
                     shape = RoundedCornerShape(25.dp),
                     color = MaterialTheme.colorScheme.primary,
-                    shadowElevation = 2.dp
+                    shadowElevation = 2.dp,
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(
-                            text = paciente.nombreUsuario.take(1).uppercase() +
+                            text =
+                                paciente.nombreUsuario.take(1).uppercase() +
                                     paciente.apellidoUsuario.take(1).uppercase(),
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
-                            fontFamily = roboto
+                            fontFamily = roboto,
                         )
                     }
                 }
@@ -262,13 +271,13 @@ fun PacienteCard(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = roboto,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = "ID: ${paciente.idPaciente}",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontFamily = roboto,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
                     )
                 }
             }
@@ -279,7 +288,7 @@ fun PacienteCard(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(2.dp)
+                shape = RoundedCornerShape(2.dp),
             ) {
                 Spacer(modifier = Modifier.height(1.dp))
             }
@@ -292,7 +301,7 @@ fun PacienteCard(
                 label = "Email",
                 value = paciente.emailUsuario,
                 iconColor = MaterialTheme.colorScheme.primary,
-                roboto = roboto
+                roboto = roboto,
             )
 
             // Teléfono
@@ -301,7 +310,7 @@ fun PacienteCard(
                 label = "Teléfono",
                 value = paciente.telefono,
                 iconColor = MaterialTheme.colorScheme.primary,
-                roboto = roboto
+                roboto = roboto,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -309,7 +318,7 @@ fun PacienteCard(
             // Fecha Nacimiento y Género en columnas separadas (una debajo de otra)
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 // Fecha de Nacimiento
                 InfoRowCompact(
@@ -318,7 +327,7 @@ fun PacienteCard(
                     value = paciente.fechaNacimiento,
                     iconColor = MaterialTheme.colorScheme.primary,
                     roboto = roboto,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 // Género
@@ -328,7 +337,7 @@ fun PacienteCard(
                     value = paciente.genero,
                     iconColor = MaterialTheme.colorScheme.primary,
                     roboto = roboto,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
@@ -340,35 +349,37 @@ fun PacienteCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 paciente.direccion.forEach { direccion ->
                     Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
                         shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
                         ) {
                             Text(
                                 text = direccion.calle,
                                 fontFamily = roboto,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             if (direccion.ciudad != null || direccion.provincia != null) {
                                 Text(
                                     text = listOfNotNull(direccion.ciudad, direccion.provincia).joinToString(", "),
                                     fontFamily = roboto,
                                     fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             if (direccion.codigoPostal != null || direccion.pais != null) {
@@ -376,7 +387,7 @@ fun PacienteCard(
                                     text = listOfNotNull(direccion.codigoPostal, direccion.pais).joinToString(" - "),
                                     fontFamily = roboto,
                                     fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -392,47 +403,49 @@ fun PacienteCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 paciente.tutores.forEach { tutor ->
                     Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
                         shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
                         ) {
                             Text(
                                 text = "${tutor.nombre} (${tutor.tipo})",
                                 fontFamily = roboto,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
                                 text = "Tel: ${tutor.telefono}",
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 text = "Email: ${tutor.email}",
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             if (tutor.dni.isNotBlank()) {
                                 Text(
                                     text = "DNI: ${tutor.dni}",
                                     fontFamily = roboto,
                                     fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -448,24 +461,24 @@ fun PacienteCard(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     paciente.situaciones.forEach { situacion ->
                         Surface(
                             shape = RoundedCornerShape(16.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer
+                            color = MaterialTheme.colorScheme.primaryContainer,
                         ) {
                             Text(
                                 text = situacion.descripcion ?: situacion.nombre,
                                 fontFamily = roboto,
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                             )
                         }
                     }
@@ -477,46 +490,50 @@ fun PacienteCard(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
-                color = when (metodoPagoStr) {
-                    "ONLINE" -> MaterialTheme.colorScheme.primaryContainer
-                    "PRESENCIAL" -> MaterialTheme.colorScheme.tertiaryContainer
-                    else -> MaterialTheme.colorScheme.surfaceVariant
-                }
+                color =
+                    when (metodoPagoStr) {
+                        "ONLINE" -> MaterialTheme.colorScheme.primaryContainer
+                        "PRESENCIAL" -> MaterialTheme.colorScheme.tertiaryContainer
+                        else -> MaterialTheme.colorScheme.surfaceVariant
+                    },
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = metodoIcono,
                         contentDescription = "Método de pago",
-                        tint = when (metodoPagoStr) {
-                            "ONLINE" -> MaterialTheme.colorScheme.primary
-                            "PRESENCIAL" -> MaterialTheme.colorScheme.tertiary
-                            else -> MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        modifier = Modifier.size(20.dp)
+                        tint =
+                            when (metodoPagoStr) {
+                                "ONLINE" -> MaterialTheme.colorScheme.primary
+                                "PRESENCIAL" -> MaterialTheme.colorScheme.tertiary
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Método de pago:",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontFamily = roboto,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = metodoTexto,
-                        color = when (metodoPagoStr) {
-                            "ONLINE" -> MaterialTheme.colorScheme.primary
-                            "PRESENCIAL" -> MaterialTheme.colorScheme.tertiary
-                            else -> MaterialTheme.colorScheme.onSurface
-                        },
+                        color =
+                            when (metodoPagoStr) {
+                                "ONLINE" -> MaterialTheme.colorScheme.primary
+                                "PRESENCIAL" -> MaterialTheme.colorScheme.tertiary
+                                else -> MaterialTheme.colorScheme.onSurface
+                            },
                         fontFamily = roboto,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
@@ -525,7 +542,7 @@ fun PacienteCard(
             if (paciente.createdAt.isNotBlank()) {
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    color = MaterialTheme.colorScheme.outlineVariant,
                 )
 
                 InfoRowCompact(
@@ -534,7 +551,7 @@ fun PacienteCard(
                     value = paciente.createdAt.split("T")[0],
                     iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     roboto = roboto,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
@@ -546,13 +563,13 @@ fun PacienteCard(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
             ) {
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = "Editar",
                     modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -560,7 +577,7 @@ fun PacienteCard(
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
             }
         }
@@ -573,17 +590,17 @@ fun InfoRow(
     label: String,
     value: String,
     iconColor: Color,
-    roboto: FontFamily
+    roboto: FontFamily,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
             tint = iconColor,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
@@ -592,14 +609,14 @@ fun InfoRow(
             fontFamily = roboto,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.width(80.dp)
+            modifier = Modifier.width(80.dp),
         )
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onSurface,
             fontFamily = roboto,
             fontSize = 14.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -611,17 +628,17 @@ fun InfoRowCompact(
     value: String,
     iconColor: Color,
     roboto: FontFamily,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
             tint = iconColor,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(18.dp),
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
@@ -630,7 +647,7 @@ fun InfoRowCompact(
             fontFamily = roboto,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.width(130.dp)
+            modifier = Modifier.width(130.dp),
         )
         Text(
             text = value.ifEmpty { "No especificado" },
@@ -638,7 +655,7 @@ fun InfoRowCompact(
             fontFamily = roboto,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
     }
 }

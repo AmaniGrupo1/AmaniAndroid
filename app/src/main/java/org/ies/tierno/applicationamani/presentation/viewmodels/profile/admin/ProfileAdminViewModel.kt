@@ -17,9 +17,8 @@ import org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO
 import java.io.File
 
 class ProfileAdminViewModel(
-    private val profileUseCaseGeneral: ProfileUseCaseGeneral
+    private val profileUseCaseGeneral: ProfileUseCaseGeneral,
 ) : ViewModel() {
-
     private val _perfil = MutableStateFlow<AdminDTO?>(null)
     val perfil: StateFlow<AdminDTO?> = _perfil.asStateFlow()
 
@@ -31,9 +30,16 @@ class ProfileAdminViewModel(
 
     sealed class UploadStatus {
         object Idle : UploadStatus()
+
         object Loading : UploadStatus()
-        data class Success(val url: String) : UploadStatus()
-        data class Error(val message: String) : UploadStatus()
+
+        data class Success(
+            val url: String,
+        ) : UploadStatus()
+
+        data class Error(
+            val message: String,
+        ) : UploadStatus()
     }
 
     private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
@@ -44,60 +50,73 @@ class ProfileAdminViewModel(
         viewModelScope.launch {
             val result = profileUseCaseGeneral.getAdminProfile(id)
 
-            result.onSuccess {
-                _perfil.value = it
-                _error.value = null
-            }.onFailure {
-                _error.value = it.message
-            }
+            result
+                .onSuccess {
+                    _perfil.value = it
+                    _error.value = null
+                }.onFailure {
+                    _error.value = it.message
+                }
 
             _isLoading.value = false
         }
     }
 
-    fun updateProfile(id: Long, dto: UpdateAdminRequestDTO) {
+    fun updateProfile(
+        id: Long,
+        dto: UpdateAdminRequestDTO,
+    ) {
         _isLoading.value = true
         viewModelScope.launch {
             val result = profileUseCaseGeneral.updateAdminProfile(id, dto)
 
-            result.onSuccess {
-                fetchProfile(id)
-                _error.value = null
-            }.onFailure {
-                _error.value = it.message
-            }
+            result
+                .onSuccess {
+                    fetchProfile(id)
+                    _error.value = null
+                }.onFailure {
+                    _error.value = it.message
+                }
 
             _isLoading.value = false
         }
     }
 
-    fun uploadFoto(id: Long, imageUri: Uri, context: Context) {
+    fun uploadFoto(
+        id: Long,
+        imageUri: Uri,
+        context: Context,
+    ) {
         viewModelScope.launch {
             _uploadStatus.value = UploadStatus.Loading
 
             try {
-                val file = getFile(imageUri, context)
-                    ?: throw Exception("No se pudo obtener archivo")
+                val file =
+                    getFile(imageUri, context)
+                        ?: throw Exception("No se pudo obtener archivo")
 
                 val request = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val multipart = MultipartBody.Part.createFormData("file", file.name, request)
 
                 val result = profileUseCaseGeneral.updateAdminPhoto(id, multipart)
 
-                result.onSuccess {
-                    _uploadStatus.value = UploadStatus.Success("ok")
-                    fetchProfile(id)
-                }.onFailure {
-                    _uploadStatus.value = UploadStatus.Error(it.message ?: "Error al subir la foto")
-                }
-
+                result
+                    .onSuccess {
+                        _uploadStatus.value = UploadStatus.Success("ok")
+                        fetchProfile(id)
+                    }.onFailure {
+                        _uploadStatus.value = UploadStatus.Error(it.message ?: "Error al subir la foto")
+                    }
             } catch (e: Exception) {
                 _uploadStatus.value = UploadStatus.Error(e.message ?: "Error al procesar la imagen")
             }
         }
     }
 
-    private fun getFile(uri: Uri, context: Context): File? {
+    private fun getFile(
+        uri: Uri,
+        context: Context,
+    ): File? {
         return try {
             val input = context.contentResolver.openInputStream(uri) ?: return null
             val file = File.createTempFile("admin_", ".jpg", context.cacheDir)

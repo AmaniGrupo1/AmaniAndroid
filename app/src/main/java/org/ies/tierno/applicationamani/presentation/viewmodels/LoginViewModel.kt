@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
-import timber.log.Timber
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
@@ -27,6 +26,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import org.ies.tierno.applicationamani.dto.requestPaciente.UsuarioRequest
 import org.ies.tierno.applicationamani.dto.tutor.TutorRequestDTO
 import retrofit2.HttpException
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.Period
 
@@ -35,9 +35,8 @@ class LoginViewModel(
     private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase,
     private val userSessionDataStore: UserSessionDataStore,
     private val tokenDataStore: TokenDataStore,
-    private val tokenHolder: TokenHolder
+    private val tokenHolder: TokenHolder,
 ) : ViewModel() {
-
     // ==================== VALIDACIONES DE CONTRASEÑA ====================
 
     companion object {
@@ -52,9 +51,7 @@ class LoginViewModel(
         /**
          * Mensaje de error para la contraseña
          */
-        fun getPasswordErrorMessage(): String {
-            return "La contraseña debe tener al menos 8 caracteres y contener letras y números"
-        }
+        fun getPasswordErrorMessage(): String = "La contraseña debe tener al menos 8 caracteres y contener letras y números"
     }
 
     /**
@@ -62,9 +59,7 @@ class LoginViewModel(
      * @param password Contraseña a validar
      * @return true si la contraseña es válida, false en caso contrario
      */
-    fun isValidPassword(password: String): Boolean {
-        return PASSWORD_REGEX.matches(password)
-    }
+    fun isValidPassword(password: String): Boolean = PASSWORD_REGEX.matches(password)
 
     // ── Login ──
     private val _username = MutableStateFlow("")
@@ -82,8 +77,13 @@ class LoginViewModel(
     private val _loginError = MutableStateFlow<String?>(null)
     val loginError: StateFlow<String?> = _loginError
 
-    fun setUsername(username: String) { _username.value = username }
-    fun setPassword(password: String) { _password.value = password }
+    fun setUsername(username: String) {
+        _username.value = username
+    }
+
+    fun setPassword(password: String) {
+        _password.value = password
+    }
 
     /**
      * Ejecuta el proceso de inicio de sesión.
@@ -118,34 +118,37 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                val request = LoginRequestDTO(
-                    email = usernameValue,
-                    password = passwordValue
-                )
+                val request =
+                    LoginRequestDTO(
+                        email = usernameValue,
+                        password = passwordValue,
+                    )
 
                 val result = loginUseCase.login(request)
 
-                result.onSuccess { loginResponse ->
-                    tokenDataStore.saveToken(loginResponse.token)
-                    tokenHolder.setToken(loginResponse.token)
-                    Timber.d("Login: token saved and cached in memory")
-                    saveUserSession(loginResponse)
-                    _loginResult.value = Result.success(loginResponse)
-                    _loginError.value = null
-                }.onFailure { error ->
-                    _loginResult.value = Result.failure(error)
-                    _loginError.value = when (error) {
-                        is HttpException -> {
-                            when (error.code()) {
-                                401 -> "Credenciales incorrectas"
-                                404 -> "Usuario no encontrado"
-                                500 -> "Error en el servidor: los datos enviados no son válidos"
-                                else -> "Error de conexión: ${error.message()}"
+                result
+                    .onSuccess { loginResponse ->
+                        tokenDataStore.saveToken(loginResponse.token)
+                        tokenHolder.setToken(loginResponse.token)
+                        Timber.d("Login: token saved and cached in memory")
+                        saveUserSession(loginResponse)
+                        _loginResult.value = Result.success(loginResponse)
+                        _loginError.value = null
+                    }.onFailure { error ->
+                        _loginResult.value = Result.failure(error)
+                        _loginError.value =
+                            when (error) {
+                                is HttpException -> {
+                                    when (error.code()) {
+                                        401 -> "Credenciales incorrectas"
+                                        404 -> "Usuario no encontrado"
+                                        500 -> "Error en el servidor: los datos enviados no son válidos"
+                                        else -> "Error de conexión: ${error.message()}"
+                                    }
+                                }
+                                else -> error.message ?: "Error al iniciar sesión"
                             }
-                        }
-                        else -> error.message ?: "Error al iniciar sesión"
                     }
-                }
             } catch (e: Exception) {
                 _loginError.value = e.message ?: "Error inesperado al iniciar sesión"
                 _loginResult.value = Result.failure(e)
@@ -158,20 +161,22 @@ class LoginViewModel(
     /**
      * Guarda la sesión del usuario en DataStore
      */
+
     /**
      * Guarda la sesión del usuario en DataStore
      */
     private suspend fun saveUserSession(loginResponse: LoginResponseDTO) {
         try {
-            val session = UserSession(
-                idUsuario = loginResponse.idUsuario,
-                nombre = loginResponse.nombre,
-                rol = loginResponse.rol,
-                idPsicologo = loginResponse.idPsicologo,
-                idPaciente = loginResponse.idPaciente,
-                idioma = loginResponse.idioma ?: "es",
-                tema = loginResponse.tema ?: false
-            )
+            val session =
+                UserSession(
+                    idUsuario = loginResponse.idUsuario,
+                    nombre = loginResponse.nombre,
+                    rol = loginResponse.rol,
+                    idPsicologo = loginResponse.idPsicologo,
+                    idPaciente = loginResponse.idPaciente,
+                    idioma = loginResponse.idioma ?: "es",
+                    tema = loginResponse.tema ?: false,
+                )
 
             userSessionDataStore.saveSession(session)
 
@@ -181,7 +186,6 @@ class LoginViewModel(
             println("Nombre: ${session.nombre}")
             println("Rol: ${session.rol}")
             println("ID Psicólogo: ${session.idPsicologo}")
-
         } catch (e: Exception) {
             println("Error al guardar la sesión: ${e.message}")
         }
@@ -198,12 +202,11 @@ class LoginViewModel(
         _isLoggingIn.value = false
     }
 
-    fun isLoginFormValid(): Boolean {
-        return _username.value.isNotBlank() &&
-                _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
-                _password.value.isNotBlank() &&
-                isValidPassword(_password.value)
-    }
+    fun isLoginFormValid(): Boolean =
+        _username.value.isNotBlank() &&
+            _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
+            _password.value.isNotBlank() &&
+            isValidPassword(_password.value)
 
     // ── Campos registro básico ──
     val nombre = MutableStateFlow("")
@@ -263,33 +266,101 @@ class LoginViewModel(
     val passwordError: StateFlow<String?> = _passwordError
 
     // ── Setters ──
-    fun setNombre(value: String) { nombre.value = value }
-    fun setApellido(value: String) { apellido.value = value }
-    fun setDni(value: String) { dni.value = value }
-    fun setEmail(value: String) { email.value = value }
-    fun setRegPassword(value: String) { regPassword.value = value }
-    fun setTelefono(value: String) { telefono.value = value }
-    fun setGenero(value: String) { genero.value = value }
-    fun setFechaNacimiento(value: String) { fechaNacimiento.value = value }
+    fun setNombre(value: String) {
+        nombre.value = value
+    }
 
-    fun setTutorNombre(value: String) { tutorNombre.value = value }
-    fun setTutorTelefono(value: String) { tutorTelefono.value = value }
-    fun setTutorEmail(value: String) { tutorEmail.value = value }
-    fun setTutorDni(value: String) { tutorDni.value = value }
-    fun setTutorTipo(value: String) { tutorTipo.value = value }
+    fun setApellido(value: String) {
+        apellido.value = value
+    }
 
-    fun setRegistroEspecialidad(value: String) { registroEspecialidad.value = value }
-    fun setRegistroExperiencia(value: Int?) { registroExperiencia.value = value }
-    fun setRegistroDescripcion(value: String?) { registroDescripcion.value = value }
-    fun setRegistroLicencia(value: String?) { registroLicencia.value = value }
+    fun setDni(value: String) {
+        dni.value = value
+    }
 
-    fun setDateOfBirth(date: LocalDate) { _dateOfBirth.value = date }
-    fun setShowDatePicker(show: Boolean) { _showDatePicker.value = show }
-    fun setDateError(error: String?) { _dateError.value = error }
-    fun setPhoneError(error: String?) { _phoneError.value = error }
-    fun setEmailError(error: String?) { _emailError.value = error }
-    fun setPasswordError(error: String?) { _passwordError.value = error }
-    fun setTelefonoPsicologo(value: String) { telefono.value = value }
+    fun setEmail(value: String) {
+        email.value = value
+    }
+
+    fun setRegPassword(value: String) {
+        regPassword.value = value
+    }
+
+    fun setTelefono(value: String) {
+        telefono.value = value
+    }
+
+    fun setGenero(value: String) {
+        genero.value = value
+    }
+
+    fun setFechaNacimiento(value: String) {
+        fechaNacimiento.value = value
+    }
+
+    fun setTutorNombre(value: String) {
+        tutorNombre.value = value
+    }
+
+    fun setTutorTelefono(value: String) {
+        tutorTelefono.value = value
+    }
+
+    fun setTutorEmail(value: String) {
+        tutorEmail.value = value
+    }
+
+    fun setTutorDni(value: String) {
+        tutorDni.value = value
+    }
+
+    fun setTutorTipo(value: String) {
+        tutorTipo.value = value
+    }
+
+    fun setRegistroEspecialidad(value: String) {
+        registroEspecialidad.value = value
+    }
+
+    fun setRegistroExperiencia(value: Int?) {
+        registroExperiencia.value = value
+    }
+
+    fun setRegistroDescripcion(value: String?) {
+        registroDescripcion.value = value
+    }
+
+    fun setRegistroLicencia(value: String?) {
+        registroLicencia.value = value
+    }
+
+    fun setDateOfBirth(date: LocalDate) {
+        _dateOfBirth.value = date
+    }
+
+    fun setShowDatePicker(show: Boolean) {
+        _showDatePicker.value = show
+    }
+
+    fun setDateError(error: String?) {
+        _dateError.value = error
+    }
+
+    fun setPhoneError(error: String?) {
+        _phoneError.value = error
+    }
+
+    fun setEmailError(error: String?) {
+        _emailError.value = error
+    }
+
+    fun setPasswordError(error: String?) {
+        _passwordError.value = error
+    }
+
+    fun setTelefonoPsicologo(value: String) {
+        telefono.value = value
+    }
 
     fun resetRegisterState() {
         _isRegistering.value = false
@@ -309,79 +380,101 @@ class LoginViewModel(
     val codigoPostal = MutableStateFlow("")
     val pais = MutableStateFlow("España")
 
-    fun setCalle(value: String) { calle.value = value }
-    fun setCiudad(value: String) { ciudad.value = value }
-    fun setProvincia(value: String) { provincia.value = value }
-    fun setCodigoPostal(value: String) { codigoPostal.value = value }
-    fun setPais(value: String) { pais.value = value }
+    fun setCalle(value: String) {
+        calle.value = value
+    }
+
+    fun setCiudad(value: String) {
+        ciudad.value = value
+    }
+
+    fun setProvincia(value: String) {
+        provincia.value = value
+    }
+
+    fun setCodigoPostal(value: String) {
+        codigoPostal.value = value
+    }
+
+    fun setPais(value: String) {
+        pais.value = value
+    }
 
     // ── Estados derivados ──
 
-    val esMenor: StateFlow<Boolean> = fechaNacimiento.map { f ->
-        try {
-            val nacimiento = LocalDate.parse(f)
-            Period.between(nacimiento, LocalDate.now()).years < 18
-        } catch (e: Exception) { false }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val esMenor: StateFlow<Boolean> =
+        fechaNacimiento
+            .map { f ->
+                try {
+                    val nacimiento = LocalDate.parse(f)
+                    Period.between(nacimiento, LocalDate.now()).years < 18
+                } catch (e: Exception) {
+                    false
+                }
+            }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val tutorValido: StateFlow<Boolean> = combine(
-        esMenor,
-        tutorNombre,
-        tutorTelefono,
-        tutorEmail,
-        tutorDni
-    ) { esMenor, nombre, telefono, email, dni ->
-        if (!esMenor) {
-            true
-        } else {
-            nombre.isNotBlank() &&
+    val tutorValido: StateFlow<Boolean> =
+        combine(
+            esMenor,
+            tutorNombre,
+            tutorTelefono,
+            tutorEmail,
+            tutorDni,
+        ) { esMenor, nombre, telefono, email, dni ->
+            if (!esMenor) {
+                true
+            } else {
+                nombre.isNotBlank() &&
                     telefono.isNotBlank() &&
                     email.isNotBlank() &&
                     email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
                     dni.isNotBlank() &&
                     dni.matches(Regex("^[0-9]{8}[A-Za-z]$"))
-        }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+            }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val direccionValida: StateFlow<Boolean> = combine(calle) { array ->
-        array[0].isNotBlank()
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val direccionValida: StateFlow<Boolean> =
+        combine(calle) { array ->
+            array[0].isNotBlank()
+        }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val formularioValido: StateFlow<Boolean> = combine(
-        nombre,
-        apellido,
-        dni,
-        email,
-        regPassword,
-        telefono,
-        genero,
-        fechaNacimiento,
-        aceptaTerminos
-    ) { array ->
-        val n = array[0] as String
-        val a = array[1] as String
-        val d = array[2] as String
-        val e = array[3] as String
-        val p = array[4] as String
-        val t = array[5] as String
-        val g = array[6] as String
-        val f = array[7] as String
-        val term = array[8] as Boolean
+    val formularioValido: StateFlow<Boolean> =
+        combine(
+            nombre,
+            apellido,
+            dni,
+            email,
+            regPassword,
+            telefono,
+            genero,
+            fechaNacimiento,
+            aceptaTerminos,
+        ) { array ->
+            val n = array[0] as String
+            val a = array[1] as String
+            val d = array[2] as String
+            val e = array[3] as String
+            val p = array[4] as String
+            val t = array[5] as String
+            val g = array[6] as String
+            val f = array[7] as String
+            val term = array[8] as Boolean
 
-        val camposCompletos = listOf(n, a, d, e, p, t, g, f).all { it.isNotBlank() }
-        val fechaValida = f.matches(Regex("""\d{4}-\d{2}-\d{2}"""))
-        val passwordValida = isValidPassword(p)  // ✅ Validación de contraseña
+            val camposCompletos = listOf(n, a, d, e, p, t, g, f).all { it.isNotBlank() }
+            val fechaValida = f.matches(Regex("""\d{4}-\d{2}-\d{2}"""))
+            val passwordValida = isValidPassword(p) // ✅ Validación de contraseña
 
-        camposCompletos && fechaValida && term && passwordValida
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+            camposCompletos && fechaValida && term && passwordValida
+        }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val formularioCompletoValido: StateFlow<Boolean> = combine(
-        formularioValido,
-        tutorValido,
-        direccionValida
-    ) { formValido, tutorVal, dirVal ->
-        formValido && tutorVal && dirVal
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val formularioCompletoValido: StateFlow<Boolean> =
+        combine(
+            formularioValido,
+            tutorValido,
+            direccionValida,
+        ) { formValido, tutorVal, dirVal ->
+            formValido && tutorVal && dirVal
+        }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // ── Acciones de registro ──
 
@@ -416,20 +509,22 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                val result = loginUseCase.registrarAdmin(
-                    RegistryPacienteDTO(
-                        nombre = nombre.value,
-                        apellido = apellido.value,
-                        email = email.value,
-                        password = regPassword.value
+                val result =
+                    loginUseCase.registrarAdmin(
+                        RegistryPacienteDTO(
+                            nombre = nombre.value,
+                            apellido = apellido.value,
+                            email = email.value,
+                            password = regPassword.value,
+                        ),
                     )
-                )
 
-                result.onSuccess {
-                    _registerSuccess.value = true
-                }.onFailure { error ->
-                    _registerError.value = error.message ?: "Error al registrar administrador"
-                }
+                result
+                    .onSuccess {
+                        _registerSuccess.value = true
+                    }.onFailure { error ->
+                        _registerError.value = error.message ?: "Error al registrar administrador"
+                    }
             } catch (e: Exception) {
                 _registerError.value = e.message ?: "Error inesperado"
             } finally {
@@ -456,60 +551,65 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                val tutoresList = if (esMenor.value) {
-                    listOf(
-                        TutorRequestDTO(
-                            nombre = tutorNombre.value,
-                            telefono = tutorTelefono.value,
-                            email = tutorEmail.value,
-                            dni = tutorDni.value,
-                            tipo = tutorTipo.value
+                val tutoresList =
+                    if (esMenor.value) {
+                        listOf(
+                            TutorRequestDTO(
+                                nombre = tutorNombre.value,
+                                telefono = tutorTelefono.value,
+                                email = tutorEmail.value,
+                                dni = tutorDni.value,
+                                tipo = tutorTipo.value,
+                            ),
                         )
+                    } else {
+                        emptyList()
+                    }
+
+                val direccion =
+                    DireccionRequest(
+                        idPaciente = null,
+                        calle = calle.value,
+                        ciudad = ciudad.value.ifBlank { null },
+                        provincia = provincia.value.ifBlank { null },
+                        codigoPostal = codigoPostal.value.ifBlank { null },
+                        pais = pais.value.ifBlank { null },
                     )
-                } else {
-                    emptyList()
-                }
 
-                val direccion = DireccionRequest(
-                    idPaciente = null,
-                    calle = calle.value,
-                    ciudad = ciudad.value.ifBlank { null },
-                    provincia = provincia.value.ifBlank { null },
-                    codigoPostal = codigoPostal.value.ifBlank { null },
-                    pais = pais.value.ifBlank { null }
-                )
-
-                val request = PacienteRequest(
-                    fechaNacimiento = fechaNacimiento.value,
-                    genero = genero.value,
-                    telefono = telefono.value,
-                    usuario = UsuarioRequest(
-                        nombre = nombre.value,
-                        apellido = apellido.value,
-                        email = email.value,
-                        password = regPassword.value,
-                        rol = Rol.paciente,
-                        dni = dni.value
-                    ),
-                    aceptaTerminos = aceptaTerminos.value,
-                    aceptaVideoconferencia = aceptaVideoconferencia.value,
-                    aceptaComunicacion = aceptaComunicacion.value,
-                    idSituaciones = situacionesIds.value,
-                    tutores = tutoresList,
-                    direccion = listOf(direccion)
-                )
+                val request =
+                    PacienteRequest(
+                        fechaNacimiento = fechaNacimiento.value,
+                        genero = genero.value,
+                        telefono = telefono.value,
+                        usuario =
+                            UsuarioRequest(
+                                nombre = nombre.value,
+                                apellido = apellido.value,
+                                email = email.value,
+                                password = regPassword.value,
+                                rol = Rol.PACIENTE,
+                                dni = dni.value,
+                            ),
+                        aceptaTerminos = aceptaTerminos.value,
+                        aceptaVideoconferencia = aceptaVideoconferencia.value,
+                        aceptaComunicacion = aceptaComunicacion.value,
+                        idSituaciones = situacionesIds.value,
+                        tutores = tutoresList,
+                        direccion = listOf(direccion),
+                    )
 
                 val result = loginUseCase.registerPaciente(request)
 
-                result.onSuccess { response ->
-                    _registerSuccess.value = true
-                    _registerError.value = null
-                    _successMessage.value = "¡Paciente registrado correctamente!"
-                    limpiarFormulario()
-                }.onFailure { error ->
-                    _registerError.value = error.message ?: "Error al registrar paciente"
-                    _registerSuccess.value = false
-                }
+                result
+                    .onSuccess { response ->
+                        _registerSuccess.value = true
+                        _registerError.value = null
+                        _successMessage.value = "¡Paciente registrado correctamente!"
+                        limpiarFormulario()
+                    }.onFailure { error ->
+                        _registerError.value = error.message ?: "Error al registrar paciente"
+                        _registerSuccess.value = false
+                    }
             } catch (e: Exception) {
                 _registerError.value = e.message ?: "Error inesperado al registrar paciente"
                 _registerSuccess.value = false
@@ -560,7 +660,10 @@ class LoginViewModel(
     private val _isAsignandoPaciente = MutableStateFlow(false)
     val isAsignandoPaciente: StateFlow<Boolean> = _isAsignandoPaciente
 
-    fun asignarPaciente(idPaciente: Long, idPsicologo: Long) {
+    fun asignarPaciente(
+        idPaciente: Long,
+        idPsicologo: Long,
+    ) {
         _isAsignandoPaciente.value = true
         _asignarPacienteError.value = null
         _asignarPacienteSuccess.value = false
@@ -569,13 +672,14 @@ class LoginViewModel(
             try {
                 val result = asignarPacienteAlPsicologoUseCase(idPaciente, idPsicologo)
 
-                result.onSuccess {
-                    _asignarPacienteSuccess.value = true
-                    _asignarPacienteError.value = null
-                }.onFailure { error ->
-                    _asignarPacienteError.value = error.message ?: "Error al asignar paciente"
-                    _asignarPacienteSuccess.value = false
-                }
+                result
+                    .onSuccess {
+                        _asignarPacienteSuccess.value = true
+                        _asignarPacienteError.value = null
+                    }.onFailure { error ->
+                        _asignarPacienteError.value = error.message ?: "Error al asignar paciente"
+                        _asignarPacienteSuccess.value = false
+                    }
             } catch (e: Exception) {
                 _asignarPacienteError.value = e.message ?: "Error inesperado al asignar paciente"
                 _asignarPacienteSuccess.value = false
@@ -592,21 +696,13 @@ class LoginViewModel(
 
     // ── Registro de Psicólogo con validación de contraseña ──
 
-    private fun isValidEmail(email: String): Boolean {
-        return Regex("^[A-Za-z0-9+_.-]+@(.+)$").matches(email)
-    }
+    private fun isValidEmail(email: String): Boolean = Regex("^[A-Za-z0-9+_.-]+@(.+)$").matches(email)
 
-    private fun isValidPhone(phone: String): Boolean {
-        return Regex("^[0-9]{9}$").matches(phone)
-    }
+    private fun isValidPhone(phone: String): Boolean = Regex("^[0-9]{9}$").matches(phone)
 
-    private fun calculateAge(dateOfBirth: LocalDate): Int {
-        return Period.between(dateOfBirth, LocalDate.now()).years
-    }
+    private fun calculateAge(dateOfBirth: LocalDate): Int = Period.between(dateOfBirth, LocalDate.now()).years
 
-    private fun isAdult(dateOfBirth: LocalDate): Boolean {
-        return calculateAge(dateOfBirth) >= 18
-    }
+    private fun isAdult(dateOfBirth: LocalDate): Boolean = calculateAge(dateOfBirth) >= 18
 
     fun clearAllErrors() {
         _dateError.value = null
@@ -662,30 +758,32 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                val psicologoRequest = PsicologoRequestDTO(
-                    nombrePsicologo = nombre.value,
-                    apellidoPsicologo = apellido.value,
-                    email = email.value,
-                    password = regPassword.value,
-                    especialidad = registroEspecialidad.value,
-                    experiencia = registroExperiencia.value,
-                    descripcion = registroDescripcion.value,
-                    licencia = registroLicencia.value,
-                    telefono = telefono.value
-                )
+                val psicologoRequest =
+                    PsicologoRequestDTO(
+                        nombrePsicologo = nombre.value,
+                        apellidoPsicologo = apellido.value,
+                        email = email.value,
+                        password = regPassword.value,
+                        especialidad = registroEspecialidad.value,
+                        experiencia = registroExperiencia.value,
+                        descripcion = registroDescripcion.value,
+                        licencia = registroLicencia.value,
+                        telefono = telefono.value,
+                    )
 
                 val result = loginUseCase.registrarPsicologo(psicologoRequest)
 
-                result.onSuccess { response ->
-                    _registerSuccess.value = true
-                    _registerError.value = null
-                }.onFailure { error ->
-                    if (error.message?.contains("email", ignoreCase = true) == true) {
-                        _emailError.value = "Este correo electrónico ya está registrado"
+                result
+                    .onSuccess { response ->
+                        _registerSuccess.value = true
+                        _registerError.value = null
+                    }.onFailure { error ->
+                        if (error.message?.contains("email", ignoreCase = true) == true) {
+                            _emailError.value = "Este correo electrónico ya está registrado"
+                        }
+                        _registerError.value = error.message ?: "Error al registrar psicólogo"
+                        _registerSuccess.value = false
                     }
-                    _registerError.value = error.message ?: "Error al registrar psicólogo"
-                    _registerSuccess.value = false
-                }
             } catch (e: Exception) {
                 _registerError.value = e.message ?: "Error inesperado al registrar psicólogo"
                 _registerSuccess.value = false
@@ -718,59 +816,64 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                val tutoresList = if (esMenor.value) {
-                    listOf(
-                        TutorRequestDTO(
-                            nombre = tutorNombre.value,
-                            telefono = tutorTelefono.value,
-                            email = tutorEmail.value,
-                            dni = tutorDni.value,
-                            tipo = tutorTipo.value
+                val tutoresList =
+                    if (esMenor.value) {
+                        listOf(
+                            TutorRequestDTO(
+                                nombre = tutorNombre.value,
+                                telefono = tutorTelefono.value,
+                                email = tutorEmail.value,
+                                dni = tutorDni.value,
+                                tipo = tutorTipo.value,
+                            ),
                         )
+                    } else {
+                        emptyList()
+                    }
+
+                val direccion =
+                    DireccionRequest(
+                        idPaciente = null,
+                        calle = calle.value,
+                        ciudad = ciudad.value.ifBlank { null },
+                        provincia = provincia.value.ifBlank { null },
+                        codigoPostal = codigoPostal.value.ifBlank { null },
+                        pais = pais.value.ifBlank { null },
                     )
-                } else {
-                    emptyList()
-                }
 
-                val direccion = DireccionRequest(
-                    idPaciente = null,
-                    calle = calle.value,
-                    ciudad = ciudad.value.ifBlank { null },
-                    provincia = provincia.value.ifBlank { null },
-                    codigoPostal = codigoPostal.value.ifBlank { null },
-                    pais = pais.value.ifBlank { null }
-                )
-
-                val request = PacienteRequest(
-                    fechaNacimiento = fechaNacimiento.value,
-                    genero = genero.value,
-                    telefono = telefono.value,
-                    usuario = UsuarioRequest(
-                        nombre = nombre.value,
-                        apellido = apellido.value,
-                        email = email.value,
-                        password = regPassword.value,
-                        rol = Rol.paciente,
-                        dni = dni.value
-                    ),
-                    aceptaTerminos = aceptaTerminos.value,
-                    aceptaVideoconferencia = aceptaVideoconferencia.value,
-                    aceptaComunicacion = aceptaComunicacion.value,
-                    idSituaciones = situacionesIds.value,
-                    tutores = tutoresList,
-                    direccion = listOf(direccion)
-                )
+                val request =
+                    PacienteRequest(
+                        fechaNacimiento = fechaNacimiento.value,
+                        genero = genero.value,
+                        telefono = telefono.value,
+                        usuario =
+                            UsuarioRequest(
+                                nombre = nombre.value,
+                                apellido = apellido.value,
+                                email = email.value,
+                                password = regPassword.value,
+                                rol = Rol.PACIENTE,
+                                dni = dni.value,
+                            ),
+                        aceptaTerminos = aceptaTerminos.value,
+                        aceptaVideoconferencia = aceptaVideoconferencia.value,
+                        aceptaComunicacion = aceptaComunicacion.value,
+                        idSituaciones = situacionesIds.value,
+                        tutores = tutoresList,
+                        direccion = listOf(direccion),
+                    )
 
                 val result = loginUseCase.registrarPacienteDesdePsicologo(request)
 
-                result.onSuccess { response ->
-                    _crearPacienteDesdePsicologoSuccess.value = true
-                    _crearPacienteDesdePsicologoError.value = null
-                    limpiarFormulario()
-                }.onFailure { error ->
-                    _crearPacienteDesdePsicologoError.value = error.message ?: "Error al registrar paciente"
-                    _crearPacienteDesdePsicologoSuccess.value = false
-                }
+                result
+                    .onSuccess { response ->
+                        _crearPacienteDesdePsicologoSuccess.value = true
+                        _crearPacienteDesdePsicologoError.value = null
+                        limpiarFormulario()
+                    }.onFailure { error ->
+                        _crearPacienteDesdePsicologoError.value = error.message ?: "Error al registrar paciente"
+                        _crearPacienteDesdePsicologoSuccess.value = false
+                    }
             } catch (e: Exception) {
                 _crearPacienteDesdePsicologoError.value = e.message ?: "Error inesperado al registrar paciente"
                 _crearPacienteDesdePsicologoSuccess.value = false

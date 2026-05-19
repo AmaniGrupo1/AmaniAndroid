@@ -1,10 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-<<<<<<< HEAD
-import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
-import androidx.compose.material3.MaterialTheme
-=======
->>>>>>> login
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +19,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -49,31 +43,26 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
-<<<<<<< HEAD
-import org.ies.tierno.applicationamani.ui.theme.BarlowCondensed
-import org.ies.tierno.applicationamani.ui.theme.Roboto
-=======
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-import org.koin.androidx.compose.koinViewModel
->>>>>>> login
 
 // Fuentes profesionales
-val robotoFont = FontFamily(
-    Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
-    Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
-    Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
-    Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
-)
+val robotoFont =
+    FontFamily(
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
+        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold),
+    )
 
-val barlowCondensed = FontFamily(
-    Font(R.font.barlow_condensed_black)
-)
+val barlowCondensed =
+    FontFamily(
+        Font(R.font.barlow_condensed_black),
+    )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +71,7 @@ fun ListadoPsicologosScreen(
     loginViewModel: LoginViewModel,
     pacienteId: Long,
     viewModel: ListarPsicologosAdminViewModel,
-    listarPacientesViewModel: ListarPacientesViewModel
+    listarPacientesViewModel: ListarPacientesViewModel,
 ) {
     val psicologos by viewModel.psicologos.collectAsState()
     val scope = rememberCoroutineScope()
@@ -96,13 +85,7 @@ fun ListadoPsicologosScreen(
     val screenColors = getScreenColors()
     val cardColors = getCardColors()
 
-<<<<<<< HEAD
-    val backgroundColor = MaterialTheme.colorScheme.background
-    val cardColor = MaterialTheme.colorScheme.surface
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val deleteColor = MaterialTheme.colorScheme.error
-=======
-    // Colores dinámicos según el tema
+// Colores dinámicos según el tema
     val backgroundColor = if (isDark) screenColors.background else Color(0xFFF5F5F5)
     val cardBackgroundColor = if (isDark) cardColors.cardBackground else Color.White
     val textPrimaryColor = if (isDark) cardColors.cardContent else Color.Black
@@ -112,7 +95,6 @@ fun ListadoPsicologosScreen(
     val buttonTextColor = if (isDark) Color.Black else Color.White
     val topBarTextColor = if (isDark) Color.White else Color.Black
     val fabTextColor = if (isDark) Color.Black else Color.White
->>>>>>> login
 
     // Observar el estado de la baja desde el ViewModel
     val bajaEstado by listarPacientesViewModel.bajaEstado.collectAsState()
@@ -139,7 +121,7 @@ fun ListadoPsicologosScreen(
                 color = topBarTextColor,
                 fontSize = 20.sp,
                 fontFamily = barlowCondensed,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -147,87 +129,64 @@ fun ListadoPsicologosScreen(
             FloatingActionButton(
                 onClick = { navController.popBackStack() },
                 containerColor = primaryColor,
-                modifier = Modifier
-                    .width(120.dp)
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .width(120.dp)
+                        .padding(8.dp),
                 shape = RoundedCornerShape(24.dp),
             ) {
-<<<<<<< HEAD
-                Icon(Icons.Default.Person, contentDescription = "Psicólogo", tint = MaterialTheme.colorScheme.onPrimary)
-=======
                 Text(
                     "Cancelar",
                     color = fabTextColor,
                     fontFamily = robotoFont,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
->>>>>>> login
             }
-        }
+        },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(psicologos) { psicologo ->
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         // Nombre
                         Text(
-<<<<<<< HEAD
-                            "Nombre: ${psicologo.nombre} ${psicologo.apellido}",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontFamily = roboto
-                        )
-                        Text(
-                            "Especialidad: ${psicologo.especialidad}",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontFamily = roboto
-                        )
-                        Text(
-                            "Descripción: ${psicologo.descripcion ?: "-"}",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontFamily = roboto
-                        )
-                        Text(
-                            "Licencia: ${psicologo.licencia ?: "-"}",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontFamily = roboto
-=======
                             "👤 ${psicologo.nombre} ${psicologo.apellido}",
                             color = textPrimaryColor,
                             fontFamily = robotoFont,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
->>>>>>> login
+                            fontWeight = FontWeight.Bold,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
                         // Especialidad
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 "📚 Especialidad:",
                                 color = textSecondaryColor,
                                 fontFamily = robotoFont,
                                 fontSize = 13.sp,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
                             Text(
                                 psicologo.especialidad,
                                 color = textPrimaryColor,
                                 fontFamily = robotoFont,
                                 fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
                             )
                         }
 
@@ -236,21 +195,21 @@ fun ListadoPsicologosScreen(
                         // Descripción
                         if (!psicologo.descripcion.isNullOrBlank()) {
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(
                                     "📝 Descripción:",
                                     color = textSecondaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 )
                                 Text(
-                                    psicologo.descripcion,
+                                    psicologo.descripcion!!,
                                     color = textPrimaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
-                                    maxLines = 2
+                                    maxLines = 2,
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
@@ -259,21 +218,21 @@ fun ListadoPsicologosScreen(
                         // Licencia
                         if (!psicologo.licencia.isNullOrBlank()) {
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(
                                     "📜 Licencia:",
                                     color = textSecondaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 )
                                 Text(
-                                    psicologo.licencia,
+                                    psicologo.licencia!!,
                                     color = textPrimaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
@@ -282,21 +241,21 @@ fun ListadoPsicologosScreen(
                         // Experiencia
                         psicologo.experiencia?.let { exp ->
                             Row(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(
                                     "⭐ Experiencia:",
                                     color = textSecondaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 )
                                 Text(
                                     "$exp años",
                                     color = textPrimaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
@@ -304,10 +263,9 @@ fun ListadoPsicologosScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-<<<<<<< HEAD
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Button(
                                 onClick = {
@@ -315,9 +273,9 @@ fun ListadoPsicologosScreen(
                                     mostrarDialogoBaja = true
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             ) {
-                                Text("Dar de baja", color = MaterialTheme.colorScheme.onPrimary, fontFamily = roboto)
+                                Text("Dar de baja", color = buttonTextColor, fontFamily = robotoFont)
                             }
 
                             Button(
@@ -326,16 +284,13 @@ fun ListadoPsicologosScreen(
                                     // navController.navigate("editarPsicologo/${psicologo.idPsicologo}")
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             ) {
-                                Text("Editar", color = MaterialTheme.colorScheme.onPrimary, fontFamily = roboto)
+                                Text("Editar", color = buttonTextColor, fontFamily = robotoFont)
                             }
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
-
-=======
->>>>>>> login
                         val asignarSuccess by loginViewModel.asignarPacienteSuccess.collectAsState()
                         val asignarError by loginViewModel.asignarPacienteError.collectAsState()
                         val isAsignando by loginViewModel.isAsignandoPaciente.collectAsState()
@@ -345,33 +300,30 @@ fun ListadoPsicologosScreen(
                                 scope.launch {
                                     loginViewModel.asignarPaciente(
                                         pacienteId,
-                                        psicologo.idPsicologo
+                                        psicologo.idPsicologo,
                                     )
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = primaryColor,
-                                disabledContainerColor = primaryColor.copy(alpha = 0.5f)
-                            ),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = primaryColor,
+                                    disabledContainerColor = primaryColor.copy(alpha = 0.5f),
+                                ),
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isAsignando,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
                         ) {
-<<<<<<< HEAD
-                            Text("Asignar a paciente", color = MaterialTheme.colorScheme.onPrimary, fontFamily = roboto)
-=======
                             if (isAsignando) {
                                 androidx.compose.material3.CircularProgressIndicator(
                                     modifier = Modifier.width(20.dp),
                                     color = buttonTextColor,
-                                    strokeWidth = 2.dp
+                                    strokeWidth = 2.dp,
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text("Asignando...", color = buttonTextColor, fontFamily = robotoFont)
                             } else {
                                 Text("✓ Asignar a paciente", color = buttonTextColor, fontFamily = robotoFont)
                             }
->>>>>>> login
                         }
 
                         LaunchedEffect(asignarSuccess, asignarError) {
@@ -403,14 +355,14 @@ fun ListadoPsicologosScreen(
                         fontFamily = barlowCondensed,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = textPrimaryColor
+                        color = textPrimaryColor,
                     )
                 },
                 text = {
                     Text(
                         "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
                         fontFamily = robotoFont,
-                        color = textSecondaryColor
+                        color = textSecondaryColor,
                     )
                 },
                 confirmButton = {
@@ -420,17 +372,12 @@ fun ListadoPsicologosScreen(
                             listarPacientesViewModel.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
                         enabled = !isBajaInProgress,
-                        colors = ButtonDefaults.buttonColors(containerColor = deleteColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
                     ) {
                         Text(
                             if (isBajaInProgress) "Procesando..." else "Dar de baja",
-<<<<<<< HEAD
-                            fontFamily = roboto,
-                            color = MaterialTheme.colorScheme.onPrimary
-=======
                             fontFamily = robotoFont,
-                            color = Color.White
->>>>>>> login
+                            color = Color.White,
                         )
                     }
                 },
@@ -442,13 +389,14 @@ fun ListadoPsicologosScreen(
                             }
                         },
                         enabled = !isBajaInProgress,
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = primaryColor
-                        )
+                        colors =
+                            ButtonDefaults.outlinedButtonColors(
+                                contentColor = primaryColor,
+                            ),
                     ) {
                         Text("Cancelar", fontFamily = robotoFont, color = textPrimaryColor)
                     }
-                }
+                },
             )
         }
     }

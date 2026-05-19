@@ -29,7 +29,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatListViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val userSessionDataStore: UserSessionDataStore = mockk(relaxed = true)
     private val profileUseCaseGeneral: ProfileUseCaseGeneral = mockk(relaxed = true)
@@ -38,18 +37,33 @@ class ChatListViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        coEvery { userSessionDataStore.getSession() } returns UserSession(
-            idUsuario = 1L, nombre = "Paciente", rol = "PACIENTE",
-            idPsicologo = 10L, idPaciente = 5L
-        )
-        every { listarPacientesByPsicologo() } returns flowOf(emptyList())
-        coEvery { profileUseCaseGeneral.getPsicologoById(any()) } returns Result.success(
-            PsicologoProfileResponseDTO(
-                idPsicologo = 10L, especialidad = "Clínica", experiencia = 5,
-                descripcion = "Test", licencia = "123",
-                usuario = UsuarioProfileResponseDTO(idUsuario = 10L, nombre = "Dr. García", apellido = "López", email = null, fotoPerfilUrl = null)
+        coEvery { userSessionDataStore.getSession() } returns
+            UserSession(
+                idUsuario = 1L,
+                nombre = "Paciente",
+                rol = "PACIENTE",
+                idPsicologo = 10L,
+                idPaciente = 5L,
             )
-        )
+        every { listarPacientesByPsicologo() } returns flowOf(emptyList())
+        coEvery { profileUseCaseGeneral.getPsicologoById(any()) } returns
+            Result.success(
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 10L,
+                    especialidad = "Clínica",
+                    experiencia = 5,
+                    descripcion = "Test",
+                    licencia = "123",
+                    usuario =
+                        UsuarioProfileResponseDTO(
+                            idUsuario = 10L,
+                            nombre = "Dr. García",
+                            apellido = "López",
+                            email = null,
+                            fotoPerfilUrl = null,
+                        ),
+                ),
+            )
     }
 
     @After
@@ -58,96 +72,151 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `paciente session loads psicologo as partner`() = runTest {
-        val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
-        advanceUntilIdle()
+    fun `paciente session loads psicologo as partner`() =
+        runTest {
+            val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
+            advanceUntilIdle()
 
-        assertEquals(1L, viewModel.currentUserId.value)
-        assertEquals("PACIENTE", viewModel.currentUserRol.value)
-        assertFalse(viewModel.isLoading.value)
-    }
-
-    @Test
-    fun `no session sets error`() = runTest {
-        coEvery { userSessionDataStore.getSession() } returns null
-
-        val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
-        advanceUntilIdle()
-
-        assertEquals("No hay sesión activa", viewModel.error.value)
-        assertFalse(viewModel.isLoading.value)
-    }
+            assertEquals(1L, viewModel.currentUserId.value)
+            assertEquals("PACIENTE", viewModel.currentUserRol.value)
+            assertFalse(viewModel.isLoading.value)
+        }
 
     @Test
-    fun `unsupported rol sets error`() = runTest {
-        coEvery { userSessionDataStore.getSession() } returns UserSession(
-            idUsuario = 1L, nombre = "Admin", rol = "ADMIN", idPsicologo = null, idPaciente = null
-        )
+    fun `no session sets error`() =
+        runTest {
+            coEvery { userSessionDataStore.getSession() } returns null
 
-        val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
-        advanceUntilIdle()
+            val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
+            advanceUntilIdle()
 
-        assertNotNull(viewModel.error.value)
-    }
-
-    @Test
-    fun `psicologo session loads assigned patients`() = runTest {
-        coEvery { userSessionDataStore.getSession() } returns UserSession(
-            idUsuario = 10L, nombre = "Dr. García", rol = "PSICOLOGO",
-            idPsicologo = 10L, idPaciente = null
-        )
-        val pacientes = listOf(
-            PacientePsicologoResponseDTO(idPaciente = 5L, idUsuario = 100L, nombre = "Juan", apellido = "Perez", email = "j@t.com", dni = "1", telefono = "")
-        )
-        every { listarPacientesByPsicologo() } returns flowOf(pacientes)
-        coEvery { profileUseCaseGeneral.getPacienteByIdFirebase(any()) } returns Result.success(
-            PacienteProfileResponseDTO(
-                idPaciente = 5L, telefono = "123", genero = "Hombre", fechaNacimiento = null,
-                usuario = UsuarioProfileResponseDTO(idUsuario = 100L, nombre = "Juan", apellido = "Perez", email = null, fotoPerfilUrl = null)
-            )
-        )
-
-        val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
-        advanceUntilIdle()
-
-        assertEquals("PSICOLOGO", viewModel.currentUserRol.value)
-    }
+            assertEquals("No hay sesión activa", viewModel.error.value)
+            assertFalse(viewModel.isLoading.value)
+        }
 
     @Test
-    fun `retry clears error and reloads`() = runTest {
-        coEvery { userSessionDataStore.getSession() } returns null
+    fun `unsupported rol sets error`() =
+        runTest {
+            coEvery { userSessionDataStore.getSession() } returns
+                UserSession(
+                    idUsuario = 1L,
+                    nombre = "Admin",
+                    rol = "ADMIN",
+                    idPsicologo = null,
+                    idPaciente = null,
+                )
 
-        val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
-        advanceUntilIdle()
-        assertNotNull(viewModel.error.value)
+            val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
+            advanceUntilIdle()
 
-        coEvery { userSessionDataStore.getSession() } returns UserSession(
-            idUsuario = 1L, nombre = "Paciente", rol = "PACIENTE", idPsicologo = 10L, idPaciente = 5L
-        )
-
-        viewModel.retry()
-        advanceUntilIdle()
-
-        assertNull(viewModel.error.value)
-    }
+            assertNotNull(viewModel.error.value)
+        }
 
     @Test
-    fun `paciente without psicologo resolves via profile`() = runTest {
-        coEvery { userSessionDataStore.getSession() } returns UserSession(
-            idUsuario = 1L, nombre = "Paciente", rol = "PACIENTE",
-            idPsicologo = null, idPaciente = 5L
-        )
-        coEvery { profileUseCaseGeneral.obtenerPsicologoAsignado(5L) } returns Result.success(
-            PsicologoProfileResponseDTO(
-                idPsicologo = 10L, especialidad = "Clínica", experiencia = 5,
-                descripcion = "Test", licencia = "123",
-                usuario = UsuarioProfileResponseDTO(idUsuario = 10L, nombre = "Dr. García", apellido = "López", email = null, fotoPerfilUrl = null)
-            )
-        )
+    fun `psicologo session loads assigned patients`() =
+        runTest {
+            coEvery { userSessionDataStore.getSession() } returns
+                UserSession(
+                    idUsuario = 10L,
+                    nombre = "Dr. García",
+                    rol = "PSICOLOGO",
+                    idPsicologo = 10L,
+                    idPaciente = null,
+                )
+            val pacientes =
+                listOf(
+                    PacientePsicologoResponseDTO(
+                        idPaciente = 5L,
+                        idUsuario = 100L,
+                        nombre = "Juan",
+                        apellido = "Perez",
+                        email = "j@t.com",
+                        dni = "1",
+                        telefono = "",
+                    ),
+                )
+            every { listarPacientesByPsicologo() } returns flowOf(pacientes)
+            coEvery { profileUseCaseGeneral.getPacienteByIdFirebase(any()) } returns
+                Result.success(
+                    PacienteProfileResponseDTO(
+                        idPaciente = 5L,
+                        telefono = "123",
+                        genero = "Hombre",
+                        fechaNacimiento = null,
+                        usuario =
+                            UsuarioProfileResponseDTO(
+                                idUsuario = 100L,
+                                nombre = "Juan",
+                                apellido = "Perez",
+                                email = null,
+                                fotoPerfilUrl = null,
+                            ),
+                    ),
+                )
 
-        val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
-        advanceUntilIdle()
+            val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
+            advanceUntilIdle()
 
-        assertNull(viewModel.error.value)
-    }
+            assertEquals("PSICOLOGO", viewModel.currentUserRol.value)
+        }
+
+    @Test
+    fun `retry clears error and reloads`() =
+        runTest {
+            coEvery { userSessionDataStore.getSession() } returns null
+
+            val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
+            advanceUntilIdle()
+            assertNotNull(viewModel.error.value)
+
+            coEvery { userSessionDataStore.getSession() } returns
+                UserSession(
+                    idUsuario = 1L,
+                    nombre = "Paciente",
+                    rol = "PACIENTE",
+                    idPsicologo = 10L,
+                    idPaciente = 5L,
+                )
+
+            viewModel.retry()
+            advanceUntilIdle()
+
+            assertNull(viewModel.error.value)
+        }
+
+    @Test
+    fun `paciente without psicologo resolves via profile`() =
+        runTest {
+            coEvery { userSessionDataStore.getSession() } returns
+                UserSession(
+                    idUsuario = 1L,
+                    nombre = "Paciente",
+                    rol = "PACIENTE",
+                    idPsicologo = null,
+                    idPaciente = 5L,
+                )
+            coEvery { profileUseCaseGeneral.obtenerPsicologoAsignado(5L) } returns
+                Result.success(
+                    PsicologoProfileResponseDTO(
+                        idPsicologo = 10L,
+                        especialidad = "Clínica",
+                        experiencia = 5,
+                        descripcion = "Test",
+                        licencia = "123",
+                        usuario =
+                            UsuarioProfileResponseDTO(
+                                idUsuario = 10L,
+                                nombre = "Dr. García",
+                                apellido = "López",
+                                email = null,
+                                fotoPerfilUrl = null,
+                            ),
+                    ),
+                )
+
+            val viewModel = ChatListViewModel(userSessionDataStore, profileUseCaseGeneral, listarPacientesByPsicologo)
+            advanceUntilIdle()
+
+            assertNull(viewModel.error.value)
+        }
 }

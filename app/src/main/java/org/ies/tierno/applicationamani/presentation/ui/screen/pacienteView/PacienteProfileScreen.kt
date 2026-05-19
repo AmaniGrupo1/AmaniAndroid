@@ -1,8 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.screens.profile
 
 import android.Manifest.permission.CAMERA
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -24,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -46,6 +43,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -54,6 +52,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -82,12 +81,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -101,10 +97,8 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.perfil.UsuarioUpdateDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente.ProfilePacienteViewModel
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.java.KoinJavaComponent.getKoin
@@ -123,7 +117,7 @@ private const val BASE_URL = "http://192.168.1.175:8080"
 fun PacienteProfileScreen(
     pacienteId: Long,
     navController: NavController,
-    viewModel: ProfilePacienteViewModel = koinViewModel()
+    viewModel: ProfilePacienteViewModel = koinViewModel(),
 ) {
     val imageLoader = koinInject<coil.ImageLoader>()
     val context = LocalContext.current
@@ -199,7 +193,7 @@ fun PacienteProfileScreen(
             is ProfilePacienteViewModel.UploadStatus.Error -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        (uploadStatus as ProfilePacienteViewModel.UploadStatus.Error).message
+                        (uploadStatus as ProfilePacienteViewModel.UploadStatus.Error).message,
                     )
                 }
                 viewModel.clearUpload()
@@ -223,78 +217,82 @@ fun PacienteProfileScreen(
     var showImageOptions by remember { mutableStateOf(false) }
     var hasCameraPermission by remember {
         mutableStateOf(
-            ContextCompat.checkSelfPermission(context, CAMERA) == PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, CAMERA) == PERMISSION_GRANTED,
         )
     }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.uploadFoto(pacienteId, it, context)
-            refreshTrigger = System.currentTimeMillis()
-        }
-    }
-
-    // Archivo temporal para la cámara
-    val photoFile = remember {
-        File(context.cacheDir, "camera_photo_paciente.jpg")
-    }
-    val photoUri = remember(photoFile) {
-        FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            photoFile
-        )
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success: Boolean ->
-        if (success) {
-            viewModel.uploadFoto(pacienteId, photoUri, context)
-            refreshTrigger = System.currentTimeMillis()
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasCameraPermission = isGranted
-        if (isGranted) {
-            cameraLauncher.launch(photoUri)
-        } else {
-            scope.launch {
-                snackbarHostState.showSnackbar("Permiso de cámara denegado")
+    val galleryLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { uri: Uri? ->
+            uri?.let {
+                viewModel.uploadFoto(pacienteId, it, context)
+                refreshTrigger = System.currentTimeMillis()
             }
         }
-    }
+
+    // Archivo temporal para la cámara
+    val photoFile =
+        remember {
+            File(context.cacheDir, "camera_photo_paciente.jpg")
+        }
+    val photoUri =
+        remember(photoFile) {
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                photoFile,
+            )
+        }
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicture(),
+        ) { success: Boolean ->
+            if (success) {
+                viewModel.uploadFoto(pacienteId, photoUri, context)
+                refreshTrigger = System.currentTimeMillis()
+            }
+        }
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            hasCameraPermission = isGranted
+            if (isGranted) {
+                cameraLauncher.launch(photoUri)
+            } else {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Permiso de cámara denegado")
+                }
+            }
+        }
 
     fun buildFullImageUrl(relativeUrl: String?): String {
         if (relativeUrl.isNullOrEmpty()) return ""
         if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
             return relativeUrl
         }
-        return "${BASE_URL}${relativeUrl}"
+        return "${BASE_URL}$relativeUrl"
     }
 
     val fullImageUrl = buildFullImageUrl(perfil?.usuario?.fotoPerfilUrl)
 
     // Función para convertir String a LocalDate
-    fun parseLocalDate(dateString: String): LocalDate? {
-        return try {
+    fun parseLocalDate(dateString: String): LocalDate? =
+        try {
             LocalDate.parse(dateString)
         } catch (e: Exception) {
             null
         }
-    }
 
     // Función para formatear LocalDate a String
     fun formatFecha(fecha: LocalDate?): String {
         if (fecha == null) return "No especificada"
         return try {
             fecha.format(
-                DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+                DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("es", "ES")),
             )
         } catch (e: Exception) {
             fecha.toString()
@@ -318,7 +316,7 @@ fun PacienteProfileScreen(
                         text = "Mi Perfil",
                         style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) colorScheme.onSurface else Color.White
+                        color = if (isDark) colorScheme.onSurface else Color.White,
                     )
                 },
                 navigationIcon = {
@@ -326,97 +324,108 @@ fun PacienteProfileScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = if (isDark) colorScheme.onSurface else Color.White
+                            tint = if (isDark) colorScheme.onSurface else Color.White,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorScheme.primary
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.primary,
+                    ),
             )
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = if (isDark) {
-                            listOf(colorScheme.background, colorScheme.background)
-                        } else {
-                            listOf(colorScheme.primaryContainer.copy(alpha = 0.3f), colorScheme.background)
-                        }
-                    )
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    if (isDark) {
+                                        listOf(colorScheme.background, colorScheme.background)
+                                    } else {
+                                        listOf(colorScheme.primaryContainer.copy(alpha = 0.3f), colorScheme.background)
+                                    },
+                            ),
+                    ),
         ) {
             when {
                 isLoading && perfil == null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator(color = colorScheme.primary)
                     }
                 }
                 perfil != null -> {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 20.dp, vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         // ========== SECCIÓN FOTO DE PERFIL ==========
                         Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 24.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 24.dp),
                             shape = MaterialTheme.shapes.medium,
                             elevation = CardDefaults.cardElevation(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
+                            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                         ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
                                     text = "Foto de Perfil",
                                     style = typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     color = colorScheme.primary,
-                                    modifier = Modifier.padding(bottom = 16.dp)
+                                    modifier = Modifier.padding(bottom = 16.dp),
                                 )
 
                                 Box(
                                     modifier = Modifier.size(130.dp),
-                                    contentAlignment = Alignment.BottomEnd
+                                    contentAlignment = Alignment.BottomEnd,
                                 ) {
-                                    val imageUrl = if (fullImageUrl.isEmpty()) {
-                                        R.drawable.ic_default_avatar
-                                    } else {
-                                        "$fullImageUrl?t=$refreshTrigger"
-                                    }
+                                    val imageUrl =
+                                        if (fullImageUrl.isEmpty()) {
+                                            R.drawable.ic_default_avatar
+                                        } else {
+                                            "$fullImageUrl?t=$refreshTrigger"
+                                        }
 
                                     AsyncImage(
-                                        model = ImageRequest.Builder(context)
-                                            .data(imageUrl)
-                                            .crossfade(true)
-                                            .error(R.drawable.ic_default_avatar)
-                                            .placeholder(R.drawable.ic_default_avatar)
-                                            .build(),
+                                        model =
+                                            ImageRequest
+                                                .Builder(context)
+                                                .data(imageUrl)
+                                                .crossfade(true)
+                                                .error(R.drawable.ic_default_avatar)
+                                                .placeholder(R.drawable.ic_default_avatar)
+                                                .build(),
                                         imageLoader = imageLoader,
                                         contentDescription = "Foto de perfil",
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clip(CircleShape)
-                                            .border(
-                                                BorderStroke(3.dp, colorScheme.primary),
-                                                CircleShape
-                                            ),
-                                        contentScale = ContentScale.Crop
+                                        modifier =
+                                            Modifier
+                                                .fillMaxSize()
+                                                .clip(CircleShape)
+                                                .border(
+                                                    BorderStroke(3.dp, colorScheme.primary),
+                                                    CircleShape,
+                                                ),
+                                        contentScale = ContentScale.Crop,
                                     )
 
                                     FloatingActionButton(
@@ -425,12 +434,12 @@ fun PacienteProfileScreen(
                                         containerColor = colorScheme.primary,
                                         contentColor = colorScheme.onPrimary,
                                         shape = CircleShape,
-                                        elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                                        elevation = FloatingActionButtonDefaults.elevation(4.dp),
                                     ) {
                                         Icon(
                                             Icons.Default.CameraAlt,
                                             contentDescription = "Cambiar foto",
-                                            modifier = Modifier.size(20.dp)
+                                            modifier = Modifier.size(20.dp),
                                         )
                                     }
                                 }
@@ -440,13 +449,13 @@ fun PacienteProfileScreen(
                                     style = typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colorScheme.onSurface,
-                                    modifier = Modifier.padding(top = 16.dp)
+                                    modifier = Modifier.padding(top = 16.dp),
                                 )
 
                                 Text(
                                     text = perfil!!.usuario?.email ?: "Email no disponible",
                                     style = typography.bodyMedium,
-                                    color = colorScheme.onSurfaceVariant
+                                    color = colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -456,35 +465,37 @@ fun PacienteProfileScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium,
                             elevation = CardDefaults.cardElevation(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
+                            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                         ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp)
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
                                         text = "Información Personal",
                                         style = typography.titleMedium,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = colorScheme.primary
+                                        color = colorScheme.primary,
                                     )
                                     if (!isEditing) {
                                         TextButton(
                                             onClick = { isEditing = true },
-                                            colors = ButtonDefaults.textButtonColors(
-                                                contentColor = colorScheme.primary
-                                            )
+                                            colors =
+                                                ButtonDefaults.textButtonColors(
+                                                    contentColor = colorScheme.primary,
+                                                ),
                                         ) {
                                             Icon(
                                                 Icons.Default.Edit,
                                                 contentDescription = "Editar",
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text("Editar", style = typography.labelLarge)
@@ -503,12 +514,13 @@ fun PacienteProfileScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = colorScheme.primary,
-                                            unfocusedBorderColor = colorScheme.outline,
-                                            focusedLabelColor = colorScheme.primary,
-                                            unfocusedLabelColor = colorScheme.onSurfaceVariant
-                                        )
+                                        colors =
+                                            OutlinedTextFieldDefaults.colors(
+                                                focusedBorderColor = colorScheme.primary,
+                                                unfocusedBorderColor = colorScheme.outline,
+                                                focusedLabelColor = colorScheme.primary,
+                                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                            ),
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -520,12 +532,13 @@ fun PacienteProfileScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = colorScheme.primary,
-                                            unfocusedBorderColor = colorScheme.outline,
-                                            focusedLabelColor = colorScheme.primary,
-                                            unfocusedLabelColor = colorScheme.onSurfaceVariant
-                                        )
+                                        colors =
+                                            OutlinedTextFieldDefaults.colors(
+                                                focusedBorderColor = colorScheme.primary,
+                                                unfocusedBorderColor = colorScheme.outline,
+                                                focusedLabelColor = colorScheme.primary,
+                                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                            ),
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -537,12 +550,13 @@ fun PacienteProfileScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = colorScheme.primary,
-                                            unfocusedBorderColor = colorScheme.outline,
-                                            focusedLabelColor = colorScheme.primary,
-                                            unfocusedLabelColor = colorScheme.onSurfaceVariant
-                                        )
+                                        colors =
+                                            OutlinedTextFieldDefaults.colors(
+                                                focusedBorderColor = colorScheme.primary,
+                                                unfocusedBorderColor = colorScheme.outline,
+                                                focusedLabelColor = colorScheme.primary,
+                                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                            ),
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -554,12 +568,13 @@ fun PacienteProfileScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = colorScheme.primary,
-                                            unfocusedBorderColor = colorScheme.outline,
-                                            focusedLabelColor = colorScheme.primary,
-                                            unfocusedLabelColor = colorScheme.onSurfaceVariant
-                                        )
+                                        colors =
+                                            OutlinedTextFieldDefaults.colors(
+                                                focusedBorderColor = colorScheme.primary,
+                                                unfocusedBorderColor = colorScheme.outline,
+                                                focusedLabelColor = colorScheme.primary,
+                                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                            ),
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -571,12 +586,13 @@ fun PacienteProfileScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = colorScheme.primary,
-                                            unfocusedBorderColor = colorScheme.outline,
-                                            focusedLabelColor = colorScheme.primary,
-                                            unfocusedLabelColor = colorScheme.onSurfaceVariant
-                                        )
+                                        colors =
+                                            OutlinedTextFieldDefaults.colors(
+                                                focusedBorderColor = colorScheme.primary,
+                                                unfocusedBorderColor = colorScheme.outline,
+                                                focusedLabelColor = colorScheme.primary,
+                                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                            ),
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -584,7 +600,7 @@ fun PacienteProfileScreen(
                                     // Dropdown para género
                                     ExposedDropdownMenuBox(
                                         expanded = showGeneroDropdown,
-                                        onExpandedChange = { showGeneroDropdown = it }
+                                        onExpandedChange = { showGeneroDropdown = it },
                                     ) {
                                         OutlinedTextField(
                                             value = generoEdit,
@@ -594,20 +610,22 @@ fun PacienteProfileScreen(
                                             trailingIcon = {
                                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = showGeneroDropdown)
                                             },
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .menuAnchor(),
+                                            modifier =
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .menuAnchor(),
                                             shape = MaterialTheme.shapes.small,
-                                            colors = OutlinedTextFieldDefaults.colors(
-                                                focusedBorderColor = colorScheme.primary,
-                                                unfocusedBorderColor = colorScheme.outline,
-                                                focusedLabelColor = colorScheme.primary,
-                                                unfocusedLabelColor = colorScheme.onSurfaceVariant
-                                            )
+                                            colors =
+                                                OutlinedTextFieldDefaults.colors(
+                                                    focusedBorderColor = colorScheme.primary,
+                                                    unfocusedBorderColor = colorScheme.outline,
+                                                    focusedLabelColor = colorScheme.primary,
+                                                    unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                                ),
                                         )
                                         ExposedDropdownMenu(
                                             expanded = showGeneroDropdown,
-                                            onDismissRequest = { showGeneroDropdown = false }
+                                            onDismissRequest = { showGeneroDropdown = false },
                                         ) {
                                             generoOptions.forEach { opcion ->
                                                 DropdownMenuItem(
@@ -615,7 +633,7 @@ fun PacienteProfileScreen(
                                                     onClick = {
                                                         generoEdit = opcion
                                                         showGeneroDropdown = false
-                                                    }
+                                                    },
                                                 )
                                             }
                                         }
@@ -625,21 +643,23 @@ fun PacienteProfileScreen(
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     ) {
                                         Button(
                                             onClick = {
                                                 val emailCambiado = emailHasChanged()
-                                                val updateDto = UpdatePacienteRequestDTO(
-                                                    telefono = telefonoEdit.ifBlank { null },
-                                                    genero = generoEdit.ifBlank { null },
-                                                    fechaNacimiento = parseLocalDate(fechaNacimientoEdit),
-                                                    usuario = UsuarioUpdateDTO(
-                                                        nombre = nombreEdit.ifBlank { null },
-                                                        apellido = apellidoEdit.ifBlank { null },
-                                                        email = emailEdit.ifBlank { null }
+                                                val updateDto =
+                                                    UpdatePacienteRequestDTO(
+                                                        telefono = telefonoEdit.ifBlank { null },
+                                                        genero = generoEdit.ifBlank { null },
+                                                        fechaNacimiento = parseLocalDate(fechaNacimientoEdit),
+                                                        usuario =
+                                                            UsuarioUpdateDTO(
+                                                                nombre = nombreEdit.ifBlank { null },
+                                                                apellido = apellidoEdit.ifBlank { null },
+                                                                email = emailEdit.ifBlank { null },
+                                                            ),
                                                     )
-                                                )
 
                                                 viewModel.updateProfile(pacienteId, updateDto) { success ->
                                                     if (success) {
@@ -648,7 +668,7 @@ fun PacienteProfileScreen(
                                                             scope.launch {
                                                                 snackbarHostState.showSnackbar(
                                                                     message = "✅ Correo electrónico actualizado correctamente. Serás redirigido al inicio de sesión.",
-                                                                    duration = SnackbarDuration.Long
+                                                                    duration = SnackbarDuration.Long,
                                                                 )
                                                             }
                                                             isRedirecting = true
@@ -656,7 +676,7 @@ fun PacienteProfileScreen(
                                                             scope.launch {
                                                                 snackbarHostState.showSnackbar(
                                                                     message = "✅ Perfil actualizado correctamente",
-                                                                    duration = SnackbarDuration.Short
+                                                                    duration = SnackbarDuration.Short,
                                                                 )
                                                             }
                                                         }
@@ -664,37 +684,38 @@ fun PacienteProfileScreen(
                                                         scope.launch {
                                                             snackbarHostState.showSnackbar(
                                                                 message = "❌ Error al actualizar el perfil",
-                                                                duration = SnackbarDuration.Short
+                                                                duration = SnackbarDuration.Short,
                                                             )
                                                         }
                                                     }
                                                 }
                                             },
                                             modifier = Modifier.weight(1f).height(48.dp),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = colorScheme.primary
-                                            ),
+                                            colors =
+                                                ButtonDefaults.buttonColors(
+                                                    containerColor = colorScheme.primary,
+                                                ),
                                             shape = CircleShape,
-                                            elevation = ButtonDefaults.buttonElevation(4.dp)
+                                            elevation = ButtonDefaults.buttonElevation(4.dp),
                                         ) {
                                             if (viewModel.isLoading.collectAsState().value) {
                                                 CircularProgressIndicator(
                                                     modifier = Modifier.size(20.dp),
                                                     color = colorScheme.onPrimary,
-                                                    strokeWidth = 2.dp
+                                                    strokeWidth = 2.dp,
                                                 )
                                             } else {
                                                 Row {
                                                     Icon(
                                                         Icons.Default.Save,
                                                         contentDescription = "Guardar",
-                                                        modifier = Modifier.size(18.dp)
+                                                        modifier = Modifier.size(18.dp),
                                                     )
                                                     Spacer(modifier = Modifier.width(6.dp))
                                                     Text(
                                                         "Guardar",
                                                         style = typography.labelLarge,
-                                                        fontWeight = FontWeight.Medium
+                                                        fontWeight = FontWeight.Medium,
                                                     )
                                                 }
                                             }
@@ -713,10 +734,11 @@ fun PacienteProfileScreen(
                                                 }
                                             },
                                             modifier = Modifier.weight(1f).height(48.dp),
-                                            colors = ButtonDefaults.outlinedButtonColors(
-                                                contentColor = colorScheme.onSurfaceVariant
-                                            ),
-                                            shape = CircleShape
+                                            colors =
+                                                ButtonDefaults.outlinedButtonColors(
+                                                    contentColor = colorScheme.onSurfaceVariant,
+                                                ),
+                                            shape = CircleShape,
                                         ) {
                                             Text("Cancelar", style = typography.labelLarge)
                                         }
@@ -728,7 +750,7 @@ fun PacienteProfileScreen(
                                         label = "Nombre completo",
                                         value = "${perfil!!.usuario?.nombre ?: ""} ${perfil!!.usuario?.apellido ?: ""}".trim(),
                                         colorScheme = colorScheme,
-                                        typography = typography
+                                        typography = typography,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -738,7 +760,7 @@ fun PacienteProfileScreen(
                                         label = "Correo electrónico",
                                         value = perfil!!.usuario?.email ?: "No especificado",
                                         colorScheme = colorScheme,
-                                        typography = typography
+                                        typography = typography,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -748,7 +770,7 @@ fun PacienteProfileScreen(
                                         label = "Teléfono",
                                         value = perfil!!.telefono ?: "No especificado",
                                         colorScheme = colorScheme,
-                                        typography = typography
+                                        typography = typography,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -758,7 +780,7 @@ fun PacienteProfileScreen(
                                         label = "Fecha de nacimiento",
                                         value = formatFecha(perfil!!.fechaNacimiento),
                                         colorScheme = colorScheme,
-                                        typography = typography
+                                        typography = typography,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -768,7 +790,7 @@ fun PacienteProfileScreen(
                                         label = "Género",
                                         value = perfil!!.genero ?: "No especificado",
                                         colorScheme = colorScheme,
-                                        typography = typography
+                                        typography = typography,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -778,7 +800,7 @@ fun PacienteProfileScreen(
                                         label = "ID de paciente",
                                         value = perfil!!.idPaciente?.toString() ?: "No disponible",
                                         colorScheme = colorScheme,
-                                        typography = typography
+                                        typography = typography,
                                     )
                                 }
                             }
@@ -791,32 +813,33 @@ fun PacienteProfileScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium,
                             elevation = CardDefaults.cardElevation(4.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = colorScheme.primary.copy(alpha = 0.05f)
-                            )
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = colorScheme.primary.copy(alpha = 0.05f),
+                                ),
                         ) {
                             Column(
                                 modifier = Modifier.padding(20.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
                                     text = "💜 AMANI Psicología",
                                     style = typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = colorScheme.primary
+                                    color = colorScheme.primary,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "Tu bienestar es nuestra prioridad",
                                     style = typography.bodySmall,
                                     color = colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Versión 1.0.0",
                                     style = typography.labelSmall,
-                                    color = colorScheme.onSurfaceVariant
+                                    color = colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -830,7 +853,7 @@ fun PacienteProfileScreen(
                         onRetry = { viewModel.fetchProfile(pacienteId) },
                         colorScheme = colorScheme,
                         typography = typography,
-                        isDark = isDark
+                        isDark = isDark,
                     )
                 }
             }
@@ -848,20 +871,20 @@ fun PacienteProfileScreen(
                     text = "Cambiar foto de perfil",
                     style = typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurface
+                    color = colorScheme.onSurface,
                 )
             },
             text = {
                 Text(
                     text = "Selecciona una opción para obtener la imagen",
                     style = typography.bodyMedium,
-                    color = colorScheme.onSurfaceVariant
+                    color = colorScheme.onSurfaceVariant,
                 )
             },
             confirmButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Button(
                         onClick = {
@@ -874,17 +897,17 @@ fun PacienteProfileScreen(
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-                        shape = CircleShape
+                        shape = CircleShape,
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
                             contentDescription = "Cámara",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             "Cámara",
-                            style = typography.labelLarge
+                            style = typography.labelLarge,
                         )
                     }
                     Button(
@@ -894,17 +917,17 @@ fun PacienteProfileScreen(
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = colorScheme.secondary),
-                        shape = CircleShape
+                        shape = CircleShape,
                     ) {
                         Icon(
                             Icons.Default.PhotoLibrary,
                             contentDescription = "Galería",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             "Galería",
-                            style = typography.labelLarge
+                            style = typography.labelLarge,
                         )
                     }
                 }
@@ -913,7 +936,7 @@ fun PacienteProfileScreen(
                 TextButton(onClick = { showImageOptions = false }) {
                     Text("Cancelar", style = typography.labelLarge, color = colorScheme.primary)
                 }
-            }
+            },
         )
     }
 
@@ -928,32 +951,32 @@ fun PacienteProfileScreen(
                     text = "Correo actualizado",
                     style = typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.primary
+                    color = colorScheme.primary,
                 )
             },
             text = {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
                         Icons.Default.Email,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = colorScheme.primary
+                        tint = colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Tu correo electrónico ha sido actualizado correctamente.",
                         style = typography.bodyMedium,
                         color = colorScheme.onSurface,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Serás redirigido al inicio de sesión para que ingreses con tu nuevo correo.",
                         style = typography.bodySmall,
                         color = colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             },
@@ -963,51 +986,52 @@ fun PacienteProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                     shape = CircleShape,
-                    enabled = false
+                    enabled = false,
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(16.dp),
                             color = colorScheme.onPrimary,
-                            strokeWidth = 2.dp
+                            strokeWidth = 2.dp,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Redirigiendo...",
-                            style = typography.labelLarge
+                            style = typography.labelLarge,
                         )
                     }
                 }
-            }
+            },
         )
     }
 
     // Mostrar loading overlay mientras sube la foto
     if (uploadStatus is ProfilePacienteViewModel.UploadStatus.Loading) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(enabled = false) { },
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(enabled = false) { },
+            contentAlignment = Alignment.Center,
         ) {
             Card(
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicator(color = colorScheme.primary)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Subiendo foto...",
                         style = typography.bodyMedium,
-                        color = colorScheme.onSurface
+                        color = colorScheme.onSurface,
                     )
                 }
             }
@@ -1021,30 +1045,30 @@ fun InfoRowPaciente(
     label: String,
     value: String,
     colorScheme: ColorScheme,
-    typography: androidx.compose.material3.Typography
+    typography: androidx.compose.material3.Typography,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
     ) {
         Icon(
             icon,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            tint = colorScheme.primary
+            tint = colorScheme.primary,
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = typography.labelSmall,
-                color = colorScheme.onSurfaceVariant
+                color = colorScheme.onSurfaceVariant,
             )
             Text(
                 text = value.ifEmpty { "No especificado" },
                 style = typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
-                color = colorScheme.onSurface
+                color = colorScheme.onSurface,
             )
         }
     }
@@ -1056,49 +1080,50 @@ fun ErrorContentPaciente(
     onRetry: () -> Unit,
     colorScheme: ColorScheme,
     typography: androidx.compose.material3.Typography,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Default.Error,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = colorScheme.error
+            tint = colorScheme.error,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Error al cargar el perfil",
             style = typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = colorScheme.onSurface
+            color = colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = error,
             style = typography.bodyMedium,
             color = colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
             colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-            shape = CircleShape
+            shape = CircleShape,
         ) {
             Icon(
                 Icons.Default.Refresh,
-                contentDescription = null
+                contentDescription = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 "Reintentar",
-                style = typography.labelLarge
+                style = typography.labelLarge,
             )
         }
     }

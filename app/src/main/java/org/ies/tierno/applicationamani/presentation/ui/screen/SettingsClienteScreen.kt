@@ -88,7 +88,7 @@ fun SettingsClienteScreen(
     navController: NavController,
     onNavigateToSupport: () -> Unit = {},
     viewModel: SettingsClienteViewModel = koinViewModel(),
-    idiomaViewModel: IdiomaViewModel = koinViewModel()
+    idiomaViewModel: IdiomaViewModel = koinViewModel(),
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -97,12 +97,14 @@ fun SettingsClienteScreen(
     var genderExpanded by remember { mutableStateOf(false) }
     val genderOptions = listOf("Hombre", "Mujer", "No Binario")
 
-    val consentimientoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { _ -> }
-    val proteccionDatosLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { _ -> }
+    val consentimientoLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { _ -> }
+    val proteccionDatosLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { _ -> }
 
     LaunchedEffect(Unit) {
         viewModel.cargarUsuario()
@@ -112,54 +114,59 @@ fun SettingsClienteScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Configuración", style = typography.titleLarge) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.surface,
-                    titleContentColor = colors.onSurface
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colors.surface,
+                        titleContentColor = colors.onSurface,
+                    ),
             )
-        }
+        },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             if (viewModel.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     // Sección de Perfil / Foto
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Box(
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .background(colors.surfaceContainerHigh)
-                                    .border(2.dp, colors.primary, CircleShape),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .size(100.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.surfaceContainerHigh)
+                                        .border(2.dp, colors.primary, CircleShape),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     Icons.Default.Person,
                                     contentDescription = null,
                                     modifier = Modifier.size(60.dp),
-                                    tint = colors.primary
+                                    tint = colors.primary,
                                 )
                                 Box(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .size(32.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.primary)
-                                        .padding(6.dp),
-                                    contentAlignment = Alignment.Center
+                                    modifier =
+                                        Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(colors.primary)
+                                            .padding(6.dp),
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(Icons.Default.CameraAlt, contentDescription = null, tint = colors.onPrimary)
                                 }
@@ -167,7 +174,7 @@ fun SettingsClienteScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "${viewModel.nombre} ${viewModel.apellidos}",
-                                style = typography.titleLarge
+                                style = typography.titleLarge,
                             )
                         }
                     }
@@ -180,14 +187,14 @@ fun SettingsClienteScreen(
                                 viewModel.nombre,
                                 { viewModel.nombre = it },
                                 Icons.Default.Person,
-                                Modifier.weight(1f)
+                                Modifier.weight(1f),
                             )
                             TextFieldCustom(
                                 "Apellidos",
                                 viewModel.apellidos,
                                 { viewModel.apellidos = it },
                                 Icons.Default.Person,
-                                Modifier.weight(1f)
+                                Modifier.weight(1f),
                             )
                         }
 
@@ -197,26 +204,27 @@ fun SettingsClienteScreen(
                                 text = "Género",
                                 style = typography.labelMedium,
                                 color = colors.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                             )
                             ExposedDropdownMenuBox(
                                 expanded = genderExpanded,
-                                onExpandedChange = { genderExpanded = it }
+                                onExpandedChange = { genderExpanded = it },
                             ) {
                                 OutlinedTextField(
                                     value = viewModel.genero,
                                     onValueChange = {},
                                     readOnly = true,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                     leadingIcon = { Icon(Icons.Default.Transgender, contentDescription = null) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
-                                    colors = OutlinedTextFieldDefaults.colors()
+                                    colors = OutlinedTextFieldDefaults.colors(),
                                 )
                                 ExposedDropdownMenu(
                                     expanded = genderExpanded,
-                                    onDismissRequest = { genderExpanded = false }
+                                    onDismissRequest = { genderExpanded = false },
                                 ) {
                                     genderOptions.forEach { option ->
                                         DropdownMenuItem(
@@ -224,7 +232,7 @@ fun SettingsClienteScreen(
                                             onClick = {
                                                 viewModel.genero = option
                                                 genderExpanded = false
-                                            }
+                                            },
                                         )
                                     }
                                 }
@@ -239,21 +247,21 @@ fun SettingsClienteScreen(
                             viewModel.telefono,
                             { viewModel.telefono = it },
                             Icons.Default.Phone,
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
                         )
                         TextFieldCustom(
                             "Dirección",
                             viewModel.direccion,
                             { viewModel.direccion = it },
                             Icons.Default.Home,
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
                         )
                         TextFieldCustom(
                             "Código Postal",
                             viewModel.codigoPostal,
                             { viewModel.codigoPostal = it },
                             Icons.Default.MarkunreadMailbox,
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
                         )
                     }
 
@@ -263,7 +271,7 @@ fun SettingsClienteScreen(
                             OutlinedButton(
                                 onClick = { consentimientoLauncher.launch("application/pdf") },
                                 modifier = Modifier.weight(1f),
-                                shape = CircleShape
+                                shape = CircleShape,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.UploadFile, contentDescription = null)
@@ -273,7 +281,7 @@ fun SettingsClienteScreen(
                             OutlinedButton(
                                 onClick = { proteccionDatosLauncher.launch("application/pdf") },
                                 modifier = Modifier.weight(1f),
-                                shape = CircleShape
+                                shape = CircleShape,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.GppGood, contentDescription = null)
@@ -288,7 +296,7 @@ fun SettingsClienteScreen(
                         onClick = { viewModel.guardarUsuario() },
                         modifier = Modifier.fillMaxWidth(),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors()
+                        colors = ButtonDefaults.buttonColors(),
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
@@ -296,11 +304,14 @@ fun SettingsClienteScreen(
                     }
 
                     // Theme selector
-                    val userSessionDataStore: UserSessionDataStore = try {
-                        org.koin.java.KoinJavaComponent.getKoin().get()
-                    } catch (e: Exception) {
-                        UserSessionDataStore(LocalContext.current)
-                    }
+                    val userSessionDataStore: UserSessionDataStore =
+                        try {
+                            org.koin.java.KoinJavaComponent
+                                .getKoin()
+                                .get()
+                        } catch (e: Exception) {
+                            UserSessionDataStore(LocalContext.current)
+                        }
                     val sessionState = userSessionDataStore.sessionFlow.collectAsState(initial = null)
                     val session = sessionState.value
 
@@ -308,7 +319,7 @@ fun SettingsClienteScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(containerColor = amaniColors.cardBackground),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -320,18 +331,18 @@ fun SettingsClienteScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.tema_oscuro_claro),
                                     style = typography.bodyLarge,
-                                    color = colors.onSurface
+                                    color = colors.onSurface,
                                 )
                                 ThemeModeSelector(
                                     currentTema = session?.tema ?: false,
                                     userSessionDataStore = userSessionDataStore,
                                     session = session,
-                                    idiomaViewModel = idiomaViewModel
+                                    idiomaViewModel = idiomaViewModel,
                                 )
                             }
                         }
@@ -341,25 +352,25 @@ fun SettingsClienteScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium,
-                        colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.4f))
+                        colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.4f)),
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
                             Text("¿Necesitas ayuda?", style = typography.titleMedium)
                             Text(
                                 "Reporta un bug o envía una sugerencia al equipo de soporte.",
                                 style = typography.bodySmall,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                             Button(
                                 onClick = onNavigateToSupport,
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = CircleShape,
-                                colors = ButtonDefaults.buttonColors(containerColor = colors.secondary)
+                                colors = ButtonDefaults.buttonColors(containerColor = colors.secondary),
                             ) {
                                 Text("Abrir ticket de soporte", style = typography.labelLarge)
                             }
@@ -369,7 +380,7 @@ fun SettingsClienteScreen(
                     // Eliminar cuenta
                     TextButton(
                         onClick = { viewModel.borrarCuenta() },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
                         Icon(Icons.Default.DeleteForever, contentDescription = null, tint = colors.error)
                         Spacer(modifier = Modifier.width(4.dp))
@@ -383,7 +394,7 @@ fun SettingsClienteScreen(
                             color = colors.error,
                             style = typography.bodySmall,
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     }
 
@@ -398,31 +409,31 @@ fun SettingsClienteScreen(
 fun SettingsSection(
     title: String,
     icon: ImageVector,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(start = 4.dp)
+            modifier = Modifier.padding(start = 4.dp),
         ) {
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-            elevation = CardDefaults.cardElevation()
+            elevation = CardDefaults.cardElevation(),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
-                content = content
+                content = content,
             )
         }
     }
@@ -434,7 +445,7 @@ fun TextFieldCustom(
     value: String,
     onValueChange: (String) -> Unit,
     icon: ImageVector,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
     Column(modifier = modifier) {
@@ -442,7 +453,7 @@ fun TextFieldCustom(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
         OutlinedTextField(
             value = value,
@@ -451,16 +462,17 @@ fun TextFieldCustom(
             singleLine = true,
             leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp)) },
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = colors.onSurface,
-                unfocusedTextColor = colors.onSurface,
-                focusedBorderColor = colors.primary,
-                unfocusedBorderColor = colors.outline,
-                focusedContainerColor = colors.surfaceContainerLowest,
-                unfocusedContainerColor = colors.surfaceContainerLowest,
-                focusedLabelColor = colors.primary,
-                unfocusedLabelColor = colors.onSurfaceVariant
-            )
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = colors.onSurface,
+                    unfocusedTextColor = colors.onSurface,
+                    focusedBorderColor = colors.primary,
+                    unfocusedBorderColor = colors.outline,
+                    focusedContainerColor = colors.surfaceContainerLowest,
+                    unfocusedContainerColor = colors.surfaceContainerLowest,
+                    focusedLabelColor = colors.primary,
+                    unfocusedLabelColor = colors.onSurfaceVariant,
+                ),
         )
     }
 }

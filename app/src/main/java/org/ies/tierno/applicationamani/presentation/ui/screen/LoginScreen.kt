@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -50,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -62,7 +60,6 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -71,7 +68,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = koinViewModel()
+    loginViewModel: LoginViewModel = koinViewModel(),
 ) {
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
@@ -89,7 +86,7 @@ fun LoginScreen(
         if (!loginError.isNullOrBlank()) {
             snackbarHostState.showSnackbar(
                 message = loginError ?: "Error al iniciar sesión",
-                duration = SnackbarDuration.Short
+                duration = SnackbarDuration.Short,
             )
         }
     }
@@ -99,15 +96,19 @@ fun LoginScreen(
 
         result.onSuccess { response ->
             val rol = response.rol
-            val rolNormalizado = rol.lowercase().trim()
-                .replace("o", "o")
-                .replace("a", "a")
+            val rolNormalizado =
+                rol
+                    .lowercase()
+                    .trim()
+                    .replace("o", "o")
+                    .replace("a", "a")
 
-            val destination = when (rolNormalizado) {
-                "admin", "administrador" -> Screens.pacientesSinPsicologo.route
-                "psicologo", "psicologa" -> Screens.psicologoHome.route
-                else -> Screens.pacienteHome.route
-            }
+            val destination =
+                when (rolNormalizado) {
+                    "admin", "administrador" -> Screens.pacientesSinPsicologo.route
+                    "psicologo", "psicologa" -> Screens.psicologoHome.route
+                    else -> Screens.pacienteHome.route
+                }
 
             navController.navigate(destination) {
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
@@ -143,7 +144,7 @@ fun LoginScreen(
                 navController.navigate(Screens.registro.route)
             },
             emailTouched = emailTouched,
-            passwordTouched = passwordTouched
+            passwordTouched = passwordTouched,
         )
     }
 }
@@ -161,7 +162,7 @@ fun LoginScreenContent(
     onLogin: () -> Unit,
     onRegisterClick: () -> Unit,
     emailTouched: Boolean = false,
-    passwordTouched: Boolean = false
+    passwordTouched: Boolean = false,
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     val colorScheme = MaterialTheme.colorScheme
@@ -169,38 +170,43 @@ fun LoginScreenContent(
     val shapes = MaterialTheme.shapes
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                        colorScheme.surface
-                    )
-                )
-            )
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(
+                    brush =
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    colorScheme.surface,
+                                ),
+                        ),
+                ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             // Logo con elevación tonal
             Surface(
-                modifier = Modifier
-                    .size(140.dp)
-                    .imePadding(),
+                modifier =
+                    Modifier
+                        .size(140.dp)
+                        .imePadding(),
                 shape = CircleShape,
                 tonalElevation = 2.dp,
-                shadowElevation = 1.dp
+                shadowElevation = 1.dp,
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "Logo de Amani Psicología",
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
 
@@ -209,55 +215,60 @@ fun LoginScreenContent(
             // Nombre de la marca
             Text(
                 text = "AMANI",
-                style = typography.displayLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 4.sp
-                ),
-                color = colorScheme.primary
+                style =
+                    typography.displayLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 4.sp,
+                    ),
+                color = colorScheme.primary,
             )
 
             Text(
                 text = "Psicología y Bienestar",
-                style = typography.titleMedium.copy(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium
-                ),
+                style =
+                    typography.titleMedium.copy(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                    ),
                 color = colorScheme.secondary,
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = 32.dp),
             )
 
             // Tarjeta de inicio de sesión
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(12.dp, shapes.extraLarge),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .shadow(12.dp, shapes.extraLarge),
                 shape = shapes.extraLarge,
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     // Título
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = "Bienvenido de vuelta",
-                            style = typography.headlineSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = colorScheme.onSurface
-                            )
+                            style =
+                                typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = colorScheme.onSurface,
+                                ),
                         )
                         Text(
                             text = "Accede a tu espacio terapéutico",
                             style = typography.bodyMedium,
                             color = colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     }
 
@@ -274,7 +285,7 @@ fun LoginScreenContent(
                         placeholder = {
                             Text(
                                 "usuario@ejemplo.com",
-                                style = typography.bodyMedium
+                                style = typography.bodyMedium,
                             )
                         },
                         isError = emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
@@ -284,21 +295,21 @@ fun LoginScreenContent(
                                     Text(
                                         text = "📧 Introduce tu correo electrónico",
                                         style = typography.bodySmall,
-                                        color = colorScheme.onSurfaceVariant
+                                        color = colorScheme.onSurfaceVariant,
                                     )
                                 }
                                 emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
                                     Text(
                                         text = "❌ Formato de correo inválido (ej: usuario@dominio.com)",
                                         style = typography.bodySmall,
-                                        color = colorScheme.error
+                                        color = colorScheme.error,
                                     )
                                 }
                                 emailTouched && username.isNotBlank() && username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
                                     Text(
                                         text = "✅ Correo válido",
                                         style = typography.bodySmall,
-                                        color = colorScheme.primary // Usando primary para éxito
+                                        color = colorScheme.primary, // Usando primary para éxito
                                     )
                                 }
                             }
@@ -306,20 +317,21 @@ fun LoginScreenContent(
                         singleLine = true,
                         enabled = !isLoggingIn,
                         shape = shapes.medium,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = colorScheme.onSurface,
-                            unfocusedTextColor = colorScheme.onSurface,
-                            focusedLabelColor = colorScheme.primary,
-                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
-                            focusedPlaceholderColor = colorScheme.onSurfaceVariant,
-                            unfocusedPlaceholderColor = colorScheme.onSurfaceVariant,
-                            cursorColor = colorScheme.primary,
-                            focusedBorderColor = colorScheme.primary,
-                            unfocusedBorderColor = colorScheme.outline,
-                            errorBorderColor = colorScheme.error,
-                            focusedContainerColor = colorScheme.surface,
-                            unfocusedContainerColor = colorScheme.surface
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedPlaceholderColor = colorScheme.onSurfaceVariant,
+                                unfocusedPlaceholderColor = colorScheme.onSurfaceVariant,
+                                cursorColor = colorScheme.primary,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface,
+                            ),
                     )
 
                     // Campo de contraseña - solo muestra error si el usuario ha interactuado
@@ -333,7 +345,7 @@ fun LoginScreenContent(
                         placeholder = {
                             Text(
                                 "••••••••",
-                                style = typography.bodyMedium
+                                style = typography.bodyMedium,
                             )
                         },
                         isError = passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password),
@@ -343,21 +355,21 @@ fun LoginScreenContent(
                                     Text(
                                         text = "🔒 Introduce tu contraseña",
                                         style = typography.bodySmall,
-                                        color = colorScheme.onSurfaceVariant
+                                        color = colorScheme.onSurfaceVariant,
                                     )
                                 }
                                 passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
                                     Text(
                                         text = "❌ " + LoginViewModel.getPasswordErrorMessage(),
                                         style = typography.bodySmall,
-                                        color = colorScheme.error
+                                        color = colorScheme.error,
                                     )
                                 }
                                 passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
                                     Text(
                                         text = "✅ Contraseña válida",
                                         style = typography.bodySmall,
-                                        color = colorScheme.primary // Usando primary para éxito
+                                        color = colorScheme.primary, // Usando primary para éxito
                                     )
                                 }
                             }
@@ -366,32 +378,33 @@ fun LoginScreenContent(
                         trailingIcon = {
                             IconButton(
                                 onClick = { isPasswordVisible = !isPasswordVisible },
-                                enabled = !isLoggingIn
+                                enabled = !isLoggingIn,
                             ) {
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                     contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                                    tint = colorScheme.primary
+                                    tint = colorScheme.primary,
                                 )
                             }
                         },
                         singleLine = true,
                         enabled = !isLoggingIn,
                         shape = shapes.medium,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = colorScheme.onSurface,
-                            unfocusedTextColor = colorScheme.onSurface,
-                            focusedLabelColor = colorScheme.primary,
-                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
-                            focusedPlaceholderColor = colorScheme.onSurfaceVariant,
-                            unfocusedPlaceholderColor = colorScheme.onSurfaceVariant,
-                            cursorColor = colorScheme.primary,
-                            focusedBorderColor = colorScheme.primary,
-                            unfocusedBorderColor = colorScheme.outline,
-                            errorBorderColor = colorScheme.error,
-                            focusedContainerColor = colorScheme.surface,
-                            unfocusedContainerColor = colorScheme.surface
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedPlaceholderColor = colorScheme.onSurfaceVariant,
+                                unfocusedPlaceholderColor = colorScheme.onSurfaceVariant,
+                                cursorColor = colorScheme.primary,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface,
+                            ),
                     )
 
                     // Botón de inicio de sesión
@@ -400,34 +413,35 @@ fun LoginScreenContent(
                         shape = CircleShape,
                         onClick = onLogin,
                         enabled = isLoginEnabled && !isLoggingIn,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorScheme.primary,
-                            contentColor = colorScheme.onPrimary,
-                            disabledContainerColor = colorScheme.primary.copy(alpha = 0.5f),
-                            disabledContentColor = colorScheme.onPrimary.copy(alpha = 0.7f)
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.primary,
+                                contentColor = colorScheme.onPrimary,
+                                disabledContainerColor = colorScheme.primary.copy(alpha = 0.5f),
+                                disabledContentColor = colorScheme.onPrimary.copy(alpha = 0.7f),
+                            ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     ) {
                         if (isLoggingIn) {
                             Row(
                                 horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(18.dp),
                                     strokeWidth = 2.dp,
-                                    color = colorScheme.onPrimary
+                                    color = colorScheme.onPrimary,
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     "Iniciando sesión...",
-                                    style = typography.labelLarge
+                                    style = typography.labelLarge,
                                 )
                             }
                         } else {
                             Text(
                                 "Iniciar sesión",
-                                style = typography.labelLarge
+                                style = typography.labelLarge,
                             )
                         }
                     }
@@ -436,25 +450,27 @@ fun LoginScreenContent(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(1.dp)
-                                .background(colorScheme.outlineVariant)
+                            modifier =
+                                Modifier
+                                    .weight(1f)
+                                    .height(1.dp)
+                                    .background(colorScheme.outlineVariant),
                         )
                         Text(
                             text = "¿Nuevo en AMANI?",
                             style = typography.bodySmall,
                             color = colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp),
                         )
                         Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(1.dp)
-                                .background(colorScheme.outlineVariant)
+                            modifier =
+                                Modifier
+                                    .weight(1f)
+                                    .height(1.dp)
+                                    .background(colorScheme.outlineVariant),
                         )
                     }
 
@@ -462,14 +478,15 @@ fun LoginScreenContent(
                     TextButton(
                         onClick = onRegisterClick,
                         enabled = !isLoggingIn,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = "Crear cuenta nueva",
-                            style = typography.bodyLarge.copy(
-                                fontWeight = FontWeight.Medium,
-                                color = if (!isLoggingIn) colorScheme.primary else colorScheme.onSurfaceVariant
-                            )
+                            style =
+                                typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (!isLoggingIn) colorScheme.primary else colorScheme.onSurfaceVariant,
+                                ),
                         )
                     }
                 }
@@ -482,7 +499,7 @@ fun LoginScreenContent(
                 style = typography.bodySmall,
                 color = colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

@@ -75,7 +75,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SettingsPsicologoScreen(
     idPsicologo: Long,
     navController: NavController,
-    viewModel: ProfilePsicologoViewModel = koinViewModel()
+    viewModel: ProfilePsicologoViewModel = koinViewModel(),
 ) {
     val perfil by viewModel.perfil.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -114,60 +114,67 @@ fun SettingsPsicologoScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colors.primary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                    ),
             )
-        }
+        },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             if (isLoading && perfil == null) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     // Foto de Perfil
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Box(
-                                modifier = Modifier
-                                    .size(110.dp)
-                                    .clip(CircleShape)
-                                    .background(colors.primaryContainer)
-                                    .border(3.dp, colors.primary, CircleShape),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .size(110.dp)
+                                        .clip(CircleShape)
+                                        .background(colors.primaryContainer)
+                                        .border(3.dp, colors.primary, CircleShape),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(perfil?.usuario?.fotoPerfilUrl)
-                                        .crossfade(true)
-                                        .error(R.drawable.ic_default_avatar)
-                                        .placeholder(R.drawable.ic_default_avatar)
-                                        .build(),
+                                    model =
+                                        ImageRequest
+                                            .Builder(LocalContext.current)
+                                            .data(perfil?.usuario?.fotoPerfilUrl)
+                                            .crossfade(true)
+                                            .error(R.drawable.ic_default_avatar)
+                                            .placeholder(R.drawable.ic_default_avatar)
+                                            .build(),
                                     contentDescription = "Foto de perfil",
                                     modifier = Modifier.fillMaxSize().clip(CircleShape),
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Crop,
                                 )
                                 Box(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .size(34.dp)
-                                        .clip(CircleShape)
-                                        .background(colors.primary)
-                                        .padding(7.dp),
-                                    contentAlignment = Alignment.Center
+                                    modifier =
+                                        Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .size(34.dp)
+                                            .clip(CircleShape)
+                                            .background(colors.primary)
+                                            .padding(7.dp),
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
                                 }
@@ -177,7 +184,7 @@ fun SettingsPsicologoScreen(
                                 text = "Psicólogo Colegiado",
                                 style = typography.labelLarge,
                                 color = colors.primary,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
                             )
                         }
                     }
@@ -190,14 +197,14 @@ fun SettingsPsicologoScreen(
                                 nombre,
                                 { nombre = it },
                                 Icons.Default.Badge,
-                                Modifier.weight(1f)
+                                Modifier.weight(1f),
                             )
                             TextFieldPsico(
                                 "Apellidos",
                                 apellidos,
                                 { apellidos = it },
                                 Icons.Default.Badge,
-                                Modifier.weight(1f)
+                                Modifier.weight(1f),
                             )
                         }
                         TextFieldPsico(
@@ -206,7 +213,7 @@ fun SettingsPsicologoScreen(
                             {},
                             Icons.Default.Email,
                             Modifier.fillMaxWidth(),
-                            readOnly = true
+                            readOnly = true,
                         )
                     }
 
@@ -217,7 +224,7 @@ fun SettingsPsicologoScreen(
                             especialidad,
                             { especialidad = it },
                             Icons.Default.Psychology,
-                            Modifier.fillMaxWidth()
+                            Modifier.fillMaxWidth(),
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             TextFieldPsico(
@@ -225,14 +232,14 @@ fun SettingsPsicologoScreen(
                                 experiencia,
                                 { experiencia = it },
                                 Icons.Default.Timeline,
-                                Modifier.weight(1f)
+                                Modifier.weight(1f),
                             )
                             TextFieldPsico(
                                 "Licencia/Colegiado",
                                 licencia,
                                 { licencia = it },
                                 Icons.Default.Verified,
-                                Modifier.weight(1.5f)
+                                Modifier.weight(1.5f),
                             )
                         }
                         TextFieldPsico(
@@ -242,18 +249,19 @@ fun SettingsPsicologoScreen(
                             Icons.AutoMirrored.Filled.Notes,
                             Modifier.fillMaxWidth(),
                             singleLine = false,
-                            minLines = 3
+                            minLines = 3,
                         )
                     }
 
                     // Botón Guardar
                     Button(
                         onClick = { /* Pendiente: ViewModel.updateProfile */ },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        elevation = ButtonDefaults.elevatedButtonElevation()
+                        elevation = ButtonDefaults.elevatedButtonElevation(),
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -264,7 +272,7 @@ fun SettingsPsicologoScreen(
                     OutlinedButton(
                         onClick = { /* Navegar a soporte */ },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -282,32 +290,32 @@ fun SettingsPsicologoScreen(
 fun SettingsSectionPsico(
     title: String,
     icon: ImageVector,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(start = 4.dp)
+            modifier = Modifier.padding(start = 4.dp),
         ) {
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
             Column(
                 modifier = Modifier.padding(18.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp),
-                content = content
+                content = content,
             )
         }
     }
@@ -322,14 +330,14 @@ fun TextFieldPsico(
     modifier: Modifier = Modifier,
     readOnly: Boolean = false,
     singleLine: Boolean = true,
-    minLines: Int = 1
+    minLines: Int = 1,
 ) {
     Column(modifier = modifier) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
         OutlinedTextField(
             value = value,
@@ -340,12 +348,27 @@ fun TextFieldPsico(
             readOnly = readOnly,
             leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp)) },
             shape = RoundedCornerShape(14.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = if (readOnly) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = if (readOnly) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-            )
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor =
+                        if (readOnly) {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(
+                                alpha = 0.3f,
+                            )
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                    unfocusedContainerColor =
+                        if (readOnly) {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(
+                                alpha = 0.3f,
+                            )
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                ),
         )
     }
 }

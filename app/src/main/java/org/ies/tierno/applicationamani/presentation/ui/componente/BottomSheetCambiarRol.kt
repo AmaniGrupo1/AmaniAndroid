@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -20,30 +19,31 @@ import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 fun BottomSheetCambiarRol(
     user: UsuarioDTO,
     onDismiss: () -> Unit,
-    onConfirm: (Rol) -> Unit
+    onConfirm: (Rol) -> Unit,
 ) {
-    var selectedRol by remember { mutableStateOf(user.rol ?: Rol.paciente) }
+    var selectedRol by remember { mutableStateOf(user.rol ?: Rol.PACIENTE) }
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = Color.White),
         ) {
             Column(
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
             ) {
                 // Header
                 Text(
                     "Cambiar Rol de Usuario",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -51,13 +51,13 @@ fun BottomSheetCambiarRol(
                 Text(
                     "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
 
                 Text(
                     user.email ?: "",
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = Color.Gray,
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -65,28 +65,30 @@ fun BottomSheetCambiarRol(
                 // Rol actual
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFFE3F2FD)
+                    color = Color(0xFFE3F2FD),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Rol actual:", fontSize = 14.sp)
                         Text(
-                            when (user.rol ?: Rol.paciente) {
-                                Rol.admin -> "👑 Administrador"
-                                Rol.psicologo -> "🧠 Psicólogo"
-                                Rol.paciente -> "👤 Paciente"
+                            when (user.rol ?: Rol.PACIENTE) {
+                                Rol.ADMIN -> "👑 Administrador"
+                                Rol.PSICOLOGO -> "🧠 Psicólogo"
+                                Rol.PACIENTE -> "👤 Paciente"
                             },
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = when (user.rol ?: Rol.paciente) {
-                                Rol.admin -> Color(0xFFE53935)
-                                Rol.psicologo -> Color(0xFF43A047)
-                                Rol.paciente -> Color(0xFF1E88E5)
-                            }
+                            color =
+                                when (user.rol ?: Rol.PACIENTE) {
+                                    Rol.ADMIN -> Color(0xFFE53935)
+                                    Rol.PSICOLOGO -> Color(0xFF43A047)
+                                    Rol.PACIENTE -> Color(0xFF1E88E5)
+                                },
                         )
                     }
                 }
@@ -97,31 +99,31 @@ fun BottomSheetCambiarRol(
                 Text(
                     "Nuevo rol:",
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Botones de roles
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     RolOptionButton(
-                        rol = Rol.admin,
-                        isSelected = selectedRol == Rol.admin,
-                        onClick = { selectedRol = Rol.admin }
+                        rol = Rol.ADMIN,
+                        isSelected = selectedRol == Rol.ADMIN,
+                        onClick = { selectedRol = Rol.ADMIN },
                     )
 
                     RolOptionButton(
-                        rol = Rol.psicologo,
-                        isSelected = selectedRol == Rol.psicologo,
-                        onClick = { selectedRol = Rol.psicologo }
+                        rol = Rol.PSICOLOGO,
+                        isSelected = selectedRol == Rol.PSICOLOGO,
+                        onClick = { selectedRol = Rol.PSICOLOGO },
                     )
 
                     RolOptionButton(
-                        rol = Rol.paciente,
-                        isSelected = selectedRol == Rol.paciente,
-                        onClick = { selectedRol = Rol.paciente }
+                        rol = Rol.PACIENTE,
+                        isSelected = selectedRol == Rol.PACIENTE,
+                        onClick = { selectedRol = Rol.PACIENTE },
                     )
                 }
 
@@ -130,12 +132,12 @@ fun BottomSheetCambiarRol(
                 // Botones de acción
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
                     ) {
                         Text("Cancelar")
                     }
@@ -144,9 +146,10 @@ fun BottomSheetCambiarRol(
                         onClick = { onConfirm(selectedRol) },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                            ),
                     ) {
                         Text("Confirmar")
                     }
@@ -160,21 +163,23 @@ fun BottomSheetCambiarRol(
 fun RolOptionButton(
     rol: Rol,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-    val (icon, label, color) = when (rol) {
-        Rol.admin -> Triple("👑", "Admin", Color(0xFFE53935))
-        Rol.psicologo -> Triple("🧠", "Psicólogo", Color(0xFF43A047))
-        Rol.paciente -> Triple("👤", "Paciente", Color(0xFF1E88E5))
-    }
+    val (icon, label, color) =
+        when (rol) {
+            Rol.ADMIN -> Triple("👑", "Admin", Color(0xFFE53935))
+            Rol.PSICOLOGO -> Triple("🧠", "Psicólogo", Color(0xFF43A047))
+            Rol.PACIENTE -> Triple("👤", "Paciente", Color(0xFF1E88E5))
+        }
 
     FilterChip(
         selected = isSelected,
         onClick = onClick,
         label = { Text("$icon $label") },
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = color.copy(alpha = 0.1f),
-            selectedLabelColor = color
-        )
+        colors =
+            FilterChipDefaults.filterChipColors(
+                selectedContainerColor = color.copy(alpha = 0.1f),
+                selectedLabelColor = color,
+            ),
     )
 }

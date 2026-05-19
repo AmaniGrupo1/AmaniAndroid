@@ -8,5 +8,5 @@ data class CambiarRolResponseDTO(
     val email: String,
     val rolAnterior: Rol,
     val nuevoRol: Rol,
-    val mensaje: String
+    val mensaje: String,
 )

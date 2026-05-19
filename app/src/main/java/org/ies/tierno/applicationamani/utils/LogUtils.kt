@@ -43,24 +43,26 @@ object LogUtils {
         }
 
         val fecha = LocalDate.now().format(DATE_FORMAT)
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.provider",
-            file
-        )
+        val uri =
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                file,
+            )
 
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Logs AMANI - $fecha")
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val shareIntent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, "Logs AMANI - $fecha")
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
 
         context.startActivity(
             Intent.createChooser(shareIntent, "Compartir logs").apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            },
         )
     }
 }

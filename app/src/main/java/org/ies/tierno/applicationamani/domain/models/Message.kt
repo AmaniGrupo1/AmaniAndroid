@@ -31,7 +31,7 @@ data class Message(
     val isRead: Boolean = false,
     val deliveredAt: Long? = null,
     val readBy: Map<String, Long>? = null,
-    val status: MessageStatus = MessageStatus.SENT
+    val status: MessageStatus = MessageStatus.SENT,
 ) {
     /**
      * Determina si el mensaje ha sido entregado basándose en la marca de tiempo [deliveredAt].
@@ -46,8 +46,10 @@ data class Message(
 enum class AttachmentType {
     /** Archivos de imagen (JPG, PNG, etc.). */
     IMAGE,
+
     /** Documentos de texto o PDF. */
     DOCUMENT,
+
     /** Notas de voz o archivos de audio. */
-    AUDIO
+    AUDIO,
 }

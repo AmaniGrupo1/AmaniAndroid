@@ -22,7 +22,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DiarioEmocionalViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val repository: DiarioEmocionalRepository = mockk(relaxed = true)
     private lateinit var viewModel: DiarioEmocionalViewModel
@@ -40,13 +39,14 @@ class DiarioEmocionalViewModelTest {
     }
 
     @Test
-    fun `initial state is correct`() = runTest {
-        assertEquals("", viewModel.uiState.value.titulo)
-        assertEquals("", viewModel.uiState.value.contenido)
-        assertEquals(5f, viewModel.uiState.value.intensidad, 0.01f)
-        assertEquals(0, viewModel.uiState.value.currentStep)
-        assertNull(viewModel.uiState.value.editandoId)
-    }
+    fun `initial state is correct`() =
+        runTest {
+            assertEquals("", viewModel.uiState.value.titulo)
+            assertEquals("", viewModel.uiState.value.contenido)
+            assertEquals(5f, viewModel.uiState.value.intensidad, 0.01f)
+            assertEquals(0, viewModel.uiState.value.currentStep)
+            assertNull(viewModel.uiState.value.editandoId)
+        }
 
     @Test
     fun `onTituloChange updates title`() {
@@ -90,41 +90,45 @@ class DiarioEmocionalViewModelTest {
     }
 
     @Test
-    fun `guardarEntrada shows error when title is blank`() = runTest {
-        viewModel.guardarEntrada()
-        assertEquals("Título y contenido son obligatorios.", viewModel.uiState.value.mensajeError)
-    }
+    fun `guardarEntrada shows error when title is blank`() =
+        runTest {
+            viewModel.guardarEntrada()
+            assertEquals("Título y contenido son obligatorios.", viewModel.uiState.value.mensajeError)
+        }
 
     @Test
-    fun `guardarEntrada shows error when content is blank`() = runTest {
-        viewModel.onTituloChange("Título")
-        viewModel.guardarEntrada()
-        assertEquals("Título y contenido son obligatorios.", viewModel.uiState.value.mensajeError)
-    }
+    fun `guardarEntrada shows error when content is blank`() =
+        runTest {
+            viewModel.onTituloChange("Título")
+            viewModel.guardarEntrada()
+            assertEquals("Título y contenido son obligatorios.", viewModel.uiState.value.mensajeError)
+        }
 
     @Test
-    fun `guardarEntrada calls repository when valid`() = runTest {
-        viewModel.onTituloChange("Título")
-        viewModel.onContenidoChange("Contenido")
-        coEvery { repository.guardarEntrada(any(), any(), any(), any(), any()) } returns Unit
+    fun `guardarEntrada calls repository when valid`() =
+        runTest {
+            viewModel.onTituloChange("Título")
+            viewModel.onContenidoChange("Contenido")
+            coEvery { repository.guardarEntrada(any(), any(), any(), any(), any()) } returns Unit
 
-        viewModel.guardarEntrada()
-        advanceUntilIdle()
+            viewModel.guardarEntrada()
+            advanceUntilIdle()
 
-        coVerify { repository.guardarEntrada(null, "Título", "Contenido", "", 5) }
-    }
+            coVerify { repository.guardarEntrada(null, "Título", "Contenido", "", 5) }
+        }
 
     @Test
     fun `editarEntrada populates state`() {
-        val entrada = EntradaDiario(
-            id = 1L,
-            titulo = "T",
-            contenido = "C",
-            emocion = "Feliz",
-            intensidad = 8,
-            createdAt = 0L,
-            updatedAt = 0L
-        )
+        val entrada =
+            EntradaDiario(
+                id = 1L,
+                titulo = "T",
+                contenido = "C",
+                emocion = "Feliz",
+                intensidad = 8,
+                createdAt = 0L,
+                updatedAt = 0L,
+            )
         viewModel.editarEntrada(entrada)
 
         assertEquals(1L, viewModel.uiState.value.editandoId)
@@ -133,26 +137,34 @@ class DiarioEmocionalViewModelTest {
     }
 
     @Test
-    fun `eliminarEntrada calls repository`() = runTest {
-        val entrada = EntradaDiario(
-            id = 1L, titulo = "T", contenido = "C", emocion = "Feliz",
-            intensidad = 5, createdAt = 0L, updatedAt = 0L
-        )
-        coEvery { repository.eliminarEntrada(entrada) } returns Unit
+    fun `eliminarEntrada calls repository`() =
+        runTest {
+            val entrada =
+                EntradaDiario(
+                    id = 1L,
+                    titulo = "T",
+                    contenido = "C",
+                    emocion = "Feliz",
+                    intensidad = 5,
+                    createdAt = 0L,
+                    updatedAt = 0L,
+                )
+            coEvery { repository.eliminarEntrada(entrada) } returns Unit
 
-        viewModel.eliminarEntrada(entrada)
-        advanceUntilIdle()
+            viewModel.eliminarEntrada(entrada)
+            advanceUntilIdle()
 
-        coVerify { repository.eliminarEntrada(entrada) }
-    }
+            coVerify { repository.eliminarEntrada(entrada) }
+        }
 
     @Test
-    fun `forzarSincronizacion calls repository`() = runTest {
-        coEvery { repository.syncNow() } returns Unit
+    fun `forzarSincronizacion calls repository`() =
+        runTest {
+            coEvery { repository.syncNow() } returns Unit
 
-        viewModel.forzarSincronizacion()
-        advanceUntilIdle()
+            viewModel.forzarSincronizacion()
+            advanceUntilIdle()
 
-        coVerify { repository.syncNow() }
-    }
+            coVerify { repository.syncNow() }
+        }
 }

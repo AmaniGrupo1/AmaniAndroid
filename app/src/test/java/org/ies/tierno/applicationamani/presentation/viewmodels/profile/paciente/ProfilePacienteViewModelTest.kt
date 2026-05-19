@@ -19,7 +19,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfilePacienteViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: ProfileUseCaseGeneral
     private lateinit var viewModel: ProfilePacienteViewModel
@@ -37,33 +36,36 @@ class ProfilePacienteViewModelTest {
     }
 
     @Test
-    fun `fetchProfile updates perfil on success`() = runTest {
-        val expected = mockk<PacienteProfileResponseDTO>()
-        coEvery { useCase.getPacienteProfile(1L) } returns Result.success(expected)
+    fun `fetchProfile updates perfil on success`() =
+        runTest {
+            val expected = mockk<PacienteProfileResponseDTO>()
+            coEvery { useCase.getPacienteProfile(1L) } returns Result.success(expected)
 
-        viewModel.fetchProfile(1L)
-        advanceUntilIdle()
+            viewModel.fetchProfile(1L)
+            advanceUntilIdle()
 
-        assertEquals(expected, viewModel.perfil.value)
-        assertNull(viewModel.error.value)
-    }
-
-    @Test
-    fun `updateProfile calls fetchProfile on success`() = runTest {
-        coEvery { useCase.updatePacienteProfile(any(), any()) } returns Result.success(mockk())
-        coEvery { useCase.getPacienteProfile(1L) } returns Result.success(mockk())
-
-        viewModel.updateProfile(1L, mockk())
-        advanceUntilIdle()
-
-        coEvery { useCase.getPacienteProfile(1L) }
-    }
+            assertEquals(expected, viewModel.perfil.value)
+            assertNull(viewModel.error.value)
+        }
 
     @Test
-    fun `resetState resets all states`() = runTest {
-        viewModel.resetState()
-        assertNull(viewModel.error.value)
-        assertEquals(ProfilePacienteViewModel.UploadStatus.Idle, viewModel.uploadStatus.value)
-        assertEquals(false, viewModel.isLoading.value)
-    }
+    fun `updateProfile calls fetchProfile on success`() =
+        runTest {
+            coEvery { useCase.updatePacienteProfile(any(), any()) } returns Result.success(mockk())
+            coEvery { useCase.getPacienteProfile(1L) } returns Result.success(mockk())
+
+            viewModel.updateProfile(1L, mockk())
+            advanceUntilIdle()
+
+            coEvery { useCase.getPacienteProfile(1L) }
+        }
+
+    @Test
+    fun `resetState resets all states`() =
+        runTest {
+            viewModel.resetState()
+            assertNull(viewModel.error.value)
+            assertEquals(ProfilePacienteViewModel.UploadStatus.Idle, viewModel.uploadStatus.value)
+            assertEquals(false, viewModel.isLoading.value)
+        }
 }

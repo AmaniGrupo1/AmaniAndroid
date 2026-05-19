@@ -22,5 +22,5 @@ data class AgendaItemDTO(
     val terapia: TerapiaResponseDTO?,
     val metodoPago: MetodoPago?,
     val estadoPago: EstadoPago?,
-    val modalidad : ModalidadCita
+    val modalidad: ModalidadCita,
 )

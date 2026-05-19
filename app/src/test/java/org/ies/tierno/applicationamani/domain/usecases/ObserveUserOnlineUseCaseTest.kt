@@ -7,12 +7,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class ObserveUserOnlineUseCaseTest {
-
     private lateinit var repository: ChatRepository
     private lateinit var useCase: ObserveUserOnlineUseCase
 
@@ -23,33 +23,37 @@ class ObserveUserOnlineUseCaseTest {
     }
 
     @Test
-    fun `invoke should emit online status from repository`() = runTest {
-        every { repository.observeUserOnline(1L) } returns flowOf(true)
+    fun `invoke should emit online status from repository`() =
+        runTest {
+            every { repository.observeUserOnline(1L) } returns flowOf(true)
 
-        useCase(1L).test {
-            assertEquals(true, awaitItem())
-            awaitComplete()
+            useCase(1L).test {
+                assertEquals(true, awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `invoke should emit false when user offline`() = runTest {
-        every { repository.observeUserOnline(1L) } returns flowOf(false)
+    fun `invoke should emit false when user offline`() =
+        runTest {
+            every { repository.observeUserOnline(1L) } returns flowOf(false)
 
-        useCase(1L).test {
-            assertEquals(false, awaitItem())
-            awaitComplete()
+            useCase(1L).test {
+                assertEquals(false, awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `invoke should propagate error when repository flow throws`() = runTest {
-        every { repository.observeUserOnline(1L) } returns flow {
-            throw RuntimeException("Firebase error")
-        }
+    fun `invoke should propagate error when repository flow throws`() =
+        runTest {
+            every { repository.observeUserOnline(1L) } returns
+                flow {
+                    throw RuntimeException("Firebase error")
+                }
 
-        useCase(1L).test {
-            awaitError()
+            useCase(1L).test {
+                awaitError()
+            }
         }
-    }
 }

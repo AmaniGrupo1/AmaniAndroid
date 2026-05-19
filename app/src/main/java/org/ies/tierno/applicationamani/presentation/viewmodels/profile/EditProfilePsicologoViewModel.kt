@@ -10,22 +10,23 @@ import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResp
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
 
 class EditProfilePsicologoViewModel(
-    private val profile: ProfileUseCaseGeneral
+    private val profile: ProfileUseCaseGeneral,
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(
-        UpdatePsicologoRequestDTO(
-            especialidad = "",
-            experiencia = null,
-            descripcion = "",
-            licencia = "",
-            usuario = UsuarioUpdateDTO(
-                nombre = "",
-                apellido = "",
-                email = ""
-            )
+    private val _state =
+        MutableStateFlow(
+            UpdatePsicologoRequestDTO(
+                especialidad = "",
+                experiencia = null,
+                descripcion = "",
+                licencia = "",
+                usuario =
+                    UsuarioUpdateDTO(
+                        nombre = "",
+                        apellido = "",
+                        email = "",
+                    ),
+            ),
         )
-    )
 
     val state: StateFlow<UpdatePsicologoRequestDTO> = _state.asStateFlow()
 
@@ -33,17 +34,19 @@ class EditProfilePsicologoViewModel(
     // CARGAR PERFIL
     // =========================
     fun loadProfile(data: PsicologoProfileResponseDTO) {
-        _state.value = UpdatePsicologoRequestDTO(
-            especialidad = data.especialidad ?: "",
-            experiencia = data.experiencia,
-            descripcion = data.descripcion ?: "",
-            licencia = data.licencia ?: "",
-            usuario = UsuarioUpdateDTO(
-                nombre = data.usuario?.nombre ?: "",
-                apellido = data.usuario?.apellido ?: "",
-                email = data.usuario?.email ?: ""
+        _state.value =
+            UpdatePsicologoRequestDTO(
+                especialidad = data.especialidad ?: "",
+                experiencia = data.experiencia,
+                descripcion = data.descripcion ?: "",
+                licencia = data.licencia ?: "",
+                usuario =
+                    UsuarioUpdateDTO(
+                        nombre = data.usuario?.nombre ?: "",
+                        apellido = data.usuario?.apellido ?: "",
+                        email = data.usuario?.email ?: "",
+                    ),
             )
-        )
     }
 
     fun loadProfileById(idPsicologo: Long) {
@@ -64,21 +67,24 @@ class EditProfilePsicologoViewModel(
     // UPDATES
     // =========================
     fun onNombreChange(value: String) {
-        _state.value = _state.value.copy(
-            usuario = _state.value.usuario?.copy(nombre = value)
-        )
+        _state.value =
+            _state.value.copy(
+                usuario = _state.value.usuario?.copy(nombre = value),
+            )
     }
 
     fun onApellidoChange(value: String) {
-        _state.value = _state.value.copy(
-            usuario = _state.value.usuario?.copy(apellido = value)
-        )
+        _state.value =
+            _state.value.copy(
+                usuario = _state.value.usuario?.copy(apellido = value),
+            )
     }
 
     fun onEmailChange(value: String) {
-        _state.value = _state.value.copy(
-            usuario = _state.value.usuario?.copy(email = value)
-        )
+        _state.value =
+            _state.value.copy(
+                usuario = _state.value.usuario?.copy(email = value),
+            )
     }
 
     fun onEspecialidadChange(value: String) {

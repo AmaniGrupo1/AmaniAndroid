@@ -20,8 +20,8 @@ import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
  * @see org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
  */
 class CuestionarioViewModel(
-     val obtenerPreguntasUseCase: ListarPreguntasUseCase
-) : ViewModel(){
+    val obtenerPreguntasUseCase: ListarPreguntasUseCase,
+) : ViewModel() {
     /** Lista observable de preguntas del cuestionario. Puede ser `null` si no hay datos. */
     val preguntas: StateFlow<List<OpcionAdminDTO>?> =
         obtenerPreguntasUseCase()
@@ -29,6 +29,6 @@ class CuestionarioViewModel(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
-                initialValue = emptyList()
+                initialValue = emptyList(),
             )
 }

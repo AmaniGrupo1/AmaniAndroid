@@ -10,9 +10,8 @@ import timber.log.Timber
 // Evita bloquear threads de red con runBlocking y reduce la probabilidad de leer null
 // si DataStore aún no está listo.
 class AuthInterceptor(
-    private val tokenHolder: TokenHolder
+    private val tokenHolder: TokenHolder,
 ) : Interceptor {
-
     override fun intercept(chain: Interceptor.Chain): Response {
         // Obtener token de la caché en memoria (no bloqueante)
         val token = tokenHolder.getToken()
@@ -24,14 +23,17 @@ class AuthInterceptor(
             Log.w("AuthInterceptor", "TOKEN ES NULL — petición sin Authorization. URL: ${originalRequest.url}")
         }
 
-        val request = originalRequest.newBuilder().apply {
-            if (!token.isNullOrEmpty()) {
-                addHeader("Authorization", "Bearer $token")
-            } else {
-                // Loguear para depuración cuando no hay token disponible
-                Timber.d("No token available for request to %s", chain.request().url)
-            }
-        }.build()
+        val request =
+            originalRequest
+                .newBuilder()
+                .apply {
+                    if (!token.isNullOrEmpty()) {
+                        addHeader("Authorization", "Bearer $token")
+                    } else {
+                        // Loguear para depuración cuando no hay token disponible
+                        Timber.d("No token available for request to %s", chain.request().url)
+                    }
+                }.build()
 
         return chain.proceed(request)
     }

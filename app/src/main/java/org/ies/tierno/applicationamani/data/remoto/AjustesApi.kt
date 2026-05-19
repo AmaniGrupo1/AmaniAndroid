@@ -9,16 +9,14 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface AjustesApi {
-
     @PUT("api/ajustes/{idUsuario}/idioma")
     suspend fun actualizarIdioma(
         @Path("idUsuario") idUsuario: Long,
-        @Body request: IdiomaRequestDTO
+        @Body request: IdiomaRequestDTO,
     )
 
     @PUT("api/ajustes/tema")
     suspend fun actualizarTema(
-        @Body dto: UpdateTemaDTO
+        @Body dto: UpdateTemaDTO,
     ): Response<AjusteResponseDTO>
-
 }

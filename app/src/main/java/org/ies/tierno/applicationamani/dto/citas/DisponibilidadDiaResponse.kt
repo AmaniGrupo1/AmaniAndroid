@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class DisponibilidadDiaResponse(
     val fecha: LocalDate,
-    val diaCompleto : Boolean,
+    val diaCompleto: Boolean,
     @SerializedName("slotsLibres")
-    val slotsLibres: List<FranjaDisponibilidadResponse> = emptyList()
+    val slotsLibres: List<FranjaDisponibilidadResponse> = emptyList(),
 )

@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class PaymentRepositoryTest {
-
     private lateinit var api: PaymentApiService
     private lateinit var repository: PaymentRepository
 
@@ -22,24 +21,26 @@ class PaymentRepositoryTest {
     }
 
     @Test
-    fun `createPaymentIntent should return success when api succeeds`() = runTest {
-        val citaId = 1L
-        val expected = mockk<PaymentIntentResponseDTO>()
-        coEvery { api.createPaymentIntent(any()) } returns expected
+    fun `createPaymentIntent should return success when api succeeds`() =
+        runTest {
+            val citaId = 1L
+            val expected = mockk<PaymentIntentResponseDTO>()
+            coEvery { api.createPaymentIntent(any()) } returns expected
 
-        val result = repository.createPaymentIntent(citaId)
+            val result = repository.createPaymentIntent(citaId)
 
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
 
     @Test
-    fun `createPaymentIntent should return failure when api throws`() = runTest {
-        coEvery { api.createPaymentIntent(any()) } throws Exception("API error")
+    fun `createPaymentIntent should return failure when api throws`() =
+        runTest {
+            coEvery { api.createPaymentIntent(any()) } throws Exception("API error")
 
-        val result = repository.createPaymentIntent(1L)
+            val result = repository.createPaymentIntent(1L)
 
-        assertTrue(result.isFailure)
-        assertEquals("API error", result.exceptionOrNull()?.message)
-    }
+            assertTrue(result.isFailure)
+            assertEquals("API error", result.exceptionOrNull()?.message)
+        }
 }

@@ -40,88 +40,82 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuPrincipal(navController: NavController) {
-
     var expanded by remember { mutableStateOf(false) }
 
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
 
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.surface, // M3: Surface for top bar
-            titleContentColor = colors.onSurface,
-            navigationIconContentColor = colors.onSurface,
-            actionIconContentColor = colors.onSurface
-        ),
-
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = colors.surface, // M3: Surface for top bar
+                titleContentColor = colors.onSurface,
+                navigationIconContentColor = colors.onSurface,
+                actionIconContentColor = colors.onSurface,
+            ),
         // LOGO A LA IZQUIERDA
         navigationIcon = {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),
                 contentDescription = stringResource(R.string.nav_inicio),
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(40.dp),
             )
         },
-
         title = { }, // vacío porque usamos solo el logo
-
         actions = {
-
             IconButton(
-                onClick = { expanded = !expanded }
+                onClick = { expanded = !expanded },
             ) {
                 val imagen = if (expanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
                 Icon(
-                    imageVector = imagen, 
-                    contentDescription = stringResource(R.string.nav_mas)
+                    imageVector = imagen,
+                    contentDescription = stringResource(R.string.nav_mas),
                 )
             }
 
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
             ) {
-
                 DropdownMenuItem(
-                    text = { 
+                    text = {
                         Text(
                             text = stringResource(R.string.menu_inicia_sesion),
-                            style = typography.labelLarge
-                        ) 
+                            style = typography.labelLarge,
+                        )
                     },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.login.route)
-                    }
+                    },
                 )
 
                 DropdownMenuItem(
-                    text = { 
+                    text = {
                         Text(
                             text = stringResource(R.string.menu_registrate),
-                            style = typography.labelLarge
-                        ) 
+                            style = typography.labelLarge,
+                        )
                     },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.registro.route)
-                    }
+                    },
                 )
 
                 DropdownMenuItem(
-                    text = { 
+                    text = {
                         Text(
                             text = stringResource(R.string.menu_volver_principal),
-                            style = typography.labelLarge
-                        ) 
+                            style = typography.labelLarge,
+                        )
                     },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.principal.route)
-                    }
+                    },
                 )
             }
-        }
+        },
     )
 }
-

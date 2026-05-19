@@ -1,6 +1,4 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
-import androidx.compose.foundation.shape.CircleShape
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -25,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -38,7 +37,6 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,18 +55,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.koin.java.KoinJavaComponent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextOverflow
@@ -76,7 +65,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionResponseDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
@@ -89,7 +77,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ListarPacienteSinPsicologos(
     navController: NavController,
-    pacientesViewModel: PacientesViewModel = koinViewModel()
+    pacientesViewModel: PacientesViewModel = koinViewModel(),
 ) {
     val pacientes by pacientesViewModel.pacientes.collectAsStateWithLifecycle()
     val loading by pacientesViewModel.loading.collectAsStateWithLifecycle()
@@ -109,21 +97,22 @@ fun ListarPacienteSinPsicologos(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primary,
                 shadowElevation = 4.dp,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                             tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
 
@@ -133,7 +122,7 @@ fun ListarPacienteSinPsicologos(
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f, fill = false),
                     )
 
                     IconButton(onClick = {
@@ -142,53 +131,54 @@ fun ListarPacienteSinPsicologos(
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = "Refrescar",
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }
             }
-        }
+        },
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
         ) {
             when {
                 loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(48.dp),
                         )
                     }
                 }
                 pacientes.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.size(80.dp)
+                                modifier = Modifier.size(80.dp),
                             )
                             Text(
                                 text = "No hay pacientes sin asignar",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
                                 text = "Todos los pacientes ya tienen psicologo asignado",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -197,22 +187,23 @@ fun ListarPacienteSinPsicologos(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(pacientes, key = { it.idPaciente }) { paciente ->
                             PacienteExpandableCard(
                                 paciente = paciente,
                                 isExpanded = expandedCardId == paciente.idPaciente,
                                 onExpandClick = {
-                                    expandedCardId = if (expandedCardId == paciente.idPaciente) {
-                                        null
-                                    } else {
-                                        paciente.idPaciente
-                                    }
+                                    expandedCardId =
+                                        if (expandedCardId == paciente.idPaciente) {
+                                            null
+                                        } else {
+                                            paciente.idPaciente
+                                        }
                                 },
                                 onAsignarClick = {
                                     navController.navigate(Screens.listarPsicologo.createRoute(paciente.idPaciente))
-                                }
+                                },
                             )
                         }
                     }
@@ -228,46 +219,49 @@ fun PacienteExpandableCard(
     paciente: PacienteBasicoResponseDTO,
     isExpanded: Boolean,
     onExpandClick: () -> Unit,
-    onAsignarClick: () -> Unit
+    onAsignarClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .animateContentSize()
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .animateContentSize(),
         ) {
             // Header: Informacion basica (siempre visible)
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onExpandClick() }
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onExpandClick() }
+                        .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // Avatar con iniciales
                     Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(48.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = CircleShape,
+                                ),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = paciente.nombre.take(1) + paciente.apellido.take(1),
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
 
@@ -277,23 +271,23 @@ fun PacienteExpandableCard(
                         Text(
                             text = "${paciente.nombre} ${paciente.apellido}",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Row(
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(14.dp)
+                                modifier = Modifier.size(14.dp),
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = paciente.email,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -304,37 +298,40 @@ fun PacienteExpandableCard(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (isExpanded) "Contraer" else "Expandir",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
 
             // Contenido expandido
             AnimatedVisibility(
                 visible = isExpanded,
-                enter = expandVertically(
-                    animationSpec = tween(durationMillis = 300),
-                    expandFrom = Alignment.Top
-                ) + fadeIn(animationSpec = tween(300)),
-                exit = shrinkVertically(
-                    animationSpec = tween(durationMillis = 300),
-                    shrinkTowards = Alignment.Top
-                ) + fadeOut(animationSpec = tween(300))
+                enter =
+                    expandVertically(
+                        animationSpec = tween(durationMillis = 300),
+                        expandFrom = Alignment.Top,
+                    ) + fadeIn(animationSpec = tween(300)),
+                exit =
+                    shrinkVertically(
+                        animationSpec = tween(durationMillis = 300),
+                        shrinkTowards = Alignment.Top,
+                    ) + fadeOut(animationSpec = tween(300)),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 16.dp),
                 ) {
                     HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 8.dp),
                     )
 
                     // Datos Personales
                     SubSection(
                         title = "Datos Personales",
                         icon = Icons.Default.Person,
-                        iconColor = MaterialTheme.colorScheme.primary
+                        iconColor = MaterialTheme.colorScheme.primary,
                     ) {
                         DetailRow("DNI", paciente.dni ?: "No especificado")
                         DetailRow("Telefono", paciente.telefono ?: "No especificado")
@@ -348,7 +345,7 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Situaciones",
                             icon = Icons.Default.Info,
-                            iconColor = MaterialTheme.colorScheme.secondary
+                            iconColor = MaterialTheme.colorScheme.secondary,
                         ) {
                             paciente.situaciones!!.forEachIndexed { index, situacion ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
@@ -363,7 +360,7 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Direcciones",
                             icon = Icons.Default.LocationOn,
-                            iconColor = MaterialTheme.colorScheme.primary
+                            iconColor = MaterialTheme.colorScheme.primary,
                         ) {
                             paciente.direcciones!!.forEachIndexed { index, direccion ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
@@ -378,7 +375,7 @@ fun PacienteExpandableCard(
                         SubSection(
                             title = "Tutores",
                             icon = Icons.Default.People,
-                            iconColor = MaterialTheme.colorScheme.tertiary
+                            iconColor = MaterialTheme.colorScheme.tertiary,
                         ) {
                             paciente.tutores!!.forEachIndexed { index, tutor ->
                                 if (index > 0) Spacer(modifier = Modifier.height(8.dp))
@@ -392,21 +389,22 @@ fun PacienteExpandableCard(
                     // Boton Asignar Psicologo
                     Button(
                         onClick = onAsignarClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = MaterialTheme.shapes.medium
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                        shape = MaterialTheme.shapes.medium,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.AssignmentInd,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 "Asignar Psicologo",
-                                style = MaterialTheme.typography.labelLarge
+                                style = MaterialTheme.typography.labelLarge,
                             )
                         }
                     }
@@ -421,24 +419,24 @@ fun SubSection(
     title: String,
     icon: ImageVector,
     iconColor: Color,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         ) {
             Icon(
                 icon,
                 contentDescription = null,
                 tint = iconColor,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(18.dp),
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = iconColor
+                color = iconColor,
             )
         }
         content()
@@ -448,39 +446,38 @@ fun SubSection(
 @Composable
 fun DetailRow(
     label: String,
-    value: String
+    value: String,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
 
 @Composable
-fun DireccionCard(
-    direccion: DireccionResponseDTO
-) {
+fun DireccionCard(direccion: DireccionResponseDTO) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.small,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
         ) {
             if (!direccion.calle.isNullOrBlank()) {
                 DetailRow("Calle", direccion.calle)
@@ -502,16 +499,14 @@ fun DireccionCard(
 }
 
 @Composable
-fun TutorCard(
-    tutor: TutorResponseDTO
-) {
+fun TutorCard(tutor: TutorResponseDTO) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.small,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
         ) {
             if (!tutor.nombre.isNullOrBlank()) {
                 DetailRow("Nombre", tutor.nombre)
@@ -533,40 +528,38 @@ fun TutorCard(
 }
 
 @Composable
-fun SituacionCard(
-    situacion: SituacionDTO
-) {
+fun SituacionCard(situacion: SituacionDTO) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.small,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
         ) {
             // Nombre de la situacion (siempre visible)
             if (!situacion.nombre.isNullOrBlank()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = situacion.nombre,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                     if (!situacion.categoria.isNullOrBlank()) {
                         Surface(
                             shape = MaterialTheme.shapes.extraSmall,
-                            color = MaterialTheme.colorScheme.secondaryContainer
+                            color = MaterialTheme.colorScheme.secondaryContainer,
                         ) {
                             Text(
                                 text = situacion.categoria,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                             )
                         }
                     }
@@ -580,7 +573,7 @@ fun SituacionCard(
                     text = situacion.descripcion,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 16.sp
+                    lineHeight = 16.sp,
                 )
             }
         }

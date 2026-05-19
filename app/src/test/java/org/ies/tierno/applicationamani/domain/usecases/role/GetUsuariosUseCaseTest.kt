@@ -11,7 +11,6 @@ import org.junit.Test
 import retrofit2.Response
 
 class GetUsuariosUseCaseTest {
-
     private lateinit var repository: AdminRepository
     private lateinit var useCase: GetUsuariosUseCase
 
@@ -22,26 +21,28 @@ class GetUsuariosUseCaseTest {
     }
 
     @Test
-    fun `invoke should return response from repository`() = runTest {
-        val rol = "PACIENTE"
-        val dni = "12345678A"
-        val expected = Response.success(emptyList<UsuarioDTO>())
-        
-        coEvery { repository.getUsuarios(rol, dni) } returns expected
+    fun `invoke should return response from repository`() =
+        runTest {
+            val rol = "PACIENTE"
+            val dni = "12345678A"
+            val expected = Response.success(emptyList<UsuarioDTO>())
 
-        val result = useCase(rol, dni)
+            coEvery { repository.getUsuarios(rol, dni) } returns expected
 
-        assertEquals(expected, result)
-    }
+            val result = useCase(rol, dni)
+
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `invoke with null params should return response from repository`() = runTest {
-        val expected = Response.success(emptyList<UsuarioDTO>())
-        
-        coEvery { repository.getUsuarios(null, null) } returns expected
+    fun `invoke with null params should return response from repository`() =
+        runTest {
+            val expected = Response.success(emptyList<UsuarioDTO>())
 
-        val result = useCase()
+            coEvery { repository.getUsuarios(null, null) } returns expected
 
-        assertEquals(expected, result)
-    }
+            val result = useCase()
+
+            assertEquals(expected, result)
+        }
 }

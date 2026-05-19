@@ -24,14 +24,13 @@ data class EstadisticasPsicologoUiState(
     val chartData: List<Pair<LocalDate, Float>> = emptyList(), // Nueva fuente de verdad para el gráfico
     val estadisticas: EstadisticasEmocionales = EstadisticasEmocionales(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
 )
 
 class EstadisticasPsicologoViewModel(
     private val authRepository: AuthRepository,
-    private val diarioRepository: DiarioRemoteRepository
+    private val diarioRepository: DiarioRemoteRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(EstadisticasPsicologoUiState())
     val uiState: StateFlow<EstadisticasPsicologoUiState> = _uiState.asStateFlow()
 
@@ -58,7 +57,9 @@ class EstadisticasPsicologoViewModel(
 
     fun seleccionarPeriodo(periodo: String) {
         _uiState.update { it.copy(periodoSeleccionado = periodo) }
-        _uiState.value.pacienteSeleccionado?.idPaciente?.let { cargarEntradas(it) }
+        _uiState.value.pacienteSeleccionado
+            ?.idPaciente
+            ?.let { cargarEntradas(it) }
     }
 
     fun seleccionarVista(vista: String) {
@@ -68,38 +69,45 @@ class EstadisticasPsicologoViewModel(
     private fun cargarEntradas(idPaciente: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            diarioRepository.getByPaciente(idPaciente).onSuccess { allEntradas ->
-                val filtradas = filtrarPorPeriodo(allEntradas, _uiState.value.periodoSeleccionado)
-                val chartData = transformarParaGrafico(filtradas)
-                val stats = calcularEstadisticas(filtradas)
-                _uiState.update { 
-                    it.copy(
-                        entradas = filtradas, 
-                        chartData = chartData,
-                        estadisticas = stats, 
-                        isLoading = false 
-                    ) 
+            diarioRepository
+                .getByPaciente(idPaciente)
+                .onSuccess { allEntradas ->
+                    val filtradas = filtrarPorPeriodo(allEntradas, _uiState.value.periodoSeleccionado)
+                    val chartData = transformarParaGrafico(filtradas)
+                    val stats = calcularEstadisticas(filtradas)
+                    _uiState.update {
+                        it.copy(
+                            entradas = filtradas,
+                            chartData = chartData,
+                            estadisticas = stats,
+                            isLoading = false,
+                        )
+                    }
+                }.onFailure { e ->
+                    _uiState.update { it.copy(error = e.message, isLoading = false) }
                 }
-            }.onFailure { e ->
-                _uiState.update { it.copy(error = e.message, isLoading = false) }
-            }
         }
     }
 
-    private fun filtrarPorPeriodo(entradas: List<DiarioEmocionResponseDTO>, periodo: String): List<DiarioEmocionResponseDTO> {
+    private fun filtrarPorPeriodo(
+        entradas: List<DiarioEmocionResponseDTO>,
+        periodo: String,
+    ): List<DiarioEmocionResponseDTO> {
         val now = LocalDate.now()
-        val limitDate = when (periodo) {
-            "Último mes" -> now.minusMonths(1)
-            "Últimos 3 meses" -> now.minusMonths(3)
-            "Últimos 6 meses" -> now.minusMonths(6)
-            "Último año" -> now.minusYears(1)
-            else -> LocalDate.MIN
-        }
+        val limitDate =
+            when (periodo) {
+                "Último mes" -> now.minusMonths(1)
+                "Últimos 3 meses" -> now.minusMonths(3)
+                "Últimos 6 meses" -> now.minusMonths(6)
+                "Último año" -> now.minusYears(1)
+                else -> LocalDate.MIN
+            }
 
-        return entradas.filter {
-            val fecha = it.fecha.toLocalDateSafe()
-            fecha != null && (fecha.isAfter(limitDate) || fecha.isEqual(limitDate))
-        }.sortedBy { it.fecha }
+        return entradas
+            .filter {
+                val fecha = it.fecha.toLocalDateSafe()
+                fecha != null && (fecha.isAfter(limitDate) || fecha.isEqual(limitDate))
+            }.sortedBy { it.fecha }
     }
 
     private fun transformarParaGrafico(entradas: List<DiarioEmocionResponseDTO>): List<Pair<LocalDate, Float>> {
@@ -119,20 +127,24 @@ class EstadisticasPsicologoViewModel(
         val peor = entradas.minByOrNull { it.intensidad }
         val total = entradas.size
 
-        val tendencia = if (entradas.size >= 2) {
-            val mid = entradas.size / 2
-            val primera = entradas.take(mid).map { it.intensidad }.average()
-            val segunda = entradas.drop(mid).map { it.intensidad }.average()
-            segunda - primera
-        } else 0.0
+        val tendencia =
+            if (entradas.size >= 2) {
+                val mid = entradas.size / 2
+                val primera = entradas.take(mid).map { it.intensidad }.average()
+                val segunda = entradas.drop(mid).map { it.intensidad }.average()
+                segunda - primera
+            } else {
+                0.0
+            }
 
-        val observacion = when {
-            promedio >= 8 -> "El paciente muestra niveles muy positivos de bienestar emocional."
-            promedio >= 6 -> "El paciente presenta un estado emocional positivo."
-            promedio >= 4 -> "El paciente mantiene un estado emocional neutro. Seguimiento recomendado."
-            promedio >= 2 -> "El paciente presenta señales de malestar emocional. Atención prioritaria."
-            else -> "Sin datos suficientes para generar una observación."
-        }
+        val observacion =
+            when {
+                promedio >= 8 -> "El paciente muestra niveles muy positivos de bienestar emocional."
+                promedio >= 6 -> "El paciente presenta un estado emocional positivo."
+                promedio >= 4 -> "El paciente mantiene un estado emocional neutro. Seguimiento recomendado."
+                promedio >= 2 -> "El paciente presenta señales de malestar emocional. Atención prioritaria."
+                else -> "Sin datos suficientes para generar una observación."
+            }
 
         return EstadisticasEmocionales(
             promedioPeriodo = promedio,
@@ -140,8 +152,7 @@ class EstadisticasPsicologoViewModel(
             peorSesion = peor,
             totalSesiones = total,
             tendenciaPuntos = tendencia,
-            observacion = observacion
+            observacion = observacion,
         )
     }
 }
-

@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 class DarBajaPacienteUseCaseTest {
-
     private lateinit var repository: AuthRepository
     private lateinit var useCase: DarBajaPacienteUseCase
 
@@ -23,24 +22,26 @@ class DarBajaPacienteUseCaseTest {
     }
 
     @Test
-    fun `invoke should return success when repository succeeds`() = runTest {
-        coEvery { repository.darBajaPaciente(1L) } returns Result.success(MessageResponse("Baja correcta"))
+    fun `invoke should return success when repository succeeds`() =
+        runTest {
+            coEvery { repository.darBajaPaciente(1L) } returns Result.success(MessageResponse("Baja correcta"))
 
-        val result = useCase(1L)
+            val result = useCase(1L)
 
-        assertTrue(result.isSuccess)
-        assertEquals("Baja correcta", result.getOrNull()?.message)
-        coVerify { repository.darBajaPaciente(1L) }
-    }
+            assertTrue(result.isSuccess)
+            assertEquals("Baja correcta", result.getOrNull()?.message)
+            coVerify { repository.darBajaPaciente(1L) }
+        }
 
     @Test
-    fun `invoke should return failure when repository fails`() = runTest {
-        val exception = Exception("fail")
-        coEvery { repository.darBajaPaciente(1L) } returns Result.failure(exception)
+    fun `invoke should return failure when repository fails`() =
+        runTest {
+            val exception = Exception("fail")
+            coEvery { repository.darBajaPaciente(1L) } returns Result.failure(exception)
 
-        val result = useCase(1L)
+            val result = useCase(1L)
 
-        assertTrue(result.isFailure)
-        assertEquals(exception, result.exceptionOrNull())
-    }
+            assertTrue(result.isFailure)
+            assertEquals(exception, result.exceptionOrNull())
+        }
 }

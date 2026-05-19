@@ -5,5 +5,5 @@ data class AgendaPsicologoResponse(
     val horaFin: Int = 20,
     val duracionSesion: Int = 60,
     val diasNoDisponibles: List<String> = emptyList(),
-    val citas: List<CitaDetalleResponse> = emptyList()
+    val citas: List<CitaDetalleResponse> = emptyList(),
 )

@@ -7,5 +7,5 @@ data class UpdatePacienteRequestDTO(
     val telefono: String?,
     val genero: String?,
     val fechaNacimiento: LocalDate?,
-    val usuario: UsuarioUpdateDTO?
+    val usuario: UsuarioUpdateDTO?,
 )

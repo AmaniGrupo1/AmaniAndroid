@@ -26,23 +26,22 @@ fun ConsentimientoScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
 ) {
-
     var aceptaVideo by remember { mutableStateOf(false) }
     var aceptaComunicacion by remember { mutableStateOf(false) }
 
     Scaffold { padding ->
 
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(20.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-
             Text(
                 text = "Consentimiento informado",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
             )
 
 //            Row(verticalAlignment = Alignment.CenterVertically) {
@@ -71,7 +70,6 @@ fun ConsentimientoScreen(
 
             Button(
                 onClick = {
-
 //                    if (aceptaVideo || aceptaComunicacion) {
 //
 //                        navController.navigate(
@@ -79,9 +77,8 @@ fun ConsentimientoScreen(
 //                        )
 //
 //                    }
-
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Continuar")
             }

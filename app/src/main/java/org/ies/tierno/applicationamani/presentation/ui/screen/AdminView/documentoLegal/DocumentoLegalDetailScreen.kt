@@ -1,13 +1,10 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
 
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,9 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +25,6 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -41,7 +35,7 @@ import java.time.format.DateTimeFormatter
 fun DocumentoLegalDetailScreen(
     navController: NavController,
     tipoDocumento: String, // "terminos" o "privacidad"
-    viewModel: DocumentoLegalViewModel = koinViewModel()
+    viewModel: DocumentoLegalViewModel = koinViewModel(),
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val colorScheme = MaterialTheme.colorScheme
@@ -54,17 +48,19 @@ fun DocumentoLegalDetailScreen(
     val error by viewModel.error.collectAsStateWithLifecycle()
 
     // Determinar título e icono según el tipo
-    val titulo = when (tipoDocumento) {
-        "terminos" -> "📜 Términos y Condiciones"
-        "privacidad" -> "🔒 Política de Privacidad"
-        else -> "📄 Documento Legal"
-    }
+    val titulo =
+        when (tipoDocumento) {
+            "terminos" -> "📜 Términos y Condiciones"
+            "privacidad" -> "🔒 Política de Privacidad"
+            else -> "📄 Documento Legal"
+        }
 
-    val icono = when (tipoDocumento) {
-        "terminos" -> Icons.Default.Gavel
-        "privacidad" -> Icons.Default.Lock
-        else -> Icons.Default.Description
-    }
+    val icono =
+        when (tipoDocumento) {
+            "terminos" -> Icons.Default.Gavel
+            "privacidad" -> Icons.Default.Lock
+            else -> Icons.Default.Description
+        }
 
     // Cargar el documento cuando la pantalla se abre
     LaunchedEffect(tipoDocumento) {
@@ -82,7 +78,7 @@ fun DocumentoLegalDetailScreen(
                         fontWeight = FontWeight.SemiBold,
                         color = colorScheme.onPrimary,
                         maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     )
                 },
                 navigationIcon = {
@@ -90,42 +86,44 @@ fun DocumentoLegalDetailScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = colorScheme.onPrimary
+                            tint = colorScheme.onPrimary,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorScheme.primary
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.primary,
+                    ),
             )
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             when {
                 isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(48.dp),
                                 color = colorScheme.primary,
-                                strokeWidth = 3.dp
+                                strokeWidth = 3.dp,
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Cargando documento...",
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
-                                fontFamily = roboto
+                                fontFamily = roboto,
                             )
                         }
                     }
@@ -134,18 +132,18 @@ fun DocumentoLegalDetailScreen(
                 error != null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(24.dp)
+                            modifier = Modifier.padding(24.dp),
                         ) {
                             Icon(
                                 Icons.Default.Error,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = colorScheme.error
+                                tint = colorScheme.error,
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
@@ -154,7 +152,7 @@ fun DocumentoLegalDetailScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.onSurface,
                                 fontFamily = roboto,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
@@ -162,13 +160,13 @@ fun DocumentoLegalDetailScreen(
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             Button(
                                 onClick = { viewModel.getDocumentoByTipo(tipoDocumento) },
                                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-                                shape = shapes.medium
+                                shape = shapes.medium,
                             ) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Reintentar")
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -181,18 +179,18 @@ fun DocumentoLegalDetailScreen(
                 documento == null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(24.dp)
+                            modifier = Modifier.padding(24.dp),
                         ) {
                             Icon(
                                 icono,
                                 contentDescription = null,
                                 modifier = Modifier.size(80.dp),
-                                tint = colorScheme.primary.copy(alpha = 0.4f)
+                                tint = colorScheme.primary.copy(alpha = 0.4f),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
@@ -201,7 +199,7 @@ fun DocumentoLegalDetailScreen(
                                 fontWeight = FontWeight.Medium,
                                 color = colorScheme.onSurface,
                                 fontFamily = roboto,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
@@ -209,7 +207,7 @@ fun DocumentoLegalDetailScreen(
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }
@@ -218,7 +216,7 @@ fun DocumentoLegalDetailScreen(
                 else -> {
                     DocumentoContent(
                         documento = documento!!,
-                        roboto = roboto
+                        roboto = roboto,
                     )
                 }
             }
@@ -230,35 +228,38 @@ fun DocumentoLegalDetailScreen(
 @Composable
 fun DocumentoContent(
     documento: DocumentoLegalResponseDTO,
-    roboto: FontFamily
+    roboto: FontFamily,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
 
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-    val fechaCreacion = try {
-        documento.creadoEn?.let {
-            LocalDateTime.parse(it).format(fechaFormatter)
-        } ?: "Fecha no disponible"
-    } catch (e: Exception) {
-        "Fecha no disponible"
-    }
+    val fechaCreacion =
+        try {
+            documento.creadoEn?.let {
+                LocalDateTime.parse(it).format(fechaFormatter)
+            } ?: "Fecha no disponible"
+        } catch (e: Exception) {
+            "Fecha no disponible"
+        }
 
-    val fechaActualizacion = try {
-        documento.actualizadoEn?.let {
-            LocalDateTime.parse(it).format(fechaFormatter)
-        } ?: "Fecha no disponible"
-    } catch (e: Exception) {
-        "Fecha no disponible"
-    }
+    val fechaActualizacion =
+        try {
+            documento.actualizadoEn?.let {
+                LocalDateTime.parse(it).format(fechaFormatter)
+            } ?: "Fecha no disponible"
+        } catch (e: Exception) {
+            "Fecha no disponible"
+        }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(colorScheme.surface)
-            .padding(16.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .background(colorScheme.surface)
+                .padding(16.dp),
     ) {
         // Título
         Text(
@@ -267,47 +268,47 @@ fun DocumentoContent(
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
             fontFamily = roboto,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
 
         // Metadatos
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = shapes.medium,
-            color = colorScheme.surfaceVariant
+            color = colorScheme.surfaceVariant,
         ) {
             Column(
                 modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         text = "📌 Versión: ${documento.version ?: "1.0"}",
                         style = typography.labelSmall,
                         color = colorScheme.onSurfaceVariant,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                     Text(
                         text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
                         style = typography.labelSmall,
                         color = if (documento.activo) Color(0xFF4CAF50) else colorScheme.error,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 }
                 Text(
                     text = "📅 Creado: $fechaCreacion",
                     style = typography.labelSmall,
                     color = colorScheme.onSurfaceVariant,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
                 Text(
                     text = "🔄 Actualizado: $fechaActualizacion",
                     style = typography.labelSmall,
                     color = colorScheme.onSurfaceVariant,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
             }
         }
@@ -316,10 +317,11 @@ fun DocumentoContent(
 
         // Línea decorativa
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(colorScheme.primary.copy(alpha = 0.3f))
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(colorScheme.primary.copy(alpha = 0.3f)),
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -329,7 +331,7 @@ fun DocumentoContent(
             modifier = Modifier.fillMaxWidth(),
             shape = shapes.large,
             colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         ) {
             Text(
                 text = documento.contenido,
@@ -337,7 +339,7 @@ fun DocumentoContent(
                 lineHeight = 22.sp,
                 color = colorScheme.onSurface,
                 fontFamily = roboto,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         }
 

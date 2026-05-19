@@ -33,9 +33,8 @@ class DiarioSyncManager(
     private val context: Context,
     private val dao: DiarioEmocionalDao,
     private val remoteRepository: DiarioRemoteRepository,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
 ) {
-
     companion object {
         const val SYNC_TAG = "diario_sync"
     }
@@ -45,13 +44,14 @@ class DiarioSyncManager(
      * cuando haya conectividad de red.
      */
     fun enqueueImmediateSync() {
-        val request = OneTimeWorkRequestBuilder<SyncDiarioWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            )
-            .build()
+        val request =
+            OneTimeWorkRequestBuilder<SyncDiarioWorker>()
+                .setConstraints(
+                    Constraints
+                        .Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build(),
+                ).build()
         WorkManager.getInstance(context).enqueue(request)
     }
 
@@ -60,19 +60,22 @@ class DiarioSyncManager(
      * periódicamente cada 15 minutos cuando haya conectividad de red.
      */
     fun enqueuePeriodicSync() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        val constraints =
+            Constraints
+                .Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
-        val request = PeriodicWorkRequestBuilder<SyncDiarioWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
-            .addTag(DiarioSyncManager.SYNC_TAG)
-            .build()
+        val request =
+            PeriodicWorkRequestBuilder<SyncDiarioWorker>(15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .addTag(DiarioSyncManager.SYNC_TAG)
+                .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "diario_periodic_sync",
             ExistingPeriodicWorkPolicy.KEEP,
-            request
+            request,
         )
     }
 
@@ -86,15 +89,17 @@ class DiarioSyncManager(
      * @return [Result.success] si todo se procesó, [Result.failure] en caso contrario.
      */
     suspend fun pushPendingEntries(): Result<Unit> {
-        val pending = dao.getPendingSync()
-            .sortedBy {
-                when (it.syncStatus) {
-                    SyncStatus.PENDING_CREATE -> 0
-                    SyncStatus.PENDING_UPDATE -> 1
-                    SyncStatus.PENDING_DELETE -> 2
-                    SyncStatus.SYNCED -> 3
+        val pending =
+            dao
+                .getPendingSync()
+                .sortedBy {
+                    when (it.syncStatus) {
+                        SyncStatus.PENDING_CREATE -> 0
+                        SyncStatus.PENDING_UPDATE -> 1
+                        SyncStatus.PENDING_DELETE -> 2
+                        SyncStatus.SYNCED -> 3
+                    }
                 }
-            }
 
         if (pending.isEmpty()) {
             return Result.success(Unit)
@@ -104,21 +109,22 @@ class DiarioSyncManager(
             when (entry.syncStatus) {
                 SyncStatus.PENDING_CREATE -> {
                     val result = remoteRepository.create(toRequestDTO(entry))
-                    result.onSuccess { response ->
-                        dao.updateRemoteId(
-                            entry.id,
-                            response.idDiario,
-                            SyncStatus.SYNCED
-                        )
-                    }.onFailure { error ->
-                        Timber.e(error, "Fallo al crear entrada remota: localId=${entry.id}")
-                        dao.updateSyncStatus(
-                            entry.id,
-                            SyncStatus.PENDING_CREATE,
-                            System.currentTimeMillis()
-                        )
-                        return Result.failure(error)
-                    }
+                    result
+                        .onSuccess { response ->
+                            dao.updateRemoteId(
+                                entry.id,
+                                response.idDiario,
+                                SyncStatus.SYNCED,
+                            )
+                        }.onFailure { error ->
+                            Timber.e(error, "Fallo al crear entrada remota: localId=${entry.id}")
+                            dao.updateSyncStatus(
+                                entry.id,
+                                SyncStatus.PENDING_CREATE,
+                                System.currentTimeMillis(),
+                            )
+                            return Result.failure(error)
+                        }
                 }
 
                 SyncStatus.PENDING_UPDATE -> {
@@ -128,21 +134,22 @@ class DiarioSyncManager(
                         continue
                     }
                     val result = remoteRepository.update(remoteId, toRequestDTO(entry))
-                    result.onSuccess {
-                        dao.updateSyncStatus(
-                            entry.id,
-                            SyncStatus.SYNCED,
-                            System.currentTimeMillis()
-                        )
-                    }.onFailure { error ->
-                        Timber.e(error, "Fallo al actualizar entrada remota: remoteId=$remoteId")
-                        dao.updateSyncStatus(
-                            entry.id,
-                            SyncStatus.PENDING_UPDATE,
-                            System.currentTimeMillis()
-                        )
-                        return Result.failure(error)
-                    }
+                    result
+                        .onSuccess {
+                            dao.updateSyncStatus(
+                                entry.id,
+                                SyncStatus.SYNCED,
+                                System.currentTimeMillis(),
+                            )
+                        }.onFailure { error ->
+                            Timber.e(error, "Fallo al actualizar entrada remota: remoteId=$remoteId")
+                            dao.updateSyncStatus(
+                                entry.id,
+                                SyncStatus.PENDING_UPDATE,
+                                System.currentTimeMillis(),
+                            )
+                            return Result.failure(error)
+                        }
                 }
 
                 SyncStatus.PENDING_DELETE -> {
@@ -152,17 +159,18 @@ class DiarioSyncManager(
                         continue
                     }
                     val result = remoteRepository.delete(remoteId)
-                    result.onSuccess {
-                        dao.eliminar(entry)
-                    }.onFailure { error ->
-                        Timber.e(error, "Fallo al eliminar entrada remota: remoteId=$remoteId")
-                        dao.updateSyncStatus(
-                            entry.id,
-                            SyncStatus.PENDING_DELETE,
-                            System.currentTimeMillis()
-                        )
-                        return Result.failure(error)
-                    }
+                    result
+                        .onSuccess {
+                            dao.eliminar(entry)
+                        }.onFailure { error ->
+                            Timber.e(error, "Fallo al eliminar entrada remota: remoteId=$remoteId")
+                            dao.updateSyncStatus(
+                                entry.id,
+                                SyncStatus.PENDING_DELETE,
+                                System.currentTimeMillis(),
+                            )
+                            return Result.failure(error)
+                        }
                 }
 
                 SyncStatus.SYNCED -> {
@@ -187,42 +195,45 @@ class DiarioSyncManager(
      */
     suspend fun pullRemoteEntries(): Result<Unit> {
         val remoteResult = remoteRepository.getAll()
-        remoteResult.onSuccess { remoteEntries ->
-            for (remote in remoteEntries) {
-                val local = dao.getByRemoteId(remote.idDiario)
+        remoteResult
+            .onSuccess { remoteEntries ->
+                for (remote in remoteEntries) {
+                    val local = dao.getByRemoteId(remote.idDiario)
 
-                if (local == null) {
-                    dao.insertar(
-                        toLocalEntity(remote).copy(syncStatus = SyncStatus.SYNCED)
-                    )
-                    continue
-                }
+                    if (local == null) {
+                        dao.insertar(
+                            toLocalEntity(remote).copy(syncStatus = SyncStatus.SYNCED),
+                        )
+                        continue
+                    }
 
-                when (local.syncStatus) {
-                    SyncStatus.SYNCED -> {
-                        val remoteTimestamp = parseIsoToEpoch(remote.fecha)
-                        if (remoteTimestamp > local.updatedAt) {
-                            val updatedEntity = toLocalEntity(remote).copy(
-                                id = local.id,
-                                createdAt = local.createdAt,
-                                updatedAt = remoteTimestamp,
-                                syncStatus = SyncStatus.SYNCED
-                            )
-                            dao.actualizar(updatedEntity)
+                    when (local.syncStatus) {
+                        SyncStatus.SYNCED -> {
+                            val remoteTimestamp = parseIsoToEpoch(remote.fecha)
+                            if (remoteTimestamp > local.updatedAt) {
+                                val updatedEntity =
+                                    toLocalEntity(remote).copy(
+                                        id = local.id,
+                                        createdAt = local.createdAt,
+                                        updatedAt = remoteTimestamp,
+                                        syncStatus = SyncStatus.SYNCED,
+                                    )
+                                dao.actualizar(updatedEntity)
+                            }
+                        }
+
+                        SyncStatus.PENDING_CREATE,
+                        SyncStatus.PENDING_UPDATE,
+                        SyncStatus.PENDING_DELETE,
+                        -> {
+                            // Local gana: no sobrescribir cambios pendientes
                         }
                     }
-
-                    SyncStatus.PENDING_CREATE,
-                    SyncStatus.PENDING_UPDATE,
-                    SyncStatus.PENDING_DELETE -> {
-                        // Local gana: no sobrescribir cambios pendientes
-                    }
                 }
+            }.onFailure { error ->
+                Timber.e(error, "Fallo al obtener entradas remotas")
+                return Result.failure(error)
             }
-        }.onFailure { error ->
-            Timber.e(error, "Fallo al obtener entradas remotas")
-            return Result.failure(error)
-        }
 
         return Result.success(Unit)
     }
@@ -240,7 +251,7 @@ class DiarioSyncManager(
             titulo = entry.titulo,
             emocion = entry.emocion,
             intensidad = entry.intensidad,
-            nota = entry.contenido
+            nota = entry.contenido,
         )
     }
 
@@ -258,7 +269,7 @@ class DiarioSyncManager(
             createdAt = epochMillis,
             updatedAt = epochMillis,
             remoteId = response.idDiario,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
     }
 
@@ -269,8 +280,8 @@ class DiarioSyncManager(
      * [Instant.parse], luego [LocalDateTime.parse] con UTC, y finalmente
      * con "Z" añadido como fallback.
      */
-    private fun parseIsoToEpoch(fecha: String): Long {
-        return try {
+    private fun parseIsoToEpoch(fecha: String): Long =
+        try {
             Instant.parse(fecha).toEpochMilli()
         } catch (e: DateTimeParseException) {
             try {
@@ -279,5 +290,4 @@ class DiarioSyncManager(
                 Instant.parse(fecha + "Z").toEpochMilli()
             }
         }
-    }
 }

@@ -10,8 +10,8 @@ package org.ies.tierno.applicationamani.domain.models.test
  * @property texto Texto de la opción seleccionada por el paciente.
  * @property valor Valor numérico de la opción seleccionada para la puntuación.
  */
-data class Respuesta (
-   val preguntaId: String = "",
+data class Respuesta(
+    val preguntaId: String = "",
     val texto: String,
     val valor: Int = 0,
 )

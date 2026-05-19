@@ -11,9 +11,8 @@ import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 
 class ListarCitasViewModel(
     private val listarCitasUseCase: ListarCitasUseCase,
-    private val citasRepository: CitasRepository
+    private val citasRepository: CitasRepository,
 ) : ViewModel() {
-
     var citas = mutableStateListOf<CitaPacienteViewResponseDTO>()
         private set
 
@@ -45,7 +44,10 @@ class ListarCitasViewModel(
         }
     }
 
-    fun cancelarCita(idCita: Long, onSuccess: () -> Unit = {}) {
+    fun cancelarCita(
+        idCita: Long,
+        onSuccess: () -> Unit = {},
+    ) {
         viewModelScope.launch {
             try {
                 isCancelling.value = true

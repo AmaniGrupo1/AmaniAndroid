@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class HistorialClinicoUseCaseTest {
-
     private lateinit var repository: HistorialRepository
     private lateinit var useCase: HistorialClinicoUseCase
 
@@ -22,25 +21,27 @@ class HistorialClinicoUseCaseTest {
     }
 
     @Test
-    fun `getHistorialClinico should return list from repository`() = runTest {
-        val idPaciente = 1L
-        val token = "token"
-        val expected = emptyList<HistorialClinicoResponseDTO>()
-        coEvery { repository.getHistorialPaciente(idPaciente, token) } returns expected
+    fun `getHistorialClinico should return list from repository`() =
+        runTest {
+            val idPaciente = 1L
+            val token = "token"
+            val expected = emptyList<HistorialClinicoResponseDTO>()
+            coEvery { repository.getHistorialPaciente(idPaciente, token) } returns expected
 
-        val result = useCase.getHistorialClinico(idPaciente, token)
+            val result = useCase.getHistorialClinico(idPaciente, token)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `createHistorialClinico should return response from repository`() = runTest {
-        val request = mockk<HistorialClinicoRequestDTO>()
-        val expected = mockk<HistorialClinicoResponseDTO>()
-        coEvery { repository.createHistorialClinico(request) } returns expected
+    fun `createHistorialClinico should return response from repository`() =
+        runTest {
+            val request = mockk<HistorialClinicoRequestDTO>()
+            val expected = mockk<HistorialClinicoResponseDTO>()
+            coEvery { repository.createHistorialClinico(request) } returns expected
 
-        val result = useCase.createHistorialClinico(request)
+            val result = useCase.createHistorialClinico(request)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 }

@@ -26,15 +26,15 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.remoto.FileStorageService
 import org.ies.tierno.applicationamani.domain.models.Message
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessagesAsReadUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.SendMessageUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import timber.log.Timber
 import java.io.File
@@ -45,14 +45,18 @@ import java.io.File
 enum class AudioPlaybackStatus {
     /** El reproductor está inactivo. */
     IDLE,
+
     /** El audio se está cargando o cargando en el buffer. */
     LOADING,
+
     /** El audio se está reproduciendo actualmente. */
     PLAYING,
+
     /** La reproducción está pausada. */
     PAUSED,
+
     /** Ocurrió un error durante la reproducción. */
-    ERROR
+    ERROR,
 }
 
 /**
@@ -69,7 +73,7 @@ data class AudioPlaybackUiState(
     val activeMessageId: String? = null,
     val positionMs: Long = 0L,
     val durationMs: Long = 0L,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )
 
 /**
@@ -84,7 +88,7 @@ data class PsychologistInfo(
     val id: String,
     val name: String,
     val avatarUrl: String?,
-    val isOnline: Boolean
+    val isOnline: Boolean,
 )
 
 /**
@@ -107,7 +111,7 @@ data class ChatUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isOtherTyping: Boolean = false,
-    val psychologistOnline: Boolean = false
+    val psychologistOnline: Boolean = false,
 )
 
 /**
@@ -133,7 +137,7 @@ class ChatViewModel(
     private val updateUserOnlineUseCase: UpdateUserOnlineUseCase,
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
     private val authRepository: org.ies.tierno.applicationamani.data.AuthRepository,
-    appContext: Context
+    appContext: Context,
 ) : ViewModel() {
     companion object {
         private const val TAG = "ChatViewModel"
@@ -150,110 +154,118 @@ class ChatViewModel(
     /** Flujo de estado de la reproducción de audio. */
     val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
 
-    private val baseUiState = combine(
-        _messages,
-        _assignedPsychologist,
-        _isLoading,
-        _error,
-        _inputText
-    ) { messages, psychologist, loading, error, input ->
-        ChatUiState(
-            messages = messages,
-            assignedPsychologist = psychologist,
-            currentUserId = currentUserId.toString(),
-            inputText = input,
-            isLoading = loading,
-            error = error
-        )
-    }
+    private val baseUiState =
+        combine(
+            _messages,
+            _assignedPsychologist,
+            _isLoading,
+            _error,
+            _inputText,
+        ) { messages, psychologist, loading, error, input ->
+            ChatUiState(
+                messages = messages,
+                assignedPsychologist = psychologist,
+                currentUserId = currentUserId.toString(),
+                inputText = input,
+                isLoading = loading,
+                error = error,
+            )
+        }
 
     /** Flujo de estado principal de la interfaz de chat. */
-    val uiState: StateFlow<ChatUiState> = combine(
-        baseUiState,
-        _isOtherTyping,
-        _psychologistOnline
-    ) { base, isTyping, isOnline ->
-        base.copy(
-            isOtherTyping = isTyping,
-            psychologistOnline = isOnline
+    val uiState: StateFlow<ChatUiState> =
+        combine(
+            baseUiState,
+            _isOtherTyping,
+            _psychologistOnline,
+        ) { base, isTyping, isOnline ->
+            base.copy(
+                isOtherTyping = isTyping,
+                psychologistOnline = isOnline,
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ChatUiState(currentUserId = currentUserId.toString()),
         )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = ChatUiState(currentUserId = currentUserId.toString())
-    )
 
     /** Flujo que combina los estados de presencia y actividad de escritura del interlocutor. */
-    val typingOnlineState: StateFlow<Pair<Boolean, Boolean>> = combine(_isOtherTyping, _psychologistOnline) { isTyping, isOnline ->
-        Pair(isTyping, isOnline)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = Pair(false, false)
-    )
+    val typingOnlineState: StateFlow<Pair<Boolean, Boolean>> =
+        combine(_isOtherTyping, _psychologistOnline) { isTyping, isOnline ->
+            Pair(isTyping, isOnline)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Pair(false, false),
+        )
 
     private val appContext = appContext.applicationContext
     private var exoPlayer: ExoPlayer? = null
     private var progressJob: Job? = null
     private val _audioUiState = MutableStateFlow(AudioPlaybackUiState())
 
-    private val playerListener = object : Player.Listener {
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            val player = exoPlayer ?: return
-            val current = _audioUiState.value
+    private val playerListener =
+        object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                val player = exoPlayer ?: return
+                val current = _audioUiState.value
 
-            when (playbackState) {
-                Player.STATE_BUFFERING -> {
-                    _audioUiState.value = current.copy(status = AudioPlaybackStatus.LOADING)
-                }
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> {
+                        _audioUiState.value = current.copy(status = AudioPlaybackStatus.LOADING)
+                    }
 
-                Player.STATE_READY -> {
-                    if (player.isPlaying) {
-                        _audioUiState.value = current.copy(
-                            status = AudioPlaybackStatus.PLAYING,
-                            durationMs = maxOf(player.duration, 0L)
-                        )
-                        startProgressUpdates()
+                    Player.STATE_READY -> {
+                        if (player.isPlaying) {
+                            _audioUiState.value =
+                                current.copy(
+                                    status = AudioPlaybackStatus.PLAYING,
+                                    durationMs = maxOf(player.duration, 0L),
+                                )
+                            startProgressUpdates()
+                        }
+                    }
+
+                    Player.STATE_ENDED -> {
+                        stopProgressUpdates()
+                        _audioUiState.value = AudioPlaybackUiState()
                     }
                 }
+            }
 
-                Player.STATE_ENDED -> {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                val player = exoPlayer ?: return
+                val current = _audioUiState.value
+                if (current.activeMessageId == null) return
+
+                if (isPlaying) {
+                    _audioUiState.value =
+                        current.copy(
+                            status = AudioPlaybackStatus.PLAYING,
+                            durationMs = maxOf(player.duration, 0L),
+                        )
+                    startProgressUpdates()
+                } else if (player.playbackState != Player.STATE_ENDED) {
                     stopProgressUpdates()
-                    _audioUiState.value = AudioPlaybackUiState()
+                    _audioUiState.value =
+                        current.copy(
+                            status = AudioPlaybackStatus.PAUSED,
+                            positionMs = maxOf(player.currentPosition, 0L),
+                            durationMs = maxOf(player.duration, 0L),
+                        )
                 }
             }
-        }
 
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            val player = exoPlayer ?: return
-            val current = _audioUiState.value
-            if (current.activeMessageId == null) return
-
-            if (isPlaying) {
-                _audioUiState.value = current.copy(
-                    status = AudioPlaybackStatus.PLAYING,
-                    durationMs = maxOf(player.duration, 0L)
-                )
-                startProgressUpdates()
-            } else if (player.playbackState != Player.STATE_ENDED) {
+            override fun onPlayerError(error: PlaybackException) {
+                Log.e("VoiceNote", "Error de reproducción: ${error.message}", error)
                 stopProgressUpdates()
-                _audioUiState.value = current.copy(
-                    status = AudioPlaybackStatus.PAUSED,
-                    positionMs = maxOf(player.currentPosition, 0L),
-                    durationMs = maxOf(player.duration, 0L)
-                )
+                _audioUiState.value =
+                    _audioUiState.value.copy(
+                        status = AudioPlaybackStatus.ERROR,
+                        errorMessage = error.message ?: "No se pudo reproducir el audio",
+                    )
             }
         }
-
-        override fun onPlayerError(error: PlaybackException) {
-            Log.e("VoiceNote", "Error de reproducción: ${error.message}", error)
-            stopProgressUpdates()
-            _audioUiState.value = _audioUiState.value.copy(
-                status = AudioPlaybackStatus.ERROR,
-                errorMessage = error.message ?: "No se pudo reproducir el audio"
-            )
-        }
-    }
 
     init {
         if (currentUserId <= 0L || otherUserId <= 0L) {
@@ -264,7 +276,7 @@ class ChatViewModel(
                 initPlayer()
                 // Asegurar autenticación Firebase antes de iniciar listeners
                 authRepository.ensureFirebaseAuthenticated()
-                
+
                 runCatching { initChatFeatures() }
                     .onFailure { throwable ->
                         Log.e(TAG, "Error iniciando features de chat", throwable)
@@ -285,27 +297,30 @@ class ChatViewModel(
     private suspend fun loadPsychologistInfo() {
         if (currentUserId == otherUserId) return
 
-        val psicologoInfo = profileUseCaseGeneral.getPsicologoById(otherUserId).getOrNull()?.usuario
-            ?: profileUseCaseGeneral.getPacienteByIdFirebase(otherUserId).getOrNull()?.usuario
+        val psicologoInfo =
+            profileUseCaseGeneral.getPsicologoById(otherUserId).getOrNull()?.usuario
+                ?: profileUseCaseGeneral.getPacienteByIdFirebase(otherUserId).getOrNull()?.usuario
 
-        val name = if (psicologoInfo != null) {
-            buildString {
-                psicologoInfo.nombre?.let { append(it) }
-                psicologoInfo.apellido?.let {
-                    if (isNotEmpty()) append(" ")
-                    append(it)
+        val name =
+            if (psicologoInfo != null) {
+                buildString {
+                    psicologoInfo.nombre?.let { append(it) }
+                    psicologoInfo.apellido?.let {
+                        if (isNotEmpty()) append(" ")
+                        append(it)
+                    }
                 }
+            } else {
+                otherUserName
             }
-        } else {
-            otherUserName
-        }
 
-        _assignedPsychologist.value = PsychologistInfo(
-            id = otherUserId.toString(),
-            name = name.ifEmpty { "Usuario" },
-            avatarUrl = psicologoInfo?.fotoPerfilUrl,
-            isOnline = _psychologistOnline.value
-        )
+        _assignedPsychologist.value =
+            PsychologistInfo(
+                id = otherUserId.toString(),
+                name = name.ifEmpty { "Usuario" },
+                avatarUrl = psicologoInfo?.fotoPerfilUrl,
+                isOnline = _psychologistOnline.value,
+            )
     }
 
     /**
@@ -313,14 +328,17 @@ class ChatViewModel(
      */
     private fun initPlayer() {
         if (exoPlayer != null) return
-        val audioAttributes = AudioAttributes.Builder()
-            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
-            .setUsage(C.USAGE_MEDIA)
-            .build()
-        exoPlayer = ExoPlayer.Builder(appContext).build().apply {
-            setAudioAttributes(audioAttributes, true)
-            addListener(playerListener)
-        }
+        val audioAttributes =
+            AudioAttributes
+                .Builder()
+                .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                .setUsage(C.USAGE_MEDIA)
+                .build()
+        exoPlayer =
+            ExoPlayer.Builder(appContext).build().apply {
+                setAudioAttributes(audioAttributes, true)
+                addListener(playerListener)
+            }
     }
 
     private var typingJob: Job? = null
@@ -339,15 +357,14 @@ class ChatViewModel(
      */
     private fun initTyping() {
         typingJob?.cancel()
-        typingJob = observeTypingUseCase(currentUserId, otherUserId)
-            .catch { throwable ->
-                Log.e(TAG, "Error observando typing", throwable)
-                _isOtherTyping.value = false
-            }
-            .onEach { isTyping ->
-                _isOtherTyping.value = isTyping
-            }
-            .launchIn(viewModelScope)
+        typingJob =
+            observeTypingUseCase(currentUserId, otherUserId)
+                .catch { throwable ->
+                    Log.e(TAG, "Error observando typing", throwable)
+                    _isOtherTyping.value = false
+                }.onEach { isTyping ->
+                    _isOtherTyping.value = isTyping
+                }.launchIn(viewModelScope)
     }
 
     /**
@@ -355,16 +372,15 @@ class ChatViewModel(
      */
     private fun initOnlineStatus() {
         onlineJob?.cancel()
-        onlineJob = observeUserOnlineUseCase(otherUserId)
-            .catch { throwable ->
-                Log.e(TAG, "Error observando estado online", throwable)
-                _psychologistOnline.value = false
-            }
-            .onEach { isOnline ->
-                _psychologistOnline.value = isOnline
-                updatePsychologistInfo()
-            }
-            .launchIn(viewModelScope)
+        onlineJob =
+            observeUserOnlineUseCase(otherUserId)
+                .catch { throwable ->
+                    Log.e(TAG, "Error observando estado online", throwable)
+                    _psychologistOnline.value = false
+                }.onEach { isOnline ->
+                    _psychologistOnline.value = isOnline
+                    updatePsychologistInfo()
+                }.launchIn(viewModelScope)
     }
 
     /**
@@ -384,23 +400,23 @@ class ChatViewModel(
      */
     fun observeMessages() {
         observeMessagesJob?.cancel()
-        observeMessagesJob = viewModelScope.launch {
-            _isLoading.value = true
-            getMessagesUseCase(currentUserId, otherUserId)
-                .catch { throwable ->
-                    Log.e(TAG, "Error observando mensajes", throwable)
-                    _error.value = throwable.message ?: "No se pudieron cargar los mensajes"
-                    _messages.value = emptyList()
-                    _isLoading.value = false
-                }
-                .collect { messages ->
-                    _error.value = null
-                    _messages.value = messages
-                    _isLoading.value = false
-                    markMessagesAsRead()
-                    markMessagesAsDelivered()
-                }
-        }
+        observeMessagesJob =
+            viewModelScope.launch {
+                _isLoading.value = true
+                getMessagesUseCase(currentUserId, otherUserId)
+                    .catch { throwable ->
+                        Log.e(TAG, "Error observando mensajes", throwable)
+                        _error.value = throwable.message ?: "No se pudieron cargar los mensajes"
+                        _messages.value = emptyList()
+                        _isLoading.value = false
+                    }.collect { messages ->
+                        _error.value = null
+                        _messages.value = messages
+                        _isLoading.value = false
+                        markMessagesAsRead()
+                        markMessagesAsDelivered()
+                    }
+            }
     }
 
     /**
@@ -448,26 +464,32 @@ class ChatViewModel(
      * @param messageId ID del mensaje que contiene el audio.
      * @param remoteUrl URL remota del archivo de audio.
      */
-    fun toggleAudioPlayback(messageId: String, remoteUrl: String) {
+    fun toggleAudioPlayback(
+        messageId: String,
+        remoteUrl: String,
+    ) {
         if (!remoteUrl.startsWith("http")) {
-            _audioUiState.value = AudioPlaybackUiState(
-                status = AudioPlaybackStatus.ERROR,
-                activeMessageId = messageId,
-                errorMessage = "URL de audio inválida"
-            )
+            _audioUiState.value =
+                AudioPlaybackUiState(
+                    status = AudioPlaybackStatus.ERROR,
+                    activeMessageId = messageId,
+                    errorMessage = "URL de audio inválida",
+                )
             return
         }
 
         initPlayer()
-        val player = exoPlayer ?: run {
-            Log.e("VoiceNote", "ExoPlayer no se pudo inicializar")
-            _audioUiState.value = AudioPlaybackUiState(
-                status = AudioPlaybackStatus.ERROR,
-                activeMessageId = messageId,
-                errorMessage = "Error al inicializar el reproductor"
-            )
-            return
-        }
+        val player =
+            exoPlayer ?: run {
+                Log.e("VoiceNote", "ExoPlayer no se pudo inicializar")
+                _audioUiState.value =
+                    AudioPlaybackUiState(
+                        status = AudioPlaybackStatus.ERROR,
+                        activeMessageId = messageId,
+                        errorMessage = "Error al inicializar el reproductor",
+                    )
+                return
+            }
         val current = _audioUiState.value
 
         if (current.activeMessageId == messageId) {
@@ -480,27 +502,31 @@ class ChatViewModel(
         }
 
         stopProgressUpdates()
-        _audioUiState.value = AudioPlaybackUiState(
-            status = AudioPlaybackStatus.LOADING,
-            activeMessageId = messageId
-        )
+        _audioUiState.value =
+            AudioPlaybackUiState(
+                status = AudioPlaybackStatus.LOADING,
+                activeMessageId = messageId,
+            )
 
-        val mimeType = when {
-            remoteUrl.contains(".ogg", ignoreCase = true) -> "audio/ogg"
-            remoteUrl.contains(".m4a", ignoreCase = true) -> "audio/mp4"
-            remoteUrl.contains(".mp3", ignoreCase = true) -> "audio/mpeg"
-            remoteUrl.contains(".wav", ignoreCase = true) -> "audio/wav"
-            else -> null
-        }
+        val mimeType =
+            when {
+                remoteUrl.contains(".ogg", ignoreCase = true) -> "audio/ogg"
+                remoteUrl.contains(".m4a", ignoreCase = true) -> "audio/mp4"
+                remoteUrl.contains(".mp3", ignoreCase = true) -> "audio/mpeg"
+                remoteUrl.contains(".wav", ignoreCase = true) -> "audio/wav"
+                else -> null
+            }
 
-        val mediaItem = if (mimeType != null) {
-            MediaItem.Builder()
-                .setUri(remoteUrl)
-                .setMimeType(mimeType)
-                .build()
-        } else {
-            MediaItem.fromUri(remoteUrl)
-        }
+        val mediaItem =
+            if (mimeType != null) {
+                MediaItem
+                    .Builder()
+                    .setUri(remoteUrl)
+                    .setMimeType(mimeType)
+                    .build()
+            } else {
+                MediaItem.fromUri(remoteUrl)
+            }
 
         Log.d("VoiceNote", "Reproduciendo: $remoteUrl (mime=$mimeType)")
         player.setMediaItem(mediaItem)
@@ -534,18 +560,20 @@ class ChatViewModel(
     private fun startProgressUpdates() {
         val player = exoPlayer ?: return
         progressJob?.cancel()
-        progressJob = viewModelScope.launch {
-            while (isActive && exoPlayer != null) {
-                val currentState = _audioUiState.value
-                if (currentState.activeMessageId == null) break
+        progressJob =
+            viewModelScope.launch {
+                while (isActive && exoPlayer != null) {
+                    val currentState = _audioUiState.value
+                    if (currentState.activeMessageId == null) break
 
-                _audioUiState.value = currentState.copy(
-                    positionMs = maxOf(player.currentPosition, 0L),
-                    durationMs = maxOf(player.duration, 0L)
-                )
-                delay(300)
+                    _audioUiState.value =
+                        currentState.copy(
+                            positionMs = maxOf(player.currentPosition, 0L),
+                            durationMs = maxOf(player.duration, 0L),
+                        )
+                    delay(300)
+                }
             }
-        }
     }
 
     /**
@@ -570,8 +598,7 @@ class ChatViewModel(
 
             sendMessageUseCase(currentUserId, otherUserId, content)
                 .onSuccess {
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     Log.e(TAG, "Error enviando mensaje de texto", e)
                     _error.value = e.message
                 }
@@ -589,12 +616,14 @@ class ChatViewModel(
             stopTyping()
 
             Timber.d("Iniciando flujo de subida de adjunto. Uri: $uri")
-            
+
             // Asegurar que la sesión de Firebase esté activa y fresca antes de subir
             authRepository.ensureFirebaseAuthenticated()
 
-            val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
-            
+            val conversationId =
+                org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+                    .generateRoomId(currentUserId, otherUserId)
+
             Timber.d("Subiendo archivo a Storage... Room: $conversationId")
             when (val result = fileStorageService.uploadFile(uri, conversationId)) {
                 is FileStorageService.UploadResult.Success -> {
@@ -605,7 +634,7 @@ class ChatViewModel(
                         content = "",
                         attachmentUrl = result.url,
                         attachmentType = result.type,
-                        attachmentName = result.fileName
+                        attachmentName = result.fileName,
                     ).onSuccess {
                     }.onFailure { e ->
                         Log.e(TAG, "Error enviando adjunto", e)
@@ -621,6 +650,7 @@ class ChatViewModel(
     }
 
     private val _isRecording = MutableStateFlow(false)
+
     /** Indica si se está grabando una nota de voz en este momento. */
     val isRecording: StateFlow<Boolean> get() = _isRecording.asStateFlow()
 
@@ -637,6 +667,7 @@ class ChatViewModel(
     }
 
     private val _recordingFile = MutableStateFlow<File?>(null)
+
     /** Referencia al archivo de audio que se está grabando actualmente. */
     val recordingFile: StateFlow<File?> get() = _recordingFile.asStateFlow()
 
@@ -664,8 +695,10 @@ class ChatViewModel(
             // Asegurar que la sesión de Firebase esté activa y fresca antes de subir
             authRepository.ensureFirebaseAuthenticated()
 
-            val conversationId = org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService.generateRoomId(currentUserId, otherUserId)
-            
+            val conversationId =
+                org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
+                    .generateRoomId(currentUserId, otherUserId)
+
             Timber.d("Subiendo nota de voz a Storage... Room: $conversationId")
             when (val result = fileStorageService.uploadVoiceNote(file, conversationId)) {
                 is FileStorageService.UploadResult.Success -> {
@@ -676,7 +709,7 @@ class ChatViewModel(
                         content = "",
                         attachmentUrl = result.url,
                         attachmentType = result.type,
-                        attachmentName = result.fileName
+                        attachmentName = result.fileName,
                     )
                 }
                 is FileStorageService.UploadResult.Error -> {

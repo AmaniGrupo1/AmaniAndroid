@@ -6,10 +6,12 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
 
 class NotificacionViewModel(
-    val notificacionUseCase: NotificacionUseCase
+    val notificacionUseCase: NotificacionUseCase,
 ) : ViewModel() {
-
-    fun toggle(id: Long, activar: Boolean) {
+    fun toggle(
+        id: Long,
+        activar: Boolean,
+    ) {
         viewModelScope.launch {
             try {
                 notificacionUseCase.toggleNotificaciones(id, activar)

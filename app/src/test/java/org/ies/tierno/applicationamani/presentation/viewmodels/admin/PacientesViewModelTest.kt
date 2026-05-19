@@ -22,16 +22,24 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PacientesViewModelTest {
-
     private val testDispatcher = UnconfinedTestDispatcher()
     private val getPacientesSinPsicologoUseCase: GetPacientesSinPsicologoUseCase = mockk()
 
-    private val testPaciente = PacienteBasicoResponseDTO(
-        idPaciente = 1L, idUsuario = 10L, nombre = "Juan", apellido = "Perez",
-        email = "j@t.com", dni = "123", fechaNacimiento = "2000-01-01",
-        genero = "Hombre", telefono = "123", direcciones = null, tutores = null,
-        situaciones = null
-    )
+    private val testPaciente =
+        PacienteBasicoResponseDTO(
+            idPaciente = 1L,
+            idUsuario = 10L,
+            nombre = "Juan",
+            apellido = "Perez",
+            email = "j@t.com",
+            dni = "123",
+            fechaNacimiento = "2000-01-01",
+            genero = "Hombre",
+            telefono = "123",
+            direcciones = null,
+            tutores = null,
+            situaciones = null,
+        )
 
     @Before
     fun setUp() {
@@ -53,50 +61,54 @@ class PacientesViewModelTest {
     }
 
     @Test
-    fun `cargarPacientesSinPsicologo success populates list`() = runTest {
-        every { getPacientesSinPsicologoUseCase() } returns flowOf(listOf(testPaciente))
+    fun `cargarPacientesSinPsicologo success populates list`() =
+        runTest {
+            every { getPacientesSinPsicologoUseCase() } returns flowOf(listOf(testPaciente))
 
-        val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
-        viewModel.cargarPacientesSinPsicologo()
-        advanceUntilIdle()
+            val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
+            viewModel.cargarPacientesSinPsicologo()
+            advanceUntilIdle()
 
-        assertEquals(1, viewModel.pacientes.value.size)
-        assertFalse(viewModel.loading.value)
-    }
-
-    @Test
-    fun `cargarPacientesSinPsicologo failure sets empty list`() = runTest {
-        every { getPacientesSinPsicologoUseCase() } returns flow { throw RuntimeException("Error API") }
-
-        val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
-        viewModel.cargarPacientesSinPsicologo()
-        advanceUntilIdle()
-
-        assertTrue(viewModel.pacientes.value.isEmpty())
-    }
+            assertEquals(1, viewModel.pacientes.value.size)
+            assertFalse(viewModel.loading.value)
+        }
 
     @Test
-    fun `cargarPacientesSinPsicologo with empty result sets empty list`() = runTest {
-        every { getPacientesSinPsicologoUseCase() } returns flowOf(emptyList())
+    fun `cargarPacientesSinPsicologo failure sets empty list`() =
+        runTest {
+            every { getPacientesSinPsicologoUseCase() } returns flow { throw RuntimeException("Error API") }
 
-        val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
-        viewModel.cargarPacientesSinPsicologo()
-        advanceUntilIdle()
+            val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
+            viewModel.cargarPacientesSinPsicologo()
+            advanceUntilIdle()
 
-        assertTrue(viewModel.pacientes.value.isEmpty())
-        assertFalse(viewModel.loading.value)
-    }
+            assertTrue(viewModel.pacientes.value.isEmpty())
+        }
 
     @Test
-    fun `boundary loading state during request`() = runTest {
-        every { getPacientesSinPsicologoUseCase() } returns flowOf(emptyList())
+    fun `cargarPacientesSinPsicologo with empty result sets empty list`() =
+        runTest {
+            every { getPacientesSinPsicologoUseCase() } returns flowOf(emptyList())
 
-        val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
-        viewModel.cargarPacientesSinPsicologo()
-        // With UnconfinedTestDispatcher, both state changes happen immediately if flowOf is used
-        // But wait, if it's Unconfined, then loading is already false? 
-        // Actually, for flowOf(emptyList()), it completes immediately.
-        // So I might need a flow that doesn't complete immediately if I want to test the 'true' state.
-        // But the original test wanted to check the state during request.
-    }
+            val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
+            viewModel.cargarPacientesSinPsicologo()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.pacientes.value.isEmpty())
+            assertFalse(viewModel.loading.value)
+        }
+
+    @Test
+    fun `boundary loading state during request`() =
+        runTest {
+            every { getPacientesSinPsicologoUseCase() } returns flowOf(emptyList())
+
+            val viewModel = PacientesViewModel(getPacientesSinPsicologoUseCase)
+            viewModel.cargarPacientesSinPsicologo()
+            // With UnconfinedTestDispatcher, both state changes happen immediately if flowOf is used
+            // But wait, if it's Unconfined, then loading is already false?
+            // Actually, for flowOf(emptyList()), it completes immediately.
+            // So I might need a flow that doesn't complete immediately if I want to test the 'true' state.
+            // But the original test wanted to check the state during request.
+        }
 }

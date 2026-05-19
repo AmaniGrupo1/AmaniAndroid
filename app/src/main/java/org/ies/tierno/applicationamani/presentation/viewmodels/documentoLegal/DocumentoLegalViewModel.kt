@@ -10,9 +10,8 @@ import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestD
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 
 class DocumentoLegalViewModel(
-    private val useCase: DocumentoLegalUseCase
+    private val useCase: DocumentoLegalUseCase,
 ) : ViewModel() {
-
     // =========================
     // ESTADOS UI
     // =========================
@@ -44,8 +43,7 @@ class DocumentoLegalViewModel(
             result
                 .onSuccess {
                     _documentos.value = it
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -66,8 +64,7 @@ class DocumentoLegalViewModel(
             result
                 .onSuccess {
                     getAllDocumentos() // refresca lista
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -80,7 +77,7 @@ class DocumentoLegalViewModel(
     // =========================
     fun editarDocumento(
         idDocumento: Long,
-        request: DocumentoLegalRequestDTO
+        request: DocumentoLegalRequestDTO,
     ) {
         viewModelScope.launch {
             _loading.value = true
@@ -91,8 +88,7 @@ class DocumentoLegalViewModel(
             result
                 .onSuccess {
                     getAllDocumentos() // refresca lista
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -113,8 +109,7 @@ class DocumentoLegalViewModel(
             result
                 .onSuccess {
                     getAllDocumentos() // refresca lista
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -133,11 +128,8 @@ class DocumentoLegalViewModel(
                 useCase.getDocumentoByTipo(tipo)
             result
                 .onSuccess {
-
                     _documentoSeleccionado.value = it
-                }
-                .onFailure {
-
+                }.onFailure {
                     _error.value = it.message
                 }
             _loading.value = false

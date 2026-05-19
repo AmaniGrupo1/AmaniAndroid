@@ -28,46 +28,48 @@ fun ThemeModeSelector(
     currentTema: Boolean,
     userSessionDataStore: UserSessionDataStore? = null,
     session: UserSession?,
-    idiomaViewModel: IdiomaViewModel = koinViewModel()
+    idiomaViewModel: IdiomaViewModel = koinViewModel(),
 ) {
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val colors = LocalAmaniColors.current
 
-    val store = userSessionDataStore ?: try {
-        getKoin().get() as UserSessionDataStore
-    } catch (e: Exception) {
-        UserSessionDataStore(context)
-    }
+    val store =
+        userSessionDataStore ?: try {
+            getKoin().get() as UserSessionDataStore
+        } catch (e: Exception) {
+            UserSessionDataStore(context)
+        }
 
     // Determinar el texto a mostrar según el tema actual
     val currentText = if (currentTema) "Oscuro" else "Claro"
 
     Row(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .weight(1f)
-                .clickable { expanded = true }
-                .padding(start = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .clickable { expanded = true }
+                    .padding(start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = currentText,
-                color = colors.cardContent
+                color = colors.cardContent,
             )
 
             Icon(
                 Icons.Default.ArrowDropDown,
                 contentDescription = null,
                 modifier = Modifier.padding(start = 6.dp),
-                tint = colors.cardContent
+                tint = colors.cardContent,
             )
         }
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
                 text = { Text("Claro", color = colors.cardContent) },
@@ -76,7 +78,7 @@ fun ThemeModeSelector(
                     scope.launch {
                         idiomaViewModel.cambiarTema(false) // false = claro
                     }
-                }
+                },
             )
 
             DropdownMenuItem(
@@ -86,7 +88,7 @@ fun ThemeModeSelector(
                     scope.launch {
                         idiomaViewModel.cambiarTema(true) // true = oscuro
                     }
-                }
+                },
             )
         }
     }

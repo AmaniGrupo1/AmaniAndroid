@@ -11,7 +11,6 @@ import org.ies.tierno.applicationamani.domain.models.diario.SyncStatus
 
 @Dao
 interface DiarioEmocionalDao {
-
     @Query("SELECT * FROM entradas_diario_emocional WHERE syncStatus != 'PENDING_DELETE' ORDER BY createdAt DESC")
     fun observeEntradas(): Flow<List<EntradaDiarioEntity>>
 
@@ -25,10 +24,18 @@ interface DiarioEmocionalDao {
     suspend fun getPendingSync(): List<EntradaDiarioEntity>
 
     @Query("UPDATE entradas_diario_emocional SET syncStatus = :status, lastSyncAttempt = :timestamp WHERE id = :id")
-    suspend fun updateSyncStatus(id: Long, status: SyncStatus, timestamp: Long?)
+    suspend fun updateSyncStatus(
+        id: Long,
+        status: SyncStatus,
+        timestamp: Long?,
+    )
 
     @Query("UPDATE entradas_diario_emocional SET remoteId = :remoteId, syncStatus = :status WHERE id = :localId")
-    suspend fun updateRemoteId(localId: Long, remoteId: Long, status: SyncStatus)
+    suspend fun updateRemoteId(
+        localId: Long,
+        remoteId: Long,
+        status: SyncStatus,
+    )
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertar(entrada: EntradaDiarioEntity): Long

@@ -10,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 
 class CreatePaymentIntentUseCaseTest {
-
     private lateinit var repository: PaymentRepository
     private lateinit var useCase: CreatePaymentIntentUseCase
 
@@ -21,13 +20,14 @@ class CreatePaymentIntentUseCaseTest {
     }
 
     @Test
-    fun `invoke should return result from repository`() = runTest {
-        val citaId = 1L
-        val expected = Result.success(mockk<PaymentIntentResponseDTO>())
-        coEvery { repository.createPaymentIntent(citaId) } returns expected
+    fun `invoke should return result from repository`() =
+        runTest {
+            val citaId = 1L
+            val expected = Result.success(mockk<PaymentIntentResponseDTO>())
+            coEvery { repository.createPaymentIntent(citaId) } returns expected
 
-        val result = useCase(citaId)
+            val result = useCase(citaId)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 }

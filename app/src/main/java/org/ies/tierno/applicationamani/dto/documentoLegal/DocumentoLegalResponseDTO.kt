@@ -12,5 +12,5 @@ data class DocumentoLegalResponseDTO(
     val version: String?,
     val activo: Boolean,
     val creadoEn: String,
-    val actualizadoEn: String
+    val actualizadoEn: String,
 )

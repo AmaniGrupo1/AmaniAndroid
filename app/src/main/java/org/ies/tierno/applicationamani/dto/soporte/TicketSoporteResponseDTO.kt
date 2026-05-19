@@ -31,5 +31,5 @@ data class TicketSoporteResponseDTO(
     val actualizadoEn: LocalDateTime?,
     val cerradoEn: LocalDateTime?,
     val nombreUsuario: String?,
-    val apellidoUsuario: String?
+    val apellidoUsuario: String?,
 )

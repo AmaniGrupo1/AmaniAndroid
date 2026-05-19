@@ -27,7 +27,6 @@ import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SoporteTicketViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val repository: SoporteTicketRepository = mockk()
     private lateinit var viewModel: SoporteTicketViewModel
@@ -50,47 +49,57 @@ class SoporteTicketViewModelTest {
         assertEquals(FiltroTicket.TODOS, viewModel.uiState.value.filtroSeleccionado)
         assertEquals(TipoTicket.PROBLEMA, viewModel.uiState.value.tipoTicket)
         assertEquals(CategoriaTicket.BUG_APP, viewModel.uiState.value.categoria)
-        assertTrue(viewModel.uiState.value.tickets.isEmpty())
-        assertFalse(viewModel.uiState.value.isLoading)
-        assertNull(viewModel.uiState.value.error)
-    }
-
-    @Test
-    fun `cargarTickets loads tickets successfully`() = runTest {
-        val dto = TicketSoporteResponseDTO(
-            idTicket = 1L,
-            titulo = "Bug",
-            descripcion = "Desc",
-            tipo = TipoTicket.PROBLEMA,
-            categoria = CategoriaTicket.BUG_APP,
-            estado = EstadoTicket.ABIERTO,
-            creadoEn = LocalDateTime.now(),
-            actualizadoEn = null,
-            cerradoEn = null,
-            nombreUsuario = null,
-            apellidoUsuario = null
+        assertTrue(
+            viewModel.uiState.value.tickets
+                .isEmpty(),
         )
-        coEvery { repository.getMisTickets() } returns listOf(dto)
-
-        viewModel.cargarTickets()
-        advanceUntilIdle()
-
-        assertEquals(1, viewModel.uiState.value.tickets.size)
-        assertEquals("Bug", viewModel.uiState.value.tickets[0].titulo)
         assertFalse(viewModel.uiState.value.isLoading)
         assertNull(viewModel.uiState.value.error)
     }
 
     @Test
-    fun `cargarTickets shows error on failure`() = runTest {
-        coEvery { repository.getMisTickets() } throws Exception("Network error")
+    fun `cargarTickets loads tickets successfully`() =
+        runTest {
+            val dto =
+                TicketSoporteResponseDTO(
+                    idTicket = 1L,
+                    titulo = "Bug",
+                    descripcion = "Desc",
+                    tipo = TipoTicket.PROBLEMA,
+                    categoria = CategoriaTicket.BUG_APP,
+                    estado = EstadoTicket.ABIERTO,
+                    creadoEn = LocalDateTime.now(),
+                    actualizadoEn = null,
+                    cerradoEn = null,
+                    nombreUsuario = null,
+                    apellidoUsuario = null,
+                )
+            coEvery { repository.getMisTickets() } returns listOf(dto)
 
-        viewModel.cargarTickets()
-        advanceUntilIdle()
+            viewModel.cargarTickets()
+            advanceUntilIdle()
 
-        assertEquals("Network error", viewModel.uiState.value.error)
-        assertFalse(viewModel.uiState.value.isLoading)
-    }
+            assertEquals(1, viewModel.uiState.value.tickets.size)
+            assertEquals(
+                "Bug",
+                viewModel.uiState.value.tickets[0]
+                    .titulo,
+            )
+            assertFalse(viewModel.uiState.value.isLoading)
+            assertNull(viewModel.uiState.value.error)
+        }
+
+    @Test
+    fun `cargarTickets shows error on failure`() =
+        runTest {
+            coEvery { repository.getMisTickets() } throws Exception("Network error")
+
+            viewModel.cargarTickets()
+            advanceUntilIdle()
+
+            assertEquals("Network error", viewModel.uiState.value.error)
+            assertFalse(viewModel.uiState.value.isLoading)
+        }
 
     @Test
     fun `navegarA updates pantallaActual`() {
@@ -136,63 +145,68 @@ class SoporteTicketViewModelTest {
     }
 
     @Test
-    fun `enviarTicket shows error when title blank`() = runTest {
-        viewModel.snackbarMessage.test {
+    fun `enviarTicket shows error when title blank`() =
+        runTest {
+            viewModel.snackbarMessage.test {
+                viewModel.enviarTicket()
+                advanceUntilIdle()
+                assertEquals("Título y descripción son obligatorios.", awaitItem())
+            }
+        }
+
+    @Test
+    fun `enviarTicket shows error when descripcion blank`() =
+        runTest {
+            viewModel.snackbarMessage.test {
+                viewModel.onTituloChange("Título")
+                viewModel.enviarTicket()
+                advanceUntilIdle()
+                assertEquals("Título y descripción son obligatorios.", awaitItem())
+            }
+        }
+
+    @Test
+    fun `enviarTicket creates ticket successfully`() =
+        runTest {
+            val dto =
+                TicketSoporteResponseDTO(
+                    idTicket = 1L,
+                    titulo = "Bug",
+                    descripcion = "Desc",
+                    tipo = TipoTicket.PROBLEMA,
+                    categoria = CategoriaTicket.BUG_APP,
+                    estado = EstadoTicket.ABIERTO,
+                    creadoEn = LocalDateTime.now(),
+                    actualizadoEn = null,
+                    cerradoEn = null,
+                    nombreUsuario = null,
+                    apellidoUsuario = null,
+                )
+            coEvery { repository.crearTicket(any()) } returns dto
+
+            viewModel.onTituloChange("Bug")
+            viewModel.onDescripcionChange("Desc")
             viewModel.enviarTicket()
             advanceUntilIdle()
-            assertEquals("Título y descripción son obligatorios.", awaitItem())
+
+            assertEquals(1, viewModel.uiState.value.tickets.size)
+            assertTrue(viewModel.uiState.value.mostrarToastExito)
+            assertEquals("", viewModel.uiState.value.titulo)
+            assertEquals("", viewModel.uiState.value.descripcion)
         }
-    }
 
     @Test
-    fun `enviarTicket shows error when descripcion blank`() = runTest {
-        viewModel.snackbarMessage.test {
-            viewModel.onTituloChange("Título")
+    fun `enviarTicket shows error on failure`() =
+        runTest {
+            coEvery { repository.crearTicket(any()) } throws Exception("fail")
+
+            viewModel.onTituloChange("Bug")
+            viewModel.onDescripcionChange("Desc")
             viewModel.enviarTicket()
             advanceUntilIdle()
-            assertEquals("Título y descripción son obligatorios.", awaitItem())
+
+            assertEquals("fail", viewModel.uiState.value.error)
         }
-    }
-
-    @Test
-    fun `enviarTicket creates ticket successfully`() = runTest {
-        val dto = TicketSoporteResponseDTO(
-            idTicket = 1L,
-            titulo = "Bug",
-            descripcion = "Desc",
-            tipo = TipoTicket.PROBLEMA,
-            categoria = CategoriaTicket.BUG_APP,
-            estado = EstadoTicket.ABIERTO,
-            creadoEn = LocalDateTime.now(),
-            actualizadoEn = null,
-            cerradoEn = null,
-            nombreUsuario = null,
-            apellidoUsuario = null
-        )
-        coEvery { repository.crearTicket(any()) } returns dto
-
-        viewModel.onTituloChange("Bug")
-        viewModel.onDescripcionChange("Desc")
-        viewModel.enviarTicket()
-        advanceUntilIdle()
-
-        assertEquals(1, viewModel.uiState.value.tickets.size)
-        assertTrue(viewModel.uiState.value.mostrarToastExito)
-        assertEquals("", viewModel.uiState.value.titulo)
-        assertEquals("", viewModel.uiState.value.descripcion)
-    }
-
-    @Test
-    fun `enviarTicket shows error on failure`() = runTest {
-        coEvery { repository.crearTicket(any()) } throws Exception("fail")
-
-        viewModel.onTituloChange("Bug")
-        viewModel.onDescripcionChange("Desc")
-        viewModel.enviarTicket()
-        advanceUntilIdle()
-
-        assertEquals("fail", viewModel.uiState.value.error)
-    }
 
     @Test
     fun `dismissToast resets flag`() {
@@ -212,22 +226,30 @@ class SoporteTicketViewModelTest {
     }
 
     @Test
-    fun `ticketsFiltrados filters by estado`() = runTest {
-        val dto = TicketSoporteResponseDTO(
-            idTicket = 1L, titulo = "T", descripcion = "D",
-            tipo = TipoTicket.PROBLEMA, categoria = CategoriaTicket.BUG_APP,
-            estado = EstadoTicket.ABIERTO, creadoEn = LocalDateTime.now(),
-            actualizadoEn = null, cerradoEn = null,
-            nombreUsuario = null, apellidoUsuario = null
-        )
-        coEvery { repository.getMisTickets() } returns listOf(dto)
-        viewModel.cargarTickets()
-        advanceUntilIdle()
+    fun `ticketsFiltrados filters by estado`() =
+        runTest {
+            val dto =
+                TicketSoporteResponseDTO(
+                    idTicket = 1L,
+                    titulo = "T",
+                    descripcion = "D",
+                    tipo = TipoTicket.PROBLEMA,
+                    categoria = CategoriaTicket.BUG_APP,
+                    estado = EstadoTicket.ABIERTO,
+                    creadoEn = LocalDateTime.now(),
+                    actualizadoEn = null,
+                    cerradoEn = null,
+                    nombreUsuario = null,
+                    apellidoUsuario = null,
+                )
+            coEvery { repository.getMisTickets() } returns listOf(dto)
+            viewModel.cargarTickets()
+            advanceUntilIdle()
 
-        viewModel.seleccionarFiltro(FiltroTicket.ABIERTOS)
-        assertEquals(1, viewModel.ticketsFiltrados.size)
+            viewModel.seleccionarFiltro(FiltroTicket.ABIERTOS)
+            assertEquals(1, viewModel.ticketsFiltrados.size)
 
-        viewModel.seleccionarFiltro(FiltroTicket.CERRADOS)
-        assertEquals(0, viewModel.ticketsFiltrados.size)
-    }
+            viewModel.seleccionarFiltro(FiltroTicket.CERRADOS)
+            assertEquals(0, viewModel.ticketsFiltrados.size)
+        }
 }

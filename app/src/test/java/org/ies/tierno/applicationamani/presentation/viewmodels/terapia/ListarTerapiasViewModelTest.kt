@@ -21,7 +21,6 @@ import java.math.BigDecimal
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListarTerapiasViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val repository: CitasRepository = mockk(relaxed = true)
     private val terapiasGeneralUseCase: TerapiasGeneralUseCase = mockk(relaxed = true)
@@ -37,57 +36,63 @@ class ListarTerapiasViewModelTest {
     }
 
     @Test
-    fun `init loads terapias from repository`() = runTest {
-        val terapias = listOf(
-            TerapiaResponseDTO(idTipo = 1L, nombre = "Cognitivo-Conductual", duracionMinutos = 60, precio = BigDecimal("50"))
-        )
-        coEvery { repository.getTerapias() } returns Result.success(terapias)
+    fun `init loads terapias from repository`() =
+        runTest {
+            val terapias =
+                listOf(
+                    TerapiaResponseDTO(idTipo = 1L, nombre = "Cognitivo-Conductual", duracionMinutos = 60, precio = BigDecimal("50")),
+                )
+            coEvery { repository.getTerapias() } returns Result.success(terapias)
 
-        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
-        advanceUntilIdle()
+            val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
+            advanceUntilIdle()
 
-        assertEquals(1, viewModel.terapias.value.size)
-        assertEquals("Cognitivo-Conductual", viewModel.terapias.value[0].nombre)
-    }
-
-    @Test
-    fun `init on failure sets empty list`() = runTest {
-        coEvery { repository.getTerapias() } returns Result.failure(Exception("Error API"))
-
-        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
-        advanceUntilIdle()
-
-        assertTrue(viewModel.terapias.value.isEmpty())
-    }
+            assertEquals(1, viewModel.terapias.value.size)
+            assertEquals("Cognitivo-Conductual", viewModel.terapias.value[0].nombre)
+        }
 
     @Test
-    fun `cargarTerapias refreshes data`() = runTest {
-        val terapias = listOf(TerapiaResponseDTO(idTipo = 1L, nombre = "Test", duracionMinutos = 60, precio = BigDecimal("50")))
-        coEvery { repository.getTerapias() } returns Result.success(terapias)
+    fun `init on failure sets empty list`() =
+        runTest {
+            coEvery { repository.getTerapias() } returns Result.failure(Exception("Error API"))
 
-        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
-        advanceUntilIdle()
-        assertEquals(1, viewModel.terapias.value.size)
+            val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
+            advanceUntilIdle()
 
-        val nuevasTerapias = listOf(
-            TerapiaResponseDTO(idTipo = 1L, nombre = "Test", duracionMinutos = 60, precio = BigDecimal("50")),
-            TerapiaResponseDTO(idTipo = 2L, nombre = "Otra", duracionMinutos = 45, precio = BigDecimal("40"))
-        )
-        coEvery { repository.getTerapias() } returns Result.success(nuevasTerapias)
-
-        viewModel.cargarTerapias()
-        advanceUntilIdle()
-
-        assertEquals(2, viewModel.terapias.value.size)
-    }
+            assertTrue(viewModel.terapias.value.isEmpty())
+        }
 
     @Test
-    fun `boundary empty terapias list`() = runTest {
-        coEvery { repository.getTerapias() } returns Result.success(emptyList())
+    fun `cargarTerapias refreshes data`() =
+        runTest {
+            val terapias = listOf(TerapiaResponseDTO(idTipo = 1L, nombre = "Test", duracionMinutos = 60, precio = BigDecimal("50")))
+            coEvery { repository.getTerapias() } returns Result.success(terapias)
 
-        val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
-        advanceUntilIdle()
+            val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
+            advanceUntilIdle()
+            assertEquals(1, viewModel.terapias.value.size)
 
-        assertTrue(viewModel.terapias.value.isEmpty())
-    }
+            val nuevasTerapias =
+                listOf(
+                    TerapiaResponseDTO(idTipo = 1L, nombre = "Test", duracionMinutos = 60, precio = BigDecimal("50")),
+                    TerapiaResponseDTO(idTipo = 2L, nombre = "Otra", duracionMinutos = 45, precio = BigDecimal("40")),
+                )
+            coEvery { repository.getTerapias() } returns Result.success(nuevasTerapias)
+
+            viewModel.cargarTerapias()
+            advanceUntilIdle()
+
+            assertEquals(2, viewModel.terapias.value.size)
+        }
+
+    @Test
+    fun `boundary empty terapias list`() =
+        runTest {
+            coEvery { repository.getTerapias() } returns Result.success(emptyList())
+
+            val viewModel = ListarTerapiasViewModel(repository, terapiasGeneralUseCase)
+            advanceUntilIdle()
+
+            assertTrue(viewModel.terapias.value.isEmpty())
+        }
 }

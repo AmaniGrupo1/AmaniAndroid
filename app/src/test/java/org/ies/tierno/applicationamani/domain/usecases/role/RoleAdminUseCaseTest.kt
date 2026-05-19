@@ -12,7 +12,6 @@ import org.junit.Test
 import retrofit2.Response
 
 class RoleAdminUseCaseTest {
-
     private lateinit var repository: AdminRepository
     private lateinit var useCase: RoleAdminUseCase
 
@@ -23,15 +22,16 @@ class RoleAdminUseCaseTest {
     }
 
     @Test
-    fun `invoke should return response from repository`() = runTest {
-        val idUsuario = 1L
-        val nuevoRol = Rol.admin
-        val expected = Response.success(mockk<CambiarRolResponseDTO>())
-        
-        coEvery { repository.cambiarRol(any()) } returns expected
+    fun `invoke should return response from repository`() =
+        runTest {
+            val idUsuario = 1L
+            val nuevoRol = Rol.ADMIN
+            val expected = Response.success(mockk<CambiarRolResponseDTO>())
 
-        val result = useCase(idUsuario, nuevoRol)
+            coEvery { repository.cambiarRol(any()) } returns expected
 
-        assertEquals(expected, result)
-    }
+            val result = useCase(idUsuario, nuevoRol)
+
+            assertEquals(expected, result)
+        }
 }

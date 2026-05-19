@@ -32,9 +32,8 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 @Composable
 fun MenuSetting(
     navController: NavController,
-    idPsicologo: Long?  // ← Asegurar que este parámetro existe
+    idPsicologo: Long?, // ← Asegurar que este parámetro existe
 ) {
-
     LaunchedEffect(idPsicologo) {
         println("ID Psicologo actualizado: $idPsicologo")
     }
@@ -45,15 +44,16 @@ fun MenuSetting(
 
     TopAppBar(
         modifier = Modifier.shadow(elevation = 8.dp),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.primary,
-            titleContentColor = colors.onPrimary
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = colors.primary,
+                titleContentColor = colors.onPrimary,
+            ),
         navigationIcon = {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),
                 contentDescription = stringResource(R.string.nav_inicio),
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(40.dp),
             )
         },
         title = { },
@@ -62,20 +62,20 @@ fun MenuSetting(
                 Icon(
                     Icons.Default.Menu,
                     contentDescription = stringResource(R.string.nav_mas),
-                    tint = colors.onPrimary
+                    tint = colors.onPrimary,
                 )
             }
 
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.nav_perfil), style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.perfilPsicologo.createRoute(idPsicologo))
-                    }
+                    },
                 )
 
                 DropdownMenuItem(
@@ -83,7 +83,7 @@ fun MenuSetting(
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.settingsPsicologo.route)
-                    }
+                    },
                 )
 
                 DropdownMenuItem(
@@ -91,9 +91,9 @@ fun MenuSetting(
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.login.route)
-                    }
+                    },
                 )
             }
-        }
+        },
     )
 }

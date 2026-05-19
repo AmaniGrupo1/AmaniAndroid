@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class GetAllClientAndPsicologoUseCaseTest {
-
     private lateinit var repository: AuthRepository
     private lateinit var useCase: GetAllClientAndPsicologoUseCase
 
@@ -24,41 +23,51 @@ class GetAllClientAndPsicologoUseCaseTest {
     }
 
     @Test
-    fun `invoke should emit list from repository`() = runTest {
-        val list = emptyList<ListaPacientesAndPsicologo>()
-        every { repository.getPacientesConPsicologo() } returns flowOf(list)
+    fun `invoke should emit list from repository`() =
+        runTest {
+            val list = emptyList<ListaPacientesAndPsicologo>()
+            every { repository.getPacientesConPsicologo() } returns flowOf(list)
 
-        useCase().test {
-            assertEquals(list, awaitItem())
-            awaitComplete()
+            useCase().test {
+                assertEquals(list, awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `invoke should emit populated list`() = runTest {
-        val list = listOf(
-            ListaPacientesAndPsicologo(
-                idPsicologo = 1L, nombrePsicologo = "Dr. García", apellidoPsicologo = "López",
-                emailPsicologo = "g@test.com", especialidad = "Clínica", licencia = "LIC1",
-                fechaDadoAlta = "2025-01-01", pacientes = emptyList()
-            )
-        )
-        every { repository.getPacientesConPsicologo() } returns flowOf(list)
+    fun `invoke should emit populated list`() =
+        runTest {
+            val list =
+                listOf(
+                    ListaPacientesAndPsicologo(
+                        idPsicologo = 1L,
+                        nombrePsicologo = "Dr. García",
+                        apellidoPsicologo = "López",
+                        emailPsicologo = "g@test.com",
+                        especialidad = "Clínica",
+                        licencia = "LIC1",
+                        fechaDadoAlta = "2025-01-01",
+                        pacientes = emptyList(),
+                    ),
+                )
+            every { repository.getPacientesConPsicologo() } returns flowOf(list)
 
-        useCase().test {
-            assertEquals(list, awaitItem())
-            awaitComplete()
+            useCase().test {
+                assertEquals(list, awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `invoke should propagate error when repository flow throws`() = runTest {
-        every { repository.getPacientesConPsicologo() } returns flow {
-            throw RuntimeException("Error API")
-        }
+    fun `invoke should propagate error when repository flow throws`() =
+        runTest {
+            every { repository.getPacientesConPsicologo() } returns
+                flow {
+                    throw RuntimeException("Error API")
+                }
 
-        useCase().test {
-            awaitError()
+            useCase().test {
+                awaitError()
+            }
         }
-    }
 }

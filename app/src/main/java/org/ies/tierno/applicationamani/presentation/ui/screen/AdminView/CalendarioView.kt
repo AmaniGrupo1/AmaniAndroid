@@ -61,13 +61,13 @@ fun CalendarioView(
     diasBloqueados: Set<LocalDate> = emptySet(),
     diasNoLaborables: Set<LocalDate> = emptySet(),
     onMesVisibleChange: (YearMonth) -> Unit = {},
-    onFechaSeleccionada: (LocalDate) -> Unit = {}
+    onFechaSeleccionada: (LocalDate) -> Unit = {},
 ) {
     Column(modifier = modifier) {
         CalendarioHeader(
             mesActual = mesVisible,
             onMesAnterior = { onMesVisibleChange(mesVisible.minusMonths(1)) },
-            onMesSiguiente = { onMesVisibleChange(mesVisible.plusMonths(1)) }
+            onMesSiguiente = { onMesVisibleChange(mesVisible.plusMonths(1)) },
         )
         CalendarioDiasSemana()
         CalendarioGrid(
@@ -76,7 +76,7 @@ fun CalendarioView(
             fechasDestacadas = fechasDestacadas,
             diasBloqueados = diasBloqueados,
             diasNoLaborables = diasNoLaborables,
-            onFechaSeleccionada = onFechaSeleccionada
+            onFechaSeleccionada = onFechaSeleccionada,
         )
     }
 }
@@ -89,16 +89,17 @@ fun CalendarioView(
 private fun CalendarioHeader(
     mesActual: YearMonth,
     onMesAnterior: () -> Unit,
-    onMesSiguiente: () -> Unit
+    onMesSiguiente: () -> Unit,
 ) {
     val formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es"))
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onMesAnterior) {
             Icon(Icons.Default.ChevronLeft, contentDescription = "Mes anterior")
@@ -106,7 +107,7 @@ private fun CalendarioHeader(
         Text(
             text = mesActual.format(formatter).replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
         IconButton(onClick = onMesSiguiente) {
             Icon(Icons.Default.ChevronRight, contentDescription = "Mes siguiente")
@@ -127,7 +128,7 @@ private fun CalendarioDiasSemana() {
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -144,17 +145,18 @@ private fun CalendarioGrid(
     fechasDestacadas: Set<LocalDate>,
     diasBloqueados: Set<LocalDate>,
     diasNoLaborables: Set<LocalDate>,
-    onFechaSeleccionada: (LocalDate) -> Unit
+    onFechaSeleccionada: (LocalDate) -> Unit,
 ) {
     val hoy = LocalDate.now()
     val primerDia = mes.atDay(1)
     val offsetInicio = (primerDia.dayOfWeek.value - 1) // 0=Lun, 6=Dom
     val diasEnMes = mes.lengthOfMonth()
 
-    val celdas: List<LocalDate?> = buildList {
-        repeat(offsetInicio) { add(null) }
-        for (dia in 1..diasEnMes) add(mes.atDay(dia))
-    }
+    val celdas: List<LocalDate?> =
+        buildList {
+            repeat(offsetInicio) { add(null) }
+            for (dia in 1..diasEnMes) add(mes.atDay(dia))
+        }
 
     val filas = celdas.chunked(7)
 
@@ -172,7 +174,7 @@ private fun CalendarioGrid(
                         esPasado = fecha != null && fecha.isBefore(hoy),
                         esHoy = fecha == hoy,
                         modifier = Modifier.weight(1f),
-                        onClick = { if (fecha != null && !fecha.isBefore(hoy)) onFechaSeleccionada(fecha) }
+                        onClick = { if (fecha != null && !fecha.isBefore(hoy)) onFechaSeleccionada(fecha) },
                     )
                 }
             }
@@ -204,57 +206,61 @@ private fun CeldaDia(
     esPasado: Boolean,
     esHoy: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
 
     // Determinar color de fondo según el estado
-    val bgColor = when {
-        esSeleccionada -> colors.primary
-        esBloqueado -> colors.errorContainer.copy(alpha = 0.5f)
-        esNoLaborable -> colors.surfaceVariant.copy(alpha = 0.5f)
-        esHoy && !esSeleccionada -> colors.primaryContainer
-        else -> Color.Transparent
-    }
+    val bgColor =
+        when {
+            esSeleccionada -> colors.primary
+            esBloqueado -> colors.errorContainer.copy(alpha = 0.5f)
+            esNoLaborable -> colors.surfaceVariant.copy(alpha = 0.5f)
+            esHoy && !esSeleccionada -> colors.primaryContainer
+            else -> Color.Transparent
+        }
 
     // Determinar color del texto según el estado
-    val textColor = when {
-        esSeleccionada -> colors.onPrimary
-        esBloqueado -> colors.error
-        esNoLaborable -> colors.onSurfaceVariant
-        esPasado -> colors.onSurfaceVariant.copy(alpha = 0.4f)
-        esHoy -> colors.onPrimaryContainer
-        else -> colors.onSurface
-    }
+    val textColor =
+        when {
+            esSeleccionada -> colors.onPrimary
+            esBloqueado -> colors.error
+            esNoLaborable -> colors.onSurfaceVariant
+            esPasado -> colors.onSurfaceVariant.copy(alpha = 0.4f)
+            esHoy -> colors.onPrimaryContainer
+            else -> colors.onSurface
+        }
 
     // Determinar si la celda es clickeable (no puede seleccionar días pasados ni días bloqueados)
     val habilitado = fecha != null && !esPasado
 
     Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(bgColor)
-            .clickable(enabled = habilitado, onClick = onClick),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .aspectRatio(1f)
+                .padding(2.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(bgColor)
+                .clickable(enabled = habilitado, onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = fecha?.dayOfMonth?.toString() ?: "",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = if (esSeleccionada) FontWeight.Bold else FontWeight.Normal,
-                color = textColor
+                color = textColor,
             )
 
             // Punto indicador para fechas con citas (solo si no está seleccionada o bloqueada)
             if (esDestacada && !esSeleccionada && !esBloqueado) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Box(
-                    modifier = Modifier
-                        .size(4.dp)
-                        .clip(CircleShape)
-                        .background(colors.tertiary)
+                    modifier =
+                        Modifier
+                            .size(4.dp)
+                            .clip(CircleShape)
+                            .background(colors.tertiary),
                 )
             }
         }

@@ -6,5 +6,5 @@ data class PsicologoProfileResponseDTO(
     val experiencia: Int? = null,
     val descripcion: String? = null,
     val licencia: String? = null,
-    val usuario: UsuarioProfileResponseDTO? = null
+    val usuario: UsuarioProfileResponseDTO? = null,
 )

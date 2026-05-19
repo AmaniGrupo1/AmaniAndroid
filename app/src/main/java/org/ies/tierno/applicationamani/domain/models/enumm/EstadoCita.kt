@@ -4,11 +4,14 @@ import com.google.gson.annotations.SerializedName
 
 enum class EstadoCita {
     @SerializedName("pendiente")
-    pendiente,
+    PENDIENTE,
+
     @SerializedName("confirmada")
-    confirmada,
+    CONFIRMADA,
+
     @SerializedName("cancelada")
-    cancelada,
+    CANCELADA,
+
     @SerializedName("completada")
-    completada
+    COMPLETADA,
 }

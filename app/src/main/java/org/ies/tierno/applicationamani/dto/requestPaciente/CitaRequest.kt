@@ -12,5 +12,5 @@ data class CitaRequest(
     val estadoPago: String = "PENDIENTE",
     val estado: String? = null,
     val motivo: String? = null,
-    val idTipoTerapia: Long? = null
+    val idTipoTerapia: Long? = null,
 )

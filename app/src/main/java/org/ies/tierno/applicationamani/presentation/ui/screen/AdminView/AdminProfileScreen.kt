@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -50,7 +49,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -69,16 +67,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -87,10 +79,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.ProfileAdminViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -104,7 +92,7 @@ private const val BASE_URL = "http://192.168.1.175:8080"
 fun AdminProfileScreen(
     adminId: Long,
     navController: NavController,
-    viewModel: ProfileAdminViewModel = koinViewModel()
+    viewModel: ProfileAdminViewModel = koinViewModel(),
 ) {
     val imageLoader = koinInject<coil.ImageLoader>()
     val context = LocalContext.current
@@ -159,7 +147,7 @@ fun AdminProfileScreen(
             is ProfileAdminViewModel.UploadStatus.Error -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        (uploadStatus as ProfileAdminViewModel.UploadStatus.Error).message
+                        (uploadStatus as ProfileAdminViewModel.UploadStatus.Error).message,
                     )
                 }
                 viewModel.clearUpload()
@@ -172,59 +160,64 @@ fun AdminProfileScreen(
     var showImageOptions by remember { mutableStateOf(false) }
     var hasCameraPermission by remember {
         mutableStateOf(
-            ContextCompat.checkSelfPermission(context, CAMERA) == PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, CAMERA) == PERMISSION_GRANTED,
         )
     }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.uploadFoto(adminId, it, context)
-            refreshTrigger = System.currentTimeMillis()
-        }
-    }
-
-    // Archivo temporal para la camara
-    val photoFile = remember {
-        File(context.cacheDir, "camera_photo_admin.jpg")
-    }
-    val photoUri = remember(photoFile) {
-        FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            photoFile
-        )
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success: Boolean ->
-        if (success) {
-            viewModel.uploadFoto(adminId, photoUri, context)
-            refreshTrigger = System.currentTimeMillis()
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasCameraPermission = isGranted
-        if (isGranted) {
-            cameraLauncher.launch(photoUri)
-        } else {
-            scope.launch {
-                snackbarHostState.showSnackbar("Permiso de camara denegado")
+    val galleryLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { uri: Uri? ->
+            uri?.let {
+                viewModel.uploadFoto(adminId, it, context)
+                refreshTrigger = System.currentTimeMillis()
             }
         }
-    }
+
+    // Archivo temporal para la camara
+    val photoFile =
+        remember {
+            File(context.cacheDir, "camera_photo_admin.jpg")
+        }
+    val photoUri =
+        remember(photoFile) {
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                photoFile,
+            )
+        }
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicture(),
+        ) { success: Boolean ->
+            if (success) {
+                viewModel.uploadFoto(adminId, photoUri, context)
+                refreshTrigger = System.currentTimeMillis()
+            }
+        }
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            hasCameraPermission = isGranted
+            if (isGranted) {
+                cameraLauncher.launch(photoUri)
+            } else {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Permiso de camara denegado")
+                }
+            }
+        }
 
     fun buildFullImageUrl(relativeUrl: String?): String {
         if (relativeUrl.isNullOrEmpty()) return ""
         if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
             return relativeUrl
         }
-        return "${BASE_URL}${relativeUrl}"
+        return "${BASE_URL}$relativeUrl"
     }
 
     val fullImageUrl = buildFullImageUrl(perfil?.fotoPerfilUrl)
@@ -236,96 +229,105 @@ fun AdminProfileScreen(
                 title = {
                     Text(
                         text = "Mi Perfil",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             )
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.surface)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(MaterialTheme.colorScheme.surface),
         ) {
             when {
                 isLoading && perfil == null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
                     }
                 }
                 perfil != null -> {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 20.dp, vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         // ========== SECCION FOTO DE PERFIL ==========
                         Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 24.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 24.dp),
                             shape = MaterialTheme.shapes.medium,
-                            elevation = CardDefaults.cardElevation(2.dp)
+                            elevation = CardDefaults.cardElevation(2.dp),
                         ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
                                     text = "Foto de Perfil",
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(bottom = 16.dp)
+                                    modifier = Modifier.padding(bottom = 16.dp),
                                 )
 
                                 Box(
                                     modifier = Modifier.size(130.dp),
-                                    contentAlignment = Alignment.BottomEnd
+                                    contentAlignment = Alignment.BottomEnd,
                                 ) {
-                                    val imageUrl = if (fullImageUrl.isEmpty()) {
-                                        R.drawable.ic_default_avatar
-                                    } else {
-                                        "$fullImageUrl?t=$refreshTrigger"
-                                    }
+                                    val imageUrl =
+                                        if (fullImageUrl.isEmpty()) {
+                                            R.drawable.ic_default_avatar
+                                        } else {
+                                            "$fullImageUrl?t=$refreshTrigger"
+                                        }
 
                                     AsyncImage(
-                                        model = ImageRequest.Builder(context)
-                                            .data(imageUrl)
-                                            .crossfade(true)
-                                            .error(R.drawable.ic_default_avatar)
-                                            .placeholder(R.drawable.ic_default_avatar)
-                                            .build(),
+                                        model =
+                                            ImageRequest
+                                                .Builder(context)
+                                                .data(imageUrl)
+                                                .crossfade(true)
+                                                .error(R.drawable.ic_default_avatar)
+                                                .placeholder(R.drawable.ic_default_avatar)
+                                                .build(),
                                         imageLoader = imageLoader,
                                         contentDescription = "Foto de perfil",
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clip(CircleShape)
-                                            .border(
-                                                BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
-                                                CircleShape
-                                            ),
-                                        contentScale = ContentScale.Crop
+                                        modifier =
+                                            Modifier
+                                                .fillMaxSize()
+                                                .clip(CircleShape)
+                                                .border(
+                                                    BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
+                                                    CircleShape,
+                                                ),
+                                        contentScale = ContentScale.Crop,
                                     )
 
                                     FloatingActionButton(
@@ -334,12 +336,12 @@ fun AdminProfileScreen(
                                         containerColor = MaterialTheme.colorScheme.primary,
                                         contentColor = MaterialTheme.colorScheme.onPrimary,
                                         shape = CircleShape,
-                                        elevation = FloatingActionButtonDefaults.elevation(2.dp)
+                                        elevation = FloatingActionButtonDefaults.elevation(2.dp),
                                     ) {
                                         Icon(
                                             Icons.Default.CameraAlt,
                                             contentDescription = "Cambiar foto",
-                                            modifier = Modifier.size(20.dp)
+                                            modifier = Modifier.size(20.dp),
                                         )
                                     }
                                 }
@@ -347,13 +349,13 @@ fun AdminProfileScreen(
                                 Text(
                                     text = "${perfil!!.nombre} ${perfil!!.apellido ?: ""}",
                                     style = MaterialTheme.typography.headlineSmall,
-                                    modifier = Modifier.padding(top = 16.dp)
+                                    modifier = Modifier.padding(top = 16.dp),
                                 )
 
                                 Text(
                                     text = perfil!!.email,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -362,31 +364,32 @@ fun AdminProfileScreen(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium,
-                            elevation = CardDefaults.cardElevation(2.dp)
+                            elevation = CardDefaults.cardElevation(2.dp),
                         ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp)
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
                                         text = "Informacion Personal",
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.primary,
                                     )
                                     if (!isEditing) {
                                         TextButton(
-                                            onClick = { isEditing = true }
+                                            onClick = { isEditing = true },
                                         ) {
                                             Icon(
                                                 Icons.Default.Edit,
                                                 contentDescription = "Editar",
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text("Editar")
@@ -404,7 +407,7 @@ fun AdminProfileScreen(
                                         label = { Text("Nombre") },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
-                                        shape = MaterialTheme.shapes.medium
+                                        shape = MaterialTheme.shapes.medium,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -415,7 +418,7 @@ fun AdminProfileScreen(
                                         label = { Text("Apellido (opcional)") },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
-                                        shape = MaterialTheme.shapes.medium
+                                        shape = MaterialTheme.shapes.medium,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -426,45 +429,46 @@ fun AdminProfileScreen(
                                         label = { Text("Correo electronico") },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
-                                        shape = MaterialTheme.shapes.medium
+                                        shape = MaterialTheme.shapes.medium,
                                     )
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     ) {
                                         Button(
                                             onClick = {
-                                                val updateDto = org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO(
-                                                    nombre = nombreEdit.ifBlank { null },
-                                                    apellido = apellidoEdit.ifBlank { null },
-                                                    email = emailEdit.ifBlank { null }
-                                                )
+                                                val updateDto =
+                                                    org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO(
+                                                        nombre = nombreEdit.ifBlank { null },
+                                                        apellido = apellidoEdit.ifBlank { null },
+                                                        email = emailEdit.ifBlank { null },
+                                                    )
                                                 viewModel.updateProfile(adminId, updateDto)
                                                 isEditing = false
                                             },
                                             modifier = Modifier.weight(1f).height(48.dp),
                                             shape = MaterialTheme.shapes.medium,
-                                            elevation = ButtonDefaults.buttonElevation(2.dp)
+                                            elevation = ButtonDefaults.buttonElevation(2.dp),
                                         ) {
                                             Icon(
                                                 Icons.Default.Save,
                                                 contentDescription = "Guardar",
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
                                                 "Guardar",
-                                                style = MaterialTheme.typography.labelLarge
+                                                style = MaterialTheme.typography.labelLarge,
                                             )
                                         }
 
                                         OutlinedButton(
                                             onClick = { isEditing = false },
                                             modifier = Modifier.weight(1f).height(48.dp),
-                                            shape = MaterialTheme.shapes.medium
+                                            shape = MaterialTheme.shapes.medium,
                                         ) {
                                             Text("Cancelar")
                                         }
@@ -474,7 +478,7 @@ fun AdminProfileScreen(
                                     InfoRowAdmin(
                                         icon = Icons.Default.Person,
                                         label = "Nombre completo",
-                                        value = "${perfil!!.nombre} ${perfil!!.apellido ?: ""}".trim()
+                                        value = "${perfil!!.nombre} ${perfil!!.apellido ?: ""}".trim(),
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -482,7 +486,7 @@ fun AdminProfileScreen(
                                     InfoRowAdmin(
                                         icon = Icons.Default.Email,
                                         label = "Correo electronico",
-                                        value = perfil!!.email
+                                        value = perfil!!.email,
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -490,7 +494,7 @@ fun AdminProfileScreen(
                                     InfoRowAdmin(
                                         icon = Icons.Default.Badge,
                                         label = "Rol",
-                                        value = "Administrador"
+                                        value = "Administrador",
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -498,7 +502,7 @@ fun AdminProfileScreen(
                                     InfoRowAdmin(
                                         icon = Icons.Default.Lock,
                                         label = "ID de usuario",
-                                        value = perfil!!.idUsuario.toString()
+                                        value = perfil!!.idUsuario.toString(),
                                     )
                                 }
                             }
@@ -511,31 +515,32 @@ fun AdminProfileScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium,
                             elevation = CardDefaults.cardElevation(1.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                            )
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                ),
                         ) {
                             Column(
                                 modifier = Modifier.padding(20.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
                                     text = "AMANI Psicologia",
                                     style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "Plataforma de gestion terapeutica",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Version 1.0.0",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -546,7 +551,7 @@ fun AdminProfileScreen(
                 error != null -> {
                     ErrorContentAdmin(
                         error = error!!,
-                        onRetry = { viewModel.fetchProfile(adminId) }
+                        onRetry = { viewModel.fetchProfile(adminId) },
                     )
                 }
             }
@@ -561,19 +566,19 @@ fun AdminProfileScreen(
             title = {
                 Text(
                     text = "Cambiar foto de perfil",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             },
             text = {
                 Text(
                     text = "Selecciona una opcion para obtener la imagen",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             },
             confirmButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Button(
                         onClick = {
@@ -585,17 +590,17 @@ fun AdminProfileScreen(
                             }
                         },
                         modifier = Modifier.weight(1f),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
                             contentDescription = "Camara",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             "Camara",
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                     Button(
@@ -605,20 +610,21 @@ fun AdminProfileScreen(
                         },
                         modifier = Modifier.weight(1f),
                         shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ),
                     ) {
                         Icon(
                             Icons.Default.PhotoLibrary,
                             contentDescription = "Galeria",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             "Galeria",
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }
@@ -627,32 +633,33 @@ fun AdminProfileScreen(
                 TextButton(onClick = { showImageOptions = false }) {
                     Text("Cancelar")
                 }
-            }
+            },
         )
     }
 
     // Mostrar loading overlay mientras sube la foto
     if (uploadStatus is ProfileAdminViewModel.UploadStatus.Loading) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
-                .clickable(enabled = false) { },
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
+                    .clickable(enabled = false) { },
+            contentAlignment = Alignment.Center,
         ) {
             Card(
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Subiendo foto...",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
@@ -664,29 +671,29 @@ fun AdminProfileScreen(
 fun InfoRowAdmin(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
-    value: String
+    value: String,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
     ) {
         Icon(
             icon,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = value.ifEmpty { "No especificado" },
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
@@ -695,41 +702,42 @@ fun InfoRowAdmin(
 @Composable
 fun ErrorContentAdmin(
     error: String,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Default.Error,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.error
+            tint = MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Error al cargar el perfil",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = error,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
-            shape = MaterialTheme.shapes.medium
+            shape = MaterialTheme.shapes.medium,
         ) {
             Icon(
                 Icons.Default.Refresh,
-                contentDescription = null
+                contentDescription = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Reintentar")

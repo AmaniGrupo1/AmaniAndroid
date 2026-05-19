@@ -22,13 +22,12 @@ data class DiarioEmocionalUiState(
     val intensidad: Float = 5f,
     val currentStep: Int = 0,
     val editandoId: Long? = null,
-    val mensajeError: String? = null
+    val mensajeError: String? = null,
 )
 
 class DiarioEmocionalViewModel(
-    private val repository: DiarioEmocionalRepository
+    private val repository: DiarioEmocionalRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(DiarioEmocionalUiState())
     val uiState: StateFlow<DiarioEmocionalUiState> = _uiState.asStateFlow()
 
@@ -83,7 +82,7 @@ class DiarioEmocionalViewModel(
                 subEmocion = "",
                 intensidad = entrada.intensidad.toFloat(),
                 currentStep = 0,
-                mensajeError = null
+                mensajeError = null,
             )
         }
     }
@@ -105,10 +104,16 @@ class DiarioEmocionalViewModel(
                 titulo = state.titulo,
                 contenido = state.contenido,
                 emocion = state.emocion,
-                intensidad = state.intensidad.toInt()
+                intensidad = state.intensidad.toInt(),
             )
             _snackbarMessage.emit(
-                if (state.editandoId == null) "Entrada guardada. Se sincronizará con el servidor." else "Entrada actualizada. Se sincronizará con el servidor."
+                if (state.editandoId ==
+                    null
+                ) {
+                    "Entrada guardada. Se sincronizará con el servidor."
+                } else {
+                    "Entrada actualizada. Se sincronizará con el servidor."
+                },
             )
             limpiarFormulario()
         }
@@ -141,7 +146,7 @@ class DiarioEmocionalViewModel(
                 intensidad = 5f,
                 currentStep = 0,
                 editandoId = null,
-                mensajeError = null
+                mensajeError = null,
             )
         }
     }

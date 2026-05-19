@@ -23,7 +23,7 @@ data class TicketSoporte(
     val estado: EstadoTicket,
     val etiquetaEstado: String,
     val tipo: TipoTicket,
-    val categoria: CategoriaTicket
+    val categoria: CategoriaTicket,
 )
 
 /**
@@ -38,14 +38,14 @@ enum class EstadoTicket(
     val nombreVisual: String,
     val backend: String,
     val colorContenedor: Color,
-    val colorContenido: Color
+    val colorContenido: Color,
 ) {
     @SerializedName("abierto")
     ABIERTO(
         nombreVisual = "ABIERTO",
         backend = "abierto",
         colorContenedor = Color(0xFFDBEAFE),
-        colorContenido = Color(0xFF1E40AF)
+        colorContenido = Color(0xFF1E40AF),
     ),
 
     @SerializedName("en_progreso")
@@ -53,7 +53,7 @@ enum class EstadoTicket(
         nombreVisual = "EN PROCESO",
         backend = "en_progreso",
         colorContenedor = Color(0xFFDCFCE7),
-        colorContenido = Color(0xFF166534)
+        colorContenido = Color(0xFF166534),
     ),
 
     @SerializedName("cerrado")
@@ -61,13 +61,13 @@ enum class EstadoTicket(
         nombreVisual = "CERRADO",
         backend = "cerrado",
         colorContenedor = Color(0xFFF3F4F6),
-        colorContenido = Color(0xFF6B7280)
-    )
+        colorContenido = Color(0xFF6B7280),
+    ),
 }
 
 enum class TipoTicket(
     val backend: String,
-    val display: String
+    val display: String,
 ) {
     @SerializedName("problema")
     PROBLEMA("problema", "Reportar problema"),
@@ -76,19 +76,22 @@ enum class TipoTicket(
     PREGUNTA("pregunta", "Hacer pregunta"),
 
     @SerializedName("sugerencia")
-    SUGERENCIA("sugerencia", "Sugerir mejora")
+    SUGERENCIA("sugerencia", "Sugerir mejora"),
 }
 
 enum class FiltroTicket {
     TODOS,
     ABIERTOS,
-    CERRADOS
+    CERRADOS,
 }
 
 /**
  * Opción de categoría mostrada en la UI y mapeada al backend.
  */
-enum class CategoriaTicket(val display: String, val backend: String) {
+enum class CategoriaTicket(
+    val display: String,
+    val backend: String,
+) {
     @SerializedName("app")
     BUG_APP("Bug en la aplicación", "app"),
 
@@ -102,7 +105,8 @@ enum class CategoriaTicket(val display: String, val backend: String) {
     TECNICO("Rendimiento / técnico", "tecnico"),
 
     @SerializedName("otro")
-    OTRO("Otros", "otro");
+    OTRO("Otros", "otro"),
+    ;
 
     companion object {
         val todas = values().toList()

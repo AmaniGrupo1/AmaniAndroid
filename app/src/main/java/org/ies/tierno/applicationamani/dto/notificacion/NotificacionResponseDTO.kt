@@ -5,5 +5,5 @@ data class NotificacionResponseDTO(
     val titulo: String,
     val mensaje: String,
     val leida: Boolean,
-    val fecha: String // mejor como String por compatibilidad JSON
+    val fecha: String, // mejor como String por compatibilidad JSON
 )

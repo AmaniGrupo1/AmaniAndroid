@@ -14,9 +14,8 @@ import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUse
  */
 class SettingsClienteViewModel(
     private val sessionDataStore: UserSessionDataStore,
-    private val profileUseCase: ProfileUseCaseGeneral
+    private val profileUseCase: ProfileUseCaseGeneral,
 ) : ViewModel() {
-
     var nombre by mutableStateOf("")
     var apellidos by mutableStateOf("")
     var genero by mutableStateOf("")
@@ -36,20 +35,21 @@ class SettingsClienteViewModel(
             try {
                 val session = sessionDataStore.getSession()
                 val idPaciente = session?.idPaciente
-                
+
                 if (idPaciente != null) {
                     val result = profileUseCase.getPacienteById(idPaciente)
-                    result.onSuccess { profile ->
-                        nombre = profile.usuario?.nombre ?: ""
-                        apellidos = profile.usuario?.apellido ?: ""
-                        genero = profile.genero ?: "Hombre"
-                        telefono = profile.telefono ?: ""
-                        // Nota: Dirección y CP pueden requerir otro endpoint o DTO extendido
-                        // Por ahora los mantenemos vacíos o cargamos lo disponible
-                        errorMessage = null
-                    }.onFailure {
-                        errorMessage = "Error al cargar datos del perfil"
-                    }
+                    result
+                        .onSuccess { profile ->
+                            nombre = profile.usuario?.nombre ?: ""
+                            apellidos = profile.usuario?.apellido ?: ""
+                            genero = profile.genero ?: "Hombre"
+                            telefono = profile.telefono ?: ""
+                            // Nota: Dirección y CP pueden requerir otro endpoint o DTO extendido
+                            // Por ahora los mantenemos vacíos o cargamos lo disponible
+                            errorMessage = null
+                        }.onFailure {
+                            errorMessage = "Error al cargar datos del perfil"
+                        }
                 } else {
                     errorMessage = "No se encontró sesión activa"
                 }

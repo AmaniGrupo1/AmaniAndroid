@@ -18,7 +18,6 @@ import retrofit2.Response
 import java.time.LocalDateTime
 
 class SoporteTicketRepositoryTest {
-
     private lateinit var api: SoporteTicketApi
     private lateinit var repository: SoporteTicketRepository
 
@@ -29,56 +28,103 @@ class SoporteTicketRepositoryTest {
     }
 
     @Test
-    fun `getMisTickets should return body when successful`() = runTest {
-        val list = listOf(TicketSoporteResponseDTO(1L, "T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP, EstadoTicket.ABIERTO, LocalDateTime.now(), null, null, null, null))
-        coEvery { api.getMisTickets() } returns Response.success(list)
+    fun `getMisTickets should return body when successful`() =
+        runTest {
+            val list =
+                listOf(
+                    TicketSoporteResponseDTO(
+                        1L,
+                        "T",
+                        "D",
+                        TipoTicket.PROBLEMA,
+                        CategoriaTicket.BUG_APP,
+                        EstadoTicket.ABIERTO,
+                        LocalDateTime.now(),
+                        null,
+                        null,
+                        null,
+                        null,
+                    ),
+                )
+            coEvery { api.getMisTickets() } returns Response.success(list)
 
-        val result = repository.getMisTickets()
+            val result = repository.getMisTickets()
 
-        assertEquals(list, result)
-    }
+            assertEquals(list, result)
+        }
 
     @Test(expected = Exception::class)
-    fun `getMisTickets should throw when not successful`() = runTest {
-        val errorBody = "".toResponseBody("application/json".toMediaTypeOrNull())
-        coEvery { api.getMisTickets() } returns Response.error(500, errorBody)
+    fun `getMisTickets should throw when not successful`() =
+        runTest {
+            val errorBody = "".toResponseBody("application/json".toMediaTypeOrNull())
+            coEvery { api.getMisTickets() } returns Response.error(500, errorBody)
 
-        repository.getMisTickets()
-    }
+            repository.getMisTickets()
+        }
 
     @Test
-    fun `getTicketById should return ticket when successful`() = runTest {
-        val ticket = TicketSoporteResponseDTO(1L, "T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP, EstadoTicket.ABIERTO, LocalDateTime.now(), null, null, null, null)
-        coEvery { api.getTicketById(1L) } returns Response.success(ticket)
+    fun `getTicketById should return ticket when successful`() =
+        runTest {
+            val ticket =
+                TicketSoporteResponseDTO(
+                    1L,
+                    "T",
+                    "D",
+                    TipoTicket.PROBLEMA,
+                    CategoriaTicket.BUG_APP,
+                    EstadoTicket.ABIERTO,
+                    LocalDateTime.now(),
+                    null,
+                    null,
+                    null,
+                    null,
+                )
+            coEvery { api.getTicketById(1L) } returns Response.success(ticket)
 
-        val result = repository.getTicketById(1L)
+            val result = repository.getTicketById(1L)
 
-        assertEquals(ticket, result)
-    }
+            assertEquals(ticket, result)
+        }
 
     @Test(expected = Exception::class)
-    fun `getTicketById should throw when not successful`() = runTest {
-        val errorBody = "".toResponseBody("application/json".toMediaTypeOrNull())
-        coEvery { api.getTicketById(1L) } returns Response.error(404, errorBody)
+    fun `getTicketById should throw when not successful`() =
+        runTest {
+            val errorBody = "".toResponseBody("application/json".toMediaTypeOrNull())
+            coEvery { api.getTicketById(1L) } returns Response.error(404, errorBody)
 
-        repository.getTicketById(1L)
-    }
+            repository.getTicketById(1L)
+        }
 
     @Test
-    fun `crearTicket should return ticket when successful`() = runTest {
-        val ticket = TicketSoporteResponseDTO(1L, "T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP, EstadoTicket.ABIERTO, LocalDateTime.now(), null, null, null, null)
-        coEvery { api.crearTicket(any()) } returns Response.success(ticket)
+    fun `crearTicket should return ticket when successful`() =
+        runTest {
+            val ticket =
+                TicketSoporteResponseDTO(
+                    1L,
+                    "T",
+                    "D",
+                    TipoTicket.PROBLEMA,
+                    CategoriaTicket.BUG_APP,
+                    EstadoTicket.ABIERTO,
+                    LocalDateTime.now(),
+                    null,
+                    null,
+                    null,
+                    null,
+                )
+            coEvery { api.crearTicket(any()) } returns Response.success(ticket)
 
-        val result = repository.crearTicket(TicketSoporteRequestDTO("T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP))
+            val result = repository.crearTicket(TicketSoporteRequestDTO("T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP))
 
-        assertEquals(ticket, result)
-    }
+            assertEquals(ticket, result)
+        }
 
     @Test(expected = Exception::class)
-    fun `crearTicket should throw when not successful`() = runTest {
-        val errorBody = "".toResponseBody("application/json".toMediaTypeOrNull())
-        coEvery { api.crearTicket(any()) } returns Response.error(400, errorBody)
+    fun `crearTicket should throw when not successful`() =
+        runTest {
+            val errorBody = "".toResponseBody("application/json".toMediaTypeOrNull())
+            coEvery { api.crearTicket(any()) } returns Response.error(400, errorBody)
 
-        repository.crearTicket(TicketSoporteRequestDTO("T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP))
-    }
+            repository.crearTicket(TicketSoporteRequestDTO("T", "D", TipoTicket.PROBLEMA, CategoriaTicket.BUG_APP))
+        }
 }

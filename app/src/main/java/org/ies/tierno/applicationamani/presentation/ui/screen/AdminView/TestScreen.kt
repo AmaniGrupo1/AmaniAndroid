@@ -45,7 +45,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TestScreen(
     navController: NavController,
-    crearPreguntaViewModel: CrearPreguntaViewModel = koinViewModel()
+    crearPreguntaViewModel: CrearPreguntaViewModel = koinViewModel(),
 ) {
     val colorButton = android.graphics.Color.parseColor("#CCC0E4")
     val request = crearPreguntaViewModel.request.collectAsState()
@@ -62,99 +62,95 @@ fun TestScreen(
     }
     Scaffold(
         containerColor = Color(colorButton),
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
 
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
-
             Text(
                 text = "Crear pregunta",
                 fontSize = 26.sp,
                 fontFamily = roboto,
-                color = Color.Black
+                color = Color.Black,
             )
 
-
-
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Color.White,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(20.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Color.White,
+                            shape = RoundedCornerShape(20.dp),
+                        ).padding(20.dp),
             ) {
-
                 CampoPregunta(
-                    value = request.value.texto?:"",
+                    value = request.value.texto ?: "",
                     placeholder = "Pregunta",
                     onChange = { crearPreguntaViewModel.setTexto(it) },
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
                 CampoPregunta(
-                    value = request.value.tipo?:"",
+                    value = request.value.tipo ?: "",
                     placeholder = "Tipo de pregunta",
                     onChange = { crearPreguntaViewModel.setTipo(it) },
-                    roboto = roboto
+                    roboto = roboto,
                 )
-
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(0) ?: "",
                     placeholder = "Opción 1",
                     onChange = { crearPreguntaViewModel.setOpcion1(it) },
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(1) ?: "",
                     placeholder = "Opción 2",
                     onChange = { crearPreguntaViewModel.setOpcion2(it) },
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(2) ?: "",
                     placeholder = "Opción 3",
                     onChange = { crearPreguntaViewModel.setOpcion3(it) },
-                    roboto = roboto
+                    roboto = roboto,
                 )
-
 
                 CampoPregunta(
                     value = request.value.opciones?.getOrNull(3) ?: "",
                     placeholder = "Opción 4",
                     onChange = { crearPreguntaViewModel.setOpcion4(it) },
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
-
                 Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
                     shape = RoundedCornerShape(40.dp),
                     onClick = {
                         crearPreguntaViewModel.guardarPregunta()
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(colorButton),
-                        contentColor = Color.Black
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(colorButton),
+                            contentColor = Color.Black,
+                        ),
                 ) {
                     Text(
                         "Guardar pregunta",
                         fontSize = 16.sp,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -175,28 +171,29 @@ fun CampoPregunta(
     value: String,
     placeholder: String,
     onChange: (String) -> Unit,
-    roboto: FontFamily
+    roboto: FontFamily,
 ) {
-
     TextField(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier =
+            Modifier
+                .fillMaxWidth(),
         value = value,
         onValueChange = onChange,
         placeholder = {
             Text(
                 text = placeholder,
-                fontFamily = roboto
+                fontFamily = roboto,
             )
         },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFFF7F7F7),
-            unfocusedContainerColor = Color(0xFFF7F7F7),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            cursorColor = Color.Black
-        )
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFFF7F7F7),
+                unfocusedContainerColor = Color(0xFFF7F7F7),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color.Black,
+            ),
     )
 }

@@ -7,5 +7,5 @@ data class EntradaDiario(
     val emocion: String,
     val intensidad: Int,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
 )

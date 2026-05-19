@@ -16,5 +16,5 @@ data class EntradaDiarioEntity(
     val updatedAt: Long,
     val remoteId: Long? = null,
     val syncStatus: SyncStatus = SyncStatus.SYNCED,
-    val lastSyncAttempt: Long? = null
+    val lastSyncAttempt: Long? = null,
 )

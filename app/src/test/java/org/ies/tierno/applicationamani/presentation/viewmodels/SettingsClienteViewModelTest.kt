@@ -24,7 +24,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsClienteViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val sessionDataStore: UserSessionDataStore = mockk()
     private val profileUseCase: ProfileUseCaseGeneral = mockk()
@@ -42,53 +41,72 @@ class SettingsClienteViewModelTest {
     }
 
     @Test
-    fun `cargarUsuario should load profile when session has idPaciente`() = runTest {
-        coEvery { sessionDataStore.getSession() } returns UserSession(
-            idUsuario = 1L,
-            nombre = "Test",
-            rol = "PACIENTE",
-            idPsicologo = null,
-            idPaciente = 1L
-        )
-        coEvery { profileUseCase.getPacienteById(1L) } returns Result.success(
-            PacienteProfileResponseDTO(idPaciente = 1L, telefono = "123", genero = "Hombre", fechaNacimiento = null, usuario = UsuarioProfileResponseDTO(idUsuario = 1L, nombre = "Test", apellido = null, email = null, fotoPerfilUrl = null))
-        )
+    fun `cargarUsuario should load profile when session has idPaciente`() =
+        runTest {
+            coEvery { sessionDataStore.getSession() } returns
+                UserSession(
+                    idUsuario = 1L,
+                    nombre = "Test",
+                    rol = "PACIENTE",
+                    idPsicologo = null,
+                    idPaciente = 1L,
+                )
+            coEvery { profileUseCase.getPacienteById(1L) } returns
+                Result.success(
+                    PacienteProfileResponseDTO(
+                        idPaciente = 1L,
+                        telefono = "123",
+                        genero = "Hombre",
+                        fechaNacimiento = null,
+                        usuario =
+                            UsuarioProfileResponseDTO(
+                                idUsuario = 1L,
+                                nombre = "Test",
+                                apellido = null,
+                                email = null,
+                                fotoPerfilUrl = null,
+                            ),
+                    ),
+                )
 
-        viewModel.cargarUsuario()
-        advanceUntilIdle()
+            viewModel.cargarUsuario()
+            advanceUntilIdle()
 
-        assertEquals("Test", viewModel.nombre)
-        assertNull(viewModel.errorMessage)
-        assertFalse(viewModel.isLoading)
-        coVerify { profileUseCase.getPacienteById(1L) }
-    }
+            assertEquals("Test", viewModel.nombre)
+            assertNull(viewModel.errorMessage)
+            assertFalse(viewModel.isLoading)
+            coVerify { profileUseCase.getPacienteById(1L) }
+        }
 
     @Test
-    fun `cargarUsuario should show error when no session`() = runTest {
-        coEvery { sessionDataStore.getSession() } returns null
+    fun `cargarUsuario should show error when no session`() =
+        runTest {
+            coEvery { sessionDataStore.getSession() } returns null
 
-        viewModel.cargarUsuario()
-        advanceUntilIdle()
+            viewModel.cargarUsuario()
+            advanceUntilIdle()
 
-        assertEquals("No se encontró sesión activa", viewModel.errorMessage)
-        assertFalse(viewModel.isLoading)
-    }
+            assertEquals("No se encontró sesión activa", viewModel.errorMessage)
+            assertFalse(viewModel.isLoading)
+        }
 
     @Test
-    fun `cargarUsuario should show error when profile fails`() = runTest {
-        coEvery { sessionDataStore.getSession() } returns UserSession(
-            idUsuario = 1L,
-            nombre = "Test",
-            rol = "PACIENTE",
-            idPsicologo = null,
-            idPaciente = 1L
-        )
-        coEvery { profileUseCase.getPacienteById(1L) } returns Result.failure(Exception("fail"))
+    fun `cargarUsuario should show error when profile fails`() =
+        runTest {
+            coEvery { sessionDataStore.getSession() } returns
+                UserSession(
+                    idUsuario = 1L,
+                    nombre = "Test",
+                    rol = "PACIENTE",
+                    idPsicologo = null,
+                    idPaciente = 1L,
+                )
+            coEvery { profileUseCase.getPacienteById(1L) } returns Result.failure(Exception("fail"))
 
-        viewModel.cargarUsuario()
-        advanceUntilIdle()
+            viewModel.cargarUsuario()
+            advanceUntilIdle()
 
-        assertEquals("Error al cargar datos del perfil", viewModel.errorMessage)
-        assertFalse(viewModel.isLoading)
-    }
+            assertEquals("Error al cargar datos del perfil", viewModel.errorMessage)
+            assertFalse(viewModel.isLoading)
+        }
 }

@@ -8,5 +8,5 @@ data class FranjaDisponibilidadResponse(
     val horaFin: LocalTime? = null,
     @SerializedName("ocupado")
     val ocupado: Boolean = false,
-    val descripcion: String? = null
+    val descripcion: String? = null,
 )

@@ -27,39 +27,40 @@ enum class AdminNavItem {
     MENSAJES,
     CALENDARIO,
     ESTADISTICAS,
-    CONFIGURACION
+    CONFIGURACION,
 }
 
 @Composable
 fun BarraNavegationInferiorAdmin(
     navController: NavController,
     selectedItem: AdminNavItem,
-    onItemSelected: (AdminNavItem) -> Unit
+    onItemSelected: (AdminNavItem) -> Unit,
 ) {
     data class NavDest(
         val item: AdminNavItem,
         @StringRes val labelRes: Int,
         val icon: ImageVector,
-        val route: String? = null
+        val route: String? = null,
     )
 
-    val destinations = listOf(
-        NavDest(
-            AdminNavItem.DOCUMENTOS,
-            R.string.nav_documentos,
-            Icons.Outlined.Description,
-            Screens.adminHome.route
-        ),
-        NavDest(AdminNavItem.MENSAJES, R.string.nav_mensajes, Icons.Outlined.ChatBubbleOutline),
-        NavDest(
-            AdminNavItem.CALENDARIO,
-            R.string.nav_calendario,
-            Icons.Outlined.CalendarToday,
-            Screens.psicologoAgenda.route
-        ),
-        NavDest(AdminNavItem.ESTADISTICAS, R.string.nav_estadisticas, Icons.AutoMirrored.Outlined.ShowChart),
-        NavDest(AdminNavItem.CONFIGURACION, R.string.nav_ajustes, Icons.Outlined.Settings)
-    )
+    val destinations =
+        listOf(
+            NavDest(
+                AdminNavItem.DOCUMENTOS,
+                R.string.nav_documentos,
+                Icons.Outlined.Description,
+                Screens.adminHome.route,
+            ),
+            NavDest(AdminNavItem.MENSAJES, R.string.nav_mensajes, Icons.Outlined.ChatBubbleOutline),
+            NavDest(
+                AdminNavItem.CALENDARIO,
+                R.string.nav_calendario,
+                Icons.Outlined.CalendarToday,
+                Screens.psicologoAgenda.route,
+            ),
+            NavDest(AdminNavItem.ESTADISTICAS, R.string.nav_estadisticas, Icons.AutoMirrored.Outlined.ShowChart),
+            NavDest(AdminNavItem.CONFIGURACION, R.string.nav_ajustes, Icons.Outlined.Settings),
+        )
 
     NavigationBar(
         tonalElevation = 3.dp,
@@ -76,13 +77,14 @@ fun BarraNavegationInferiorAdmin(
                 label = {
                     Text(stringResource(dest.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
             )
         }
     }

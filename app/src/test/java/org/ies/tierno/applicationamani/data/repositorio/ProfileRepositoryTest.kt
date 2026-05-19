@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ProfileRepositoryTest {
-
     private lateinit var api: ProfileApi
     private lateinit var repository: ProfileRepository
 
@@ -25,75 +24,116 @@ class ProfileRepositoryTest {
     }
 
     @Test
-    fun `getProfile should return success`() = runTest {
-        val dto = PsicologoProfileResponseDTO(idPsicologo = 1L, especialidad = "N", experiencia = 5, descripcion = "D", licencia = "123", usuario = null)
-        coEvery { api.getProfilePsicologo(1L) } returns dto
+    fun `getProfile should return success`() =
+        runTest {
+            val dto =
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 1L,
+                    especialidad = "N",
+                    experiencia = 5,
+                    descripcion = "D",
+                    licencia = "123",
+                    usuario = null,
+                )
+            coEvery { api.getProfilePsicologo(1L) } returns dto
 
-        val result = repository.getProfile(1L)
+            val result = repository.getProfile(1L)
 
-        assertTrue(result.isSuccess)
-        assertEquals(dto, result.getOrNull())
-    }
-
-    @Test
-    fun `getProfile should return failure on exception`() = runTest {
-        coEvery { api.getProfilePsicologo(1L) } throws Exception("fail")
-
-        val result = repository.getProfile(1L)
-
-        assertTrue(result.isFailure)
-    }
-
-    @Test
-    fun `uploadFoto should return success`() = runTest {
-        val dto = PsicologoProfileResponseDTO(idPsicologo = 1L, especialidad = "N", experiencia = 5, descripcion = "D", licencia = "123", usuario = null)
-        val file = mockk<MultipartBody.Part>()
-        coEvery { api.uploadFoto(1L, file) } returns dto
-
-        val result = repository.uploadFoto(1L, file)
-
-        assertTrue(result.isSuccess)
-        coVerify { api.uploadFoto(1L, file) }
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(dto, result.getOrNull())
+        }
 
     @Test
-    fun `obtenerPsicologoAsignado should return success`() = runTest {
-        val dto = PsicologoProfileResponseDTO(idPsicologo = 1L, especialidad = "N", experiencia = 5, descripcion = "D", licencia = "123", usuario = null)
-        coEvery { api.obtenerPsicologoAsignado(1L) } returns dto
+    fun `getProfile should return failure on exception`() =
+        runTest {
+            coEvery { api.getProfilePsicologo(1L) } throws Exception("fail")
 
-        val result = repository.obtenerPsicologoAsignado(1L)
+            val result = repository.getProfile(1L)
 
-        assertTrue(result.isSuccess)
-    }
-
-    @Test
-    fun `getPacienteById should return success`() = runTest {
-        val dto = PacienteProfileResponseDTO(idPaciente = 1L, telefono = "123", genero = "Hombre", fechaNacimiento = null, usuario = null)
-        coEvery { api.getPacienteById(1L) } returns dto
-
-        val result = repository.getPacienteById(1L)
-
-        assertTrue(result.isSuccess)
-        assertEquals(dto, result.getOrNull())
-    }
+            assertTrue(result.isFailure)
+        }
 
     @Test
-    fun `getPacienteByIdFirebase should return success`() = runTest {
-        val dto = PacienteProfileResponseDTO(idPaciente = 1L, telefono = "123", genero = "Hombre", fechaNacimiento = null, usuario = null)
-        coEvery { api.getPacienteByIdFirebase(1L) } returns dto
+    fun `uploadFoto should return success`() =
+        runTest {
+            val dto =
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 1L,
+                    especialidad = "N",
+                    experiencia = 5,
+                    descripcion = "D",
+                    licencia = "123",
+                    usuario = null,
+                )
+            val file = mockk<MultipartBody.Part>()
+            coEvery { api.uploadFoto(1L, file) } returns dto
 
-        val result = repository.getPacienteByIdFirebase(1L)
+            val result = repository.uploadFoto(1L, file)
 
-        assertTrue(result.isSuccess)
-    }
+            assertTrue(result.isSuccess)
+            coVerify { api.uploadFoto(1L, file) }
+        }
 
     @Test
-    fun `getPsicologoById should return success`() = runTest {
-        val dto = PsicologoProfileResponseDTO(idPsicologo = 1L, especialidad = "N", experiencia = 5, descripcion = "D", licencia = "123", usuario = null)
-        coEvery { api.getPsicologoById(1L) } returns dto
+    fun `obtenerPsicologoAsignado should return success`() =
+        runTest {
+            val dto =
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 1L,
+                    especialidad = "N",
+                    experiencia = 5,
+                    descripcion = "D",
+                    licencia = "123",
+                    usuario = null,
+                )
+            coEvery { api.obtenerPsicologoAsignado(1L) } returns dto
 
-        val result = repository.getPsicologoById(1L)
+            val result = repository.obtenerPsicologoAsignado(1L)
 
-        assertTrue(result.isSuccess)
-    }
+            assertTrue(result.isSuccess)
+        }
+
+    @Test
+    fun `getPacienteById should return success`() =
+        runTest {
+            val dto =
+                PacienteProfileResponseDTO(idPaciente = 1L, telefono = "123", genero = "Hombre", fechaNacimiento = null, usuario = null)
+            coEvery { api.getPacienteById(1L) } returns dto
+
+            val result = repository.getPacienteById(1L)
+
+            assertTrue(result.isSuccess)
+            assertEquals(dto, result.getOrNull())
+        }
+
+    @Test
+    fun `getPacienteByIdFirebase should return success`() =
+        runTest {
+            val dto =
+                PacienteProfileResponseDTO(idPaciente = 1L, telefono = "123", genero = "Hombre", fechaNacimiento = null, usuario = null)
+            coEvery { api.getPacienteByIdFirebase(1L) } returns dto
+
+            val result = repository.getPacienteByIdFirebase(1L)
+
+            assertTrue(result.isSuccess)
+        }
+
+    @Test
+    fun `getPsicologoById should return success`() =
+        runTest {
+            val dto =
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 1L,
+                    especialidad = "N",
+                    experiencia = 5,
+                    descripcion = "D",
+                    licencia = "123",
+                    usuario = null,
+                )
+            coEvery { api.getPsicologoById(1L) } returns dto
+
+            val result = repository.getPsicologoById(1L)
+
+            assertTrue(result.isSuccess)
+        }
 }

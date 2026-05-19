@@ -12,5 +12,5 @@ data class CitaDetalleResponse(
     val psicologoNombre: String? = null,
     val motivo: String? = null,
     val estado: String? = null,
-    val durationMinutes: Int? = null
+    val durationMinutes: Int? = null,
 )

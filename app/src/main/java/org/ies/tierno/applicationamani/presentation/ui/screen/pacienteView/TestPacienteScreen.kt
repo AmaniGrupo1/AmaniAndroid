@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-
 /**
  * Pantalla de test del paciente (placeholder).
  *
@@ -16,17 +15,15 @@ import androidx.compose.ui.Modifier
  * Pendiente de implementar la lógica de visualización de test asignados.
  */
 @Composable
-fun TestPacienteScreen(
-
-){
-    Scaffold{
-        innerPadding ->
+fun TestPacienteScreen() {
+    Scaffold { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
         }
     }
 }

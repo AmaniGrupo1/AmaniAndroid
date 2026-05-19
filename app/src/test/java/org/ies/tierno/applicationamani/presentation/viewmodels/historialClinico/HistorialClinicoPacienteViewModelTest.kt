@@ -19,7 +19,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HistorialClinicoPacienteViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: HistorialClinicoUseCase
     private lateinit var viewModel: HistorialClinicoPacienteViewModel
@@ -37,37 +36,40 @@ class HistorialClinicoPacienteViewModelTest {
     }
 
     @Test
-    fun `cargarHistorialClinico updates historial on success`() = runTest {
-        val expected = listOf(mockk<HistorialClinicoResponseDTO>())
-        coEvery { useCase.getHistorialClinico(any(), any()) } returns expected
+    fun `cargarHistorialClinico updates historial on success`() =
+        runTest {
+            val expected = listOf(mockk<HistorialClinicoResponseDTO>())
+            coEvery { useCase.getHistorialClinico(any(), any()) } returns expected
 
-        viewModel.cargarHistorialClinico(1L, "token")
-        advanceUntilIdle()
+            viewModel.cargarHistorialClinico(1L, "token")
+            advanceUntilIdle()
 
-        assertEquals(expected, viewModel.historial.value)
-        assertNull(viewModel.error.value)
-    }
-
-    @Test
-    fun `crearHistorialClinico updates historialCreado on success`() = runTest {
-        val expected = mockk<HistorialClinicoResponseDTO>()
-        coEvery { useCase.createHistorialClinico(any()) } returns expected
-
-        viewModel.crearHistorialClinico(mockk())
-        advanceUntilIdle()
-
-        assertEquals(expected, viewModel.historialCreado.value)
-    }
+            assertEquals(expected, viewModel.historial.value)
+            assertNull(viewModel.error.value)
+        }
 
     @Test
-    fun `resetHistorialCreado sets it to null`() = runTest {
-        // First set it
-        val expected = mockk<HistorialClinicoResponseDTO>()
-        coEvery { useCase.createHistorialClinico(any()) } returns expected
-        viewModel.crearHistorialClinico(mockk())
-        advanceUntilIdle()
+    fun `crearHistorialClinico updates historialCreado on success`() =
+        runTest {
+            val expected = mockk<HistorialClinicoResponseDTO>()
+            coEvery { useCase.createHistorialClinico(any()) } returns expected
 
-        viewModel.resetHistorialCreado()
-        assertNull(viewModel.historialCreado.value)
-    }
+            viewModel.crearHistorialClinico(mockk())
+            advanceUntilIdle()
+
+            assertEquals(expected, viewModel.historialCreado.value)
+        }
+
+    @Test
+    fun `resetHistorialCreado sets it to null`() =
+        runTest {
+            // First set it
+            val expected = mockk<HistorialClinicoResponseDTO>()
+            coEvery { useCase.createHistorialClinico(any()) } returns expected
+            viewModel.crearHistorialClinico(mockk())
+            advanceUntilIdle()
+
+            viewModel.resetHistorialCreado()
+            assertNull(viewModel.historialCreado.value)
+        }
 }

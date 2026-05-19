@@ -5,8 +5,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,37 +30,39 @@ fun DarAltaPsicologo(
     showBackButton: Boolean = false,
     showLogo: Boolean = false,
     onLogout: (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
 
     TopAppBar(
-        modifier = Modifier
-            .shadow(elevation = 4.dp, shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp)),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.primary,
-            titleContentColor = colors.onPrimary,
-            navigationIconContentColor = colors.onPrimary,
-            actionIconContentColor = colors.onPrimary
-        ),
+        modifier =
+            Modifier
+                .shadow(elevation = 4.dp, shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp)),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = colors.primary,
+                titleContentColor = colors.onPrimary,
+                navigationIconContentColor = colors.onPrimary,
+                actionIconContentColor = colors.onPrimary,
+            ),
         title = {
             AnimatedContent(
                 targetState = showLogo to title,
                 transitionSpec = {
                     fadeIn().togetherWith(fadeOut())
-                }
+                },
             ) { (showLogoValue, titleValue) ->
                 if (showLogoValue) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.Center,
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
                             contentDescription = "Logo",
                             modifier = Modifier.size(32.dp),
-                            tint = Color.Unspecified
+                            tint = Color.Unspecified,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -70,7 +70,7 @@ fun DarAltaPsicologo(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = colors.onPrimary,
-                            maxLines = 1
+                            maxLines = 1,
                         )
                     }
                 } else {
@@ -80,7 +80,7 @@ fun DarAltaPsicologo(
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onPrimary,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -89,66 +89,67 @@ fun DarAltaPsicologo(
             actions()
 
             IconButton(
-                onClick = { /* Navegar a notificaciones */ }
+                onClick = { /* Navegar a notificaciones */ },
             ) {
                 Badge(
                     containerColor = colors.error,
-                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp)
+                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp),
                 ) {
                     Text("3", fontSize = 10.sp)
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = "Notificaciones",
-                    tint = colors.onPrimary
+                    tint = colors.onPrimary,
                 )
             }
 
             IconButton(
-                onClick = { expanded = true }
+                onClick = { expanded = true },
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Menú de navegación",
-                    tint = colors.onPrimary
+                    tint = colors.onPrimary,
                 )
             }
 
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .shadow(elevation = 8.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .width(280.dp),
-                shape = RoundedCornerShape(12.dp)
+                modifier =
+                    Modifier
+                        .shadow(elevation = 8.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .width(280.dp),
+                shape = RoundedCornerShape(12.dp),
             ) {
                 DropdownMenuItem(
                     text = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Psychology,
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
                                 text = "Dar de alta psicólogo",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.listarPsicologosBaja.route)
-                    }
+                    },
                 )
             }
-        }
+        },
     )
 }

@@ -35,13 +35,15 @@ fun programarRecordatorioCita(
     hora: LocalTime,
     minutosAntes: Int = 30,
     titulo: String = "Recordatorio – Amani",
-    mensaje: String = "Tu cita es en $minutosAntes minutos"
+    mensaje: String = "Tu cita es en $minutosAntes minutos",
 ) {
-    val triggerMillis = fecha.atTime(hora)
-        .minusMinutes(minutosAntes.toLong())
-        .atZone(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli()
+    val triggerMillis =
+        fecha
+            .atTime(hora)
+            .minusMinutes(minutosAntes.toLong())
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
 
     val now = System.currentTimeMillis()
 
@@ -54,18 +56,21 @@ fun programarRecordatorioCita(
     val delayMillis = triggerMillis - now
 
     // Tag único para poder cancelar este recordatorio concreto
-    val tag = "cita_${fecha}_${hora}"
+    val tag = "cita_${fecha}_$hora"
 
-    val inputData = Data.Builder()
-        .putString(CitaNotificationWorker.KEY_TITULO, titulo)
-        .putString(CitaNotificationWorker.KEY_MENSAJE, mensaje)
-        .build()
+    val inputData =
+        Data
+            .Builder()
+            .putString(CitaNotificationWorker.KEY_TITULO, titulo)
+            .putString(CitaNotificationWorker.KEY_MENSAJE, mensaje)
+            .build()
 
-    val workRequest = OneTimeWorkRequestBuilder<CitaNotificationWorker>()
-        .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
-        .setInputData(inputData)
-        .addTag(tag)
-        .build()
+    val workRequest =
+        OneTimeWorkRequestBuilder<CitaNotificationWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(inputData)
+            .addTag(tag)
+            .build()
 
     val workManager = WorkManager.getInstance(context)
 
@@ -97,9 +102,9 @@ fun programarRecordatorioCita(
 fun cancelarRecordatorioCita(
     context: Context,
     fecha: LocalDate,
-    hora: LocalTime
+    hora: LocalTime,
 ) {
-    val tag = "cita_${fecha}_${hora}"
+    val tag = "cita_${fecha}_$hora"
     runCatching {
         WorkManager.getInstance(context).cancelAllWorkByTag(tag)
     }.onSuccess {
@@ -108,4 +113,3 @@ fun cancelarRecordatorioCita(
         Timber.e(e, "Error al cancelar WorkManager [tag=$tag]")
     }
 }
-

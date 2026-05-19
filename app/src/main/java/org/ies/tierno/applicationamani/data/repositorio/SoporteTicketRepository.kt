@@ -13,9 +13,8 @@ import timber.log.Timber
  * suspendidas para crear y listar tickets.
  */
 class SoporteTicketRepository(
-    private val api: SoporteTicketApi
+    private val api: SoporteTicketApi,
 ) {
-
     /**
      * Obtiene la lista de tickets del usuario autenticado.
      *
@@ -64,7 +63,9 @@ class SoporteTicketRepository(
             Timber.i("Repositorio: Ticket creado con \u00e9xito. ID: ${body.idTicket}")
             return body
         } else {
-            Timber.e("Repositorio: Error HTTP al crear ticket. C\u00f3digo: ${response.code()}, ErrorBody: ${response.errorBody()?.string()}")
+            Timber.e(
+                "Repositorio: Error HTTP al crear ticket. C\u00f3digo: ${response.code()}, ErrorBody: ${response.errorBody()?.string()}",
+            )
             throw Exception("Error al crear ticket: ${response.code()}")
         }
     }

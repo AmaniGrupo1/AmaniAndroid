@@ -1,6 +1,4 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal
-import androidx.compose.foundation.shape.CircleShape
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -31,11 +29,9 @@ import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +42,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -64,27 +59,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.TipoDocumentoLegal
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -93,7 +78,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun GestionDocumentosScreen(
     navController: NavController,
-    viewModel: DocumentoLegalViewModel = koinViewModel()
+    viewModel: DocumentoLegalViewModel = koinViewModel(),
 ) {
     val documentos by viewModel.documentos.collectAsStateWithLifecycle()
     val isLoading by viewModel.loading.collectAsStateWithLifecycle()
@@ -127,14 +112,14 @@ fun GestionDocumentosScreen(
                 title = {
                     Text(
                         "Gestion de Documentos",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
                         )
                     }
                 },
@@ -142,44 +127,46 @@ fun GestionDocumentosScreen(
                     IconButton(onClick = { mostrarDialogoCrear = true }) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Nuevo documento"
+                            contentDescription = "Nuevo documento",
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             when {
                 isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(48.dp),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "Cargando documentos...",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -187,7 +174,7 @@ fun GestionDocumentosScreen(
 
                 documentos.isEmpty() -> {
                     EmptyDocumentState(
-                        onCreateClick = { mostrarDialogoCrear = true }
+                        onCreateClick = { mostrarDialogoCrear = true },
                     )
                 }
 
@@ -195,7 +182,7 @@ fun GestionDocumentosScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(documentos) { documento ->
                             DocumentoCard(
@@ -207,7 +194,7 @@ fun GestionDocumentosScreen(
                                         snackbarHostState.showSnackbar("Documento eliminado")
                                     }
                                 },
-                                onClick = { documentoSeleccionado = documento }
+                                onClick = { documentoSeleccionado = documento },
                             )
                         }
                     }
@@ -236,7 +223,7 @@ fun GestionDocumentosScreen(
                     mostrarDialogoCrear = false
                     documentoEditando = null
                 }
-            }
+            },
         )
     }
 
@@ -244,35 +231,33 @@ fun GestionDocumentosScreen(
     if (documentoSeleccionado != null) {
         DialogoVerDocumento(
             documento = documentoSeleccionado!!,
-            onDismiss = { documentoSeleccionado = null }
+            onDismiss = { documentoSeleccionado = null },
         )
     }
 }
 
 @Composable
-fun EmptyDocumentState(
-    onCreateClick: () -> Unit
-) {
+fun EmptyDocumentState(onCreateClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp),
         ) {
             Surface(
                 modifier = Modifier.size(100.dp),
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer
+                color = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }
@@ -282,23 +267,23 @@ fun EmptyDocumentState(
             Text(
                 text = "No hay documentos creados",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Crea politicas de seguridad, terminos y condiciones,\n o cualquier documento legal para tus pacientes",
+                text = "Crea politicas de seguridad, terminos y condiciones, o cualquier documento legal para tus pacientes",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = onCreateClick,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Crear")
                 Spacer(modifier = Modifier.width(8.dp))
@@ -313,61 +298,65 @@ fun DocumentoCard(
     documento: DocumentoLegalResponseDTO,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-    val fechaTexto = try {
-        documento.creadoEn?.let {
-            LocalDateTime.parse(it).format(fechaFormatter)
-        } ?: "Fecha no disponible"
-    } catch (e: Exception) {
-        "Fecha no disponible"
-    }
+    val fechaTexto =
+        try {
+            documento.creadoEn?.let {
+                LocalDateTime.parse(it).format(fechaFormatter)
+            } ?: "Fecha no disponible"
+        } catch (e: Exception) {
+            "Fecha no disponible"
+        }
 
     // Obtener el nombre del tipo de documento
-    val tipoNombre = when (documento.tipo) {
-        TipoDocumentoLegal.terminos -> "Terminos y Condiciones"
-        TipoDocumentoLegal.privacidad -> "Politica de Privacidad"
-        else -> "Documento Legal"
-    }
+    val tipoNombre =
+        when (documento.tipo) {
+            TipoDocumentoLegal.TERMINOS -> "Terminos y Condiciones"
+            TipoDocumentoLegal.PRIVACIDAD -> "Politica de Privacidad"
+            else -> "Documento Legal"
+        }
 
     // Icono segun el tipo
-    val tipoIcono = when (documento.tipo) {
-        TipoDocumentoLegal.terminos -> Icons.Default.Gavel
-        TipoDocumentoLegal.privacidad -> Icons.Default.Lock
-        else -> Icons.Default.Description
-    }
+    val tipoIcono =
+        when (documento.tipo) {
+            TipoDocumentoLegal.TERMINOS -> Icons.Default.Gavel
+            TipoDocumentoLegal.PRIVACIDAD -> Icons.Default.Lock
+            else -> Icons.Default.Description
+        }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Top,
             ) {
                 Row(
                     modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Surface(
                         shape = MaterialTheme.shapes.small,
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(48.dp),
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 tipoIcono,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                     }
@@ -376,33 +365,33 @@ fun DocumentoCard(
                         Text(
                             text = documento.titulo,
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Surface(
                             shape = MaterialTheme.shapes.extraSmall,
                             color = MaterialTheme.colorScheme.secondaryContainer,
-                            modifier = Modifier.padding(vertical = 2.dp)
+                            modifier = Modifier.padding(vertical = 2.dp),
                         ) {
                             Text(
                                 text = tipoNombre,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = fechaTexto,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         if (!documento.activo) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "Documento inactivo",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.error,
                             )
                         }
                     }
@@ -410,29 +399,29 @@ fun DocumentoCard(
 
                 // Botones de accion
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     IconButton(
                         onClick = onEdit,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Editar",
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
 
                     IconButton(
                         onClick = onDelete,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Eliminar",
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error,
                         )
                     }
                 }
@@ -446,7 +435,7 @@ fun DocumentoCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
@@ -457,11 +446,11 @@ fun DocumentoCard(
 fun DialogoCrearEditarDocumento(
     documento: DocumentoLegalResponseDTO?,
     onDismiss: () -> Unit,
-    onSave: (DocumentoLegalRequestDTO) -> Unit
+    onSave: (DocumentoLegalRequestDTO) -> Unit,
 ) {
     val esEdicion = documento != null
     var titulo by remember { mutableStateOf(documento?.titulo ?: "") }
-    var tipoSeleccionado by remember { mutableStateOf(documento?.tipo ?: TipoDocumentoLegal.terminos) }
+    var tipoSeleccionado by remember { mutableStateOf(documento?.tipo ?: TipoDocumentoLegal.TERMINOS) }
     var contenido by remember { mutableStateOf(documento?.contenido ?: "") }
     var activo by remember { mutableStateOf(documento?.activo ?: true) }
     var version by remember { mutableStateOf(documento?.version ?: "1.0") }
@@ -470,10 +459,11 @@ fun DialogoCrearEditarDocumento(
 
     var tipoExpanded by remember { mutableStateOf(false) }
 
-    val tiposDocumento = listOf(
-        TipoDocumentoLegal.terminos to "Terminos y Condiciones",
-        TipoDocumentoLegal.privacidad to "Politica de Privacidad"
-    )
+    val tiposDocumento =
+        listOf(
+            TipoDocumentoLegal.TERMINOS to "Terminos y Condiciones",
+            TipoDocumentoLegal.PRIVACIDAD to "Politica de Privacidad",
+        )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -483,22 +473,23 @@ fun DialogoCrearEditarDocumento(
                 Text(
                     if (esEdicion) "Editar Documento" else "Nuevo Documento",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
                     if (esEdicion) "Modifica la informacion del documento" else "Crea un nuevo documento legal",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         },
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 500.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 500.dp)
+                        .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // Campo Titulo
                 OutlinedTextField(
@@ -507,13 +498,13 @@ fun DialogoCrearEditarDocumento(
                     label = { Text("Titulo del documento") },
                     placeholder = { Text("Ej: Terminos y Condiciones de Uso") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
                 )
 
                 // Selector de Tipo
                 ExposedDropdownMenuBox(
                     expanded = tipoExpanded,
-                    onExpandedChange = { tipoExpanded = it }
+                    onExpandedChange = { tipoExpanded = it },
                 ) {
                     OutlinedTextField(
                         value = tiposDocumento.find { it.first == tipoSeleccionado }?.second ?: "",
@@ -521,14 +512,15 @@ fun DialogoCrearEditarDocumento(
                         readOnly = true,
                         label = { Text("Tipo de documento legal") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tipoExpanded) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                        shape = MaterialTheme.shapes.medium
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                        shape = MaterialTheme.shapes.medium,
                     )
                     ExposedDropdownMenu(
                         expanded = tipoExpanded,
-                        onDismissRequest = { tipoExpanded = false }
+                        onDismissRequest = { tipoExpanded = false },
                     ) {
                         tiposDocumento.forEach { (tipo, nombre) ->
                             DropdownMenuItem(
@@ -536,7 +528,7 @@ fun DialogoCrearEditarDocumento(
                                 onClick = {
                                     tipoSeleccionado = tipo
                                     tipoExpanded = false
-                                }
+                                },
                             )
                         }
                     }
@@ -549,7 +541,7 @@ fun DialogoCrearEditarDocumento(
                     label = { Text("Version") },
                     placeholder = { Text("Ej: 1.0, 2.0, 2024") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
                 )
 
                 // Campo Orden de Visualizacion
@@ -561,7 +553,7 @@ fun DialogoCrearEditarDocumento(
                     label = { Text("Orden de visualizacion") },
                     placeholder = { Text("Ej: 0, 1, 2...") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
                 )
 
                 // Campo Icono (opcional)
@@ -571,7 +563,7 @@ fun DialogoCrearEditarDocumento(
                     label = { Text("Icono (opcional)") },
                     placeholder = { Text("Ej: description, gavel, lock") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
                 )
 
                 // Campo Contenido
@@ -580,25 +572,26 @@ fun DialogoCrearEditarDocumento(
                     onValueChange = { contenido = it },
                     label = { Text("Contenido del documento") },
                     placeholder = { Text("Escribe aqui el contenido completo del documento legal...") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    shape = MaterialTheme.shapes.medium
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                    shape = MaterialTheme.shapes.medium,
                 )
 
                 // Checkbox Activo
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
                         checked = activo,
-                        onCheckedChange = { activo = it }
+                        onCheckedChange = { activo = it },
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Documento activo (visible para usuarios)",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -615,14 +608,14 @@ fun DialogoCrearEditarDocumento(
                                 icono = icono.takeIf { it.isNotBlank() },
                                 ordenVisualizacion = ordenVisualizacion,
                                 version = version.takeIf { it.isNotBlank() },
-                                activo = activo
-                            )
+                                activo = activo,
+                            ),
                         )
                     }
                 },
                 enabled = titulo.isNotBlank() && contenido.isNotBlank(),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(if (esEdicion) "Guardar cambios" else "Crear documento")
             }
@@ -630,84 +623,90 @@ fun DialogoCrearEditarDocumento(
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Cancelar")
             }
-        }
+        },
     )
 }
 
 @Composable
 fun DialogoVerDocumento(
     documento: DocumentoLegalResponseDTO,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-    val fechaCreacion = try {
-        documento.creadoEn?.let {
-            LocalDateTime.parse(it).format(fechaFormatter)
-        } ?: "Fecha no disponible"
-    } catch (e: Exception) {
-        "Fecha no disponible"
-    }
+    val fechaCreacion =
+        try {
+            documento.creadoEn?.let {
+                LocalDateTime.parse(it).format(fechaFormatter)
+            } ?: "Fecha no disponible"
+        } catch (e: Exception) {
+            "Fecha no disponible"
+        }
 
-    val fechaActualizacion = try {
-        documento.actualizadoEn?.let {
-            LocalDateTime.parse(it).format(fechaFormatter)
-        } ?: "Fecha no disponible"
-    } catch (e: Exception) {
-        "Fecha no disponible"
-    }
+    val fechaActualizacion =
+        try {
+            documento.actualizadoEn?.let {
+                LocalDateTime.parse(it).format(fechaFormatter)
+            } ?: "Fecha no disponible"
+        } catch (e: Exception) {
+            "Fecha no disponible"
+        }
 
-    val tipoNombre = when (documento.tipo) {
-        TipoDocumentoLegal.terminos -> "Terminos y Condiciones"
-        TipoDocumentoLegal.privacidad -> "Politica de Privacidad"
-        else -> "Documento Legal"
-    }
+    val tipoNombre =
+        when (documento.tipo) {
+            TipoDocumentoLegal.TERMINOS -> "Terminos y Condiciones"
+            TipoDocumentoLegal.PRIVACIDAD -> "Politica de Privacidad"
+            else -> "Documento Legal"
+        }
 
-    val tipoIcono = when (documento.tipo) {
-        TipoDocumentoLegal.terminos -> Icons.Default.Gavel
-        TipoDocumentoLegal.privacidad -> Icons.Default.Lock
-        else -> Icons.Default.Description
-    }
+    val tipoIcono =
+        when (documento.tipo) {
+            TipoDocumentoLegal.TERMINOS -> Icons.Default.Gavel
+            TipoDocumentoLegal.PRIVACIDAD -> Icons.Default.Lock
+            else -> Icons.Default.Description
+        }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             shape = MaterialTheme.shapes.extraLarge,
-            elevation = CardDefaults.cardElevation(6.dp)
+            elevation = CardDefaults.cardElevation(6.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 600.dp)
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 600.dp)
+                        .verticalScroll(rememberScrollState())
+                        .padding(24.dp),
             ) {
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Row(
                         modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Surface(
                             shape = MaterialTheme.shapes.small,
                             color = MaterialTheme.colorScheme.primaryContainer,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(48.dp),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     tipoIcono,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp),
                                 )
                             }
                         }
@@ -716,12 +715,12 @@ fun DialogoVerDocumento(
                             Text(
                                 text = documento.titulo,
                                 style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                             Text(
                                 text = tipoNombre,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         }
                     }
@@ -737,33 +736,33 @@ fun DialogoVerDocumento(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.surfaceVariant
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Text(
                             text = "Creado: $fechaCreacion",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = "Actualizado: $fechaActualizacion",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         if (documento.version != null) {
                             Text(
                                 text = "Version: ${documento.version}",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         Text(
                             text = if (documento.activo) "Activo" else "Inactivo",
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (documento.activo) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            color = if (documento.activo) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         )
                     }
                 }
@@ -778,7 +777,7 @@ fun DialogoVerDocumento(
                 Text(
                     text = documento.contenido,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -786,7 +785,7 @@ fun DialogoVerDocumento(
                 Button(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Text("Cerrar")
                 }

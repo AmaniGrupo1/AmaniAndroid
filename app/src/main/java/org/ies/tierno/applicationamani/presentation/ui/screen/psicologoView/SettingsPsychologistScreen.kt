@@ -53,25 +53,23 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
+import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 
 private const val TAG = "SettingsPsychologist"
 
 // Función auxiliar para obtener el subtítulo del tema actual
-private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
-    return if (currentTheme) "Oscuro" else "Claro"
-}
+private fun getCurrentThemeSubtitle(currentTheme: Boolean): String = if (currentTheme) "Oscuro" else "Claro"
 
 // ✅ Definir SettingsOption localmente
 data class SettingsOption(
     val id: String,
     val title: String,
     val subtitle: String,
-    val icon: ImageVector
+    val icon: ImageVector,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,7 +77,7 @@ data class SettingsOption(
 fun SettingsPsychologistScreen(
     navController: NavController,
     userSessionDataStore: UserSessionDataStore,
-    idiomaViewModel: IdiomaViewModel
+    idiomaViewModel: IdiomaViewModel,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -136,7 +134,7 @@ fun SettingsPsychologistScreen(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 },
                 navigationIcon = {
@@ -144,23 +142,25 @@ fun SettingsPsychologistScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = primaryColor,
+                    ),
             )
-        }
+        },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(backgroundColor),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(backgroundColor),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // ==================== PERFIL (Solo para psicólogo) ====================
             item {
@@ -179,26 +179,27 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
-                    options = listOf(
-                        SettingsOption(
-                            id = "mi_perfil",
-                            title = stringResource(R.string.perfil),
-                            subtitle = stringResource(R.string.editar_datos_personales),
-                            icon = Icons.Default.PersonOutline
+                    options =
+                        listOf(
+                            SettingsOption(
+                                id = "mi_perfil",
+                                title = stringResource(R.string.perfil),
+                                subtitle = stringResource(R.string.editar_datos_personales),
+                                icon = Icons.Default.PersonOutline,
+                            ),
+                            SettingsOption(
+                                id = "horario",
+                                title = stringResource(R.string.horario_laboral),
+                                subtitle = stringResource(R.string.configurar_horario_atencion),
+                                icon = Icons.Default.Schedule,
+                            ),
+                            SettingsOption(
+                                id = "especialidad",
+                                title = stringResource(R.string.mis_especialidades),
+                                subtitle = stringResource(R.string.agregar_especialidades),
+                                icon = Icons.Default.Work,
+                            ),
                         ),
-                        SettingsOption(
-                            id = "horario",
-                            title = stringResource(R.string.horario_laboral),
-                            subtitle = stringResource(R.string.configurar_horario_atencion),
-                            icon = Icons.Default.Schedule
-                        ),
-                        SettingsOption(
-                            id = "especialidad",
-                            title = stringResource(R.string.mis_especialidades),
-                            subtitle = stringResource(R.string.agregar_especialidades),
-                            icon = Icons.Default.Work
-                        )
-                    )
                 )
             }
 
@@ -219,29 +220,32 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
-                    options = listOf(
-                        SettingsOption(
-                            id = "language",
-                            title = stringResource(R.string.idioma),
-                            subtitle = if (currentLanguage == "es")
-                                stringResource(R.string.espanol)
-                            else
-                                stringResource(R.string.ingles),
-                            icon = Icons.Default.Language
+                    options =
+                        listOf(
+                            SettingsOption(
+                                id = "language",
+                                title = stringResource(R.string.idioma),
+                                subtitle =
+                                    if (currentLanguage == "es") {
+                                        stringResource(R.string.espanol)
+                                    } else {
+                                        stringResource(R.string.ingles)
+                                    },
+                                icon = Icons.Default.Language,
+                            ),
+                            SettingsOption(
+                                id = "notificaciones",
+                                title = stringResource(R.string.notificaciones),
+                                subtitle = stringResource(R.string.configurar_notificaciones),
+                                icon = Icons.Default.Notifications,
+                            ),
+                            SettingsOption(
+                                id = "tema",
+                                title = stringResource(R.string.tema),
+                                subtitle = getCurrentThemeSubtitle(currentTema),
+                                icon = Icons.Default.BrightnessMedium,
+                            ),
                         ),
-                        SettingsOption(
-                            id = "notificaciones",
-                            title = stringResource(R.string.notificaciones),
-                            subtitle = stringResource(R.string.configurar_notificaciones),
-                            icon = Icons.Default.Notifications
-                        ),
-                        SettingsOption(
-                            id = "tema",
-                            title = stringResource(R.string.tema),
-                            subtitle = getCurrentThemeSubtitle(currentTema),
-                            icon = Icons.Default.BrightnessMedium
-                        )
-                    )
                 )
             }
 
@@ -262,26 +266,27 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
-                    options = listOf(
-                        SettingsOption(
-                            id = "duracion_cita",
-                            title = stringResource(R.string.duracion_cita),
-                            subtitle = stringResource(R.string.duracion_minutos, 45),
-                            icon = Icons.Default.Timer
+                    options =
+                        listOf(
+                            SettingsOption(
+                                id = "duracion_cita",
+                                title = stringResource(R.string.duracion_cita),
+                                subtitle = stringResource(R.string.duracion_minutos, 45),
+                                icon = Icons.Default.Timer,
+                            ),
+                            SettingsOption(
+                                id = "tiempo_entre_citas",
+                                title = stringResource(R.string.tiempo_entre_citas),
+                                subtitle = stringResource(R.string.tiempo_minutos, 10),
+                                icon = Icons.Default.Timelapse,
+                            ),
+                            SettingsOption(
+                                id = "recordatorios",
+                                title = stringResource(R.string.recordatorios),
+                                subtitle = stringResource(R.string.enviar_recordatorios),
+                                icon = Icons.Default.Alarm,
+                            ),
                         ),
-                        SettingsOption(
-                            id = "tiempo_entre_citas",
-                            title = stringResource(R.string.tiempo_entre_citas),
-                            subtitle = stringResource(R.string.tiempo_minutos, 10),
-                            icon = Icons.Default.Timelapse
-                        ),
-                        SettingsOption(
-                            id = "recordatorios",
-                            title = stringResource(R.string.recordatorios),
-                            subtitle = stringResource(R.string.enviar_recordatorios),
-                            icon = Icons.Default.Alarm
-                        )
-                    )
                 )
             }
 
@@ -302,26 +307,27 @@ fun SettingsPsychologistScreen(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     primaryColor = primaryColor,
-                    options = listOf(
-                        SettingsOption(
-                            id = "version",
-                            title = stringResource(R.string.version),
-                            subtitle = stringResource(R.string.version_actual, "1.0.0"),
-                            icon = Icons.Default.Info
+                    options =
+                        listOf(
+                            SettingsOption(
+                                id = "version",
+                                title = stringResource(R.string.version),
+                                subtitle = stringResource(R.string.version_actual, "1.0.0"),
+                                icon = Icons.Default.Info,
+                            ),
+                            SettingsOption(
+                                id = "terminos",
+                                title = stringResource(R.string.terminos_condiciones),
+                                subtitle = stringResource(R.string.leer_terminos),
+                                icon = Icons.Default.Description,
+                            ),
+                            SettingsOption(
+                                id = "privacidad",
+                                title = stringResource(R.string.politica_privacidad),
+                                subtitle = stringResource(R.string.ver_politica),
+                                icon = Icons.Default.Lock,
+                            ),
                         ),
-                        SettingsOption(
-                            id = "terminos",
-                            title = stringResource(R.string.terminos_condiciones),
-                            subtitle = stringResource(R.string.leer_terminos),
-                            icon = Icons.Default.Description
-                        ),
-                        SettingsOption(
-                            id = "privacidad",
-                            title = stringResource(R.string.politica_privacidad),
-                            subtitle = stringResource(R.string.ver_politica),
-                            icon = Icons.Default.Lock
-                        )
-                    )
                 )
             }
         }
@@ -344,33 +350,34 @@ fun SettingsCategoryCardPsychologist(
     textColor: Color,
     textSecondaryColor: Color,
     dividerColor: Color,
-    primaryColor: Color
+    primaryColor: Color,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(iconColor.copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(iconColor.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         icon,
                         contentDescription = null,
                         tint = iconColor,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
@@ -379,7 +386,7 @@ fun SettingsCategoryCardPsychologist(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = textColor
+                    color = textColor,
                 )
             }
 
@@ -388,7 +395,7 @@ fun SettingsCategoryCardPsychologist(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = DividerDefaults.Thickness,
-                        color = dividerColor
+                        color = dividerColor,
                     )
                 }
 
@@ -403,7 +410,7 @@ fun SettingsCategoryCardPsychologist(
                     textColor = textColor,
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
-                    primaryColor = primaryColor
+                    primaryColor = primaryColor,
                 )
             }
         }
@@ -422,7 +429,7 @@ fun SettingsOptionRowPsychologist(
     textColor: Color,
     textSecondaryColor: Color,
     dividerColor: Color,
-    primaryColor: Color
+    primaryColor: Color,
 ) {
     val scope = rememberCoroutineScope()
     var expandedLanguage by remember { mutableStateOf(false) }
@@ -431,50 +438,50 @@ fun SettingsOptionRowPsychologist(
     val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                when (option.id) {
-                    "language" -> expandedLanguage = true
-                    "tema" -> expandedTheme = true
-                    "mi_perfil" -> {
-                        val identificador = session?.idPsicologo
-                        if (identificador != null && identificador > 0L) {
-                            navController.navigate(
-                                Screens.perfilPsicologo.createRoute(identificador)
-                            )
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    when (option.id) {
+                        "language" -> expandedLanguage = true
+                        "tema" -> expandedTheme = true
+                        "mi_perfil" -> {
+                            val identificador = session?.idPsicologo
+                            if (identificador != null && identificador > 0L) {
+                                navController.navigate(
+                                    Screens.perfilPsicologo.createRoute(identificador),
+                                )
+                            }
+                        }
+                        "horario" -> {
+                            Log.d(TAG, "📅 Navegar a horario del psicólogo")
+                        }
+                        "especialidad" -> {
+                            Log.d(TAG, "🏷️ Navegar a especialidades del psicólogo")
+                        }
+                        "notificaciones" -> {
+                            Log.d(TAG, "🔔 Navegar a notificaciones")
+                        }
+                        "terminos" -> {
+                            navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
+                        }
+                        "privacidad" -> {
+                            navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
                         }
                     }
-                    "horario" -> {
-                        Log.d(TAG, "📅 Navegar a horario del psicólogo")
-                    }
-                    "especialidad" -> {
-                        Log.d(TAG, "🏷️ Navegar a especialidades del psicólogo")
-                    }
-                    "notificaciones" -> {
-                        Log.d(TAG, "🔔 Navegar a notificaciones")
-                    }
-                    "terminos" -> {
-                        navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
-                    }
-                    "privacidad" -> {
-                        navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
-                    }
-                }
-            }
-            .padding(vertical = 8.dp),
+                }.padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 option.icon,
                 contentDescription = null,
                 tint = primaryColor,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(22.dp),
             )
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -484,20 +491,21 @@ fun SettingsOptionRowPsychologist(
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
-                    color = textColor
+                    color = textColor,
                 )
 
-                val displaySubtitle = when (option.id) {
-                    "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
-                    "tema" -> getCurrentThemeSubtitle(currentTema)
-                    else -> option.subtitle
-                }
+                val displaySubtitle =
+                    when (option.id) {
+                        "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                        "tema" -> getCurrentThemeSubtitle(currentTema)
+                        else -> option.subtitle
+                    }
 
                 Text(
                     text = displaySubtitle,
                     fontFamily = roboto,
                     fontSize = 13.sp,
-                    color = textSecondaryColor
+                    color = textSecondaryColor,
                 )
             }
         }
@@ -509,7 +517,7 @@ fun SettingsOptionRowPsychologist(
                     DropdownMenu(
                         expanded = expandedLanguage,
                         onDismissRequest = { expandedLanguage = false },
-                        containerColor = dropdownContainerColor
+                        containerColor = dropdownContainerColor,
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.espanol), color = textColor) },
@@ -519,7 +527,7 @@ fun SettingsOptionRowPsychologist(
                                     idiomaViewModel.cambiarIdioma("es")
                                 }
                                 expandedLanguage = false
-                            }
+                            },
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.ingles), color = textColor) },
@@ -529,7 +537,7 @@ fun SettingsOptionRowPsychologist(
                                     idiomaViewModel.cambiarIdioma("en")
                                 }
                                 expandedLanguage = false
-                            }
+                            },
                         )
                     }
                 }
@@ -540,7 +548,7 @@ fun SettingsOptionRowPsychologist(
                     DropdownMenu(
                         expanded = expandedTheme,
                         onDismissRequest = { expandedTheme = false },
-                        containerColor = dropdownContainerColor
+                        containerColor = dropdownContainerColor,
                     ) {
                         DropdownMenuItem(
                             text = { Text("Claro", color = textColor) },
@@ -550,7 +558,7 @@ fun SettingsOptionRowPsychologist(
                                     idiomaViewModel.cambiarTema(false) // false = claro
                                 }
                                 expandedTheme = false
-                            }
+                            },
                         )
                         DropdownMenuItem(
                             text = { Text("Oscuro", color = textColor) },
@@ -560,7 +568,7 @@ fun SettingsOptionRowPsychologist(
                                     idiomaViewModel.cambiarTema(true) // true = oscuro
                                 }
                                 expandedTheme = false
-                            }
+                            },
                         )
                     }
                 }
@@ -570,7 +578,7 @@ fun SettingsOptionRowPsychologist(
                     Icons.Default.ChevronRight,
                     contentDescription = "Ir",
                     tint = textSecondaryColor,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }

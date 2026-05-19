@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 class CrearPreguntaUseCaseTest {
-
     private lateinit var repository: TestRepositoryApi
     private lateinit var useCase: CrearPreguntaUseCase
 
@@ -23,20 +22,22 @@ class CrearPreguntaUseCaseTest {
     }
 
     @Test
-    fun `invoke should return DTO when repository succeeds`() = runTest {
-        val dto = OpcionAdminDTO("Texto", "opcion_multiple", emptyList())
-        coEvery { repository.createPregunta(any()) } returns dto
+    fun `invoke should return DTO when repository succeeds`() =
+        runTest {
+            val dto = OpcionAdminDTO("Texto", "opcion_multiple", emptyList())
+            coEvery { repository.createPregunta(any()) } returns dto
 
-        val result = useCase(PreguntaRequest("Texto", "opcion_multiple", emptyList()))
+            val result = useCase(PreguntaRequest("Texto", "opcion_multiple", emptyList()))
 
-        assertEquals(dto, result)
-        coVerify { repository.createPregunta(any()) }
-    }
+            assertEquals(dto, result)
+            coVerify { repository.createPregunta(any()) }
+        }
 
     @Test(expected = Exception::class)
-    fun `invoke should throw when repository throws`() = runTest {
-        coEvery { repository.createPregunta(any()) } throws Exception("fail")
+    fun `invoke should throw when repository throws`() =
+        runTest {
+            coEvery { repository.createPregunta(any()) } throws Exception("fail")
 
-        useCase(PreguntaRequest("Texto", "opcion_multiple", emptyList()))
-    }
+            useCase(PreguntaRequest("Texto", "opcion_multiple", emptyList()))
+        }
 }

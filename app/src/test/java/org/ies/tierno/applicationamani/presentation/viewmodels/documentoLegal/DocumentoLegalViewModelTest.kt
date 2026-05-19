@@ -19,7 +19,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DocumentoLegalViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: DocumentoLegalUseCase
     private lateinit var viewModel: DocumentoLegalViewModel
@@ -37,36 +36,39 @@ class DocumentoLegalViewModelTest {
     }
 
     @Test
-    fun `getAllDocumentos updates documentos list on success`() = runTest {
-        val expected = listOf(mockk<DocumentoLegalResponseDTO>())
-        coEvery { useCase.getAllDocumentos() } returns Result.success(expected)
+    fun `getAllDocumentos updates documentos list on success`() =
+        runTest {
+            val expected = listOf(mockk<DocumentoLegalResponseDTO>())
+            coEvery { useCase.getAllDocumentos() } returns Result.success(expected)
 
-        viewModel.getAllDocumentos()
-        advanceUntilIdle()
+            viewModel.getAllDocumentos()
+            advanceUntilIdle()
 
-        assertEquals(expected, viewModel.documentos.value)
-        assertNull(viewModel.error.value)
-    }
-
-    @Test
-    fun `crearDocumento calls getAllDocumentos on success`() = runTest {
-        coEvery { useCase.crearDocumento(any()) } returns Result.success(mockk())
-        coEvery { useCase.getAllDocumentos() } returns Result.success(emptyList())
-
-        viewModel.crearDocumento(mockk())
-        advanceUntilIdle()
-
-        coEvery { useCase.getAllDocumentos() }
-    }
+            assertEquals(expected, viewModel.documentos.value)
+            assertNull(viewModel.error.value)
+        }
 
     @Test
-    fun `getDocumentoByTipo updates seleccionado on success`() = runTest {
-        val expected = mockk<DocumentoLegalResponseDTO>()
-        coEvery { useCase.getDocumentoByTipo("T") } returns Result.success(expected)
+    fun `crearDocumento calls getAllDocumentos on success`() =
+        runTest {
+            coEvery { useCase.crearDocumento(any()) } returns Result.success(mockk())
+            coEvery { useCase.getAllDocumentos() } returns Result.success(emptyList())
 
-        viewModel.getDocumentoByTipo("T")
-        advanceUntilIdle()
+            viewModel.crearDocumento(mockk())
+            advanceUntilIdle()
 
-        assertEquals(expected, viewModel.documentoSeleccionado.value)
-    }
+            coEvery { useCase.getAllDocumentos() }
+        }
+
+    @Test
+    fun `getDocumentoByTipo updates seleccionado on success`() =
+        runTest {
+            val expected = mockk<DocumentoLegalResponseDTO>()
+            coEvery { useCase.getDocumentoByTipo("T") } returns Result.success(expected)
+
+            viewModel.getDocumentoByTipo("T")
+            advanceUntilIdle()
+
+            assertEquals(expected, viewModel.documentoSeleccionado.value)
+        }
 }

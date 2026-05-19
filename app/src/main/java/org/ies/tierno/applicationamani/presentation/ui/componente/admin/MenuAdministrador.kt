@@ -81,7 +81,7 @@ data class MenuAdministrador(
     val route: String,
     val isDanger: Boolean = false,
     val dividerBefore: Boolean = false,
-    val dividerAfter: Boolean = false
+    val dividerAfter: Boolean = false,
 )
 
 /**
@@ -102,80 +102,82 @@ fun MenuAdministrador(
     showBackButton: Boolean = false,
     showLogo: Boolean = false,
     onLogout: (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
 
     // Definición de items del menú
-    val menuItems = listOf(
+    val menuItems =
+        listOf(
             MenuAdministrador(
                 titleRes = R.string.menu_registrar_psicologo,
                 icon = Icons.Default.Psychology,
                 route = Screens.agregarPsicologo.route,
-                dividerAfter = true
+                dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_registrar_paciente,
                 icon = Icons.Default.Psychology,
                 route = Screens.registro.route,
-                dividerAfter = true
+                dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_listar_pacientes,
                 icon = Icons.Default.People,
-                route = Screens.pacientes.route
+                route = Screens.pacientes.route,
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_listar_psicologos,
                 icon = Icons.Default.Psychology,
                 route = Screens.listarPsicologoSimple.route,
-                dividerAfter = true
+                dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_registrar_admin,
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.agregarAdmin.route,
-                dividerAfter = true
+                dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.nav_citas,
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.citas.route,
-                dividerAfter = true
+                dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.nav_calendario,
                 icon = Icons.Default.AdminPanelSettings,
                 route = Screens.psicologoAgenda.route,
-                dividerAfter = true
+                dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_cerrar_sesion,
                 icon = Icons.AutoMirrored.Filled.Logout,
                 route = Screens.login.route,
-                isDanger = true
-            )
+                isDanger = true,
+            ),
         )
 
     TopAppBar(
         modifier = Modifier,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.primary,
-            titleContentColor = colors.onPrimary,
-            navigationIconContentColor = colors.onPrimary,
-            actionIconContentColor = colors.onPrimary
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = colors.primary,
+                titleContentColor = colors.onPrimary,
+                navigationIconContentColor = colors.onPrimary,
+                actionIconContentColor = colors.onPrimary,
+            ),
         navigationIcon = {
             AnimatedVisibility(
                 visible = showBackButton,
                 enter = fadeIn() + slideInHorizontally(),
-                exit = fadeOut() + slideOutHorizontally()
+                exit = fadeOut() + slideOutHorizontally(),
             ) {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.volver)
+                        contentDescription = stringResource(R.string.volver),
                     )
                 }
             }
@@ -185,25 +187,25 @@ fun MenuAdministrador(
                 targetState = showLogo to title,
                 transitionSpec = {
                     fadeIn() togetherWith fadeOut()
-                }
+                },
             ) { (showLogoValue, titleValue) ->
                 if (showLogoValue) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.Center,
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
                             contentDescription = "Logo",
                             modifier = Modifier.size(32.dp),
-                            tint = Color.Unspecified
+                            tint = Color.Unspecified,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = titleValue,
                             style = MaterialTheme.typography.titleLarge,
                             color = colors.onPrimary,
-                            maxLines = 1
+                            maxLines = 1,
                         )
                     }
                 } else {
@@ -212,7 +214,7 @@ fun MenuAdministrador(
                         style = MaterialTheme.typography.titleLarge,
                         color = colors.onPrimary,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -223,29 +225,29 @@ fun MenuAdministrador(
 
             // Badge de notificaciones (ejemplo)
             IconButton(
-                onClick = { /* Navegar a notificaciones */ }
+                onClick = { /* Navegar a notificaciones */ },
             ) {
                 Badge(
                     containerColor = colors.error,
-                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp)
+                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp),
                 ) {
                     Text("3", style = MaterialTheme.typography.labelSmall)
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = "Notificaciones",
-                    tint = colors.onPrimary
+                    tint = colors.onPrimary,
                 )
             }
 
             // Botón de menú
             IconButton(
-                onClick = { expanded = true }
+                onClick = { expanded = true },
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = stringResource(R.string.menu_admin_titulo),
-                    tint = colors.onPrimary
+                    tint = colors.onPrimary,
                 )
             }
 
@@ -253,33 +255,35 @@ fun MenuAdministrador(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .width(280.dp),
-                shape = RoundedCornerShape(12.dp)
+                modifier =
+                    Modifier
+                        .width(280.dp),
+                shape = RoundedCornerShape(12.dp),
             ) {
                 // Header del menú
                 DropdownMenuItem(
                     text = {
                         Column(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 text = stringResource(R.string.menu_admin_titulo),
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                             Text(
                                 text = stringResource(R.string.menu_selecciona_opcion),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     },
                     onClick = { },
                     enabled = false,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .clip(RoundedCornerShape(8.dp))
+                    modifier =
+                        Modifier
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .clip(RoundedCornerShape(8.dp)),
                 )
 
                 HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
@@ -289,7 +293,7 @@ fun MenuAdministrador(
                         HorizontalDivider(
                             Modifier,
                             DividerDefaults.Thickness,
-                            DividerDefaults.color
+                            DividerDefaults.color,
                         )
                     }
 
@@ -297,24 +301,28 @@ fun MenuAdministrador(
                         text = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp),
-                                    tint = if (item.isDanger)
-                                        MaterialTheme.colorScheme.error
-                                    else
-                                        MaterialTheme.colorScheme.primary
+                                    tint =
+                                        if (item.isDanger) {
+                                            MaterialTheme.colorScheme.error
+                                        } else {
+                                            MaterialTheme.colorScheme.primary
+                                        },
                                 )
                                 Text(
                                     text = stringResource(item.titleRes),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = if (item.isDanger)
-                                        MaterialTheme.colorScheme.error
-                                    else
-                                        MaterialTheme.colorScheme.onSurface
+                                    color =
+                                        if (item.isDanger) {
+                                            MaterialTheme.colorScheme.error
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurface
+                                        },
                                 )
                             }
                         },
@@ -330,7 +338,7 @@ fun MenuAdministrador(
                                 navController.navigate(item.route)
                             }
                         },
-                        modifier = Modifier.animateContentSize()
+                        modifier = Modifier.animateContentSize(),
                     )
 
                     if (item.dividerAfter) {
@@ -338,7 +346,7 @@ fun MenuAdministrador(
                     }
                 }
             }
-        }
+        },
     )
 }
 
@@ -352,24 +360,25 @@ fun MenuAdministradorSimple(
     navController: NavController,
     showBackButton: Boolean = false,
     showLogo: Boolean = false,
-    onActionClick: (() -> Unit)? = null
+    onActionClick: (() -> Unit)? = null,
 ) {
     val colors = MaterialTheme.colorScheme
 
     TopAppBar(
         modifier = Modifier,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.primary,
-            titleContentColor = colors.onPrimary,
-            navigationIconContentColor = colors.onPrimary,
-            actionIconContentColor = colors.onPrimary
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = colors.primary,
+                titleContentColor = colors.onPrimary,
+                navigationIconContentColor = colors.onPrimary,
+                actionIconContentColor = colors.onPrimary,
+            ),
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.volver)
+                        contentDescription = stringResource(R.string.volver),
                     )
                 }
             }
@@ -377,19 +386,19 @@ fun MenuAdministradorSimple(
         title = {
             if (showLogo) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.logo_original),
                         contentDescription = "Logo",
                         modifier = Modifier.size(32.dp),
-                        tint = Color.Unspecified
+                        tint = Color.Unspecified,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
-                        color = colors.onPrimary
+                        color = colors.onPrimary,
                     )
                 }
             } else {
@@ -398,7 +407,7 @@ fun MenuAdministradorSimple(
                     style = MaterialTheme.typography.titleMedium,
                     color = colors.onPrimary,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         },
@@ -407,11 +416,11 @@ fun MenuAdministradorSimple(
                 IconButton(onClick = it) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.nav_mas)
+                        contentDescription = stringResource(R.string.nav_mas),
                     )
                 }
             }
-        }
+        },
     )
 }
 
@@ -422,47 +431,49 @@ fun MenuAdministradorSimple(
 fun MenuLateralAdministrador(
     navController: NavController,
     onLogout: () -> Unit,
-    currentRoute: String
+    currentRoute: String,
 ) {
-    val menuItems = listOf(
-        Triple(Icons.Default.Home, R.string.nav_inicio, Screens.adminHome.route),
-        Triple(Icons.Default.People, R.string.nav_pacientes, Screens.pacientes.route),
-        Triple(Icons.Default.Psychology, R.string.nav_psicologos, Screens.listarPsicologo.route),
-        Triple(Icons.Default.Quiz, R.string.nav_tests, Screens.test.route),
-        Triple(Icons.Default.Edit, R.string.menu_registrar_psicologo, Screens.test.route),
-        Triple(Icons.Default.AdminPanelSettings, R.string.menu_registrar_admin, Screens.agregarAdmin.route),
-        Triple(Icons.AutoMirrored.Filled.Logout, R.string.menu_cerrar_sesion, Screens.login.route)
-    )
+    val menuItems =
+        listOf(
+            Triple(Icons.Default.Home, R.string.nav_inicio, Screens.adminHome.route),
+            Triple(Icons.Default.People, R.string.nav_pacientes, Screens.pacientes.route),
+            Triple(Icons.Default.Psychology, R.string.nav_psicologos, Screens.listarPsicologo.route),
+            Triple(Icons.Default.Quiz, R.string.nav_tests, Screens.test.route),
+            Triple(Icons.Default.Edit, R.string.menu_registrar_psicologo, Screens.test.route),
+            Triple(Icons.Default.AdminPanelSettings, R.string.menu_registrar_admin, Screens.agregarAdmin.route),
+            Triple(Icons.AutoMirrored.Filled.Logout, R.string.menu_cerrar_sesion, Screens.login.route),
+        )
 
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.primaryContainer
+                drawerContainerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 // Header del drawer
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(24.dp),
                 ) {
                     Column {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
                             contentDescription = "Logo",
                             modifier = Modifier.size(48.dp),
-                            tint = Color.Unspecified
+                            tint = Color.Unspecified,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Panel Admin",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                         Text(
                             text = "Gestión de usuarios",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         )
                     }
                 }
@@ -474,14 +485,14 @@ fun MenuLateralAdministrador(
                             Icon(
                                 imageVector = icon,
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         },
                         label = {
                             Text(
                                 text = stringResource(titleRes),
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = if (currentRoute == route) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (currentRoute == route) FontWeight.Bold else FontWeight.Normal,
                             )
                         },
                         selected = currentRoute == route,
@@ -496,15 +507,16 @@ fun MenuLateralAdministrador(
                                 navController.navigate(route)
                             }
                         },
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            unselectedContainerColor = Color.Transparent
-                        ),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        colors =
+                            NavigationDrawerItemDefaults.colors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                unselectedContainerColor = Color.Transparent,
+                            ),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                     )
                 }
             }
-        }
+        },
     ) {
         // Contenido principal
         Box(modifier = Modifier.fillMaxSize())

@@ -12,7 +12,9 @@ import org.ies.tierno.applicationamani.domain.models.MessageStatus
  *
  * @property repository Repositorio de chat para la persistencia y envío de datos.
  */
-class SendMessageUseCase(private val repository: ChatRepository) {
+class SendMessageUseCase(
+    private val repository: ChatRepository,
+) {
     /**
      * Ejecuta la lógica de envío de un mensaje.
      *
@@ -30,26 +32,28 @@ class SendMessageUseCase(private val repository: ChatRepository) {
         content: String,
         attachmentUrl: String? = null,
         attachmentType: org.ies.tierno.applicationamani.domain.models.AttachmentType? = null,
-        attachmentName: String? = null
+        attachmentName: String? = null,
     ): Result<Unit> {
-        val result = repository.sendMessage(
-            senderId,
-            receiverId,
-            content,
-            attachmentUrl,
-            attachmentType,
-            attachmentName
-        )
+        val result =
+            repository.sendMessage(
+                senderId,
+                receiverId,
+                content,
+                attachmentUrl,
+                attachmentType,
+                attachmentName,
+            )
         if (result.isFailure) {
             // TC-03: chat_offlineMessage_queuesForRetry
-            val offlineMessage = Message(
-                senderId = senderId.toString(),
-                content = content,
-                attachmentUrl = attachmentUrl,
-                attachmentType = attachmentType,
-                attachmentName = attachmentName,
-                status = MessageStatus.PENDING_RETRY
-            )
+            val offlineMessage =
+                Message(
+                    senderId = senderId.toString(),
+                    content = content,
+                    attachmentUrl = attachmentUrl,
+                    attachmentType = attachmentType,
+                    attachmentName = attachmentName,
+                    status = MessageStatus.PENDING_RETRY,
+                )
             repository.saveMessageOffline(offlineMessage)
         }
         return result

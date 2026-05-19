@@ -8,5 +8,5 @@ import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
  * @property estado Nuevo estado: abierto, en_progreso, cerrado.
  */
 data class TicketEstadoRequestDTO(
-    val estado: EstadoTicket
+    val estado: EstadoTicket,
 )

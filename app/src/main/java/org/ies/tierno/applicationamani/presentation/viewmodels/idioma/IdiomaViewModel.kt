@@ -13,25 +13,24 @@ import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCa
 
 class IdiomaViewModel(
     private val idiomaUseCase: IdiomaUseCase,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
-
     // ================= IDIOMA =================
 
-    val idioma = userSessionDataStore.sessionFlow
-        .map { it?.idioma ?: "es" }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = "es"
-        )
+    val idioma =
+        userSessionDataStore.sessionFlow
+            .map { it?.idioma ?: "es" }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = "es",
+            )
 
     fun cambiarIdioma(nuevoIdioma: String) {
-
         viewModelScope.launch {
-
-            val session = userSessionDataStore.getSession()
-                ?: return@launch
+            val session =
+                userSessionDataStore.getSession()
+                    ?: return@launch
 
             if (session.idioma == nuevoIdioma) {
                 return@launch
@@ -41,18 +40,17 @@ class IdiomaViewModel(
                 // 1. Backend
                 idiomaUseCase.actualizarIdioma(
                     session.idUsuario,
-                    nuevoIdioma
+                    nuevoIdioma,
                 )
 
                 // 2. Local (esto es lo que realmente dispara UI)
                 userSessionDataStore.saveSession(
-                    session.copy(idioma = nuevoIdioma)
+                    session.copy(idioma = nuevoIdioma),
                 )
 
                 // Bug 4 Fix: Soporte para API 33+ (Tiramisu)
                 val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(nuevoIdioma)
                 AppCompatDelegate.setApplicationLocales(appLocale)
-
             } catch (e: Exception) {
                 println("Error al cambiar idioma: ${e.message}")
             }
@@ -61,20 +59,20 @@ class IdiomaViewModel(
 
     // ================= TEMA =================
 
-    val tema = userSessionDataStore.sessionFlow
-        .map { it?.tema ?: false } // false = blanco
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
-        )
+    val tema =
+        userSessionDataStore.sessionFlow
+            .map { it?.tema ?: false } // false = blanco
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false,
+            )
 
     fun cambiarTema(nuevoTema: Boolean) {
-
         viewModelScope.launch {
-
-            val session = userSessionDataStore.getSession()
-                ?: return@launch
+            val session =
+                userSessionDataStore.getSession()
+                    ?: return@launch
 
             if (session.tema == nuevoTema) {
                 return@launch
@@ -82,11 +80,12 @@ class IdiomaViewModel(
 
             // 1. Local (esto es lo que realmente dispara UI inmediatamente)
             userSessionDataStore.saveSession(
-                session.copy(tema = nuevoTema)
+                session.copy(tema = nuevoTema),
             )
 
             // 2. Backend (intento asíncrono)
-            idiomaUseCase.actualizarTema(nuevoTema)
+            idiomaUseCase
+                .actualizarTema(nuevoTema)
                 .onFailure {
                     // Log error but keep local theme
                     println("Error al sincronizar tema con backend: ${it.message}")

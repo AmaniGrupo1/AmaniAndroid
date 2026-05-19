@@ -6,5 +6,5 @@ data class DiarioEmocionRequestDTO(
     val titulo: String,
     val emocion: String,
     val intensidad: Int,
-    val nota: String
+    val nota: String,
 )

@@ -11,5 +11,5 @@ data class EstadisticasEmocionales(
     val peorSesion: DiarioEmocionResponseDTO? = null,
     val totalSesiones: Int = 0,
     val tendenciaPuntos: Double = 0.0,
-    val observacion: String = ""
+    val observacion: String = "",
 )

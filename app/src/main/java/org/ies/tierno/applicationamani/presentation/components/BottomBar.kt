@@ -38,7 +38,7 @@ private data class BottomBarDestination(
     val route: String,
     @StringRes val labelRes: Int,
     val iconFilled: ImageVector,
-    val iconOutlined: ImageVector
+    val iconOutlined: ImageVector,
 )
 
 /**
@@ -65,34 +65,35 @@ fun BottomBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val destinations = listOf(
-        BottomBarDestination(Routes.HOME, R.string.nav_inicio, Icons.Default.Home, Icons.Outlined.Home),
-        BottomBarDestination(Routes.CHAT, R.string.nav_chat, Icons.AutoMirrored.Filled.Chat, Icons.AutoMirrored.Outlined.Chat),
-        BottomBarDestination(Routes.CITAS, R.string.nav_citas, Icons.Default.DateRange, Icons.Outlined.DateRange),
-        BottomBarDestination(Routes.DIARIO, R.string.nav_diario, Icons.Default.Book, Icons.Outlined.Book),
-        BottomBarDestination(Routes.SETTINGS, R.string.nav_ajustes, Icons.Default.Settings, Icons.Outlined.Settings)
-    )
+    val destinations =
+        listOf(
+            BottomBarDestination(Routes.HOME, R.string.nav_inicio, Icons.Default.Home, Icons.Outlined.Home),
+            BottomBarDestination(Routes.CHAT, R.string.nav_chat, Icons.AutoMirrored.Filled.Chat, Icons.AutoMirrored.Outlined.Chat),
+            BottomBarDestination(Routes.CITAS, R.string.nav_citas, Icons.Default.DateRange, Icons.Outlined.DateRange),
+            BottomBarDestination(Routes.DIARIO, R.string.nav_diario, Icons.Default.Book, Icons.Outlined.Book),
+            BottomBarDestination(Routes.SETTINGS, R.string.nav_ajustes, Icons.Default.Settings, Icons.Outlined.Settings),
+        )
 
     // M3: NavigationBar height is handled automatically, containerColor set to surfaceContainer
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer // M3: container color should be surfaceContainer
+        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: container color should be surfaceContainer
     ) {
         destinations.forEach { destination ->
             val isSelected = currentRoute == destination.route
             NavigationBarItem(
-                icon = { 
+                icon = {
                     // M3: Use Filled icon for selected and Outlined for unselected
                     Icon(
-                        imageVector = if (isSelected) destination.iconFilled else destination.iconOutlined, 
-                        contentDescription = stringResource(destination.labelRes)
-                    ) 
+                        imageVector = if (isSelected) destination.iconFilled else destination.iconOutlined,
+                        contentDescription = stringResource(destination.labelRes),
+                    )
                 },
-                label = { 
+                label = {
                     // M3: Label uses labelMedium typography
                     Text(
                         text = stringResource(destination.labelRes),
-                        style = MaterialTheme.typography.labelMedium
-                    ) 
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 },
                 selected = isSelected,
                 onClick = {
@@ -107,9 +108,8 @@ fun BottomBar(navController: NavController) {
                     }
                 },
                 alwaysShowLabel = true, // M3: Recommended for 3-5 items
-                colors = NavigationBarItemDefaults.colors() // M3: Default colors without override
+                colors = NavigationBarItemDefaults.colors(), // M3: Default colors without override
             )
         }
     }
 }
-

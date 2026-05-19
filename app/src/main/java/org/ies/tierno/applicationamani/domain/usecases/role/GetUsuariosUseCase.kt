@@ -5,12 +5,10 @@ import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 import retrofit2.Response
 
 class GetUsuariosUseCase(
-    private val repository: AdminRepository
+    private val repository: AdminRepository,
 ) {
     suspend operator fun invoke(
         rol: String? = null,
-        dni: String? = null
-    ): Response<List<UsuarioDTO>> {
-        return repository.getUsuarios(rol, dni)
-    }
+        dni: String? = null,
+    ): Response<List<UsuarioDTO>> = repository.getUsuarios(rol, dni)
 }

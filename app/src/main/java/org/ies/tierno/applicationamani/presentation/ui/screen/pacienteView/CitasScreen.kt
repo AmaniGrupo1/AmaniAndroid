@@ -14,7 +14,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -23,28 +22,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
@@ -63,7 +53,7 @@ import java.util.Locale
 fun CitasScreen(
     navController: NavController,
     viewModel: PsicologoAgendaViewModel = koinViewModel(),
-    listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel()
+    listarTerapiasViewModel: ListarTerapiasViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
 
@@ -106,25 +96,29 @@ fun CitasScreen(
         }
     }
 
-    val notifPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            pendingRecordatorio?.let { (fecha, hora) ->
-                programarRecordatorioCita(
-                    context = context,
-                    fecha = fecha,
-                    hora = hora,
-                    minutosAntes = 30,
-                    titulo = "Cita en Amani",
-                    mensaje = "Tu cita es a las ${hora.format(DateTimeFormatter.ofPattern("HH:mm"))}"
-                )
+    val notifPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { granted ->
+            if (granted) {
+                pendingRecordatorio?.let { (fecha, hora) ->
+                    programarRecordatorioCita(
+                        context = context,
+                        fecha = fecha,
+                        hora = hora,
+                        minutosAntes = 30,
+                        titulo = "Cita en Amani",
+                        mensaje = "Tu cita es a las ${hora.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                    )
+                }
             }
+            pendingRecordatorio = null
         }
-        pendingRecordatorio = null
-    }
 
-    fun programarConPermiso(fecha: LocalDate, hora: LocalTime) {
+    fun programarConPermiso(
+        fecha: LocalDate,
+        hora: LocalTime,
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pendingRecordatorio = fecha to hora
             notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -135,29 +129,32 @@ fun CitasScreen(
                 hora = hora,
                 minutosAntes = 30,
                 titulo = "Cita en Amani",
-                mensaje = "Tu cita es a las ${hora.format(DateTimeFormatter.ofPattern("HH:mm"))}"
+                mensaje = "Tu cita es a las ${hora.format(DateTimeFormatter.ofPattern("HH:mm"))}",
             )
         }
     }
 
-    val fechasConCitas = remember(agendaMensual) {
-        agendaMensual.map { it.fecha }.toSet()
-    }
-
-    val citasDelDia = remember(fechaSeleccionada, agendaMensual) {
-        fechaSeleccionada?.let { fecha ->
-            agendaMensual.filter { it.fecha == fecha }
-        } ?: emptyList()
-    }
-
-    val tieneDisponibilidad = remember(disponibilidadDia, citasDelDia) {
-        if (disponibilidadDia?.diaCompleto == true) {
-            false
-        } else {
-            val slotsLibres = disponibilidadDia?.slotsLibres?.filter { !it.ocupado } ?: emptyList()
-            slotsLibres.isNotEmpty()
+    val fechasConCitas =
+        remember(agendaMensual) {
+            agendaMensual.map { it.fecha }.toSet()
         }
-    }
+
+    val citasDelDia =
+        remember(fechaSeleccionada, agendaMensual) {
+            fechaSeleccionada?.let { fecha ->
+                agendaMensual.filter { it.fecha == fecha }
+            } ?: emptyList()
+        }
+
+    val tieneDisponibilidad =
+        remember(disponibilidadDia, citasDelDia) {
+            if (disponibilidadDia?.diaCompleto == true) {
+                false
+            } else {
+                val slotsLibres = disponibilidadDia?.slotsLibres?.filter { !it.ocupado } ?: emptyList()
+                slotsLibres.isNotEmpty()
+            }
+        }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -174,39 +171,41 @@ fun CitasScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(2.dp)
+                elevation = FloatingActionButtonDefaults.elevation(2.dp),
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Nueva cita")
             }
-        }
+        },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
             ) {
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column {
                         Text(
                             text = "Mis Citas",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
                             text = "Selecciona una fecha y agenda tu cita",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -216,7 +215,7 @@ fun CitasScreen(
                 // Leyenda
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
                     LeyendaItemAmani(MaterialTheme.colorScheme.primary, "Con citas")
                     LeyendaItemAmani(MaterialTheme.colorScheme.secondary, "Día disponible")
@@ -230,7 +229,7 @@ fun CitasScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                    elevation = CardDefaults.cardElevation(0.dp)
+                    elevation = CardDefaults.cardElevation(0.dp),
                 ) {
                     CalendarioView(
                         modifier = Modifier.fillMaxWidth(),
@@ -243,7 +242,7 @@ fun CitasScreen(
                             if (fechaSeleccionada != null) {
                                 viewModel.cargarDisponibilidadDia(fechaSeleccionada!!)
                             }
-                        }
+                        },
                     )
                 }
 
@@ -253,71 +252,81 @@ fun CitasScreen(
                 AnimatedVisibility(
                     visible = fechaSeleccionada != null && citasDelDia.isNotEmpty(),
                     enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
+                    exit = fadeOut() + shrinkVertically(),
                 ) {
                     Column {
                         Text(
                             text = "📋 Mis citas programadas",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(vertical = 8.dp),
                         )
                         citasDelDia.forEach { cita ->
                             Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 6.dp),
                                 shape = MaterialTheme.shapes.medium,
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                ),
-                                elevation = CardDefaults.cardElevation(1.dp)
+                                colors =
+                                    CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    ),
+                                elevation = CardDefaults.cardElevation(1.dp),
                             ) {
                                 Row(
                                     modifier = Modifier.padding(16.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Column {
                                         Text(
-                                            text = "🕐 ${cita.horaInicio.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                                            text = "🕐 ${cita.horaInicio.format(
+                                                DateTimeFormatter.ofPattern("HH:mm"),
+                                            )} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
                                             style = MaterialTheme.typography.titleSmall,
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         )
                                         if (!cita.motivo.isNullOrBlank()) {
                                             Text(
                                                 text = cita.motivo,
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                             )
                                         }
                                         Surface(
                                             shape = MaterialTheme.shapes.small,
-                                            color = when (cita.estado?.lowercase()) {
-                                                "confirmada" -> MaterialTheme.colorScheme.primaryContainer
-                                                "cancelada" -> MaterialTheme.colorScheme.errorContainer
-                                                else -> MaterialTheme.colorScheme.tertiaryContainer
-                                            }
+                                            color =
+                                                when (cita.estado?.lowercase()) {
+                                                    "confirmada" -> MaterialTheme.colorScheme.primaryContainer
+                                                    "cancelada" -> MaterialTheme.colorScheme.errorContainer
+                                                    else -> MaterialTheme.colorScheme.tertiaryContainer
+                                                },
                                         ) {
                                             Text(
                                                 text = cita.estado?.replaceFirstChar { it.uppercase() } ?: "Pendiente",
                                                 style = MaterialTheme.typography.labelSmall,
-                                                color = when (cita.estado?.lowercase()) {
-                                                    "confirmada" -> MaterialTheme.colorScheme.onPrimaryContainer
-                                                    "cancelada" -> MaterialTheme.colorScheme.onErrorContainer
-                                                    else -> MaterialTheme.colorScheme.onTertiaryContainer
-                                                },
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                                color =
+                                                    when (cita.estado?.lowercase()) {
+                                                        "confirmada" -> MaterialTheme.colorScheme.onPrimaryContainer
+                                                        "cancelada" -> MaterialTheme.colorScheme.onErrorContainer
+                                                        else -> MaterialTheme.colorScheme.onTertiaryContainer
+                                                    },
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                             )
                                         }
                                     }
                                     Row {
                                         IconButton(onClick = {
                                             navController.navigate(
-                                                Screens.editarCitaScreen.pass(cita.id.toString())
+                                                Screens.editarCitaScreen.pass(cita.id.toString()),
                                             )
                                         }) {
-                                            Icon(Icons.Default.Edit, contentDescription = "Editar", tint = MaterialTheme.colorScheme.primary)
+                                            Icon(
+                                                Icons.Default.Edit,
+                                                contentDescription = "Editar",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
                                         }
                                         IconButton(onClick = {
                                             enviarCitaAlCalendario(
@@ -326,10 +335,14 @@ fun CitasScreen(
                                                 descripcion = cita.motivo ?: "Cita psicológica",
                                                 fecha = cita.fecha,
                                                 hora = cita.horaInicio,
-                                                duracionMinutos = cita.duracionMinutos ?: 60
+                                                duracionMinutos = cita.duracionMinutos ?: 60,
                                             )
                                         }) {
-                                            Icon(Icons.Default.CalendarMonth, contentDescription = "Calendario", tint = MaterialTheme.colorScheme.primary)
+                                            Icon(
+                                                Icons.Default.CalendarMonth,
+                                                contentDescription = "Calendario",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
                                         }
                                     }
                                 }
@@ -343,55 +356,61 @@ fun CitasScreen(
                 AnimatedVisibility(
                     visible = fechaSeleccionada != null && !isLoading,
                     enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
+                    exit = fadeOut() + shrinkVertically(),
                 ) {
                     fechaSeleccionada?.let { fecha ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.large,
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                            elevation = CardDefaults.cardElevation(0.dp)
+                            elevation = CardDefaults.cardElevation(0.dp),
                         ) {
                             Column(modifier = Modifier.padding(20.dp)) {
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = MaterialTheme.shapes.medium,
-                                    color = if (tieneDisponibilidad) MaterialTheme.colorScheme.secondaryContainer
-                                    else MaterialTheme.colorScheme.errorContainer
+                                    color =
+                                        if (tieneDisponibilidad) {
+                                            MaterialTheme.colorScheme.secondaryContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.errorContainer
+                                        },
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(16.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Icon(
                                             imageVector = if (tieneDisponibilidad) Icons.Default.CalendarToday else Icons.Default.EventBusy,
                                             contentDescription = null,
                                             tint = if (tieneDisponibilidad) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer,
-                                            modifier = Modifier.size(32.dp)
+                                            modifier = Modifier.size(32.dp),
                                         )
                                         Spacer(modifier = Modifier.width(16.dp))
                                         Column {
                                             Text(
-                                                text = fecha.format(
-                                                    DateTimeFormatter.ofPattern(
-                                                        "EEEE, d 'de' MMMM",
-                                                        Locale.forLanguageTag("es-ES")
-                                                    )
-                                                ).replaceFirstChar { it.uppercase() },
+                                                text =
+                                                    fecha
+                                                        .format(
+                                                            DateTimeFormatter.ofPattern(
+                                                                "EEEE, d 'de' MMMM",
+                                                                Locale.forLanguageTag("es-ES"),
+                                                            ),
+                                                        ).replaceFirstChar { it.uppercase() },
                                                 style = MaterialTheme.typography.titleMedium,
-                                                color = if (tieneDisponibilidad) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer
+                                                color = if (tieneDisponibilidad) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onErrorContainer,
                                             )
                                             if (tieneDisponibilidad) {
                                                 Text(
                                                     "✅ Hay horarios disponibles",
                                                     style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                                                 )
                                             } else {
                                                 Text(
                                                     "❌ No hay disponibilidad para este día",
                                                     style = MaterialTheme.typography.bodySmall,
-                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                    color = MaterialTheme.colorScheme.onErrorContainer,
                                                 )
                                             }
                                         }
@@ -428,18 +447,19 @@ fun CitasScreen(
             },
             onCrearCita = { idPacienteParam, fecha, hora, duracion, motivo, idTerapia, metodoPago, estadoPago, monto, modalidad ->
                 scope.launch {
-                    val result = viewModel.crearCitaParaPaciente(
-                        idPaciente = idPacienteParam,
-                        fecha = fecha,
-                        hora = hora,
-                        duracionMinutos = duracion,
-                        motivo = motivo,
-                        idTipoTerapia = idTerapia,
-                        metodoPago = metodoPago,
-                        estadoPago = estadoPago,
-                        monto = monto,
-                        modalidad = modalidad
-                    )
+                    val result =
+                        viewModel.crearCitaParaPaciente(
+                            idPaciente = idPacienteParam,
+                            fecha = fecha,
+                            hora = hora,
+                            duracionMinutos = duracion,
+                            motivo = motivo,
+                            idTipoTerapia = idTerapia,
+                            metodoPago = metodoPago,
+                            estadoPago = estadoPago,
+                            monto = monto,
+                            modalidad = modalidad,
+                        )
 
                     if (result.isSuccess) {
                         programarConPermiso(fecha, hora)
@@ -468,7 +488,7 @@ fun CitasScreen(
                         metodoPago = metodoPago,
                         estadoPago = estadoPago,
                         monto = monto,
-                        modalidad = modalidad
+                        modalidad = modalidad,
                     )
 
                     snackbarHostState.showSnackbar("✏️ Cita actualizada correctamente")
@@ -486,7 +506,7 @@ fun CitasScreen(
                 mostrarDialogo = false
                 modoEdicion = false
                 citaEditando = null
-            }
+            },
         )
     }
 }
@@ -494,20 +514,21 @@ fun CitasScreen(
 @Composable
 fun LeyendaItemAmani(
     color: Color,
-    texto: String
+    texto: String,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier
-                .size(12.dp)
-                .clip(MaterialTheme.shapes.extraSmall)
-                .background(color)
+            modifier =
+                Modifier
+                    .size(12.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .background(color),
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = texto,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -526,7 +547,7 @@ fun DialogoGestionCitaAmani(
     onFechaChange: (LocalDate) -> Unit,
     onCrearCita: (Long, LocalDate, LocalTime, Int, String, Long, MetodoPago, EstadoPago, BigDecimal, ModalidadCita) -> Unit,
     onEditarCita: (Long, Long, LocalDate, LocalTime, Int, String, Long, MetodoPago, EstadoPago, BigDecimal, ModalidadCita) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val formatterFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
@@ -547,19 +568,24 @@ fun DialogoGestionCitaAmani(
 
     val colorScheme = MaterialTheme.colorScheme
 
-    val horasDisponibles = remember(slotsLibres, citasExistentes, fechaSeleccionada, modoEdicion, citaExistente) {
-        val horasLibres = slotsLibres.map { it.hora }.sorted()
-        val horasOcupadas = citasExistentes.filter {
-            if (modoEdicion && citaExistente != null) it.id != citaExistente.id else true
-        }.map { it.horaInicio }
-        horasLibres.filter { hora -> hora !in horasOcupadas }
-    }
+    val horasDisponibles =
+        remember(slotsLibres, citasExistentes, fechaSeleccionada, modoEdicion, citaExistente) {
+            val horasLibres = slotsLibres.map { it.hora }.sorted()
+            val horasOcupadas =
+                citasExistentes
+                    .filter {
+                        if (modoEdicion && citaExistente != null) it.id != citaExistente.id else true
+                    }.map { it.horaInicio }
+            horasLibres.filter { hora -> hora !in horasOcupadas }
+        }
 
     var horaSeleccionada by remember {
         mutableStateOf(
-            if (modoEdicion && citaExistente != null && horasDisponibles.contains(citaExistente.horaInicio))
+            if (modoEdicion && citaExistente != null && horasDisponibles.contains(citaExistente.horaInicio)) {
                 citaExistente.horaInicio
-            else horasDisponibles.firstOrNull()
+            } else {
+                horasDisponibles.firstOrNull()
+            },
         )
     }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
@@ -591,22 +617,23 @@ fun DialogoGestionCitaAmani(
                 Text(
                     text = if (modoEdicion) "✏️ Reagendar cita" else "📅 Agendar nueva cita",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
                     text = if (modoEdicion) "Modifica los datos de tu cita" else "Completa la información para agendar",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         },
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 550.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 550.dp)
+                        .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // Tipo de terapia
                 CampoSeleccionAmani(
@@ -614,13 +641,19 @@ fun DialogoGestionCitaAmani(
                     icono = Icons.Default.MedicalServices,
                     valor = terapiaSeleccionada?.nombre ?: "",
                     expanded = terapiaDropdownExpanded,
-                    onExpandedChange = { terapiaDropdownExpanded = it }
+                    onExpandedChange = { terapiaDropdownExpanded = it },
                 ) {
                     if (terapias.isEmpty()) {
                         DropdownMenuItem(
-                            text = { Text("No hay tipos de terapia disponibles", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                            text = {
+                                Text(
+                                    "No hay tipos de terapia disponibles",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
                             onClick = { terapiaDropdownExpanded = false },
-                            enabled = false
+                            enabled = false,
                         )
                     } else {
                         terapias.forEach { terapia ->
@@ -630,19 +663,19 @@ fun DialogoGestionCitaAmani(
                                         Text(
                                             terapia.nombre,
                                             style = MaterialTheme.typography.bodyLarge,
-                                            color = MaterialTheme.colorScheme.onSurface
+                                            color = MaterialTheme.colorScheme.onSurface,
                                         )
                                         Text(
                                             "Duración: ${terapia.duracionMinutos} min | Precio: ${terapia.precio} €",
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
                                 },
                                 onClick = {
                                     terapiaSeleccionada = terapia
                                     terapiaDropdownExpanded = false
-                                }
+                                },
                             )
                         }
                     }
@@ -651,7 +684,7 @@ fun DialogoGestionCitaAmani(
                 // Fecha
                 CampoFechaAmani(
                     fechaSeleccionada = fechaSeleccionada,
-                    onFechaChange = { fechaSeleccionada = it }
+                    onFechaChange = { fechaSeleccionada = it },
                 )
 
                 // Hora
@@ -661,18 +694,26 @@ fun DialogoGestionCitaAmani(
                     valor = horaSeleccionada?.format(formatterHora) ?: "Sin horarios disponibles",
                     expanded = horaDropdownExpanded,
                     onExpandedChange = { horaDropdownExpanded = it },
-                    error = horasDisponibles.isEmpty() && !modoEdicion
+                    error = horasDisponibles.isEmpty() && !modoEdicion,
                 ) {
                     if (horasDisponibles.isEmpty() && !modoEdicion) {
                         DropdownMenuItem(
                             text = {
                                 Column {
-                                    Text("❌ No hay horarios libres", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
-                                    Text("Prueba con otra fecha", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(
+                                        "❌ No hay horarios libres",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                    Text(
+                                        "Prueba con otra fecha",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
                                 }
                             },
                             onClick = { horaDropdownExpanded = false },
-                            enabled = false
+                            enabled = false,
                         )
                     } else {
                         horasDisponibles.forEach { hora ->
@@ -683,19 +724,19 @@ fun DialogoGestionCitaAmani(
                                             Icons.Default.AccessTime,
                                             contentDescription = "",
                                             modifier = Modifier.size(18.dp),
-                                            tint = MaterialTheme.colorScheme.primary
+                                            tint = MaterialTheme.colorScheme.primary,
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Column {
                                             Text(
                                                 hora.format(formatterHora),
                                                 style = MaterialTheme.typography.bodyLarge,
-                                                color = MaterialTheme.colorScheme.onSurface
+                                                color = MaterialTheme.colorScheme.onSurface,
                                             )
                                             Text(
                                                 "Duración: $duracionMinutos min",
                                                 style = MaterialTheme.typography.labelSmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             )
                                         }
                                     }
@@ -703,7 +744,7 @@ fun DialogoGestionCitaAmani(
                                 onClick = {
                                     horaSeleccionada = hora
                                     horaDropdownExpanded = false
-                                }
+                                },
                             )
                         }
                     }
@@ -713,30 +754,30 @@ fun DialogoGestionCitaAmani(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Column {
                             Text(
                                 "Duración de la terapia",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
                                 "$duracionMinutos minutos",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                         Icon(
                             Icons.Default.Timer,
                             contentDescription = "",
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(28.dp),
                         )
                     }
                 }
@@ -749,46 +790,52 @@ fun DialogoGestionCitaAmani(
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 3,
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
                 )
 
                 // Modalidad
                 Text(
                     "Modalidad de la cita",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 ExposedDropdownMenuBox(
                     expanded = modalidadDropdownExpanded,
-                    onExpandedChange = { modalidadDropdownExpanded = it }
+                    onExpandedChange = { modalidadDropdownExpanded = it },
                 ) {
                     OutlinedTextField(
-                        value = when (modalidadSeleccionada) {
-                            ModalidadCita.PRESENCIAL -> "🏢 Presencial"
-                            ModalidadCita.LLAMADA -> "📞 Llamada"
-                        },
+                        value =
+                            when (modalidadSeleccionada) {
+                                ModalidadCita.PRESENCIAL -> "🏢 Presencial"
+                                ModalidadCita.LLAMADA -> "📞 Llamada"
+                            },
                         onValueChange = {},
                         readOnly = true,
                         leadingIcon = {
                             Icon(
                                 if (modalidadSeleccionada == ModalidadCita.PRESENCIAL) Icons.Default.LocationOn else Icons.Default.Phone,
                                 contentDescription = "Modalidad",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
                         modifier = Modifier.fillMaxWidth().menuAnchor(),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
                     )
                     ExposedDropdownMenu(
                         expanded = modalidadDropdownExpanded,
-                        onDismissRequest = { modalidadDropdownExpanded = false }
+                        onDismissRequest = { modalidadDropdownExpanded = false },
                     ) {
                         DropdownMenuItem(
                             text = {
                                 Row {
-                                    Icon(Icons.Default.LocationOn, contentDescription = "", modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                                    Icon(
+                                        Icons.Default.LocationOn,
+                                        contentDescription = "",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text("Presencial")
                                 }
@@ -796,12 +843,17 @@ fun DialogoGestionCitaAmani(
                             onClick = {
                                 modalidadSeleccionada = ModalidadCita.PRESENCIAL
                                 modalidadDropdownExpanded = false
-                            }
+                            },
                         )
                         DropdownMenuItem(
                             text = {
                                 Row {
-                                    Icon(Icons.Default.Phone, contentDescription = "", modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                                    Icon(
+                                        Icons.Default.Phone,
+                                        contentDescription = "",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text("Llamada")
                                 }
@@ -809,7 +861,7 @@ fun DialogoGestionCitaAmani(
                             onClick = {
                                 modalidadSeleccionada = ModalidadCita.LLAMADA
                                 modalidadDropdownExpanded = false
-                            }
+                            },
                         )
                     }
                 }
@@ -818,29 +870,29 @@ fun DialogoGestionCitaAmani(
                 Text(
                     "Información de pago",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             "Método de pago",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                            horizontalArrangement = Arrangement.spacedBy(24.dp),
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
                                     selected = metodoPagoSeleccionado == MetodoPago.EFECTIVO,
                                     onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO },
-                                    colors = RadioButtonDefaults.colors(selectedColor = colorScheme.primary)
+                                    colors = RadioButtonDefaults.colors(selectedColor = colorScheme.primary),
                                 )
                                 Text("Efectivo", style = MaterialTheme.typography.bodyMedium)
                             }
@@ -848,7 +900,7 @@ fun DialogoGestionCitaAmani(
                                 RadioButton(
                                     selected = metodoPagoSeleccionado == MetodoPago.TARJETA,
                                     onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA },
-                                    colors = RadioButtonDefaults.colors(selectedColor = colorScheme.primary)
+                                    colors = RadioButtonDefaults.colors(selectedColor = colorScheme.primary),
                                 )
                                 Text("Tarjeta", style = MaterialTheme.typography.bodyMedium)
                             }
@@ -863,7 +915,7 @@ fun DialogoGestionCitaAmani(
                             leadingIcon = { Text("€", color = MaterialTheme.colorScheme.primary) },
                             singleLine = true,
                             shape = MaterialTheme.shapes.small,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -872,7 +924,7 @@ fun DialogoGestionCitaAmani(
                                 MetodoPago.EFECTIVO, MetodoPago.PRESENCIAL -> "💰 El pago se realizará en consulta el día de la cita"
                             },
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -897,7 +949,7 @@ fun DialogoGestionCitaAmani(
                             metodoPagoSeleccionado,
                             estadoPagoSeleccionado,
                             montoCalculado,
-                            modalidadSeleccionada
+                            modalidadSeleccionada,
                         )
                     } else {
                         onCrearCita(
@@ -910,29 +962,29 @@ fun DialogoGestionCitaAmani(
                             metodoPagoSeleccionado,
                             estadoPagoSeleccionado,
                             montoCalculado,
-                            modalidadSeleccionada
+                            modalidadSeleccionada,
                         )
                     }
                     onDismiss()
                 },
                 enabled = habilitado,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = CircleShape
+                shape = CircleShape,
             ) {
                 Text(
                     if (modoEdicion) "💾 Guardar cambios" else "✅ Crear cita",
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Cancelar")
             }
-        }
+        },
     )
 }
 
@@ -945,13 +997,13 @@ fun CampoSeleccionAmani(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     error: Boolean = false,
-    content: @Composable ExposedDropdownMenuBoxScope.() -> Unit
+    content: @Composable ExposedDropdownMenuBoxScope.() -> Unit,
 ) {
     Column {
         Text(
             label,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(6.dp))
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandedChange) {
@@ -966,12 +1018,12 @@ fun CampoSeleccionAmani(
                 modifier = Modifier.fillMaxWidth().menuAnchor(),
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium,
-                isError = error
+                isError = error,
             )
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) },
-                modifier = Modifier.heightIn(max = 300.dp)
+                modifier = Modifier.heightIn(max = 300.dp),
             ) { content() }
         }
     }
@@ -981,7 +1033,7 @@ fun CampoSeleccionAmani(
 @Composable
 fun CampoFechaAmani(
     fechaSeleccionada: LocalDate,
-    onFechaChange: (LocalDate) -> Unit
+    onFechaChange: (LocalDate) -> Unit,
 ) {
     val formatterFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
@@ -989,19 +1041,19 @@ fun CampoFechaAmani(
         Text(
             "Fecha",
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(6.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            elevation = CardDefaults.cardElevation(1.dp)
+            elevation = CardDefaults.cardElevation(1.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = { onFechaChange(fechaSeleccionada.minusDays(1)) }) {
                     Icon(Icons.Default.ChevronLeft, contentDescription = "Día anterior", tint = MaterialTheme.colorScheme.primary)
@@ -1010,12 +1062,15 @@ fun CampoFechaAmani(
                     Text(
                         fechaSeleccionada.format(formatterFecha),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                        fechaSeleccionada
+                            .format(
+                                DateTimeFormatter.ofPattern("EEEE", Locale("es", "ES")),
+                            ).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 IconButton(onClick = { onFechaChange(fechaSeleccionada.plusDays(1)) }) {

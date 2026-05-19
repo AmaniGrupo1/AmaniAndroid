@@ -8,7 +8,7 @@ data class SendMessageRequest(
     val idSender: Long,
     val idReceiver: Long,
     val mensaje: String,
-    val idCita: Long? = null
+    val idCita: Long? = null,
 )
 
 data class SendMessageResponse(
@@ -16,12 +16,12 @@ data class SendMessageResponse(
     val idSender: Long,
     val idReceiver: Long,
     val mensaje: String,
-    val leido: Boolean
+    val leido: Boolean,
 )
 
 interface ChatApi {
     @POST("/api/chats/messages")
     suspend fun sendMessage(
-        @Body request: SendMessageRequest
+        @Body request: SendMessageRequest,
     ): Response<SendMessageResponse>
 }

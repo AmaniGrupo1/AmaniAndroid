@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ListarPacientesByPsicologoTest {
-
     private lateinit var repository: AuthRepository
     private lateinit var useCase: ListarPacientesByPsicologo
 
@@ -24,36 +23,49 @@ class ListarPacientesByPsicologoTest {
     }
 
     @Test
-    fun `invoke should emit list from repository`() = runTest {
-        val list = listOf(
-            PacientePsicologoResponseDTO(idPaciente = 1L, idUsuario = 10L, nombre = "Juan", apellido = "Perez", email = "j@t.com", dni = "123", telefono = "")
-        )
-        every { repository.getPacientesByPsicologo() } returns flowOf(list)
+    fun `invoke should emit list from repository`() =
+        runTest {
+            val list =
+                listOf(
+                    PacientePsicologoResponseDTO(
+                        idPaciente = 1L,
+                        idUsuario = 10L,
+                        nombre = "Juan",
+                        apellido = "Perez",
+                        email = "j@t.com",
+                        dni = "123",
+                        telefono = "",
+                    ),
+                )
+            every { repository.getPacientesByPsicologo() } returns flowOf(list)
 
-        useCase().test {
-            assertEquals(list, awaitItem())
-            awaitComplete()
+            useCase().test {
+                assertEquals(list, awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `invoke should emit empty list when no pacientes`() = runTest {
-        every { repository.getPacientesByPsicologo() } returns flowOf(emptyList())
+    fun `invoke should emit empty list when no pacientes`() =
+        runTest {
+            every { repository.getPacientesByPsicologo() } returns flowOf(emptyList())
 
-        useCase().test {
-            assertEquals(emptyList<PacientePsicologoResponseDTO>(), awaitItem())
-            awaitComplete()
+            useCase().test {
+                assertEquals(emptyList<PacientePsicologoResponseDTO>(), awaitItem())
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `invoke should propagate error when repository flow throws`() = runTest {
-        every { repository.getPacientesByPsicologo() } returns flow {
-            throw RuntimeException("Error API")
-        }
+    fun `invoke should propagate error when repository flow throws`() =
+        runTest {
+            every { repository.getPacientesByPsicologo() } returns
+                flow {
+                    throw RuntimeException("Error API")
+                }
 
-        useCase().test {
-            awaitError()
+            useCase().test {
+                awaitError()
+            }
         }
-    }
 }

@@ -20,7 +20,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CrearPreguntaViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
     private val crearPreguntaUseCase: CrearPreguntaUseCase = mockk(relaxed = true)
     private lateinit var viewModel: CrearPreguntaViewModel
@@ -41,7 +40,10 @@ class CrearPreguntaViewModelTest {
 
         assertEquals("", viewModel.request.value.texto)
         assertEquals("", viewModel.request.value.tipo)
-        assertTrue(viewModel.request.value.opciones?.isEmpty() ?: false)
+        assertTrue(
+            viewModel.request.value.opciones
+                ?.isEmpty() ?: false,
+        )
         assertFalse(viewModel.guardadoExitoso.value)
     }
 
@@ -73,41 +75,44 @@ class CrearPreguntaViewModelTest {
     }
 
     @Test
-    fun `guardarPregunta success sets guardadoExitoso true`() = runTest {
-        val dto = OpcionAdminDTO("Test", "opcion_multiple", emptyList())
-        coEvery { crearPreguntaUseCase(any()) } returns dto
+    fun `guardarPregunta success sets guardadoExitoso true`() =
+        runTest {
+            val dto = OpcionAdminDTO("Test", "opcion_multiple", emptyList())
+            coEvery { crearPreguntaUseCase(any()) } returns dto
 
-        viewModel = CrearPreguntaViewModel(crearPreguntaUseCase)
-        viewModel.guardarPregunta()
-        advanceUntilIdle()
+            viewModel = CrearPreguntaViewModel(crearPreguntaUseCase)
+            viewModel.guardarPregunta()
+            advanceUntilIdle()
 
-        assertTrue(viewModel.guardadoExitoso.value)
-    }
-
-    @Test
-    fun `guardarPregunta failure sets guardadoExitoso false`() = runTest {
-        coEvery { crearPreguntaUseCase(any()) } throws Exception("Error API")
-
-        viewModel = CrearPreguntaViewModel(crearPreguntaUseCase)
-        viewModel.guardarPregunta()
-        advanceUntilIdle()
-
-        assertFalse(viewModel.guardadoExitoso.value)
-    }
+            assertTrue(viewModel.guardadoExitoso.value)
+        }
 
     @Test
-    fun `limpiarEstadoGuardado resets guardadoExitoso`() = runTest {
-        val dto = OpcionAdminDTO("Test", "opcion_multiple", emptyList())
-        coEvery { crearPreguntaUseCase(any()) } returns dto
+    fun `guardarPregunta failure sets guardadoExitoso false`() =
+        runTest {
+            coEvery { crearPreguntaUseCase(any()) } throws Exception("Error API")
 
-        viewModel = CrearPreguntaViewModel(crearPreguntaUseCase)
-        viewModel.guardarPregunta()
-        advanceUntilIdle()
-        assertTrue(viewModel.guardadoExitoso.value)
+            viewModel = CrearPreguntaViewModel(crearPreguntaUseCase)
+            viewModel.guardarPregunta()
+            advanceUntilIdle()
 
-        viewModel.limpiarEstadoGuardado()
-        assertFalse(viewModel.guardadoExitoso.value)
-    }
+            assertFalse(viewModel.guardadoExitoso.value)
+        }
+
+    @Test
+    fun `limpiarEstadoGuardado resets guardadoExitoso`() =
+        runTest {
+            val dto = OpcionAdminDTO("Test", "opcion_multiple", emptyList())
+            coEvery { crearPreguntaUseCase(any()) } returns dto
+
+            viewModel = CrearPreguntaViewModel(crearPreguntaUseCase)
+            viewModel.guardarPregunta()
+            advanceUntilIdle()
+            assertTrue(viewModel.guardadoExitoso.value)
+
+            viewModel.limpiarEstadoGuardado()
+            assertFalse(viewModel.guardadoExitoso.value)
+        }
 
     @Test
     fun `boundary all opciones blank results in empty opciones list`() {
@@ -117,6 +122,9 @@ class CrearPreguntaViewModelTest {
         viewModel.setOpcion3("")
         viewModel.setOpcion4("")
 
-        assertTrue(viewModel.request.value.opciones?.isEmpty() ?: false)
+        assertTrue(
+            viewModel.request.value.opciones
+                ?.isEmpty() ?: false,
+        )
     }
 }

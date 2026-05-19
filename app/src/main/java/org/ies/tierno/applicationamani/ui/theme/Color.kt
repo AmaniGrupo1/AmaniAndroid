@@ -46,21 +46,21 @@ val AmaniCitaPendiente = Color(0xFFE65100)
 val AmaniCitaCancelada = Color(0xFFC62828)
 
 /** Fondo suave con tinte lila para el calendario. */
-val AmaniCalendarioBg   = Color(0xFFF5F0FF)
+val AmaniCalendarioBg = Color(0xFFF5F0FF)
 
 // ── Colores sugeridos para completar M3 ────────────────────────
 
 /** Color terciario sugerido (fucsia/lila). */
-val AmaniFuchsia            = Color(0xFF7B5C9E)
-val AmaniOnFuchsia          = Color(0xFFFFFFFF)
-val AmaniFuchsiaContainer   = Color(0xFFEADDFF)
+val AmaniFuchsia = Color(0xFF7B5C9E)
+val AmaniOnFuchsia = Color(0xFFFFFFFF)
+val AmaniFuchsiaContainer = Color(0xFFEADDFF)
 val AmaniOnFuchsiaContainer = Color(0xFF21005D)
 
 /** Colores de error estándar de Material 3. */
-val AmaniError              = Color(0xFFBA1A1A)
-val AmaniOnError            = Color(0xFFFFFFFF)
-val AmaniErrorContainer     = Color(0xFFFFDAD6)
-val AmaniOnErrorContainer   = Color(0xFF410002)
+val AmaniError = Color(0xFFBA1A1A)
+val AmaniOnError = Color(0xFFFFFFFF)
+val AmaniErrorContainer = Color(0xFFFFDAD6)
+val AmaniOnErrorContainer = Color(0xFF410002)
 
 /** Tinte de superficie (basado en el color primario). */
-val AmaniSurfaceTint        = AmaniPurple
+val AmaniSurfaceTint = AmaniPurple

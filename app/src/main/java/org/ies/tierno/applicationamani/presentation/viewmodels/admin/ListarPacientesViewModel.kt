@@ -1,5 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.admin
-    
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
@@ -15,9 +15,8 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 class ListarPacientesViewModel(
     val listarPacientesUseCase: TodosLosPacientesUseCase,
     val darBajaPacienteUseCase: DarBajaPacienteUseCase,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
-
     private val _paciente = MutableStateFlow<List<DatosPacienteAdminDTO>>(emptyList())
     val paciente: StateFlow<List<DatosPacienteAdminDTO>> = _paciente
 
@@ -101,13 +100,14 @@ class ListarPacientesViewModel(
     // ACTUALIZAR LOCALMENTE
     // =========================================================
     private fun actualizarPacienteBaja(id: Long) {
-        _paciente.value = _paciente.value.map {
-            if (it.idPaciente == id) {
-                it.copy(activo = false)
-            } else {
-                it
+        _paciente.value =
+            _paciente.value.map {
+                if (it.idPaciente == id) {
+                    it.copy(activo = false)
+                } else {
+                    it
+                }
             }
-        }
     }
 
     // =========================================================

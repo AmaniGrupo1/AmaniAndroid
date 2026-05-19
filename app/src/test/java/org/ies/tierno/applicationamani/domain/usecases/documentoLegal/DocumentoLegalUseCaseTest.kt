@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class DocumentoLegalUseCaseTest {
-
     private lateinit var repository: DocumentoLegalRepository
     private lateinit var useCase: DocumentoLegalUseCase
 
@@ -22,68 +21,74 @@ class DocumentoLegalUseCaseTest {
     }
 
     @Test
-    fun `getAllDocumentos should return result from repository`() = runTest {
-        val expected = Result.success(emptyList<DocumentoLegalResponseDTO>())
-        coEvery { repository.getAllDocumentos() } returns expected
+    fun `getAllDocumentos should return result from repository`() =
+        runTest {
+            val expected = Result.success(emptyList<DocumentoLegalResponseDTO>())
+            coEvery { repository.getAllDocumentos() } returns expected
 
-        val result = useCase.getAllDocumentos()
+            val result = useCase.getAllDocumentos()
 
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun `getDocumentoById should return result from repository`() = runTest {
-        val id = 1L
-        val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
-        coEvery { repository.getDocumentoLegal(id) } returns expected
-
-        val result = useCase.getDocumentoById(id)
-
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `crearDocumento should return result from repository`() = runTest {
-        val request = mockk<DocumentoLegalRequestDTO>()
-        val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
-        coEvery { repository.crearDocumento(request) } returns expected
+    fun `getDocumentoById should return result from repository`() =
+        runTest {
+            val id = 1L
+            val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
+            coEvery { repository.getDocumentoLegal(id) } returns expected
 
-        val result = useCase.crearDocumento(request)
+            val result = useCase.getDocumentoById(id)
 
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun `editarDocumento should return result from repository`() = runTest {
-        val id = 1L
-        val request = mockk<DocumentoLegalRequestDTO>()
-        val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
-        coEvery { repository.editarDocumento(id, request) } returns expected
-
-        val result = useCase.editarDocumento(id, request)
-
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `eliminarDocumento should return result from repository`() = runTest {
-        val id = 1L
-        val expected = Result.success(Unit)
-        coEvery { repository.deleteDocumento(id) } returns expected
+    fun `crearDocumento should return result from repository`() =
+        runTest {
+            val request = mockk<DocumentoLegalRequestDTO>()
+            val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
+            coEvery { repository.crearDocumento(request) } returns expected
 
-        val result = useCase.eliminarDocumento(id)
+            val result = useCase.crearDocumento(request)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `getDocumentoByTipo should return result from repository`() = runTest {
-        val tipo = "POLITICA_PRIVACIDAD"
-        val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
-        coEvery { repository.getDocumentoByTipo(tipo) } returns expected
+    fun `editarDocumento should return result from repository`() =
+        runTest {
+            val id = 1L
+            val request = mockk<DocumentoLegalRequestDTO>()
+            val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
+            coEvery { repository.editarDocumento(id, request) } returns expected
 
-        val result = useCase.getDocumentoByTipo(tipo)
+            val result = useCase.editarDocumento(id, request)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
+
+    @Test
+    fun `eliminarDocumento should return result from repository`() =
+        runTest {
+            val id = 1L
+            val expected = Result.success(Unit)
+            coEvery { repository.deleteDocumento(id) } returns expected
+
+            val result = useCase.eliminarDocumento(id)
+
+            assertEquals(expected, result)
+        }
+
+    @Test
+    fun `getDocumentoByTipo should return result from repository`() =
+        runTest {
+            val tipo = "POLITICA_PRIVACIDAD"
+            val expected = Result.success(mockk<DocumentoLegalResponseDTO>())
+            coEvery { repository.getDocumentoByTipo(tipo) } returns expected
+
+            val result = useCase.getDocumentoByTipo(tipo)
+
+            assertEquals(expected, result)
+        }
 }

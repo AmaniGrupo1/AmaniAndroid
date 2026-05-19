@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 
 class HistorialRepositoryTest {
-
     private lateinit var api: HistorialApi
     private lateinit var repository: HistorialRepository
 
@@ -22,25 +21,27 @@ class HistorialRepositoryTest {
     }
 
     @Test
-    fun `getHistorialPaciente should return list from api`() = runTest {
-        val id = 1L
-        val token = "t"
-        val expected = emptyList<HistorialClinicoResponseDTO>()
-        coEvery { api.getHistorialPaciente(id, token) } returns expected
+    fun `getHistorialPaciente should return list from api`() =
+        runTest {
+            val id = 1L
+            val token = "t"
+            val expected = emptyList<HistorialClinicoResponseDTO>()
+            coEvery { api.getHistorialPaciente(id, token) } returns expected
 
-        val result = repository.getHistorialPaciente(id, token)
+            val result = repository.getHistorialPaciente(id, token)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `createHistorialClinico should return response from api`() = runTest {
-        val request = mockk<HistorialClinicoRequestDTO>()
-        val expected = mockk<HistorialClinicoResponseDTO>()
-        coEvery { api.createHistorialClinico(request) } returns expected
+    fun `createHistorialClinico should return response from api`() =
+        runTest {
+            val request = mockk<HistorialClinicoRequestDTO>()
+            val expected = mockk<HistorialClinicoResponseDTO>()
+            coEvery { api.createHistorialClinico(request) } returns expected
 
-        val result = repository.createHistorialClinico(request)
+            val result = repository.createHistorialClinico(request)
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 }

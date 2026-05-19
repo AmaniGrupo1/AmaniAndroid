@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.profile
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,9 +9,8 @@ import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUse
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 
 class PacienteViewModel(
-    private val profileUseCaseGeneral: ProfileUseCaseGeneral
+    private val profileUseCaseGeneral: ProfileUseCaseGeneral,
 ) : ViewModel() {
-
     private val _psicologoAsignado = MutableStateFlow<PsicologoProfileResponseDTO?>(null)
     val psicologoAsignado: StateFlow<PsicologoProfileResponseDTO?> = _psicologoAsignado
 
@@ -28,14 +26,15 @@ class PacienteViewModel(
         viewModelScope.launch {
             val result = profileUseCaseGeneral.obtenerPsicologoAsignado(idPaciente)
 
-            result.onSuccess { psicologo ->
-                _psicologoAsignado.value = psicologo
-                _error.value = null
-            }.onFailure {
-                // solo errores REALES (red, backend, 500)
-                _error.value = it.message ?: "Error al cargar datos"
-                _psicologoAsignado.value = null
-            }
+            result
+                .onSuccess { psicologo ->
+                    _psicologoAsignado.value = psicologo
+                    _error.value = null
+                }.onFailure {
+                    // solo errores REALES (red, backend, 500)
+                    _error.value = it.message ?: "Error al cargar datos"
+                    _psicologoAsignado.value = null
+                }
 
             _isLoading.value = false
         }

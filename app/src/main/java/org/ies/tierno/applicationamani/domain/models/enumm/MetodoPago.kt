@@ -4,12 +4,12 @@ enum class MetodoPago {
     EFECTIVO,
     TARJETA,
     PRESENCIAL,
-    ONLINE
+    ONLINE,
 }
 
 enum class EstadoPago {
     PENDIENTE,
     PAGADO,
     FALLIDO,
-    REEMBOLSADO
+    REEMBOLSADO,
 }

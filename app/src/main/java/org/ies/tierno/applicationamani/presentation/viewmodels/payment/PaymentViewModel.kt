@@ -9,9 +9,8 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentIntentUseCase
 
 class PaymentViewModel(
-    private val createPaymentIntentUseCase: CreatePaymentIntentUseCase
+    private val createPaymentIntentUseCase: CreatePaymentIntentUseCase,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Idle)
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
@@ -22,17 +21,18 @@ class PaymentViewModel(
         viewModelScope.launch {
             createPaymentIntentUseCase(citaId)
                 .onSuccess { response ->
-                    _uiState.value = PaymentUiState.PaymentReady(
-                        clientSecret = response.clientSecret,
-                        paymentIntentId = response.paymentIntentId,
-                        amount = response.amount,
-                        currency = response.currency
-                    )
-                }
-                .onFailure { throwable ->
-                    _uiState.value = PaymentUiState.Error(
-                        throwable.message ?: "Error al preparar el pago"
-                    )
+                    _uiState.value =
+                        PaymentUiState.PaymentReady(
+                            clientSecret = response.clientSecret,
+                            paymentIntentId = response.paymentIntentId,
+                            amount = response.amount,
+                            currency = response.currency,
+                        )
+                }.onFailure { throwable ->
+                    _uiState.value =
+                        PaymentUiState.Error(
+                            throwable.message ?: "Error al preparar el pago",
+                        )
                 }
         }
     }

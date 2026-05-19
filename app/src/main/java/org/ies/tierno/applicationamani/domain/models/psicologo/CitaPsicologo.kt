@@ -5,5 +5,5 @@ import java.time.LocalTime
 data class CitaPsicologo(
     val hora: LocalTime,
     val paciente: String,
-    val motivo: String
+    val motivo: String,
 )

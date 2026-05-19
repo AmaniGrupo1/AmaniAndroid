@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -15,29 +14,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomSheetCambiarRol
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminUserManagementScreen(
     adminUserViewModel: AdminUserViewModel = koinViewModel(),
     adminRoleViewModel: AdminRoleViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
 ) {
     val usuarios by adminUserViewModel.usuariosFiltrados.collectAsState()
     val isLoading by adminUserViewModel.isLoading.collectAsState()
@@ -96,7 +87,7 @@ fun AdminUserManagementScreen(
         pendingRol?.let { nuevoRol ->
             adminRoleViewModel.cambiarRol(
                 idUsuario = selectedUser!!.idUsuario ?: 0,
-                nuevoRol = nuevoRol
+                nuevoRol = nuevoRol,
             )
         }
         showConfirmDialog = false
@@ -112,7 +103,7 @@ fun AdminUserManagementScreen(
                     Text(
                         "Gestión de Usuarios",
                         style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = colorScheme.onPrimary
+                        color = colorScheme.onPrimary,
                     )
                 },
                 navigationIcon = {
@@ -120,56 +111,61 @@ fun AdminUserManagementScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = colorScheme.onPrimary
+                            tint = colorScheme.onPrimary,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorScheme.primary,
-                    titleContentColor = colorScheme.onPrimary,
-                    navigationIconContentColor = colorScheme.onPrimary
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.primary,
+                        titleContentColor = colorScheme.onPrimary,
+                        navigationIconContentColor = colorScheme.onPrimary,
+                    ),
                 actions = {
                     // Botón de refresco manual
                     IconButton(onClick = { adminUserViewModel.cargarUsuarios() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refrescar", tint = colorScheme.onPrimary)
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            colorScheme.surfaceContainer.copy(alpha = 0.3f),
-                            colorScheme.background
-                        )
-                    )
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        colorScheme.surfaceContainer.copy(alpha = 0.3f),
+                                        colorScheme.background,
+                                    ),
+                            ),
+                    ),
         ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 // Filtros - Estilo profesional
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .shadow(4.dp, shapes.medium),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .shadow(4.dp, shapes.medium),
                     shape = shapes.medium,
                     colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
                             "Filtros",
                             style = typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = colorScheme.primary
+                            color = colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -181,23 +177,24 @@ fun AdminUserManagementScreen(
                                 Icon(
                                     Icons.Default.Search,
                                     contentDescription = null,
-                                    tint = colorScheme.primary
+                                    tint = colorScheme.primary,
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             shape = shapes.medium,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = colorScheme.onSurface,
-                                unfocusedTextColor = colorScheme.onSurface,
-                                focusedBorderColor = colorScheme.primary,
-                                unfocusedBorderColor = colorScheme.outline,
-                                focusedLabelColor = colorScheme.primary,
-                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
-                                cursorColor = colorScheme.primary,
-                                focusedContainerColor = colorScheme.surface,
-                                unfocusedContainerColor = colorScheme.surface
-                            )
+                            colors =
+                                OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = colorScheme.onSurface,
+                                    unfocusedTextColor = colorScheme.onSurface,
+                                    focusedBorderColor = colorScheme.primary,
+                                    unfocusedBorderColor = colorScheme.outline,
+                                    focusedLabelColor = colorScheme.primary,
+                                    unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                    cursorColor = colorScheme.primary,
+                                    focusedContainerColor = colorScheme.surface,
+                                    unfocusedContainerColor = colorScheme.surface,
+                                ),
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -205,61 +202,65 @@ fun AdminUserManagementScreen(
                         Text(
                             "Filtrar por Rol:",
                             style = typography.labelLarge,
-                            color = colorScheme.onSurface
+                            color = colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             FilterChip(
                                 selected = selectedRol == null,
                                 onClick = { selectedRol = null },
                                 label = { Text("Todos") },
                                 modifier = Modifier.weight(1f),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = colorScheme.primary,
-                                    selectedLabelColor = colorScheme.onPrimary,
-                                    containerColor = colorScheme.surface,
-                                    labelColor = colorScheme.onSurfaceVariant
-                                )
+                                colors =
+                                    FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = colorScheme.primary,
+                                        selectedLabelColor = colorScheme.onPrimary,
+                                        containerColor = colorScheme.surface,
+                                        labelColor = colorScheme.onSurfaceVariant,
+                                    ),
                             )
                             FilterChip(
-                                selected = selectedRol == Rol.admin,
-                                onClick = { selectedRol = Rol.admin },
+                                selected = selectedRol == Rol.ADMIN,
+                                onClick = { selectedRol = Rol.ADMIN },
                                 label = { Text("👑 Admins") },
                                 modifier = Modifier.weight(1f),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = colorScheme.primary,
-                                    selectedLabelColor = colorScheme.onPrimary,
-                                    containerColor = colorScheme.surface,
-                                    labelColor = colorScheme.onSurfaceVariant
-                                )
+                                colors =
+                                    FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = colorScheme.primary,
+                                        selectedLabelColor = colorScheme.onPrimary,
+                                        containerColor = colorScheme.surface,
+                                        labelColor = colorScheme.onSurfaceVariant,
+                                    ),
                             )
                             FilterChip(
-                                selected = selectedRol == Rol.psicologo,
-                                onClick = { selectedRol = Rol.psicologo },
+                                selected = selectedRol == Rol.PSICOLOGO,
+                                onClick = { selectedRol = Rol.PSICOLOGO },
                                 label = { Text("🧠 Psicólogos") },
                                 modifier = Modifier.weight(1f),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = colorScheme.primary,
-                                    selectedLabelColor = colorScheme.onPrimary,
-                                    containerColor = colorScheme.surface,
-                                    labelColor = colorScheme.onSurfaceVariant
-                                )
+                                colors =
+                                    FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = colorScheme.primary,
+                                        selectedLabelColor = colorScheme.onPrimary,
+                                        containerColor = colorScheme.surface,
+                                        labelColor = colorScheme.onSurfaceVariant,
+                                    ),
                             )
                             FilterChip(
-                                selected = selectedRol == Rol.paciente,
-                                onClick = { selectedRol = Rol.paciente },
+                                selected = selectedRol == Rol.PACIENTE,
+                                onClick = { selectedRol = Rol.PACIENTE },
                                 label = { Text("👤 Pacientes") },
                                 modifier = Modifier.weight(1f),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = colorScheme.primary,
-                                    selectedLabelColor = colorScheme.onPrimary,
-                                    containerColor = colorScheme.surface,
-                                    labelColor = colorScheme.onSurfaceVariant
-                                )
+                                colors =
+                                    FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = colorScheme.primary,
+                                        selectedLabelColor = colorScheme.onPrimary,
+                                        containerColor = colorScheme.surface,
+                                        labelColor = colorScheme.onSurfaceVariant,
+                                    ),
                             )
                         }
                     }
@@ -277,18 +278,18 @@ fun AdminUserManagementScreen(
                                 Icons.Default.People,
                                 contentDescription = null,
                                 modifier = Modifier.size(72.dp),
-                                tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "No se encontraron usuarios",
                                 style = typography.titleMedium,
-                                color = colorScheme.onSurfaceVariant
+                                color = colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 "Prueba con otros filtros",
                                 style = typography.bodySmall,
-                                color = colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
+                                color = colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
                             )
                         }
                     }
@@ -296,7 +297,7 @@ fun AdminUserManagementScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(usuarios) { user ->
                             UserCard(
@@ -304,7 +305,7 @@ fun AdminUserManagementScreen(
                                 onCambiarRol = {
                                     selectedUser = user
                                     showBottomSheet = true
-                                }
+                                },
                             )
                         }
                     }
@@ -325,7 +326,7 @@ fun AdminUserManagementScreen(
                     "Confirmar cambio de rol",
                     style = typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.primary
+                    color = colorScheme.primary,
                 )
             },
             text = {
@@ -333,44 +334,45 @@ fun AdminUserManagementScreen(
                     Text(
                         "¿Estás seguro de que quieres cambiar el rol de?",
                         style = typography.bodyMedium,
-                        color = colorScheme.onSurface
+                        color = colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "${selectedUser?.nombre ?: ""} ${selectedUser?.apellido ?: ""}".trim(),
                         style = typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.primary
+                        color = colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = selectedUser?.email ?: "",
                         style = typography.bodySmall,
-                        color = colorScheme.onSurfaceVariant
+                        color = colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Rol actual: ${when (selectedUser?.rol) {
-                            Rol.admin -> "👑 Administrador"
-                            Rol.psicologo -> "🧠 Psicólogo"
+                            Rol.ADMIN -> "👑 Administrador"
+                            Rol.PSICOLOGO -> "🧠 Psicólogo"
                             else -> "👤 Paciente"
                         }}",
                         style = typography.bodySmall,
-                        color = colorScheme.onSurfaceVariant
+                        color = colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = "Nuevo rol: ${when (pendingRol) {
-                            Rol.admin -> "👑 Administrador"
-                            Rol.psicologo -> "🧠 Psicólogo"
+                            Rol.ADMIN -> "👑 Administrador"
+                            Rol.PSICOLOGO -> "🧠 Psicólogo"
                             else -> "👤 Paciente"
                         }}",
                         style = typography.bodySmall,
                         fontWeight = FontWeight.Bold,
-                        color = when (pendingRol) {
-                            Rol.admin -> colorScheme.error
-                            Rol.psicologo -> colorScheme.secondary
-                            else -> colorScheme.primary
-                        }
+                        color =
+                            when (pendingRol) {
+                                Rol.ADMIN -> colorScheme.error
+                                Rol.PSICOLOGO -> colorScheme.secondary
+                                else -> colorScheme.primary
+                            },
                     )
                 }
             },
@@ -379,10 +381,11 @@ fun AdminUserManagementScreen(
                     onClick = {
                         confirmRoleChange()
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorScheme.primary
-                    ),
-                    shape = shapes.small
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                        ),
+                    shape = shapes.small,
                 ) {
                     Text("Sí, cambiar rol", color = colorScheme.onPrimary)
                 }
@@ -393,13 +396,13 @@ fun AdminUserManagementScreen(
                         showConfirmDialog = false
                         pendingRol = null
                     },
-                    shape = shapes.small
+                    shape = shapes.small,
                 ) {
                     Text("Cancelar")
                 }
             },
             containerColor = colorScheme.surface,
-            shape = shapes.extraLarge
+            shape = shapes.extraLarge,
         )
     }
 
@@ -413,7 +416,7 @@ fun AdminUserManagementScreen(
             onConfirm = { nuevoRol ->
                 pendingRol = nuevoRol
                 showConfirmDialog = true
-            }
+            },
         )
     }
 }
@@ -421,65 +424,70 @@ fun AdminUserManagementScreen(
 @Composable
 fun UserCard(
     user: UsuarioDTO,
-    onCambiarRol: () -> Unit
+    onCambiarRol: () -> Unit,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
 
     // Colores según rol
-    val roleColor = when (user.rol) {
-        Rol.admin -> colorScheme.error
-        Rol.psicologo -> colorScheme.tertiary
-        else -> colorScheme.primary
-    }
+    val roleColor =
+        when (user.rol) {
+            Rol.ADMIN -> colorScheme.error
+            Rol.PSICOLOGO -> colorScheme.tertiary
+            else -> colorScheme.primary
+        }
 
     val roleBgColor = roleColor.copy(alpha = 0.1f)
 
-    val roleLabel = when (user.rol) {
-        Rol.admin -> "👑 Administrador"
-        Rol.psicologo -> "🧠 Psicólogo"
-        else -> "👤 Paciente"
-    }
+    val roleLabel =
+        when (user.rol) {
+            Rol.ADMIN -> "👑 Administrador"
+            Rol.PSICOLOGO -> "🧠 Psicólogo"
+            else -> "👤 Paciente"
+        }
 
-    val roleIcon = when (user.rol) {
-        Rol.admin -> Icons.Default.AdminPanelSettings
-        Rol.psicologo -> Icons.Default.Psychology
-        else -> Icons.Default.Person
-    }
+    val roleIcon =
+        when (user.rol) {
+            Rol.ADMIN -> Icons.Default.AdminPanelSettings
+            Rol.PSICOLOGO -> Icons.Default.Psychology
+            else -> Icons.Default.Person
+        }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(2.dp, shapes.medium),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(2.dp, shapes.medium),
         shape = shapes.medium,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 // Nombre y rol en una fila
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Icon(
                         roleIcon,
                         contentDescription = null,
                         tint = roleColor,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(28.dp),
                     )
                     Text(
                         text = "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
                         style = typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurface
+                        color = colorScheme.onSurface,
                     )
                 }
 
@@ -489,7 +497,7 @@ fun UserCard(
                 Text(
                     text = user.email ?: "",
                     style = typography.bodySmall,
-                    color = colorScheme.onSurfaceVariant
+                    color = colorScheme.onSurfaceVariant,
                 )
 
                 // DNI si existe
@@ -497,7 +505,7 @@ fun UserCard(
                     Text(
                         text = "DNI: ${user.dni}",
                         style = typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     )
                 }
 
@@ -507,14 +515,14 @@ fun UserCard(
                 Surface(
                     shape = CircleShape,
                     color = roleBgColor,
-                    modifier = Modifier
+                    modifier = Modifier,
                 ) {
                     Text(
                         text = roleLabel,
                         style = typography.labelSmall,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-                        color = roleColor
+                        color = roleColor,
                     )
                 }
             }
@@ -522,13 +530,13 @@ fun UserCard(
             // Botón cambiar rol
             IconButton(
                 onClick = onCambiarRol,
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier.size(44.dp),
             ) {
                 Icon(
                     Icons.Default.SwapHoriz,
                     contentDescription = "Cambiar rol",
                     modifier = Modifier.size(24.dp),
-                    tint = colorScheme.primary.copy(alpha = 0.8f)
+                    tint = colorScheme.primary.copy(alpha = 0.8f),
                 )
             }
         }

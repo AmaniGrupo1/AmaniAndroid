@@ -57,7 +57,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -68,13 +67,14 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import java.math.BigDecimal
 
 // Colores de la marca Amani
-private val AmaniPrimary = Color(0xFF9B87F5)      // Morado suave
+private val AmaniPrimary = Color(0xFF9B87F5) // Morado suave
 private val AmaniPrimaryLight = Color(0xFFEDE7FF) // Morado muy claro para fondos
-private val AmaniSecondary = Color(0xFF7E69D6)    // Morado mas oscuro para acentos
-private val AmaniBackground = Color(0xFFFDF8FF)   // Fondo blanco con tono lila muy suave
+private val AmaniSecondary = Color(0xFF7E69D6) // Morado mas oscuro para acentos
+private val AmaniBackground = Color(0xFFFDF8FF) // Fondo blanco con tono lila muy suave
 private val AmaniCardBackground = Color.White
 private val AmaniTextPrimary = Color(0xFF2D2D35)
 private val AmaniTextSecondary = Color(0xFF6B6B7A)
@@ -84,7 +84,7 @@ private val AmaniDivider = Color(0xFFE8E2F3)
 @Composable
 fun TerapiasScreen(
     navController: NavController,
-    viewModel: ListarTerapiasViewModel = viewModel()
+    viewModel: ListarTerapiasViewModel = viewModel(),
 ) {
     val terapias by viewModel.terapias.collectAsState()
     val loading by viewModel.loading.collectAsState()
@@ -102,7 +102,7 @@ fun TerapiasScreen(
             scope.launch {
                 snackbarHostState.showSnackbar(
                     message = it,
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
                 viewModel.limpiarError()
             }
@@ -120,7 +120,7 @@ fun TerapiasScreen(
                         text = stringResource(R.string.gestion_terapias),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        color = Color.White,
                     )
                 },
                 navigationIcon = {
@@ -128,13 +128,14 @@ fun TerapiasScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.volver),
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AmaniPrimary,
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = AmaniPrimary,
+                    ),
             )
         },
         floatingActionButton = {
@@ -142,44 +143,45 @@ fun TerapiasScreen(
                 onClick = { viewModel.mostrarDialogCrear() },
                 containerColor = AmaniPrimary,
                 contentColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(4.dp)
+                elevation = FloatingActionButtonDefaults.elevation(4.dp),
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_terapia))
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             when {
                 loading && terapias.isEmpty() -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = AmaniPrimary
+                        color = AmaniPrimary,
                     )
                 }
                 terapias.isEmpty() -> {
                     EmptyTerapiasScreen(
-                        onAddClick = { viewModel.mostrarDialogCrear() }
+                        onAddClick = { viewModel.mostrarDialogCrear() },
                     )
                 }
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(
                             items = terapias,
-                            key = { it.idTipo }
+                            key = { it.idTipo },
                         ) { terapia ->
                             TarjetaTerapia(
                                 terapia = terapia,
                                 onEditClick = { viewModel.mostrarDialogEditar(terapia) },
-                                onDeleteClick = { terapiaAEliminar = terapia }
+                                onDeleteClick = { terapiaAEliminar = terapia },
                             )
                         }
                     }
@@ -196,13 +198,13 @@ fun TerapiasScreen(
                 Text(
                     text = stringResource(R.string.confirmar_eliminacion),
                     fontWeight = FontWeight.Bold,
-                    color = AmaniTextPrimary
+                    color = AmaniTextPrimary,
                 )
             },
             text = {
                 Text(
                     text = stringResource(R.string.confirmar_eliminar_terapia, terapiaAEliminar!!.nombre),
-                    color = AmaniTextSecondary
+                    color = AmaniTextSecondary,
                 )
             },
             confirmButton = {
@@ -211,11 +213,12 @@ fun TerapiasScreen(
                         viewModel.eliminarTerapia(terapiaAEliminar!!.idTipo)
                         terapiaAEliminar = null
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = Color.White,
+                        ),
+                    shape = RoundedCornerShape(8.dp),
                 ) {
                     Text(stringResource(R.string.eliminar))
                 }
@@ -223,15 +226,16 @@ fun TerapiasScreen(
             dismissButton = {
                 TextButton(
                     onClick = { terapiaAEliminar = null },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = AmaniTextSecondary
-                    )
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = AmaniTextSecondary,
+                        ),
                 ) {
                     Text(stringResource(R.string.cancelar))
                 }
             },
             shape = RoundedCornerShape(16.dp),
-            containerColor = amaniColors.cardBackground
+            containerColor = amaniColors.cardBackground,
         )
     }
 
@@ -248,10 +252,10 @@ fun TerapiasScreen(
                         id = terapiaEditando!!.idTipo,
                         nombre = nombre,
                         duracion = duracion,
-                        precio = precio
+                        precio = precio,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -260,53 +264,54 @@ fun TerapiasScreen(
 fun TarjetaTerapia(
     terapia: TerapiaResponseDTO,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = LocalAmaniColors.current.cardBackground)
+        colors = CardDefaults.cardColors(containerColor = LocalAmaniColors.current.cardBackground),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = terapia.nombre,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = AmaniPrimary
+                    color = AmaniPrimary,
                 )
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     IconButton(
                         onClick = onEditClick,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(36.dp),
                     ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = stringResource(R.string.editar),
-                            tint = AmaniPrimary
+                            tint = AmaniPrimary,
                         )
                     }
 
                     IconButton(
                         onClick = onDeleteClick,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(36.dp),
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = stringResource(R.string.eliminar),
-                            tint = Color(0xFFE57373)
+                            tint = Color(0xFFE57373),
                         )
                     }
                 }
@@ -316,27 +321,27 @@ fun TarjetaTerapia(
 
             HorizontalDivider(
                 thickness = 1.dp,
-                color = AmaniDivider
+                color = AmaniDivider,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.Schedule,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
-                        tint = AmaniTextSecondary
+                        tint = AmaniTextSecondary,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.duracion_minutos, terapia.duracionMinutos),
                         fontSize = 14.sp,
-                        color = AmaniTextSecondary
+                        color = AmaniTextSecondary,
                     )
                 }
 
@@ -345,14 +350,14 @@ fun TarjetaTerapia(
                         Icons.Default.AttachMoney,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
-                        tint = AmaniPrimary
+                        tint = AmaniPrimary,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.precio_formato, terapia.precio.toString()),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = AmaniPrimary
+                        color = AmaniPrimary,
                     )
                 }
             }
@@ -361,19 +366,17 @@ fun TarjetaTerapia(
 }
 
 @Composable
-fun EmptyTerapiasScreen(
-    onAddClick: () -> Unit
-) {
+fun EmptyTerapiasScreen(onAddClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             Icons.Default.FitnessCenter,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
-            tint = AmaniPrimary.copy(alpha = 0.4f)
+            tint = AmaniPrimary.copy(alpha = 0.4f),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -382,7 +385,7 @@ fun EmptyTerapiasScreen(
             text = stringResource(R.string.no_hay_terapias),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
-            color = AmaniTextPrimary
+            color = AmaniTextPrimary,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -390,7 +393,7 @@ fun EmptyTerapiasScreen(
         Text(
             text = stringResource(R.string.presiona_para_agregar),
             fontSize = 14.sp,
-            color = AmaniTextSecondary
+            color = AmaniTextSecondary,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -398,10 +401,11 @@ fun EmptyTerapiasScreen(
         Button(
             onClick = onAddClick,
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AmaniPrimary,
-                contentColor = Color.White
-            )
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = AmaniPrimary,
+                    contentColor = Color.White,
+                ),
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
@@ -415,7 +419,7 @@ fun EmptyTerapiasScreen(
 fun TerapiaDialog(
     terapia: TerapiaResponseDTO?,
     onDismiss: () -> Unit,
-    onConfirm: (nombre: String, duracion: Int, precio: BigDecimal) -> Unit
+    onConfirm: (nombre: String, duracion: Int, precio: BigDecimal) -> Unit,
 ) {
     var nombre by remember(terapia) { mutableStateOf(terapia?.nombre ?: "") }
     var duracion by remember(terapia) { mutableStateOf(terapia?.duracionMinutos?.toString() ?: "") }
@@ -432,12 +436,12 @@ fun TerapiaDialog(
                 text = titulo,
                 fontWeight = FontWeight.Bold,
                 color = AmaniPrimary,
-                fontSize = 20.sp
+                fontSize = 20.sp,
             )
         },
         text = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 OutlinedTextField(
                     value = nombre,
@@ -445,11 +449,12 @@ fun TerapiaDialog(
                     label = { Text(stringResource(R.string.nombre_terapia)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniPrimary,
-                        unfocusedBorderColor = AmaniDivider,
-                        focusedLabelColor = AmaniPrimary
-                    )
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = AmaniPrimary,
+                            unfocusedBorderColor = AmaniDivider,
+                            focusedLabelColor = AmaniPrimary,
+                        ),
                 )
 
                 OutlinedTextField(
@@ -458,14 +463,16 @@ fun TerapiaDialog(
                     label = { Text(stringResource(R.string.duracion_minutos_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniPrimary,
-                        unfocusedBorderColor = AmaniDivider,
-                        focusedLabelColor = AmaniPrimary
-                    )
+                    keyboardOptions =
+                        androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                        ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = AmaniPrimary,
+                            unfocusedBorderColor = AmaniDivider,
+                            focusedLabelColor = AmaniPrimary,
+                        ),
                 )
 
                 OutlinedTextField(
@@ -475,14 +482,16 @@ fun TerapiaDialog(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     leadingIcon = { Text("EUR", color = AmaniTextSecondary) },
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaniPrimary,
-                        unfocusedBorderColor = AmaniDivider,
-                        focusedLabelColor = AmaniPrimary
-                    )
+                    keyboardOptions =
+                        androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal,
+                        ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = AmaniPrimary,
+                            unfocusedBorderColor = AmaniDivider,
+                            focusedLabelColor = AmaniPrimary,
+                        ),
                 )
             }
         },
@@ -492,20 +501,27 @@ fun TerapiaDialog(
                     val duracionInt = duracion.toIntOrNull()
                     val precioDecimal = precio.toBigDecimalOrNull()
 
-                    if (nombre.isNotBlank() && duracionInt != null && duracionInt > 0 && precioDecimal != null && precioDecimal > BigDecimal.ZERO) {
+                    if (nombre.isNotBlank() &&
+                        duracionInt != null &&
+                        duracionInt > 0 &&
+                        precioDecimal != null &&
+                        precioDecimal > BigDecimal.ZERO
+                    ) {
                         onConfirm(nombre, duracionInt, precioDecimal)
                     }
                 },
-                enabled = nombre.isNotBlank() &&
+                enabled =
+                    nombre.isNotBlank() &&
                         duracion.toIntOrNull() != null &&
                         duracion.toIntOrNull()!! > 0 &&
                         precio.toBigDecimalOrNull() != null &&
                         precio.toBigDecimalOrNull()!! > BigDecimal.ZERO,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AmaniPrimary,
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(10.dp)
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = AmaniPrimary,
+                        contentColor = Color.White,
+                    ),
+                shape = RoundedCornerShape(10.dp),
             ) {
                 Text(botonTexto)
             }
@@ -513,14 +529,15 @@ fun TerapiaDialog(
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = AmaniTextSecondary
-                )
+                colors =
+                    ButtonDefaults.textButtonColors(
+                        contentColor = AmaniTextSecondary,
+                    ),
             ) {
                 Text(stringResource(R.string.cancelar))
             }
         },
         shape = RoundedCornerShape(20.dp),
-        containerColor = AmaniCardBackground
+        containerColor = AmaniCardBackground,
     )
 }

@@ -5,16 +5,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
-import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 
 class SituacionViewModel(
     private val useCase: SituacionUseCase,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
-
     // =========================
     // LISTA
     // =========================
@@ -79,7 +78,10 @@ class SituacionViewModel(
     // =========================
     // CREATE
     // =========================
-    fun crearSituacion(request: SituacionRequest, onResult: (Boolean, String?) -> Unit = { _, _ -> }) {
+    fun crearSituacion(
+        request: SituacionRequest,
+        onResult: (Boolean, String?) -> Unit = { _, _ -> },
+    ) {
         viewModelScope.launch {
             val result = useCase.createSituacion(request)
             onResult(result.isSuccess, result.exceptionOrNull()?.message)
@@ -93,7 +95,11 @@ class SituacionViewModel(
     // =========================
     // UPDATE
     // =========================
-    fun actualizarSituacion(id: Long, request: SituacionRequest, onResult: (Boolean, String?) -> Unit = { _, _ -> }) {
+    fun actualizarSituacion(
+        id: Long,
+        request: SituacionRequest,
+        onResult: (Boolean, String?) -> Unit = { _, _ -> },
+    ) {
         viewModelScope.launch {
             val result = useCase.updateSituacion(id, request)
             onResult(result.isSuccess, result.exceptionOrNull()?.message)
@@ -107,7 +113,10 @@ class SituacionViewModel(
     // =========================
     // DELETE
     // =========================
-    fun eliminarSituacion(id: Long, onResult: (Boolean, String?) -> Unit = { _, _ -> }) {
+    fun eliminarSituacion(
+        id: Long,
+        onResult: (Boolean, String?) -> Unit = { _, _ -> },
+    ) {
         viewModelScope.launch {
             val result = useCase.deleteSituacion(id)
             onResult(result.isSuccess, result.exceptionOrNull()?.message)

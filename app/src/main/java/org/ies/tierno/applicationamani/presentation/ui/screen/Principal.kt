@@ -60,7 +60,7 @@ fun getFrasesMotivacionales(context: Context): List<String> {
         resources.getString(R.string.frase_5),
         resources.getString(R.string.frase_6),
         resources.getString(R.string.frase_7),
-        resources.getString(R.string.frase_8)
+        resources.getString(R.string.frase_8),
     )
 }
 
@@ -75,14 +75,14 @@ fun getConsejosLista(context: Context): List<String> {
         resources.getString(R.string.consejo_5),
         resources.getString(R.string.consejo_6),
         resources.getString(R.string.consejo_7),
-        resources.getString(R.string.consejo_8)
+        resources.getString(R.string.consejo_8),
     )
 }
 
 @Composable
 fun Principal(
     navController: NavController,
-    userSessionDataStore: UserSessionDataStore
+    userSessionDataStore: UserSessionDataStore,
 ) {
     val typography = MaterialTheme.typography
     val context = LocalContext.current
@@ -92,12 +92,14 @@ fun Principal(
     val currentLanguage = session?.idioma ?: "es"
 
     // ✅ Forzar recomposición cuando cambia el idioma
-    val frasesMotivacionales = remember(currentLanguage) {
-        getFrasesMotivacionales(context)
-    }
-    val consejosLista = remember(currentLanguage) {
-        getConsejosLista(context)
-    }
+    val frasesMotivacionales =
+        remember(currentLanguage) {
+            getFrasesMotivacionales(context)
+        }
+    val consejosLista =
+        remember(currentLanguage) {
+            getConsejosLista(context)
+        }
 
     var mostrarConsejo by remember { mutableStateOf(false) }
     var consejoActual by remember { mutableStateOf("") }
@@ -114,11 +116,12 @@ fun Principal(
 
     fun cambiarFrase() {
         val otrasFrases = frasesMotivacionales.filter { it != fraseActual }
-        fraseActual = if (otrasFrases.isNotEmpty()) {
-            otrasFrases.random()
-        } else {
-            frasesMotivacionales.random()
-        }
+        fraseActual =
+            if (otrasFrases.isNotEmpty()) {
+                otrasFrases.random()
+            } else {
+                frasesMotivacionales.random()
+            }
     }
 
     LaunchedEffect(Unit) {
@@ -132,62 +135,68 @@ fun Principal(
         topBar = {
             MenuPrincipal(navController)
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surfaceContainerLow,
-                            MaterialTheme.colorScheme.surface
-                        )
-                    )
-                )
-                .padding(24.dp),
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        MaterialTheme.colorScheme.surfaceContainerLow,
+                                        MaterialTheme.colorScheme.surface,
+                                    ),
+                            ),
+                    ).padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = stringResource(R.string.amani),
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 4.sp
-                ),
+                style =
+                    MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 4.sp,
+                    ),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             Text(
                 text = stringResource(R.string.psicologia_bienestar),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary, // M3: Secondary for subtitles
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = 32.dp),
             )
 
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
                 shape = MaterialTheme.shapes.medium, // M3: Medium for cards
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation() // M3: Default elevation
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                elevation = CardDefaults.cardElevation(), // M3: Default elevation
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
                         imageVector = Icons.Default.SelfImprovement,
                         contentDescription = "Cambiar frase",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(48.dp) // Large icon is fine for illustration
-                            .clickable { cambiarFrase() }
+                        modifier =
+                            Modifier
+                                .size(48.dp) // Large icon is fine for illustration
+                                .clickable { cambiarFrase() },
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -195,7 +204,7 @@ fun Principal(
                         text = fraseActual,
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -203,24 +212,24 @@ fun Principal(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = "🔄",
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.clickable { cambiarFrase() }
+                            modifier = Modifier.clickable { cambiarFrase() },
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.tap_nueva_frase),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "⏱️",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
@@ -235,53 +244,55 @@ fun Principal(
                     consejoActual = consejosLista.random()
                     mostrarConsejo = true
                 },
-                colors = ButtonDefaults.buttonColors() // M3: No hardcoded colors
+                colors = ButtonDefaults.buttonColors(), // M3: No hardcoded colors
             ) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp) // M3: 18dp for icons in buttons
+                    modifier = Modifier.size(18.dp), // M3: 18dp for icons in buttons
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.recibir_consejo),
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
 
             if (mostrarConsejo) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { mostrarConsejo = false },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { mostrarConsejo = false },
                     shape = MaterialTheme.shapes.medium, // M3: Medium for cards
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                    ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                        ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = stringResource(R.string.consejo_dia),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = consejoActual,
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = stringResource(R.string.tap_cerrar),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }

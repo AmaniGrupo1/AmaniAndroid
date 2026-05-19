@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.domain.models.admin
 
-
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,5 +11,5 @@ data class RegistrarPsicologoAdminDTO(
     val especialidad: String,
     val experiencia: Int? = null, // opcional
     val descripcion: String? = null,
-    val licencia: String? = null
+    val licencia: String? = null,
 )

@@ -40,24 +40,25 @@ fun PaymentScreen(
     monto: String,
     viewModel: PaymentViewModel,
     onPaymentSuccess: () -> Unit,
-    onPaymentCanceled: () -> Unit
+    onPaymentCanceled: () -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val paymentSheet = rememberPaymentSheet { result ->
-        when (result) {
-            is PaymentSheetResult.Completed -> {
-                viewModel.onPaymentSuccess()
-            }
-            is PaymentSheetResult.Canceled -> {
-                viewModel.onPaymentCanceled()
-            }
-            is PaymentSheetResult.Failed -> {
-                viewModel.onPaymentFailed(result.error.localizedMessage ?: "Error en el pago")
+    val paymentSheet =
+        rememberPaymentSheet { result ->
+            when (result) {
+                is PaymentSheetResult.Completed -> {
+                    viewModel.onPaymentSuccess()
+                }
+                is PaymentSheetResult.Canceled -> {
+                    viewModel.onPaymentCanceled()
+                }
+                is PaymentSheetResult.Failed -> {
+                    viewModel.onPaymentFailed(result.error.localizedMessage ?: "Error en el pago")
+                }
             }
         }
-    }
 
     LaunchedEffect(citaId) {
         if (uiState is PaymentUiState.Idle) {
@@ -84,29 +85,30 @@ fun PaymentScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Pago de sesión") }
+                title = { Text("Pago de sesión") },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         text = "Resumen de la cita",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                     Text(text = "Psicólogo: $psicologoName")
                     Text(text = "Fecha: $fecha")
@@ -116,14 +118,15 @@ fun PaymentScreen(
 
             when (uiState) {
                 is PaymentUiState.Idle,
-                is PaymentUiState.Loading -> {
+                is PaymentUiState.Loading,
+                -> {
                     CircularProgressIndicator()
                     Text(text = "Preparando pago seguro...")
                 }
                 is PaymentUiState.PaymentReady -> {
                     Text(
                         text = "Procesando pago seguro con Stripe...",
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
                 is PaymentUiState.Error -> {
@@ -131,7 +134,7 @@ fun PaymentScreen(
                     Text(
                         text = "Error: $errorMessage",
                         color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.preparePayment(citaId) }) {
@@ -145,7 +148,7 @@ fun PaymentScreen(
                     Text(
                         text = "Pago completado correctamente.",
                         color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Button(onClick = onPaymentSuccess) {
                         Text("Continuar")

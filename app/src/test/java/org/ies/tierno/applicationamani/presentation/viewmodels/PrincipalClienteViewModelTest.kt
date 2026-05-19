@@ -5,7 +5,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PrincipalClienteViewModelTest {
-
     @Test
     fun `especialidades contains 4 items`() {
         val viewModel = PrincipalClienteViewModel()

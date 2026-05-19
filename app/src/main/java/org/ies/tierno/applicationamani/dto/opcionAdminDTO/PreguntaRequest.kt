@@ -10,8 +10,8 @@ package org.ies.tierno.applicationamani.dto.opcionAdminDTO
  * @property tipo Tipo de pregunta (p. ej. «selección única»), o `null`.
  * @property opciones Lista de textos de las opciones de respuesta, o `null`.
  */
-data class PreguntaRequest (
-     val texto: String? = null,
-     val tipo: String? = null,
-     val opciones: List<String?>? = null
+data class PreguntaRequest(
+    val texto: String? = null,
+    val tipo: String? = null,
+    val opciones: List<String?>? = null,
 )

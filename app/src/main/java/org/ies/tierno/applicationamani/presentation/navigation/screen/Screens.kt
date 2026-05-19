@@ -13,8 +13,9 @@ import android.net.Uri
  *
  * @see org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
  */
-sealed class Screens(val route: String) {
-
+sealed class Screens(
+    val route: String,
+) {
     /** Pantalla de inicio de sesión. */
     object login : Screens("login")
 
@@ -61,8 +62,11 @@ sealed class Screens(val route: String) {
     object psicologoAgenda : Screens("psicologoAgenda")
 
     object psicologoHome : Screens("psicologoHome")
+
     object pacienteHome : Screens("pacienteHome")
+
     object settingsPsicologo : Screens("settingsPsicologo")
+
     object estadisticasPsicologo : Screens("estadisticasPsicologo")
 
     object listarPsicologo : Screens("listarPsicologo/{pacienteId}") {
@@ -82,8 +86,13 @@ sealed class Screens(val route: String) {
     }
 
     object chatList : Screens("chatList")
+
     object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}") {
-        fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String): String {
+        fun createRoute(
+            currentUserId: Long,
+            otherUserId: Long,
+            otherUserName: String,
+        ): String {
             val encodedName = Uri.encode(otherUserName)
             return "chat/$currentUserId/$otherUserId/$encodedName"
         }
@@ -96,37 +105,54 @@ sealed class Screens(val route: String) {
     }
 
     object registroPacienteDesdePsicologo : Screens("registroPacienteDesdePsicologo")
+
     object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
 
     object diarioEmocional : Screens("diarioEmocional")
 
     object nuevoTicket : Screens("nuevoTicket")
+
     object paymentScreen : Screens("paymentScreen/{citaId}/{psicologoName}/{fecha}/{monto}") {
-        fun createRoute(citaId: Long, psicologoName: String, fecha: String, monto: String) =
-            "paymentScreen/$citaId/${Uri.encode(psicologoName)}/$fecha/$monto"
+        fun createRoute(
+            citaId: Long,
+            psicologoName: String,
+            fecha: String,
+            monto: String,
+        ) = "paymentScreen/$citaId/${Uri.encode(psicologoName)}/$fecha/$monto"
     }
+
     object misTickets : Screens("misTickets")
 
     object settingsAdmin : Screens("settingsAdmin")
+
     object cambiarRol : Screens("cambiarRol")
+
     object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}") {
         fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
     }
+
     object settingPsicologo : Screens("settingPsicologo")
+
     object terapias : Screens("terapias")
+
     object crearSituaciones : Screens("crearSituaciones")
+
     object politicaPrivacidad : Screens("politicaPrivacidad")
+
     object listarPsicologosBaja : Screens("listarPsicologosBaja")
 
     object historialClinico : Screens("historialClinico/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
     }
+
     object profileAdmin : Screens("profileAdmin/{adminId}") {
         fun createRoute(adminId: Long?) = "profileAdmin/$adminId"
     }
+
     object perfilPaciente : Screens("perfilPaciente/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "perfilPaciente/$pacienteId"
     }
+
     object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
     }

@@ -17,7 +17,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ChatScreenTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -41,7 +40,7 @@ class ChatScreenTest {
             ChatScreen(
                 viewModel = viewModel,
                 onNavigateBack = {},
-                otherUserName = "Test User"
+                otherUserName = "Test User",
             )
         }
 
@@ -56,7 +55,7 @@ class ChatScreenTest {
             ChatScreen(
                 viewModel = viewModel,
                 onNavigateBack = {},
-                otherUserName = "Test User"
+                otherUserName = "Test User",
             )
         }
 
@@ -71,7 +70,7 @@ class ChatScreenTest {
             ChatScreen(
                 viewModel = viewModel,
                 onNavigateBack = {},
-                otherUserName = "Test User"
+                otherUserName = "Test User",
             )
         }
 
@@ -80,16 +79,17 @@ class ChatScreenTest {
 
     @Test
     fun whenMessagesArePresent_showsMessages() {
-        val messages = listOf(
-            Message(id = "1", content = "Hello", senderId = "2")
-        )
+        val messages =
+            listOf(
+                Message(id = "1", content = "Hello", senderId = "2"),
+            )
         uiStateFlow.value = ChatUiState(messages = messages, currentUserId = "1")
 
         composeTestRule.setContent {
             ChatScreen(
                 viewModel = viewModel,
                 onNavigateBack = {},
-                otherUserName = "Test User"
+                otherUserName = "Test User",
             )
         }
 
@@ -98,7 +98,7 @@ class ChatScreenTest {
 
     @Test
     fun whenErrorIsPresent_showsSnackbar() {
-        // We use a small delay or manual trigger if needed, 
+        // We use a small delay or manual trigger if needed,
         // but here we just check if it eventually shows up.
         uiStateFlow.value = ChatUiState(error = "Network Error")
 
@@ -106,7 +106,7 @@ class ChatScreenTest {
             ChatScreen(
                 viewModel = viewModel,
                 onNavigateBack = {},
-                otherUserName = "Test User"
+                otherUserName = "Test User",
             )
         }
 

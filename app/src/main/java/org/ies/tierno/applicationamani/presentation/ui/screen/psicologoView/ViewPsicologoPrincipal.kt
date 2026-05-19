@@ -28,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Description
@@ -63,16 +62,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
@@ -82,9 +77,6 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.MenuSetting
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -96,7 +88,7 @@ fun ViewPsicologoPrincipal(
     userSessionDataStore: UserSessionDataStore,
     navController: NavController,
     viewModel: ListarPacientesByPsicologoViewModel = koinViewModel(),
-    profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel()
+    profilePsicologoViewModel: ProfilePsicologoViewModel = koinViewModel(),
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -129,7 +121,7 @@ fun ViewPsicologoPrincipal(
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
                 color = colorScheme.primary,
-                strokeWidth = 3.dp
+                strokeWidth = 3.dp,
             )
         }
         return
@@ -142,29 +134,30 @@ fun ViewPsicologoPrincipal(
                     imageVector = Icons.Default.Error,
                     contentDescription = null,
                     modifier = Modifier.size(64.dp),
-                    tint = colorScheme.error
+                    tint = colorScheme.error,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.error_sesion),
                     style = typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurface
+                    color = colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.no_encontrado_id_psicologo),
                     style = typography.bodyMedium,
-                    color = colorScheme.onSurfaceVariant
+                    color = colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { navController.navigate(Screens.login.route) },
                     shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorScheme.primary,
-                        contentColor = colorScheme.onPrimary
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                            contentColor = colorScheme.onPrimary,
+                        ),
                 ) {
                     Text(stringResource(R.string.volver_login), style = typography.labelLarge)
                 }
@@ -182,28 +175,30 @@ fun ViewPsicologoPrincipal(
                     navController.navigate(Screens.registroPacienteDesdePsicologo.route)
                 },
                 containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
+                contentColor = colorScheme.onPrimary,
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = stringResource(R.string.agregar_paciente)
+                    contentDescription = stringResource(R.string.agregar_paciente),
                 )
             }
-        }
+        },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             when {
                 isLoading -> LoadingState()
                 pacientes.isEmpty() -> EmptyState()
-                else -> PacientesList(
-                    pacientes = pacientes,
-                    listState = listState,
-                    navController = navController
-                )
+                else ->
+                    PacientesList(
+                        pacientes = pacientes,
+                        listState = listState,
+                        navController = navController,
+                    )
             }
         }
     }
@@ -218,19 +213,19 @@ private fun LoadingState() {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
                 color = colorScheme.primary,
-                strokeWidth = 3.dp
+                strokeWidth = 3.dp,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.cargando_pacientes),
                 color = colorScheme.onSurfaceVariant,
-                style = typography.bodyMedium
+                style = typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.puede_tomar_segundos),
                 color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                style = typography.labelSmall
+                style = typography.labelSmall,
             )
         }
     }
@@ -243,27 +238,27 @@ private fun EmptyState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.People,
                 contentDescription = null,
                 modifier = Modifier.size(80.dp),
-                tint = colorScheme.primary.copy(alpha = 0.5f)
+                tint = colorScheme.primary.copy(alpha = 0.5f),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.no_tienes_pacientes),
                 style = typography.headlineSmall,
                 fontWeight = FontWeight.Medium,
-                color = colorScheme.onSurface
+                color = colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.cuando_asignen_pacientes),
                 style = typography.bodyMedium,
                 color = colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -274,31 +269,32 @@ private fun EmptyState() {
 private fun PacientesList(
     pacientes: List<PacientePsicologoResponseDTO>,
     listState: LazyListState,
-    navController: NavController
+    navController: NavController,
 ) {
     LazyColumn(
         state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .padding(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
+        item(key = "header_stats") {
             HeaderStats(pacientes.size)
         }
 
         items(
             items = pacientes,
-            key = { paciente -> paciente.idPaciente ?: "${paciente.email}-${paciente.dni}" }
+            key = { paciente -> paciente.idPaciente ?: "${paciente.email}-${paciente.dni}" },
         ) { paciente ->
             PacienteCard(
                 paciente = paciente,
-                navController = navController
+                navController = navController,
             )
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item(key = "bottom_spacer") { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
 
@@ -311,38 +307,39 @@ private fun HeaderStats(totalPacientes: Int) {
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.large,
         colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
                 Text(
                     text = stringResource(R.string.total_pacientes),
                     style = typography.labelLarge,
-                    color = colorScheme.onPrimary.copy(alpha = 0.9f)
+                    color = colorScheme.onPrimary.copy(alpha = 0.9f),
                 )
                 Text(
                     text = "$totalPacientes",
                     style = typography.displayMedium,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onPrimary
+                    color = colorScheme.onPrimary,
                 )
                 Text(
                     text = stringResource(R.string.asignados_consulta),
                     style = typography.labelSmall,
-                    color = colorScheme.onPrimary.copy(alpha = 0.8f)
+                    color = colorScheme.onPrimary.copy(alpha = 0.8f),
                 )
             }
             Icon(
                 imageVector = Icons.Default.People,
                 contentDescription = null,
                 tint = colorScheme.onPrimary,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             )
         }
     }
@@ -352,7 +349,7 @@ private fun HeaderStats(totalPacientes: Int) {
 @Composable
 fun PacienteCard(
     paciente: PacientePsicologoResponseDTO,
-    navController: NavController
+    navController: NavController,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val esMenor = esMenorDeEdad(paciente.fechaNacimiento)
@@ -360,38 +357,42 @@ fun PacienteCard(
     val shapes = MaterialTheme.shapes
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded }
-            .animateContentSize(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .animateContentSize(),
         shape = shapes.medium,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 6.dp
-        ),
-        colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = 2.dp,
+                pressedElevation = 6.dp,
+            ),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             PacienteHeader(
                 paciente = paciente,
                 esMenor = esMenor,
-                navController = navController
+                navController = navController,
             )
 
             AnimatedVisibility(
                 visible = expanded,
-                enter = expandVertically(
-                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-                ) + fadeIn(),
-                exit = shrinkVertically(
-                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
-                ) + fadeOut()
+                enter =
+                    expandVertically(
+                        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+                    ) + fadeIn(),
+                exit =
+                    shrinkVertically(
+                        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+                    ) + fadeOut(),
             ) {
                 ExpandedContent(
                     paciente = paciente,
-                    esMenor = esMenor
+                    esMenor = esMenor,
                 )
             }
         }
@@ -403,7 +404,7 @@ fun PacienteCard(
 fun PacienteHeader(
     paciente: PacientePsicologoResponseDTO,
     esMenor: Boolean,
-    navController: NavController
+    navController: NavController,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -411,78 +412,82 @@ fun PacienteHeader(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = colorScheme.surface
+        color = colorScheme.surface,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Avatar circular con iniciales
                 Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    colorScheme.primary,
-                                    colorScheme.primaryContainer
-                                )
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(
+                                brush =
+                                    Brush.linearGradient(
+                                        colors =
+                                            listOf(
+                                                colorScheme.primary,
+                                                colorScheme.primaryContainer,
+                                            ),
+                                    ),
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "${paciente.nombre?.take(1) ?: "?"}${paciente.apellido?.take(1) ?: "?"}",
                         style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.onPrimary
+                        color = colorScheme.onPrimary,
                     )
                 }
 
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
                             text = "${paciente.nombre ?: stringResource(R.string.sin_nombre)} ${paciente.apellido ?: ""}".trim(),
                             style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = colorScheme.onSurface
+                            color = colorScheme.onSurface,
                         )
 
                         if (esMenor) {
                             Surface(
                                 shape = shapes.small,
-                                color = colorScheme.errorContainer
+                                color = colorScheme.errorContainer,
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Warning,
                                         contentDescription = stringResource(R.string.menor),
                                         modifier = Modifier.size(12.dp),
-                                        tint = colorScheme.onErrorContainer
+                                        tint = colorScheme.onErrorContainer,
                                     )
                                     Text(
                                         text = stringResource(R.string.menor),
                                         style = typography.labelSmall,
                                         fontWeight = FontWeight.Medium,
-                                        color = colorScheme.onErrorContainer
+                                        color = colorScheme.onErrorContainer,
                                     )
                                 }
                             }
@@ -493,37 +498,37 @@ fun PacienteHeader(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colorScheme.onSurfaceVariant
+                            tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = paciente.email ?: stringResource(R.string.email_no_disponible),
                             style = typography.bodySmall,
                             color = colorScheme.onSurfaceVariant,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Phone,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colorScheme.onSurfaceVariant
+                            tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = paciente.telefono ?: stringResource(R.string.telefono_no_disponible),
                             style = typography.bodySmall,
-                            color = colorScheme.onSurfaceVariant
+                            color = colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -534,17 +539,17 @@ fun PacienteHeader(
                 onClick = {
                     paciente.idPaciente?.let { id ->
                         navController.navigate(
-                            Screens.crearHistorialClinico.createRoute(id)
+                            Screens.crearHistorialClinico.createRoute(id),
                         )
                     }
                 },
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(40.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = stringResource(R.string.crear_historial_clinico),
                     tint = colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -555,48 +560,54 @@ fun PacienteHeader(
 @Composable
 fun ExpandedContent(
     paciente: PacientePsicologoResponseDTO,
-    esMenor: Boolean
+    esMenor: Boolean,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            .padding(16.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                .padding(16.dp),
     ) {
         Text(
             text = stringResource(R.string.informacion_detallada),
             style = typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             color = colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier.padding(bottom = 12.dp),
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             InfoSection(
                 title = stringResource(R.string.datos_personales),
                 icon = Icons.Default.Person,
-                items = listOf(
-                    stringResource(R.string.nombre_completo) to "${paciente.nombre ?: stringResource(R.string.no_disponible)} ${paciente.apellido ?: ""}".trim(),
-                    stringResource(R.string.dni) to (paciente.dni ?: stringResource(R.string.no_registrado)),
-                    stringResource(R.string.fecha_nacimiento) to formatearFechaDesdeString(paciente.fechaNacimiento),
-                    stringResource(R.string.edad) to "${calcularEdadDesdeString(paciente.fechaNacimiento)} ${stringResource(R.string.anios)}",
-                    stringResource(R.string.genero) to (paciente.genero?.let {
-                        when(it) {
-                            "MASCULINO" -> stringResource(R.string.masculino)
-                            "FEMENINO" -> stringResource(R.string.femenino)
-                            "OTRO" -> stringResource(R.string.otro)
-                            "PREFIERO_NO_DECIR" -> stringResource(R.string.prefiero_no_decir)
-                            else -> it
-                        }
-                    } ?: stringResource(R.string.no_especificado)),
-                    stringResource(R.string.email) to (paciente.email ?: stringResource(R.string.no_disponible)),
-                    stringResource(R.string.telefono) to (paciente.telefono ?: stringResource(R.string.no_disponible))
-                )
+                items =
+                    listOf(
+                        stringResource(R.string.nombre_completo) to
+                            "${paciente.nombre ?: stringResource(R.string.no_disponible)} ${paciente.apellido ?: ""}".trim(),
+                        stringResource(R.string.dni) to (paciente.dni ?: stringResource(R.string.no_registrado)),
+                        stringResource(R.string.fecha_nacimiento) to formatearFechaDesdeString(paciente.fechaNacimiento),
+                        stringResource(R.string.edad) to
+                            "${calcularEdadDesdeString(paciente.fechaNacimiento)} ${stringResource(R.string.anios)}",
+                        stringResource(R.string.genero) to (
+                            paciente.genero?.let {
+                                when (it) {
+                                    "MASCULINO" -> stringResource(R.string.masculino)
+                                    "FEMENINO" -> stringResource(R.string.femenino)
+                                    "OTRO" -> stringResource(R.string.otro)
+                                    "PREFIERO_NO_DECIR" -> stringResource(R.string.prefiero_no_decir)
+                                    else -> it
+                                }
+                            } ?: stringResource(R.string.no_especificado)
+                        ),
+                        stringResource(R.string.email) to (paciente.email ?: stringResource(R.string.no_disponible)),
+                        stringResource(R.string.telefono) to (paciente.telefono ?: stringResource(R.string.no_disponible)),
+                    ),
             )
 
             val tutores = paciente.tutor ?: emptyList()
@@ -608,13 +619,14 @@ fun ExpandedContent(
                 InfoSection(
                     title = stringResource(R.string.direccion),
                     icon = Icons.Default.Person,
-                    items = listOf(
-                        stringResource(R.string.calle) to (direccion.calle ?: stringResource(R.string.no_disponible)),
-                        stringResource(R.string.ciudad) to (direccion.ciudad ?: stringResource(R.string.no_disponible)),
-                        stringResource(R.string.provincia) to (direccion.provincia ?: stringResource(R.string.no_disponible)),
-                        stringResource(R.string.codigo_postal) to (direccion.codigoPostal ?: stringResource(R.string.no_disponible)),
-                        stringResource(R.string.pais) to (direccion.pais ?: stringResource(R.string.no_disponible))
-                    )
+                    items =
+                        listOf(
+                            stringResource(R.string.calle) to (direccion.calle ?: stringResource(R.string.no_disponible)),
+                            stringResource(R.string.ciudad) to (direccion.ciudad ?: stringResource(R.string.no_disponible)),
+                            stringResource(R.string.provincia) to (direccion.provincia ?: stringResource(R.string.no_disponible)),
+                            stringResource(R.string.codigo_postal) to (direccion.codigoPostal ?: stringResource(R.string.no_disponible)),
+                            stringResource(R.string.pais) to (direccion.pais ?: stringResource(R.string.no_disponible)),
+                        ),
                 )
             }
         }
@@ -622,9 +634,7 @@ fun ExpandedContent(
 }
 
 @Composable
-fun TutorInfoSection(
-    tutores: List<TutorResponseDTO>
-) {
+fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
@@ -633,28 +643,29 @@ fun TutorInfoSection(
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.medium,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.People,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
-                    tint = colorScheme.secondary
+                    tint = colorScheme.secondary,
                 )
                 Text(
                     text = stringResource(R.string.datos_tutor_responsable),
                     style = typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = colorScheme.secondary
+                    color = colorScheme.secondary,
                 )
             }
 
@@ -662,41 +673,42 @@ fun TutorInfoSection(
 
             tutores.forEachIndexed { index, tutor ->
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                 ) {
                     if (tutores.size > 1) {
                         Text(
                             text = "${stringResource(R.string.tutor)} ${index + 1}",
                             style = typography.labelMedium,
                             fontWeight = FontWeight.Medium,
-                            color = colorScheme.primary
+                            color = colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = colorScheme.onSurfaceVariant
+                            tint = colorScheme.onSurfaceVariant,
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = tutor.nombre,
                                 style = typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
-                                color = colorScheme.onSurface
+                                color = colorScheme.onSurface,
                             )
                             Text(
                                 text = "${stringResource(R.string.dni)}: ${tutor.dni}",
                                 style = typography.labelSmall,
-                                color = colorScheme.onSurfaceVariant
+                                color = colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -705,52 +717,52 @@ fun TutorInfoSection(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Phone,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colorScheme.onSurfaceVariant
+                            tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
                             tutor.telefono ?: stringResource(R.string.no_disponible),
                             style = typography.bodySmall,
-                            color = colorScheme.onSurface
+                            color = colorScheme.onSurface,
                         )
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colorScheme.onSurfaceVariant
+                            tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = tutor.email ?: stringResource(R.string.no_disponible),
                             style = typography.bodySmall,
-                            color = colorScheme.onSurface
+                            color = colorScheme.onSurface,
                         )
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Badge,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
-                            tint = colorScheme.onSurfaceVariant
+                            tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = "${stringResource(R.string.parentesco)}: ${tutor.tipo}",
                             style = typography.bodySmall,
-                            color = colorScheme.onSurface
+                            color = colorScheme.onSurface,
                         )
                     }
                 }
@@ -759,7 +771,7 @@ fun TutorInfoSection(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = 0.5.dp,
-                        color = colorScheme.outlineVariant
+                        color = colorScheme.outlineVariant,
                     )
                 }
             }
@@ -771,7 +783,7 @@ fun TutorInfoSection(
 fun InfoSection(
     title: String,
     icon: ImageVector,
-    items: List<Pair<String, String>>
+    items: List<Pair<String, String>>,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -781,28 +793,29 @@ fun InfoSection(
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.medium,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
-                    tint = colorScheme.primary
+                    tint = colorScheme.primary,
                 )
                 Text(
                     text = title,
                     style = typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = colorScheme.onSurface
+                    color = colorScheme.onSurface,
                 )
             }
 
@@ -810,26 +823,27 @@ fun InfoSection(
 
             items.forEachIndexed { index, (label, value) ->
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
                 ) {
                     Text(
                         text = label,
                         style = typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant
+                        color = colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = value.ifEmpty { stringResource(R.string.no_disponible) },
                         style = typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = colorScheme.onSurface
+                        color = colorScheme.onSurface,
                     )
                     if (index != items.size - 1) {
                         HorizontalDivider(
                             modifier = Modifier.padding(top = 4.dp),
                             thickness = 0.5.dp,
-                            color = colorScheme.outlineVariant
+                            color = colorScheme.outlineVariant,
                         )
                     }
                 }
@@ -846,16 +860,14 @@ private fun calcularEdadDesdeString(fechaNacimientoStr: String?): Int {
         val fechaNacimiento = LocalDate.parse(fechaNacimientoStr)
         val hoy = LocalDate.now()
         hoy.year - fechaNacimiento.year -
-                if (hoy.dayOfYear < fechaNacimiento.dayOfYear) 1 else 0
+            if (hoy.dayOfYear < fechaNacimiento.dayOfYear) 1 else 0
     } catch (e: Exception) {
         0
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun esMenorDeEdad(fechaNacimientoStr: String?): Boolean {
-    return calcularEdadDesdeString(fechaNacimientoStr) < 18
-}
+private fun esMenorDeEdad(fechaNacimientoStr: String?): Boolean = calcularEdadDesdeString(fechaNacimientoStr) < 18
 
 @Composable
 @RequiresApi(Build.VERSION_CODES.O)

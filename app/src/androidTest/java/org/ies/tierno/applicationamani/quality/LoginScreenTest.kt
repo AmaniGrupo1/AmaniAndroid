@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class LoginScreenTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 

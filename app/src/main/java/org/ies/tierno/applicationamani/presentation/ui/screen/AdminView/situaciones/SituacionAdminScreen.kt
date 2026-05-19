@@ -81,7 +81,7 @@ private val AmaniDefaultError = Color(0xFFE57373)
 @Composable
 fun SituacionAdminScreen(
     navController: NavController,
-    viewModel: SituacionViewModel
+    viewModel: SituacionViewModel,
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val situaciones by viewModel.situaciones.collectAsState()
@@ -116,7 +116,7 @@ fun SituacionAdminScreen(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 },
                 navigationIcon = {
@@ -124,13 +124,14 @@ fun SituacionAdminScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = primaryColor,
+                    ),
             )
         },
         floatingActionButton = {
@@ -140,17 +141,18 @@ fun SituacionAdminScreen(
                     showDialog = true
                 },
                 containerColor = primaryColor,
-                contentColor = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White
+                contentColor = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_situacion))
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             when {
                 situaciones.isEmpty() -> {
@@ -163,18 +165,18 @@ fun SituacionAdminScreen(
                         textPrimaryColor = textPrimaryColor,
                         textSecondaryColor = textSecondaryColor,
                         roboto = roboto,
-                        isDark = isDark
+                        isDark = isDark,
                     )
                 }
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(
                             items = situaciones,
-                            key = { it.idSituacion }
+                            key = { it.idSituacion },
                         ) { situacion ->
                             TarjetaSituacion(
                                 situacion = situacion,
@@ -190,7 +192,7 @@ fun SituacionAdminScreen(
                                 dividerColor = dividerColor,
                                 errorColor = errorColor,
                                 roboto = roboto,
-                                isDark = isDark
+                                isDark = isDark,
                             )
                         }
                     }
@@ -209,14 +211,14 @@ fun SituacionAdminScreen(
                     text = "Confirmar eliminacion",
                     fontWeight = FontWeight.Bold,
                     color = textPrimaryColor,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
             },
             text = {
                 Text(
                     text = "Estas seguro de que quieres eliminar la situacion \"${situacionAEliminar!!.nombre}\"?\n\nEsta accion no se puede deshacer.",
                     color = textSecondaryColor,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
             },
             confirmButton = {
@@ -230,14 +232,15 @@ fun SituacionAdminScreen(
                                 } else {
                                     scope.launch { snackbarHostState.showSnackbar("Error al eliminar la situacion") }
                                 }
-                            }
+                            },
                         )
                         situacionAEliminar = null
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = errorColor,
-                        contentColor = Color.White
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = errorColor,
+                            contentColor = Color.White,
+                        ),
                 ) {
                     Text("Eliminar", fontFamily = roboto)
                 }
@@ -247,7 +250,7 @@ fun SituacionAdminScreen(
                     Text("Cancelar", fontFamily = roboto, color = primaryColor)
                 }
             },
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(16.dp),
         )
     }
 
@@ -260,12 +263,13 @@ fun SituacionAdminScreen(
                 situacionEditando = null
             },
             onConfirm = { nombre, categoria, descripcion ->
-                val request = SituacionRequest(
-                    nombre = nombre,
-                    categoria = categoria,
-                    descripcion = descripcion,
-                    activo = true
-                )
+                val request =
+                    SituacionRequest(
+                        nombre = nombre,
+                        categoria = categoria,
+                        descripcion = descripcion,
+                        activo = true,
+                    )
 
                 if (situacionEditando == null) {
                     viewModel.crearSituacion(
@@ -273,7 +277,7 @@ fun SituacionAdminScreen(
                         onResult = { success, _ ->
                             val msg = if (success) "Situacion creada correctamente" else "Error al crear la situacion"
                             scope.launch { snackbarHostState.showSnackbar(msg) }
-                        }
+                        },
                     )
                 } else {
                     viewModel.actualizarSituacion(
@@ -282,7 +286,7 @@ fun SituacionAdminScreen(
                         onResult = { success, _ ->
                             val msg = if (success) "Situacion actualizada correctamente" else "Error al actualizar la situacion"
                             scope.launch { snackbarHostState.showSnackbar(msg) }
-                        }
+                        },
                     )
                 }
                 showDialog = false
@@ -293,7 +297,7 @@ fun SituacionAdminScreen(
             textPrimaryColor = textPrimaryColor,
             textSecondaryColor = textSecondaryColor,
             roboto = roboto,
-            isDark = isDark
+            isDark = isDark,
         )
     }
 }
@@ -310,26 +314,26 @@ fun TarjetaSituacion(
     dividerColor: Color,
     errorColor: Color,
     roboto: FontFamily,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = situacion.nombre,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = primaryColor,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = onEditClick, modifier = Modifier.size(36.dp)) {
@@ -349,7 +353,7 @@ fun TarjetaSituacion(
                         Icons.Default.Category,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
-                        tint = textSecondaryColor
+                        tint = textSecondaryColor,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -357,7 +361,7 @@ fun TarjetaSituacion(
                         fontSize = 12.sp,
                         color = primaryColor,
                         fontWeight = FontWeight.Medium,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -371,7 +375,7 @@ fun TarjetaSituacion(
                     fontSize = 14.sp,
                     color = textSecondaryColor,
                     maxLines = 3,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
             }
         }
@@ -385,18 +389,18 @@ fun EmptySituacionesScreen(
     textPrimaryColor: Color,
     textSecondaryColor: Color,
     roboto: FontFamily,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             Icons.AutoMirrored.Filled.List,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
-            tint = primaryColor.copy(alpha = 0.4f)
+            tint = primaryColor.copy(alpha = 0.4f),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
@@ -404,20 +408,20 @@ fun EmptySituacionesScreen(
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = textPrimaryColor,
-            fontFamily = roboto
+            fontFamily = roboto,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Presiona el boton + para agregar una situacion",
             fontSize = 14.sp,
             color = textSecondaryColor,
-            fontFamily = roboto
+            fontFamily = roboto,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onAddClick,
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
+            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
@@ -429,7 +433,6 @@ fun EmptySituacionesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SituacionDialog(
-
     situacion: SituacionDTO?,
     onDismiss: () -> Unit,
     onConfirm: (nombre: String, categoria: String, descripcion: String) -> Unit,
@@ -438,7 +441,7 @@ fun SituacionDialog(
     textPrimaryColor: Color,
     textSecondaryColor: Color,
     roboto: FontFamily,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
     var nombre by remember(situacion) { mutableStateOf(situacion?.nombre ?: "") }
     var categoria by remember(situacion) { mutableStateOf(situacion?.categoria ?: "") }
@@ -457,7 +460,7 @@ fun SituacionDialog(
                 fontWeight = FontWeight.Bold,
                 color = primaryColor,
                 fontSize = 20.sp,
-                fontFamily = roboto
+                fontFamily = roboto,
             )
         },
         text = {
@@ -468,12 +471,13 @@ fun SituacionDialog(
                     label = { Text("Nombre de la situacion", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        focusedLabelColor = primaryColor,
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
-                    )
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            focusedLabelColor = primaryColor,
+                            focusedTextColor = textPrimaryColor,
+                            unfocusedTextColor = textPrimaryColor,
+                        ),
                 )
                 OutlinedTextField(
                     value = categoria,
@@ -481,19 +485,20 @@ fun SituacionDialog(
                     label = { Text("Categoria", fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        focusedLabelColor = primaryColor,
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
-                    ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            focusedLabelColor = primaryColor,
+                            focusedTextColor = textPrimaryColor,
+                            unfocusedTextColor = textPrimaryColor,
+                        ),
                     placeholder = {
                         Text(
                             "Ej: Personal, Laboral, Social...",
                             color = textSecondaryColor.copy(alpha = 0.5f),
-                            fontFamily = roboto
+                            fontFamily = roboto,
                         )
-                    }
+                    },
                 )
                 OutlinedTextField(
                     value = descripcion,
@@ -502,12 +507,13 @@ fun SituacionDialog(
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = primaryColor,
-                        focusedLabelColor = primaryColor,
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
-                    )
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryColor,
+                            focusedLabelColor = primaryColor,
+                            focusedTextColor = textPrimaryColor,
+                            unfocusedTextColor = textPrimaryColor,
+                        ),
                 )
             }
         },
@@ -520,7 +526,7 @@ fun SituacionDialog(
                 },
                 enabled = nombre.isNotBlank() && categoria.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
             ) {
                 Text(botonTexto, fontFamily = roboto, color = if (isDark) Color.Black else Color.White)
             }
@@ -530,6 +536,6 @@ fun SituacionDialog(
                 Text("Cancelar", fontFamily = roboto, color = primaryColor)
             }
         },
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(20.dp),
     )
 }

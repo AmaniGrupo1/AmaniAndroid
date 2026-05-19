@@ -7,7 +7,6 @@ import org.junit.Before
 import org.junit.Test
 
 class QuestionnaireViewModelTest {
-
     private lateinit var viewModel: QuestionnaireViewModel
 
     @Before
@@ -76,7 +75,7 @@ class QuestionnaireViewModelTest {
         viewModel.questions.indices.forEach { i ->
             assertEquals(
                 viewModel.questions[i].answers.size,
-                viewModel.selectedAnswers[i].size
+                viewModel.selectedAnswers[i].size,
             )
         }
     }

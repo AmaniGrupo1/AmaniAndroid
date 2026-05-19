@@ -19,5 +19,5 @@ data class User(
     val genero: String,
     val direccion: String,
     val telefono: String,
-    val codigoPostal: String
+    val codigoPostal: String,
 )

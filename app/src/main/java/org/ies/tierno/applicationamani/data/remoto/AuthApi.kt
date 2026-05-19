@@ -19,33 +19,26 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-
 interface AuthApi {
-
     @POST("auth/login")
     suspend fun login(
-        @Body request: LoginRequestDTO
+        @Body request: LoginRequestDTO,
     ): Response<LoginResponseDTO>
-
 
     @POST("/auth/register-paciente")
     suspend fun registerPaciente(
-        @Body request: PacienteRequest
+        @Body request: PacienteRequest,
     ): Response<LoginResponseDTO>
-
-
 
     @POST("/auth/register-admin")
     suspend fun registerAdmin(
-        @Body request: RegistryPacienteDTO
+        @Body request: RegistryPacienteDTO,
     ): Response<LoginResponseDTO>
-
 
     @POST("/api/admin/psicologos/create")
     suspend fun registerPsicologo(
-        @Body request: PsicologoRequestDTO
+        @Body request: PsicologoRequestDTO,
     ): Response<PsicologoSelfResponseDTO>
-
 
     @GET("/api/admin/psicologos/pacientes")
     suspend fun getPacientesConPsicologo(): Response<List<ListaPacientesAndPsicologo>>
@@ -56,36 +49,35 @@ interface AuthApi {
 
     @PUT("auth/pacientes/{id}/baja")
     suspend fun darBajaPaciente(
-        @Path("id") id: Long
+        @Path("id") id: Long,
     ): Response<MessageResponse>
 
     @PUT("auth/psicologos/{id}/alta")
     suspend fun darAltaPsicologo(
-        @Path("id") id: Long
+        @Path("id") id: Long,
     ): Response<MessageResponse>
 
-    //ASIGNAMOS UN PSICÓLOGO
+    // ASIGNAMOS UN PSICÓLOGO
     @POST("/api/admin/psicologos/asignar-psicologo")
     suspend fun asignarPsicologo(
-        @Body request: AsignarPacienteAlPsicologoRequestDTO
+        @Body request: AsignarPacienteAlPsicologoRequestDTO,
     ): Response<Boolean>
 
-    //LISTAMOS LOS PSICÓLOGOS
+    // LISTAMOS LOS PSICÓLOGOS
     @GET("/api/admin/psicologos")
     suspend fun getPsicologos(): Response<List<PsicologoSelfResponseDTO>>
 
     @GET("/api/admin/psicologos/listaPsicologoBaja")
     suspend fun getPsicologosBaja(): Response<List<PsicologoSelfResponseDTO>>
 
-    //LISTAMOS LOS PACIENTES POR PSICÓLOGO
+    // LISTAMOS LOS PACIENTES POR PSICÓLOGO
     @GET("/api/psicologo/pacientes/getAll")
     suspend fun getPacientesByPsicologo(): Response<List<PacientePsicologoResponseDTO>>
 
-   @POST("/auth/registrar/pacienteDesde/psicologo")
-   suspend fun crearPacienteDesdePsicologo(
-       @Body request: PacienteRequest
-   ): Response<LoginResponseDTO>
-
+    @POST("/auth/registrar/pacienteDesde/psicologo")
+    suspend fun crearPacienteDesdePsicologo(
+        @Body request: PacienteRequest,
+    ): Response<LoginResponseDTO>
 
     @GET("/api/pacientes/sin-psicologo")
     suspend fun getPacientesSinPsicologo(): Response<List<PacienteBasicoResponseDTO>>

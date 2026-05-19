@@ -22,15 +22,15 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.data.remoto.FileStorageService
-import org.ies.tierno.applicationamani.domain.usecases.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessageDeliveredUseCase
-import org.ies.tierno.applicationamani.domain.usecases.MarkMessagesAsReadUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.SendMessageUseCase
-import org.ies.tierno.applicationamani.domain.usecases.StartTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.StopTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.UpdateUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.GetMessagesUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessageDeliveredUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessagesAsReadUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.SendMessageUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
+import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -40,9 +40,8 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
-    
+
     private val sendMessageUseCase: SendMessageUseCase = mockk(relaxed = true)
     private val getMessagesUseCase: GetMessagesUseCase = mockk(relaxed = true)
     private val markMessagesAsReadUseCase: MarkMessagesAsReadUseCase = mockk(relaxed = true)
@@ -62,7 +61,7 @@ class ChatViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        
+
         // Mock Log
         mockkStatic(Log::class)
         every { Log.e(any<String>(), any<String>()) } returns 0
@@ -78,8 +77,14 @@ class ChatViewModelTest {
 
         // Mock Media3 Util
         mockkStatic(androidx.media3.common.util.Util::class)
-        every { androidx.media3.common.util.Util.isRunningOnEmulator() } returns false
-        every { androidx.media3.common.util.Util.getCurrentOrMainLooper() } returns looper
+        every {
+            androidx.media3.common.util.Util
+                .isRunningOnEmulator()
+        } returns false
+        every {
+            androidx.media3.common.util.Util
+                .getCurrentOrMainLooper()
+        } returns looper
 
         // Mock ExoPlayer Builder
         mockkConstructor(androidx.media3.exoplayer.ExoPlayer.Builder::class)
@@ -101,130 +106,151 @@ class ChatViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel() = ChatViewModel(
-        1L, 2L, "Psicologo",
-        sendMessageUseCase, getMessagesUseCase, markMessagesAsReadUseCase,
-        markMessageDeliveredUseCase, fileStorageService, startTypingUseCase,
-        stopTypingUseCase, observeTypingUseCase, observeUserOnlineUseCase,
-        updateUserOnlineUseCase, profileUseCaseGeneral, authRepository, context
-    )
+    private fun createViewModel() =
+        ChatViewModel(
+            1L,
+            2L,
+            "Psicologo",
+            sendMessageUseCase,
+            getMessagesUseCase,
+            markMessagesAsReadUseCase,
+            markMessageDeliveredUseCase,
+            fileStorageService,
+            startTypingUseCase,
+            stopTypingUseCase,
+            observeTypingUseCase,
+            observeUserOnlineUseCase,
+            updateUserOnlineUseCase,
+            profileUseCaseGeneral,
+            authRepository,
+            context,
+        )
 
     @Test
-    fun `initial state is correct`() = runTest {
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertEquals("1", state.currentUserId)
-            assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), state.messages)
-            assertNull(state.error)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when messages are observed, they are updated in state`() = runTest {
-        val messages = listOf(mockk<org.ies.tierno.applicationamani.domain.models.Message>(relaxed = true))
-        val messagesFlow = MutableStateFlow(emptyList<org.ies.tierno.applicationamani.domain.models.Message>())
-        every { getMessagesUseCase(any(), any()) } returns messagesFlow
-
-        viewModel = createViewModel()
-
-        viewModel.uiState.test {
-            assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), awaitItem().messages)
-            
-            messagesFlow.value = messages
-            assertEquals(messages, awaitItem().messages)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when messages observation fails, error is updated in state`() = runTest {
-        val errorFlow = flow<List<org.ies.tierno.applicationamani.domain.models.Message>> {
-            throw Exception("Network Error")
-        }
-        every { getMessagesUseCase(any(), any()) } returns errorFlow
-
-        viewModel = createViewModel()
-        
-        viewModel.uiState.test {
-            // Skip initial state and potentially intermediate loading states
-            var lastState = awaitItem()
-            while (lastState.error == null) {
-                lastState = awaitItem()
+    fun `initial state is correct`() =
+        runTest {
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertEquals("1", state.currentUserId)
+                assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), state.messages)
+                assertNull(state.error)
+                cancelAndIgnoreRemainingEvents()
             }
-            assertEquals("Network Error", lastState.error)
-            cancelAndIgnoreRemainingEvents()
         }
-    }
 
     @Test
-    fun `when sendTextMessage is called, it clears input and calls usecase`() = runTest {
-        coEvery { sendMessageUseCase(any(), any(), any()) } returns Result.success(Unit)
-        
-        viewModel.uiState.test {
-            awaitItem() // Initial
-            
-            viewModel.onInputChanged("Hello")
-            assertEquals("Hello", awaitItem().inputText)
-            
-            viewModel.sendMessage()
-            
-            // Wait for input to be cleared
-            var state = awaitItem()
-            while (state.inputText != "") {
-                state = awaitItem()
+    fun `when messages are observed, they are updated in state`() =
+        runTest {
+            val messages = listOf(mockk<org.ies.tierno.applicationamani.domain.models.Message>(relaxed = true))
+            val messagesFlow = MutableStateFlow(emptyList<org.ies.tierno.applicationamani.domain.models.Message>())
+            every { getMessagesUseCase(any(), any()) } returns messagesFlow
+
+            viewModel = createViewModel()
+
+            viewModel.uiState.test {
+                assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), awaitItem().messages)
+
+                messagesFlow.value = messages
+                assertEquals(messages, awaitItem().messages)
+                cancelAndIgnoreRemainingEvents()
             }
-            assertEquals("", state.inputText)
-            cancelAndIgnoreRemainingEvents()
         }
-        coVerify { sendMessageUseCase(1L, 2L, "Hello") }
-    }
 
     @Test
-    fun `when sendTextMessage fails, error is shown in UI`() = runTest {
-        coEvery { sendMessageUseCase(any(), any(), any()) } returns Result.failure(Exception("Failed to send"))
-        
-        viewModel.uiState.test {
-            awaitItem() // Initial
-            
-            viewModel.onInputChanged("Hello")
-            awaitItem() // Input changed
-            
-            viewModel.sendMessage()
-            
-            // Wait for error
-            var state = awaitItem()
-            while (state.error == null) {
-                state = awaitItem()
+    fun `when messages observation fails, error is updated in state`() =
+        runTest {
+            val errorFlow =
+                flow<List<org.ies.tierno.applicationamani.domain.models.Message>> {
+                    throw Exception("Network Error")
+                }
+            every { getMessagesUseCase(any(), any()) } returns errorFlow
+
+            viewModel = createViewModel()
+
+            viewModel.uiState.test {
+                // Skip initial state and potentially intermediate loading states
+                var lastState = awaitItem()
+                while (lastState.error == null) {
+                    lastState = awaitItem()
+                }
+                assertEquals("Network Error", lastState.error)
+                cancelAndIgnoreRemainingEvents()
             }
-            assertEquals("Failed to send", state.error)
-            cancelAndIgnoreRemainingEvents()
         }
-    }
 
     @Test
-    fun `when onInputChanged is called with non-empty text, it starts typing`() = runTest {
-        viewModel.onInputChanged("H")
-        advanceUntilIdle()
-        coVerify { startTypingUseCase(1L, 2L) }
-    }
+    fun `when sendTextMessage is called, it clears input and calls usecase`() =
+        runTest {
+            coEvery { sendMessageUseCase(any(), any(), any()) } returns Result.success(Unit)
 
-    @Test
-    fun `when onInputChanged is called with empty text, it stops typing`() = runTest {
-        viewModel.onInputChanged("")
-        advanceUntilIdle()
-        coVerify { stopTypingUseCase(1L, 2L) }
-    }
+            viewModel.uiState.test {
+                awaitItem() // Initial
 
-    @Test
-    fun `when toggleAudioPlayback is called with invalid URL, it shows error`() = runTest {
-        viewModel.toggleAudioPlayback("msg1", "invalid-url")
-        
-        viewModel.audioUiState.test {
-            val state = awaitItem()
-            assertEquals(AudioPlaybackStatus.ERROR, state.status)
-            assertEquals("URL de audio inválida", state.errorMessage)
-            cancelAndIgnoreRemainingEvents()
+                viewModel.onInputChanged("Hello")
+                assertEquals("Hello", awaitItem().inputText)
+
+                viewModel.sendMessage()
+
+                // Wait for input to be cleared
+                var state = awaitItem()
+                while (state.inputText != "") {
+                    state = awaitItem()
+                }
+                assertEquals("", state.inputText)
+                cancelAndIgnoreRemainingEvents()
+            }
+            coVerify { sendMessageUseCase(1L, 2L, "Hello") }
         }
-    }
+
+    @Test
+    fun `when sendTextMessage fails, error is shown in UI`() =
+        runTest {
+            coEvery { sendMessageUseCase(any(), any(), any()) } returns Result.failure(Exception("Failed to send"))
+
+            viewModel.uiState.test {
+                awaitItem() // Initial
+
+                viewModel.onInputChanged("Hello")
+                awaitItem() // Input changed
+
+                viewModel.sendMessage()
+
+                // Wait for error
+                var state = awaitItem()
+                while (state.error == null) {
+                    state = awaitItem()
+                }
+                assertEquals("Failed to send", state.error)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when onInputChanged is called with non-empty text, it starts typing`() =
+        runTest {
+            viewModel.onInputChanged("H")
+            advanceUntilIdle()
+            coVerify { startTypingUseCase(1L, 2L) }
+        }
+
+    @Test
+    fun `when onInputChanged is called with empty text, it stops typing`() =
+        runTest {
+            viewModel.onInputChanged("")
+            advanceUntilIdle()
+            coVerify { stopTypingUseCase(1L, 2L) }
+        }
+
+    @Test
+    fun `when toggleAudioPlayback is called with invalid URL, it shows error`() =
+        runTest {
+            viewModel.toggleAudioPlayback("msg1", "invalid-url")
+
+            viewModel.audioUiState.test {
+                val state = awaitItem()
+                assertEquals(AudioPlaybackStatus.ERROR, state.status)
+                assertEquals("URL de audio inválida", state.errorMessage)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

@@ -52,7 +52,7 @@ data class AmaniBottomBarItem(
     val route: String?,
     @StringRes val labelRes: Int,
     val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val unselectedIcon: ImageVector,
 )
 
 /**
@@ -61,112 +61,117 @@ data class AmaniBottomBarItem(
 sealed interface BottomBarConfig {
     /** Barra del paciente: Inicio, Citas, Chat, Diario, Ajustes. */
     data object Paciente : BottomBarConfig
+
     /** Barra del administrador: Inicio, Pacientes, Psicólogos, Tests, Más. */
     data object Admin : BottomBarConfig
+
     /** Barra del psicólogo: Agenda, Pacientes, Chat, Ajustes. */
     data object Psicologo : BottomBarConfig
 }
 
 // ── Definición de ítems por rol ────────────────────────────────
 
-private fun pacienteItems() = listOf(
-    AmaniBottomBarItem(
-        route = Screens.pacienteHome.route,
-        labelRes = R.string.nav_inicio,
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home
-    ),
-    AmaniBottomBarItem(
-        route = Screens.agendaCitaScreen.route,
-        labelRes = R.string.nav_citas,
-        selectedIcon = Icons.Filled.DateRange,
-        unselectedIcon = Icons.Outlined.DateRange
-    ),
-    AmaniBottomBarItem(
-        route = Screens.chatList.route,
-        labelRes = R.string.nav_chat,
-        selectedIcon = Icons.AutoMirrored.Filled.Chat,
-        unselectedIcon = Icons.AutoMirrored.Outlined.Chat
-    ),
-    AmaniBottomBarItem(
-        route = Screens.diarioEmocional.route,
-        labelRes = R.string.nav_diario,
-        selectedIcon = Icons.Filled.Book,
-        unselectedIcon = Icons.Outlined.Book
-    ),
-    AmaniBottomBarItem(
-        route = Screens.settingsCliente.route,
-        labelRes = R.string.nav_ajustes,
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings
+private fun pacienteItems() =
+    listOf(
+        AmaniBottomBarItem(
+            route = Screens.pacienteHome.route,
+            labelRes = R.string.nav_inicio,
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Outlined.Home,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.agendaCitaScreen.route,
+            labelRes = R.string.nav_citas,
+            selectedIcon = Icons.Filled.DateRange,
+            unselectedIcon = Icons.Outlined.DateRange,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.chatList.route,
+            labelRes = R.string.nav_chat,
+            selectedIcon = Icons.AutoMirrored.Filled.Chat,
+            unselectedIcon = Icons.AutoMirrored.Outlined.Chat,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.diarioEmocional.route,
+            labelRes = R.string.nav_diario,
+            selectedIcon = Icons.Filled.Book,
+            unselectedIcon = Icons.Outlined.Book,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.settingsCliente.route,
+            labelRes = R.string.nav_ajustes,
+            selectedIcon = Icons.Filled.Settings,
+            unselectedIcon = Icons.Outlined.Settings,
+        ),
     )
-)
 
-private fun adminItems() = listOf(
-    AmaniBottomBarItem(
-        route = Screens.adminHome.route,
-        labelRes = R.string.nav_inicio,
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home
-    ),
-    AmaniBottomBarItem(
-        route = Screens.pacientesSinPsicologo.route,
-        labelRes = R.string.nav_pacientes,
-        selectedIcon = Icons.Filled.People,
-        unselectedIcon = Icons.Outlined.People
-    ),
-    AmaniBottomBarItem(
-        route = Screens.listarPsicologoSimple.route,
-        labelRes = R.string.nav_psicologos,
-        selectedIcon = Icons.Filled.Psychology,
-        unselectedIcon = Icons.Outlined.Psychology
-    ),
-    AmaniBottomBarItem(
-        route = Screens.settingsAdmin.route,
-        labelRes = R.string.nav_ajustes,
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings
-    ),
-    AmaniBottomBarItem(
-        route = null,
-        labelRes = R.string.nav_mas,
-        selectedIcon = Icons.Filled.MoreVert,
-        unselectedIcon = Icons.Outlined.MoreVert
+private fun adminItems() =
+    listOf(
+        AmaniBottomBarItem(
+            route = Screens.adminHome.route,
+            labelRes = R.string.nav_inicio,
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Outlined.Home,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.pacientesSinPsicologo.route,
+            labelRes = R.string.nav_pacientes,
+            selectedIcon = Icons.Filled.People,
+            unselectedIcon = Icons.Outlined.People,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.listarPsicologoSimple.route,
+            labelRes = R.string.nav_psicologos,
+            selectedIcon = Icons.Filled.Psychology,
+            unselectedIcon = Icons.Outlined.Psychology,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.settingsAdmin.route,
+            labelRes = R.string.nav_ajustes,
+            selectedIcon = Icons.Filled.Settings,
+            unselectedIcon = Icons.Outlined.Settings,
+        ),
+        AmaniBottomBarItem(
+            route = null,
+            labelRes = R.string.nav_mas,
+            selectedIcon = Icons.Filled.MoreVert,
+            unselectedIcon = Icons.Outlined.MoreVert,
+        ),
     )
-)
 
-private fun psicologoItems() = listOf(
-    AmaniBottomBarItem(
-        route = Screens.psicologoAgenda.route,
-        labelRes = R.string.nav_agenda,
-        selectedIcon = Icons.Filled.CalendarMonth,
-        unselectedIcon = Icons.Outlined.CalendarMonth
-    ),
-    AmaniBottomBarItem(
-        route = Screens.psicologoHome.route,
-        labelRes = R.string.nav_pacientes,
-        selectedIcon = Icons.Filled.People,
-        unselectedIcon = Icons.Outlined.People
-    ),
-    AmaniBottomBarItem(
-        route = Screens.estadisticasPsicologo.route,
-        labelRes = R.string.nav_estadisticas,
-        selectedIcon = Icons.AutoMirrored.Filled.ShowChart,
-        unselectedIcon = Icons.AutoMirrored.Outlined.ShowChart
-    ),
-    AmaniBottomBarItem(
-        route = Screens.chatList.route,
-        labelRes = R.string.nav_chat,
-        selectedIcon = Icons.AutoMirrored.Filled.Chat,
-        unselectedIcon = Icons.AutoMirrored.Outlined.Chat
-    ),
-    AmaniBottomBarItem(
-        route = Screens.settingPsicologo.route,
-        labelRes = R.string.nav_ajustes,
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings
+private fun psicologoItems() =
+    listOf(
+        AmaniBottomBarItem(
+            route = Screens.psicologoAgenda.route,
+            labelRes = R.string.nav_agenda,
+            selectedIcon = Icons.Filled.CalendarMonth,
+            unselectedIcon = Icons.Outlined.CalendarMonth,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.psicologoHome.route,
+            labelRes = R.string.nav_pacientes,
+            selectedIcon = Icons.Filled.People,
+            unselectedIcon = Icons.Outlined.People,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.estadisticasPsicologo.route,
+            labelRes = R.string.nav_estadisticas,
+            selectedIcon = Icons.AutoMirrored.Filled.ShowChart,
+            unselectedIcon = Icons.AutoMirrored.Outlined.ShowChart,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.chatList.route,
+            labelRes = R.string.nav_chat,
+            selectedIcon = Icons.AutoMirrored.Filled.Chat,
+            unselectedIcon = Icons.AutoMirrored.Outlined.Chat,
+        ),
+        AmaniBottomBarItem(
+            route = Screens.settingPsicologo.route,
+            labelRes = R.string.nav_ajustes,
+            selectedIcon = Icons.Filled.Settings,
+            unselectedIcon = Icons.Outlined.Settings,
+        ),
     )
-)
 
 // ── Composable principal ───────────────────────────────────────
 
@@ -184,20 +189,21 @@ private fun psicologoItems() = listOf(
 fun AmaniBottomBar(
     navController: NavController,
     config: BottomBarConfig,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    val items = when (config) {
-        BottomBarConfig.Paciente -> pacienteItems()
-        BottomBarConfig.Admin    -> adminItems()
-        BottomBarConfig.Psicologo -> psicologoItems()
-    }
+    val items =
+        when (config) {
+            BottomBarConfig.Paciente -> pacienteItems()
+            BottomBarConfig.Admin -> adminItems()
+            BottomBarConfig.Psicologo -> psicologoItems()
+        }
 
     NavigationBar(
         modifier = modifier.navigationBarsPadding(),
-        containerColor = MaterialTheme.colorScheme.surfaceContainer // M3: surfaceContainer per spec
+        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: surfaceContainer per spec
     ) {
         items.forEach { item ->
             val isSelected = item.route != null && currentRoute == item.route
@@ -221,7 +227,7 @@ fun AmaniBottomBar(
                     // M3: Use selected icon (Filled) and unselected icon (Outlined)
                     Icon(
                         imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = stringResource(item.labelRes)
+                        contentDescription = stringResource(item.labelRes),
                     )
                 },
                 label = {
@@ -230,13 +236,12 @@ fun AmaniBottomBar(
                         text = stringResource(item.labelRes),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
                     )
                 },
                 alwaysShowLabel = true, // M3: Recommended for 3-5 items
-                colors = NavigationBarItemDefaults.colors() // M3: No hardcoded colors
+                colors = NavigationBarItemDefaults.colors(), // M3: No hardcoded colors
             )
         }
     }
 }
-

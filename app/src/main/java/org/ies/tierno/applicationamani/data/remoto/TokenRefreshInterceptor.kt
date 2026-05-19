@@ -18,9 +18,8 @@ import timber.log.Timber
  * antes de notificar el logout.
  */
 class TokenRefreshInterceptor(
-    private val authEventChannel: AuthEventChannel
+    private val authEventChannel: AuthEventChannel,
 ) : Interceptor {
-
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -43,4 +42,3 @@ class TokenRefreshInterceptor(
         return response
     }
 }
-

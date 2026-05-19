@@ -5,16 +5,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicologoAdminUseCase
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
-
 
 class ListarPsicologosAdminViewModel(
     val listarPsicologoAdminUseCase: ListarPsicologoAdminUseCase,
-    private val userSessionDataStore: UserSessionDataStore
-): ViewModel() {
-
+    private val userSessionDataStore: UserSessionDataStore,
+) : ViewModel() {
     // Psicólogos activos
     private val _psicologo = MutableStateFlow<List<PsicologoSelfResponseDTO>>(emptyList())
     val psicologos: StateFlow<List<PsicologoSelfResponseDTO>> = _psicologo
@@ -49,7 +47,6 @@ class ListarPsicologosAdminViewModel(
                         _psicologosBaja.value = lista
                     }
                 }
-
             } else {
 
                 userSessionDataStore.sessionFlow.collect { s ->
@@ -73,7 +70,6 @@ class ListarPsicologosAdminViewModel(
                                 _psicologosBaja.value = lista
                             }
                         }
-
                     } else {
 
                         _psicologo.value = emptyList()
@@ -88,7 +84,6 @@ class ListarPsicologosAdminViewModel(
     // ACTUALIZAR LOCALMENTE AL DAR ALTA
     // =========================================================
     fun actualizarPsicologoAlta(id: Long) {
-
         val psicologo =
             _psicologosBaja.value.find {
                 it.idPsicologo == id
@@ -100,7 +95,6 @@ class ListarPsicologosAdminViewModel(
             }
 
         if (psicologo != null) {
-
             _psicologo.value =
                 _psicologo.value + psicologo
         }
@@ -110,7 +104,6 @@ class ListarPsicologosAdminViewModel(
     // ACTUALIZAR LOCALMENTE AL DAR BAJA
     // =========================================================
     fun actualizarPsicologoBaja(id: Long) {
-
         val psicologo =
             _psicologo.value.find {
                 it.idPsicologo == id
@@ -122,7 +115,6 @@ class ListarPsicologosAdminViewModel(
             }
 
         if (psicologo != null) {
-
             _psicologosBaja.value =
                 _psicologosBaja.value + psicologo
         }

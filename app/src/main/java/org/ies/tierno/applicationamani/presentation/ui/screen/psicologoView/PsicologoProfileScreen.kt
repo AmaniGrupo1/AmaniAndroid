@@ -87,6 +87,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
 
 private const val TAG = "PsicologoProfileScreen"
+
 // Usar la MISMA URL que en Retrofit
 private const val BASE_URL = "http://192.168.1.175:8080"
 
@@ -95,10 +96,9 @@ private const val BASE_URL = "http://192.168.1.175:8080"
 fun PsicologoProfileScreen(
     psicologoId: Long,
     navController: NavController,
-    viewModel: ProfilePsicologoViewModel = koinViewModel()
+    viewModel: ProfilePsicologoViewModel = koinViewModel(),
 ) {
-
-    //INYECTO LA IMAGEN EN EL VIEWMODEL PARA QUE PUEDA GESTIONAR EL ESTADO DE LA URL Y FORZAR REFRESH DESDE ALLÍ
+    // INYECTO LA IMAGEN EN EL VIEWMODEL PARA QUE PUEDA GESTIONAR EL ESTADO DE LA URL Y FORZAR REFRESH DESDE ALLÍ
     val imageLoader = koinInject<coil.ImageLoader>()
 
     val context = LocalContext.current
@@ -133,7 +133,7 @@ fun PsicologoProfileScreen(
                 snackbarHostState.showSnackbar(
                     message = errorMessage,
                     actionLabel = "Cerrar",
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
             }
         }
@@ -147,7 +147,7 @@ fun PsicologoProfileScreen(
                     snackbarHostState.showSnackbar(
                         message = "¡Foto de perfil actualizada correctamente!",
                         actionLabel = "👍",
-                        duration = SnackbarDuration.Short
+                        duration = SnackbarDuration.Short,
                     )
                 }
             }
@@ -158,7 +158,7 @@ fun PsicologoProfileScreen(
                     snackbarHostState.showSnackbar(
                         message = errorMessage,
                         actionLabel = "Cerrar",
-                        duration = SnackbarDuration.Long
+                        duration = SnackbarDuration.Long,
                     )
                 }
             }
@@ -172,44 +172,46 @@ fun PsicologoProfileScreen(
                 title = {
                     Text(
                         text = "Mi Perfil Profesional",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
                     }
-                }
+                },
             )
         },
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) { data ->
                 Snackbar(
                     snackbarData = data,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    actionColor = MaterialTheme.colorScheme.primary
+                    actionColor = MaterialTheme.colorScheme.primary,
                 )
             }
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             when {
                 isLoading -> {
                     Log.d(TAG, "Estado: Cargando...")
                     CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
                     )
                 }
                 perfil != null -> {
@@ -221,7 +223,7 @@ fun PsicologoProfileScreen(
                         onPhotoUpload = { uri ->
                             Log.d(TAG, "onPhotoUpload llamado con URI: $uri")
                             viewModel.uploadFotoPerfil(psicologoId, uri, context)
-                        }
+                        },
                     )
                 }
                 error != null -> {
@@ -231,7 +233,7 @@ fun PsicologoProfileScreen(
                         onRetry = {
                             Log.d(TAG, "Retry clicked - fetching profile again")
                             viewModel.fetchProfile(psicologoId)
-                        }
+                        },
                     )
                 }
             }
@@ -244,7 +246,7 @@ fun ProfileContent(
     navController: NavController,
     perfil: PsicologoProfileResponseDTO,
     imageLoader: coil.ImageLoader,
-    onPhotoUpload: (Uri) -> Unit
+    onPhotoUpload: (Uri) -> Unit,
 ) {
     val context = LocalContext.current
     var showOptions by remember { mutableStateOf(false) }
@@ -262,7 +264,7 @@ fun ProfileContent(
             return relativeUrl
         }
         // Construimos la URL completa con la base
-        return "${BASE_URL}${relativeUrl}"
+        return "${BASE_URL}$relativeUrl"
     }
 
     val currentPhotoUrl = perfil.usuario?.fotoPerfilUrl
@@ -273,144 +275,156 @@ fun ProfileContent(
     Log.d(TAG, "ProfileContent - ¿URL vacía o nula?: ${currentPhotoUrl.isNullOrEmpty()}")
 
     // ========== LAUNCHER PARA GALERÍA ==========
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        Log.d(TAG, "Galería - URI seleccionada: $uri")
-        uri?.let {
-            Log.d(TAG, "Galería - Path: ${it.path}")
-            Log.d(TAG, "Galería - Scheme: ${it.scheme}")
-            onPhotoUpload(it)
-            // Forzar refresco después del upload
-            refreshTrigger = System.currentTimeMillis()
-            Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
+    val galleryLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { uri: Uri? ->
+            Log.d(TAG, "Galería - URI seleccionada: $uri")
+            uri?.let {
+                Log.d(TAG, "Galería - Path: ${it.path}")
+                Log.d(TAG, "Galería - Scheme: ${it.scheme}")
+                onPhotoUpload(it)
+                // Forzar refresco después del upload
+                refreshTrigger = System.currentTimeMillis()
+                Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
+            }
         }
-    }
 
     // Archivo temporal para la cámara
-    val photoFile = remember {
-        File(context.cacheDir, "camera_photo.jpg")
-    }
-    val photoUri = remember(photoFile) {
-        FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            photoFile
-        )
-    }
+    val photoFile =
+        remember {
+            File(context.cacheDir, "camera_photo.jpg")
+        }
+    val photoUri =
+        remember(photoFile) {
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                photoFile,
+            )
+        }
 
     // ========== CÁMARA CON TAKEPICTURE (RECOMENDADO PARA ALTA RESOLUCIÓN) ==========
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success: Boolean ->
-        Log.d(TAG, "Cámara - Resultado: $success")
-        if (success) {
-            Log.d(TAG, "Cámara - Foto capturada en: ${photoFile.absolutePath}")
-            onPhotoUpload(photoUri)
-            // Forzar refresco después del upload
-            refreshTrigger = System.currentTimeMillis()
-            Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicture(),
+        ) { success: Boolean ->
+            Log.d(TAG, "Cámara - Resultado: $success")
+            if (success) {
+                Log.d(TAG, "Cámara - Foto capturada en: ${photoFile.absolutePath}")
+                onPhotoUpload(photoUri)
+                // Forzar refresco después del upload
+                refreshTrigger = System.currentTimeMillis()
+                Log.d(TAG, "Refresh trigger actualizado: $refreshTrigger")
+            }
         }
-    }
 
     // ========== PERMISOS ==========
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
                 context,
-                CAMERA
-            ) == PERMISSION_GRANTED
+                CAMERA,
+            ) == PERMISSION_GRANTED,
         )
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        Log.d(TAG, "Permiso de cámara - ¿Concedido?: $isGranted")
-        hasCameraPermission = isGranted
-        if (isGranted) {
-            Log.d(TAG, "Permiso concedido - lanzando cámara")
-            cameraLauncher.launch(photoUri)
-        } else {
-            Log.w(TAG, "Permiso de cámara denegado")
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            Log.d(TAG, "Permiso de cámara - ¿Concedido?: $isGranted")
+            hasCameraPermission = isGranted
+            if (isGranted) {
+                Log.d(TAG, "Permiso concedido - lanzando cámara")
+                cameraLauncher.launch(photoUri)
+            } else {
+                Log.w(TAG, "Permiso de cámara denegado")
+            }
         }
-    }
 
     // ========== UI ==========
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = "Foto de Perfil",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
 
                 Box(
                     modifier = Modifier.size(120.dp),
-                    contentAlignment = Alignment.BottomEnd
+                    contentAlignment = Alignment.BottomEnd,
                 ) {
-                    val imageUrl: Any? = if (fullImageUrl.isEmpty()) {
-                        Log.d(TAG, "AsyncImage - Usando avatar por defecto (URL vacía)")
-                        R.drawable.ic_default_avatar
-                    } else {
-                        val urlWithTimestamp = "$fullImageUrl?t=$refreshTrigger"
-                        Log.d(TAG, "AsyncImage - URL construida: $urlWithTimestamp")
-                        urlWithTimestamp
-                    }
+                    val imageUrl: Any? =
+                        if (fullImageUrl.isEmpty()) {
+                            Log.d(TAG, "AsyncImage - Usando avatar por defecto (URL vacía)")
+                            R.drawable.ic_default_avatar
+                        } else {
+                            val urlWithTimestamp = "$fullImageUrl?t=$refreshTrigger"
+                            Log.d(TAG, "AsyncImage - URL construida: $urlWithTimestamp")
+                            urlWithTimestamp
+                        }
 
                     // ✅ FORZAR REFRESH CON refreshTrigger
                     AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(imageUrl)
-                            .crossfade(true)
-                            .error(R.drawable.ic_default_avatar)
-                            .placeholder(R.drawable.ic_default_avatar)
-                            .diskCacheKey("$fullImageUrl$refreshTrigger")
-                            .listener(
-                                onStart = { request ->
-                                    Log.d(TAG, "AsyncImage - Iniciando carga: ${request.data}")
-                                },
-                                onSuccess = { request, metadata ->
-                                    Log.d(TAG, "AsyncImage - Éxito al cargar imagen: ${request.data}")
-                                },
-                                onError = { request, throwable ->
-                                    Log.e(TAG, "AsyncImage - Error al cargar imagen: ${request.data}")
-                                }
-                            )
-                            .build(),
+                        model =
+                            ImageRequest
+                                .Builder(LocalContext.current)
+                                .data(imageUrl)
+                                .crossfade(true)
+                                .error(R.drawable.ic_default_avatar)
+                                .placeholder(R.drawable.ic_default_avatar)
+                                .diskCacheKey("$fullImageUrl$refreshTrigger")
+                                .listener(
+                                    onStart = { request ->
+                                        Log.d(TAG, "AsyncImage - Iniciando carga: ${request.data}")
+                                    },
+                                    onSuccess = { request, metadata ->
+                                        Log.d(TAG, "AsyncImage - Éxito al cargar imagen: ${request.data}")
+                                    },
+                                    onError = { request, throwable ->
+                                        Log.e(TAG, "AsyncImage - Error al cargar imagen: ${request.data}")
+                                    },
+                                ).build(),
                         imageLoader = imageLoader,
                         contentDescription = "Foto de perfil",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .border(
-                                BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
-                                CircleShape
-                            ),
-                        contentScale = ContentScale.Crop
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                                .border(
+                                    BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
+                                    CircleShape,
+                                ),
+                        contentScale = ContentScale.Crop,
                     )
 
                     FloatingActionButton(
@@ -420,12 +434,12 @@ fun ProfileContent(
                         },
                         modifier = Modifier.size(40.dp),
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
+                        contentColor = Color.White,
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
                             contentDescription = "Cambiar foto",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }
@@ -434,13 +448,13 @@ fun ProfileContent(
                     text = "${perfil.usuario?.nombre} ${perfil.usuario?.apellido}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier.padding(top = 12.dp),
                 )
 
                 Text(
                     text = perfil.usuario?.email ?: "Email no disponible",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = Color.Gray,
                 )
             }
         }
@@ -449,27 +463,29 @@ fun ProfileContent(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
             ) {
                 Text(
                     text = "Información Profesional",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
 
                 InfoRow(
                     icon = Icons.Default.Work,
                     label = "Especialidad",
-                    value = perfil.especialidad ?: "No especificada"
+                    value = perfil.especialidad ?: "No especificada",
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -477,7 +493,7 @@ fun ProfileContent(
                 InfoRow(
                     icon = Icons.Default.Timeline,
                     label = "Experiencia",
-                    value = if (perfil.experiencia != null) "${perfil.experiencia} años" else "No especificada"
+                    value = if (perfil.experiencia != null) "${perfil.experiencia} años" else "No especificada",
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -485,7 +501,7 @@ fun ProfileContent(
                 InfoRow(
                     icon = Icons.Default.Badge,
                     label = "Número de Licencia",
-                    value = perfil.licencia ?: "No especificada"
+                    value = perfil.licencia ?: "No especificada",
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -494,14 +510,14 @@ fun ProfileContent(
                     text = "Descripción",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = perfil.descripcion ?: "Sin descripción disponible",
                     fontSize = 14.sp,
                     color = Color.DarkGray,
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp,
                 )
             }
         }
@@ -510,18 +526,18 @@ fun ProfileContent(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             OutlinedButton(
                 onClick = {
                     perfil.idPsicologo?.let { id ->
                         navController.navigate(
-                            Screens.editProfilePsicologo.createRoute(id)
+                            Screens.editProfilePsicologo.createRoute(id),
                         )
                     }
                 },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Icon(Icons.Default.Edit, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -533,7 +549,7 @@ fun ProfileContent(
                     navController.popBackStack()
                 },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -558,7 +574,7 @@ fun ProfileContent(
                         Log.d(TAG, "Opción Galería seleccionada")
                         showOptions = false
                         galleryLauncher.launch("image/*")
-                    }
+                    },
                 ) {
                     Text("Galería")
                 }
@@ -575,11 +591,11 @@ fun ProfileContent(
                             Log.d(TAG, "Solicitando permiso de cámara")
                             permissionLauncher.launch(android.Manifest.permission.CAMERA)
                         }
-                    }
+                    },
                 ) {
                     Text("Cámara")
                 }
-            }
+            },
         )
     }
 }
@@ -588,29 +604,29 @@ fun ProfileContent(
 fun InfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
-    value: String
+    value: String,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column {
             Text(
                 text = label,
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = Color.Gray,
             )
             Text(
                 text = value,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
         }
     }
@@ -619,35 +635,36 @@ fun InfoRow(
 @Composable
 fun ErrorContent(
     error: String,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
 ) {
     Log.e(TAG, "ErrorContent mostrando error: $error")
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Default.Error,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.error
+            tint = MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Error al cargar el perfil",
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = error,
             fontSize = 14.sp,
             color = Color.Gray,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
@@ -655,7 +672,7 @@ fun ErrorContent(
                 Log.d(TAG, "Botón Reintentar clickeado")
                 onRetry()
             },
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))

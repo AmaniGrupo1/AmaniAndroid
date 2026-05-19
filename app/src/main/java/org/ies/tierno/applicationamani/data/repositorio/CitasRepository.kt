@@ -13,51 +13,57 @@ import org.ies.tierno.applicationamani.dto.terapias.TerapiaRequest
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 
 class CitasRepository(
-    private val citasApi: CitasApi
+    private val citasApi: CitasApi,
 ) {
-
     suspend fun getAgendaPaciente(
         idPaciente: Long,
-        month: String
-    ): Result<List<AgendaItemDTO>> = runCatching {
-        citasApi.getAgendaPaciente(idPaciente, month)
-    }
+        month: String,
+    ): Result<List<AgendaItemDTO>> =
+        runCatching {
+            citasApi.getAgendaPaciente(idPaciente, month)
+        }
 
     suspend fun getAgendaPsicologo(
         idPsicologo: Long,
-        month: String
-    ): Result<List<AgendaItemDTO>> = runCatching {
-        citasApi.getAgendaPsicologo(idPsicologo, month)
-    }
+        month: String,
+    ): Result<List<AgendaItemDTO>> =
+        runCatching {
+            citasApi.getAgendaPsicologo(idPsicologo, month)
+        }
 
-    suspend fun getDuracion(
-        idPsicologo: Long
-    ): Result<Int> = runCatching {
-        citasApi.getDuracion(idPsicologo)
-    }
+    suspend fun getDuracion(idPsicologo: Long): Result<Int> =
+        runCatching {
+            citasApi.getDuracion(idPsicologo)
+        }
 
     suspend fun getDisponibilidadDia(
         idPsicologo: Long,
         fecha: String,
-        duracionMinutos: Int
-    ): Result<DisponibilidadDiaResponse> = runCatching {
-        citasApi.getDisponibilidadDia(
-            idPsicologo = idPsicologo,
-            fecha = fecha,
-            duracion = duracionMinutos
-        )
-    }
+        duracionMinutos: Int,
+    ): Result<DisponibilidadDiaResponse> =
+        runCatching {
+            citasApi.getDisponibilidadDia(
+                idPsicologo = idPsicologo,
+                fecha = fecha,
+                duracion = duracionMinutos,
+            )
+        }
 
-    suspend fun crearCita(request: CrearCitaRequestDTO): Result<AgendaItemDTO> = runCatching {
-        citasApi.crearCitaPsicologo(request)
-    }
+    suspend fun crearCita(request: CrearCitaRequestDTO): Result<AgendaItemDTO> =
+        runCatching {
+            citasApi.crearCitaPsicologo(request)
+        }
 
-    suspend fun cancelarCita(idCita: Long): Result<AgendaItemDTO> = runCatching {
-        citasApi.cancelarCita(idCita)
-    }
+    suspend fun cancelarCita(idCita: Long): Result<AgendaItemDTO> =
+        runCatching {
+            citasApi.cancelarCita(idCita)
+        }
 
-    suspend fun editarCita(idCita: Long, request: CrearCitaRequestDTO): Result<AgendaItemDTO> {
-        return try {
+    suspend fun editarCita(
+        idCita: Long,
+        request: CrearCitaRequestDTO,
+    ): Result<AgendaItemDTO> =
+        try {
             val response = citasApi.editarCita(idCita, request)
             if (response.isSuccessful) {
                 val body = response.body()
@@ -73,78 +79,80 @@ class CitasRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-    suspend fun getPacientesDelPsicologo(idPsicologo: Long): Result<List<PacientesAsignadoDTO>> = runCatching {
-        val todosLosPsicologos = citasApi.getPsicologosConPacientes()
-        todosLosPsicologos
-            .firstOrNull { it.idPsicologo == idPsicologo }
-            ?.pacientes
-            ?: emptyList()
-    }
+    suspend fun getPacientesDelPsicologo(idPsicologo: Long): Result<List<PacientesAsignadoDTO>> =
+        runCatching {
+            val todosLosPsicologos = citasApi.getPsicologosConPacientes()
+            todosLosPsicologos
+                .firstOrNull { it.idPsicologo == idPsicologo }
+                ?.pacientes
+                ?: emptyList()
+        }
 
     suspend fun actualizarHorario(
         idPsicologo: Long,
-        request: HorarioRequestDTO
-    ): Result<Unit> = runCatching {
-        citasApi.actualizarHorario(idPsicologo, request)
-    }
+        request: HorarioRequestDTO,
+    ): Result<Unit> =
+        runCatching {
+            citasApi.actualizarHorario(idPsicologo, request)
+        }
 
     suspend fun actualizarDuracion(
         idPsicologo: Long,
-        duracion: Int
-    ): Result<Unit> = runCatching {
-        citasApi.actualizarDuracion(
-            idPsicologo = idPsicologo,
-            duracion = duracion
-        )
-    }
+        duracion: Int,
+    ): Result<Unit> =
+        runCatching {
+            citasApi.actualizarDuracion(
+                idPsicologo = idPsicologo,
+                duracion = duracion,
+            )
+        }
 
     suspend fun bloquearDiaNoDisponible(
         idPsicologo: Long,
         fecha: String,
         horaInicio: String? = null,
         horaFin: String? = null,
-        motivo: String? = null
+        motivo: String? = null,
     ) = runCatching {
-        val request = BloqueoRequestDTO(
-            fecha = fecha,
-            horaInicio = horaInicio,
-            horaFin = horaFin,
-            motivo = motivo ?: "No disponible"
-        )
+        val request =
+            BloqueoRequestDTO(
+                fecha = fecha,
+                horaInicio = horaInicio,
+                horaFin = horaFin,
+                motivo = motivo ?: "No disponible",
+            )
         citasApi.marcarDiaNoDisponible(idPsicologo, request)
     }
 
     suspend fun quitarDiaNoDisponible(
         idPsicologo: Long,
-        fecha: String
+        fecha: String,
     ) = runCatching {
         citasApi.eliminarDiaNoDisponible(idPsicologo, fecha)
     }
 
-    suspend fun getTerapias(): Result<List<TerapiaResponseDTO>> = runCatching {
-        citasApi.getTerapias()
-    }
+    suspend fun getTerapias(): Result<List<TerapiaResponseDTO>> =
+        runCatching {
+            citasApi.getTerapias()
+        }
 
-    suspend fun getHorarioActual(
-        idPsicologo: Long
-    ): Result<HorarioRequestDTO> = runCatching {
-        citasApi.getHorarioActual(idPsicologo)
-    }
+    suspend fun getHorarioActual(idPsicologo: Long): Result<HorarioRequestDTO> =
+        runCatching {
+            citasApi.getHorarioActual(idPsicologo)
+        }
 
-    suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO> {
-        return citasApi.getMisCitas()
-    }
+    suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO> = citasApi.getMisCitas()
 
     suspend fun cambiarEstadoCita(
         idCita: Long,
-        estado: EstadoCita
-    ): Result<Unit> {
-        return try {
-            val request = mapOf(
-                "estado" to estado.name.lowercase()
-            )
+        estado: EstadoCita,
+    ): Result<Unit> =
+        try {
+            val request =
+                mapOf(
+                    "estado" to estado.name.lowercase(),
+                )
             val response = citasApi.cambiarEstadoCita(idCita, request)
             if (response.isSuccessful) {
                 Result.success(Unit)
@@ -154,11 +162,9 @@ class CitasRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-
-    suspend fun crearTerapia(request: TerapiaRequest): Result<TerapiaResponseDTO> {
-        return try {
+    suspend fun crearTerapia(request: TerapiaRequest): Result<TerapiaResponseDTO> =
+        try {
             val response = citasApi.crearTerapia(request)
 
             if (response.isSuccessful) {
@@ -171,32 +177,26 @@ class CitasRepository(
             } else {
                 Result.failure(Exception("Error HTTP: ${response.code()}"))
             }
-
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-
 
     suspend fun actualizarTerapia(
         id: Long,
-        request: TerapiaRequest
-    ): Result<TerapiaResponseDTO> {
-        return try {
+        request: TerapiaRequest,
+    ): Result<TerapiaResponseDTO> =
+        try {
             val response = citasApi.actualizarTerapia(id, request)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-
-    suspend fun eliminarTerapia(id: Long): Result<Unit> {
-        return try {
+    suspend fun eliminarTerapia(id: Long): Result<Unit> =
+        try {
             citasApi.eliminarTerapia(id)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 }

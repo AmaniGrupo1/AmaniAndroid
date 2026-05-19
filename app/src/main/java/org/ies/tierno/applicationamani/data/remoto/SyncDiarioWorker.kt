@@ -17,9 +17,8 @@ import timber.log.Timber
 class SyncDiarioWorker(
     context: Context,
     params: WorkerParameters,
-    private val syncManager: DiarioSyncManager
+    private val syncManager: DiarioSyncManager,
 ) : CoroutineWorker(context, params) {
-
     override suspend fun doWork(): Result {
         Timber.d("SyncDiarioWorker: iniciando sincronización")
 

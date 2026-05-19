@@ -20,17 +20,17 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CuestionarioViewModelTest {
-
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var listarPreguntasUseCase: ListarPreguntasUseCase
     private lateinit var viewModel: CuestionarioViewModel
 
-    private val samplePregunta = OpcionAdminDTO(
-        texto = "¿Con qué frecuencia se siente ansioso?",
-        tipo = "selección única",
-        opciones = listOf("Nunca", "A veces", "A menudo", "Siempre")
-    )
+    private val samplePregunta =
+        OpcionAdminDTO(
+            texto = "¿Con qué frecuencia se siente ansioso?",
+            tipo = "selección única",
+            opciones = listOf("Nunca", "A veces", "A menudo", "Siempre"),
+        )
 
     @Before
     fun setUp() {
@@ -44,62 +44,67 @@ class CuestionarioViewModelTest {
     }
 
     @Test
-    fun `preguntas is initially empty list`() = runTest {
-        every { listarPreguntasUseCase() } returns flowOf(listOf(samplePregunta))
+    fun `preguntas is initially empty list`() =
+        runTest {
+            every { listarPreguntasUseCase() } returns flowOf(listOf(samplePregunta))
 
-        viewModel = CuestionarioViewModel(listarPreguntasUseCase)
+            viewModel = CuestionarioViewModel(listarPreguntasUseCase)
 
-        assertEquals(emptyList<OpcionAdminDTO>(), viewModel.preguntas.value)
-    }
+            assertEquals(emptyList<OpcionAdminDTO>(), viewModel.preguntas.value)
+        }
 
     @Test
-    fun `when useCase emits list, preguntas updates`() = runTest {
-        val preguntas = listOf(samplePregunta, samplePregunta.copy(texto = "¿Cómo duerme?"))
-        every { listarPreguntasUseCase() } returns flowOf(preguntas)
+    fun `when useCase emits list, preguntas updates`() =
+        runTest {
+            val preguntas = listOf(samplePregunta, samplePregunta.copy(texto = "¿Cómo duerme?"))
+            every { listarPreguntasUseCase() } returns flowOf(preguntas)
 
-        viewModel = CuestionarioViewModel(listarPreguntasUseCase)
+            viewModel = CuestionarioViewModel(listarPreguntasUseCase)
 
-        viewModel.preguntas.test {
-            assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
-            assertEquals(preguntas, awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            viewModel.preguntas.test {
+                assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
+                assertEquals(preguntas, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when useCase emits null, preguntas updates to null`() = runTest {
-        every { listarPreguntasUseCase() } returns flowOf(null)
+    fun `when useCase emits null, preguntas updates to null`() =
+        runTest {
+            every { listarPreguntasUseCase() } returns flowOf(null)
 
-        viewModel = CuestionarioViewModel(listarPreguntasUseCase)
+            viewModel = CuestionarioViewModel(listarPreguntasUseCase)
 
-        viewModel.preguntas.test {
-            assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
-            assertEquals(null, awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            viewModel.preguntas.test {
+                assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
+                assertEquals(null, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when useCase emits empty list, preguntas is empty list`() = runTest {
-        every { listarPreguntasUseCase() } returns flowOf(emptyList())
+    fun `when useCase emits empty list, preguntas is empty list`() =
+        runTest {
+            every { listarPreguntasUseCase() } returns flowOf(emptyList())
 
-        viewModel = CuestionarioViewModel(listarPreguntasUseCase)
+            viewModel = CuestionarioViewModel(listarPreguntasUseCase)
 
-        viewModel.preguntas.test {
-            assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            viewModel.preguntas.test {
+                assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when useCase flow throws exception, preguntas remains at initial value`() = runTest {
-        every { listarPreguntasUseCase() } returns flow { throw RuntimeException("Error de red") }
+    fun `when useCase flow throws exception, preguntas remains at initial value`() =
+        runTest {
+            every { listarPreguntasUseCase() } returns flow { throw RuntimeException("Error de red") }
 
-        viewModel = CuestionarioViewModel(listarPreguntasUseCase)
+            viewModel = CuestionarioViewModel(listarPreguntasUseCase)
 
-        viewModel.preguntas.test {
-            assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
-            cancelAndIgnoreRemainingEvents()
+            viewModel.preguntas.test {
+                assertEquals(emptyList<OpcionAdminDTO>(), awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 }

@@ -62,7 +62,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -89,7 +88,9 @@ import kotlin.math.sin
 
 sealed class Valence {
     object Warm : Valence()
+
     object Cold : Valence()
+
     object Neutral : Valence()
 }
 
@@ -98,21 +99,21 @@ enum class PlutchikEmotion(
     val color: Color,
     val emoji: String,
     val variants: List<String>,
-    val valence: Valence
+    val valence: Valence,
 ) {
     ALEGRIA(
         "Alegría",
         Color(0xFFFFEB3B),
         "😊",
         listOf("Éxtasis", "Alegría", "Serenidad"),
-        Valence.Warm
+        Valence.Warm,
     ),
     CONFIANZA(
         "Confianza",
         Color(0xFF8BC34A),
         "🤝",
         listOf("Admiración", "Confianza", "Aceptación"),
-        Valence.Neutral
+        Valence.Neutral,
     ),
     IRA("Ira", Color(0xFFF44336), "😡", listOf("Furia", "Ira", "Irritación"), Valence.Warm),
     TRISTEZA(
@@ -120,7 +121,7 @@ enum class PlutchikEmotion(
         Color(0xFF2196F3),
         "😢",
         listOf("Congoja", "Tristeza", "Melancolía"),
-        Valence.Cold
+        Valence.Cold,
     ),
     ASCO("Asco", Color(0xFF4CAF50), "🤢", listOf("Repulsión", "Asco", "Aburrimiento"), Valence.Cold),
     MIEDO("Miedo", Color(0xFF9C27B0), "😨", listOf("Terror", "Miedo", "Aprensión"), Valence.Cold),
@@ -129,15 +130,15 @@ enum class PlutchikEmotion(
         Color(0xFF00BCD4),
         "😲",
         listOf("Asombro", "Sorpresa", "Distracción"),
-        Valence.Neutral
+        Valence.Neutral,
     ),
     ANTICIPACION(
         "Anticipación",
         Color(0xFFFF9800),
         "⏳",
         listOf("Vigilancia", "Anticipación", "Interés"),
-        Valence.Warm
-    )
+        Valence.Warm,
+    ),
 }
 
 private fun resolvePrimaryEmotion(emocion: String): String {
@@ -151,30 +152,31 @@ private fun resolvePrimaryEmotion(emocion: String): String {
 fun StepIndicator(
     currentStep: Int,
     totalSteps: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(totalSteps) { step ->
             val isSelected = step == currentStep
             val color by animateColorAsState(
                 targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer,
-                label = "color"
+                label = "color",
             )
             val width by animateDpAsState(
                 targetValue = if (isSelected) 32.dp else 8.dp,
-                label = "width"
+                label = "width",
             )
 
             Box(
-                modifier = Modifier
-                    .height(8.dp)
-                    .width(width)
-                    .clip(CircleShape)
-                    .background(color)
+                modifier =
+                    Modifier
+                        .height(8.dp)
+                        .width(width)
+                        .clip(CircleShape)
+                        .background(color),
             )
         }
     }
@@ -185,47 +187,48 @@ fun EmotionWheel(
     selectedEmotion: String,
     onEmotionSelected: (String) -> Unit,
     selectedSubEmotion: String = "",
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val emotions = PlutchikEmotion.entries
     val angleStep = 360f / emotions.size
     val primaryLabel = resolvePrimaryEmotion(selectedEmotion)
 
-    val accessibilityLabel = when {
-        primaryLabel.isBlank() ->
-            "Rueda de emociones. Toca un segmento para seleccionar tu emoción."
+    val accessibilityLabel =
+        when {
+            primaryLabel.isBlank() ->
+                "Rueda de emociones. Toca un segmento para seleccionar tu emoción."
 
-        selectedSubEmotion.isNotBlank() ->
-            "Emoción: $primaryLabel – $selectedSubEmotion"
+            selectedSubEmotion.isNotBlank() ->
+                "Emoción: $primaryLabel – $selectedSubEmotion"
 
-        else ->
-            "Emoción seleccionada: $primaryLabel. Toca otro segmento para cambiar."
-    }
+            else ->
+                "Emoción seleccionada: $primaryLabel. Toca otro segmento para cambiar."
+        }
 
     Box(
-        modifier = modifier
-            .size(300.dp)
-            
-            .clip(CircleShape)
-            .background(Color.White)
-            .semantics { contentDescription = accessibilityLabel }
-            .pointerInput(Unit) {
-                detectTapGestures { offset ->
-                    val center = Offset(size.width / 2f, size.height / 2f)
-                    val dx = offset.x - center.x
-                    val dy = offset.y - center.y
+        modifier =
+            modifier
+                .size(300.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .semantics { contentDescription = accessibilityLabel }
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        val center = Offset(size.width / 2f, size.height / 2f)
+                        val dx = offset.x - center.x
+                        val dy = offset.y - center.y
 
-                    val radius = min(size.width, size.height) / 2f
-                    if (dx * dx + dy * dy > radius * radius) return@detectTapGestures
+                        val radius = min(size.width, size.height) / 2f
+                        if (dx * dx + dy * dy > radius * radius) return@detectTapGestures
 
-                    var angle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
-                    if (angle < 0) angle += 360f
-                    val adjustedAngle = (angle + 90f) % 360f
-                    val index = (adjustedAngle / angleStep).toInt().coerceIn(0, emotions.size - 1)
-                    onEmotionSelected(emotions[index].label)
-                }
-            },
-        contentAlignment = Alignment.Center
+                        var angle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                        if (angle < 0) angle += 360f
+                        val adjustedAngle = (angle + 90f) % 360f
+                        val index = (adjustedAngle / angleStep).toInt().coerceIn(0, emotions.size - 1)
+                        onEmotionSelected(emotions[index].label)
+                    }
+                },
+        contentAlignment = Alignment.Center,
     ) {
         androidx.compose.foundation.Canvas(modifier = Modifier.size(300.dp)) {
             val radius = min(size.width, size.height) / 2f
@@ -237,11 +240,12 @@ fun EmotionWheel(
                 val startAngle = index * angleStep - 90f
                 val isSelected = emotion.label == primaryLabel
 
-                val tintColor = when (emotion.valence) {
-                    is Valence.Warm -> Color(0xFFFFA726).copy(alpha = 0.25f)
-                    is Valence.Cold -> Color(0xFF42A5F5).copy(alpha = 0.25f)
-                    is Valence.Neutral -> Color.Transparent
-                }
+                val tintColor =
+                    when (emotion.valence) {
+                        is Valence.Warm -> Color(0xFFFFA726).copy(alpha = 0.25f)
+                        is Valence.Cold -> Color(0xFF42A5F5).copy(alpha = 0.25f)
+                        is Valence.Neutral -> Color.Transparent
+                    }
                 if (tintColor != Color.Transparent) {
                     drawArc(
                         color = tintColor,
@@ -249,7 +253,7 @@ fun EmotionWheel(
                         sweepAngle = angleStep,
                         useCenter = true,
                         topLeft = arcTopLeft,
-                        size = arcSize
+                        size = arcSize,
                     )
                 }
 
@@ -259,7 +263,7 @@ fun EmotionWheel(
                     sweepAngle = angleStep,
                     useCenter = true,
                     topLeft = arcTopLeft,
-                    size = arcSize
+                    size = arcSize,
                 )
 
                 if (isSelected) {
@@ -270,7 +274,7 @@ fun EmotionWheel(
                         useCenter = true,
                         topLeft = arcTopLeft,
                         size = arcSize,
-                        style = Stroke(width = 6f)
+                        style = Stroke(width = 6f),
                     )
                 }
 
@@ -280,13 +284,14 @@ fun EmotionWheel(
                 val textY = center.y + textRadius * sin(midAngleRad).toFloat()
 
                 drawContext.canvas.nativeCanvas.apply {
-                    val paint = android.graphics.Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        textSize = 32f
-                        textAlign = android.graphics.Paint.Align.CENTER
-                        isFakeBoldText = isSelected
-                        setShadowLayer(4f, 1f, 1f, android.graphics.Color.BLACK)
-                    }
+                    val paint =
+                        android.graphics.Paint().apply {
+                            color = android.graphics.Color.WHITE
+                            textSize = 32f
+                            textAlign = android.graphics.Paint.Align.CENTER
+                            isFakeBoldText = isSelected
+                            setShadowLayer(4f, 1f, 1f, android.graphics.Color.BLACK)
+                        }
                     drawText(emotion.emoji, textX, textY - 14f, paint)
                     paint.textSize = 24f
                     drawText(emotion.label, textX, textY + 20f, paint)
@@ -298,18 +303,19 @@ fun EmotionWheel(
                 drawLine(
                     color = Color.White.copy(alpha = 0.4f),
                     start = center,
-                    end = Offset(
-                        center.x + radius * cos(lineAngleRad).toFloat(),
-                        center.y + radius * sin(lineAngleRad).toFloat()
-                    ),
-                    strokeWidth = 2f
+                    end =
+                        Offset(
+                            center.x + radius * cos(lineAngleRad).toFloat(),
+                            center.y + radius * sin(lineAngleRad).toFloat(),
+                        ),
+                    strokeWidth = 2f,
                 )
             }
 
             drawCircle(
                 color = Color.White,
                 radius = radius * 0.2f,
-                center = center
+                center = center,
             )
         }
     }
@@ -321,23 +327,25 @@ fun SubEmotionChips(
     variants: List<String>,
     selectedSubEmotion: String,
     onSubEmotionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
     ) {
         variants.forEach { variant ->
             FilterChip(
                 selected = variant == selectedSubEmotion,
                 onClick = { onSubEmotionSelected(variant) },
                 label = { Text(variant) },
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
-                    .semantics { contentDescription = "Sub-emoción: $variant" }
+                modifier =
+                    Modifier
+                        .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                        .semantics { contentDescription = "Sub-emoción: $variant" },
             )
         }
     }
@@ -351,7 +359,7 @@ private fun StepEmocion(
     onEmocionChange: (String) -> Unit,
     subEmocion: String,
     onSubEmocionChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val primaryEmotion = resolvePrimaryEmotion(emocion)
     val selectedPrimary = PlutchikEmotion.entries.find { it.label == primaryEmotion }
@@ -359,7 +367,7 @@ private fun StepEmocion(
     Column(
         modifier = modifier.padding(horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         OutlinedTextField(
             value = titulo,
@@ -367,7 +375,7 @@ private fun StepEmocion(
             label = { Text("Título de la entrada") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            leadingIcon = { Icon(Icons.Default.Mood, contentDescription = null) }
+            leadingIcon = { Icon(Icons.Default.Mood, contentDescription = null) },
         )
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -375,12 +383,12 @@ private fun StepEmocion(
                 text = "Tu rueda de emociones",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
             Text(
                 text = "Toca un segmento para identificar qué sientes",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -388,7 +396,7 @@ private fun StepEmocion(
             selectedEmotion = emocion,
             onEmotionSelected = onEmocionChange,
             selectedSubEmotion = subEmocion,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
         )
 
         if (selectedPrimary != null && selectedPrimary.variants.isNotEmpty()) {
@@ -396,12 +404,12 @@ private fun StepEmocion(
                 Text(
                     text = "¿Puedes ser más específico?",
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
                 SubEmotionChips(
                     variants = selectedPrimary.variants,
                     selectedSubEmotion = subEmocion,
-                    onSubEmotionSelected = onSubEmocionChange
+                    onSubEmotionSelected = onSubEmocionChange,
                 )
             }
         } else {
@@ -414,24 +422,24 @@ private fun StepEmocion(
 private fun StepIntensidad(
     intensidad: Float,
     onIntensidadChange: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.padding(24.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Surface(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(120.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = intensidad.toInt().toString(),
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -442,7 +450,7 @@ private fun StepIntensidad(
             text = "¿Qué tan fuerte es este sentimiento?",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -452,12 +460,12 @@ private fun StepIntensidad(
             onValueChange = onIntensidadChange,
             valueRange = 1f..10f,
             steps = 8,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text("Leve", style = MaterialTheme.typography.labelMedium)
             Text("Moderado", style = MaterialTheme.typography.labelMedium)
@@ -473,24 +481,24 @@ private fun StepContexto(
     isEditing: Boolean,
     onGuardar: () -> Unit,
     onCancelar: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Cuéntanos más",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
             Text(
                 text = "Expresar tus pensamientos ayuda a procesarlos",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -498,32 +506,35 @@ private fun StepContexto(
             value = contenido,
             onValueChange = onContenidoChange,
             label = { Text("¿Qué está pasando por tu mente?") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
             shape = RoundedCornerShape(16.dp),
-            minLines = 5
+            minLines = 5,
         )
 
         Text(
             text = "${contenido.length}/500",
             style = MaterialTheme.typography.labelMedium,
-            color = if (contenido.length >= 480)
-                MaterialTheme.colorScheme.error
-            else
-                MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.End)
+            color =
+                if (contenido.length >= 480) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            modifier = Modifier.align(Alignment.End),
         )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (isEditing) {
                 OutlinedButton(
                     onClick = onCancelar,
                     modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(14.dp),
                 ) {
                     Text("Cancelar")
                 }
@@ -532,7 +543,7 @@ private fun StepContexto(
                 onClick = onGuardar,
                 modifier = Modifier.weight(if (isEditing) 1.5f else 1f).height(56.dp),
                 shape = RoundedCornerShape(14.dp),
-                elevation = ButtonDefaults.buttonColors().let { ButtonDefaults.elevatedButtonElevation() }
+                elevation = ButtonDefaults.buttonColors().let { ButtonDefaults.elevatedButtonElevation() },
             ) {
                 Icon(if (isEditing) Icons.Default.Edit else Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -544,9 +555,7 @@ private fun StepContexto(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun DiarioEmocionalScreen(
-    viewModel: DiarioEmocionalViewModel = koinViewModel()
-) {
+fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val snackbarHostState = remember { SnackbarHostState() }
@@ -566,86 +575,91 @@ fun DiarioEmocionalScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Diario Emocional", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                    ),
                 actions = {
                     IconButton(onClick = { viewModel.forzarSincronizacion() }) {
                         Icon(Icons.Default.Info, contentDescription = "Sincronizar", tint = Color.White)
                     }
-                }
+                },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            item {
+            item(key = "indicator_pager") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         StepIndicator(
                             currentStep = state.currentStep,
-                            totalSteps = 3
+                            totalSteps = 3,
                         )
 
                         HorizontalPager(
                             state = pagerState,
                             userScrollEnabled = false,
-                            modifier = Modifier.height(if (state.currentStep == 1) 320.dp else 520.dp)
+                            modifier = Modifier.height(if (state.currentStep == 1) 320.dp else 520.dp),
                         ) { page ->
                             when (page) {
-                                0 -> StepEmocion(
-                                    titulo = state.titulo,
-                                    onTituloChange = viewModel::onTituloChange,
-                                    emocion = state.emocion,
-                                    onEmocionChange = viewModel::onEmocionChange,
-                                    subEmocion = state.subEmocion,
-                                    onSubEmocionChange = viewModel::onSubEmocionChange,
-                                    modifier = Modifier.fillMaxSize()
-                                )
+                                0 ->
+                                    StepEmocion(
+                                        titulo = state.titulo,
+                                        onTituloChange = viewModel::onTituloChange,
+                                        emocion = state.emocion,
+                                        onEmocionChange = viewModel::onEmocionChange,
+                                        subEmocion = state.subEmocion,
+                                        onSubEmocionChange = viewModel::onSubEmocionChange,
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
 
-                                1 -> StepIntensidad(
-                                    intensidad = state.intensidad,
-                                    onIntensidadChange = viewModel::onIntensidadChange,
-                                    modifier = Modifier.fillMaxSize()
-                                )
+                                1 ->
+                                    StepIntensidad(
+                                        intensidad = state.intensidad,
+                                        onIntensidadChange = viewModel::onIntensidadChange,
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
 
-                                2 -> StepContexto(
-                                    contenido = state.contenido,
-                                    onContenidoChange = viewModel::onContenidoChange,
-                                    isEditing = state.editandoId != null,
-                                    onGuardar = viewModel::guardarEntrada,
-                                    onCancelar = viewModel::cancelarEdicion,
-                                    modifier = Modifier.fillMaxSize()
-                                )
+                                2 ->
+                                    StepContexto(
+                                        contenido = state.contenido,
+                                        onContenidoChange = viewModel::onContenidoChange,
+                                        isEditing = state.editandoId != null,
+                                        onGuardar = viewModel::guardarEntrada,
+                                        onCancelar = viewModel::cancelarEdicion,
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
                             }
                         }
 
                         if (state.currentStep < 2) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
                                 if (state.currentStep > 0) {
                                     OutlinedButton(
                                         onClick = viewModel::onPreviousStep,
                                         modifier = Modifier.weight(1f).height(48.dp),
-                                        shape = RoundedCornerShape(12.dp)
+                                        shape = RoundedCornerShape(12.dp),
                                     ) {
                                         Text("Anterior")
                                     }
@@ -654,7 +668,7 @@ fun DiarioEmocionalScreen(
                                     onClick = viewModel::onNextStep,
                                     modifier = Modifier.weight(1f).height(48.dp),
                                     shape = RoundedCornerShape(12.dp),
-                                    enabled = if (state.currentStep == 0) state.emocion.isNotBlank() else true
+                                    enabled = if (state.currentStep == 0) state.emocion.isNotBlank() else true,
                                 ) {
                                     Text("Siguiente")
                                 }
@@ -665,54 +679,54 @@ fun DiarioEmocionalScreen(
             }
 
             if (!state.mensajeError.isNullOrBlank()) {
-                item {
+                item(key = "error_message") {
                     Surface(
                         color = MaterialTheme.colorScheme.errorContainer,
                         shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = state.mensajeError ?: "",
                                 color = MaterialTheme.colorScheme.onErrorContainer,
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
                             )
                         }
                     }
                 }
             }
 
-            item {
+            item(key = "history_header") {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
                 ) {
                     Icon(Icons.Default.History, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Historial de Bienestar",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
 
             if (state.entradas.isEmpty()) {
-                item {
+                item(key = "empty_history") {
                     Box(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "Tu diario está esperando tu primera entrada...",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
@@ -722,7 +736,7 @@ fun DiarioEmocionalScreen(
                         entrada = entrada,
                         onEdit = { viewModel.editarEntrada(entrada) },
                         onDelete = { viewModel.eliminarEntrada(entrada) },
-                        formatter = formatter
+                        formatter = formatter,
                     )
                 }
             }
@@ -735,36 +749,38 @@ fun HistoryEntryCard(
     entrada: org.ies.tierno.applicationamani.domain.models.diario.EntradaDiario,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    formatter: DateTimeFormatter
+    formatter: DateTimeFormatter,
 ) {
-    val emotionEntry = PlutchikEmotion.entries.find { it.label == entrada.emocion }
-        ?: PlutchikEmotion.entries.find { it.variants.contains(entrada.emocion) }
+    val emotionEntry =
+        PlutchikEmotion.entries.find { it.label == entrada.emocion }
+            ?: PlutchikEmotion.entries.find { it.variants.contains(entrada.emocion) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
-            modifier = Modifier.height(IntrinsicSize.Min)
+            modifier = Modifier.height(IntrinsicSize.Min),
         ) {
             // Indicador de color lateral
             Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(6.dp)
-                    .background(emotionEntry?.color ?: MaterialTheme.colorScheme.outline)
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .width(6.dp)
+                        .background(emotionEntry?.color ?: MaterialTheme.colorScheme.outline),
             )
 
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
@@ -772,36 +788,39 @@ fun HistoryEntryCard(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = formatter.format(
-                                Instant.ofEpochMilli(entrada.createdAt)
-                                    .atZone(ZoneId.systemDefault()).toLocalDateTime()
-                            ),
+                            text =
+                                formatter.format(
+                                    Instant
+                                        .ofEpochMilli(entrada.createdAt)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDateTime(),
+                                ),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = (emotionEntry?.color ?: MaterialTheme.colorScheme.primary).copy(alpha = 0.1f)
+                        color = (emotionEntry?.color ?: MaterialTheme.colorScheme.primary).copy(alpha = 0.1f),
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = emotionEntry?.emoji ?: "✨",
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = entrada.emocion,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = emotionEntry?.color ?: MaterialTheme.colorScheme.primary
+                                color = emotionEntry?.color ?: MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
@@ -812,39 +831,41 @@ fun HistoryEntryCard(
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 4.dp),
                     thickness = 0.5.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "Intensidad:",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         repeat(10) { index ->
                             Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .padding(1.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (index < entrada.intensidad)
-                                            emotionEntry?.color ?: MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.surfaceVariant
-                                    )
+                                modifier =
+                                    Modifier
+                                        .size(8.dp)
+                                        .padding(1.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (index < entrada.intensidad) {
+                                                emotionEntry?.color ?: MaterialTheme.colorScheme.primary
+                                            } else {
+                                                MaterialTheme.colorScheme.surfaceVariant
+                                            },
+                                        ),
                             )
                         }
                     }
@@ -855,7 +876,7 @@ fun HistoryEntryCard(
                                 Icons.Default.Edit,
                                 contentDescription = "Editar",
                                 modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                         IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
@@ -863,7 +884,7 @@ fun HistoryEntryCard(
                                 Icons.Default.Delete,
                                 contentDescription = "Eliminar",
                                 modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.error
+                                tint = MaterialTheme.colorScheme.error,
                             )
                         }
                     }

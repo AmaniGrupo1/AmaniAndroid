@@ -7,5 +7,5 @@ data class UpdatePsicologoRequestDTO(
     val experiencia: Int?,
     val descripcion: String?,
     val licencia: String?,
-    val usuario: UsuarioUpdateDTO?
+    val usuario: UsuarioUpdateDTO?,
 )

@@ -35,17 +35,17 @@ import timber.log.Timber
  * @see retrofitModule
  */
 class AmaniApplication : Application() {
-
     // Bug 3 Fix: Envolver el applicationContext con el Locale personalizado
     // Esto asegura que los componentes que usen applicationContext tengan recursos localizados
     override fun attachBaseContext(base: Context) {
-        val lang = runBlocking {
-            try {
-                UserSessionDataStore(base).sessionFlow.firstOrNull()?.idioma ?: "es"
-            } catch (e: Exception) {
-                "es"
+        val lang =
+            runBlocking {
+                try {
+                    UserSessionDataStore(base).sessionFlow.firstOrNull()?.idioma ?: "es"
+                } catch (e: Exception) {
+                    "es"
+                }
             }
-        }
         val context = LanguageManager.setLocale(base, lang)
         super.attachBaseContext(context)
     }
@@ -75,7 +75,7 @@ class AmaniApplication : Application() {
             workManagerFactory()
             modules(
                 appModule,
-                retrofitModule
+                retrofitModule,
             )
         }
     }
@@ -89,13 +89,14 @@ class AmaniApplication : Application() {
      */
     private fun crearCanalNotificaciones() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CitaNotificationWorker.CANAL_CITAS_ID,
-                "Recordatorio de citas",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notificaciones de recordatorio de tus citas en Amani"
-            }
+            val channel =
+                NotificationChannel(
+                    CitaNotificationWorker.CANAL_CITAS_ID,
+                    "Recordatorio de citas",
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    description = "Notificaciones de recordatorio de tus citas en Amani"
+                }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }

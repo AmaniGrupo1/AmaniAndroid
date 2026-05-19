@@ -12,26 +12,30 @@ import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
 import retrofit2.HttpException
 
-class SituacionRepository(private val api: SituacionApi) {
-
-    fun getSituaciones(): Flow<List<SituacionDTO>> = flow {
-        val response = api.getSituaciones()
-        if (response.isSuccessful && response.body() != null) {
-            emit(response.body()!!.map { dto ->
-                SituacionDTO(
-                    idSituacion = dto.idSituacion,
-                    nombre = dto.nombre,
-                    categoria = dto.categoria,
-                    descripcion = dto.descripcion
+class SituacionRepository(
+    private val api: SituacionApi,
+) {
+    fun getSituaciones(): Flow<List<SituacionDTO>> =
+        flow {
+            val response = api.getSituaciones()
+            if (response.isSuccessful && response.body() != null) {
+                emit(
+                    response.body()!!.map { dto ->
+                        SituacionDTO(
+                            idSituacion = dto.idSituacion,
+                            nombre = dto.nombre,
+                            categoria = dto.categoria,
+                            descripcion = dto.descripcion,
+                        )
+                    },
                 )
-            })
-        } else {
-            throw HttpException(response)
-        }
-    }.flowOn(Dispatchers.IO).catch { emit(emptyList()) }
+            } else {
+                throw HttpException(response)
+            }
+        }.flowOn(Dispatchers.IO).catch { emit(emptyList()) }
 
-    suspend fun getSituacionById(id: Long): Result<SituacionDTO> {
-        return withContext(Dispatchers.IO) {
+    suspend fun getSituacionById(id: Long): Result<SituacionDTO> =
+        withContext(Dispatchers.IO) {
             try {
                 val response = api.getSituacionById(id)
                 if (response.isSuccessful && response.body() != null) {
@@ -41,8 +45,8 @@ class SituacionRepository(private val api: SituacionApi) {
                             idSituacion = dto.idSituacion,
                             nombre = dto.nombre,
                             categoria = dto.categoria,
-                            descripcion = dto.descripcion
-                        )
+                            descripcion = dto.descripcion,
+                        ),
                     )
                 } else {
                     Result.failure(HttpException(response))
@@ -51,10 +55,9 @@ class SituacionRepository(private val api: SituacionApi) {
                 Result.failure(e)
             }
         }
-    }
 
-    suspend fun createSituacion(request: SituacionRequest): Result<SituacionDTO> {
-        return try {
+    suspend fun createSituacion(request: SituacionRequest): Result<SituacionDTO> =
+        try {
             val response = api.createSituacion(request)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
@@ -64,10 +67,12 @@ class SituacionRepository(private val api: SituacionApi) {
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-    suspend fun updateSituacion(id: Long, request: SituacionRequest): Result<SituacionDTO> {
-        return try {
+    suspend fun updateSituacion(
+        id: Long,
+        request: SituacionRequest,
+    ): Result<SituacionDTO> =
+        try {
             val response = api.updateSituacion(id, request)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
@@ -77,10 +82,9 @@ class SituacionRepository(private val api: SituacionApi) {
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
-    suspend fun deleteSituacion(id: Long): Result<Unit> {
-        return try {
+    suspend fun deleteSituacion(id: Long): Result<Unit> =
+        try {
             val response = api.deleteSituacion(id)
             if (response.isSuccessful) {
                 Result.success(Unit)
@@ -90,5 +94,4 @@ class SituacionRepository(private val api: SituacionApi) {
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 }

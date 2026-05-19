@@ -26,7 +26,6 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 
 class EstadisticasPsicologoScreenTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -37,9 +36,11 @@ class EstadisticasPsicologoScreenTest {
     fun setUp() {
         stopKoin() // Ensure clean state
         startKoin {
-            modules(module {
-                single { mockViewModel }
-            })
+            modules(
+                module {
+                    single { mockViewModel }
+                },
+            )
         }
         every { mockViewModel.uiState } returns uiStateFlow
     }
@@ -89,15 +90,18 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun cuando_fecha_es_corta_no_crashea_substring() {
-        val uiStateFechaCorta = EstadisticasPsicologoUiState(
-            entradas = listOf(
-                DiarioEmocionResponseDTO(1, "2023", "Test", "Feliz", 8, "Nota")
-            ),
-            estadisticas = EstadisticasEmocionales(
-                mejorSesion = DiarioEmocionResponseDTO(1, "2023", "Test", "Feliz", 8, "Nota"),
-                peorSesion = DiarioEmocionResponseDTO(1, "2023", "Test", "Feliz", 8, "Nota")
+        val uiStateFechaCorta =
+            EstadisticasPsicologoUiState(
+                entradas =
+                    listOf(
+                        DiarioEmocionResponseDTO(1, "2023", "Test", "Feliz", 8, "Nota"),
+                    ),
+                estadisticas =
+                    EstadisticasEmocionales(
+                        mejorSesion = DiarioEmocionResponseDTO(1, "2023", "Test", "Feliz", 8, "Nota"),
+                        peorSesion = DiarioEmocionResponseDTO(1, "2023", "Test", "Feliz", 8, "Nota"),
+                    ),
             )
-        )
         uiStateFlow.value = uiStateFechaCorta
 
         composeTestRule.setContent {
@@ -110,13 +114,14 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun metricas_muestran_valores_del_uiState() {
-        val stats = EstadisticasEmocionales(
-            promedioPeriodo = 7.5,
-            mejorSesion = DiarioEmocionResponseDTO(1, "2023-10-27", "Best", "Happy", 9, ""),
-            peorSesion = DiarioEmocionResponseDTO(2, "2023-10-20", "Worst", "Sad", 3, ""),
-            totalSesiones = 10,
-            tendenciaPuntos = 1.2
-        )
+        val stats =
+            EstadisticasEmocionales(
+                promedioPeriodo = 7.5,
+                mejorSesion = DiarioEmocionResponseDTO(1, "2023-10-27", "Best", "Happy", 9, ""),
+                peorSesion = DiarioEmocionResponseDTO(2, "2023-10-20", "Worst", "Sad", 3, ""),
+                totalSesiones = 10,
+                tendenciaPuntos = 1.2,
+            )
         uiStateFlow.value = EstadisticasPsicologoUiState(estadisticas = stats)
 
         composeTestRule.setContent {
@@ -128,7 +133,7 @@ class EstadisticasPsicologoScreenTest {
         composeTestRule.onNodeWithText("Promedio periodo").assertIsDisplayed()
         composeTestRule.onNodeWithText("Mejor sesión").assertIsDisplayed()
         composeTestRule.onNodeWithText("Peor sesión").assertIsDisplayed()
-        
+
         // Scroll to the metrics grid (index 2 in LazyColumn)
         composeTestRule.onNodeWithTag("stats_list").performScrollToIndex(2)
         composeTestRule.onNodeWithText("Total sesiones").assertIsDisplayed()
@@ -143,9 +148,10 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun tendencia_positiva_muestra_texto_mejorando() {
-        uiStateFlow.value = EstadisticasPsicologoUiState(
-            estadisticas = EstadisticasEmocionales(tendenciaPuntos = 1.5)
-        )
+        uiStateFlow.value =
+            EstadisticasPsicologoUiState(
+                estadisticas = EstadisticasEmocionales(tendenciaPuntos = 1.5),
+            )
 
         composeTestRule.setContent {
             EstadisticasPsicologoScreen()
@@ -157,9 +163,10 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun tendencia_negativa_muestra_texto_bajando() {
-        uiStateFlow.value = EstadisticasPsicologoUiState(
-            estadisticas = EstadisticasEmocionales(tendenciaPuntos = -2.0)
-        )
+        uiStateFlow.value =
+            EstadisticasPsicologoUiState(
+                estadisticas = EstadisticasEmocionales(tendenciaPuntos = -2.0),
+            )
 
         composeTestRule.setContent {
             EstadisticasPsicologoScreen()
@@ -171,9 +178,10 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun tendencia_cero_muestra_texto_estable() {
-        uiStateFlow.value = EstadisticasPsicologoUiState(
-            estadisticas = EstadisticasEmocionales(tendenciaPuntos = 0.0)
-        )
+        uiStateFlow.value =
+            EstadisticasPsicologoUiState(
+                estadisticas = EstadisticasEmocionales(tendenciaPuntos = 0.0),
+            )
 
         composeTestRule.setContent {
             EstadisticasPsicologoScreen()
@@ -185,10 +193,27 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun dropdown_paciente_muestra_lista_al_hacer_click() {
-        val pacientes = listOf(
-            PacientePsicologoResponseDTO(idPaciente = 1L, idUsuario = 100L, nombre = "Juan", apellido = "Perez", email = "juan@test.com", dni = "123", telefono = ""),
-            PacientePsicologoResponseDTO(idPaciente = 2L, idUsuario = 101L, nombre = "Maria", apellido = "Garcia", email = "maria@test.com", dni = "456", telefono = "")
-        )
+        val pacientes =
+            listOf(
+                PacientePsicologoResponseDTO(
+                    idPaciente = 1L,
+                    idUsuario = 100L,
+                    nombre = "Juan",
+                    apellido = "Perez",
+                    email = "juan@test.com",
+                    dni = "123",
+                    telefono = "",
+                ),
+                PacientePsicologoResponseDTO(
+                    idPaciente = 2L,
+                    idUsuario = 101L,
+                    nombre = "Maria",
+                    apellido = "Garcia",
+                    email = "maria@test.com",
+                    dni = "456",
+                    telefono = "",
+                ),
+            )
         uiStateFlow.value = EstadisticasPsicologoUiState(pacientes = pacientes)
 
         composeTestRule.setContent {
@@ -196,7 +221,7 @@ class EstadisticasPsicologoScreenTest {
         }
 
         composeTestRule.onNodeWithTag("dropdown_paciente").performClick()
-        
+
         // Use useUnmergedTree to find the menu item text if it's nested
         composeTestRule.onNodeWithText("Juan Perez", useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithText("Maria Garcia", useUnmergedTree = true).assertIsDisplayed()
@@ -204,7 +229,16 @@ class EstadisticasPsicologoScreenTest {
 
     @Test
     fun seleccionar_paciente_llama_al_viewmodel() {
-        val paciente = PacientePsicologoResponseDTO(idPaciente = 1L, idUsuario = 100L, nombre = "Juan", apellido = "Perez", email = "juan@test.com", dni = "123", telefono = "")
+        val paciente =
+            PacientePsicologoResponseDTO(
+                idPaciente = 1L,
+                idUsuario = 100L,
+                nombre = "Juan",
+                apellido = "Perez",
+                email = "juan@test.com",
+                dni = "123",
+                telefono = "",
+            )
         uiStateFlow.value = EstadisticasPsicologoUiState(pacientes = listOf(paciente))
 
         composeTestRule.setContent {
@@ -248,9 +282,10 @@ class EstadisticasPsicologoScreenTest {
     @Test
     fun observation_card_muestra_texto_de_uiState() {
         val obs = "El paciente muestra una mejoría notable en su estado de ánimo."
-        uiStateFlow.value = EstadisticasPsicologoUiState(
-            estadisticas = EstadisticasEmocionales(observacion = obs)
-        )
+        uiStateFlow.value =
+            EstadisticasPsicologoUiState(
+                estadisticas = EstadisticasEmocionales(observacion = obs),
+            )
 
         composeTestRule.setContent {
             EstadisticasPsicologoScreen()
@@ -272,7 +307,6 @@ class EstadisticasPsicologoScreenTest {
         composeTestRule.onNodeWithTag("stats_list").performScrollToIndex(3)
         composeTestRule.onNodeWithText("Observación").assertIsDisplayed()
     }
-
 
     @Test
     fun topbar_muestra_titulo_correcto() {

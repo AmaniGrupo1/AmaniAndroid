@@ -50,7 +50,7 @@ private val ErrorColor = Color(0xFFE57373)
 @Composable
 fun AgregarAdministrador(
     navController: NavController,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
 ) {
     val tokens = rememberAdminThemeTokens()
     val amani = LocalAmaniColors.current
@@ -70,7 +70,8 @@ fun AgregarAdministrador(
     var passwordTouched by remember { mutableStateOf(false) }
 
     // Validar si el formulario es válido
-    val isFormValid = name.isNotBlank() &&
+    val isFormValid =
+        name.isNotBlank() &&
             surname.isNotBlank() &&
             email.isNotBlank() &&
             emailError == null &&
@@ -80,14 +81,15 @@ fun AgregarAdministrador(
         containerColor = tokens.screenBackground,
         topBar = {
             MenuAdministrador("Agregar administrador", navController)
-        }
+        },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -99,17 +101,18 @@ fun AgregarAdministrador(
                 placeholder = { Text("Nombre", fontFamily = roboto) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = tokens.cardBackground,
-                    unfocusedContainerColor = tokens.cardBackground,
-                    focusedBorderColor = tokens.primary,
-                    unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
-                    cursorColor = tokens.primary,
-                    focusedTextColor = tokens.cardContent,
-                    unfocusedTextColor = tokens.cardContent,
-                    focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
-                    unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f)
-                )
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = tokens.cardBackground,
+                        unfocusedContainerColor = tokens.cardBackground,
+                        focusedBorderColor = tokens.primary,
+                        unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
+                        cursorColor = tokens.primary,
+                        focusedTextColor = tokens.cardContent,
+                        unfocusedTextColor = tokens.cardContent,
+                        focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                        unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                    ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -122,17 +125,18 @@ fun AgregarAdministrador(
                 placeholder = { Text("Apellido", fontFamily = roboto) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = tokens.cardBackground,
-                    unfocusedContainerColor = tokens.cardBackground,
-                    focusedBorderColor = tokens.primary,
-                    unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
-                    cursorColor = tokens.primary,
-                    focusedTextColor = tokens.cardContent,
-                    unfocusedTextColor = tokens.cardContent,
-                    focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
-                    unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f)
-                )
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = tokens.cardBackground,
+                        unfocusedContainerColor = tokens.cardBackground,
+                        focusedBorderColor = tokens.primary,
+                        unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
+                        cursorColor = tokens.primary,
+                        focusedTextColor = tokens.cardContent,
+                        unfocusedTextColor = tokens.cardContent,
+                        focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                        unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                    ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -149,17 +153,18 @@ fun AgregarAdministrador(
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 isError = emailTouched && email.isNotBlank() && emailError != null,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = tokens.cardBackground,
-                    unfocusedContainerColor = tokens.cardBackground,
-                    focusedBorderColor = if (emailTouched && emailError != null) ErrorColor else tokens.primary,
-                    unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
-                    cursorColor = tokens.primary,
-                    focusedTextColor = tokens.cardContent,
-                    unfocusedTextColor = tokens.cardContent,
-                    focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
-                    unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f)
-                ),
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = tokens.cardBackground,
+                        unfocusedContainerColor = tokens.cardBackground,
+                        focusedBorderColor = if (emailTouched && emailError != null) ErrorColor else tokens.primary,
+                        unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
+                        cursorColor = tokens.primary,
+                        focusedTextColor = tokens.cardContent,
+                        unfocusedTextColor = tokens.cardContent,
+                        focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                        unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                    ),
                 supportingText = {
                     when {
                         !emailTouched && email.isBlank() -> {
@@ -167,7 +172,7 @@ fun AgregarAdministrador(
                                 text = "📧 Introduce el correo electrónico",
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
-                                color = tokens.cardContent.copy(alpha = 0.6f)
+                                color = tokens.cardContent.copy(alpha = 0.6f),
                             )
                         }
                         emailTouched && email.isNotBlank() && emailError != null -> {
@@ -175,7 +180,7 @@ fun AgregarAdministrador(
                                 text = "❌ $emailError",
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
-                                color = ErrorColor
+                                color = ErrorColor,
                             )
                         }
                         emailTouched && email.isNotBlank() && emailError == null -> {
@@ -183,11 +188,11 @@ fun AgregarAdministrador(
                                 text = "✅ Correo válido",
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
-                                color = SuccessColor
+                                color = SuccessColor,
                             )
                         }
                     }
-                }
+                },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -206,24 +211,33 @@ fun AgregarAdministrador(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
                         )
                     }
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 isError = passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = tokens.cardBackground,
-                    unfocusedContainerColor = tokens.cardBackground,
-                    focusedBorderColor = if (passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password)) ErrorColor else tokens.primary,
-                    unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
-                    cursorColor = tokens.primary,
-                    focusedTextColor = tokens.cardContent,
-                    unfocusedTextColor = tokens.cardContent,
-                    focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
-                    unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f)
-                ),
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = tokens.cardBackground,
+                        unfocusedContainerColor = tokens.cardBackground,
+                        focusedBorderColor =
+                            if (passwordTouched &&
+                                password.isNotBlank() &&
+                                !loginViewModel.isValidPassword(password)
+                            ) {
+                                ErrorColor
+                            } else {
+                                tokens.primary
+                            },
+                        unfocusedBorderColor = tokens.cardContent.copy(alpha = 0.3f),
+                        cursorColor = tokens.primary,
+                        focusedTextColor = tokens.cardContent,
+                        unfocusedTextColor = tokens.cardContent,
+                        focusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                        unfocusedPlaceholderColor = tokens.cardContent.copy(alpha = 0.5f),
+                    ),
                 supportingText = {
                     when {
                         !passwordTouched && password.isBlank() -> {
@@ -231,7 +245,7 @@ fun AgregarAdministrador(
                                 text = "🔒 Introduce una contraseña",
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
-                                color = tokens.cardContent.copy(alpha = 0.6f)
+                                color = tokens.cardContent.copy(alpha = 0.6f),
                             )
                         }
                         passwordTouched && password.isNotBlank() && !loginViewModel.isValidPassword(password) -> {
@@ -239,7 +253,7 @@ fun AgregarAdministrador(
                                 text = "❌ " + LoginViewModel.getPasswordErrorMessage(),
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
-                                color = ErrorColor
+                                color = ErrorColor,
                             )
                         }
                         passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
@@ -247,36 +261,38 @@ fun AgregarAdministrador(
                                 text = "✅ Contraseña válida",
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
-                                color = SuccessColor
+                                color = SuccessColor,
                             )
                         }
                     }
-                }
+                },
             )
 
             Spacer(modifier = Modifier.height(30.dp))
 
             // Botón Registrar
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, tokens.cardContent),
                 onClick = { loginViewModel.registrarAdmin() },
                 enabled = isFormValid,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = tokens.primary,
-                    contentColor = tokens.onPrimary,
-                    disabledContainerColor = tokens.cardContent.copy(alpha = 0.3f),
-                    disabledContentColor = tokens.cardContent.copy(alpha = 0.5f)
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = tokens.primary,
+                        contentColor = tokens.onPrimary,
+                        disabledContainerColor = tokens.cardContent.copy(alpha = 0.3f),
+                        disabledContentColor = tokens.cardContent.copy(alpha = 0.5f),
+                    ),
             ) {
                 Text(
                     "Registrarse administrador",
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
                 )
             }
 
@@ -284,22 +300,24 @@ fun AgregarAdministrador(
 
             // Botón Cancelar
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
                 shape = RoundedCornerShape(50.dp),
                 border = BorderStroke(2.dp, tokens.cardContent),
                 onClick = { navController.popBackStack() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = tokens.cardBackground,
-                    contentColor = tokens.cardContent
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = tokens.cardBackground,
+                        contentColor = tokens.cardContent,
+                    ),
             ) {
                 Text(
                     "Cancelar",
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
                 )
             }
         }

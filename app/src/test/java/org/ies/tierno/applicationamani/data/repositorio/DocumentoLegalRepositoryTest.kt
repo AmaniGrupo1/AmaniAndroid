@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class DocumentoLegalRepositoryTest {
-
     private lateinit var api: DocumentoLegalApi
     private lateinit var repository: DocumentoLegalRepository
 
@@ -24,82 +23,89 @@ class DocumentoLegalRepositoryTest {
     }
 
     @Test
-    fun `getDocumentoLegal should return success when api returns document`() = runTest {
-        val id = 1L
-        val expected = mockk<DocumentoLegalResponseDTO>()
-        coEvery { api.getDocumentoById(id) } returns expected
+    fun `getDocumentoLegal should return success when api returns document`() =
+        runTest {
+            val id = 1L
+            val expected = mockk<DocumentoLegalResponseDTO>()
+            coEvery { api.getDocumentoById(id) } returns expected
 
-        val result = repository.getDocumentoLegal(id)
+            val result = repository.getDocumentoLegal(id)
 
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
-
-    @Test
-    fun `getDocumentoLegal should return failure when api throws`() = runTest {
-        coEvery { api.getDocumentoById(any()) } throws Exception("Not found")
-
-        val result = repository.getDocumentoLegal(1L)
-
-        assertTrue(result.isFailure)
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
 
     @Test
-    fun `getAllDocumentos should return success when api succeeds`() = runTest {
-        val expected = emptyList<DocumentoLegalResponseDTO>()
-        coEvery { api.getAllDocumentos() } returns expected
+    fun `getDocumentoLegal should return failure when api throws`() =
+        runTest {
+            coEvery { api.getDocumentoById(any()) } throws Exception("Not found")
 
-        val result = repository.getAllDocumentos()
+            val result = repository.getDocumentoLegal(1L)
 
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
-
-    @Test
-    fun `deleteDocumento should return success when api succeeds`() = runTest {
-        val id = 1L
-        coEvery { api.eliminarDocumento(id) } returns Unit
-
-        val result = repository.deleteDocumento(id)
-
-        assertTrue(result.isSuccess)
-        coVerify { api.eliminarDocumento(id) }
-    }
+            assertTrue(result.isFailure)
+        }
 
     @Test
-    fun `crearDocumento should return success when api succeeds`() = runTest {
-        val request = mockk<DocumentoLegalRequestDTO>()
-        val expected = mockk<DocumentoLegalResponseDTO>()
-        coEvery { api.crearDocumento(request) } returns expected
+    fun `getAllDocumentos should return success when api succeeds`() =
+        runTest {
+            val expected = emptyList<DocumentoLegalResponseDTO>()
+            coEvery { api.getAllDocumentos() } returns expected
 
-        val result = repository.crearDocumento(request)
+            val result = repository.getAllDocumentos()
 
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
-
-    @Test
-    fun `editarDocumento should return success when api succeeds`() = runTest {
-        val id = 1L
-        val request = mockk<DocumentoLegalRequestDTO>()
-        val expected = mockk<DocumentoLegalResponseDTO>()
-        coEvery { api.editarDocumento(id, request) } returns expected
-
-        val result = repository.editarDocumento(id, request)
-
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
 
     @Test
-    fun `getDocumentoByTipo should return success when api succeeds`() = runTest {
-        val tipo = "T"
-        val expected = mockk<DocumentoLegalResponseDTO>()
-        coEvery { api.getDocumentoByTipo(tipo) } returns expected
+    fun `deleteDocumento should return success when api succeeds`() =
+        runTest {
+            val id = 1L
+            coEvery { api.eliminarDocumento(id) } returns Unit
 
-        val result = repository.getDocumentoByTipo(tipo)
+            val result = repository.deleteDocumento(id)
 
-        assertTrue(result.isSuccess)
-        assertEquals(expected, result.getOrNull())
-    }
+            assertTrue(result.isSuccess)
+            coVerify { api.eliminarDocumento(id) }
+        }
+
+    @Test
+    fun `crearDocumento should return success when api succeeds`() =
+        runTest {
+            val request = mockk<DocumentoLegalRequestDTO>()
+            val expected = mockk<DocumentoLegalResponseDTO>()
+            coEvery { api.crearDocumento(request) } returns expected
+
+            val result = repository.crearDocumento(request)
+
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
+
+    @Test
+    fun `editarDocumento should return success when api succeeds`() =
+        runTest {
+            val id = 1L
+            val request = mockk<DocumentoLegalRequestDTO>()
+            val expected = mockk<DocumentoLegalResponseDTO>()
+            coEvery { api.editarDocumento(id, request) } returns expected
+
+            val result = repository.editarDocumento(id, request)
+
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
+
+    @Test
+    fun `getDocumentoByTipo should return success when api succeeds`() =
+        runTest {
+            val tipo = "T"
+            val expected = mockk<DocumentoLegalResponseDTO>()
+            coEvery { api.getDocumentoByTipo(tipo) } returns expected
+
+            val result = repository.getDocumentoByTipo(tipo)
+
+            assertTrue(result.isSuccess)
+            assertEquals(expected, result.getOrNull())
+        }
 }

@@ -14,7 +14,9 @@ import org.ies.tierno.applicationamani.dto.admin.MessageResponse
  * @see org.ies.tierno.applicationamani.data.AuthRepository
  * @see org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
  */
-class DarBajaPacienteUseCase(val repository: AuthRepository) {
+class DarBajaPacienteUseCase(
+    val repository: AuthRepository,
+) {
     /**
      * Da de baja al paciente identificado por [id].
      *
@@ -22,11 +24,7 @@ class DarBajaPacienteUseCase(val repository: AuthRepository) {
      * @return [Result.success] con mensaje de confirmación,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend operator fun invoke(id: Long): Result<MessageResponse> {
-        return repository.darBajaPaciente(id)
-    }
+    suspend operator fun invoke(id: Long): Result<MessageResponse> = repository.darBajaPaciente(id)
 
-    suspend fun darAltaPsicologo(id: Long): Result<MessageResponse> {
-         return repository.darAltaPsicologo(id)
-    }
+    suspend fun darAltaPsicologo(id: Long): Result<MessageResponse> = repository.darAltaPsicologo(id)
 }

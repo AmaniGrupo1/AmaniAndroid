@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,7 +51,10 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteV
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalClienteViewModel = viewModel()) {
+fun PrincipalClienteScreen(
+    navController: NavController,
+    viewModel: PrincipalClienteViewModel = viewModel(),
+) {
     val typography = MaterialTheme.typography
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -65,35 +67,38 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 Text(
                     text = "Menú",
                     modifier = Modifier.padding(16.dp),
-                    style = typography.titleLarge // M3: titleLarge for drawer header
+                    style = typography.titleLarge, // M3: titleLarge for drawer header
                 )
                 HorizontalDivider()
                 Text(
                     text = "Perfil",
                     style = typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(16.dp),
                 )
                 Text(
                     text = "Mis citas",
                     style = typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(16.dp),
                 )
                 Text(
                     text = "Cerrar sesión",
                     style = typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(16.dp),
                 )
             }
-        }
+        },
     ) {
         Scaffold(
             topBar = {
@@ -105,47 +110,51 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                                 scope.launch {
                                     drawerState.open()
                                 }
-                            }
+                            },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu"
+                                contentDescription = "Menu",
                             )
                         }
                     },
                     // M3: TopAppBar colors and scroll behavior (pinned by default in Scaffold)
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            titleContentColor = MaterialTheme.colorScheme.onSurface,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 )
             },
             bottomBar = {
                 // M3: Integrated AmaniBottomBar
                 AmaniBottomBar(
                     navController = navController,
-                    config = BottomBarConfig.Paciente
+                    config = BottomBarConfig.Paciente,
                 )
-            }
+            },
         ) { paddingValues ->
             Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(24.dp) // M3: Spacing multiple of 8
+                modifier =
+                    Modifier
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(24.dp), // M3: Spacing multiple of 8
             ) {
                 // M3: Card with surfaceContainerHigh for better depth
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    shape = MaterialTheme.shapes.medium
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -153,21 +162,22 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                     ) {
                         Text(
                             text = "Imagen del psicólogo",
-                            style = typography.bodyLarge
+                            style = typography.bodyLarge,
                         )
                     }
                 }
-                
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    shape = MaterialTheme.shapes.medium
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     ) {
                         Text(
                             text = "N. Psico",
@@ -186,12 +196,12 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                         especialidades.forEach { especialidad ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(vertical = 4.dp)
+                                modifier = Modifier.padding(vertical = 4.dp),
                             ) {
                                 Text(
                                     text = especialidad,
                                     style = typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }

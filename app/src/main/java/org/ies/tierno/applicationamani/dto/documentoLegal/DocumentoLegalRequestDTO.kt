@@ -7,5 +7,5 @@ data class DocumentoLegalRequestDTO(
     val icono: String?,
     val ordenVisualizacion: Int,
     val version: String?,
-    val activo: Boolean
+    val activo: Boolean,
 )
