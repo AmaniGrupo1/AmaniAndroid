@@ -41,7 +41,7 @@ jobs:
           gcloud firebase test android run \
             --type robo \
             --app app/build/outputs/apk/debug/app-debug.apk \
-            --device model=pixel7,version=33,locale=es,orientation=portrait \
+            --device model=panther,version=33,locale=es,orientation=portrait \
             --timeout 5m \
             --project ${{ secrets.GCP_PROJECT_ID }}
 
@@ -51,6 +51,6 @@ jobs:
             --type instrumentation \
             --app app/build/outputs/apk/debug/app-debug.apk \
             --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
-            --device model=pixel7,version=33,locale=es,orientation=portrait \
+            --device model=panther,version=33,locale=es,orientation=portrait \
             --timeout 10m \
             --project ${{ secrets.GCP_PROJECT_ID }}
