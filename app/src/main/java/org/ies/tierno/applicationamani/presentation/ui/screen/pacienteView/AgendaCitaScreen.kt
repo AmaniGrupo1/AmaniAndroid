@@ -209,7 +209,10 @@ fun AgendaCitaScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(citas) { cita ->
+                        items(
+                            items = citas,
+                            key = { it.idCita ?: it.hashCode() },
+                        ) { cita ->
                             CitaCardAmani(
                                 cita = cita,
                                 onCancelClick = {

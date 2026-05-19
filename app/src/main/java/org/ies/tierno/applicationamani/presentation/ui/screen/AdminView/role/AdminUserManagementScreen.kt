@@ -299,7 +299,10 @@ fun AdminUserManagementScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(usuarios) { user ->
+                        items(
+                            items = usuarios,
+                            key = { user -> user.idUsuario ?: user.email ?: user.hashCode() },
+                        ) { user ->
                             UserCard(
                                 user = user,
                                 onCambiarRol = {

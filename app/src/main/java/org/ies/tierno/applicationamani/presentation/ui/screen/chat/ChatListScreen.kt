@@ -170,7 +170,10 @@ fun ChatListScreen(
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            items(partners) { partner ->
+                            items(
+                                items = partners,
+                                key = { partner -> partner.id },
+                            ) { partner ->
                                 ChatPartnerCard(
                                     partnerName = partner.nombre,
                                     currentUserRol = currentUserRol,

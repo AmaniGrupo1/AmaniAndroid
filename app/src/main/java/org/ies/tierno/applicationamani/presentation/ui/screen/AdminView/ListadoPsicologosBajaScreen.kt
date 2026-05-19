@@ -213,7 +213,10 @@ fun ListadoPsicologosBajaScreen(
                             .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(psicologosBaja) { psicologo ->
+                    items(
+                        items = psicologosBaja,
+                        key = { it.idPsicologo },
+                    ) { psicologo ->
                         PsicologoBajaCard(
                             psicologo = psicologo,
                             onDarAlta = {

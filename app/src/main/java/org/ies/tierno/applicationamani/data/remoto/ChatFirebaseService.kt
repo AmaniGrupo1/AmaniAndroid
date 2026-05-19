@@ -95,7 +95,7 @@ class ChatFirebaseService(
         val deliveredAt = if (currentUserId != null) child.longMapValue("deliveredTo")?.get(currentUserId.toString()) else null
 
         return Message(
-            id = idMensaje.toString(),
+            id = child.key ?: idMensaje.toString(),
             senderId = senderId.toString(),
             content = mensaje,
             timestamp = timestamp,

@@ -324,7 +324,10 @@ fun HistorialClinicoScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        items(historial) { item ->
+                        items(
+                            items = historial,
+                            key = { it.id },
+                        ) { item ->
                             HistorialCard(
                                 item = item,
                                 isExpanded = expandedCardId == item.id,
