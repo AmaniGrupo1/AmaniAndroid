@@ -1,42 +1,47 @@
+# --- Android Studio / IntelliJ ---
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
+*.iws
+*.ipr
 /captures
 .externalNativeBuild
 .cxx
+.kotlin/
+/.agents/
+/.claude/
+/.artifacts/
+
+# --- Gradle ---
+.gradle/
+/build/
+/*/build/
+gradle-app.setting
+
+# --- Local Configurations ---
 local.properties
-.idea
-/.agents/skills/agent-development/examples/agent-creation-prompt.md
-/.agents/skills/agent-development/references/agent-creation-system-prompt.md
-/.agents/skills/mcp-integration/references/authentication.md
-/.agents/skills/agent-development/examples/complete-agent-examples.md
-/.agents/skills/mcp-integration/examples/http-server.json
-/README.md
-/.agents/skills/mcp-integration/references/server-types.md
-/.agents/skills/agent-development/SKILL.md
-/.agents/skills/frontend-design/SKILL.md
-/.agents/skills/mcp-integration/SKILL.md
-/skills-lock.json
-/.agents/skills/mcp-integration/examples/sse-server.json
-/.agents/skills/mcp-integration/examples/stdio-server.json
-/.agents/skills/agent-development/references/system-prompt-design.md
-/.agents/skills/mcp-integration/references/tool-usage.md
-/.agents/skills/agent-development/references/triggering-examples.md
-/.agents/skills/agent-development/scripts/validate-agent.sh
-# Eclipse/IDE files
+/secrets.properties
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- Miscellaneous / Garbage ---
+*.zip
+*.tar
+*.gz
+/tatus
+/screens_list.txt
+/navgraph_list.txt
+/coverage-dashboard.html
+/login_test.sh
+/test_identity.sh
+/app.zip
+/parse_coverage.py
+
+# --- Eclipse/IDE files ---
 .project
 .classpath
 .settings/
-.settings
 
-# Firebase config
-/app/google-services.json
-
+# --- Firebase config ---
+# /app/google-services.json

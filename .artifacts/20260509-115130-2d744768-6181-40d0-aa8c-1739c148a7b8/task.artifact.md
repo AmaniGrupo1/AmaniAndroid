@@ -1,2 +1,0 @@
-- [x] Update `abiFilters` in `app/build.gradle.kts`
-- [x] Notify user
