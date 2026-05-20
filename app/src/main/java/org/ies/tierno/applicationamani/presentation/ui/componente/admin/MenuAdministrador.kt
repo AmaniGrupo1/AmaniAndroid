@@ -84,7 +84,7 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
  * @property dividerAfter Indica si se debe mostrar un divisor después del elemento.
  */
 data class MenuAdministrador(
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val icon: ImageVector,
     val route: String,
     val isDanger: Boolean = false,

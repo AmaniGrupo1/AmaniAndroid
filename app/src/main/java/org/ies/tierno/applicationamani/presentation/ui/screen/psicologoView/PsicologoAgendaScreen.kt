@@ -961,7 +961,6 @@ fun TarjetaCitaMejorada(
                     when (cita.modalidad) {
                         ModalidadCita.PRESENCIAL -> Icons.Default.LocationOn
                         ModalidadCita.LLAMADA -> Icons.Default.Phone
-                        null -> Icons.Default.Info
                     },
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
@@ -972,7 +971,6 @@ fun TarjetaCitaMejorada(
                     text = when (cita.modalidad) {
                         ModalidadCita.PRESENCIAL -> "Presencial"
                         ModalidadCita.LLAMADA -> "Llamada"
-                        null -> "Modalidad no especificada"
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.primary,

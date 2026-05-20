@@ -480,7 +480,7 @@ class LoginViewModel(
             genero,
             fechaNacimiento,
             aceptaTerminos,
-        ) { array ->
+        ) { array: Array<Any> ->
             val n = array[0] as String
             val a = array[1] as String
             val d = array[2] as String

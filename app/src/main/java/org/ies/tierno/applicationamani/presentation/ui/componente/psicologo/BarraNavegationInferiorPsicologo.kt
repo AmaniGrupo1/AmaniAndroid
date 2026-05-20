@@ -34,7 +34,7 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 enum class PsicologoNavItem(
     val route: String,
     val icon: @Composable () -> Unit,
-    @StringRes val labelRes: Int,
+    @param:StringRes val labelRes: Int,
 ) {
     MIS_PACIENTES(
         route = Screens.psicologoHome.route,

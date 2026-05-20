@@ -24,13 +24,9 @@ class DocumentoLegalRepository(
     suspend fun getDocumentoLegal(idDocumento: Long): Result<DocumentoLegalResponseDTO> {
         return try {
             val response = documentoLegalApi.getDocumentoById(idDocumento)
-            if (response != null) {
-                Result.success(response)
-            } else {
-                Result.failure(Exception("Documento legal no encontrado"))
-            }
+            Result.success(response)
         } catch (e: Exception) {
-            return Result.failure(e)
+            Result.failure(e)
         }
     }
 

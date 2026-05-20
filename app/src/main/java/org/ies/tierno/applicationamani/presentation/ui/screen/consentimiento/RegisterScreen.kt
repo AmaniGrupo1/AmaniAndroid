@@ -7,9 +7,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -503,7 +504,7 @@ fun RegisterScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                             shape = textFieldShape,
                             isError = genero.isBlank(),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -813,7 +814,7 @@ fun RegisterScreen(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                                 shape = textFieldShape,
                                 isError = tutorTipo.isBlank(),
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -973,7 +974,7 @@ fun RegisterScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Situaciones",

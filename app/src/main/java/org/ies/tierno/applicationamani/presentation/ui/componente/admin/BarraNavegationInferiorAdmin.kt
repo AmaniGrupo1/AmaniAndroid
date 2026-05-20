@@ -59,7 +59,7 @@ fun BarraNavegationInferiorAdmin(
 ) {
     data class NavDest(
         val item: AdminNavItem,
-        @StringRes val labelRes: Int,
+        @param:StringRes val labelRes: Int,
         val icon: ImageVector,
         val route: String? = null,
     )
