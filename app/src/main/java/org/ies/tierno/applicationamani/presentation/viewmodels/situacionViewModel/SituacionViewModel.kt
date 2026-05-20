@@ -10,33 +10,39 @@ import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseC
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
 
+/**
+ * ViewModel que gestiona el CRUD de situaciones desde el panel de administración.
+ *
+ * Permite listar, consultar por ID, crear, actualizar y eliminar situaciones
+ * mediante [SituacionUseCase]. Espera a que exista una sesión válida antes de
+ * cargar los datos.
+ *
+ * @constructor Crea una instancia con el caso de uso de situaciones y la sesión.
+ * @param useCase Caso de uso que centraliza las operaciones de situaciones.
+ * @param userSessionDataStore Almacén local de la sesión del usuario.
+ */
 class SituacionViewModel(
     private val useCase: SituacionUseCase,
     private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
-    // =========================
-    // LISTA
-    // =========================
+    /** Lista observable de todas las situaciones disponibles. */
     private val _situaciones = MutableStateFlow<List<SituacionDTO>>(emptyList())
     val situaciones: StateFlow<List<SituacionDTO>> = _situaciones
 
-    // =========================
-    // DETALLE
-    // =========================
+    /** Situación seleccionada para consulta de detalle. */
     private val _situacionSeleccionada = MutableStateFlow<SituacionDTO?>(null)
     val situacionSeleccionada: StateFlow<SituacionDTO?> = _situacionSeleccionada
 
+    /** Mensaje de error de la última operación fallida. */
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
     init {
-        // Cargar situaciones solo cuando exista sesión válida (token disponible)
         viewModelScope.launch {
             val session = userSessionDataStore.getSession()
             if (session != null) {
                 cargarSituaciones()
             } else {
-                // esperar hasta que la sesión esté disponible
                 userSessionDataStore.sessionFlow.collect { s ->
                     if (s != null) {
                         cargarSituaciones()
@@ -48,9 +54,12 @@ class SituacionViewModel(
         }
     }
 
-    // =========================
-    // GET ALL
-    // =========================
+    /**
+     * Carga la lista completa de situaciones desde el backend.
+     *
+     * Recolecta el flujo de [SituacionUseCase.getSituaciones] y actualiza
+     * [situaciones] de forma reactiva.
+     */
     fun cargarSituaciones() {
         viewModelScope.launch {
             try {
@@ -63,9 +72,11 @@ class SituacionViewModel(
         }
     }
 
-    // =========================
-    // GET BY ID
-    // =========================
+    /**
+     * Obtiene una situación específica por su ID y la expone en [situacionSeleccionada].
+     *
+     * @param id Identificador de la situación a consultar.
+     */
     fun obtenerPorId(id: Long) {
         viewModelScope.launch {
             val result = useCase.getSituacionById(id)
@@ -75,9 +86,12 @@ class SituacionViewModel(
         }
     }
 
-    // =========================
-    // CREATE
-    // =========================
+    /**
+     * Crea una nueva situación y refresca la lista.
+     *
+     * @param request DTO con los datos de la nueva situación.
+     * @param onResult Callback opcional con `(éxito, mensajeError)`.
+     */
     fun crearSituacion(
         request: SituacionRequest,
         onResult: (Boolean, String?) -> Unit = { _, _ -> },
@@ -87,14 +101,18 @@ class SituacionViewModel(
             onResult(result.isSuccess, result.exceptionOrNull()?.message)
 
             if (result.isSuccess) {
-                cargarSituaciones() // refrescar lista
+                cargarSituaciones()
             }
         }
     }
 
-    // =========================
-    // UPDATE
-    // =========================
+    /**
+     * Actualiza una situación existente y refresca la lista.
+     *
+     * @param id Identificador de la situación a actualizar.
+     * @param request DTO con los nuevos datos.
+     * @param onResult Callback opcional con `(éxito, mensajeError)`.
+     */
     fun actualizarSituacion(
         id: Long,
         request: SituacionRequest,
@@ -110,9 +128,12 @@ class SituacionViewModel(
         }
     }
 
-    // =========================
-    // DELETE
-    // =========================
+    /**
+     * Elimina una situación por su ID y refresca la lista.
+     *
+     * @param id Identificador de la situación a eliminar.
+     * @param onResult Callback opcional con `(éxito, mensajeError)`.
+     */
     fun eliminarSituacion(
         id: Long,
         onResult: (Boolean, String?) -> Unit = { _, _ -> },
@@ -127,13 +148,12 @@ class SituacionViewModel(
         }
     }
 
-    // =========================
-    // LIMPIAR SELECCIÓN Y ERROR
-    // =========================
+    /** Deselecciona la situación actual. */
     fun limpiarSeleccion() {
         _situacionSeleccionada.value = null
     }
 
+    /** Limpia el mensaje de error actual. */
     fun limpiarError() {
         _error.value = null
     }

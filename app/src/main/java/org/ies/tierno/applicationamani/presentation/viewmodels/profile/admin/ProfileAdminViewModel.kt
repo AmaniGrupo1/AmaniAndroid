@@ -16,35 +16,68 @@ import org.ies.tierno.applicationamani.dto.perfil.admin.AdminDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO
 import java.io.File
 
+/**
+ * ViewModel que gestiona el perfil del administrador.
+ *
+ * Permite consultar, actualizar datos y subir una foto de perfil mediante
+ * [ProfileUseCaseGeneral]. Expone estados de carga, error y progreso de subida.
+ *
+ * @constructor Crea una instancia con el caso de uso de perfiles.
+ * @param profileUseCaseGeneral Caso de uso genérico para operaciones de perfil.
+ */
 class ProfileAdminViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
 ) : ViewModel() {
+    /** Perfil del administrador autenticado. */
     private val _perfil = MutableStateFlow<AdminDTO?>(null)
     val perfil: StateFlow<AdminDTO?> = _perfil.asStateFlow()
 
+    /** Indica si una operación de carga o actualización está en curso. */
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    /** Mensaje de error de la última operación fallida. */
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    /**
+     * Estado sellado que representa el progreso de subida de foto de perfil.
+     */
     sealed class UploadStatus {
+        /** Estado inicial: no hay subida en curso. */
         object Idle : UploadStatus()
 
+        /** La foto se está subiendo al backend. */
         object Loading : UploadStatus()
 
+        /**
+         * La subida se completó exitosamente.
+         *
+         * @property url URL de la foto almacenada en el servidor.
+         */
         data class Success(
             val url: String,
         ) : UploadStatus()
 
+        /**
+         * La subida falló con un mensaje de error.
+         *
+         * @property message Descripción del error.
+         */
         data class Error(
             val message: String,
         ) : UploadStatus()
     }
 
+    /** Estado de la subida de foto de perfil. */
     private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
     val uploadStatus: StateFlow<UploadStatus> = _uploadStatus.asStateFlow()
 
+    /**
+     * Obtiene el perfil del administrador desde el backend.
+     *
+     * @param id Identificador del administrador.
+     */
     fun fetchProfile(id: Long) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -62,6 +95,14 @@ class ProfileAdminViewModel(
         }
     }
 
+    /**
+     * Actualiza los datos del perfil del administrador en el backend.
+     *
+     * Tras una actualización exitosa, recarga automáticamente el perfil.
+     *
+     * @param id Identificador del administrador.
+     * @param dto DTO con los nuevos datos del perfil.
+     */
     fun updateProfile(
         id: Long,
         dto: UpdateAdminRequestDTO,
@@ -82,6 +123,16 @@ class ProfileAdminViewModel(
         }
     }
 
+    /**
+     * Sube una foto de perfil para el administrador.
+     *
+     * Convierte la URI de la imagen en un [MultipartBody.Part] y la envía al backend.
+     * Actualiza [uploadStatus] durante todo el proceso y recarga el perfil al finalizar.
+     *
+     * @param id Identificador del administrador.
+     * @param imageUri URI de la imagen seleccionada por el usuario.
+     * @param context Contexto de la aplicación para acceder al ContentResolver.
+     */
     fun uploadFoto(
         id: Long,
         imageUri: Uri,
@@ -113,6 +164,13 @@ class ProfileAdminViewModel(
         }
     }
 
+    /**
+     * Convierte una URI de contenido en un archivo temporal.
+     *
+     * @param uri URI del contenido a copiar.
+     * @param context Contexto de la aplicación.
+     * @return Archivo temporal con el contenido, o `null` si falla.
+     */
     private fun getFile(
         uri: Uri,
         context: Context,
@@ -133,14 +191,17 @@ class ProfileAdminViewModel(
         }
     }
 
+    /** Limpia el mensaje de error actual. */
     fun clearError() {
         _error.value = null
     }
 
+    /** Reinicia el estado de subida de foto a [UploadStatus.Idle]. */
     fun clearUpload() {
         _uploadStatus.value = UploadStatus.Idle
     }
 
+    /** Reinicia todos los estados del ViewModel a sus valores iniciales. */
     fun resetState() {
         _error.value = null
         _uploadStatus.value = UploadStatus.Idle

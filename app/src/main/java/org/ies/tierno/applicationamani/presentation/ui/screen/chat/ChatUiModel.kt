@@ -7,6 +7,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Elementos de la lista de chat, que pueden ser mensajes o separadores de fecha.
+ *
+ * @see MessageItem
+ * @see DateSeparator
+ */
 sealed class ChatListItem {
     data class MessageItem(
         val msg: Message,
@@ -19,6 +25,17 @@ sealed class ChatListItem {
     ) : ChatListItem()
 }
 
+/**
+ * Construye la lista de elementos de chat a partir de los mensajes ordenados.
+ *
+ * Agrupa mensajes consecutivos del mismo remitente e inserta separadores
+ * de fecha entre días distintos. El resultado se invierte para mostrar
+ * los mensajes más recientes al final de la lista.
+ *
+ * @param messages Lista de mensajes a procesar.
+ * @param currentUserId Identificador del usuario actual para el agrupamiento.
+ * @return Lista de [ChatListItem] lista para renderizar en un [LazyColumn].
+ */
 fun buildChatItems(
     messages: List<Message>,
     currentUserId: String,
@@ -61,6 +78,12 @@ fun buildChatItems(
     return items.reversed()
 }
 
+/**
+ * Formatea un timestamp en milisegundos a una cadena de hora legible (HH:mm).
+ *
+ * @param timestamp Timestamp en milisegundos UTC.
+ * @return Hora formateada, o cadena vacía si el timestamp es 0.
+ */
 fun formatTimestamp(timestamp: Long): String {
     if (timestamp == 0L) return ""
     val instant = Instant.ofEpochMilli(timestamp)
@@ -68,6 +91,12 @@ fun formatTimestamp(timestamp: Long): String {
     return localTime.format(DateTimeFormatter.ofPattern("HH:mm"))
 }
 
+/**
+ * Formatea una duración en segundos al formato \»m:ss\».
+ *
+ * @param seconds Duración en segundos.
+ * @return Duración formateada como \»m:ss\».
+ */
 fun formatDuration(seconds: Int): String {
     val mins = seconds / 60
     val secs = seconds % 60

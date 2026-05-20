@@ -15,6 +15,19 @@ import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDT
 import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
 import java.time.LocalDate
 
+/**
+ * Estado de la UI para la pantalla de estadísticas emocionales del psicólogo.
+ *
+ * @property pacientes Lista de pacientes asignados al psicólogo.
+ * @property pacienteSeleccionado Paciente actualmente seleccionado para visualizar sus estadísticas.
+ * @property periodoSeleccionado Periodo de tiempo seleccionado para el análisis (\"Último mes\", \"Últimos 3 meses\", etc.).
+ * @property vistaSeleccionada Tipo de visualización del gráfico (\"Línea\", \"Barras\", etc.).
+ * @property entradas Entradas del diario emocional filtradas por periodo.
+ * @property chartData Datos transformados para renderizar el gráfico (fecha → intensidad).
+ * @property estadisticas Estadísticas agregadas calculadas a partir de las entradas.
+ * @property isLoading Indica si los datos se están cargando.
+ * @property error Mensaje de error si la carga falló.
+ */
 data class EstadisticasPsicologoUiState(
     val pacientes: List<PacientePsicologoResponseDTO> = emptyList(),
     val pacienteSeleccionado: PacientePsicologoResponseDTO? = null,
@@ -27,10 +40,22 @@ data class EstadisticasPsicologoUiState(
     val error: String? = null,
 )
 
+/**
+ * ViewModel que calcula y expone las estadísticas emocionales de los pacientes de un psicólogo.
+ *
+ * Permite seleccionar un paciente concreto y un periodo de tiempo para visualizar
+ * gráficos de intensidad emocional a lo largo del tiempo, así como estadísticas
+ * agregadas (promedio, tendencia, mejor/peor sesión). Utiliza [DiarioRemoteRepository]
+ * para obtener las entradas del diario emocional.
+ *
+ * @param authRepository Repositorio de autenticación para obtener pacientes asignados al psicólogo.
+ * @param diarioRepository Repositorio remoto para consultar entradas del diario emocional.
+ */
 class EstadisticasPsicologoViewModel(
     private val authRepository: AuthRepository,
     private val diarioRepository: DiarioRemoteRepository,
 ) : ViewModel() {
+    /** Estado consolidado de la UI de estadísticas emocionales. */
     private val _uiState = MutableStateFlow(EstadisticasPsicologoUiState())
     val uiState: StateFlow<EstadisticasPsicologoUiState> = _uiState.asStateFlow()
 
@@ -38,6 +63,12 @@ class EstadisticasPsicologoViewModel(
         cargarPacientes()
     }
 
+    /**
+     * Carga la lista de pacientes asignados al psicólogo desde el backend.
+     *
+     * Si hay pacientes disponibles y no hay ninguno seleccionado,
+     * selecciona automáticamente el primero de la lista.
+     */
     fun cargarPacientes() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -50,11 +81,21 @@ class EstadisticasPsicologoViewModel(
         }
     }
 
+    /**
+     * Selecciona un paciente y carga sus entradas del diario emocional.
+     *
+     * @param paciente Paciente cuyas estadísticas se mostrarán.
+     */
     fun seleccionarPaciente(paciente: PacientePsicologoResponseDTO) {
         _uiState.update { it.copy(pacienteSeleccionado = paciente) }
         cargarEntradas(paciente.idPaciente ?: return)
     }
 
+    /**
+     * Cambia el periodo de análisis y recarga las entradas filtradas.
+     *
+     * @param periodo Etiqueta del periodo ("Último mes", "Últimos 3 meses", etc.).
+     */
     fun seleccionarPeriodo(periodo: String) {
         _uiState.update { it.copy(periodoSeleccionado = periodo) }
         _uiState.value.pacienteSeleccionado
@@ -62,6 +103,11 @@ class EstadisticasPsicologoViewModel(
             ?.let { cargarEntradas(it) }
     }
 
+    /**
+     * Cambia el tipo de visualización del gráfico de estadísticas.
+     *
+     * @param vista Tipo de gráfico ("Línea", "Barras", etc.).
+     */
     fun seleccionarVista(vista: String) {
         _uiState.update { it.copy(vistaSeleccionada = vista) }
     }

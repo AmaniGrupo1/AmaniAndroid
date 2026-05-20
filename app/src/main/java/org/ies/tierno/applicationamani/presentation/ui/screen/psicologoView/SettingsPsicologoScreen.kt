@@ -70,6 +70,17 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de ajustes del perfil del psicólogo.
+ *
+ * Permite al psicólogo editar sus datos profesionales (nombre, apellidos,
+ * especialidad, experiencia, licencia, descripción) y acceder al centro
+ * de ayuda y soporte.
+ *
+ * @param idPsicologo Identificador del psicólogo en sesión.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el perfil del psicólogo.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPsicologoScreen(
@@ -286,6 +297,13 @@ fun SettingsPsicologoScreen(
     }
 }
 
+/**
+ * Sección agrupada de ajustes con título, icono y contenido para el psicólogo.
+ *
+ * @param title Título descriptivo de la sección.
+ * @param icon Icono vectorial que identifica la sección.
+ * @param content Contenido composable a mostrar dentro de la tarjeta.
+ */
 @Composable
 fun SettingsSectionPsico(
     title: String,
@@ -321,6 +339,18 @@ fun SettingsSectionPsico(
     }
 }
 
+/**
+ * Campo de texto personalizado con etiqueta e icono para formularios del psicólogo.
+ *
+ * @param label Etiqueta descriptiva mostrada sobre el campo.
+ * @param value Valor actual del campo de texto.
+ * @param onValueChange Callback invocado al modificar el texto.
+ * @param icon Icono vectorial a la izquierda del campo.
+ * @param modifier Modificador de diseño opcional.
+ * @param readOnly Indica si el campo es de solo lectura.
+ * @param singleLine Indica si el campo es de una sola línea.
+ * @param minLines Número mínimo de líneas visibles.
+ */
 @Composable
 fun TextFieldPsico(
     label: String,

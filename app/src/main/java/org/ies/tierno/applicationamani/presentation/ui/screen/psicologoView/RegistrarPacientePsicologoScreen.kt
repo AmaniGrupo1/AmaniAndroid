@@ -37,6 +37,18 @@ import java.time.format.DateTimeFormatter
 private val SuccessColor = Color(0xFF81C784)
 private val ErrorColor = Color(0xFFE57373)
 
+/**
+ * Pantalla de registro de un nuevo paciente desde la vista del psicólogo.
+ *
+ * Presenta un formulario completo con campos personales, datos del tutor
+ * legal (si el paciente es menor de edad), dirección, selección de
+ * situaciones y aceptación de términos. Similar a [RegisterScreen] pero
+ * adaptada al flujo del psicólogo que registra pacientes manualmente.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel que gestiona el estado del registro.
+ * @param situacionViewModel ViewModel que gestiona la lista de situaciones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrarPacientePsicologoScreen(

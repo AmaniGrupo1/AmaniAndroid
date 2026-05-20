@@ -90,6 +90,18 @@ object SimpleScreenColors {
     val Success = Color(0xFF81C784)
 }
 
+/**
+ * Pantalla simplificada de listado de psicólogos con acciones rápidas.
+ *
+ * Presenta una lista de psicólogos con tarjetas expandibles que muestran
+ * información detallada. Cada tarjeta incluye botones para dar de baja y
+ * editar los datos del psicólogo. La lista se recarga automáticamente al
+ * entrar en la pantalla.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de psicólogos.
+ * @param listarPaciente ViewModel para gestionar bajas de psicólogos.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosSimpleScreen(

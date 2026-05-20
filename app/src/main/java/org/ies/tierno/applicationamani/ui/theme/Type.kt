@@ -11,16 +11,25 @@ import org.ies.tierno.applicationamani.R
 
 // ── Font families ──────────────────────────────────────────────────
 
+/**
+ * Familia tipográfica Roboto, utilizada como fuente principal para el texto del cuerpo.
+ */
 val Roboto =
     FontFamily(
         Font(R.font.roboto_variablefont_wdth_wght),
     )
 
+/**
+ * Familia tipográfica Nunito, empleada en títulos de marca y encabezados destacados.
+ */
 val Nunito =
     FontFamily(
         Font(R.font.nunito_variablefont_wght),
     )
 
+/**
+ * Familia tipográfica Barlow Condensed, reservada para encabezados de pantalla.
+ */
 val BarlowCondensed =
     FontFamily(
         Font(R.font.barlow_condensed_black),
@@ -28,6 +37,10 @@ val BarlowCondensed =
 
 // ── M3 Typography — all 15 slots ───────────────────────────────────
 
+/**
+ * Escala tipográfica completa de Material 3 (15 slots) configurada con las fuentes
+ * corporativas Roboto, Nunito y Barlow Condensed.
+ */
 val Typography =
     Typography(
         // Display — brand titles ("AMANI")

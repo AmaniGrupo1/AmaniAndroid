@@ -45,6 +45,24 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 
+/**
+ * Barra de entrada de texto para el chat, con soporte para adjuntos y notas de voz.
+ *
+ * Incluye un campo de texto con forma de píldora, botones para adjuntar
+ * archivos, grabar notas de voz y enviar mensajes. Durante la grabación
+ * muestra una [RecordingBar] con animación de pulso y cronómetro.
+ *
+ * @param text Texto actual del campo de entrada.
+ * @param onTextChange Callback invocado al modificar el texto.
+ * @param onSend Callback invocado al enviar el mensaje.
+ * @param onMicClick Callback invocado al pulsar el botón de micrófono.
+ * @param onAttachFile Callback invocado al pulsar el botón de adjuntar archivo.
+ * @param onStopRecording Callback invocado al detener la grabación.
+ * @param isRecording Indica si se está grabando una nota de voz.
+ * @param recordingSeconds Segundos transcurridos de la grabación actual.
+ * @param isOtherTyping Indica si el interlocutor está escribiendo.
+ * @param modifier Modificador de diseño opcional.
+ */
 @Composable
 fun ChatInputBar(
     text: String,

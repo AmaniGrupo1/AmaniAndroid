@@ -68,6 +68,17 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de creación de un nuevo ticket de soporte técnico.
+ *
+ * Permite al usuario seleccionar el tipo de incidencia (bug, sugerencia,
+ * consulta), la categoría y escribir una descripción detallada. Incluye
+ * información automática del dispositivo (modelo, versión de Android,
+ * versión de la app) para facilitar el diagnóstico por parte del soporte.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el envío del ticket de soporte.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NuevoTicketScreen(

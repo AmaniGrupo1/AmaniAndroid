@@ -96,6 +96,18 @@ import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
+/**
+ * Módulo principal de inyección de dependencias con Koin.
+ *
+ * Declara todas las dependencias de la aplicación organizadas por capa:
+ * - Repositorios y APIs (singleton)
+ * - Casos de uso (factory)
+ * - ViewModels (viewModel)
+ * - Workers de WorkManager (worker)
+ *
+ * Las dependencias se resuelven de forma automática a través de los
+ * constructores anotados de cada clase, respetando la arquitectura limpia.
+ */
 val appModule =
     module {
         single { TokenDataStore(androidContext()) }

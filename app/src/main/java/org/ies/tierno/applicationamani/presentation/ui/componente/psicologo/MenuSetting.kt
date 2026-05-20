@@ -28,6 +28,17 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Barra superior (TopAppBar) con menú de configuración para el psicólogo.
+ *
+ * Muestra el logotipo de Amani a la izquierda y un icono de menú a la
+ * derecha que despliega opciones de navegación: Perfil, Ajustes y Cerrar
+ * sesión. Utiliza [LaunchedEffect] para reaccionar a cambios en el
+ * identificador del psicólogo.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param idPsicologo Identificador del psicólogo en sesión para generar rutas parametrizadas.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuSetting(

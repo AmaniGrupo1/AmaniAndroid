@@ -23,6 +23,14 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Enumeración de los elementos de navegación disponibles en la barra
+ * inferior del panel del psicólogo.
+ *
+ * @property route Ruta de navegación asociada al elemento.
+ * @property icon Composable que renderiza el icono del elemento.
+ * @property labelRes Recurso de texto con la etiqueta del elemento.
+ */
 enum class PsicologoNavItem(
     val route: String,
     val icon: @Composable () -> Unit,
@@ -45,6 +53,16 @@ enum class PsicologoNavItem(
     ),
 }
 
+/**
+ * Barra de navegación inferior específica para la vista del psicólogo.
+ *
+ * Muestra tres destinos (Mis Pacientes, Agenda, Perfil) utilizando una
+ * [NavigationBar] de Material 3 con colores semánticos.
+ *
+ * @param navController Controlador de navegación para cambiar de pantalla.
+ * @param selectedItem Elemento actualmente seleccionado en la barra.
+ * @param onItemSelected Callback invocado al seleccionar un nuevo elemento, recibe el [PsicologoNavItem] pulsado.
+ */
 @Composable
 fun BarraNavegationInferiorPsicologo(
     navController: NavController,
@@ -81,6 +99,17 @@ fun BarraNavegationInferiorPsicologo(
     }
 }
 
+/**
+ * Barra superior (TopAppBar) para las pantallas del psicólogo.
+ *
+ * Muestra un título y, opcionalmente, un botón de retroceso. Hereda los
+ * colores primarios del tema Material 3.
+ *
+ * @param title Título a mostrar en la barra.
+ * @param navController Controlador de navegación para la acción de retroceso.
+ * @param showBackButton Indica si se debe mostrar el botón de retroceso.
+ * @param actions Contenido adicional a la derecha de la barra.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuPsicologo(

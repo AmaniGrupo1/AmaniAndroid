@@ -19,6 +19,14 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Generador de documentos PDF para el historial clínico del paciente.
+ *
+ * Utiliza la librería iText para crear un documento PDF formateado con
+ * los datos del historial clínico, incluyendo diagnósticos, tratamientos
+ * y observaciones. También proporciona un método para compartir el PDF
+ * mediante un [Intent] de Android.
+ */
 object HistorialPDFGenerator {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale("es", "ES"))
 

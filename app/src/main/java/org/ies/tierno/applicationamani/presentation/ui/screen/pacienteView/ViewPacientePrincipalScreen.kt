@@ -78,6 +78,19 @@ import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 
+/**
+ * Pantalla principal del paciente con la información de su psicólogo asignado.
+ *
+ * Muestra los datos del psicólogo (nombre, especialidad, experiencia,
+ * licencia, descripción) obtenidos desde [PacienteViewModel] y
+ * [ProfilePsicologoViewModel]. Incluye un botón para navegar a la agenda
+ * de citas.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param profilePsicologoViewModel ViewModel que gestiona el perfil del psicólogo.
+ * @param pacienteViewModel ViewModel que gestiona los datos del paciente.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPacientePrincipalScreen(
@@ -691,6 +704,16 @@ fun PsicologoContent(
     }
 }
 
+/**
+ * Fila informativa profesional con icono, etiqueta y valor.
+ *
+ * @param icon Icono vectorial representativo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ * @param iconColor Color del icono.
+ * @param labelColor Color de la etiqueta.
+ * @param valueColor Color del valor.
+ */
 @Composable
 fun ProfessionalInfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,

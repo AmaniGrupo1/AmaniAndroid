@@ -65,6 +65,13 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacie
 
 /**
  * Pantalla de listado de pacientes con opciones de gestión.
+ *
+ * Muestra una lista de pacientes registrados en el sistema con información
+ * resumida (nombre, email, teléfono, método de pago) y permite al
+ * administrador editar los datos de cada paciente.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de pacientes.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -584,6 +591,15 @@ fun PacienteCard(
     }
 }
 
+/**
+ * Fila informativa con icono, etiqueta y valor para los datos del paciente.
+ *
+ * @param icon Icono vectorial representativo del campo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ * @param iconColor Color del icono.
+ * @param roboto Familia tipográfica Roboto.
+ */
 @Composable
 fun InfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -621,6 +637,16 @@ fun InfoRow(
     }
 }
 
+/**
+ * Versión compacta de [InfoRow] con icono, etiqueta y valor en una sola línea.
+ *
+ * @param icon Icono vectorial representativo del campo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ * @param iconColor Color del icono.
+ * @param roboto Familia tipográfica Roboto.
+ * @param modifier Modificador de diseño opcional.
+ */
 @Composable
 fun InfoRowCompact(
     icon: androidx.compose.ui.graphics.vector.ImageVector,

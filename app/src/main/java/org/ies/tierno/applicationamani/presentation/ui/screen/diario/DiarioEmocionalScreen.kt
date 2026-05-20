@@ -86,6 +86,9 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
+/**
+ * Valencia emocional: cálida, fría o neutra.
+ */
 sealed class Valence {
     object Warm : Valence()
 
@@ -94,6 +97,15 @@ sealed class Valence {
     object Neutral : Valence()
 }
 
+/**
+ * Emoción según el modelo de la rueda de Plutchik, con color, emoji y variantes.
+ *
+ * @property label Etiqueta descriptiva de la emoción.
+ * @property color Color asociado a la emoción en la rueda.
+ * @property emoji Emoji representativo.
+ * @property variants Variantes de intensidad de la emoción.
+ * @property valence Valencia emocional (cálida, fría o neutra).
+ */
 enum class PlutchikEmotion(
     val label: String,
     val color: Color,
@@ -148,6 +160,12 @@ private fun resolvePrimaryEmotion(emocion: String): String {
         ?: emocion
 }
 
+/**
+ * Indicador visual de pasos para el flujo de creación de una entrada del diario.
+ *
+ * @param currentStep Paso actual (1-based).
+ * @param steps Lista de etiquetas de cada paso.
+ */
 @Composable
 fun StepIndicator(
     currentStep: Int,
@@ -182,6 +200,16 @@ fun StepIndicator(
     }
 }
 
+/**
+ * Rueda de emociones interactiva basada en el modelo de Plutchik.
+ *
+ * Permite al usuario seleccionar una emoción principal pulsando sobre
+ * los sectores de la rueda. Cada sector tiene un color y emoji asociado.
+ *
+ * @param emotions Lista de emociones a mostrar en la rueda.
+ * @param selectedIndex Índice de la emoción seleccionada, o `null` si ninguna.
+ * @param onEmotionSelected Callback invocado al seleccionar una emoción, recibe el índice.
+ */
 @Composable
 fun EmotionWheel(
     selectedEmotion: String,
@@ -322,6 +350,13 @@ fun EmotionWheel(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Chips de sub-emociones para refinar la emoción seleccionada en la rueda.
+ *
+ * @param emotion Emoción principal seleccionada.
+ * @param selectedSubEmotion Sub-emoción actualmente seleccionada.
+ * @param onSubEmotionSelected Callback invocado al seleccionar una sub-emoción.
+ */
 @Composable
 fun SubEmotionChips(
     variants: List<String>,
@@ -554,6 +589,17 @@ private fun StepContexto(
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+/**
+ * Pantalla del diario emocional del paciente.
+ *
+ * Permite al usuario registrar sus emociones diarias mediante una rueda
+ * de emociones interactiva (modelo de Plutchik), seleccionar sub-emociones,
+ * ajustar la intensidad con un slider y añadir notas de contexto. También
+ * muestra un histórico de entradas anteriores con opciones de edición y
+ * eliminación.
+ *
+ * @param viewModel ViewModel que gestiona el estado del diario emocional.
+ */
 @Composable
 fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -744,6 +790,14 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
     }
 }
 
+/**
+ * Tarjeta que muestra una entrada del historial del diario emocional.
+ *
+ * @param entrada Datos de la entrada del diario.
+ * @param emotionEntry Emoción de Plutchik asociada, o `null`.
+ * @param onEdit Callback invocado al pulsar el botón de editar.
+ * @param onDelete Callback invocado al pulsar el botón de eliminar.
+ */
 @Composable
 fun HistoryEntryCard(
     entrada: org.ies.tierno.applicationamani.domain.models.diario.EntradaDiario,

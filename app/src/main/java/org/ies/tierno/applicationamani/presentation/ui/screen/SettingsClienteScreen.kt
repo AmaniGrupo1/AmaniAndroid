@@ -81,6 +81,17 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * Pantalla de ajustes del perfil del cliente (paciente).
+ *
+ * Permite al usuario editar sus datos personales (nombre, apellidos, email,
+ * teléfono, género), gestionar documentos de consentimiento y protección
+ * de datos, cambiar el tema visual de la aplicación y acceder al soporte
+ * técnico. También incluye la opción de eliminar la cuenta de forma
+ * permanente.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param onNavigateToSupport Callback invocado al solicitar navegar a la pantalla de soporte.
+ * @param viewModel ViewModel que gestiona el estado del perfil del cliente.
+ * @param idiomaViewModel ViewModel que gestiona el cambio de idioma y tema.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -405,6 +416,16 @@ fun SettingsClienteScreen(
     }
 }
 
+/**
+ * Sección agrupada de ajustes con título, icono y contenido.
+ *
+ * Renderiza una cabecera con el icono y el título, seguida de una [Card]
+ * que envuelve el contenido personalizado proporcionado por el caller.
+ *
+ * @param title Título descriptivo de la sección.
+ * @param icon Icono vectorial que identifica la sección.
+ * @param content Contenido composable a mostrar dentro de la tarjeta.
+ */
 @Composable
 fun SettingsSection(
     title: String,
@@ -439,6 +460,19 @@ fun SettingsSection(
     }
 }
 
+/**
+ * Campo de texto personalizado con etiqueta externa e icono.
+ *
+ * Envuelve un [OutlinedTextField] con una etiqueta superior y un icono
+ * a la izquierda, utilizando los colores del tema Material 3. Ideal para
+ * formularios de edición de perfil.
+ *
+ * @param label Etiqueta descriptiva mostrada sobre el campo.
+ * @param value Valor actual del campo de texto.
+ * @param onValueChange Callback invocado al modificar el texto.
+ * @param icon Icono vectorial a la izquierda del campo.
+ * @param modifier Modificador de diseño opcional.
+ */
 @Composable
 fun TextFieldCustom(
     label: String,

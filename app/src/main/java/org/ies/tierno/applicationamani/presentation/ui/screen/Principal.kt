@@ -50,6 +50,15 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPrincipal
 
 // Colores corporativos AMANI Psicología
 // Función para obtener las frases según el idioma actual
+/**
+ * Obtiene la lista de frases motivacionales desde los recursos de la aplicación.
+ *
+ * Las frases se localizan según el idioma configurado en el sistema y se
+ * muestran de forma rotativa en la pantalla principal.
+ *
+ * @param context Contexto de la aplicación para acceder a los recursos.
+ * @return Lista de frases motivacionales en el idioma actual.
+ */
 fun getFrasesMotivacionales(context: Context): List<String> {
     val resources = context.resources
     return listOf(
@@ -65,6 +74,15 @@ fun getFrasesMotivacionales(context: Context): List<String> {
 }
 
 // Función para obtener los consejos según el idioma actual
+/**
+ * Obtiene la lista de consejos de bienestar desde los recursos de la aplicación.
+ *
+ * Los consejos se localizan según el idioma configurado en el sistema y
+ * se muestran aleatoriamente al usuario cuando solicita un consejo.
+ *
+ * @param context Contexto de la aplicación para acceder a los recursos.
+ * @return Lista de consejos en el idioma actual.
+ */
 fun getConsejosLista(context: Context): List<String> {
     val resources = context.resources
     return listOf(
@@ -79,6 +97,18 @@ fun getConsejosLista(context: Context): List<String> {
     )
 }
 
+/**
+ * Pantalla principal de bienvenida de la aplicación Amani.
+ *
+ * Muestra frases motivacionales que rotan automáticamente cada pocos
+ * segundos y un botón para recibir un consejo de bienestar aleatorio.
+ * Incluye la barra superior [MenuPrincipal] con acceso a inicio de sesión
+ * y registro. Las frases y consejos se actualizan dinámicamente cuando
+ * el usuario cambia el idioma desde los ajustes.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param userSessionDataStore Almacén de sesión para consultar el idioma actual.
+ */
 @Composable
 fun Principal(
     navController: NavController,

@@ -10,6 +10,16 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import org.ies.tierno.applicationamani.domain.models.Message
 
+/**
+ * Servicio de mensajería en tiempo real mediante Firebase Realtime Database.
+ *
+ * Gestiona la creación de salas de chat, el envío y recepción de mensajes,
+ * los indicadores de escritura, el estado de conexión de usuarios y las
+ * confirmaciones de entrega y lectura. Utiliza [FirebaseInstance] para
+ * acceder a las referencias de la base de datos.
+ *
+ * @property firebaseInstance Instancia singleton de Firebase RTDB.
+ */
 class ChatFirebaseService(
     private val firebaseInstance: FirebaseInstance,
 ) {
@@ -18,6 +28,14 @@ class ChatFirebaseService(
     private val typingRef = firebaseInstance.getReference("typing")
 
     companion object {
+        /**
+         * Genera un identificador único de sala de chat a partir de dos IDs de usuario,
+         * ordenándolos para garantizar que la misma sala se use independientemente del orden.
+         *
+         * @param userId1 Identificador del primer usuario.
+         * @param userId2 Identificador del segundo usuario.
+         * @return Cadena con formato "{minId}_{maxId}".
+         */
         fun generateRoomId(
             userId1: Long,
             userId2: Long,
@@ -108,7 +126,17 @@ class ChatFirebaseService(
         )
     }
 
-    fun observeMessages(
+    /**
+     * Observa el flujo de mensajes en tiempo real entre dos usuarios.
+     *
+     * Escucha los cambios en la sala de chat compartida y convierte cada
+     * [DataSnapshot] en un [Message] del modelo de dominio.
+     *
+     * @param userId1 Identificador del primer usuario.
+     * @param userId2 Identificador del segundo usuario.
+     * @return [Flow] que emite la lista actualizada de [Message].
+     */
+    fun observeMessages((
         userId1: Long,
         userId2: Long,
     ): Flow<List<Message>> =
@@ -162,7 +190,17 @@ class ChatFirebaseService(
             awaitClose { messagesRef.removeEventListener(listener) }
         }
 
-    suspend fun updateMessageAttachment(
+    /**
+     * Actualiza los metadatos de un adjunto en un mensaje existente.
+     *
+     * @param senderId Identificador del remitente.
+     * @param receiverId Identificador del destinatario.
+     * @param messageId Identificador del mensaje.
+     * @param attachmentUrl URL del archivo adjunto.
+     * @param attachmentType Tipo de adjunto como cadena.
+     * @param attachmentName Nombre del archivo.
+     */
+    suspend fun updateMessageAttachment((
         senderId: Long,
         receiverId: Long,
         messageId: Long,
@@ -188,7 +226,18 @@ class ChatFirebaseService(
             Result.failure(e)
         }
 
-    suspend fun sendMessage(
+    /**
+     * Envía un mensaje a la sala de chat en Firebase RTDB.
+     *
+     * @param senderId Identificador del remitente.
+     * @param receiverId Identificador del destinatario.
+     * @param content Contenido textual del mensaje.
+     * @param attachmentUrl URL del adjunto, opcional.
+     * @param attachmentType Tipo de adjunto, opcional.
+     * @param attachmentName Nombre del adjunto, opcional.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun sendMessage((
         senderId: Long,
         receiverId: Long,
         content: String,
@@ -222,7 +271,14 @@ class ChatFirebaseService(
             Result.failure(e)
         }
 
-    suspend fun markMessagesAsRead(
+    /**
+     * Marca todos los mensajes de una conversación como leídos.
+     *
+     * @param userId Identificador del usuario que lee.
+     * @param otherUserId Identificador del otro participante.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun markMessagesAsRead((
         currentUserId: Long,
         otherUserId: Long,
     ): Result<Unit> =
@@ -247,7 +303,14 @@ class ChatFirebaseService(
             Result.failure(e)
         }
 
-    suspend fun getMessages(
+    /**
+     * Obtiene el historial de mensajes de una conversación.
+     *
+     * @param userId Identificador del usuario actual.
+     * @param otherUserId Identificador del otro participante.
+     * @return [Result] con la lista de [Message].
+     */
+    suspend fun getMessages((
         userId1: Long,
         userId2: Long,
     ): Result<List<Message>> =
@@ -267,7 +330,14 @@ class ChatFirebaseService(
 
     // ==================== TYPING INDICATORS ====================
 
-    fun observeTyping(
+    /**
+     * Observa el indicador de escritura entre dos usuarios.
+     *
+     * @param userId1 Identificador del primer usuario.
+     * @param userId2 Identificador del segundo usuario.
+     * @return [Flow] que emite `true` cuando el otro usuario está escribiendo.
+     */
+    fun observeTyping((
         userId1: Long,
         userId2: Long,
     ): Flow<Boolean> =
@@ -295,7 +365,14 @@ class ChatFirebaseService(
             awaitClose { typingRefChild.removeEventListener(listener) }
         }
 
-    suspend fun startTyping(
+    /**
+     * Activa el indicador de escritura del usuario en la sala de chat.
+     *
+     * @param senderId Identificador del usuario que escribe.
+     * @param receiverId Identificador del destinatario.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun startTyping((
         senderId: Long,
         receiverId: Long,
     ): Result<Unit> =
@@ -309,7 +386,14 @@ class ChatFirebaseService(
             Result.failure(e)
         }
 
-    suspend fun stopTyping(
+    /**
+     * Desactiva el indicador de escritura del usuario.
+     *
+     * @param senderId Identificador del usuario.
+     * @param receiverId Identificador del destinatario.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun stopTyping((
         senderId: Long,
         receiverId: Long,
     ): Result<Unit> =
@@ -325,7 +409,13 @@ class ChatFirebaseService(
 
     // ==================== ONLINE STATUS ====================
 
-    fun observeUserOnline(userId: Long): Flow<Boolean> =
+    /**
+     * Observa el estado de conexión de un usuario.
+     *
+     * @param userId Identificador del usuario.
+     * @return [Flow] que emite `true` cuando está en línea.
+     */
+    fun observeUserOnline((userId: Long): Flow<Boolean> =
         callbackFlow {
             val userRef = usersRef.child(userId.toString()).child("isOnline")
 
@@ -346,7 +436,14 @@ class ChatFirebaseService(
             awaitClose { userRef.removeEventListener(listener) }
         }
 
-    suspend fun updateUserOnline(
+    /**
+     * Actualiza el estado de conexión de un usuario en Firebase.
+     *
+     * @param userId Identificador del usuario.
+     * @param isOnline `true` si está en línea.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun updateUserOnline((
         userId: Long,
         isOnline: Boolean,
     ): Result<Unit> =
@@ -363,7 +460,14 @@ class ChatFirebaseService(
             Result.failure(e)
         }
 
-    suspend fun updateLastSeen(
+    /**
+     * Actualiza la marca de última actividad del usuario.
+     *
+     * @param userId Identificador del usuario.
+     * @param lastSeen Timestamp en milisegundos.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun updateLastSeen((
         userId: Long,
         lastSeen: Long,
     ): Result<Unit> =
@@ -380,17 +484,38 @@ class ChatFirebaseService(
 
     // ==================== DELIVERY & READ RECEIPTS ====================
 
-    suspend fun markMessageDelivered(
+    /**
+     * Marca un mensaje como entregado al destinatario.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun markMessageDelivered((
         messageId: Long,
         receiverId: Long,
     ): Result<Unit> = Result.success(Unit)
 
-    suspend fun markMessageAsRead(
+    /**
+     * Marca un mensaje individual como leído por el destinatario.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun markMessageAsRead((
         messageId: Long,
         receiverId: Long,
     ): Result<Unit> = Result.success(Unit)
 
-    fun observeMessageDelivery(
+    /**
+     * Observa el estado de entrega de un mensaje específico.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Flow] que emite `true` cuando ha sido entregado.
+     */
+    fun observeMessageDelivery((
         messageId: Long,
         receiverId: Long,
     ): Flow<Boolean> =
@@ -399,7 +524,14 @@ class ChatFirebaseService(
             awaitClose {}
         }
 
-    fun observeMessageRead(
+    /**
+     * Observa el estado de lectura de un mensaje específico.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Flow] que emite `true` cuando ha sido leído.
+     */
+    fun observeMessageRead((
         messageId: Long,
         receiverId: Long,
     ): Flow<Boolean> =

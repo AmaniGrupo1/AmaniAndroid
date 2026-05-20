@@ -49,6 +49,17 @@ import org.ies.tierno.applicationamani.domain.models.soporte.TicketSoporte
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla que lista los tickets de soporte del usuario.
+ *
+ * Muestra los tickets agrupados por estado (abierto, en proceso, cerrado)
+ * con filtros por pestañas. Cada ticket muestra su título, fecha, estado
+ * y una etiqueta descriptiva. Si no hay tickets, se muestra un estado
+ * vacío con un mensaje informativo.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de tickets de soporte.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisTicketsScreen(

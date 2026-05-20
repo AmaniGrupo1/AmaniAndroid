@@ -19,12 +19,28 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 
+/**
+ * Servicio de almacenamiento de archivos en Firebase Storage.
+ *
+ * Gestiona la subida de archivos (imágenes, documentos, notas de voz) al bucket
+ * de Firebase Storage para el chat de la aplicación, comprimiendo imágenes
+ * automáticamente antes de la subida.
+ *
+ * @property firebaseInstance Singleton de acceso a las instancias de Firebase.
+ * @property context Contexto de la aplicación para acceso a ContentResolver.
+ */
 class FileStorageService(
     private val firebaseInstance: FirebaseInstance,
     private val context: Context,
 ) {
     private val storageRef: StorageReference = firebaseInstance.getStorage().reference
 
+    /**
+     * Resultado sellado de una operación de subida de archivo.
+     *
+     * @property Success Contiene la URL de descarga, el tipo de adjunto y el nombre del fichero.
+     * @property Error Contiene el mensaje de error descriptivo.
+     */
     sealed class UploadResult {
         data class Success(
             val url: String,
@@ -37,6 +53,14 @@ class FileStorageService(
         ) : UploadResult()
     }
 
+    /**
+     * Sube un archivo (imagen, documento o audio) a Firebase Storage dentro de la
+     * carpeta de la conversación indicada. Comprime imágenes superiores a 1024px.
+     *
+     * @param uri URI del archivo a subir.
+     * @param conversationId Identificador de la conversación de chat.
+     * @return [UploadResult] con la URL de descarga y metadatos, o el error.
+     */
     suspend fun uploadFile(
         uri: Uri,
         conversationId: String,
@@ -103,6 +127,13 @@ class FileStorageService(
             }
         }
 
+    /**
+     * Sube una nota de voz grabada desde el chat a Firebase Storage.
+     *
+     * @param audioFile Archivo local de audio a subir.
+     * @param conversationId Identificador de la conversación de chat.
+     * @return [UploadResult] con la URL de descarga y tipo [AttachmentType.AUDIO], o el error.
+     */
     suspend fun uploadVoiceNote(
         audioFile: File,
         conversationId: String,
@@ -180,6 +211,12 @@ class FileStorageService(
         }
     }
 
+    /**
+     * Extrae el nombre del archivo desde una URI de contenido.
+     *
+     * @param uri URI de contenido del archivo.
+     * @return Nombre del archivo o "file" si no se puede determinar.
+     */
     fun getFileNameFromUri(uri: Uri): String {
         var fileName = "file"
         context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->

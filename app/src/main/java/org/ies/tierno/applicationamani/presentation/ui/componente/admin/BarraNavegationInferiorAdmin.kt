@@ -22,6 +22,16 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Enumeración de los elementos de navegación disponibles en la barra
+ * inferior del panel de administración.
+ *
+ * @property DOCUMENTOS Gestión de documentos legales.
+ * @property MENSAJES Bandeja de mensajes y chat.
+ * @property CALENDARIO Vista del calendario de citas.
+ * @property ESTADISTICAS Panel de estadísticas y reportes.
+ * @property CONFIGURACION Acceso a la configuración del sistema.
+ */
 enum class AdminNavItem {
     DOCUMENTOS,
     MENSAJES,
@@ -30,6 +40,17 @@ enum class AdminNavItem {
     CONFIGURACION,
 }
 
+/**
+ * Barra de navegación inferior específica para la vista de administración.
+ *
+ * Renderiza una [NavigationBar] con cinco destinos (Documentos, Mensajes,
+ * Calendario, Estadísticas, Configuración) utilizando los colores semánticos
+ * de Material 3.
+ *
+ * @param navController Controlador de navegación para cambiar de pantalla.
+ * @param selectedItem Elemento actualmente seleccionado en la barra.
+ * @param onItemSelected Callback invocado al seleccionar un nuevo elemento, recibe el [AdminNavItem] pulsado.
+ */
 @Composable
 fun BarraNavegationInferiorAdmin(
     navController: NavController,

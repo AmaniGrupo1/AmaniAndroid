@@ -32,6 +32,7 @@ import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 
 /**
  * Módulo Koin para la configuración de Retrofit.
@@ -132,6 +133,14 @@ val retrofitModule =
                                 typeOfT: Type,
                                 context: JsonDeserializationContext,
                             ): LocalDateTime = LocalDateTime.parse(json.asString)
+                        },
+                    ).registerTypeAdapter(
+                        Rol::class.java,
+                        JsonDeserializer<Rol> { json, _, _ ->
+                            // Normaliza a mayúsculas para soportar "paciente", "PACIENTE", "Paciente", etc.
+                            val value = json.asString.trim().uppercase()
+                                .removePrefix("ROLE_") // por si el backend envía "ROLE_PACIENTE"
+                            Rol.entries.firstOrNull { it.name == value } ?: Rol.PACIENTE
                         },
                     ).create()
 

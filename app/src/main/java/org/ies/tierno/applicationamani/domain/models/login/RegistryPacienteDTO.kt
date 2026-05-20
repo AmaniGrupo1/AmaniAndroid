@@ -1,15 +1,15 @@
 package org.ies.tierno.applicationamani.domain.models.login
 
 /**
- * DTO de solicitud de registro para usuarios con rol de administrador o psicólogo.
+ * DTO de solicitud de registro para un nuevo paciente en el sistema.
  *
- * Contiene los datos básicos necesarios para crear una cuenta de usuario
- * sin los campos extendidos propios de un paciente.
+ * Contiene los datos personales básicos y credenciales necesarios para
+ * crear una cuenta de paciente.
  *
- * @property nombre Nombre del usuario a registrar.
- * @property apellido Apellido del usuario a registrar.
- * @property email Dirección de correo electrónico.
- * @property password Contraseña elegida por el usuario.
+ * @property nombre Nombre de pila del paciente.
+ * @property apellido Apellidos del paciente.
+ * @property email Dirección de correo electrónico que servirá como identificador de acceso.
+ * @property password Contraseña elegida por el paciente.
  *
  * @see org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
  */

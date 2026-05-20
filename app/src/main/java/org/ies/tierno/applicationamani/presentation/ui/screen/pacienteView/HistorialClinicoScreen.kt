@@ -40,6 +40,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Encuentra la [Activity] asociada a un [Context], recorriendo los
+ * [ContextWrapper] si es necesario.
+ *
+ * @return La Activity encontrada, o `null` si no se encuentra.
+ */
 fun Context.findActivity(): Activity? {
     var context = this
     while (context is ContextWrapper) {
@@ -49,6 +55,18 @@ fun Context.findActivity(): Activity? {
     return null
 }
 
+/**
+ * Pantalla de visualización del historial clínico del paciente.
+ *
+ * Muestra una lista de entradas del historial con diagnóstico, tratamiento
+ * y observaciones en tarjetas expandibles. Permite generar y compartir un
+ * PDF del historial completo mediante [HistorialPDFGenerator].
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param idPaciente Identificador del paciente cuyo historial se muestra.
+ * @param viewModel ViewModel que gestiona la carga del historial clínico.
+ * @param userSessionDataStore Almacén de sesión para obtener el nombre del paciente.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistorialClinicoScreen(

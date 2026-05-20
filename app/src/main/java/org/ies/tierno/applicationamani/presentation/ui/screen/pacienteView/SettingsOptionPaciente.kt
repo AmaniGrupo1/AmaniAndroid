@@ -91,6 +91,14 @@ private const val TAG = "SettingsPaciente"
 private fun getCurrentThemeSubtitle(currentTheme: Boolean): String = if (currentTheme) "Oscuro" else "Claro"
 
 // Definir SettingsOption localmente para paciente
+/**
+ * Modelo de datos para una opción de configuración en la pantalla de ajustes del paciente.
+ *
+ * @property id Identificador único de la opción.
+ * @property title Título descriptivo.
+ * @property subtitle Texto secundario con información adicional.
+ * @property icon Icono vectorial asociado.
+ */
 data class SettingsOptionPaciente(
     val id: String,
     val title: String,
@@ -98,6 +106,17 @@ data class SettingsOptionPaciente(
     val icon: ImageVector,
 )
 
+/**
+ * Pantalla de ajustes del perfil del paciente.
+ *
+ * Permite al paciente cambiar el idioma, el tema visual, gestionar
+ * notificaciones, ver documentos legales, acceder al soporte y cerrar
+ * sesión. Los cambios de idioma provocan la recreación de la Activity.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ * @param idiomaViewModel ViewModel que gestiona el cambio de idioma y tema.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPacienteScreen(

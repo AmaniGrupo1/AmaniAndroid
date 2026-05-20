@@ -6,6 +6,15 @@ import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.data.remoto.SendMessageRequest
 import org.ies.tierno.applicationamani.domain.models.Message
 
+/**
+ * Implementación concreta de [ChatRepository].
+ *
+ * Delega las operaciones de mensajería en [ChatFirebaseService] para la
+ * comunicación en tiempo real y en [ChatApi] para el envío HTTP de mensajes.
+ *
+ * @property chatFirebaseService Servicio Firebase para mensajería en tiempo real.
+ * @property chatApi Cliente Retrofit para operaciones REST de chat.
+ */
 class ChatRepositoryImpl(
     private val chatFirebaseService: ChatFirebaseService,
     private val chatApi: ChatApi,
@@ -15,6 +24,20 @@ class ChatRepositoryImpl(
         otherUserId: Long,
     ): Flow<List<Message>> = chatFirebaseService.observeMessages(currentUserId, otherUserId)
 
+    /**
+     * Envía un mensaje a través de la API REST y actualiza los adjuntos en Firebase.
+     *
+     * Si el contenido está vacío pero hay un adjunto, genera un texto descriptivo
+     * automático según el tipo de archivo.
+     *
+     * @param senderId Identificador del remitente.
+     * @param receiverId Identificador del destinatario.
+     * @param content Contenido textual del mensaje.
+     * @param attachmentUrl URL del archivo adjunto en almacenamiento remoto.
+     * @param attachmentType Tipo de adjunto (imagen, documento o audio).
+     * @param attachmentName Nombre descriptivo del adjunto.
+     * @return [Result] que indica éxito o fallo en el envío.
+     */
     override suspend fun sendMessage(
         senderId: Long,
         receiverId: Long,
@@ -70,11 +93,25 @@ class ChatRepositoryImpl(
             Result.failure(e)
         }
 
+    /**
+     * Marca todos los mensajes de una conversación como leídos en Firebase.
+     *
+     * @param currentUserId Identificador del usuario que lee.
+     * @param otherUserId Identificador del otro participante.
+     * @return [Result] que indica éxito o fallo de la operación.
+     */
     override suspend fun markMessagesAsRead(
         currentUserId: Long,
         otherUserId: Long,
     ): Result<Unit> = chatFirebaseService.markMessagesAsRead(currentUserId, otherUserId)
 
+    /**
+     * Obtiene el historial de mensajes desde Firebase.
+     *
+     * @param currentUserId Identificador del usuario actual.
+     * @param otherUserId Identificador del otro participante.
+     * @return [Result] con la lista de [Message] del historial.
+     */
     override suspend fun getMessages(
         currentUserId: Long,
         otherUserId: Long,
@@ -107,6 +144,13 @@ class ChatRepositoryImpl(
         lastSeen: Long,
     ): Result<Unit> = chatFirebaseService.updateLastSeen(userId, lastSeen)
 
+    /**
+     * Marca un mensaje como entregado. Actualmente delegado como operación no implementada.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Result] exitoso por defecto.
+     */
     override suspend fun markMessageDelivered(
         messageId: Long,
         receiverId: Long,
@@ -115,6 +159,13 @@ class ChatRepositoryImpl(
         return Result.success(Unit)
     }
 
+    /**
+     * Marca un mensaje individual como leído. Actualmente delegado como operación no implementada.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario que lo ha leído.
+     * @return [Result] exitoso por defecto.
+     */
     override suspend fun markMessageAsRead(
         messageId: Long,
         receiverId: Long,
@@ -123,6 +174,13 @@ class ChatRepositoryImpl(
         return Result.success(Unit)
     }
 
+    /**
+     * Observa el estado de entrega. Actualmente emite siempre `false`.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Flow] que emite `false` por defecto.
+     */
     override fun observeMessageDelivery(
         messageId: Long,
         receiverId: Long,
@@ -131,6 +189,13 @@ class ChatRepositoryImpl(
         return kotlinx.coroutines.flow.flow { emit(false) }
     }
 
+    /**
+     * Observa el estado de lectura. Actualmente emite siempre `false`.
+     *
+     * @param messageId Identificador del mensaje.
+     * @param receiverId Identificador del destinatario.
+     * @return [Flow] que emite `false` por defecto.
+     */
     override fun observeMessageRead(
         messageId: Long,
         receiverId: Long,
@@ -139,6 +204,15 @@ class ChatRepositoryImpl(
         return kotlinx.coroutines.flow.flow { emit(false) }
     }
 
+    /**
+     * Almacena un mensaje localmente para envío diferido.
+     *
+     * Actualmente es una operación no implementada que retorna éxito por defecto.
+     * En una implementación real, persistiría el mensaje en Room o DataStore.
+     *
+     * @param message Mensaje a almacenar localmente.
+     * @return [Result] exitoso por defecto.
+     */
     override suspend fun saveMessageOffline(message: Message): Result<Unit> {
         // TC-03: chat_offlineMessage_queuesForRetry
         // En una implementación real, aquí se guardaría en Room o DataStore

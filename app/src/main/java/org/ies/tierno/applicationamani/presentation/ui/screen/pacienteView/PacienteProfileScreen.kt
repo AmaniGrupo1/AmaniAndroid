@@ -112,6 +112,19 @@ private const val BASE_URL = "http://192.168.1.175:8080"
 
 // Colores originales para el modo DEFECTO
 
+/**
+ * Pantalla de perfil del paciente.
+ *
+ * Muestra los datos personales del paciente (nombre, apellidos, email,
+ * teléfono, fecha de nacimiento, DNI) y permite editar el perfil y subir
+ * una foto desde la cámara o galería. Incluye gestión de permisos de
+ * cámara y un diálogo de éxito tras la actualización.
+ *
+ * @param pacienteId Identificador del paciente cuyo perfil se muestra.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el estado del perfil del paciente.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PacienteProfileScreen(
@@ -1039,6 +1052,15 @@ fun PacienteProfileScreen(
     }
 }
 
+/**
+ * Fila informativa con icono, etiqueta y valor para los datos del perfil del paciente.
+ *
+ * @param icon Icono vectorial representativo del campo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ * @param colorScheme Esquema de colores de Material 3.
+ * @param typography Tipografía de Material 3.
+ */
 @Composable
 fun InfoRowPaciente(
     icon: ImageVector,
@@ -1074,6 +1096,15 @@ fun InfoRowPaciente(
     }
 }
 
+/**
+ * Pantalla de error con mensaje y botón de reintento para el perfil del paciente.
+ *
+ * @param error Mensaje descriptivo del error.
+ * @param onRetry Callback invocado al pulsar el botón de reintento.
+ * @param colorScheme Esquema de colores de Material 3.
+ * @param typography Tipografía de Material 3.
+ * @param isDark Indica si el tema oscuro está activo.
+ */
 @Composable
 fun ErrorContentPaciente(
     error: String,

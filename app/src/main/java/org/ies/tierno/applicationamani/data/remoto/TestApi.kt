@@ -37,7 +37,12 @@ interface TestApi {
     @GET("/api/paciente/preguntas")
     suspend fun getPreguntas(): List<OpcionAdminDTO>
 
-    // NUEVO ENDPOINT
+    /**
+     * Registra las respuestas de un paciente al test.
+     *
+     * @param idPaciente Identificador único del paciente que responde.
+     * @param respuestas Lista de respuestas enviadas por el paciente.
+     */
     @POST("/api/paciente/preguntas/responder/{idPaciente}")
     suspend fun responderTest(
         @Path("idPaciente")

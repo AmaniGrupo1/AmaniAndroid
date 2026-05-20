@@ -19,6 +19,13 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * Interfaz Retrofit para la gestión de citas, horarios y terapias.
+ *
+ * Expone los endpoints que permiten a pacientes y psicólogos crear, cancelar,
+ * editar y consultar citas, así como gestionar la disponibilidad horaria del
+ * psicólogo y las terapias asociadas.
+ */
 interface CitasApi {
     @GET("/api/citas/paciente/{idPaciente}/agenda")
     suspend fun getAgendaPaciente(

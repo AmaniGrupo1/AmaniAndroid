@@ -23,6 +23,18 @@ import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import org.koin.androidx.compose.koinViewModel
 import org.koin.java.KoinJavaComponent.getKoin
 
+/**
+ * Selector desplegable de tema (claro/oscuro) para la pantalla de ajustes.
+ *
+ * Muestra el tema actual como texto pulsable y despliega un [DropdownMenu]
+ * con las opciones \»Claro\» y \»Oscuro\». Al seleccionar una opción,
+ * invoca [IdiomaViewModel.cambiarTema] para persistir la preferencia.
+ *
+ * @param currentTema Estado actual del tema: `true` para oscuro, `false` para claro.
+ * @param userSessionDataStore Almacén de sesión opcional; si es `null`, se obtiene de Koin.
+ * @param session Sesión actual del usuario.
+ * @param idiomaViewModel ViewModel que gestiona el cambio de tema e idioma.
+ */
 @Composable
 fun ThemeModeSelector(
     currentTema: Boolean,

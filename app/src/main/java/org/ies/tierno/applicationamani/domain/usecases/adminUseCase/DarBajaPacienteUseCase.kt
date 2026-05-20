@@ -26,5 +26,12 @@ class DarBajaPacienteUseCase(
      */
     suspend operator fun invoke(id: Long): Result<MessageResponse> = repository.darBajaPaciente(id)
 
+    /**
+     * Da de alta a un psicólogo previamente dado de baja.
+     *
+     * @param id Identificador único del psicólogo.
+     * @return [Result.success] con mensaje de confirmación,
+     *         o [Result.failure] con la excepción correspondiente.
+     */
     suspend fun darAltaPsicologo(id: Long): Result<MessageResponse> = repository.darAltaPsicologo(id)
 }

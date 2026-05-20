@@ -57,6 +57,19 @@ val ColorScheme.success: Color
 val ColorScheme.warning: Color
     get() = Color(0xFFFF9800)
 
+/**
+ * Pantalla de agenda del psicólogo con vista de calendario mensual.
+ *
+ * Muestra un [CalendarioView] interactivo con las citas del mes, días
+ * bloqueados y no laborables. Permite al psicólogo crear nuevas citas,
+ * editar las existentes, cancelar citas y configurar su horario de
+ * disponibilidad semanal. Incluye diálogos de confirmación para las
+ * acciones destructivas y un [SnackbarHost] para notificaciones.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la agenda del psicólogo.
+ * @param listarTerapiasViewModel ViewModel que gestiona las terapias disponibles.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PsicologoAgendaScreen(
@@ -2096,6 +2109,16 @@ fun CampoFecha(
 
 // ==================== DIÁLOGO CONFIRMAR CANCELACIÓN ====================
 
+/**
+ * Diálogo de confirmación mejorado para cancelar una cita desde la agenda del psicólogo.
+ *
+ * Muestra los detalles de la cita (paciente, fecha, hora, motivo) y
+ * advierte que la acción es irreversible.
+ *
+ * @param cita Datos de la cita a cancelar.
+ * @param onConfirmar Callback invocado al confirmar la cancelación.
+ * @param onDismiss Callback invocado al cerrar el diálogo sin cancelar.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DialogoConfirmarCancelacionMejorado(

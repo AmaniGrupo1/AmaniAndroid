@@ -77,6 +77,18 @@ private val AmaniDefaultTextSecondary = Color(0xFF6B6B7A)
 private val AmaniDefaultDivider = Color(0xFFE8E2F3)
 private val AmaniDefaultError = Color(0xFFE57373)
 
+/**
+ * Pantalla de gestión de situaciones desde el panel de administración.
+ *
+ * Permite listar, crear, editar y eliminar situaciones (categorías de
+ * contexto del paciente) que pueden ser asignadas a los historiales
+ * clínicos. Incluye un [FloatingActionButton] para añadir nuevas
+ * situaciones y un diálogo de edición con campos de nombre, categoría
+ * y descripción.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el CRUD de situaciones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SituacionAdminScreen(
@@ -430,6 +442,23 @@ fun EmptySituacionesScreen(
     }
 }
 
+/**
+ * Diálogo de creación/edición de una situación.
+ *
+ * Presenta un formulario con campos de nombre, categoría y descripción.
+ * Si [situacion] no es `null`, el diálogo opera en modo edición;
+ * en caso contrario, en modo creación.
+ *
+ * @param situacion Situación a editar, o `null` para crear una nueva.
+ * @param onDismiss Callback invocado al cerrar el diálogo sin guardar.
+ * @param onConfirm Callback invocado al confirmar, recibe nombre, categoría y descripción.
+ * @param primaryColor Color primario para los elementos del diálogo.
+ * @param cardBackgroundColor Color de fondo de la tarjeta del diálogo.
+ * @param textPrimaryColor Color del texto principal.
+ * @param textSecondaryColor Color del texto secundario.
+ * @param roboto Familia tipográfica Roboto.
+ * @param isDark Indica si el tema oscuro está activo.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SituacionDialog(

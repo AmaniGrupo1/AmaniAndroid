@@ -72,6 +72,17 @@ import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla de registro de un nuevo psicólogo desde el panel de administración.
+ *
+ * Presenta un formulario completo con campos de nombre, apellidos, email,
+ * contraseña, especialidad, fecha de nacimiento y teléfono. Incluye
+ * validación de campos, selector de fecha con restricción de mayoría de
+ * edad y un botón de registro que invoca [LoginViewModel.registrarPsicologo].
+ *
+ * @param onBack Callback invocado para navegar hacia atrás.
+ * @param loginViewModel ViewModel que gestiona el registro y validación.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgregaPsicologoScreen(

@@ -39,6 +39,20 @@ private val SuccessColor = Color(0xFF81C784)
 private val ErrorColor = Color(0xFFE57373)
 private val WarningColor = Color(0xFFFF9800)
 
+/**
+ * Pantalla de registro de un nuevo paciente en la plataforma Amani.
+ *
+ * Presenta un formulario completo con campos personales (nombre, apellidos,
+ * DNI, email, contraseña, teléfono, género, fecha de nacimiento), datos
+ * del tutor legal (si el paciente es menor de edad), dirección, selección
+ * de situaciones personales y aceptación de términos legales. Incluye
+ * validación de campos, selector de fecha con restricción de mayoría de
+ * edad y diálogos de confirmación de éxito o error.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel que gestiona el estado del registro.
+ * @param situacionViewModel ViewModel que gestiona la lista de situaciones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(

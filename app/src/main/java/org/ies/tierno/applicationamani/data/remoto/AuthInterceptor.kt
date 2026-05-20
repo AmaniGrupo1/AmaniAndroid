@@ -6,9 +6,15 @@ import okhttp3.Response
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import timber.log.Timber
 
-// Interceptor que añade el header Authorization usando el token cacheado en TokenHolder.
-// Evita bloquear threads de red con runBlocking y reduce la probabilidad de leer null
-// si DataStore aún no está listo.
+/**
+ * Interceptor OkHttp que añade el header `Authorization: Bearer <token>` a cada petición.
+ *
+ * Utiliza [TokenHolder] como caché en memoria para obtener el token de forma no bloqueante,
+ * evitando así problemas de latencia que ocurrirían al leer directamente de DataStore.
+ * Si no hay token disponible, la petición se envía sin el header de autorización.
+ *
+ * @property tokenHolder Contenedor en memoria del token JWT actual.
+ */
 class AuthInterceptor(
     private val tokenHolder: TokenHolder,
 ) : Interceptor {

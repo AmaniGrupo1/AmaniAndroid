@@ -23,6 +23,18 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleVie
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de gestión de usuarios para el administrador.
+ *
+ * Permite listar, filtrar por rol y por DNI, y cambiar el rol de cualquier
+ * usuario del sistema. Incluye un [BottomSheetCambiarRol] para seleccionar
+ * el nuevo rol y un diálogo de confirmación antes de aplicar el cambio.
+ * La lista se refresca automáticamente tras cada modificación.
+ *
+ * @param adminUserViewModel ViewModel que gestiona la lista y filtrado de usuarios.
+ * @param adminRoleViewModel ViewModel que gestiona el cambio de rol.
+ * @param onNavigateBack Callback invocado para volver a la pantalla anterior.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminUserManagementScreen(
@@ -424,6 +436,12 @@ fun AdminUserManagementScreen(
     }
 }
 
+/**
+ * Tarjeta que muestra la información resumida de un usuario y permite cambiar su rol.
+ *
+ * @param user Datos del usuario a mostrar.
+ * @param onCambiarRol Callback invocado al pulsar el botón de cambio de rol.
+ */
 @Composable
 fun UserCard(
     user: UsuarioDTO,

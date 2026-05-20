@@ -81,6 +81,17 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
+/**
+ * Pantalla principal del panel de administración con vista de psicólogos.
+ *
+ * Muestra una lista de psicólogos registrados, cada uno con sus pacientes
+ * asignados en tarjetas expandibles. Incluye la barra superior
+ * [MenuAdministrador] y un botón flotante para asignar nuevos pacientes.
+ * La carga inicial muestra un indicador de progreso.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de psicólogos y pacientes.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ViewAdminPrincipal(
@@ -643,6 +654,11 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
     }
 }
 
+/**
+ * Tarjeta compacta que muestra la información resumida de un paciente asignado.
+ *
+ * @param paciente DTO con los datos básicos del paciente (nombre, apellido, email).
+ */
 @Composable
 fun PacienteItem(paciente: PacientesAsignadoDTO) {
     val colorScheme = MaterialTheme.colorScheme

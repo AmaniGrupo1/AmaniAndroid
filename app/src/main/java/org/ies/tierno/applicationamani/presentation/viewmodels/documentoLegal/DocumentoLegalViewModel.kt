@@ -4,35 +4,53 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
-import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
-import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
+import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalGeneralUseCase
+import org.ies.tierno.applicationamani.dto.legal.DocumentoLegalRequestDTO
+import org.ies.tierno.applicationamani.dto.legal.DocumentoLegalResponseDTO
 
+/**
+ * ViewModel que gestiona el CRUD de documentos legales desde el panel de administración.
+ *
+ * Permite listar, crear, editar, eliminar y consultar documentos legales por tipo
+ * mediante [DocumentoLegalGeneralUseCase]. Expone estados de carga, error y el
+ * documento seleccionado para visualización o edición.
+ *
+ * @constructor Crea una instancia con el caso de uso de documentos legales.
+ * @param useCase Caso de uso que centraliza las operaciones sobre documentos legales.
+ */
 class DocumentoLegalViewModel(
-    private val useCase: DocumentoLegalUseCase,
+    private val useCase: DocumentoLegalGeneralUseCase,
 ) : ViewModel() {
-    // =========================
-    // ESTADOS UI
-    // =========================
-
+    /** Lista de todos los documentos legales existentes. */
     private val _documentos = MutableStateFlow<List<DocumentoLegalResponseDTO>>(emptyList())
-    val documentos: StateFlow<List<DocumentoLegalResponseDTO>> = _documentos
+    val documentos: StateFlow<List<DocumentoLegalResponseDTO>> = _documentos.asStateFlow()
 
+    /** Documento legal seleccionado para consulta por tipo. */
     private val _documentoSeleccionado =
         MutableStateFlow<DocumentoLegalResponseDTO?>(null)
     val documentoSeleccionado: StateFlow<DocumentoLegalResponseDTO?> =
-        _documentoSeleccionado
+        _documentoSeleccionado.asStateFlow()
 
+    /** Indica si una operación está en curso. */
     private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
+    /** Mensaje de error de la última operación fallida. */
     private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    val error: StateFlow<String?> = _error.asStateFlow()
 
-    // =========================
-    // OBTENER TODOS
-    // =========================
+    init {
+        getAllDocumentos()
+    }
+
+    /**
+     * Obtiene todos los documentos legales desde el backend.
+     *
+     * Lanza una corrutina que consulta [DocumentoLegalGeneralUseCase.getAllDocumentos]
+     * y actualiza [documentos] con el resultado.
+     */
     fun getAllDocumentos() {
         viewModelScope.launch {
             _loading.value = true
@@ -51,9 +69,11 @@ class DocumentoLegalViewModel(
         }
     }
 
-    // =========================
-    // CREAR
-    // =========================
+    /**
+     * Crea un nuevo documento legal y refresca la lista.
+     *
+     * @param request DTO con los datos del nuevo documento.
+     */
     fun crearDocumento(request: DocumentoLegalRequestDTO) {
         viewModelScope.launch {
             _loading.value = true
@@ -63,7 +83,7 @@ class DocumentoLegalViewModel(
 
             result
                 .onSuccess {
-                    getAllDocumentos() // refresca lista
+                    getAllDocumentos()
                 }.onFailure {
                     _error.value = it.message
                 }
@@ -72,9 +92,12 @@ class DocumentoLegalViewModel(
         }
     }
 
-    // =========================
-    // EDITAR
-    // =========================
+    /**
+     * Edita un documento legal existente y refresca la lista.
+     *
+     * @param idDocumento Identificador del documento a editar.
+     * @param request DTO con los nuevos datos del documento.
+     */
     fun editarDocumento(
         idDocumento: Long,
         request: DocumentoLegalRequestDTO,
@@ -87,7 +110,7 @@ class DocumentoLegalViewModel(
 
             result
                 .onSuccess {
-                    getAllDocumentos() // refresca lista
+                    getAllDocumentos()
                 }.onFailure {
                     _error.value = it.message
                 }
@@ -96,9 +119,11 @@ class DocumentoLegalViewModel(
         }
     }
 
-    // =========================
-    // ELIMINAR
-    // =========================
+    /**
+     * Elimina un documento legal por su ID y refresca la lista.
+     *
+     * @param idDocumento Identificador del documento a eliminar.
+     */
     fun eliminarDocumento(idDocumento: Long) {
         viewModelScope.launch {
             _loading.value = true
@@ -108,7 +133,7 @@ class DocumentoLegalViewModel(
 
             result
                 .onSuccess {
-                    getAllDocumentos() // refresca lista
+                    getAllDocumentos()
                 }.onFailure {
                     _error.value = it.message
                 }
@@ -117,9 +142,11 @@ class DocumentoLegalViewModel(
         }
     }
 
-    // =========================
-// OBTENER POR TIPO
-// =========================
+    /**
+     * Obtiene un documento legal por su tipo y lo expone en [documentoSeleccionado].
+     *
+     * @param tipo Tipo del documento legal a consultar (ej. "privacidad", "terminos").
+     */
     fun getDocumentoByTipo(tipo: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -136,9 +163,7 @@ class DocumentoLegalViewModel(
         }
     }
 
-    // =========================
-    // LIMPIAR ERROR
-    // =========================
+    /** Limpia el mensaje de error actual. */
     fun clearError() {
         _error.value = null
     }

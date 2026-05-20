@@ -74,6 +74,17 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla de gestión de documentos legales (creación, edición, visualización).
+ *
+ * Permite al administrador listar, crear, editar y visualizar documentos
+ * legales del sistema. Incluye un diálogo de creación con campos de título,
+ * tipo de documento, versión, estado activo y contenido. Los documentos se
+ * gestionan a través de [DocumentoLegalViewModel].
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el CRUD de documentos legales.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GestionDocumentosScreen(

@@ -10,24 +10,44 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 
 /**
- * ViewModel para la pantalla de ajustes del perfil del cliente.
+ * ViewModel que gestiona la pantalla de ajustes y edición del perfil del cliente.
+ *
+ * Permite cargar los datos del usuario autenticado desde la sesión local y el backend,
+ * editar campos como nombre, apellidos, teléfono y dirección, así como persistir cambios
+ * o eliminar la cuenta.
+ *
+ * @constructor Crea el ViewModel con las dependencias de sesión y perfil.
+ * @param sessionDataStore Almacén local de la sesión del usuario autenticado.
+ * @param profileUseCase Caso de uso genérico para operaciones de perfil.
  */
 class SettingsClienteViewModel(
     private val sessionDataStore: UserSessionDataStore,
     private val profileUseCase: ProfileUseCaseGeneral,
 ) : ViewModel() {
+    /** Nombre del usuario en el formulario de edición. */
     var nombre by mutableStateOf("")
+    /** Apellidos del usuario en el formulario de edición. */
     var apellidos by mutableStateOf("")
+    /** Género seleccionado por el usuario. */
     var genero by mutableStateOf("")
+    /** Dirección postal introducida por el usuario. */
     var direccion by mutableStateOf("")
+    /** Teléfono de contacto del usuario. */
     var telefono by mutableStateOf("")
+    /** Código postal asociado a la dirección. */
     var codigoPostal by mutableStateOf("")
 
+    /** Indica si los datos del perfil se están cargando desde el backend. */
     var isLoading by mutableStateOf(false)
+    /** Mensaje de error de la última operación fallida de carga o guardado. */
     var errorMessage by mutableStateOf<String?>(null)
 
     /**
-     * Carga los datos del usuario desde la sesión y el backend.
+     * Carga los datos del perfil del usuario desde la sesión local y el backend.
+     *
+     * Recupera el `idPaciente` de [UserSessionDataStore] y consulta el perfil
+     * completo mediante [ProfileUseCaseGeneral.getPacienteById]. Rellena los
+     * campos del formulario con los valores obtenidos.
      */
     fun cargarUsuario() {
         isLoading = true
@@ -63,13 +83,17 @@ class SettingsClienteViewModel(
 
     /**
      * Persiste los cambios realizados en el perfil del usuario.
+     *
+     * Pendiente de implementación: se requiere un caso de uso de actualización de perfil.
      */
     fun guardarUsuario() {
         // Pendiente: Implementar caso de uso para actualizar perfil
     }
 
     /**
-     * Elimina la cuenta del usuario.
+     * Elimina la cuenta del usuario autenticado.
+     *
+     * Pendiente de implementación: se requiere un caso de uso de borrado de cuenta.
      */
     fun borrarCuenta() {
         // Pendiente: Implementar borrado
