@@ -60,7 +60,7 @@ object AgendaCitaDefaultColors {
 @Composable
 fun AgendaCitaScreen(
     navController: NavController,
-    viewModel: ListarCitasViewModel = koinViewModel()
+    viewModel: ListarCitasViewModel
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val context = LocalContext.current

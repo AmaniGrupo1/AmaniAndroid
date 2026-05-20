@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
+import org.ies.tierno.applicationamani.data.remoto.HistorialCitaApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
@@ -8,6 +9,7 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.citas.HistorialCitaResponseDTO
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaRequest
@@ -15,7 +17,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class CitasRepository(
-    private val citasApi: CitasApi
+    private val citasApi: CitasApi,
+    private val historial : HistorialCitaApi
 ) {
 
     suspend fun getAgendaPaciente(
@@ -201,4 +204,9 @@ class CitasRepository(
             Result.failure(e)
         }
     }
+
+    suspend fun getHistorialCitas(): Result<List<HistorialCitaResponseDTO>> =
+        runCatching {
+            historial.getHistorialCitas()
+        }
 }

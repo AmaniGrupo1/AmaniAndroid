@@ -63,6 +63,7 @@ import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessageD
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
+import org.ies.tierno.applicationamani.domain.usecases.historialCita.HistorialCitaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
@@ -92,7 +93,7 @@ val appModule = module {
     single { AuthRepository(get(), get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
-    single { CitasRepository(get()) }
+    single { CitasRepository(get(), get()) }
     single { ProfileRepository(get()) }
     single { NotificacionRepository(get()) }
     single { AjustesRepository(get()) }
@@ -137,6 +138,7 @@ val appModule = module {
     factory { TerapiasGeneralUseCase(get()) }
     factory { GetUsuariosUseCase(get()) }
     factory { RoleAdminUseCase(get()) }
+    factory { HistorialCitaUseCase(get()) }
 
 
     viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
@@ -156,7 +158,7 @@ val appModule = module {
     viewModel { EditProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get(), get()) }
-    viewModel { ListarCitasViewModel(get(), get()) }
+    viewModel { ListarCitasViewModel(get(), get(), get()) }
     viewModel { AdminRoleViewModel(get()) }
     viewModel { AdminUserViewModel(get()) }
 

@@ -51,6 +51,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPr
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.HistorialCitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.HistorialClinicoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.SettingsPacienteScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.CrearHistorialClinicoScreen
@@ -66,6 +67,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacie
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
@@ -90,6 +92,7 @@ fun NavGraph(
     val listaPsicologoSimple : ListarPsicologosAdminViewModel = koinViewModel()
     val historialClinicoPacienteViewModel : HistorialClinicoPacienteViewModel = koinViewModel()
     val listarPacientesViewModel : ListarPacientesViewModel = koinViewModel()
+    val listarCita : ListarCitasViewModel = koinViewModel()
 
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -176,6 +179,9 @@ fun NavGraph(
             composable(Screens.adminHome.route) {
                 ViewAdminPrincipal(navController)
             }
+            composable(Screens.historialCitas.route) {
+                HistorialCitasScreen(navController, listarCita)
+            }
             composable(Screens.psicologoAgenda.route) {
                 PsicologoAgendaScreen(
                     navController,
@@ -189,7 +195,7 @@ fun NavGraph(
             }
 
             composable(Screens.agendaCitaScreen.route) {
-                AgendaCitaScreen(navController)
+                AgendaCitaScreen(navController, listarCita)
             }
 
 

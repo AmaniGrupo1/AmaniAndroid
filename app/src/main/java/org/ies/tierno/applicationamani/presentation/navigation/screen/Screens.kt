@@ -104,6 +104,8 @@
 
         object listarPsicologosBaja : Screens("listarPsicologosBaja")
 
+        object historialCitas : Screens("historialCitas")
+
         object historialClinico : Screens("historialClinico/{pacienteId}"){
             fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
         }

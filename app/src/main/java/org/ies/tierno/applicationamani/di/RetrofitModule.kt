@@ -20,6 +20,7 @@ import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
 import org.ies.tierno.applicationamani.BuildConfig
+import org.ies.tierno.applicationamani.data.remoto.HistorialCitaApi
 import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -106,7 +107,7 @@ val retrofitModule = module {
             .create()
 
         Retrofit.Builder()
-           .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+            .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
 
             //.baseUrl("http://192.168.1.175:8080/")
             .addConverterFactory(GsonConverterFactory.create(gson))
@@ -125,4 +126,5 @@ val retrofitModule = module {
     single<HistorialApi> { get<Retrofit>().create(HistorialApi::class.java) }
     single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }
     single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
+    single<HistorialCitaApi> { get<Retrofit>().create(HistorialCitaApi::class.java) }
 }

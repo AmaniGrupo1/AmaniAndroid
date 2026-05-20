@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -35,9 +36,13 @@ import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import android.app.Activity
+import android.content.Intent
+import android.provider.CalendarContract
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 private const val TAG = "SettingsPaciente"
 
@@ -105,6 +110,13 @@ fun SettingsPacienteScreen(
     // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
+    // Estados para diálogos
+    var mostrarDialogoFacturacion by remember { mutableStateOf(false) }
+    var mensajeDialogo by remember { mutableStateOf("") }
+
+    // Estado para la alerta de calendario
+    var mostrarAlertaCalendario by remember { mutableStateOf(false) }
+
     // Control de recreación para evitar loops
     var previousLanguage by remember { mutableStateOf(currentLanguage) }
     var isRecreating by remember { mutableStateOf(false) }
@@ -133,21 +145,103 @@ fun SettingsPacienteScreen(
                         fontFamily = roboto
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = if (isDark) Color.Black else Color.White
-                        )
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = primaryColor
                 )
             )
         }
     ) { padding ->
+
+        // Diálogo para mensajes de facturación
+        if (mostrarDialogoFacturacion) {
+            Dialog(
+                onDismissRequest = { mostrarDialogoFacturacion = false }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = surfaceColor
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color(0xFF3498DB),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "🚧 En desarrollo",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor,
+                            fontFamily = roboto
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = mensajeDialogo,
+                            fontSize = 14.sp,
+                            color = textSecondaryColor,
+                            fontFamily = roboto,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(
+                            onClick = { mostrarDialogoFacturacion = false },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primaryColor
+                            )
+                        ) {
+                            Text("Entendido", color = Color.White, fontFamily = roboto)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Diálogo de alerta para el calendario
+        if (mostrarAlertaCalendario) {
+            Dialog(
+                onDismissRequest = { mostrarAlertaCalendario = false }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .width(250.dp)
+                        .padding(24.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = surfaceColor
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(
+                            color = primaryColor,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Abriendo calendario...",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = textColor,
+                            fontFamily = roboto
+                        )
+                    }
+                }
+            }
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -174,6 +268,21 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
+                    onMostrarDialogo = { mensaje ->
+                        mensajeDialogo = mensaje
+                        mostrarDialogoFacturacion = true
+                    },
+                    onAbrirCalendario = {
+                        mostrarAlertaCalendario = true
+                        scope.launch {
+                            delay(3000)
+                            mostrarAlertaCalendario = false
+                            abrirCalendario(context, onMostrarDialogo = { msg ->
+                                mensajeDialogo = msg
+                                mostrarDialogoFacturacion = true
+                            })
+                        }
+                    },
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "mi_perfil",
@@ -215,6 +324,21 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
+                    onMostrarDialogo = { mensaje ->
+                        mensajeDialogo = mensaje
+                        mostrarDialogoFacturacion = true
+                    },
+                    onAbrirCalendario = {
+                        mostrarAlertaCalendario = true
+                        scope.launch {
+                            delay(3000)
+                            mostrarAlertaCalendario = false
+                            abrirCalendario(context, onMostrarDialogo = { msg ->
+                                mensajeDialogo = msg
+                                mostrarDialogoFacturacion = true
+                            })
+                        }
+                    },
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "language",
@@ -230,12 +354,6 @@ fun SettingsPacienteScreen(
                             title = stringResource(R.string.notificaciones),
                             subtitle = stringResource(R.string.configurar_notificaciones),
                             icon = Icons.Default.Notifications
-                        ),
-                        SettingsOptionPaciente(
-                            id = "recordatorios",
-                            title = stringResource(R.string.recordatorios),
-                            subtitle = stringResource(R.string.recordatorios_citas),
-                            icon = Icons.Default.Alarm
                         ),
                         SettingsOptionPaciente(
                             id = "tema",
@@ -265,13 +383,22 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
+                    onMostrarDialogo = { mensaje ->
+                        mensajeDialogo = mensaje
+                        mostrarDialogoFacturacion = true
+                    },
+                    onAbrirCalendario = {
+                        mostrarAlertaCalendario = true
+                        scope.launch {
+                            delay(3000)
+                            mostrarAlertaCalendario = false
+                            abrirCalendario(context, onMostrarDialogo = { msg ->
+                                mensajeDialogo = msg
+                                mostrarDialogoFacturacion = true
+                            })
+                        }
+                    },
                     options = listOf(
-                        SettingsOptionPaciente(
-                            id = "proximas_citas",
-                            title = stringResource(R.string.proximas_citas),
-                            subtitle = stringResource(R.string.ver_citas_proximas),
-                            icon = Icons.Default.CalendarToday
-                        ),
                         SettingsOptionPaciente(
                             id = "historial_citas",
                             title = stringResource(R.string.historial_citas),
@@ -306,6 +433,21 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
+                    onMostrarDialogo = { mensaje ->
+                        mensajeDialogo = mensaje
+                        mostrarDialogoFacturacion = true
+                    },
+                    onAbrirCalendario = {
+                        mostrarAlertaCalendario = true
+                        scope.launch {
+                            delay(3000)
+                            mostrarAlertaCalendario = false
+                            abrirCalendario(context, onMostrarDialogo = { msg ->
+                                mensajeDialogo = msg
+                                mostrarDialogoFacturacion = true
+                            })
+                        }
+                    },
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "metodos_pago",
@@ -347,6 +489,21 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
+                    onMostrarDialogo = { mensaje ->
+                        mensajeDialogo = mensaje
+                        mostrarDialogoFacturacion = true
+                    },
+                    onAbrirCalendario = {
+                        mostrarAlertaCalendario = true
+                        scope.launch {
+                            delay(3000)
+                            mostrarAlertaCalendario = false
+                            abrirCalendario(context, onMostrarDialogo = { msg ->
+                                mensajeDialogo = msg
+                                mostrarDialogoFacturacion = true
+                            })
+                        }
+                    },
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "ayuda",
@@ -388,6 +545,21 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
+                    onMostrarDialogo = { mensaje ->
+                        mensajeDialogo = mensaje
+                        mostrarDialogoFacturacion = true
+                    },
+                    onAbrirCalendario = {
+                        mostrarAlertaCalendario = true
+                        scope.launch {
+                            delay(3000)
+                            mostrarAlertaCalendario = false
+                            abrirCalendario(context, onMostrarDialogo = { msg ->
+                                mensajeDialogo = msg
+                                mostrarDialogoFacturacion = true
+                            })
+                        }
+                    },
                     options = listOf(
                         SettingsOptionPaciente(
                             id = "version",
@@ -420,6 +592,23 @@ fun SettingsPacienteScreen(
     }
 }
 
+// Función para abrir el calendario fuera del composable
+fun abrirCalendario(context: android.content.Context, onMostrarDialogo: (String) -> Unit) {
+    try {
+        val intent = Intent(Intent.ACTION_INSERT)
+            .setData(CalendarContract.Events.CONTENT_URI)
+            .putExtra(CalendarContract.Events.TITLE, "Recordatorio de cita médica")
+            .putExtra(CalendarContract.Events.DESCRIPTION, "Cita programada en Amani Psicología")
+            .putExtra(CalendarContract.Events.EVENT_LOCATION, "Centro Amani")
+
+        context.startActivity(intent)
+        Log.d(TAG, "📅 Abriendo calendario del dispositivo")
+    } catch (e: Exception) {
+        Log.e(TAG, "❌ Error al abrir el calendario: ${e.message}")
+        onMostrarDialogo("No se pudo abrir el calendario. Asegúrate de tener una aplicación de calendario instalada.")
+    }
+}
+
 @Composable
 fun SettingsCategoryCardPaciente(
     title: String,
@@ -437,7 +626,9 @@ fun SettingsCategoryCardPaciente(
     textSecondaryColor: Color,
     dividerColor: Color,
     iconColorGeneral: Color,
-    isDark: Boolean
+    isDark: Boolean,
+    onMostrarDialogo: (String) -> Unit,
+    onAbrirCalendario: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -497,7 +688,9 @@ fun SettingsCategoryCardPaciente(
                     textSecondaryColor = textSecondaryColor,
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColorGeneral,
-                    isDark = isDark
+                    isDark = isDark,
+                    onMostrarDialogo = onMostrarDialogo,
+                    onAbrirCalendario = onAbrirCalendario
                 )
             }
         }
@@ -517,12 +710,14 @@ fun SettingsOptionRowPaciente(
     textSecondaryColor: Color,
     dividerColor: Color,
     iconColorGeneral: Color,
-    isDark: Boolean
+    isDark: Boolean,
+    onMostrarDialogo: (String) -> Unit,
+    onAbrirCalendario: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var expandedIdioma by remember { mutableStateOf(false) }
     var expandedTema by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val dropdownContainerColor = if (isDark) Color.DarkGray else Color.White
 
     Row(
@@ -532,6 +727,22 @@ fun SettingsOptionRowPaciente(
                 when (option.id) {
                     "language" -> expandedIdioma = true
                     "tema" -> expandedTema = true
+
+                    "recordatorios_citas" -> {
+                        onAbrirCalendario()
+                    }
+
+                    "metodos_pago" -> {
+                        onMostrarDialogo("Aún no se ha implementado el módulo de métodos de pago, pero en futuro lo haremos.")
+                    }
+
+                    "historial_pagos" -> {
+                        onMostrarDialogo("Aún no se ha implementado el historial de pagos, pero en futuro lo haremos.")
+                    }
+
+                    "facturas" -> {
+                        onMostrarDialogo("Aún no se ha implementado la descarga de facturas, pero en futuro lo haremos.")
+                    }
 
                     "mi_perfil" -> {
                         val identificador = session?.idPaciente
@@ -572,15 +783,7 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "historial_citas" -> {
-                        Log.d(TAG, "📋 Navegar a historial de citas")
-                    }
-
-                    "metodos_pago" -> {
-                        Log.d(TAG, "💳 Navegar a métodos de pago")
-                    }
-
-                    "historial_pagos" -> {
-                        Log.d(TAG, "💰 Navegar a historial de pagos")
+                        navController.navigate(Screens.historialCitas.route)
                     }
 
                     "ayuda" -> {
@@ -688,7 +891,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text("Claro", color = textColor) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(false) // false = claro
+                                    idiomaViewModel.cambiarTema(false)
                                 }
                                 expandedTema = false
                             }
@@ -697,7 +900,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text("Oscuro", color = textColor) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(true) // true = oscuro
+                                    idiomaViewModel.cambiarTema(true)
                                 }
                                 expandedTema = false
                             }

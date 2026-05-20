@@ -450,18 +450,6 @@ fun SettingsAdminScreen(
                             title = stringResource(R.string.version),
                             subtitle = stringResource(R.string.version_100),
                             icon = Icons.Default.Info
-                        ),
-                        SettingsOption(
-                            id = "terminos",
-                            title = stringResource(R.string.terminos_condiciones),
-                            subtitle = stringResource(R.string.leer_terminos),
-                            icon = Icons.Default.Description
-                        ),
-                        SettingsOption(
-                            id = "privacidad",
-                            title = stringResource(R.string.politica_privacidad),
-                            subtitle = stringResource(R.string.ver_politica),
-                            icon = Icons.Default.Lock
                         )
                     )
                 )
