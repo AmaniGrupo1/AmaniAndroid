@@ -1,13 +1,19 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.profile
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import java.io.File
 
 /**
  * ViewModel que expone el perfil del psicólogo autenticado para su visualización.
@@ -33,6 +39,16 @@ class ProfilePsicologoViewModel(
     /** Mensaje de error si la carga del perfil falla. */
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
+
+    sealed class UploadStatus {
+        object Idle : UploadStatus()
+        object Loading : UploadStatus()
+        data class Success(val url: String) : UploadStatus()
+        data class Error(val message: String) : UploadStatus()
+    }
+
+    private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
+    val uploadStatus: StateFlow<UploadStatus> = _uploadStatus.asStateFlow()
 
     // =========================
     // FETCH PROFILE
@@ -92,5 +108,59 @@ class ProfilePsicologoViewModel(
     /** Limpia el mensaje de error actual. */
     fun clearError() {
         _error.value = null
+    }
+
+    // =========================
+    // UPLOAD FOTO
+    // =========================
+    fun uploadFotoPerfil(
+        id: Long,
+        imageUri: Uri,
+        context: Context,
+    ) {
+        viewModelScope.launch {
+            _uploadStatus.value = UploadStatus.Loading
+
+            try {
+                val file =
+                    getFile(imageUri, context)
+                        ?: throw Exception("No se pudo obtener archivo")
+
+                val request = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val multipart = MultipartBody.Part.createFormData("file", file.name, request)
+
+                val result = profileUseCaseGeneral.uploadPerfil(id, multipart)
+
+                result
+                    .onSuccess {
+                        _uploadStatus.value = UploadStatus.Success("ok")
+                        fetchProfile(id)
+                    }.onFailure {
+                        _uploadStatus.value = UploadStatus.Error(it.message ?: "Error al subir la foto")
+                    }
+            } catch (e: Exception) {
+                _uploadStatus.value = UploadStatus.Error(e.message ?: "Error al procesar la imagen")
+            }
+        }
+    }
+
+    private fun getFile(
+        uri: Uri,
+        context: Context,
+    ): File? {
+        return try {
+            val input = context.contentResolver.openInputStream(uri) ?: return null
+            val file = File.createTempFile("psico_", ".jpg", context.cacheDir)
+
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+
+            input.close()
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

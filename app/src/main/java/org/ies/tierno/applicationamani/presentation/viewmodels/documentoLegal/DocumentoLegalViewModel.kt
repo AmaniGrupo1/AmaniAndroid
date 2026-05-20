@@ -6,22 +6,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalGeneralUseCase
-import org.ies.tierno.applicationamani.dto.legal.DocumentoLegalRequestDTO
-import org.ies.tierno.applicationamani.dto.legal.DocumentoLegalResponseDTO
+import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
+import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
+import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 
 /**
  * ViewModel que gestiona el CRUD de documentos legales desde el panel de administración.
  *
  * Permite listar, crear, editar, eliminar y consultar documentos legales por tipo
- * mediante [DocumentoLegalGeneralUseCase]. Expone estados de carga, error y el
+ * mediante [DocumentoLegalUseCase]. Expone estados de carga, error y el
  * documento seleccionado para visualización o edición.
  *
  * @constructor Crea una instancia con el caso de uso de documentos legales.
  * @param useCase Caso de uso que centraliza las operaciones sobre documentos legales.
  */
 class DocumentoLegalViewModel(
-    private val useCase: DocumentoLegalGeneralUseCase,
+    private val useCase: DocumentoLegalUseCase,
 ) : ViewModel() {
     /** Lista de todos los documentos legales existentes. */
     private val _documentos = MutableStateFlow<List<DocumentoLegalResponseDTO>>(emptyList())
@@ -48,8 +48,8 @@ class DocumentoLegalViewModel(
     /**
      * Obtiene todos los documentos legales desde el backend.
      *
-     * Lanza una corrutina que consulta [DocumentoLegalGeneralUseCase.getAllDocumentos]
-     * y actualiza [documentos] con el resultado.
+     * Lanza una corrutina que consulta [DocumentoLegalUseCase.getAllDocumentos]
+     * and updates [documentos] with the result.
      */
     fun getAllDocumentos() {
         viewModelScope.launch {

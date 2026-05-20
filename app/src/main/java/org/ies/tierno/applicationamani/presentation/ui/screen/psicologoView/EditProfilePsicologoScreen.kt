@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-import EditProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

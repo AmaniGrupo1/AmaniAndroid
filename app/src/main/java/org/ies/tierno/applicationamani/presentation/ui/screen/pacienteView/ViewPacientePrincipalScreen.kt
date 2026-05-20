@@ -105,23 +105,23 @@ fun ViewPacientePrincipalScreen(
 
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    val pacienteInfo by profilePsicologoViewModel.pacientesProfile.collectAsState()
-    val isLoadingPaciente by profilePsicologoViewModel.isLoading.collectAsState()
+    val pacienteInfo by profilePsicologoViewModel.perfil.collectAsStateWithLifecycle()
+    val isLoadingPaciente by profilePsicologoViewModel.isLoading.collectAsStateWithLifecycle()
 
-    val psicologo by pacienteViewModel.psicologoAsignado.collectAsState()
-    val isLoadingPsicologo by pacienteViewModel.isLoading.collectAsState()
-    val errorPsicologo by pacienteViewModel.error.collectAsState()
+    val psicologo by pacienteViewModel.psicologoAsignado.collectAsStateWithLifecycle()
+    val isLoadingPsicologo by pacienteViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorPsicologo by pacienteViewModel.error.collectAsStateWithLifecycle()
 
     LaunchedEffect(session) {
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
-        profilePsicologoViewModel.fetchProfile(idPaciente)
+        // profilePsicologoViewModel.fetchProfile(idPaciente) // Incorrecto, idPaciente no es idPsicologo
         pacienteViewModel.cargarPsicologoAsignado(idPaciente)
     }
 
     val isLoading = isLoadingPaciente || isLoadingPsicologo
     val error = errorPsicologo
 
-    val nombrePaciente = pacienteInfo?.usuario?.nombre?.split(" ")?.firstOrNull()
+    val nombrePaciente = psicologo?.usuario?.nombre?.split(" ")?.firstOrNull()
         ?: session?.nombre?.split(" ")?.firstOrNull()
         ?: "Paciente"
 

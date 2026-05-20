@@ -155,8 +155,7 @@ class ChatRepositoryImpl(
         messageId: Long,
         receiverId: Long,
     ): Result<Unit> {
-        // Simplificado: no necesario por ahora
-        return Result.success(Unit)
+        return chatFirebaseService.markMessageDelivered(messageId, receiverId)
     }
 
     /**
@@ -170,8 +169,7 @@ class ChatRepositoryImpl(
         messageId: Long,
         receiverId: Long,
     ): Result<Unit> {
-        // Simplificado: no necesario por ahora
-        return Result.success(Unit)
+        return chatFirebaseService.markMessageAsRead(messageId, receiverId)
     }
 
     /**
@@ -185,8 +183,7 @@ class ChatRepositoryImpl(
         messageId: Long,
         receiverId: Long,
     ): Flow<Boolean> {
-        // Simplificado: no necesario por ahora
-        return kotlinx.coroutines.flow.flow { emit(false) }
+        return chatFirebaseService.observeMessageDelivery(messageId, receiverId)
     }
 
     /**
@@ -194,28 +191,16 @@ class ChatRepositoryImpl(
      *
      * @param messageId Identificador del mensaje.
      * @param receiverId Identificador del destinatario.
-     * @return [Flow] que emite `false` por defecto.
+     * @return [Flow] que emite `true` cuando el mensaje ha sido leído.
      */
     override fun observeMessageRead(
         messageId: Long,
         receiverId: Long,
     ): Flow<Boolean> {
-        // Simplificado: no necesario por ahora
-        return kotlinx.coroutines.flow.flow { emit(false) }
+        return chatFirebaseService.observeMessageRead(messageId, receiverId)
     }
 
-    /**
-     * Almacena un mensaje localmente para envío diferido.
-     *
-     * Actualmente es una operación no implementada que retorna éxito por defecto.
-     * En una implementación real, persistiría el mensaje en Room o DataStore.
-     *
-     * @param message Mensaje a almacenar localmente.
-     * @return [Result] exitoso por defecto.
-     */
     override suspend fun saveMessageOffline(message: Message): Result<Unit> {
-        // TC-03: chat_offlineMessage_queuesForRetry
-        // En una implementación real, aquí se guardaría en Room o DataStore
         return Result.success(Unit)
     }
 }

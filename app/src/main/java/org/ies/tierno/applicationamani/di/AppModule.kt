@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.di
 
-import EditProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import androidx.room.Room
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository

@@ -136,7 +136,7 @@ class ChatFirebaseService(
      * @param userId2 Identificador del segundo usuario.
      * @return [Flow] que emite la lista actualizada de [Message].
      */
-    fun observeMessages((
+    fun observeMessages(
         userId1: Long,
         userId2: Long,
     ): Flow<List<Message>> =
@@ -200,7 +200,7 @@ class ChatFirebaseService(
      * @param attachmentType Tipo de adjunto como cadena.
      * @param attachmentName Nombre del archivo.
      */
-    suspend fun updateMessageAttachment((
+    suspend fun updateMessageAttachment(
         senderId: Long,
         receiverId: Long,
         messageId: Long,
@@ -237,7 +237,7 @@ class ChatFirebaseService(
      * @param attachmentName Nombre del adjunto, opcional.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun sendMessage((
+    suspend fun sendMessage(
         senderId: Long,
         receiverId: Long,
         content: String,
@@ -278,7 +278,7 @@ class ChatFirebaseService(
      * @param otherUserId Identificador del otro participante.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun markMessagesAsRead((
+    suspend fun markMessagesAsRead(
         currentUserId: Long,
         otherUserId: Long,
     ): Result<Unit> =
@@ -310,7 +310,7 @@ class ChatFirebaseService(
      * @param otherUserId Identificador del otro participante.
      * @return [Result] con la lista de [Message].
      */
-    suspend fun getMessages((
+    suspend fun getMessages(
         userId1: Long,
         userId2: Long,
     ): Result<List<Message>> =
@@ -337,7 +337,7 @@ class ChatFirebaseService(
      * @param userId2 Identificador del segundo usuario.
      * @return [Flow] que emite `true` cuando el otro usuario está escribiendo.
      */
-    fun observeTyping((
+    fun observeTyping(
         userId1: Long,
         userId2: Long,
     ): Flow<Boolean> =
@@ -372,7 +372,7 @@ class ChatFirebaseService(
      * @param receiverId Identificador del destinatario.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun startTyping((
+    suspend fun startTyping(
         senderId: Long,
         receiverId: Long,
     ): Result<Unit> =
@@ -393,7 +393,7 @@ class ChatFirebaseService(
      * @param receiverId Identificador del destinatario.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun stopTyping((
+    suspend fun stopTyping(
         senderId: Long,
         receiverId: Long,
     ): Result<Unit> =
@@ -415,7 +415,7 @@ class ChatFirebaseService(
      * @param userId Identificador del usuario.
      * @return [Flow] que emite `true` cuando está en línea.
      */
-    fun observeUserOnline((userId: Long): Flow<Boolean> =
+    fun observeUserOnline(userId: Long): Flow<Boolean> =
         callbackFlow {
             val userRef = usersRef.child(userId.toString()).child("isOnline")
 
@@ -443,7 +443,7 @@ class ChatFirebaseService(
      * @param isOnline `true` si está en línea.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun updateUserOnline((
+    suspend fun updateUserOnline(
         userId: Long,
         isOnline: Boolean,
     ): Result<Unit> =
@@ -467,7 +467,7 @@ class ChatFirebaseService(
      * @param lastSeen Timestamp en milisegundos.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun updateLastSeen((
+    suspend fun updateLastSeen(
         userId: Long,
         lastSeen: Long,
     ): Result<Unit> =
@@ -491,7 +491,7 @@ class ChatFirebaseService(
      * @param receiverId Identificador del destinatario.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun markMessageDelivered((
+    suspend fun markMessageDelivered(
         messageId: Long,
         receiverId: Long,
     ): Result<Unit> = Result.success(Unit)
@@ -503,7 +503,7 @@ class ChatFirebaseService(
      * @param receiverId Identificador del destinatario.
      * @return [Result] que indica éxito o fallo.
      */
-    suspend fun markMessageAsRead((
+    suspend fun markMessageAsRead(
         messageId: Long,
         receiverId: Long,
     ): Result<Unit> = Result.success(Unit)
@@ -515,7 +515,7 @@ class ChatFirebaseService(
      * @param receiverId Identificador del destinatario.
      * @return [Flow] que emite `true` cuando ha sido entregado.
      */
-    fun observeMessageDelivery((
+    fun observeMessageDelivery(
         messageId: Long,
         receiverId: Long,
     ): Flow<Boolean> =
@@ -531,7 +531,7 @@ class ChatFirebaseService(
      * @param receiverId Identificador del destinatario.
      * @return [Flow] que emite `true` cuando ha sido leído.
      */
-    fun observeMessageRead((
+    fun observeMessageRead(
         messageId: Long,
         receiverId: Long,
     ): Flow<Boolean> =
