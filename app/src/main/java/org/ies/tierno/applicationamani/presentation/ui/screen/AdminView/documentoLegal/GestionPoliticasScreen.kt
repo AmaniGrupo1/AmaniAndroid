@@ -572,7 +572,7 @@ fun DialogoEditarPolitica(
                     if (titulo.isNotBlank() && contenido.isNotBlank()) {
                         onSave(
                             DocumentoLegalRequestDTO(
-                                tipo = documento.tipo.name,
+                                tipo = documento.tipo?.name ?: TipoDocumentoLegal.TERMINOS.name,
                                 titulo = titulo,
                                 contenido = contenido,
                                 icono = documento.icono,

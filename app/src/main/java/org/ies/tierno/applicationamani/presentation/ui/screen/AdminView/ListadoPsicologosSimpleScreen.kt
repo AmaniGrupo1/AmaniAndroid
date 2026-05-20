@@ -76,7 +76,7 @@ import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 
 // Colores originales para el modo DEFECTO (como LoginScreen)
-object AdminViewDefaultColors {
+object SimpleScreenColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
     val PrimaryDark = Color(0xFF4A2B50)
@@ -144,16 +144,16 @@ fun ListadoPsicologosSimpleScreen(
     val cardColors = getCardColors()
 
     // Determinar colores según el tema
-    val backgroundColor = if (isDark) backgroundColor else AdminViewDefaultColors.Background
-    val surfaceColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Surface
+    val backgroundColor = if (isDark) screenColors.background else SimpleScreenColors.Background
+    val surfaceColor = if (isDark) cardColors.cardBackground else SimpleScreenColors.Surface
     val primaryColor =
-        if (isDark) MaterialTheme.colorScheme.primary else AdminViewDefaultColors.Primary
-    val primaryColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Accent
+        if (isDark) MaterialTheme.colorScheme.primary else SimpleScreenColors.Primary
+    val accentColor = if (isDark) cardColors.cardBackground else SimpleScreenColors.Accent
     val textPrimaryColor =
-        if (isDark) cardColors.cardContent else AdminViewDefaultColors.TextPrimary
+        if (isDark) cardColors.cardContent else SimpleScreenColors.TextPrimary
     val textSecondaryColor =
-        if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AdminViewDefaultColors.TextSecondary
-    val errorColor = AdminViewDefaultColors.Error
+        if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else SimpleScreenColors.TextSecondary
+    val errorColor = SimpleScreenColors.Error
 
     val typography = MaterialTheme.typography
 
@@ -214,9 +214,9 @@ fun ListadoPsicologosSimpleScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = if (isDark) {
-                            listOf(backgroundColor, backgroundColor)
+                            listOf(screenColors.background, screenColors.background)
                         } else {
-                            listOf(primaryColor, Color.White)
+                            listOf(accentColor, Color.White)
                         }
                     )
                 )

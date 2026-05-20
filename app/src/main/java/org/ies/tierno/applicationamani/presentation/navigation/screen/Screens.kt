@@ -46,14 +46,8 @@ sealed class Screens(
     /** Pantalla para agregar un administrador. */
     object agregarAdmin : Screens("agregarAdmin")
 
-    /** Pantalla para registrar un paciente desde la vista de administrador. */
-    object agregarPacienteAdmin : Screens("agregarPacienteAdmin")
-
     /** Pantalla principal del administrador. */
     object adminHome : Screens("home")
-
-    /** Pantalla del cuestionario. */
-    object cuestionario : Screens("cuestionario")
 
     /** Pantalla de citas del paciente con calendario y horas libres. */
     object citas : Screens("citas")

@@ -4,7 +4,7 @@ import org.ies.tierno.applicationamani.domain.models.enumm.TipoDocumentoLegal
 
 data class DocumentoLegalResponseDTO(
     val idDocumento: Long,
-    val tipo: TipoDocumentoLegal,
+    val tipo: TipoDocumentoLegal?,
     val titulo: String,
     val contenido: String,
     val icono: String?,
