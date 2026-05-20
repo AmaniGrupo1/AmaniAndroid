@@ -1,9 +1,0 @@
-package com.google.protobuf;
-
-/* JADX INFO: loaded from: classes22.dex */
-@CheckReturnValue
-interface MessageInfoFactory {
-    boolean isSupported(Class<?> clazz);
-
-    MessageInfo messageInfoFor(Class<?> clazz);
-}
