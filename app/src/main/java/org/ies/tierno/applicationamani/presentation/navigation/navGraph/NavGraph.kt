@@ -30,6 +30,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.Calendar
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosBajaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListadoPsicologosSimpleScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.ListarPacienteSinPsicologos
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TerapiasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.TestScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal.DocumentoLegalDetailScreen
@@ -56,6 +57,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.Edit
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.EstadisticasPsicologoScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.PsicologoAgendaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView.SettingsPsychologistScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.settings.SettingsAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.situacion.SituacionAdminScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.MisTicketsScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.NuevoTicketScreen
@@ -108,9 +110,9 @@ fun NavGraph(
             val currentRoute = currentBackStackEntry?.destination?.route
             val hideBottomBar =
                 currentRoute == Screens.login.route ||
-                    currentRoute == Screens.registro.route ||
-                    currentRoute == Screens.principal.route ||
-                    currentRoute?.startsWith("chat") == true
+                        currentRoute == Screens.registro.route ||
+                        currentRoute == Screens.principal.route ||
+                        currentRoute?.startsWith("chat") == true
             if (!hideBottomBar) {
                 AmaniBottomBar(navController, bottomBarConfig)
             }
@@ -186,8 +188,15 @@ fun NavGraph(
             composable(Screens.pacientes.route) {
                 ListadoPacientesScreen(navController, listarPacientesViewModel)
             }
+            composable(Screens.pacientesSinPsicologo.route) {
+                ListarPacienteSinPsicologos(navController)
+            }
             composable(Screens.listarPsicologosBaja.route) {
-                ListadoPsicologosBajaScreen(navController, listaPsicologoSimple, listarPacientesViewModel)
+                ListadoPsicologosBajaScreen(
+                    navController,
+                    listaPsicologoSimple,
+                    listarPacientesViewModel
+                )
             }
             composable(Screens.cambiarRol.route) {
                 // Pasar lambda de navegación para que el botón de volver funcione correctamente
@@ -232,7 +241,11 @@ fun NavGraph(
                 ViewPacientePrincipalScreen(navController, profilePsicolgo)
             }
             composable(Screens.listarPsicologoSimple.route) {
-                ListadoPsicologosSimpleScreen(navController, listaPsicologoSimple, listarPacientesViewModel)
+                ListadoPsicologosSimpleScreen(
+                    navController,
+                    listaPsicologoSimple,
+                    listarPacientesViewModel
+                )
             }
 
             composable(Screens.chatList.route) {
@@ -261,7 +274,8 @@ fun NavGraph(
             ) { backStackEntry ->
                 val currentUserId = backStackEntry.arguments?.getLong("currentUserId") ?: 0L
                 val otherUserId = backStackEntry.arguments?.getLong("otherUserId") ?: 0L
-                val otherUserName = Uri.decode(backStackEntry.arguments?.getString("otherUserName") ?: "")
+                val otherUserName =
+                    Uri.decode(backStackEntry.arguments?.getString("otherUserName") ?: "")
 
                 if (currentUserId <= 0L || otherUserId <= 0L) {
                     LaunchedEffect(Unit) {
@@ -270,7 +284,13 @@ fun NavGraph(
                     return@composable
                 }
 
-                val viewModel: ChatViewModel = koinViewModel(parameters = { parametersOf(currentUserId, otherUserId, otherUserName) })
+                val viewModel: ChatViewModel = koinViewModel(parameters = {
+                    parametersOf(
+                        currentUserId,
+                        otherUserId,
+                        otherUserName
+                    )
+                })
 
                 ChatScreen(
                     viewModel = viewModel,
@@ -321,7 +341,8 @@ fun NavGraph(
                     ),
             ) { backStackEntry ->
                 val citaId = backStackEntry.arguments?.getLong("citaId") ?: 0L
-                val psicologoName = Uri.decode(backStackEntry.arguments?.getString("psicologoName") ?: "")
+                val psicologoName =
+                    Uri.decode(backStackEntry.arguments?.getString("psicologoName") ?: "")
                 val fecha = backStackEntry.arguments?.getString("fecha") ?: ""
                 val monto = backStackEntry.arguments?.getString("monto") ?: ""
 
@@ -342,7 +363,8 @@ fun NavGraph(
             }
 
             composable(Screens.editProfilePsicologo.route) { backStackEntry ->
-                val identificador = backStackEntry.arguments?.getString("identificador")?.toLongOrNull() ?: 0L
+                val identificador =
+                    backStackEntry.arguments?.getString("identificador")?.toLongOrNull() ?: 0L
                 EditProfilePsicologoScreen(
                     navController = navController,
                     identificador = identificador,
@@ -367,6 +389,9 @@ fun NavGraph(
 
             composable(Screens.politicaPrivacidad.route) {
                 GestionPoliticasScreen(navController)
+            }
+            composable(Screens.settingsAdmin.route) {
+                SettingsAdminScreen(navController, userSessionDataStore, idiomaViewModel)
             }
 
             composable(
