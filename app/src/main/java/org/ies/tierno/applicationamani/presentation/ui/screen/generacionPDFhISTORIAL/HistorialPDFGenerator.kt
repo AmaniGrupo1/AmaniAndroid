@@ -28,7 +28,7 @@ import java.util.Locale
  * mediante un [Intent] de Android.
  */
 object HistorialPDFGenerator {
-    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale("es", "ES"))
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
 
     suspend fun generarPDF(
         context: Context,

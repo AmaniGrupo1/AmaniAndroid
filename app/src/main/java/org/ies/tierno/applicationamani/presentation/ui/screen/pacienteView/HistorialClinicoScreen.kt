@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -107,7 +108,7 @@ fun HistorialClinicoScreen(
     fun formatFecha(fechaStr: String): String =
         try {
             val fecha = LocalDateTime.parse(fechaStr)
-            val formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+            val formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
             fecha.format(formatter)
         } catch (e: Exception) {
             fechaStr
@@ -512,7 +513,7 @@ fun HistorialCard(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                Icons.Default.Note,
+                                Icons.AutoMirrored.Filled.Note,
                                 contentDescription = "Observaciones",
                                 modifier = Modifier.size(16.dp),
                                 tint = colorScheme.onSurfaceVariant,

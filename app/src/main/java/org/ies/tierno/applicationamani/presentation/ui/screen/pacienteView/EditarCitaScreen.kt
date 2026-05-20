@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -620,7 +621,7 @@ fun EditarCitaScreen(
                                             modifier =
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .menuAnchor(),
+                                                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                             shape = RoundedCornerShape(12.dp),
                                             colors =
                                                 OutlinedTextFieldDefaults.colors(

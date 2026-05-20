@@ -22,14 +22,14 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.ContactSupport
+import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Payment
@@ -149,7 +149,7 @@ fun SettingsPacienteScreen(
 
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
     LaunchedEffect(currentLanguage) {
-        if (previousLanguage != null && previousLanguage != currentLanguage && !isRecreating) {
+        if (previousLanguage != currentLanguage && !isRecreating) {
             Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage'")
             isRecreating = true
             delay(150)
@@ -378,13 +378,13 @@ fun SettingsPacienteScreen(
                                 id = "ayuda",
                                 title = stringResource(R.string.ayuda),
                                 subtitle = stringResource(R.string.preguntas_frecuentes),
-                                icon = Icons.Default.Help,
+                                icon = Icons.AutoMirrored.Filled.Help,
                             ),
                             SettingsOptionPaciente(
                                 id = "contacto",
                                 title = stringResource(R.string.contacto),
                                 subtitle = stringResource(R.string.contactar_soporte),
-                                icon = Icons.Default.ContactSupport,
+                                icon = Icons.AutoMirrored.Filled.ContactSupport,
                             ),
                             SettingsOptionPaciente(
                                 id = "reportar_problema",
@@ -434,7 +434,7 @@ fun SettingsPacienteScreen(
                                 id = "cerrar_sesion",
                                 title = stringResource(R.string.cerrar_sesion),
                                 subtitle = stringResource(R.string.salir_aplicacion),
-                                icon = Icons.Default.Logout,
+                                icon = Icons.AutoMirrored.Filled.Logout,
                             ),
                         ),
                 )

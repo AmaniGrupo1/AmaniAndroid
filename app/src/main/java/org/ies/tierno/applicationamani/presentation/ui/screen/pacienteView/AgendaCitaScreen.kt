@@ -316,7 +316,7 @@ fun CitaCardAmani(
     val shapes = MaterialTheme.shapes
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
-    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     val fecha =
@@ -633,7 +633,7 @@ fun CitaCardAmani(
                             ),
                         shape = CircleShape,
                         border =
-                            ButtonDefaults.outlinedButtonBorder.copy(
+                            ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = Brush.horizontalGradient(listOf(colorScheme.error, colorScheme.error)),
                             ),
                     ) {

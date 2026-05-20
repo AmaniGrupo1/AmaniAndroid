@@ -22,7 +22,7 @@ object LanguageManager {
         context: Context,
         language: String,
     ): Context {
-        val locale = Locale(language)
+        val locale = java.util.Locale.Builder().setLanguage(language).build()
         Locale.setDefault(locale)
 
         val config = Configuration(context.resources.configuration)

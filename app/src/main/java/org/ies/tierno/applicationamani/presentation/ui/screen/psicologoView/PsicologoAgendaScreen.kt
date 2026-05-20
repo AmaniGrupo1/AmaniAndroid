@@ -726,7 +726,7 @@ fun LeyendaMejorada() {
 @Composable
 fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
+    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -1360,7 +1360,7 @@ fun DialogoNoDisponibleMejorado(
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
+    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
     var motivoBloqueo by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -1516,14 +1516,14 @@ fun DialogoCrearEditarCitaMejorado(
 
     val horasDisponibles = remember(slotsLibres, citaAEditar, fechaSeleccionada) {
         val libres = slotsLibres.filter { !it.ocupado }.map { it.hora }.sorted()
-        if (esEdicion && citaAEditar != null) {
+        if (esEdicion) {
             val horaEdicion = citaAEditar.horaInicio
             if (horaEdicion !in libres) (listOf(horaEdicion) + libres).distinct()
                 .sorted() else libres
         } else libres
     }
 
-    var horaSeleccionada by remember { mutableStateOf(if (esEdicion && citaAEditar != null) citaAEditar.horaInicio else horasDisponibles.firstOrNull()) }
+    var horaSeleccionada by remember { mutableStateOf(if (esEdicion) citaAEditar.horaInicio else horasDisponibles.firstOrNull()) }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(terapiaSeleccionada) {
@@ -2089,7 +2089,7 @@ fun CampoFecha(
                         fechaSeleccionada.format(
                             DateTimeFormatter.ofPattern(
                                 "EEEE",
-                                Locale("es", "ES")
+                                java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
                             )
                         ).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodySmall,
