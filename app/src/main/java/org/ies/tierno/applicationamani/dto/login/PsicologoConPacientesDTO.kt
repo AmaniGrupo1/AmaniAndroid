@@ -8,7 +8,7 @@ data class ListaPacientesAndPsicologo(
     val especialidad: String,
     val licencia: String?,
     val fechaDadoAlta: String,
-    val pacientes: List<PacientesAsignadoDTO>
+    val pacientes: List<PacientesAsignadoDTO>,
 )
 
 @Deprecated("Use ListaPacientesAndPsicologo instead", ReplaceWith("ListaPacientesAndPsicologo"))

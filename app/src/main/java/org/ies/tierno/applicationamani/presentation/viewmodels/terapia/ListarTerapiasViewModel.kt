@@ -13,9 +13,8 @@ import java.math.BigDecimal
 
 class ListarTerapiasViewModel(
     private val repository: CitasRepository,
-    private val terapiasGeneralUseCase: TerapiasGeneralUseCase
+    private val terapiasGeneralUseCase: TerapiasGeneralUseCase,
 ) : ViewModel() {
-
     private val _terapias = MutableStateFlow<List<TerapiaResponseDTO>>(emptyList())
     val terapias = _terapias.asStateFlow()
 
@@ -39,7 +38,8 @@ class ListarTerapiasViewModel(
         viewModelScope.launch {
             _loading.value = true
 
-            repository.getTerapias()
+            repository
+                .getTerapias()
                 .onSuccess { _terapias.value = it }
                 .onFailure {
                     _error.value = it.message
@@ -51,22 +51,26 @@ class ListarTerapiasViewModel(
     }
 
     // ➕ CREAR
-    fun crearTerapia(nombre: String, duracion: Int, precio: BigDecimal) {
+    fun crearTerapia(
+        nombre: String,
+        duracion: Int,
+        precio: BigDecimal,
+    ) {
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
 
-            val result = terapiasGeneralUseCase.crearTerapia(
-                TerapiaRequest(nombre, duracion, precio)
-            )
+            val result =
+                terapiasGeneralUseCase.crearTerapia(
+                    TerapiaRequest(nombre, duracion, precio),
+                )
 
             result
                 .onSuccess {
                     _terapiaCreada.value = it
                     cargarTerapias()
                     _showDialog.value = false
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -79,24 +83,24 @@ class ListarTerapiasViewModel(
         id: Long,
         nombre: String,
         duracion: Int,
-        precio: BigDecimal
+        precio: BigDecimal,
     ) {
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
 
-            val result = terapiasGeneralUseCase.actualizarTerapia(
-                id,
-                TerapiaRequest(nombre, duracion, precio)
-            )
+            val result =
+                terapiasGeneralUseCase.actualizarTerapia(
+                    id,
+                    TerapiaRequest(nombre, duracion, precio),
+                )
 
             result
                 .onSuccess {
                     cargarTerapias()
                     _showDialog.value = false
                     _terapiaEditando.value = null
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -110,11 +114,11 @@ class ListarTerapiasViewModel(
             _loading.value = true
             _error.value = null
 
-            terapiasGeneralUseCase.eliminarTerapia(id)
+            terapiasGeneralUseCase
+                .eliminarTerapia(id)
                 .onSuccess {
                     cargarTerapias()
-                }
-                .onFailure {
+                }.onFailure {
                     _error.value = it.message
                 }
 
@@ -126,6 +130,7 @@ class ListarTerapiasViewModel(
     fun limpiarError() {
         _error.value = null
     }
+
     fun mostrarDialogCrear() {
         _terapiaEditando.value = null
         _showDialog.value = true

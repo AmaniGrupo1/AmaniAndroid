@@ -13,14 +13,12 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileResponseDTO
-import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import java.io.File
 
 class ProfilePacienteViewModel(
-    private val profileUseCaseGeneral: ProfileUseCaseGeneral
+    private val profileUseCaseGeneral: ProfileUseCaseGeneral,
 ) : ViewModel() {
-
     private val _perfil = MutableStateFlow<PacienteProfileResponseDTO?>(null)
     val perfil: StateFlow<PacienteProfileResponseDTO?> = _perfil.asStateFlow()
 
@@ -32,9 +30,16 @@ class ProfilePacienteViewModel(
 
     sealed class UploadStatus {
         object Idle : UploadStatus()
+
         object Loading : UploadStatus()
-        data class Success(val url: String) : UploadStatus()
-        data class Error(val message: String) : UploadStatus()
+
+        data class Success(
+            val url: String,
+        ) : UploadStatus()
+
+        data class Error(
+            val message: String,
+        ) : UploadStatus()
     }
 
     private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
@@ -45,55 +50,66 @@ class ProfilePacienteViewModel(
         viewModelScope.launch {
             val result = profileUseCaseGeneral.getPacienteProfile(id)
 
-            result.onSuccess {
-                _perfil.value = it
-                _error.value = null
-            }.onFailure {
-                _error.value = it.message
-            }
+            result
+                .onSuccess {
+                    _perfil.value = it
+                    _error.value = null
+                }.onFailure {
+                    _error.value = it.message
+                }
 
             _isLoading.value = false
         }
     }
 
-    fun updateProfile(id: Long, update : UpdatePacienteRequestDTO) {
+    fun updateProfile(
+        id: Long,
+        update: UpdatePacienteRequestDTO,
+    ) {
         _isLoading.value = true
         viewModelScope.launch {
-            val result = profileUseCaseGeneral.updatePacienteProfile(
-                id,
-                update
-            )
+            val result =
+                profileUseCaseGeneral.updatePacienteProfile(
+                    id,
+                    update,
+                )
 
-            result.onSuccess {
-                fetchProfile(id)
-            }.onFailure {
-                _error.value = it.message
-            }
+            result
+                .onSuccess {
+                    fetchProfile(id)
+                }.onFailure {
+                    _error.value = it.message
+                }
 
             _isLoading.value = false
         }
     }
 
-    fun uploadFoto(id: Long, imageUri: Uri, context: Context) {
+    fun uploadFoto(
+        id: Long,
+        imageUri: Uri,
+        context: Context,
+    ) {
         viewModelScope.launch {
             _uploadStatus.value = UploadStatus.Loading
 
             try {
-                val file = getFile(imageUri, context)
-                    ?: throw Exception("No se pudo obtener archivo")
+                val file =
+                    getFile(imageUri, context)
+                        ?: throw Exception("No se pudo obtener archivo")
 
                 val request = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val multipart = MultipartBody.Part.createFormData("file", file.name, request)
 
                 val result = profileUseCaseGeneral.updatePacientePhoto(id, multipart)
 
-                result.onSuccess {
-                    _uploadStatus.value = UploadStatus.Success("ok")
-                    fetchProfile(id)
-                }.onFailure {
-                    _uploadStatus.value = UploadStatus.Error(it.message ?: "Error")
-                }
-
+                result
+                    .onSuccess {
+                        _uploadStatus.value = UploadStatus.Success("ok")
+                        fetchProfile(id)
+                    }.onFailure {
+                        _uploadStatus.value = UploadStatus.Error(it.message ?: "Error")
+                    }
             } catch (e: Exception) {
                 _uploadStatus.value = UploadStatus.Error(e.message ?: "Error")
             }
@@ -102,24 +118,32 @@ class ProfilePacienteViewModel(
 
     // En ProfilePacienteViewModel.kt, añade esta función:
 
-    fun updateProfile(id: Long, update: UpdatePacienteRequestDTO, onResult: (Boolean) -> Unit = {}) {
+    fun updateProfile(
+        id: Long,
+        update: UpdatePacienteRequestDTO,
+        onResult: (Boolean) -> Unit = {},
+    ) {
         _isLoading.value = true
         viewModelScope.launch {
             val result = profileUseCaseGeneral.updatePacienteProfile(id, update)
 
-            result.onSuccess {
-                fetchProfile(id)
-                onResult(true)
-            }.onFailure {
-                _error.value = it.message
-                onResult(false)
-            }
+            result
+                .onSuccess {
+                    fetchProfile(id)
+                    onResult(true)
+                }.onFailure {
+                    _error.value = it.message
+                    onResult(false)
+                }
 
             _isLoading.value = false
         }
     }
 
-    private fun getFile(uri: Uri, context: Context): File? {
+    private fun getFile(
+        uri: Uri,
+        context: Context,
+    ): File? {
         val input = context.contentResolver.openInputStream(uri) ?: return null
         val file = File.createTempFile("paciente_", ".jpg", context.cacheDir)
 

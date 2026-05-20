@@ -5,5 +5,5 @@ import java.math.BigDecimal
 data class TerapiaRequest(
     val nombre: String,
     val duracionMinutos: Int,
-    val precio: BigDecimal
+    val precio: BigDecimal,
 )

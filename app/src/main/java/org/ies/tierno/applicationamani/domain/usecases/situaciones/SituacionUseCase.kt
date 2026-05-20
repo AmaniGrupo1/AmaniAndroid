@@ -6,37 +6,33 @@ import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
 
 class SituacionUseCase(
-    private val repository: SituacionRepository
+    private val repository: SituacionRepository,
 ) {
-
     // =========================
     // LISTAR TODAS
     // =========================
-    fun getSituaciones(): Flow<List<SituacionDTO>> {
-        return repository.getSituaciones()
-    }
+    fun getSituaciones(): Flow<List<SituacionDTO>> = repository.getSituaciones()
 
     // =========================
     // OBTENER POR ID
     // =========================
-    suspend fun getSituacionById(id: Long) =
-        repository.getSituacionById(id)
+    suspend fun getSituacionById(id: Long) = repository.getSituacionById(id)
 
     // =========================
     // CREAR
     // =========================
-    suspend fun createSituacion(request: SituacionRequest) =
-        repository.createSituacion(request)
+    suspend fun createSituacion(request: SituacionRequest) = repository.createSituacion(request)
 
     // =========================
     // ACTUALIZAR
     // =========================
-    suspend fun updateSituacion(id: Long, request: SituacionRequest) =
-        repository.updateSituacion(id, request)
+    suspend fun updateSituacion(
+        id: Long,
+        request: SituacionRequest,
+    ) = repository.updateSituacion(id, request)
 
     // =========================
     // ELIMINAR
     // =========================
-    suspend fun deleteSituacion(id: Long) =
-        repository.deleteSituacion(id)
+    suspend fun deleteSituacion(id: Long) = repository.deleteSituacion(id)
 }

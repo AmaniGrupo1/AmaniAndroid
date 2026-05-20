@@ -4,5 +4,5 @@ data class SituacionRequest(
     val nombre: String,
     val categoria: String,
     val descripcion: String,
-    val activo: Boolean = true
+    val activo: Boolean = true,
 )

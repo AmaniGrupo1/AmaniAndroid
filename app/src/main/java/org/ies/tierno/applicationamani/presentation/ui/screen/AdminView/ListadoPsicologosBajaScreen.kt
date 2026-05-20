@@ -48,22 +48,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.presentation.ui.componente.admin.DarAltaPsicologo
-import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
+
+object AdminViewDefaultColors {
+    val Background = Color(0xFFF5F5F5)
+    val Surface = Color.White
+    val Primary = Color(0xFF6C63FF)
+    val Success = Color(0xFF4CAF50)
+    val Accent = Color(0xFFF5F5F5)
+    val TextPrimary = Color.Black
+    val TextSecondary = Color(0xFF6B6B6B)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosBajaScreen(
     navController: NavController,
     viewModel: ListarPsicologosAdminViewModel,
-    listarPacienteViewModel: ListarPacientesViewModel
+    listarPacienteViewModel: ListarPacientesViewModel,
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val psicologosBaja by viewModel.psicologosBaja.collectAsState()
@@ -83,18 +91,15 @@ fun ListadoPsicologosBajaScreen(
 
     // Efecto para manejar el resultado del alta
     LaunchedEffect(altaEstado) {
-
         if (altaEstado != null && isAltaInProgress) {
-
             if (altaEstado!!.isSuccess) {
-
                 // ELIMINAR DE LA LISTA LOCAL
                 viewModel.actualizarPsicologoAlta(
-                    psicologoSeleccionado!!.idPsicologo
+                    psicologoSeleccionado!!.idPsicologo,
                 )
 
                 snackbarHostState.showSnackbar(
-                    "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de alta exitosamente"
+                    "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de alta exitosamente",
                 )
 
                 mostrarDialogoAlta = false
@@ -102,14 +107,12 @@ fun ListadoPsicologosBajaScreen(
                 psicologoSeleccionado = null
 
                 listarPacienteViewModel.limpiarAltaEstado()
-
             } else if (altaEstado!!.isFailure) {
-
                 snackbarHostState.showSnackbar(
                     "Error al dar de alta: ${
                         altaEstado!!.exceptionOrNull()?.message
                             ?: "Error desconocido"
-                    }"
+                    }",
                 )
             }
 
@@ -134,75 +137,86 @@ fun ListadoPsicologosBajaScreen(
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
-                Text(
-                    text = "Psicólogos dados de baja",
-                    style = typography.headlineMedium?.copy(
+            Text(
+                text = "Psicólogos dados de baja",
+                style =
+                    typography.headlineMedium?.copy(
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryColor
+                        color = primaryColor,
                     ) ?: MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(16.dp),
-                    fontFamily = roboto
-                )
+                modifier = Modifier.padding(16.dp),
+                fontFamily = roboto,
+            )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = if (isDark) {
-                            listOf(
-                                screenColors.background,
-                                screenColors.background
-                            )
-                        } else {
-                            listOf(
-                                accentColor,
-                                Color.White
-                            )
-                        }
-                    )
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    if (isDark) {
+                                        listOf(
+                                            screenColors.background,
+                                            screenColors.background,
+                                        )
+                                    } else {
+                                        listOf(
+                                            accentColor,
+                                            Color.White,
+                                        )
+                                    },
+                            ),
+                    ),
         ) {
             if (psicologosBaja.isEmpty()) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = "✅ No hay psicólogos dados de baja",
-                        style = typography.titleMedium?.copy(
-                            fontSize = 18.sp,
-                            color = textSecondaryColor
-                        ) ?: MaterialTheme.typography.titleMedium,
+                        style =
+                            typography.titleMedium?.copy(
+                                fontSize = 18.sp,
+                                color = textSecondaryColor,
+                            ) ?: MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Todos los psicólogos están activos",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 14.sp,
-                            color = textSecondaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
+                        style =
+                            typography.bodyMedium?.copy(
+                                fontSize = 14.sp,
+                                color = textSecondaryColor,
+                            ) ?: MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(psicologosBaja) { psicologo ->
+                    items(
+                        items = psicologosBaja,
+                        key = { it.idPsicologo },
+                    ) { psicologo ->
                         PsicologoBajaCard(
                             psicologo = psicologo,
                             onDarAlta = {
@@ -216,7 +230,7 @@ fun ListadoPsicologosBajaScreen(
                             textPrimaryColor = textPrimaryColor,
                             textSecondaryColor = textSecondaryColor,
                             successColor = successColor,
-                            roboto = roboto
+                            roboto = roboto,
                         )
                     }
                 }
@@ -235,22 +249,24 @@ fun ListadoPsicologosBajaScreen(
                 title = {
                     Text(
                         text = "Confirmar alta",
-                        style = typography.headlineSmall?.copy(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.headlineSmall,
-                        fontFamily = roboto
+                        style =
+                            typography.headlineSmall?.copy(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = textPrimaryColor,
+                            ) ?: MaterialTheme.typography.headlineSmall,
+                        fontFamily = roboto,
                     )
                 },
                 text = {
                     Text(
                         text = "¿Seguro que deseas dar de alta a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 14.sp,
-                            color = textSecondaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
+                        style =
+                            typography.bodyMedium?.copy(
+                                fontSize = 14.sp,
+                                color = textSecondaryColor,
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto,
                     )
                 },
                 confirmButton = {
@@ -259,20 +275,22 @@ fun ListadoPsicologosBajaScreen(
                             isAltaInProgress = true
                             listarPacienteViewModel.darAltaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = successColor
-                        ),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = successColor,
+                            ),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !isAltaInProgress
+                        enabled = !isAltaInProgress,
                     ) {
                         Text(
                             if (isAltaInProgress) "Procesando..." else "Dar de alta",
-                            style = typography.labelLarge?.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.labelLarge,
+                            style =
+                                typography.labelLarge?.copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ) ?: MaterialTheme.typography.labelLarge,
                             color = Color.White,
-                            fontFamily = roboto
+                            fontFamily = roboto,
                         )
                     }
                 },
@@ -284,21 +302,23 @@ fun ListadoPsicologosBajaScreen(
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = primaryColor
-                        ),
-                        enabled = !isAltaInProgress
+                        colors =
+                            ButtonDefaults.outlinedButtonColors(
+                                contentColor = primaryColor,
+                            ),
+                        enabled = !isAltaInProgress,
                     ) {
                         Text(
                             "Cancelar",
-                            style = typography.labelLarge?.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.labelLarge,
-                            fontFamily = roboto
+                            style =
+                                typography.labelLarge?.copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ) ?: MaterialTheme.typography.labelLarge,
+                            fontFamily = roboto,
                         )
                     }
-                }
+                },
             )
         }
     }
@@ -315,51 +335,54 @@ fun PsicologoBajaCard(
     textPrimaryColor: Color,
     textSecondaryColor: Color,
     successColor: Color,
-    roboto: FontFamily
+    roboto: FontFamily,
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(8.dp, RoundedCornerShape(20.dp)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(8.dp, RoundedCornerShape(20.dp)),
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             // Indicador de estado "Dado de baja"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Nombre completo
                 Text(
                     text = "${psicologo.nombre} ${psicologo.apellido}",
-                    style = typography.titleLarge?.copy(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = primaryColor
-                    ) ?: MaterialTheme.typography.titleLarge,
-                    fontFamily = roboto
+                    style =
+                        typography.titleLarge?.copy(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryColor,
+                        ) ?: MaterialTheme.typography.titleLarge,
+                    fontFamily = roboto,
                 )
 
                 // Badge de estado
                 Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Red.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier =
+                        Modifier
+                            .background(
+                                color = Color.Red.copy(alpha = 0.1f),
+                                shape = RoundedCornerShape(12.dp),
+                            ).padding(horizontal = 8.dp, vertical = 4.dp),
                 ) {
                     Text(
                         text = "DADO DE BAJA",
-                        style = typography.labelSmall?.copy(
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Red
-                        ) ?: MaterialTheme.typography.labelSmall,
-                        fontFamily = roboto
+                        style =
+                            typography.labelSmall?.copy(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red,
+                            ) ?: MaterialTheme.typography.labelSmall,
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -369,24 +392,26 @@ fun PsicologoBajaCard(
             // Especialidad
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = "Especialidad:",
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 13.sp,
-                        color = textSecondaryColor,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto
+                    style =
+                        typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium,
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto,
                 )
                 Text(
                     text = psicologo.especialidad,
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 13.sp,
-                        color = textPrimaryColor
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto
+                    style =
+                        typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textPrimaryColor,
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto,
                 )
             }
 
@@ -396,24 +421,26 @@ fun PsicologoBajaCard(
             if (!psicologo.licencia.isNullOrBlank()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         text = "Licencia:",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
+                        style =
+                            typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textSecondaryColor,
+                                fontWeight = FontWeight.Medium,
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto,
                     )
                     Text(
                         text = psicologo.licencia,
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
+                        style =
+                            typography.bodyMedium?.copy(
+                                fontSize = 13.sp,
+                                color = textPrimaryColor,
+                            ) ?: MaterialTheme.typography.bodyMedium,
+                        fontFamily = roboto,
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -423,22 +450,24 @@ fun PsicologoBajaCard(
             if (!psicologo.descripcion.isNullOrBlank()) {
                 Text(
                     text = "Descripción:",
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 12.sp,
-                        color = textSecondaryColor,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.bodyMedium,
+                    style =
+                        typography.bodyMedium?.copy(
+                            fontSize = 12.sp,
+                            color = textSecondaryColor,
+                            fontWeight = FontWeight.Medium,
+                        ) ?: MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp),
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
                 Text(
                     text = psicologo.descripcion,
-                    style = typography.bodySmall?.copy(
-                        fontSize = 12.sp,
-                        color = textSecondaryColor
-                    ) ?: MaterialTheme.typography.bodySmall,
+                    style =
+                        typography.bodySmall?.copy(
+                            fontSize = 12.sp,
+                            color = textSecondaryColor,
+                        ) ?: MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 2.dp),
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
             }
 
@@ -447,26 +476,28 @@ fun PsicologoBajaCard(
             // Botón de acción: Dar de alta
             Button(
                 onClick = onDarAlta,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = successColor
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = successColor,
+                    ),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
                     contentDescription = "Dar de alta",
                     tint = Color.White,
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = 8.dp),
                 )
                 Text(
                     "Dar de alta",
-                    style = typography.labelMedium?.copy(
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium
-                    ) ?: MaterialTheme.typography.labelMedium,
+                    style =
+                        typography.labelMedium?.copy(
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                        ) ?: MaterialTheme.typography.labelMedium,
                     color = Color.White,
-                    fontFamily = roboto
+                    fontFamily = roboto,
                 )
             }
         }

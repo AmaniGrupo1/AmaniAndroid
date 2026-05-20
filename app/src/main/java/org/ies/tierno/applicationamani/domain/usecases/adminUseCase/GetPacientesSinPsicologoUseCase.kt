@@ -5,9 +5,7 @@ import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 
 class GetPacientesSinPsicologoUseCase(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
 ) {
-    operator fun invoke(): Flow<List<PacienteBasicoResponseDTO>> {
-        return repository.getPacientesSinPsicologo()
-    }
+    operator fun invoke(): Flow<List<PacienteBasicoResponseDTO>> = repository.getPacientesSinPsicologo()
 }

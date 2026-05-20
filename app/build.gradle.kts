@@ -1,10 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.kover)
+    // alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -20,9 +24,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // ✅ IMPORTANTE (plan B compatibilidad NDK)
+        // ✅ Soporte para ARM y Emuladores (x86)
         ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
         }
     }
 
@@ -44,7 +48,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -59,25 +63,32 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-}
 
-// ✅ Kotlin moderno
-kotlin {
-    jvmToolchain(17)
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
+    // ✅ Kotlin moderno
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 dependencies {
 
     // PDF Generation
-    implementation("com.itextpdf:itext7-core:7.2.5")
+    implementation("com.itextpdf:itext7-core:7.2.5") {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
+    }
+    implementation(libs.bcprov.jdk15to18)
 
     // Para imprimir
-    implementation("androidx.print:print:1.0.0")
+    implementation(libs.androidx.print)
 
     // ✅ CameraX ACTUALIZADO (CRÍTICO)
-    implementation("androidx.camera:camera-camera2:1.4.0")
-    implementation("androidx.camera:camera-lifecycle:1.4.0")
-    implementation("androidx.camera:camera-view:1.4.0")
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // Imágenes
     implementation(libs.coil.compose)
@@ -85,18 +96,23 @@ dependencies {
     // DI
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.workmanager)
 
     // Networking
-    implementation(libs.retrofit.v290)
+    implementation(libs.retrofit)
     implementation(libs.converter.gson)
     // Logging interceptor para inspección de headers en debug
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation(libs.logging.interceptor)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.firebase.crashlytics)
+    ksp(libs.androidx.room.compiler)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -107,6 +123,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
 
     // Media
     implementation(libs.androidx.media3.exoplayer)
@@ -122,8 +139,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.foundation.layout)
+
+    // Charts
+    implementation(libs.vico.compose.m3)
+    implementation(libs.vico.core)
+    implementation(libs.vico.views)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -136,14 +156,24 @@ dependencies {
     // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.material)
 
     // Logging
     implementation(libs.timber)
+    implementation(libs.stripe.android)
 
     // Tests
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
+
+    androidTestImplementation(libs.mockk.agent)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.uiautomator)
+    androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
@@ -152,9 +182,10 @@ dependencies {
 }
 
 // 📚 Dokka
+
 dokka {
     moduleName.set("Amani Android")
-    dokkaSourceSets.register("main") {
+    dokkaSourceSets.configureEach {
         sourceRoots.from(file("src/main/java"))
         includes.from("MODULE.md")
     }
@@ -166,6 +197,32 @@ detekt {
     buildUponDefaultConfig = true
     ignoreFailures = true
     source.setFrom(files("src/main/java", "src/main/kotlin"))
+}
+
+kover {
+    reports {
+        variant("debug") {
+            filters {
+                excludes {
+                    classes(
+                        "*.di.*",
+                        "*.ui.*",
+                        "*Activity",
+                        "*Application",
+                        "*.dto.*",
+                        "*.models.*",
+                        "*.R",
+                        "*.R$*",
+                    )
+                }
+            }
+            verify {
+                rule {
+                    minBound(7)
+                }
+            }
+        }
+    }
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

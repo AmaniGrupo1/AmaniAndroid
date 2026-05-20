@@ -6,21 +6,14 @@ import org.ies.tierno.applicationamani.dto.role.CambiarRolRequestDTO
 import org.ies.tierno.applicationamani.dto.role.CambiarRolResponseDTO
 import retrofit2.Response
 
-
 class AdminRepository(
-    private val adminApiService: AdminApiService
+    private val adminApiService: AdminApiService,
 ) {
-
-    suspend fun cambiarRol(
-        cambiarRolRequestDTO: CambiarRolRequestDTO
-    ): Response<CambiarRolResponseDTO> {
-        return adminApiService.cambiarRol(cambiarRolRequestDTO)
-    }
+    suspend fun cambiarRol(cambiarRolRequestDTO: CambiarRolRequestDTO): Response<CambiarRolResponseDTO> =
+        adminApiService.cambiarRol(cambiarRolRequestDTO)
 
     suspend fun getUsuarios(
         rol: String? = null,
-        dni: String? = null
-    ): Response<List<UsuarioDTO>> {
-        return adminApiService.getUsuarios(rol, dni)
-    }
+        dni: String? = null,
+    ): Response<List<UsuarioDTO>> = adminApiService.getUsuarios(rol, dni)
 }

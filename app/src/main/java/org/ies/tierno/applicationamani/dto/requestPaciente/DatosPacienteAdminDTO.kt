@@ -20,7 +20,7 @@ import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
  * @property updatedAt Fecha de última actualización en formato ISO 8601.
  * @property activo Indica si el paciente está activo (`true`) o dado de baja (`false`).
  */
-data class DatosPacienteAdminDTO (
+data class DatosPacienteAdminDTO(
     val idPaciente: Long,
     val nombreUsuario: String,
     val apellidoUsuario: String,
@@ -30,11 +30,11 @@ data class DatosPacienteAdminDTO (
     val telefono: String,
     val createdAt: String,
     val updatedAt: String,
-    val activo : Boolean,
-    val metodoPago : String,
-    val estadoPago : String,
-    val situaciones : List<SituacionDTO>,
-    val tutores : List<TutorResponseDTO>,
-    val direccion : List<DireccionResponseDTO>,
-    val edad : Int
+    val activo: Boolean,
+    val metodoPago: String,
+    val estadoPago: String,
+    val situaciones: List<SituacionDTO>,
+    val tutores: List<TutorResponseDTO>,
+    val direccion: List<DireccionResponseDTO>,
+    val edad: Int,
 )

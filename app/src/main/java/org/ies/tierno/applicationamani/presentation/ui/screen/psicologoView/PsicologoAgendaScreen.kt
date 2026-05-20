@@ -769,10 +769,10 @@ fun TarjetaCitaMejorada(
     var isUpdating by remember { mutableStateOf(false) }
 
     val estadosDisponibles = listOf(
-        EstadoCita.pendiente to "⏳ Pendiente",
-        EstadoCita.confirmada to "✅ Confirmada",
-        EstadoCita.completada to "🏁 Completada",
-        EstadoCita.cancelada to "❌ Cancelada"
+        EstadoCita.PENDIENTE to "⏳ Pendiente",
+        EstadoCita.CONFIRMADA to "✅ Confirmada",
+        EstadoCita.COMPLETADA to "🏁 Completada",
+        EstadoCita.CANCELADA to "❌ Cancelada"
     )
 
     Card(
@@ -869,17 +869,17 @@ fun TarjetaCitaMejorada(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         when (estado) {
-                                            EstadoCita.confirmada -> Icons.Default.CheckCircle
-                                            EstadoCita.cancelada -> Icons.Default.Cancel
-                                            EstadoCita.completada -> Icons.Default.DoneAll
+                                            EstadoCita.CONFIRMADA -> Icons.Default.CheckCircle
+                                            EstadoCita.CANCELADA -> Icons.Default.Cancel
+                                            EstadoCita.COMPLETADA -> Icons.Default.DoneAll
                                             else -> Icons.Default.Schedule
                                         },
                                         contentDescription = null,
                                         modifier = Modifier.size(18.dp),
                                         tint = when (estado) {
-                                            EstadoCita.confirmada -> colors.primary
-                                            EstadoCita.cancelada -> colors.error
-                                            EstadoCita.completada -> colors.success
+                                            EstadoCita.CONFIRMADA -> colors.primary
+                                            EstadoCita.CANCELADA -> colors.error
+                                            EstadoCita.COMPLETADA -> colors.success
                                             else -> colors.tertiary
                                         }
                                     )
@@ -974,7 +974,7 @@ fun TarjetaCitaMejorada(
                     when (cita.metodoPago) {
                         MetodoPago.EFECTIVO -> Icons.Default.Money
                         MetodoPago.TARJETA -> Icons.Default.CreditCard
-                        null -> Icons.Default.Info
+                        else -> Icons.Default.Info
                     },
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
@@ -985,7 +985,7 @@ fun TarjetaCitaMejorada(
                     text = when (cita.metodoPago) {
                         MetodoPago.EFECTIVO -> "Pago en efectivo"
                         MetodoPago.TARJETA -> "Pago con tarjeta"
-                        null -> "Método de pago no especificado"
+                        else -> "Método de pago no especificado"
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.primary,
@@ -1930,7 +1930,9 @@ fun DialogoCrearEditarCitaMejorado(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             when (metodoPagoSeleccionado) {
-                                MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"; MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
+                                MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"
+                                MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
+                                else -> "Método de pago no especificado"
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.onSurfaceVariant

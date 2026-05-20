@@ -10,11 +10,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 
 private val Context.userSessionDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "user_session_prefs"
+    name = "user_session_prefs",
 )
 
 data class UserSession(
@@ -24,13 +23,12 @@ data class UserSession(
     val idPsicologo: Long? = null,
     val idPaciente: Long? = null,
     val idioma: String? = "es",
-    val tema: Boolean = false  // false = claro, true = oscuro
+    val tema: Boolean = false, // false = claro, true = oscuro
 )
 
 class UserSessionDataStore(
-    private val context: Context
+    private val context: Context,
 ) {
-
     private companion object {
         val USER_ID_KEY = longPreferencesKey("user_id")
         val USER_NAME_KEY = stringPreferencesKey("user_name")
@@ -41,7 +39,7 @@ class UserSessionDataStore(
         val THEME_KEY = booleanPreferencesKey("theme")
 
         // Clave antigua para migración (si se usaba String)
-        val OLD_THEME_KEY = stringPreferencesKey("theme")  // Esta es la misma clave pero como String
+        val OLD_THEME_KEY = stringPreferencesKey("theme") // Esta es la misma clave pero como String
         val MIGRATION_DONE_KEY = booleanPreferencesKey("migration_done")
     }
 
@@ -56,12 +54,13 @@ class UserSessionDataStore(
             if (!migrationDone) {
                 // Intentar leer el tema antiguo como String
                 val oldThemeString = preferences[OLD_THEME_KEY]
-                val newTheme = when (oldThemeString) {
-                    "DARK" -> true   // Oscuro
-                    "LIGHT" -> false // Claro
-                    "SYSTEM" -> false // Defecto -> claro
-                    else -> false     // Por defecto claro
-                }
+                val newTheme =
+                    when (oldThemeString) {
+                        "DARK" -> true // Oscuro
+                        "LIGHT" -> false // Claro
+                        "SYSTEM" -> false // Defecto -> claro
+                        else -> false // Por defecto claro
+                    }
 
                 // Guardar el nuevo valor y marcar migración completada
                 context.userSessionDataStore.edit { editor ->
@@ -84,11 +83,12 @@ class UserSessionDataStore(
             val idioma = mutablePrefs[LANGUAGE_KEY]
             val tema = mutablePrefs[THEME_KEY] ?: false
 
-            val normalizedPsychologistId = when (idPsicologo) {
-                null -> null
-                0L -> null
-                else -> idPsicologo
-            }
+            val normalizedPsychologistId =
+                when (idPsicologo) {
+                    null -> null
+                    0L -> null
+                    else -> idPsicologo
+                }
 
             if (idUsuario != null && rol != null) {
                 emit(
@@ -99,8 +99,8 @@ class UserSessionDataStore(
                         idPsicologo = normalizedPsychologistId,
                         idPaciente = idPaciente,
                         idioma = idioma,
-                        tema = tema
-                    )
+                        tema = tema,
+                    ),
                 )
             } else {
                 emit(null)
@@ -147,7 +147,5 @@ class UserSessionDataStore(
         }
     }
 
-    suspend fun getSession(): UserSession? {
-        return sessionFlow.first()
-    }
+    suspend fun getSession(): UserSession? = sessionFlow.first()
 }

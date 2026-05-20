@@ -21,53 +21,53 @@ import org.ies.tierno.applicationamani.domain.models.Question
  * @see org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScreen
  */
 class QuestionnaireViewModel : ViewModel() {
-
     /**
      * Lista inmutable de preguntas del cuestionario.
      *
      * Cada [Question] contiene un título y una lista de respuestas.
      * En una versión futura se obtendrán desde el repositorio remoto.
      */
-    val questions = listOf(
-        Question(
-            "Pregunta 1",
-            listOf(
-                "Respuesta 1",
-                "Respuesta 2",
-                "Respuesta 3",
-                "Respuesta 4"
-            )
-        ),
-        Question(
-            "Pregunta 2",
-            listOf(
-                "Respuesta 1",
-                "Respuesta 2",
-                "Respuesta 3",
-                "Respuesta 4",
-                "Respuesta 5",
-                "Respuesta 6"
-            )
-        ),
-        Question(
-            "Pregunta 3",
-            listOf(
-                "Respuesta 1",
-                "Respuesta 2",
-                "Respuesta 3",
-                "Respuesta 4"
-            )
-        ),
-        Question(
-            "Pregunta 4",
-            listOf(
-                "Respuesta 1",
-                "Respuesta 2",
-                "Respuesta 3",
-                "Respuesta 4"
-            )
+    val questions =
+        listOf(
+            Question(
+                "Pregunta 1",
+                listOf(
+                    "Respuesta 1",
+                    "Respuesta 2",
+                    "Respuesta 3",
+                    "Respuesta 4",
+                ),
+            ),
+            Question(
+                "Pregunta 2",
+                listOf(
+                    "Respuesta 1",
+                    "Respuesta 2",
+                    "Respuesta 3",
+                    "Respuesta 4",
+                    "Respuesta 5",
+                    "Respuesta 6",
+                ),
+            ),
+            Question(
+                "Pregunta 3",
+                listOf(
+                    "Respuesta 1",
+                    "Respuesta 2",
+                    "Respuesta 3",
+                    "Respuesta 4",
+                ),
+            ),
+            Question(
+                "Pregunta 4",
+                listOf(
+                    "Respuesta 1",
+                    "Respuesta 2",
+                    "Respuesta 3",
+                    "Respuesta 4",
+                ),
+            ),
         )
-    )
 
     /**
      * Índice de la pregunta que se muestra actualmente (base 0).
@@ -90,7 +90,7 @@ class QuestionnaireViewModel : ViewModel() {
     init {
         questions.forEach { question ->
             selectedAnswers.add(
-                MutableList(question.answers.size) { false }
+                MutableList(question.answers.size) { false },
             )
         }
     }
@@ -101,7 +101,10 @@ class QuestionnaireViewModel : ViewModel() {
      * @param index Índice de la respuesta dentro de la pregunta actual.
      * @param value `true` para seleccionar, `false` para deseleccionar.
      */
-    fun changeAnswer(index: Int, value: Boolean) {
+    fun changeAnswer(
+        index: Int,
+        value: Boolean,
+    ) {
         selectedAnswers[actualQuestion][index] = value
     }
 

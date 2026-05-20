@@ -19,32 +19,29 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 @Composable
-fun RegistroExitosoScreen(
-    navController: NavController
-) {
-
+fun RegistroExitosoScreen(navController: NavController) {
     Scaffold(
-        containerColor = Color(0xFFCCC0E4)
+        containerColor = Color(0xFFCCC0E4),
     ) { padding ->
 
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             Text(
                 text = "Registro completado correctamente",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
             )
 
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
                     navController.navigate(Screens.login.route)
-                }
+                },
             ) {
                 Text("Ir al login")
             }

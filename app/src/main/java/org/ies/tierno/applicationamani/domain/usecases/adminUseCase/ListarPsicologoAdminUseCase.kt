@@ -5,16 +5,11 @@ import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 
 class ListarPsicologoAdminUseCase(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
-
     // Psicólogos ACTIVOS
-    operator fun invoke(): Flow<List<PsicologoSelfResponseDTO>> {
-        return authRepository.getPsicologos()
-    }
+    operator fun invoke(): Flow<List<PsicologoSelfResponseDTO>> = authRepository.getPsicologos()
 
     // Psicólogos DADOS DE BAJA
-    fun getPsicologosBaja(): Flow<List<PsicologoSelfResponseDTO>> {
-        return authRepository.getPsicologosBaja()
-    }
+    fun getPsicologosBaja(): Flow<List<PsicologoSelfResponseDTO>> = authRepository.getPsicologosBaja()
 }

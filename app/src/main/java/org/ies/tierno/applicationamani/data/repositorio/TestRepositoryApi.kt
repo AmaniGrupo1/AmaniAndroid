@@ -22,22 +22,22 @@ import org.ies.tierno.applicationamani.dto.opcionAdminDTO.PreguntaRequest
  * @see org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
  * @see org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarPreguntasUseCase
  */
-class TestRepositoryApi(private val testApi: TestApi) {
-
+class TestRepositoryApi(
+    private val testApi: TestApi,
+) {
     /**
      * Crea una nueva pregunta de test en el backend.
      *
      * @param pregunta Datos de la pregunta a crear (texto, tipo y opciones).
      * @return [OpcionAdminDTO] con los datos de la pregunta creada, o `null` si ocurre un error.
      */
-    suspend fun createPregunta(pregunta: PreguntaRequest): OpcionAdminDTO? {
-        return try {
+    suspend fun createPregunta(pregunta: PreguntaRequest): OpcionAdminDTO? =
+        try {
             testApi.createPregunta(pregunta)
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
-    }
 
     /**
      * Obtiene un flujo reactivo con la lista de todas las preguntas de test.
@@ -47,35 +47,29 @@ class TestRepositoryApi(private val testApi: TestApi) {
      *
      * @return [Flow] que emite una lista de [OpcionAdminDTO].
      */
-    fun getPreguntasFlow(): Flow<List<OpcionAdminDTO>> = flow {
-        val preguntas = testApi.getPreguntas() // llamada Retrofit suspend
-        emit(preguntas) // emitimos la lista como flujo
-    }.catch { e ->
-        e.printStackTrace()
-        emit(emptyList())
-    }
+    fun getPreguntasFlow(): Flow<List<OpcionAdminDTO>> =
+        flow {
+            val preguntas = testApi.getPreguntas() // llamada Retrofit suspend
+            emit(preguntas) // emitimos la lista como flujo
+        }.catch { e ->
+            e.printStackTrace()
+            emit(emptyList())
+        }
 
     suspend fun responderTest(
         idPaciente: Long,
-        respuestas: List<RespuestasRequestDTO>
-    ): Boolean {
-
-        return try {
-
+        respuestas: List<RespuestasRequestDTO>,
+    ): Boolean =
+        try {
             testApi.responderTest(
                 idPaciente,
-                respuestas
+                respuestas,
             )
 
             true
-
         } catch (e: Exception) {
-
             e.printStackTrace()
 
             false
-
         }
-
-    }
 }

@@ -1094,6 +1094,7 @@ fun DialogoGestionCitaAmani(
                             when (metodoPagoSeleccionado) {
                                 MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"
                                 MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
+                                else -> "Método de pago no especificado"
                             },
                             fontSize = 12.sp,
                             color = colors.textSecondary,

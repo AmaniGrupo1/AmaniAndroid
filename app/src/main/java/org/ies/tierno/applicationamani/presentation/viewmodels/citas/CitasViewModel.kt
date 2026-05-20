@@ -28,9 +28,8 @@ import java.time.format.DateTimeFormatter
 class CitasViewModel(
     private val citasRepository: CitasRepository,
     private val profileRepository: ProfileRepository,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
-
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
@@ -73,11 +72,11 @@ class CitasViewModel(
 
     private fun cargarPsicologoAsignado(idPaciente: Long) {
         viewModelScope.launch {
-            profileRepository.obtenerPsicologoAsignado(idPaciente)
+            profileRepository
+                .obtenerPsicologoAsignado(idPaciente)
                 .onSuccess { psicologo ->
                     _psicologoId.value = psicologo.idPsicologo
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _errorMessage.value = "No se pudo obtener el psicólogo asignado: ${e.message}"
                 }
         }
@@ -95,12 +94,12 @@ class CitasViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            citasRepository.getAgendaPaciente(idPaciente, month.toString())
+            citasRepository
+                .getAgendaPaciente(idPaciente, month.toString())
                 .onSuccess { agenda ->
                     _agendaMensual.value = agenda
                     _errorMessage.value = null
-                }
-                .onFailure { error ->
+                }.onFailure { error ->
                     _errorMessage.value = error.message ?: "Error cargando agenda"
                     _agendaMensual.value = emptyList()
                 }
@@ -113,12 +112,12 @@ class CitasViewModel(
 
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.getDisponibilidadDia(idPsicologo, fecha.toString(), 60)
+            citasRepository
+                .getDisponibilidadDia(idPsicologo, fecha.toString(), 60)
                 .onSuccess {
                     _disponibilidadDia.value = it
                     _errorMessage.value = null
-                }
-                .onFailure {
+                }.onFailure {
                     _errorMessage.value = it.message ?: "Error disponibilidad"
                 }
             _isLoading.value = false
@@ -134,36 +133,41 @@ class CitasViewModel(
         idTipoTerapia: Long,
         metodoPago: MetodoPago,
         monto: BigDecimal,
-        modalidadCita: ModalidadCita
+        modalidadCita: ModalidadCita,
     ): Result<Unit> {
+        val session =
+            _userSession.value
+                ?: return Result.failure(Exception("No hay sesión"))
 
-        val session = _userSession.value
-            ?: return Result.failure(Exception("No hay sesión"))
-
-        val idPsicologo = _psicologoId.value ?: session.idPsicologo
-        ?: return Result.failure(Exception("No hay psicólogo asignado"))
+        val idPsicologo =
+            _psicologoId.value ?: session.idPsicologo
+                ?: return Result.failure(Exception("No hay psicólogo asignado"))
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
-        val request = CrearCitaRequestDTO(
-            idPaciente = idPaciente,
-            idPsicologo = idPsicologo,
-            startDatetime = startDatetime,
-            durationMinutes = duracionMinutos,
-            metodoPago = metodoPago,
-            estadoPago = if (metodoPago == MetodoPago.TARJETA)
-                EstadoPago.PAGADO
-            else
-                EstadoPago.PENDIENTE,
-            monto = monto,
-            motivo = motivo,
-            idTipoTerapia = idTipoTerapia,
-            estado = EstadoCita.pendiente,
-            modalidad = modalidadCita
-        )
+        val request =
+            CrearCitaRequestDTO(
+                idPaciente = idPaciente,
+                idPsicologo = idPsicologo,
+                startDatetime = startDatetime,
+                durationMinutes = duracionMinutos,
+                metodoPago = metodoPago,
+                estadoPago =
+                    if (metodoPago == MetodoPago.TARJETA) {
+                        EstadoPago.PAGADO
+                    } else {
+                        EstadoPago.PENDIENTE
+                    },
+                monto = monto,
+                motivo = motivo,
+                idTipoTerapia = idTipoTerapia,
+                estado = EstadoCita.PENDIENTE,
+                modalidad = modalidadCita,
+            )
 
-        return citasRepository.crearCita(request)
+        return citasRepository
+            .crearCita(request)
             .map {
                 refrescarDatosTrasCambio(fecha)
             }
@@ -177,11 +181,11 @@ class CitasViewModel(
     fun cancelarCita(idCita: Long) {
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.cancelarCita(idCita)
+            citasRepository
+                .cancelarCita(idCita)
                 .onSuccess {
                     _errorMessage.value = null
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al cancelar la cita"
                 }
             _isLoading.value = false

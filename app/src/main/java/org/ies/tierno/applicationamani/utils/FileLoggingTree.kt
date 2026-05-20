@@ -18,8 +18,9 @@ import java.time.format.DateTimeFormatter
  *
  * @param context Contexto de aplicación para resolver la ruta del fichero.
  */
-class FileLoggingTree(private val context: Context) : Timber.Tree() {
-
+class FileLoggingTree(
+    private val context: Context,
+) : Timber.Tree() {
     companion object {
         private const val LOG_FILE = "amani_logs.txt"
         private const val OLD_LOG_FILE = "amani_logs_old.txt"
@@ -30,24 +31,31 @@ class FileLoggingTree(private val context: Context) : Timber.Tree() {
     private val logFile: File
         get() = File(context.filesDir, LOG_FILE)
 
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+    override fun log(
+        priority: Int,
+        tag: String?,
+        message: String,
+        t: Throwable?,
+    ) {
         if (priority < Log.WARN) return
 
         val timestamp = LocalDateTime.now().format(DATE_FORMAT)
-        val level = when (priority) {
-            Log.WARN -> "W"
-            Log.ERROR -> "E"
-            else -> "?"
-        }
+        val level =
+            when (priority) {
+                Log.WARN -> "W"
+                Log.ERROR -> "E"
+                else -> "?"
+            }
 
         val prefix = "[$timestamp] $level/${tag ?: "null"}: $message"
 
-        val linesToWrite = buildList {
-            add(prefix)
-            if (t != null) {
-                add(Log.getStackTraceString(t))
+        val linesToWrite =
+            buildList {
+                add(prefix)
+                if (t != null) {
+                    add(Log.getStackTraceString(t))
+                }
             }
-        }
 
         runCatching {
             rotateIfNeeded()
@@ -67,7 +75,10 @@ class FileLoggingTree(private val context: Context) : Timber.Tree() {
         }
     }
 
-    private fun appendText(file: File, text: String) {
+    private fun appendText(
+        file: File,
+        text: String,
+    ) {
         file.appendText(text)
     }
 }

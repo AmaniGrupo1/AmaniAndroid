@@ -48,30 +48,32 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireView
  * @see org.ies.tierno.applicationamani.domain.models.Question
  */
 @Composable
-fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireViewModel = viewModel()) {
+fun QuestionnaireScreen(
+    navController: NavController,
+    viewModel: QuestionnaireViewModel = viewModel(),
+) {
     val typography = MaterialTheme.typography
 
     val question = viewModel.questions[viewModel.actualQuestion]
-    Scaffold(
-
-    ) {
-        innerPadding ->
+    Scaffold { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
-                .padding(16.dp)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .fillMaxSize(),
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             LinearProgressIndicator(
-            progress = {
-                (viewModel.actualQuestion + 1).toFloat() /
-                                        viewModel.questions.size
-            },
-            modifier = Modifier,
-            color = ProgressIndicatorDefaults.linearColor,
-            trackColor = ProgressIndicatorDefaults.linearTrackColor,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                progress = {
+                    (viewModel.actualQuestion + 1).toFloat() /
+                        viewModel.questions.size
+                },
+                modifier = Modifier,
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
             Text(
                 "Intenta marcar las respuestas o frases que encajen contigo, te asignaremos un psicólogo en base a ellas.",
@@ -96,15 +98,15 @@ fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireVi
             question.answers.forEachIndexed { index, answer ->
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
-                        checked = viewModel.selectedAnswers
+                        checked =
+                            viewModel.selectedAnswers
                             [viewModel.actualQuestion][index],
-
                         onCheckedChange = {
                             viewModel.changeAnswer(index, it)
-                        }
+                        },
                     )
                     Text(answer)
                 }
@@ -115,18 +117,15 @@ fun QuestionnaireScreen(navController: NavController, viewModel: QuestionnaireVi
             Button(
                 modifier = Modifier.align(Alignment.End),
                 onClick = {
-
                     if (viewModel.actualQuestion <
                         viewModel.questions.size - 1
                     ) {
                         viewModel.nextQuestion() // Pasa a la siguiente pregunta
                     } else {
-
                         // Cuestionario terminado
                         // navController.navigate()
                     }
-
-                }
+                },
             ) {
                 Text("Continuar")
             }

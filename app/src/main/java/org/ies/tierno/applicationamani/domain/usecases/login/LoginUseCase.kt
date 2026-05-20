@@ -6,7 +6,6 @@ import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
-import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 
 /**
@@ -20,12 +19,10 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
  * @see org.ies.tierno.applicationamani.data.AuthRepository
  * @see org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
  */
-class LoginUseCase(private val repository: AuthRepository) {
-
-
-    suspend fun login(request: LoginRequestDTO): Result<LoginResponseDTO> {
-        return repository.login(request)
-    }
+class LoginUseCase(
+    private val repository: AuthRepository,
+) {
+    suspend fun login(request: LoginRequestDTO): Result<LoginResponseDTO> = repository.login(request)
 
     /**
      * Registra un nuevo paciente desde la aplicación pública.
@@ -34,9 +31,7 @@ class LoginUseCase(private val repository: AuthRepository) {
      * @return [Result.success] con [LoginResponseDTO] del paciente creado,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend fun registerPaciente(request: PacienteRequest): Result<LoginResponseDTO> {
-        return repository.registerPaciente(request)
-    }
+    suspend fun registerPaciente(request: PacienteRequest): Result<LoginResponseDTO> = repository.registerPaciente(request)
 
     /**
      * Registra un nuevo paciente desde el panel de administración.
@@ -56,9 +51,7 @@ class LoginUseCase(private val repository: AuthRepository) {
      * @return [Result.success] con [LoginResponseDTO] del admin creado,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend fun registrarAdmin(request: RegistryPacienteDTO): Result<LoginResponseDTO> {
-        return repository.registerAdmin(request)
-    }
+    suspend fun registrarAdmin(request: RegistryPacienteDTO): Result<LoginResponseDTO> = repository.registerAdmin(request)
 
     /**
      * Registra un nuevo usuario con rol de psicólogo.
@@ -67,14 +60,8 @@ class LoginUseCase(private val repository: AuthRepository) {
      * @return [Result.success] con [LoginResponseDTO] del psicólogo creado,
      *         o [Result.failure] con la excepción correspondiente.
      */
-    suspend fun registrarPsicologo(request: PsicologoRequestDTO): Result<PsicologoSelfResponseDTO> {
-        return repository.registerPsicologo(request)
-    }
+    suspend fun registrarPsicologo(request: PsicologoRequestDTO): Result<PsicologoSelfResponseDTO> = repository.registerPsicologo(request)
 
-    suspend fun registrarPacienteDesdePsicologo(
-        request: PacienteRequest
-    ): Result<LoginResponseDTO> {
-        return repository.crearPacienteDesdePsicologo(request)
-    }
-
+    suspend fun registrarPacienteDesdePsicologo(request: PacienteRequest): Result<LoginResponseDTO> =
+        repository.crearPacienteDesdePsicologo(request)
 }

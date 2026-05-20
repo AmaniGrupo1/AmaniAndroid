@@ -1,11 +1,9 @@
 package org.ies.tierno.applicationamani.domain.models.citas
 
-import androidx.navigation.NavType
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -24,5 +22,5 @@ data class AgendaItemDTO(
     val terapia: TerapiaResponseDTO?,
     val metodoPago: MetodoPago?,
     val estadoPago: EstadoPago?,
-    val modalidad : ModalidadCita
+    val modalidad: ModalidadCita,
 )

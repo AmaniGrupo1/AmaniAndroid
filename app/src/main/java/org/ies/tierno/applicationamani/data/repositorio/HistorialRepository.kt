@@ -5,24 +5,17 @@ import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
 import org.ies.tierno.applicationamani.dto.historial.request.HistorialClinicoRequestDTO
 
 class HistorialRepository(
-    private val historialApi: HistorialApi
+    private val historialApi: HistorialApi,
 ) {
-
     suspend fun getHistorialPaciente(
         idPaciente: Long,
-        token: String
-    ): List<HistorialClinicoResponseDTO> {
-
-        return historialApi.getHistorialPaciente(
+        token: String,
+    ): List<HistorialClinicoResponseDTO> =
+        historialApi.getHistorialPaciente(
             idPaciente = idPaciente,
-            token
+            token,
         )
-    }
 
-    suspend fun createHistorialClinico(
-        request: HistorialClinicoRequestDTO
-    ): HistorialClinicoResponseDTO {
-
-        return historialApi.createHistorialClinico(request)
-    }
+    suspend fun createHistorialClinico(request: HistorialClinicoRequestDTO): HistorialClinicoResponseDTO =
+        historialApi.createHistorialClinico(request)
 }

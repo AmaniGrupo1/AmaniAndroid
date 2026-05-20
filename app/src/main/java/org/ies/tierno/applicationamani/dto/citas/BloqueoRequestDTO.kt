@@ -8,5 +8,5 @@ data class BloqueoRequestDTO(
     val horaInicio: String?,
     @SerializedName("horaFin")
     val horaFin: String?,
-    val motivo: String? = null
+    val motivo: String? = null,
 )

@@ -14,7 +14,10 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+#+keepattributes SourceFile,LineNumberTable
+
+# Firebase Crashlytics: mantener clases para asegurar recogida correcta de traza
+-keep class com.google.firebase.crashlytics.** { *; }
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.

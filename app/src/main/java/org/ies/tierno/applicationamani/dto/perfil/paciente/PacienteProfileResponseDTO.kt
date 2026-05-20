@@ -8,5 +8,5 @@ data class PacienteProfileResponseDTO(
     val telefono: String? = null,
     val genero: String? = null,
     val fechaNacimiento: LocalDate? = null,
-    val usuario: UsuarioProfileResponseDTO? = null
+    val usuario: UsuarioProfileResponseDTO? = null,
 )

@@ -9,10 +9,10 @@ data class Conversation(
     val lastMessage: String = "",
     val lastMessageTime: Long = System.currentTimeMillis(),
     val estado: ConversationState = ConversationState.ACTIVA,
-    val unreadCount: Int = 0
+    val unreadCount: Int = 0,
 )
 
 enum class ConversationState {
     ACTIVA,
-    CERRADA
+    CERRADA,
 }

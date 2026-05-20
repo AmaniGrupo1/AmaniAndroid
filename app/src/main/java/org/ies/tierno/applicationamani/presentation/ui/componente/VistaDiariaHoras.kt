@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import java.time.LocalDate
@@ -54,11 +53,11 @@ import java.util.Locale
  * @property motivo Texto opcional que describe la cita ocupada (ej: "Sesión con Dr. García").
  */
 data class FranjaHoraria(
-    val diaSemana : Short,
+    val diaSemana: Short,
     val horaInicio: String,
     val horaFin: String,
-    val activo : Boolean = true,
-    val motivo: String? = null
+    val activo: Boolean = true,
+    val motivo: String? = null,
 )
 
 // ─── Composable principal ──────────────────────────────────────
@@ -84,10 +83,9 @@ fun VistaDiariaHoras(
     fecha: LocalDate,
     franjas: List<FranjaHoraria>,
     modifier: Modifier = Modifier,
-    onFranjaSeleccionada: (FranjaHoraria) -> Unit = {}
+    onFranjaSeleccionada: (FranjaHoraria) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-
         // ── Cabecera del día ──
         CabeceraDia(fecha)
 
@@ -100,14 +98,14 @@ fun VistaDiariaHoras(
 
         // ── Lista de franjas ──
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             franjas.forEach { franja ->
                 TarjetaFranja(
                     franja = franja,
                     onClick = {
                         if (franja.activo) onFranjaSeleccionada(franja)
-                    }
+                    },
                 )
             }
         }
@@ -125,9 +123,10 @@ fun VistaDiariaHoras(
 private fun CabeceraDia(fecha: LocalDate) {
     val localeEs = Locale.forLanguageTag("es-ES")
 
-    val diaSemana = fecha.dayOfWeek
-        .getDisplayName(TextStyle.FULL, localeEs)
-        .replaceFirstChar { it.uppercase() }
+    val diaSemana =
+        fecha.dayOfWeek
+            .getDisplayName(TextStyle.FULL, localeEs)
+            .replaceFirstChar { it.uppercase() }
 
     val formatter = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", localeEs)
 
@@ -135,26 +134,26 @@ private fun CabeceraDia(fecha: LocalDate) {
     val typography = MaterialTheme.typography
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = colors.primaryContainer,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    color = colors.primaryContainer,
+                    shape = RoundedCornerShape(12.dp),
+                ).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = diaSemana,
             style = typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = colors.onPrimaryContainer
+            color = colors.onPrimaryContainer,
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = fecha.format(formatter),
             style = typography.bodyMedium,
-            color = colors.onPrimaryContainer
+            color = colors.onPrimaryContainer,
         )
     }
 }
@@ -171,7 +170,7 @@ private fun Leyenda() {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         IndicadorLeyenda(color = amani.citaLibre, texto = "Libre")
         Spacer(modifier = Modifier.width(24.dp))
@@ -183,19 +182,23 @@ private fun Leyenda() {
  * Pequeño punto de color + texto para un ítem de la leyenda.
  */
 @Composable
-private fun IndicadorLeyenda(color: Color, texto: String) {
+private fun IndicadorLeyenda(
+    color: Color,
+    texto: String,
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier
-                .size(10.dp)
-                .clip(CircleShape)
-                .background(color)
+            modifier =
+                Modifier
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .background(color),
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = texto,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -215,7 +218,7 @@ private fun IndicadorLeyenda(color: Color, texto: String) {
 @Composable
 private fun TarjetaFranja(
     franja: FranjaHoraria,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val amani = LocalAmaniColors.current
     val colors = MaterialTheme.colorScheme
@@ -223,29 +226,32 @@ private fun TarjetaFranja(
 
     val borderColor by animateColorAsState(
         targetValue = if (franja.activo) amani.citaLibre else amani.citaOcupada,
-        label = "borderColor"
+        label = "borderColor",
     )
     val containerColor by animateColorAsState(
         targetValue = if (franja.activo) amani.textFieldContainer else amani.citaOcupadaBg,
-        label = "containerColor"
+        label = "containerColor",
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
-            .clickable(enabled = franja.activo, onClick = onClick),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
+                .clickable(enabled = franja.activo, onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (franja.activo) 2.dp else 0.dp
-        )
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = if (franja.activo) 2.dp else 0.dp,
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // ── Hora ──
             Text(
@@ -254,7 +260,7 @@ private fun TarjetaFranja(
                 fontWeight = FontWeight.SemiBold,
                 color = if (franja.activo) colors.onSurface else colors.onSurfaceVariant,
                 modifier = Modifier.width(56.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -264,7 +270,7 @@ private fun TarjetaFranja(
                 imageVector = if (franja.activo) Icons.Default.AccessTime else Icons.Default.Close,
                 contentDescription = if (franja.activo) "Hora libre" else "Hora ocupada",
                 tint = if (franja.activo) amani.citaLibre else amani.citaOcupada,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(22.dp),
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -275,13 +281,13 @@ private fun TarjetaFranja(
                     text = if (franja.activo) "Disponible" else "Ocupado",
                     style = typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    color = if (franja.activo) amani.citaLibre else amani.citaOcupada
+                    color = if (franja.activo) amani.citaLibre else amani.citaOcupada,
                 )
                 if (!franja.activo && !franja.motivo.isNullOrBlank()) {
                     Text(
                         text = franja.motivo,
                         style = typography.bodySmall,
-                        color = colors.onSurfaceVariant
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
@@ -292,7 +298,7 @@ private fun TarjetaFranja(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Seleccionar",
                     tint = amani.citaLibre.copy(alpha = 0.5f),
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
@@ -318,7 +324,7 @@ fun generarFranjasDia(
     horaInicio: Int = 8,
     horaFin: Int = 20,
     intervaloMinutos: Int = 60,
-    citasOcupadas: Map<LocalTime, String> = emptyMap()  // <-- cambio aquí
+    citasOcupadas: Map<LocalTime, String> = emptyMap(), // <-- cambio aquí
 ): List<FranjaHoraria> {
     val franjas = mutableListOf<FranjaHoraria>()
     var hora = LocalTime.of(horaInicio, 0)
@@ -336,11 +342,10 @@ fun generarFranjasDia(
                 horaInicio = inicioStr,
                 horaFin = finStr,
                 activo = motivo == null,
-                motivo = motivo
-            )
+                motivo = motivo,
+            ),
         )
         hora = hora.plusMinutes(intervaloMinutos.toLong())
     }
     return franjas
 }
-

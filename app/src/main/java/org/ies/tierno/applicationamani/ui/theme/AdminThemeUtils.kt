@@ -17,7 +17,7 @@ fun rememberAdminThemeTokens(): AdminThemeTokens {
         onPrimary = screenColors.onPrimary,
         cardBackground = cardColors.cardBackground,
         cardContent = cardColors.cardContent,
-        screenBackground = screenColors.background
+        screenBackground = screenColors.background,
     )
 }
 
@@ -26,5 +26,5 @@ data class AdminThemeTokens(
     val onPrimary: Color,
     val cardBackground: Color,
     val cardContent: Color,
-    val screenBackground: Color
+    val screenBackground: Color,
 )

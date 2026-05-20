@@ -1,128 +1,153 @@
-    package org.ies.tierno.applicationamani.presentation.navigation.screen
+package org.ies.tierno.applicationamani.presentation.navigation.screen
 
-    /**
-     * Clase sellada que define todas las rutas de navegación de la aplicación.
-     *
-     * Cada objeto hijo representa una pantalla accesible a través del
-     * [org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph]. El uso de una clase sellada garantiza que las rutas
-     * se gestionan de forma segura en tiempo de compilación.
-     *
-     * @property route Cadena identificadora única de la ruta de navegación.
-     *
-     * @see org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
-     */
-    sealed class Screens(val route: String) {
+import android.net.Uri
 
-        /** Pantalla de inicio de sesión. */
-        object login : Screens("login")
+/**
+ * Clase sellada que define todas las rutas de navegación de la aplicación.
+ *
+ * Cada objeto hijo representa una pantalla accesible a través del
+ * [org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph]. El uso de una clase sellada garantiza que las rutas
+ * se gestionan de forma segura en tiempo de compilación.
+ *
+ * @property route Cadena identificadora única de la ruta de navegación.
+ *
+ * @see org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
+ */
+sealed class Screens(
+    val route: String,
+) {
+    /** Pantalla de inicio de sesión. */
+    object login : Screens("login")
 
-        /** Pantalla de registro de nuevo usuario. */
-        object registro : Screens("registro")
+    /** Pantalla de registro de nuevo usuario. */
+    object registro : Screens("registro")
 
-        /** Pantalla principal para usuarios no autenticados. */
-        object principal : Screens("principal")
+    /** Pantalla principal para usuarios no autenticados. */
+    object principal : Screens("principal")
 
+    /** Pantalla del cuestionario de evaluación inicial. */
+    object questionnaire : Screens("questionnaire")
 
+    /** Pantalla principal del cliente autenticado con su psicólogo asignado. */
+    object principalCliente : Screens("principalCliente")
 
-        /** Pantalla del cuestionario de evaluación inicial. */
-        object questionnaire : Screens("questionnaire")
+    /** Pantalla de ajustes del cliente. */
+    object settingsCliente : Screens("settingsCliente")
 
-        /** Pantalla principal del cliente autenticado con su psicólogo asignado. */
-        object principalCliente : Screens("principalCliente")
+    /** Pantalla para agregar un psicólogo (vista de administrador). */
+    object agregarPsicologo : Screens("agregarPsicologo")
 
-        /** Pantalla de ajustes del cliente. */
-        object settingsCliente : Screens("settingsCliente")
+    /** Pantalla de creación de preguntas de test (vista de administrador). */
+    object test : Screens("test")
 
-        /** Pantalla para agregar un psicólogo (vista de administrador). */
-        object agregarPsicologo : Screens("agregarPsicologo")
+    /** Pantalla de listado de pacientes (vista de administrador). */
+    object pacientes : Screens("pacientes")
 
-        /** Pantalla de creación de preguntas de test (vista de administrador). */
-        object test : Screens("test")
+    /** Pantalla para agregar un administrador. */
+    object agregarAdmin : Screens("agregarAdmin")
 
-        /** Pantalla de listado de pacientes (vista de administrador). */
-        object pacientes : Screens("pacientes")
+    /** Pantalla principal del administrador. */
+    object adminHome : Screens("home")
 
-        /** Pantalla para agregar un administrador. */
-        object agregarAdmin : Screens("agregarAdmin")
+    /** Pantalla de citas del paciente con calendario y horas libres. */
+    object citas : Screens("citas")
 
-        /** Pantalla principal del administrador. */
-        object adminHome : Screens("home")
+    /** Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles). */
+    object psicologoAgenda : Screens("psicologoAgenda")
 
-        /** Pantalla del cuestionario. */
-        object cuestionario : Screens("cuestionario")
+    object psicologoHome : Screens("psicologoHome")
 
-        /** Pantalla de citas del paciente con calendario y horas libres. */
-        object citas : Screens("citas")
+    object pacienteHome : Screens("pacienteHome")
 
-        /** Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles). */
-        object psicologoAgenda : Screens("psicologoAgenda")
+    object settingsPsicologo : Screens("settingsPsicologo")
 
-        object psicologoHome : Screens("psicologoHome")
-        object pacienteHome : Screens("pacienteHome")
+    object estadisticasPsicologo : Screens("estadisticasPsicologo")
 
-        object listarPsicologo : Screens("listarPsicologo/{pacienteId}"){
-            fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
-        }
+    object listarPsicologo : Screens("listarPsicologo/{pacienteId}") {
+        fun createRoute(pacienteId: Long) = "listarPsicologo/$pacienteId"
+    }
 
-        object listarPsicologoSimple : Screens("listarPsicologoSimple")
+    object documentoLegalDetail : Screens("documento_legal_detail/{tipo}") {
+        fun createRoute(tipo: String) = "documento_legal_detail/$tipo"
+    }
 
-        object calendario : Screens("calendario")
+    object listarPsicologoSimple : Screens("listarPsicologoSimple")
 
-        object perfilPsicologo : Screens("perfilPsicologo/{psicologoId}"){
-            fun createRoute(psicologoId: Long?) = "perfilPsicologo/$psicologoId"
-        }
+    object calendario : Screens("calendario")
 
-        object chatList : Screens("chatList")
-        object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}"){
-            fun createRoute(currentUserId: Long, otherUserId: Long, otherUserName: String) = "chat/$currentUserId/$otherUserId/$otherUserName"
-        }
+    object perfilPsicologo : Screens("perfilPsicologo/{psicologoId}") {
+        fun createRoute(psicologoId: Long?) = "perfilPsicologo/$psicologoId"
+    }
 
-        object agendaCitaScreen : Screens("agendaCitaScreen")
+    object chatList : Screens("chatList")
 
-        object editarCitaScreen : Screens("editarCitaScreen/{citaId}") {
-            fun pass(citaId: String) = "editarCitaScreen/$citaId"
-        }
-
-        object registroPacienteDesdePsicologo : Screens("registroPacienteDesdePsicologo")
-
-        object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
-
-        object settingsAdmin : Screens("settingsAdmin")
-
-        object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}"){
-            fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
-        }
-
-        object settingPsicologo : Screens("settingPsicologo")
-
-        object terapias : Screens("terapias")
-
-        object crearSituaciones : Screens("crearSituaciones")
-
-        object politicaPrivacidad : Screens("politicaPrivacidad")
-        object cambiarRol : Screens("cambiarRol")
-
-        object listarPsicologosBaja : Screens("listarPsicologosBaja")
-
-        object historialCitas : Screens("historialCitas")
-
-        object historialClinico : Screens("historialClinico/{pacienteId}"){
-            fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
-        }
-
-        object profileAdmin : Screens("profileAdmin/{adminId}"){
-            fun createRoute(adminId: Long?) = "profileAdmin/$adminId"
-        }
-        object perfilPaciente : Screens("perfilPaciente/{pacienteId}"){
-            fun createRoute(pacienteId: Long?) = "perfilPaciente/$pacienteId"
-        }
-
-        object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}"){
-            fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
-        }
-
-        object documentoLegalDetail : Screens("documento_legal_detail/{tipo}") {
-            fun createRoute(tipo: String) = "documento_legal_detail/$tipo"
+    object chat : Screens("chat/{currentUserId}/{otherUserId}/{otherUserName}") {
+        fun createRoute(
+            currentUserId: Long,
+            otherUserId: Long,
+            otherUserName: String,
+        ): String {
+            val encodedName = Uri.encode(otherUserName)
+            return "chat/$currentUserId/$otherUserId/$encodedName"
         }
     }
 
+    object agendaCitaScreen : Screens("agendaCitaScreen")
+
+    object editarCitaScreen : Screens("editarCitaScreen/{citaId}") {
+        fun pass(citaId: String) = "editarCitaScreen/$citaId"
+    }
+
+    object registroPacienteDesdePsicologo : Screens("registroPacienteDesdePsicologo")
+
+    object pacientesSinPsicologo : Screens("pacientesSinPsicologo")
+
+    object diarioEmocional : Screens("diarioEmocional")
+
+    object nuevoTicket : Screens("nuevoTicket")
+
+    object paymentScreen : Screens("paymentScreen/{citaId}/{psicologoName}/{fecha}/{monto}") {
+        fun createRoute(
+            citaId: Long,
+            psicologoName: String,
+            fecha: String,
+            monto: String,
+        ) = "paymentScreen/$citaId/${Uri.encode(psicologoName)}/$fecha/$monto"
+    }
+
+    object misTickets : Screens("misTickets")
+
+    object settingsAdmin : Screens("settingsAdmin")
+
+    object cambiarRol : Screens("cambiarRol")
+
+    object editProfilePsicologo : Screens("editProfilePsicologo/{identificador}") {
+        fun createRoute(identificador: Long?) = "editProfilePsicologo/$identificador"
+    }
+
+    object settingPsicologo : Screens("settingPsicologo")
+
+    object terapias : Screens("terapias")
+
+    object crearSituaciones : Screens("crearSituaciones")
+
+    object politicaPrivacidad : Screens("politicaPrivacidad")
+
+    object listarPsicologosBaja : Screens("listarPsicologosBaja")
+
+    object historialClinico : Screens("historialClinico/{pacienteId}") {
+        fun createRoute(pacienteId: Long?) = "historialClinico/$pacienteId"
+    }
+
+    object profileAdmin : Screens("profileAdmin/{adminId}") {
+        fun createRoute(adminId: Long?) = "profileAdmin/$adminId"
+    }
+
+    object perfilPaciente : Screens("perfilPaciente/{pacienteId}") {
+        fun createRoute(pacienteId: Long?) = "perfilPaciente/$pacienteId"
+    }
+
+    object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}") {
+        fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
+    }
+}

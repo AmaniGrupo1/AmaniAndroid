@@ -9,15 +9,14 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface HistorialApi {
-
     @GET("/api/historial-clinico/paciente/{idPaciente}")
     suspend fun getHistorialPaciente(
         @Path("idPaciente") idPaciente: Long,
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
     ): List<HistorialClinicoResponseDTO>
 
     @POST("/api/historial-clinico")
     suspend fun createHistorialClinico(
-        @Body request: HistorialClinicoRequestDTO
+        @Body request: HistorialClinicoRequestDTO,
     ): HistorialClinicoResponseDTO
 }

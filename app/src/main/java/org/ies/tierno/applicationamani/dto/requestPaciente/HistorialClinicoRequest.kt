@@ -17,5 +17,5 @@ data class HistorialClinicoRequest(
     val titulo: String,
     val diagnostico: String? = null,
     val tratamiento: String? = null,
-    val observaciones: String? = null
+    val observaciones: String? = null,
 )

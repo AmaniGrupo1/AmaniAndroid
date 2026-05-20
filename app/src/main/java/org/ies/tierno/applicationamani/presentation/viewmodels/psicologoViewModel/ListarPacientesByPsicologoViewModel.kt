@@ -14,9 +14,8 @@ import java.time.YearMonth
 
 class ListarPacientesByPsicologoViewModel(
     private val authRepository: AuthRepository,
-    private val citasRepository: CitasRepository
+    private val citasRepository: CitasRepository,
 ) : ViewModel() {
-
     private val _pacientes = MutableStateFlow<List<PacientePsicologoResponseDTO>>(emptyList())
     val pacientes: StateFlow<List<PacientePsicologoResponseDTO>> = _pacientes.asStateFlow()
 
@@ -37,7 +36,10 @@ class ListarPacientesByPsicologoViewModel(
         }
     }
 
-    private fun cargarCitasDePacientes(pacientesList: List<PacientePsicologoResponseDTO>, idPsicologo: Long) {
+    private fun cargarCitasDePacientes(
+        pacientesList: List<PacientePsicologoResponseDTO>,
+        idPsicologo: Long,
+    ) {
         viewModelScope.launch {
             val mapa = mutableMapOf<Long, List<AgendaItemDTO>>()
             val mesActual = YearMonth.now().toString()

@@ -2,15 +2,16 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.admin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 
 class PacientesViewModel(
-    private val getPacientesSinPsicologoUseCase: GetPacientesSinPsicologoUseCase
+    private val getPacientesSinPsicologoUseCase: GetPacientesSinPsicologoUseCase,
 ) : ViewModel() {
-
     private val _pacientes = MutableStateFlow<List<PacienteBasicoResponseDTO>>(emptyList())
     val pacientes: StateFlow<List<PacienteBasicoResponseDTO>> = _pacientes
 
@@ -24,8 +25,8 @@ class PacientesViewModel(
             getPacientesSinPsicologoUseCase()
                 .catch {
                     _pacientes.value = emptyList()
-                }
-                .collect {
+                    _loading.value = false
+                }.collect {
                     _pacientes.value = it
                     _loading.value = false
                 }

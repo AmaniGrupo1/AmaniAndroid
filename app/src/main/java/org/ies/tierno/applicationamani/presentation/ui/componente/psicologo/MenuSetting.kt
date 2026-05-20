@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
@@ -31,9 +32,8 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 @Composable
 fun MenuSetting(
     navController: NavController,
-    idPsicologo: Long?  // ← Asegurar que este parámetro existe
+    idPsicologo: Long?, // ← Asegurar que este parámetro existe
 ) {
-
     LaunchedEffect(idPsicologo) {
         println("ID Psicologo actualizado: $idPsicologo")
     }
@@ -44,15 +44,16 @@ fun MenuSetting(
 
     TopAppBar(
         modifier = Modifier.shadow(elevation = 8.dp),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colors.primary,
-            titleContentColor = colors.onPrimary
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = colors.primary,
+                titleContentColor = colors.onPrimary,
+            ),
         navigationIcon = {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),
-                contentDescription = "Logo",
-                modifier = Modifier.size(40.dp)
+                contentDescription = stringResource(R.string.nav_inicio),
+                modifier = Modifier.size(40.dp),
             )
         },
         title = { },
@@ -60,32 +61,39 @@ fun MenuSetting(
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(
                     Icons.Default.Menu,
-                    contentDescription = "Menu",
-                    tint = colors.onPrimary
+                    contentDescription = stringResource(R.string.nav_mas),
+                    tint = colors.onPrimary,
                 )
             }
 
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
             ) {
                 DropdownMenuItem(
-                    text = { Text("Perfil", style = typography.labelLarge) },
+                    text = { Text(stringResource(R.string.nav_perfil), style = typography.labelLarge) },
                     onClick = {
                         expanded = false
-                        print("idPsicologo en MenuSetting: $idPsicologo") // Debug
                         navController.navigate(Screens.perfilPsicologo.createRoute(idPsicologo))
-                    }
+                    },
                 )
 
                 DropdownMenuItem(
-                    text = { Text("Sign out", style = typography.labelLarge) },
+                    text = { Text(stringResource(R.string.nav_ajustes), style = typography.labelLarge) },
+                    onClick = {
+                        expanded = false
+                        navController.navigate(Screens.settingsPsicologo.route)
+                    },
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_cerrar_sesion), style = typography.labelLarge) },
                     onClick = {
                         expanded = false
                         navController.navigate(Screens.login.route)
-                    }
+                    },
                 )
             }
-        }
+        },
     )
 }

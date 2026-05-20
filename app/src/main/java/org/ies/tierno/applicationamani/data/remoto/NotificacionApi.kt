@@ -1,20 +1,21 @@
 package org.ies.tierno.applicationamani.data.remoto
 
-
 import org.ies.tierno.applicationamani.dto.notificacion.NotificacionConfigDTO
 import org.ies.tierno.applicationamani.dto.notificacion.NotificacionResponseDTO
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface NotificacionApi {
-
     // ─────────────────────────────
     // Obtener notificaciones
     // GET /api/notificaciones/{idUsuario}
     // ─────────────────────────────
     @GET("api/notificaciones/{idUsuario}")
     suspend fun getNotificaciones(
-        @Path("idUsuario") idUsuario: Long
+        @Path("idUsuario") idUsuario: Long,
     ): Response<List<NotificacionResponseDTO>>
 
     // ─────────────────────────────
@@ -23,7 +24,7 @@ interface NotificacionApi {
     // ─────────────────────────────
     @PUT("api/notificaciones/leer/{id}")
     suspend fun marcarLeida(
-        @Path("id") id: Long
+        @Path("id") id: Long,
     ): Response<NotificacionResponseDTO>
 
     // ─────────────────────────────
@@ -32,7 +33,7 @@ interface NotificacionApi {
     // ─────────────────────────────
     @PUT("api/notificaciones/leer-todas/{idUsuario}")
     suspend fun marcarTodasLeidas(
-        @Path("idUsuario") idUsuario: Long
+        @Path("idUsuario") idUsuario: Long,
     ): Response<Unit>
 
     // ─────────────────────────────
@@ -41,7 +42,7 @@ interface NotificacionApi {
     // ─────────────────────────────
     @GET("api/notificaciones/no-leidas/{idUsuario}")
     suspend fun contarNoLeidas(
-        @Path("idUsuario") idUsuario: Long
+        @Path("idUsuario") idUsuario: Long,
     ): Response<Long>
 
     // ─────────────────────────────
@@ -51,7 +52,7 @@ interface NotificacionApi {
     @PUT("api/notificaciones/configuracion/{idUsuario}/activar")
     suspend fun actualizarNotificaciones(
         @Path("idUsuario") idUsuario: Long,
-        @Query("activar") activar: Boolean
+        @Query("activar") activar: Boolean,
     ): Response<NotificacionConfigDTO>
 
     // ─────────────────────────────
@@ -60,6 +61,6 @@ interface NotificacionApi {
     // ─────────────────────────────
     @GET("api/notificaciones/configuracion/{idUsuario}")
     suspend fun obtenerEstadoNotificaciones(
-        @Path("idUsuario") idUsuario: Long
+        @Path("idUsuario") idUsuario: Long,
     ): Response<Boolean>
 }

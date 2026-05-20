@@ -5,12 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,82 +30,26 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.ContactoPsicologoDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-// Colores originales para el modo DEFECTO (Amani)
-object AgendaCitaDefaultColors {
-    val Primary = Color(0xFF6B4E71)
-    val PrimaryLight = Color(0xFF9B7E9F)
-    val PrimaryDark = Color(0xFF4A2B50)
-    val Secondary = Color(0xFFE8B4B8)
-    val Accent = Color(0xFFF5E6E8)
-    val Background = Color(0xFFFDF8F9)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D1B30)
-    val TextSecondary = Color(0xFF7A6B7E)
-    val Error = Color(0xFFE57373)
-    val Success = Color(0xFF81C784)
-    val Warning = Color(0xFFFF9800)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgendaCitaScreen(
     navController: NavController,
-    viewModel: ListarCitasViewModel
+    viewModel: ListarCitasViewModel = koinViewModel(),
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val context = LocalContext.current
-
-    // Obtener estado del tema
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
     val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
-
-    // Determinar colores según el tema
-    val colors = if (isDark) {
-        AgendaCitaThemeColors(
-            primary = Color.White,
-            primaryLight = Color.White.copy(alpha = 0.7f),
-            primaryDark = Color.DarkGray,
-            secondary = Color.Gray,
-            accent = cardColors.cardBackground,
-            background = screenColors.background,
-            surface = cardColors.cardBackground,
-            textPrimary = cardColors.cardContent,
-            textSecondary = cardColors.cardContent.copy(alpha = 0.7f),
-            error = AgendaCitaDefaultColors.Error,
-            success = AgendaCitaDefaultColors.Success,
-            warning = AgendaCitaDefaultColors.Warning,
-            textFieldContainer = Color.DarkGray,
-            textFieldText = Color.White
-        )
-    } else {
-        AgendaCitaThemeColors(
-            primary = AgendaCitaDefaultColors.Primary,
-            primaryLight = AgendaCitaDefaultColors.PrimaryLight,
-            primaryDark = AgendaCitaDefaultColors.PrimaryDark,
-            secondary = AgendaCitaDefaultColors.Secondary,
-            accent = AgendaCitaDefaultColors.Accent,
-            background = AgendaCitaDefaultColors.Background,
-            surface = AgendaCitaDefaultColors.Surface,
-            textPrimary = AgendaCitaDefaultColors.TextPrimary,
-            textSecondary = AgendaCitaDefaultColors.TextSecondary,
-            error = AgendaCitaDefaultColors.Error,
-            success = AgendaCitaDefaultColors.Success,
-            warning = AgendaCitaDefaultColors.Warning,
-            textFieldContainer = Color.White,
-            textFieldText = Color.Black
-        )
-    }
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
     val citas = viewModel.citas
     val isLoading = viewModel.isLoading.value
@@ -118,13 +62,16 @@ fun AgendaCitaScreen(
     var showTerapiaInfoDialog by remember { mutableStateOf(false) }
     var terapiaInfoSeleccionada by remember { mutableStateOf<CitaPacienteViewResponseDTO?>(null) }
 
+    // Cargar citas al iniciar
     LaunchedEffect(Unit) {
         viewModel.cargarCitas()
     }
 
     LaunchedEffect(error) {
         error?.let {
-            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_LONG).show()
+            android.widget.Toast
+                .makeText(context, it, android.widget.Toast.LENGTH_LONG)
+                .show()
             viewModel.clearError()
         }
     }
@@ -135,23 +82,37 @@ fun AgendaCitaScreen(
                 title = {
                     Text(
                         text = "Mis Citas",
-                        fontSize = 20.sp,
+                        style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) Color.Black else Color.White,
-                        fontFamily = roboto
+                        color = if (isDark) colorScheme.onSurface else Color.White,
+                        fontFamily = roboto,
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                    }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.refrescar() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refrescar", tint = if (isDark) Color.Black else Color.White)
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Refrescar",
+                            tint = if (isDark) colorScheme.onSurface else Color.White,
+                        )
                     }
                     IconButton(onClick = { showContactDialog = true }) {
-                        Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = "Contacto", tint = if (isDark) Color.Black else Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ContactSupport,
+                            contentDescription = "Contacto",
+                            tint = if (isDark) colorScheme.onSurface else Color.White,
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.primary
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.primary,
+                    ),
             )
         },
         floatingActionButton = {
@@ -159,47 +120,50 @@ fun AgendaCitaScreen(
                 onClick = {
                     navController.navigate(Screens.citas.route)
                 },
-                containerColor = colors.primary,
-                contentColor = if (isDark) Color.Black else Color.White,
-                shape = RoundedCornerShape(16.dp),
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                containerColor = colorScheme.primary,
+                contentColor = colorScheme.onPrimary,
+                shape = shapes.large,
+                elevation = FloatingActionButtonDefaults.elevation(8.dp),
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Agendar Cita", modifier = Modifier.size(24.dp))
             }
         },
-        containerColor = colors.background
+        containerColor = colorScheme.background,
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = if (isDark) {
-                            listOf(colors.background, colors.background)
-                        } else {
-                            listOf(colors.accent, Color.White)
-                        }
-                    )
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    if (isDark) {
+                                        listOf(colorScheme.background, colorScheme.background)
+                                    } else {
+                                        listOf(colorScheme.secondaryContainer, Color.White)
+                                    },
+                            ),
+                    ),
         ) {
             when {
                 isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
-                            CircularProgressIndicator(color = colors.primary)
+                            CircularProgressIndicator(color = colorScheme.primary)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "Cargando tus citas...",
-                                fontSize = 14.sp,
-                                color = colors.textSecondary,
-                                fontFamily = roboto
+                                style = typography.bodyMedium,
+                                color = colorScheme.onSurfaceVariant,
+                                fontFamily = roboto,
                             )
                         }
                     }
@@ -208,32 +172,32 @@ fun AgendaCitaScreen(
                 citas.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             Icon(
                                 Icons.Default.Event,
                                 contentDescription = null,
                                 modifier = Modifier.size(80.dp),
-                                tint = colors.primary.copy(alpha = 0.3f)
+                                tint = colorScheme.primary.copy(alpha = 0.3f),
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(
                                 text = "No tienes citas agendadas",
-                                fontSize = 18.sp,
+                                style = typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.textPrimary,
-                                fontFamily = roboto
+                                color = colorScheme.onSurface,
+                                fontFamily = roboto,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Presiona el botón + para agendar una nueva cita",
-                                fontSize = 14.sp,
-                                color = colors.textSecondary,
-                                fontFamily = roboto
+                                style = typography.bodyMedium,
+                                color = colorScheme.onSurfaceVariant,
+                                fontFamily = roboto,
                             )
                         }
                     }
@@ -243,9 +207,12 @@ fun AgendaCitaScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(citas) { cita ->
+                        items(
+                            items = citas,
+                            key = { it.idCita ?: it.hashCode() },
+                        ) { cita ->
                             CitaCardAmani(
                                 cita = cita,
                                 onCancelClick = {
@@ -257,11 +224,12 @@ fun AgendaCitaScreen(
                                     if (citaId != null && citaId > 0) {
                                         navController.navigate(Screens.editarCitaScreen.pass(citaId.toString()))
                                     } else {
-                                        android.widget.Toast.makeText(
-                                            context,
-                                            "No se puede reagendar esta cita",
-                                            android.widget.Toast.LENGTH_SHORT
-                                        ).show()
+                                        android.widget.Toast
+                                            .makeText(
+                                                context,
+                                                "No se puede reagendar esta cita",
+                                                android.widget.Toast.LENGTH_SHORT,
+                                            ).show()
                                     }
                                 },
                                 onCardClick = {
@@ -271,9 +239,7 @@ fun AgendaCitaScreen(
                                     terapiaInfoSeleccionada = cita
                                     showTerapiaInfoDialog = true
                                 },
-                                colors = colors,
-                                roboto = roboto,
-                                isDark = isDark
+                                isDark = isDark,
                             )
                         }
                     }
@@ -285,9 +251,7 @@ fun AgendaCitaScreen(
     if (showContactDialog) {
         ContactDialogAmani(
             onDismiss = { showContactDialog = false },
-            colors = colors,
-            roboto = roboto,
-            isDark = isDark
+            isDark = isDark,
         )
     }
 
@@ -298,12 +262,11 @@ fun AgendaCitaScreen(
                 showTerapiaInfoDialog = false
                 terapiaInfoSeleccionada = null
             },
-            colors = colors,
-            roboto = roboto,
-            isDark = isDark
+            isDark = isDark,
         )
     }
 
+    // Diálogo de confirmación de cancelación
     if (showCancelDialog && citaToCancel != null) {
         CancelConfirmationDialogAmani(
             cita = citaToCancel!!,
@@ -312,19 +275,18 @@ fun AgendaCitaScreen(
                 viewModel.cancelarCita(citaToCancel!!.idCita!!) {
                     showCancelDialog = false
                     citaToCancel = null
-                    android.widget.Toast.makeText(
-                        context,
-                        "Cita cancelada exitosamente",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
+                    android.widget.Toast
+                        .makeText(
+                            context,
+                            "Cita cancelada exitosamente",
+                            android.widget.Toast.LENGTH_SHORT,
+                        ).show()
                 }
             },
             onDismiss = {
                 showCancelDialog = false
                 citaToCancel = null
             },
-            colors = colors,
-            roboto = roboto
         )
     }
 }
@@ -336,94 +298,116 @@ fun CitaCardAmani(
     onRescheduleClick: () -> Unit,
     onCardClick: () -> Unit,
     onTerapiaClick: () -> Unit,
-    colors: AgendaCitaThemeColors,
-    roboto: FontFamily,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    val fecha = try {
-        cita.fecha?.let { LocalDate.parse(it) }
-    } catch (e: Exception) { null }
+    val fecha =
+        try {
+            cita.fecha?.let { LocalDate.parse(it) }
+        } catch (e: Exception) {
+            null
+        }
 
-    val horaInicio = try {
-        cita.horaInicio?.let { LocalTime.parse(it) }
-    } catch (e: Exception) { null }
+    val horaInicio =
+        try {
+            cita.horaInicio?.let { LocalTime.parse(it) }
+        } catch (e: Exception) {
+            null
+        }
 
-    val horaFin = try {
-        cita.horaFin?.let { LocalTime.parse(it) }
-    } catch (e: Exception) { null }
+    val horaFin =
+        try {
+            cita.horaFin?.let { LocalTime.parse(it) }
+        } catch (e: Exception) {
+            null
+        }
 
-    val estadoColor = when (cita.estado?.lowercase()) {
-        "confirmada" -> colors.success
-        "pendiente" -> colors.warning
-        "cancelada" -> colors.error
-        "completada" -> colors.textSecondary
-        else -> colors.textSecondary
-    }
+    val successGreen = Color(0xFF4CAF50)
+    val warningOrange = Color(0xFFFF9800)
 
-    val estadoTexto = when (cita.estado?.lowercase()) {
-        "confirmada" -> "Confirmada"
-        "pendiente" -> "Pendiente"
-        "cancelada" -> "Cancelada"
-        "completada" -> "Completada"
-        else -> cita.estado ?: "Desconocido"
-    }
+    val estadoColor =
+        when (cita.estado?.lowercase()) {
+            "confirmada" -> successGreen
+            "pendiente" -> warningOrange
+            "cancelada" -> colorScheme.error
+            "completada" -> colorScheme.onSurfaceVariant
+            else -> colorScheme.onSurfaceVariant
+        }
+
+    val estadoTexto =
+        when (cita.estado?.lowercase()) {
+            "confirmada" -> "Confirmada"
+            "pendiente" -> "Pendiente"
+            "cancelada" -> "Cancelada"
+            "completada" -> "Completada"
+            else -> cita.estado ?: "Desconocido"
+        }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCardClick() },
-        shape = RoundedCornerShape(20.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onCardClick() },
+        shape = shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (cita.estado?.lowercase() == "cancelada")
-                colors.surface.copy(alpha = 0.7f)
-            else
-                colors.surface
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (cita.estado?.lowercase() == "cancelada") {
+                        colorScheme.surface.copy(alpha = 0.7f)
+                    } else {
+                        colorScheme.surface
+                    },
+            ),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             // Cabecera con fecha y estado
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(
                         Icons.Default.Event,
                         contentDescription = null,
-                        tint = colors.primary,
-                        modifier = Modifier.size(20.dp)
+                        tint = colorScheme.primary,
+                        modifier = Modifier.size(20.dp),
                     )
                     Text(
-                        text = fecha?.format(dateFormatter)?.replaceFirstChar { it.uppercase() }
-                            ?: cita.fecha ?: "Fecha no disponible",
-                        fontSize = 13.sp,
+                        text =
+                            fecha?.format(dateFormatter)?.replaceFirstChar { it.uppercase() }
+                                ?: cita.fecha ?: "Fecha no disponible",
+                        style = typography.bodySmall,
                         fontWeight = FontWeight.Medium,
-                        color = colors.textPrimary,
-                        fontFamily = roboto
+                        color = colorScheme.onSurface,
+                        fontFamily = roboto,
                     )
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = estadoColor.copy(alpha = 0.1f)
+                    shape = shapes.medium,
+                    color = estadoColor.copy(alpha = 0.1f),
                 ) {
                     Text(
                         text = estadoTexto,
-                        fontSize = 11.sp,
+                        style = typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = estadoColor,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -433,24 +417,26 @@ fun CitaCardAmani(
             // Horario y Duración
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.Schedule,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = colors.textSecondary
+                        tint = colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (horaInicio != null && horaFin != null)
-                            "${horaInicio.format(timeFormatter)} - ${horaFin.format(timeFormatter)}"
-                        else
-                            "${cita.horaInicio ?: "?"} - ${cita.horaFin ?: "?"}",
-                        fontSize = 13.sp,
-                        color = colors.textSecondary,
-                        fontFamily = roboto
+                        text =
+                            if (horaInicio != null && horaFin != null) {
+                                "${horaInicio.format(timeFormatter)} - ${horaFin.format(timeFormatter)}"
+                            } else {
+                                "${cita.horaInicio ?: "?"} - ${cita.horaFin ?: "?"}"
+                            },
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                        fontFamily = roboto,
                     )
                 }
 
@@ -459,14 +445,14 @@ fun CitaCardAmani(
                         Icons.Default.Timer,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = colors.textSecondary
+                        tint = colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "${cita.durationMinutes ?: 0} min",
-                        fontSize = 13.sp,
-                        color = colors.textSecondary,
-                        fontFamily = roboto
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -477,37 +463,39 @@ fun CitaCardAmani(
             if (cita.metodoPago != null) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
                         when (cita.metodoPago.name) {
-                            "EFECTIVO" -> Icons.Default.Money
+                            "EFECTIVO" -> Icons.Default.Payments
                             "TARJETA" -> Icons.Default.CreditCard
                             else -> Icons.Default.Payment
                         },
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = colors.primary
+                        tint = colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = when (cita.metodoPago.name) {
-                            "EFECTIVO" -> "💰 Pago en efectivo"
-                            "TARJETA" -> "💳 Pago con tarjeta"
-                            else -> "Método de pago: ${cita.metodoPago.name}"
-                        },
-                        fontSize = 12.sp,
-                        color = colors.textSecondary,
-                        fontFamily = roboto
+                        text =
+                            when (cita.metodoPago.name) {
+                                "EFECTIVO" -> "💰 Pago en efectivo"
+                                "TARJETA" -> "💳 Pago con tarjeta"
+                                else -> "Método de pago: ${cita.metodoPago.name}"
+                            },
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                        fontFamily = roboto,
                     )
                 }
+                Spacer(modifier = Modifier.height(4.dp))
             }
 
             // ✅ NUEVO: Estado del pago (solo si existe)
             if (cita.estadoPago != null) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
                         when (cita.estadoPago.name) {
@@ -519,68 +507,68 @@ fun CitaCardAmani(
                         },
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = when (cita.estadoPago.name) {
-                            "PAGADO" -> colors.success
-                            "PENDIENTE" -> colors.warning
-                            "FALLIDO" -> colors.error
-                            "REEMBOLSADO" -> colors.primary
-                            else -> colors.textSecondary
-                        }
+                        tint =
+                            when (cita.estadoPago.name) {
+                                "PAGADO" -> successGreen
+                                "PENDIENTE" -> warningOrange
+                                "FALLIDO" -> colorScheme.error
+                                "REEMBOLSADO" -> colorScheme.primary
+                                else -> colorScheme.onSurfaceVariant
+                            },
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = when (cita.estadoPago.name) {
-                            "PAGADO" -> "✅ Pagado"
-                            "PENDIENTE" -> "⏳ Pendiente de pago"
-                            "FALLIDO" -> "❌ Pago fallido"
-                            "REEMBOLSADO" -> "🔄 Reembolsado"
-                            else -> "Estado: ${cita.estadoPago.name}"
-                        },
-                        fontSize = 12.sp,
-                        color = when (cita.estadoPago.name) {
-                            "PAGADO" -> colors.success
-                            "PENDIENTE" -> colors.warning
-                            "FALLIDO" -> colors.error
-                            "REEMBOLSADO" -> colors.primary
-                            else -> colors.textSecondary
-                        },
+                        text =
+                            when (cita.estadoPago.name) {
+                                "PAGADO" -> "✅ Pagado"
+                                "PENDIENTE" -> "⏳ Pendiente de pago"
+                                "FALLIDO" -> "❌ Pago fallido"
+                                "REEMBOLSADO" -> "🔄 Reembolsado"
+                                else -> "Estado: ${cita.estadoPago.name}"
+                            },
+                        style = typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                        color =
+                            when (cita.estadoPago.name) {
+                                "PAGADO" -> successGreen
+                                "PENDIENTE" -> warningOrange
+                                "FALLIDO" -> colorScheme.error
+                                "REEMBOLSADO" -> colorScheme.primary
+                                else -> colorScheme.onSurfaceVariant
+                            },
                         fontFamily = roboto,
-                        fontWeight = FontWeight.Medium
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             // Tipo de terapia y modalidad
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
             ) {
                 cita.tipoTerapia?.let { terapia ->
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = colors.primary.copy(alpha = 0.1f),
-                        modifier = Modifier.clickable { onTerapiaClick() }
+                        shape = shapes.small,
+                        color = colorScheme.primary.copy(alpha = 0.1f),
+                        modifier = Modifier.clickable { onTerapiaClick() },
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
                         ) {
                             Text(
                                 text = terapia,
-                                fontSize = 12.sp,
+                                style = typography.labelMedium,
                                 fontWeight = FontWeight.Medium,
-                                color = colors.primary,
-                                fontFamily = roboto
+                                color = colorScheme.primary,
+                                fontFamily = roboto,
                             )
                             Icon(
                                 Icons.Default.Info,
                                 contentDescription = "Info terapia",
                                 modifier = Modifier.size(14.dp),
-                                tint = colors.primary
+                                tint = colorScheme.primary,
                             )
                         }
                     }
@@ -588,15 +576,15 @@ fun CitaCardAmani(
 
                 cita.modalidad?.let { modalidad ->
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = colors.primaryLight.copy(alpha = 0.1f)
+                        shape = shapes.small,
+                        color = colorScheme.primaryContainer.copy(alpha = 0.1f),
                     ) {
                         Text(
                             text = modalidad,
-                            fontSize = 12.sp,
+                            style = typography.labelMedium,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            color = colors.primaryLight,
-                            fontFamily = roboto
+                            color = colorScheme.onPrimaryContainer,
+                            fontFamily = roboto,
                         )
                     }
                 }
@@ -608,11 +596,11 @@ fun CitaCardAmani(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = motivo,
-                        fontSize = 13.sp,
-                        color = colors.textSecondary,
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        fontFamily = roboto
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -622,51 +610,56 @@ fun CitaCardAmani(
                 Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    // Botón Cancelar
                     OutlinedButton(
                         onClick = onCancelClick,
                         modifier = Modifier.weight(1f).height(44.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = colors.error
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(
-                            brush = Brush.horizontalGradient(listOf(colors.error, colors.error))
-                        )
+                        colors =
+                            ButtonDefaults.outlinedButtonColors(
+                                contentColor = colorScheme.error,
+                            ),
+                        shape = CircleShape,
+                        border =
+                            ButtonDefaults.outlinedButtonBorder.copy(
+                                brush = Brush.horizontalGradient(listOf(colorScheme.error, colorScheme.error)),
+                            ),
                     ) {
                         Icon(
                             Icons.Default.Cancel,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = colors.error
+                            tint = colorScheme.error,
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Cancelar", fontSize = 13.sp, fontWeight = FontWeight.Medium, fontFamily = roboto)
+                        Text("Cancelar", style = typography.labelLarge, fontWeight = FontWeight.Medium, fontFamily = roboto)
                     }
 
+                    // Botón Reagendar
                     Button(
                         onClick = onRescheduleClick,
                         modifier = Modifier.weight(1f).height(44.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colors.primary
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.buttonElevation(4.dp)
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.primary,
+                            ),
+                        shape = CircleShape,
+                        elevation = ButtonDefaults.buttonElevation(4.dp),
                     ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = if (isDark) Color.Black else Color.White
+                            tint = if (isDark) colorScheme.onSurface else Color.White,
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             "Reagendar",
-                            fontSize = 13.sp,
+                            style = typography.labelLarge,
                             fontWeight = FontWeight.Medium,
-                            color = if (isDark) Color.Black else Color.White,
-                            fontFamily = roboto
+                            color = if (isDark) colorScheme.onSurface else Color.White,
+                            fontFamily = roboto,
                         )
                     }
                 }
@@ -679,38 +672,43 @@ fun CitaCardAmani(
 fun TerapiaInfoDialogAmani(
     cita: CitaPacienteViewResponseDTO,
     onDismiss: () -> Unit,
-    colors: AgendaCitaThemeColors,
-    roboto: FontFamily,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = colors.surface),
-            elevation = CardDefaults.cardElevation(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+            shape = shapes.extraLarge,
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+            elevation = CardDefaults.cardElevation(12.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "🎯 Información de la Terapia",
-                        fontSize = 20.sp,
+                        text = "Información de la Terapia",
+                        style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = colors.primary,
-                        fontFamily = roboto
+                        color = colorScheme.primary,
+                        fontFamily = roboto,
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = colors.textSecondary)
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = colorScheme.onSurfaceVariant)
                     }
                 }
 
@@ -718,26 +716,26 @@ fun TerapiaInfoDialogAmani(
 
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = colors.primary.copy(alpha = 0.08f)
+                    shape = shapes.medium,
+                    color = colorScheme.primary.copy(alpha = 0.08f),
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(
                             Icons.Default.Psychology,
                             contentDescription = null,
                             modifier = Modifier.size(56.dp),
-                            tint = colors.primary
+                            tint = colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = cita.tipoTerapia ?: "Terapia no especificada",
-                            fontSize = 18.sp,
+                            style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = colors.primary,
-                            fontFamily = roboto
+                            color = colorScheme.primary,
+                            fontFamily = roboto,
                         )
                     }
                 }
@@ -746,64 +744,69 @@ fun TerapiaInfoDialogAmani(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = colors.primaryLight.copy(alpha = 0.1f)
-                    )
+                    shape = shapes.medium,
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = colorScheme.primaryContainer.copy(alpha = 0.1f),
+                        ),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(70.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(colors.primary.copy(alpha = 0.1f)),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(70.dp)
+                                    .clip(shapes.medium)
+                                    .background(colorScheme.primary.copy(alpha = 0.1f)),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "${cita.durationMinutes ?: 60}",
-                                    fontSize = 26.sp,
+                                    style = typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = colors.primary,
-                                    fontFamily = roboto
+                                    color = colorScheme.primary,
+                                    fontFamily = roboto,
                                 )
                                 Text(
                                     text = "minutos",
-                                    fontSize = 11.sp,
-                                    color = colors.primary,
-                                    fontFamily = roboto
+                                    style = typography.labelSmall,
+                                    color = colorScheme.primary,
+                                    fontFamily = roboto,
                                 )
                             }
                         }
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "⏰ Duración de la sesión",
-                                fontSize = 12.sp,
-                                color = colors.textSecondary,
-                                fontFamily = roboto
+                                text = "Duración de la sesión",
+                                style = typography.labelSmall,
+                                color = colorScheme.onSurfaceVariant,
+                                fontFamily = roboto,
                             )
                             Text(
                                 text = "${cita.durationMinutes ?: 60} minutos",
-                                fontSize = 16.sp,
+                                style = typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary,
-                                fontFamily = roboto
+                                color = colorScheme.onSurface,
+                                fontFamily = roboto,
                             )
                             Text(
-                                text = if ((cita.durationMinutes ?: 60) <= 60)
-                                    "Sesión estándar de una hora"
-                                else
-                                    "Sesión extendida para mayor profundidad",
-                                fontSize = 12.sp,
-                                color = colors.textSecondary,
-                                fontFamily = roboto
+                                text =
+                                    if ((cita.durationMinutes ?: 60) <= 60) {
+                                        "Sesión estándar de una hora"
+                                    } else {
+                                        "Sesión extendida para mayor profundidad"
+                                    },
+                                style = typography.bodySmall,
+                                color = colorScheme.onSurfaceVariant,
+                                fontFamily = roboto,
                             )
                         }
                     }
@@ -813,26 +816,26 @@ fun TerapiaInfoDialogAmani(
 
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    color = colors.primary.copy(alpha = 0.05f)
+                    shape = shapes.medium,
+                    color = colorScheme.primary.copy(alpha = 0.05f),
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     ) {
                         Text(
-                            text = "💡 Recomendaciones",
-                            fontSize = 14.sp,
+                            text = "Recomendaciones",
+                            style = typography.labelLarge,
                             fontWeight = FontWeight.Bold,
-                            color = colors.primary,
-                            fontFamily = roboto
+                            color = colorScheme.primary,
+                            fontFamily = roboto,
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "• Llega 5 minutos antes para prepararte\n• Ten lista tu identificación\n• Prepara tus preguntas o temas a tratar\n• Busca un lugar tranquilo si es online",
-                            fontSize = 12.sp,
-                            color = colors.textSecondary,
+                            text = "- Llega 5 minutos antes para prepararte\n- Ten lista tu identificación\n- Prepara tus preguntas o temas a tratar\n- Busca un lugar tranquilo si es online",
+                            style = typography.bodySmall,
+                            color = colorScheme.onSurfaceVariant,
                             lineHeight = 20.sp,
-                            fontFamily = roboto
+                            fontFamily = roboto,
                         )
                     }
                 }
@@ -841,21 +844,23 @@ fun TerapiaInfoDialogAmani(
 
                 Button(
                     onClick = onDismiss,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.primary
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    elevation = ButtonDefaults.buttonElevation(4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                        ),
+                    shape = CircleShape,
+                    elevation = ButtonDefaults.buttonElevation(4.dp),
                 ) {
                     Text(
                         "Entendido",
-                        fontSize = 15.sp,
+                        style = typography.labelLarge,
                         fontWeight = FontWeight.Medium,
-                        color = if (isDark) Color.Black else Color.White,
-                        fontFamily = roboto
+                        color = if (isDark) colorScheme.onSurface else Color.White,
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -866,39 +871,41 @@ fun TerapiaInfoDialogAmani(
 @Composable
 fun ContactDialogAmani(
     onDismiss: () -> Unit,
-    colors: AgendaCitaThemeColors,
-    roboto: FontFamily,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val contacto = ContactoPsicologoDTO()
-    val context = LocalContext.current
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = colors.surface),
-            elevation = CardDefaults.cardElevation(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+            shape = shapes.extraLarge,
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+            elevation = CardDefaults.cardElevation(12.dp),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp)
+                modifier = Modifier.padding(24.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = "Contacto Amani Psicología",
-                        fontSize = 20.sp,
+                        style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = colors.primary,
-                        fontFamily = roboto
+                        color = colorScheme.primary,
+                        fontFamily = roboto,
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = colors.textSecondary)
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = colorScheme.onSurfaceVariant)
                     }
                 }
 
@@ -908,24 +915,21 @@ fun ContactDialogAmani(
                     icon = Icons.Default.Phone,
                     text = contacto.telefono,
                     onClick = { },
-                    colors = colors,
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
                 ContactInfoItemAmani(
                     icon = Icons.Default.Email,
                     text = contacto.email,
                     onClick = { },
-                    colors = colors,
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
                 ContactInfoItemAmani(
                     icon = Icons.Default.Language,
                     text = contacto.website,
                     onClick = { },
-                    colors = colors,
-                    roboto = roboto
+                    roboto = roboto,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -933,57 +937,59 @@ fun ContactDialogAmani(
                 HorizontalDivider(
                     modifier = Modifier,
                     thickness = 1.dp,
-                    color = colors.textSecondary.copy(alpha = 0.2f)
+                    color = colorScheme.outlineVariant,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = "Horario de atención",
-                    fontSize = 16.sp,
+                    style = typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = colors.textPrimary,
-                    fontFamily = roboto
+                    color = colorScheme.onSurface,
+                    fontFamily = roboto,
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
                     text = "Lunes a Viernes: 9:00 - 20:00",
-                    fontSize = 14.sp,
-                    color = colors.textSecondary,
-                    fontFamily = roboto
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
+                    fontFamily = roboto,
                 )
                 Text(
                     text = "Sábados: 10:00 - 14:00",
-                    fontSize = 14.sp,
-                    color = colors.textSecondary,
-                    fontFamily = roboto
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
+                    fontFamily = roboto,
                 )
                 Text(
                     text = "Domingos: Cerrado",
-                    fontSize = 14.sp,
-                    color = colors.textSecondary,
-                    fontFamily = roboto
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
+                    fontFamily = roboto,
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = onDismiss,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.primary
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    elevation = ButtonDefaults.buttonElevation(4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                        ),
+                    shape = CircleShape,
+                    elevation = ButtonDefaults.buttonElevation(4.dp),
                 ) {
                     Text(
                         "Cerrar",
-                        fontSize = 15.sp,
+                        style = typography.labelLarge,
                         fontWeight = FontWeight.Medium,
-                        color = if (isDark) Color.Black else Color.White,
-                        fontFamily = roboto
+                        color = if (isDark) colorScheme.onSurface else Color.White,
+                        fontFamily = roboto,
                     )
                 }
             }
@@ -996,29 +1002,31 @@ fun ContactInfoItemAmani(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
     onClick: () -> Unit,
-    colors: AgendaCitaThemeColors,
-    roboto: FontFamily
+    roboto: FontFamily,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             icon,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = colors.primary
+            tint = colorScheme.primary,
         )
         Spacer(modifier = Modifier.width(14.dp))
         Text(
             text = text,
-            fontSize = 14.sp,
-            color = colors.primary,
+            style = typography.bodyMedium,
+            color = colorScheme.primary,
             fontWeight = FontWeight.Medium,
-            fontFamily = roboto
+            fontFamily = roboto,
         )
     }
 }
@@ -1029,84 +1037,89 @@ fun CancelConfirmationDialogAmani(
     isCancelling: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    colors: AgendaCitaThemeColors,
-    roboto: FontFamily
 ) {
-    val fechaFormateada = try {
-        cita.fecha?.let {
-            LocalDate.parse(it).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-        } ?: cita.fecha ?: "Fecha no disponible"
-    } catch (e: Exception) {
-        cita.fecha ?: "Fecha no disponible"
-    }
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
-    val horaFormateada = try {
-        cita.horaInicio?.let {
-            LocalTime.parse(it).format(DateTimeFormatter.ofPattern("HH:mm"))
-        } ?: cita.horaInicio ?: "Hora no disponible"
-    } catch (e: Exception) {
-        cita.horaInicio ?: "Hora no disponible"
-    }
+    val fechaFormateada =
+        try {
+            cita.fecha?.let {
+                LocalDate.parse(it).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            } ?: cita.fecha ?: "Fecha no disponible"
+        } catch (e: Exception) {
+            cita.fecha ?: "Fecha no disponible"
+        }
+
+    val horaFormateada =
+        try {
+            cita.horaInicio?.let {
+                LocalTime.parse(it).format(DateTimeFormatter.ofPattern("HH:mm"))
+            } ?: cita.horaInicio ?: "Hora no disponible"
+        } catch (e: Exception) {
+            cita.horaInicio ?: "Hora no disponible"
+        }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = colors.surface,
-        shape = RoundedCornerShape(24.dp),
+        containerColor = colorScheme.surface,
+        shape = shapes.extraLarge,
         icon = {
             Icon(
                 Icons.Default.Warning,
                 contentDescription = null,
-                tint = colors.error,
-                modifier = Modifier.size(40.dp)
+                tint = colorScheme.error,
+                modifier = Modifier.size(40.dp),
             )
         },
         title = {
             Text(
                 text = "Cancelar Cita",
-                fontSize = 18.sp,
+                style = typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = colors.textPrimary,
-                fontFamily = roboto
+                color = colorScheme.onSurface,
+                fontFamily = roboto,
             )
         },
         text = {
             Column {
                 Text(
                     text = "¿Estás seguro de que deseas cancelar esta cita?",
-                    fontSize = 14.sp,
-                    color = colors.textPrimary,
-                    fontFamily = roboto
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurface,
+                    fontFamily = roboto,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.primaryLight.copy(alpha = 0.1f)
+                    shape = shapes.medium,
+                    color = colorScheme.primaryContainer.copy(alpha = 0.1f),
                 ) {
                     Column(
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(12.dp),
                     ) {
                         Text(
-                            text = "📅 $fechaFormateada",
-                            fontSize = 14.sp,
+                            text = "$fechaFormateada",
+                            style = typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
-                            color = colors.primary,
-                            fontFamily = roboto
+                            color = colorScheme.primary,
+                            fontFamily = roboto,
                         )
                         Text(
-                            text = "⏰ $horaFormateada",
-                            fontSize = 14.sp,
+                            text = "$horaFormateada",
+                            style = typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
-                            color = colors.primary,
-                            fontFamily = roboto
+                            color = colorScheme.primary,
+                            fontFamily = roboto,
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "Esta acción no se puede deshacer.",
-                    fontSize = 12.sp,
-                    color = colors.error,
-                    fontFamily = roboto
+                    style = typography.bodySmall,
+                    color = colorScheme.error,
+                    fontFamily = roboto,
                 )
             }
         },
@@ -1114,52 +1127,36 @@ fun CancelConfirmationDialogAmani(
             Button(
                 onClick = onConfirm,
                 enabled = !isCancelling,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colors.error,
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.height(40.dp)
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = colorScheme.error,
+                        contentColor = Color.White,
+                    ),
+                shape = CircleShape,
+                modifier = Modifier.height(40.dp),
             ) {
                 if (isCancelling) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
                         strokeWidth = 2.dp,
-                        color = Color.White
+                        color = Color.White,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-                Text("Sí, cancelar", fontSize = 13.sp, fontWeight = FontWeight.Medium, fontFamily = roboto)
+                Text("Sí, cancelar", style = typography.labelLarge, fontWeight = FontWeight.Medium, fontFamily = roboto)
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = colors.textSecondary
-                )
+                shape = CircleShape,
+                colors =
+                    ButtonDefaults.textButtonColors(
+                        contentColor = colorScheme.onSurfaceVariant,
+                    ),
             ) {
-                Text("No, mantener", fontSize = 13.sp, fontFamily = roboto)
+                Text("No, mantener", style = typography.labelLarge, fontFamily = roboto)
             }
-        }
+        },
     )
 }
-
-// Clase auxiliar para los colores del tema
-data class AgendaCitaThemeColors(
-    val primary: Color,
-    val primaryLight: Color,
-    val primaryDark: Color,
-    val secondary: Color,
-    val accent: Color,
-    val background: Color,
-    val surface: Color,
-    val textPrimary: Color,
-    val textSecondary: Color,
-    val error: Color,
-    val success: Color,
-    val warning: Color,
-    val textFieldContainer: Color,
-    val textFieldText: Color
-)

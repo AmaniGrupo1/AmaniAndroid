@@ -25,7 +25,9 @@ interface TestApi {
      * @return [OpcionAdminDTO] con los datos de la pregunta creada.
      */
     @POST("/api/admin/preguntas")
-    suspend fun createPregunta(@Body pregunta: PreguntaRequest): OpcionAdminDTO
+    suspend fun createPregunta(
+        @Body pregunta: PreguntaRequest,
+    ): OpcionAdminDTO
 
     /**
      * Obtiene todas las preguntas de test disponibles para el paciente.
@@ -38,12 +40,9 @@ interface TestApi {
     // NUEVO ENDPOINT
     @POST("/api/paciente/preguntas/responder/{idPaciente}")
     suspend fun responderTest(
-
         @Path("idPaciente")
         idPaciente: Long,
-
         @Body
-        respuestas: List<RespuestasRequestDTO>
-
+        respuestas: List<RespuestasRequestDTO>,
     )
 }

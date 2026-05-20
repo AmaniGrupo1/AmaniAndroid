@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -60,13 +59,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfilePsicologoScreen(
     navController: NavController,
     identificador: Long,
-    editProfilePsicologoViewModel: EditProfilePsicologoViewModel = koinViewModel()
+    editProfilePsicologoViewModel: EditProfilePsicologoViewModel = koinViewModel(),
 ) {
     val primaryColor = Color(0xFF7B68EE)
     val backgroundColor = Color(0xFFCCC0E4)
@@ -95,7 +93,7 @@ fun EditProfilePsicologoScreen(
                 snackbarHostState.showSnackbar(
                     message = "Perfil actualizado correctamente",
                     actionLabel = "👍",
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
                 delay(1500)
                 navController.popBackStack()
@@ -110,7 +108,7 @@ fun EditProfilePsicologoScreen(
                 snackbarHostState.showSnackbar(
                     message = it,
                     actionLabel = "Cerrar",
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
             }
         }
@@ -121,12 +119,12 @@ fun EditProfilePsicologoScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) { data ->
                 Snackbar(
                     snackbarData = data,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         },
@@ -136,7 +134,7 @@ fun EditProfilePsicologoScreen(
                     Text(
                         text = "Editar Perfil Profesional",
                         color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
@@ -145,20 +143,21 @@ fun EditProfilePsicologoScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             val textFieldShape = RoundedCornerShape(12.dp)
 
@@ -167,7 +166,7 @@ fun EditProfilePsicologoScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
@@ -175,7 +174,7 @@ fun EditProfilePsicologoScreen(
                         style = MaterialTheme.typography.titleLarge,
                         color = primaryColor,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
 
                     // Nombre
@@ -188,10 +187,11 @@ fun EditProfilePsicologoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -206,10 +206,11 @@ fun EditProfilePsicologoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -224,10 +225,11 @@ fun EditProfilePsicologoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
                 }
             }
@@ -237,7 +239,7 @@ fun EditProfilePsicologoScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
@@ -245,7 +247,7 @@ fun EditProfilePsicologoScreen(
                         style = MaterialTheme.typography.titleLarge,
                         color = primaryColor,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
 
                     // Especialidad
@@ -258,10 +260,11 @@ fun EditProfilePsicologoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -276,10 +279,11 @@ fun EditProfilePsicologoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -294,10 +298,11 @@ fun EditProfilePsicologoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -314,25 +319,28 @@ fun EditProfilePsicologoScreen(
                         shape = textFieldShape,
                         minLines = 3,
                         maxLines = 5,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = Color.Gray
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = primaryColor,
+                                unfocusedBorderColor = Color.Gray,
+                            ),
                     )
                 }
             }
 
             // ==================== BOTÓN GUARDAR ====================
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
                 enabled = !isLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = primaryColor,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.Gray.copy(alpha = 0.5f)
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = primaryColor,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.5f),
+                    ),
                 shape = RoundedCornerShape(12.dp),
                 onClick = {
                     isLoading = true
@@ -354,13 +362,13 @@ fun EditProfilePsicologoScreen(
                             isLoading = false
                         }
                     }
-                }
+                },
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         color = Color.White,
-                        strokeWidth = 2.dp
+                        strokeWidth = 2.dp,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Guardando...", fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -372,7 +380,7 @@ fun EditProfilePsicologoScreen(
             // Botón cancelar
             TextButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Cancelar", color = Color.Gray)
             }

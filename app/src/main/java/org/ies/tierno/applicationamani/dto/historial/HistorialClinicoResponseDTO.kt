@@ -6,5 +6,5 @@ data class HistorialClinicoResponseDTO(
     val diagnostico: String,
     val tratamiento: String,
     val observaciones: String,
-    val creadoEn: String
+    val creadoEn: String,
 )

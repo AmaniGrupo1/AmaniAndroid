@@ -5,13 +5,28 @@ import com.google.firebase.storage.FirebaseStorage
 
 object FirebaseInstance {
     private const val RTDB_URL = "https://amani-160bf-default-rtdb.europe-west1.firebasedatabase.app"
+    private const val USE_EMULATOR = false
 
     private val databaseInstance: FirebaseDatabase by lazy {
-        FirebaseDatabase.getInstance(RTDB_URL)
+        FirebaseDatabase.getInstance(RTDB_URL).apply {
+            if (USE_EMULATOR) {
+                android.util.Log.d("FirebaseInstance", "MODO DESARROLLO: Usando emulador RTDB en 10.0.2.2:9000")
+                useEmulator("10.0.2.2", 9000)
+            } else {
+                android.util.Log.d("FirebaseInstance", "MODO PRODUCCIÓN: Conectando a Firebase Real...")
+            }
+        }
     }
 
     private val storageInstance: FirebaseStorage by lazy {
-        FirebaseStorage.getInstance()
+        FirebaseStorage.getInstance().apply {
+            if (USE_EMULATOR) {
+                android.util.Log.d("FirebaseInstance", "MODO DESARROLLO: Usando emulador Storage en 10.0.2.2:9199")
+                useEmulator("10.0.2.2", 9199)
+            } else {
+                android.util.Log.d("FirebaseInstance", "MODO PRODUCCIÓN: Usando bucket por defecto de google-services.json")
+            }
+        }
     }
 
     fun getDatabase(): FirebaseDatabase = databaseInstance

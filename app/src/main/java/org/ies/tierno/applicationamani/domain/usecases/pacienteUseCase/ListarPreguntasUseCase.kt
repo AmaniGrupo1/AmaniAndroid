@@ -15,13 +15,13 @@ import org.ies.tierno.applicationamani.dto.opcionAdminDTO.OpcionAdminDTO
  * @see org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
  * @see org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
  */
-class ListarPreguntasUseCase(val repository: TestRepositoryApi) {
+class ListarPreguntasUseCase(
+    val repository: TestRepositoryApi,
+) {
     /**
      * Obtiene un flujo con la lista de preguntas del test.
      *
      * @return [Flow] que emite una lista de [OpcionAdminDTO], o `null` si no hay datos.
      */
-     operator fun invoke():Flow<List<OpcionAdminDTO>?> {
-        return repository.getPreguntasFlow()
-    }
+    operator fun invoke(): Flow<List<OpcionAdminDTO>?> = repository.getPreguntasFlow()
 }

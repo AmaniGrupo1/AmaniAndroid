@@ -1,19 +1,49 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Feed
-import androidx.compose.material.icons.filled.Feed
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +56,6 @@ import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.dto.historial.request.HistorialClinicoRequestDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
-import org.koin.androidx.compose.koinViewModel
 
 object HistorialClinicoColors {
     val Primary = Color(0xFF6B4E71)
@@ -47,7 +76,7 @@ object HistorialClinicoColors {
 fun CrearHistorialClinicoScreen(
     navController: NavController,
     pacienteId: Long,
-    viewModel: HistorialClinicoPacienteViewModel
+    viewModel: HistorialClinicoPacienteViewModel,
 ) {
     val context = LocalContext.current
     val tokenDataStore = remember { TokenDataStore(context) }
@@ -75,7 +104,7 @@ fun CrearHistorialClinicoScreen(
         if (historialCreado != null) {
             snackbarHostState.showSnackbar(
                 message = "Historial clínico creado exitosamente",
-                duration = SnackbarDuration.Short
+                duration = SnackbarDuration.Short,
             )
             viewModel.resetHistorialCreado()
             navController.popBackStack()
@@ -86,7 +115,7 @@ fun CrearHistorialClinicoScreen(
         if (!error.isNullOrBlank()) {
             snackbarHostState.showSnackbar(
                 message = error ?: "Error al crear historial clínico",
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Long,
             )
         }
     }
@@ -94,7 +123,7 @@ fun CrearHistorialClinicoScreen(
     val typography = MaterialTheme.typography
 
     Scaffold(
-        containerColor = HistorialClinicoColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -102,15 +131,16 @@ fun CrearHistorialClinicoScreen(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         Text(
                             text = "Nuevo Historial Clínico",
-                            style = typography.titleLarge?.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                fontSize = 20.sp
-                            ) ?: MaterialTheme.typography.titleLarge
+                            style =
+                                typography.titleLarge?.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                ) ?: MaterialTheme.typography.titleLarge,
                         )
                         IconButton(onClick = {
                             navController.navigate(Screens.historialClinico.createRoute(pacienteId))
@@ -124,77 +154,85 @@ fun CrearHistorialClinicoScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = Color.White,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HistorialClinicoColors.Primary
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
             )
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            HistorialClinicoColors.Accent,
-                            Color.White
-                        )
-                    )
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        HistorialClinicoColors.Accent,
+                                        Color.White,
+                                    ),
+                            ),
+                    ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp, vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.Top,
             ) {
                 // Título de la sección
                 Text(
                     text = "Información del Historial",
-                    style = typography.headlineSmall?.copy(
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = HistorialClinicoColors.Primary
-                    ) ?: MaterialTheme.typography.headlineSmall,
+                    style =
+                        typography.headlineSmall?.copy(
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                        ) ?: MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
                 )
 
                 Text(
                     text = "Registra la información clínica del paciente",
-                    style = typography.bodyMedium?.copy(
-                        fontSize = 14.sp,
-                        color = HistorialClinicoColors.TextSecondary,
-                        textAlign = TextAlign.Center
-                    ) ?: MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                    style =
+                        typography.bodyMedium?.copy(
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        ) ?: MaterialTheme.typography.bodyMedium,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
                 )
 
                 // Card principal
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(12.dp, RoundedCornerShape(28.dp)),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(containerColor = HistorialClinicoColors.Surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
                     ) {
                         // Campo: Título
                         OutlinedTextField(
@@ -204,16 +242,18 @@ fun CrearHistorialClinicoScreen(
                             label = {
                                 Text(
                                     "Título *",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
                                 Text(
                                     "Ej: Sesión de terapia inicial",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
                             isError = titulo.isBlank() && historialCreado != null,
@@ -221,29 +261,31 @@ fun CrearHistorialClinicoScreen(
                                 if (titulo.isBlank()) {
                                     Text(
                                         text = "El título es obligatorio",
-                                        style = typography.bodySmall?.copy(fontSize = 12.sp)
-                                            ?: MaterialTheme.typography.bodySmall,
-                                        color = HistorialClinicoColors.Error
+                                        style =
+                                            typography.bodySmall?.copy(fontSize = 12.sp)
+                                                ?: MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.error,
                                     )
                                 }
                             },
                             singleLine = true,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            )
+                            shape = MaterialTheme.shapes.medium,
+                            colors =
+                                OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    cursorColor = MaterialTheme.colorScheme.primary,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                    errorBorderColor = MaterialTheme.colorScheme.error,
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                ),
                         )
 
                         // Campo: Diagnóstico
@@ -254,36 +296,39 @@ fun CrearHistorialClinicoScreen(
                             label = {
                                 Text(
                                     "Diagnóstico",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
                                 Text(
                                     "Descripción del diagnóstico clínico",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
                             minLines = 3,
                             maxLines = 5,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            )
+                            shape = MaterialTheme.shapes.medium,
+                            colors =
+                                OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    cursorColor = MaterialTheme.colorScheme.primary,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                    errorBorderColor = MaterialTheme.colorScheme.error,
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                ),
                         )
 
                         // Campo: Tratamiento
@@ -294,36 +339,39 @@ fun CrearHistorialClinicoScreen(
                             label = {
                                 Text(
                                     "Tratamiento",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
                                 Text(
                                     "Tratamiento recomendado o en curso",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
                             minLines = 3,
                             maxLines = 5,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            )
+                            shape = MaterialTheme.shapes.medium,
+                            colors =
+                                OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    cursorColor = MaterialTheme.colorScheme.primary,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                    errorBorderColor = MaterialTheme.colorScheme.error,
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                ),
                         )
 
                         // Campo: Observaciones
@@ -334,43 +382,47 @@ fun CrearHistorialClinicoScreen(
                             label = {
                                 Text(
                                     "Observaciones",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
                                 Text(
                                     "Notas adicionales sobre el paciente",
-                                    style = typography.bodyMedium?.copy(fontSize = 14.sp)
-                                        ?: MaterialTheme.typography.bodyMedium,
-                                    color = HistorialClinicoColors.TextSecondary
+                                    style =
+                                        typography.bodyMedium?.copy(fontSize = 14.sp)
+                                            ?: MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             },
                             minLines = 4,
                             maxLines = 8,
                             enabled = !isLoading,
-                            shape = RoundedCornerShape(16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                focusedLabelColor = HistorialClinicoColors.Primary,
-                                unfocusedLabelColor = HistorialClinicoColors.TextSecondary,
-                                focusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                unfocusedPlaceholderColor = HistorialClinicoColors.TextSecondary,
-                                cursorColor = HistorialClinicoColors.Primary,
-                                focusedBorderColor = HistorialClinicoColors.Primary,
-                                unfocusedBorderColor = HistorialClinicoColors.TextSecondary.copy(alpha = 0.3f),
-                                errorBorderColor = HistorialClinicoColors.Error,
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            )
+                            shape = MaterialTheme.shapes.medium,
+                            colors =
+                                OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    cursorColor = MaterialTheme.colorScheme.primary,
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                    errorBorderColor = MaterialTheme.colorScheme.error,
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                ),
                         )
 
                         // Botón de guardar
                         Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
                             shape = RoundedCornerShape(26.dp),
                             onClick = {
                                 if (titulo.isNotBlank()) {
@@ -380,44 +432,47 @@ fun CrearHistorialClinicoScreen(
                                             titulo = titulo,
                                             diagnostico = diagnostico.ifBlank { null },
                                             tratamiento = tratamiento.ifBlank { null },
-                                            observaciones = observaciones.ifBlank { null }
-                                        )
+                                            observaciones = observaciones.ifBlank { null },
+                                        ),
                                     )
                                 }
                             },
                             enabled = !isLoading && titulo.isNotBlank(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = HistorialClinicoColors.Primary,
-                                contentColor = Color.White,
-                                disabledContainerColor = HistorialClinicoColors.PrimaryLight.copy(alpha = 0.5f),
-                                disabledContentColor = Color.White.copy(alpha = 0.7f)
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = Color.White,
+                                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                    disabledContentColor = Color.White.copy(alpha = 0.7f),
+                                ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                         ) {
                             if (isLoading) {
                                 Row(
                                     horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(20.dp),
                                         strokeWidth = 2.dp,
-                                        color = Color.White
+                                        color = Color.White,
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         "Guardando...",
-                                        style = typography.labelLarge?.copy(fontSize = 15.sp)
-                                            ?: MaterialTheme.typography.labelLarge
+                                        style =
+                                            typography.labelLarge?.copy(fontSize = 15.sp)
+                                                ?: MaterialTheme.typography.labelLarge,
                                     )
                                 }
                             } else {
                                 Text(
                                     "Guardar Historial Clínico",
-                                    style = typography.labelLarge?.copy(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium
-                                    ) ?: MaterialTheme.typography.labelLarge
+                                    style =
+                                        typography.labelLarge?.copy(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Medium,
+                                        ) ?: MaterialTheme.typography.labelLarge,
                                 )
                             }
                         }
@@ -428,12 +483,13 @@ fun CrearHistorialClinicoScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = "💜 Registra la información con precisión y empatía",
-                    style = typography.bodySmall?.copy(
-                        fontSize = 12.sp,
-                        color = HistorialClinicoColors.TextSecondary,
-                        textAlign = TextAlign.Center
-                    ) ?: MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth()
+                    style =
+                        typography.bodySmall?.copy(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        ) ?: MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }

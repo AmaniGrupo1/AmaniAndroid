@@ -25,23 +25,23 @@ import timber.log.Timber
  * de la aplicación y del dispositivo.
  *
  * El canal de notificaciones [CANAL_CITAS_ID] se crea en
- * [org.ies.tierno.applicationamani.MyLibraryApplication.onCreate].
+ * [org.ies.tierno.applicationamani.AmaniApplication.onCreate].
  */
 class CitaNotificationWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : Worker(context, params) {
-
     override fun doWork(): Result {
         val titulo = inputData.getString(KEY_TITULO) ?: "Recordatorio de cita"
         val mensaje = inputData.getString(KEY_MENSAJE) ?: "Tienes una cita próximamente"
 
         // En Android 13+ comprobar que el permiso POST_NOTIFICATIONS fue concedido
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val granted = ContextCompat.checkSelfPermission(
-                applicationContext,
-                android.Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+            val granted =
+                ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                ) == PackageManager.PERMISSION_GRANTED
             if (!granted) {
                 Timber.e("Permiso POST_NOTIFICATIONS no concedido, no se puede mostrar notificación")
                 return Result.failure()
@@ -49,25 +49,29 @@ class CitaNotificationWorker(
         }
 
         // Intent que abre la app al pulsar la notificación
-        val tapIntent = PendingIntent.getActivity(
-            applicationContext,
-            0,
-            Intent(applicationContext, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            },
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val tapIntent =
+            PendingIntent.getActivity(
+                applicationContext,
+                0,
+                Intent(applicationContext, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                },
+                PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        val notification = NotificationCompat.Builder(applicationContext, CANAL_CITAS_ID)
-            .setSmallIcon(R.drawable.ic_notificacion_amani)
-            .setContentTitle(titulo)
-            .setContentText(mensaje)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setContentIntent(tapIntent)
-            .build()
+        val notification =
+            NotificationCompat
+                .Builder(applicationContext, CANAL_CITAS_ID)
+                .setSmallIcon(R.drawable.ic_notificacion_amani)
+                .setContentTitle(titulo)
+                .setContentText(mensaje)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setContentIntent(tapIntent)
+                .build()
 
-        NotificationManagerCompat.from(applicationContext)
+        NotificationManagerCompat
+            .from(applicationContext)
             .notify(System.currentTimeMillis().toInt(), notification)
 
         return Result.success()

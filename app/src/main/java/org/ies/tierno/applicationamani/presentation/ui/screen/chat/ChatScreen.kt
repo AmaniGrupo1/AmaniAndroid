@@ -13,9 +13,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,12 +60,22 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewMode
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.PsychologistInfo
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
+/**
+ * Pantalla principal del chat individual entre un paciente y un psicólogo (o viceversa).
+ *
+ * Muestra la lista de mensajes, permite enviar texto, archivos adjuntos y notas de voz.
+ * Gestiona los permisos de grabación de audio y la navegación hacia atrás.
+ *
+ * @param viewModel ViewModel que gestiona la lógica y el estado del chat.
+ * @param onNavigateBack Callback ejecutado al pulsar el botón de retroceso.
+ * @param otherUserName Nombre del interlocutor para mostrar en la cabecera si no hay info completa.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     viewModel: ChatViewModel = viewModel(),
     onNavigateBack: () -> Unit,
-    otherUserName: String = ""
+    otherUserName: String = "",
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val audioUiState by viewModel.audioUiState.collectAsStateWithLifecycle()
@@ -76,24 +91,27 @@ fun ChatScreen(
         onDispose { audioHandler.release() }
     }
 
-    val chatItems = remember(uiState.messages) {
-        buildChatItems(uiState.messages, uiState.currentUserId)
-    }
-
-    val audioPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            val file = audioHandler.startRecording()
-            file?.let { viewModel.startRecording(it) }
+    val chatItems =
+        remember(uiState.messages) {
+            buildChatItems(uiState.messages, uiState.currentUserId)
         }
-    }
 
-    val fileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { viewModel.sendAttachment(it) }
-    }
+    val audioPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            if (isGranted) {
+                val file = audioHandler.startRecording()
+                file?.let { viewModel.startRecording(it) }
+            }
+        }
+
+    val fileLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { uri: Uri? ->
+            uri?.let { viewModel.sendAttachment(it) }
+        }
 
     LaunchedEffect(chatItems.size) {
         if (chatItems.isNotEmpty()) listState.animateScrollToItem(0)
@@ -107,21 +125,28 @@ fun ChatScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             ChatTopBar(
                 psychologistInfo = uiState.assignedPsychologist,
                 onNavigateBack = onNavigateBack,
-                otherUserName = otherUserName
+                otherUserName = otherUserName,
             )
         },
         bottomBar = {
             ChatInputBar(
+                modifier =
+                    Modifier
+                        .navigationBarsPadding()
+                        .imePadding(),
                 text = uiState.inputText,
                 onTextChange = viewModel::onInputChanged,
                 onSend = viewModel::sendMessage,
                 onMicClick = {
                     if (ContextCompat.checkSelfPermission(
-                            context, Manifest.permission.RECORD_AUDIO
+                            context,
+                            Manifest.permission.RECORD_AUDIO,
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
                         val file = audioHandler.startRecording()
@@ -141,23 +166,24 @@ fun ChatScreen(
                 },
                 isRecording = isRecording,
                 recordingSeconds = recordingSeconds,
-                isOtherTyping = uiState.isOtherTyping
+                isOtherTyping = uiState.isOtherTyping,
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)
-                .padding(bottom = 8.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(paddingValues)
+                    .consumeWindowInsets(paddingValues),
         ) {
             when {
                 uiState.isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
                     }
@@ -167,19 +193,19 @@ fun ChatScreen(
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.ChatBubbleOutline,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
                             text = "Aún no hay mensajes",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -189,7 +215,7 @@ fun ChatScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
                         reverseLayout = true,
-                        contentPadding = PaddingValues(horizontal = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
                     ) {
                         items(
                             items = chatItems,
@@ -198,21 +224,22 @@ fun ChatScreen(
                                     is ChatListItem.MessageItem -> item.msg.id
                                     is ChatListItem.DateSeparator -> "sep_${item.label}"
                                 }
-                            }
+                            },
                         ) { item ->
                             when (item) {
                                 is ChatListItem.DateSeparator -> DateSeparatorChip(item.label)
-                                is ChatListItem.MessageItem -> MessageBubble(
-                                    message = item.msg,
-                                    isFirstInGroup = item.isFirstInGroup,
-                                    isLastInGroup = item.isLastInGroup,
-                                    currentUserId = uiState.currentUserId,
-                                    psychologistInfo = uiState.assignedPsychologist,
-                                    audioUiState = audioUiState,
-                                    onPlayPause = { messageId, url ->
-                                        viewModel.toggleAudioPlayback(messageId, url)
-                                    }
-                                )
+                                is ChatListItem.MessageItem ->
+                                    MessageBubble(
+                                        message = item.msg,
+                                        isFirstInGroup = item.isFirstInGroup,
+                                        isLastInGroup = item.isLastInGroup,
+                                        currentUserId = uiState.currentUserId,
+                                        psychologistInfo = uiState.assignedPsychologist,
+                                        audioUiState = audioUiState,
+                                        onPlayPause = { messageId, url ->
+                                            viewModel.toggleAudioPlayback(messageId, url)
+                                        },
+                                    )
                             }
                         }
                     }
@@ -222,12 +249,17 @@ fun ChatScreen(
     }
 }
 
+/**
+ * Barra superior personalizada para la pantalla de chat.
+ *
+ * Muestra el avatar del psicólogo, su nombre y su estado de conexión.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChatTopBar(
     psychologistInfo: PsychologistInfo?,
     onNavigateBack: () -> Unit,
-    otherUserName: String = ""
+    otherUserName: String = "",
 ) {
     val amaniColors = LocalAmaniColors.current
 
@@ -237,35 +269,42 @@ private fun ChatTopBar(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable { },
                 ) {
-                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = 24.dp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = psychologistInfo.name,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(4.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (psychologistInfo.isOnline) amaniColors.citaLibre
-                                else MaterialTheme.colorScheme.outline
+                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = 28.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = psychologistInfo.name,
+                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .size(6.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (psychologistInfo.isOnline) {
+                                                amaniColors.citaLibre
+                                            } else {
+                                                MaterialTheme.colorScheme.outline
+                                            },
+                                        ),
                             )
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(
-                        text = if (psychologistInfo.isOnline) "En línea" else "Desconectado",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (psychologistInfo.isOnline) "En línea" else "Desconectado",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
             } else {
                 Text(
                     text = otherUserName.ifEmpty { "Psicólogo" },
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
                 )
             }
         },
@@ -273,24 +312,31 @@ private fun ChatTopBar(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
+                    contentDescription = "Volver",
+                    modifier = Modifier.size(20.dp),
                 )
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface
-        )
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        windowInsets = WindowInsets(0, 0, 0, 0),
     )
 }
 
+/**
+ * Chip visual que se utiliza para separar mensajes por fecha en el LazyColumn.
+ */
 @Composable
 private fun DateSeparatorChip(label: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.Center
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center,
     ) {
         SuggestionChip(
             onClick = { },
@@ -298,9 +344,9 @@ private fun DateSeparatorChip(label: String) {
             label = {
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
                 )
-            }
+            },
         )
     }
 }

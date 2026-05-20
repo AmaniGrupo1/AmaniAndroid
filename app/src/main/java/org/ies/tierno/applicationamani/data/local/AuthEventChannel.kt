@@ -9,12 +9,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
  * necesita ser deslogueado (ej: HTTP 401, token expirado).
  */
 class AuthEventChannel {
-
-    private val _eventChannel = Channel<AuthEvent>(Channel.BUFFERED)
-    val events: Flow<AuthEvent> = _eventChannel.receiveAsFlow()
+    private val _events = Channel<AuthEvent>(Channel.BUFFERED)
+    val events: Flow<AuthEvent> = _events.receiveAsFlow()
 
     suspend fun sendEvent(event: AuthEvent) {
-        _eventChannel.send(event)
+        _events.send(event)
     }
 }
 
@@ -27,6 +26,7 @@ sealed class AuthEvent {
     /**
      * Token refrescado exitosamente
      */
-    data class TokenRefreshed(val newToken: String) : AuthEvent()
+    data class TokenRefreshed(
+        val newToken: String,
+    ) : AuthEvent()
 }
-

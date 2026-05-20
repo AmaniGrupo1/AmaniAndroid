@@ -32,9 +32,8 @@ import java.time.format.DateTimeFormatter
 class PsicologoAgendaViewModel(
     private val citasRepository: CitasRepository,
     private val authRepository: AuthRepository,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
-
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
@@ -74,11 +73,11 @@ class PsicologoAgendaViewModel(
         val id = _userSession.value?.idPsicologo ?: return
 
         viewModelScope.launch {
-            citasRepository.getHorarioActual(id)
+            citasRepository
+                .getHorarioActual(id)
                 .onSuccess {
                     _horarioActual.value = it // ✔️ es HorarioRequestDTO completo
-                }
-                .onFailure {
+                }.onFailure {
                     _errorMessage.value = "Error cargando horario"
                 }
         }
@@ -115,14 +114,14 @@ class PsicologoAgendaViewModel(
         if (idPsicologo == null || idPsicologo <= 0) {
             Log.e(
                 "PSICOLOGO_AGENDA_VM",
-                "❌ idPsicologo inválido: $idPsicologo - NO se hace la petición"
+                "❌ idPsicologo inválido: $idPsicologo - NO se hace la petición",
             )
             return
         }
 
         Log.d(
             "PSICOLOGO_AGENDA_VM",
-            "✅ idPsicologo válido: $idPsicologo - Haciendo petición al backend"
+            "✅ idPsicologo válido: $idPsicologo - Haciendo petición al backend",
         )
         println("📅 Cargando agenda para mes: $month")
         val session = _userSession.value
@@ -137,12 +136,12 @@ class PsicologoAgendaViewModel(
 
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.getAgendaPsicologo(psychologistId, month.toString())
+            citasRepository
+                .getAgendaPsicologo(psychologistId, month.toString())
                 .onSuccess { agenda ->
                     _agendaMensual.value = agenda
                     _errorMessage.value = null
-                }
-                .onFailure { error ->
+                }.onFailure { error ->
                     _errorMessage.value = error.message ?: "No se pudo cargar la agenda"
                     _agendaMensual.value = emptyList()
                 }
@@ -157,53 +156,59 @@ class PsicologoAgendaViewModel(
         }
 
         val session = _userSession.value
-        val psychologistId = session?.idPsicologo ?: run {
-            _errorMessage.value = "No hay sesión de psicólogo"
-            return
-        }
+        val psychologistId =
+            session?.idPsicologo ?: run {
+                _errorMessage.value = "No hay sesión de psicólogo"
+                return
+            }
 
         viewModelScope.launch {
             _isLoading.value = true
 
             try {
-                citasRepository.actualizarHorario(
-                    psychologistId,
-                    HorarioRequestDTO(franjas)
-                ).onSuccess {
-                    val fechaActual = _disponibilidadDia.value?.fecha
+                citasRepository
+                    .actualizarHorario(
+                        psychologistId,
+                        HorarioRequestDTO(franjas),
+                    ).onSuccess {
+                        val fechaActual = _disponibilidadDia.value?.fecha
 
-                    cargarAgendaMensual(_mesVisible.value)
+                        cargarAgendaMensual(_mesVisible.value)
 
-                    if (fechaActual != null) {
-                        cargarDisponibilidadDia(fechaActual)
+                        if (fechaActual != null) {
+                            cargarDisponibilidadDia(fechaActual)
+                        }
+
+                        _successMessage.value = "Horario actualizado correctamente"
+                        HorarioEvents.notificar()
+                    }.onFailure {
+                        _errorMessage.value = it.message ?: "Error al actualizar el horario"
                     }
-
-                    _successMessage.value = "Horario actualizado correctamente"
-                    HorarioEvents.notificar()
-                }.onFailure {
-                    _errorMessage.value = it.message ?: "Error al actualizar el horario"
-                }
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    fun bloquearDia(fecha: LocalDate, motivo: String?) {
+    fun bloquearDia(
+        fecha: LocalDate,
+        motivo: String?,
+    ) {
         val id = _userSession.value?.idPsicologo ?: return
 
         viewModelScope.launch {
-            citasRepository.bloquearDiaNoDisponible(
-                id,
-                fecha.toString(),
-                null,
-                null,
-                motivo
-            ).onSuccess {
-                cargarAgendaMensual(_mesVisible.value)
-            }.onFailure {
-                _errorMessage.value = it.message
-            }
+            citasRepository
+                .bloquearDiaNoDisponible(
+                    id,
+                    fecha.toString(),
+                    null,
+                    null,
+                    motivo,
+                ).onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }.onFailure {
+                    _errorMessage.value = it.message
+                }
         }
     }
 
@@ -211,14 +216,15 @@ class PsicologoAgendaViewModel(
         val id = _userSession.value?.idPsicologo ?: return
 
         viewModelScope.launch {
-            citasRepository.quitarDiaNoDisponible(
-                id,
-                fecha.toString()
-            ).onSuccess {
-                cargarAgendaMensual(_mesVisible.value)
-            }.onFailure {
-                _errorMessage.value = it.message
-            }
+            citasRepository
+                .quitarDiaNoDisponible(
+                    id,
+                    fecha.toString(),
+                ).onSuccess {
+                    cargarAgendaMensual(_mesVisible.value)
+                }.onFailure {
+                    _errorMessage.value = it.message
+                }
         }
     }
 
@@ -238,8 +244,10 @@ class PsicologoAgendaViewModel(
         cargarPacientesAsignados()
     }
 
-    fun cargarDisponibilidadDia(fecha: LocalDate, durationMinutes: Int = _duracionCita.value) {
-
+    fun cargarDisponibilidadDia(
+        fecha: LocalDate,
+        durationMinutes: Int = _duracionCita.value,
+    ) {
         Log.d("PSICOLOGO_AGENDA_VM", "📞 cargarDisponibilidadDia($fecha, $duracionCita) - INICIO")
 
         val idPsicologo = userSession.value?.idPsicologo
@@ -248,14 +256,14 @@ class PsicologoAgendaViewModel(
         if (idPsicologo == null || idPsicologo <= 0) {
             Log.e(
                 "PSICOLOGO_AGENDA_VM",
-                "❌ idPsicologo inválido: $idPsicologo - NO se hace la petición"
+                "❌ idPsicologo inválido: $idPsicologo - NO se hace la petición",
             )
             return
         }
 
         Log.d(
             "PSICOLOGO_AGENDA_VM",
-            "✅ idPsicologo válido: $idPsicologo - Haciendo petición al backend"
+            "✅ idPsicologo válido: $idPsicologo - Haciendo petición al backend",
         )
         val psychologistId = _userSession.value?.idPsicologo ?: return
 
@@ -265,15 +273,14 @@ class PsicologoAgendaViewModel(
             // 🔥 IMPORTANTE: limpiar antes de recargar
             _disponibilidadDia.value = null
 
-            citasRepository.getDisponibilidadDia(
-                psychologistId,
-                fecha.toString(),
-                durationMinutes
-            )
-                .onSuccess {
+            citasRepository
+                .getDisponibilidadDia(
+                    psychologistId,
+                    fecha.toString(),
+                    durationMinutes,
+                ).onSuccess {
                     _disponibilidadDia.value = it
-                }
-                .onFailure {
+                }.onFailure {
                     _errorMessage.value = it.message ?: "Error al cargar disponibilidad"
                 }
 
@@ -289,11 +296,11 @@ class PsicologoAgendaViewModel(
     fun cargarDuracionCita() {
         val psychologistId = _userSession.value?.idPsicologo ?: return
         viewModelScope.launch {
-            citasRepository.getDuracion(psychologistId)
+            citasRepository
+                .getDuracion(psychologistId)
                 .onSuccess { duracion ->
                     _duracionCita.value = duracion
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _errorMessage.value = e.message ?: "Error al cargar la duración de las citas"
                 }
         }
@@ -303,18 +310,20 @@ class PsicologoAgendaViewModel(
     // En PsicologoAgendaViewModel.kt
 
     fun actualizarDuracionCita(nuevaDuracion: Int) {
-        val psychologistId = _userSession.value?.idPsicologo ?: run {
-            _errorMessage.value = "No hay sesión de psicólogo"
-            return
-        }
+        val psychologistId =
+            _userSession.value?.idPsicologo ?: run {
+                _errorMessage.value = "No hay sesión de psicólogo"
+                return
+            }
 
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.actualizarDuracion(psychologistId, nuevaDuracion)
+            citasRepository
+                .actualizarDuracion(psychologistId, nuevaDuracion)
                 .onSuccess {
                     _duracionCita.value = nuevaDuracion
                     _successMessage.value =
-                        "Duración de citas actualizada a ${nuevaDuracion} minutos"
+                        "Duración de citas actualizada a $nuevaDuracion minutos"
 
                     // ✅ IMPORTANTE: Recargar disponibilidad si hay una fecha seleccionada
                     val fechaActual = _disponibilidadDia.value?.fecha
@@ -322,8 +331,7 @@ class PsicologoAgendaViewModel(
                         // Recargar con la nueva duración
                         cargarDisponibilidadDia(fechaActual, nuevaDuracion)
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _errorMessage.value =
                         e.message ?: "Error al actualizar la duración de las citas"
                 }
@@ -340,19 +348,20 @@ class PsicologoAgendaViewModel(
         motivo: String,
         idTipoTerapia: Long,
         metodoPago: MetodoPago,
-        estadoPago: EstadoPago,  // ← AÑADIR ESTE PARÁMETRO
+        estadoPago: EstadoPago, // ← AÑADIR ESTE PARÁMETRO
         monto: BigDecimal,
-        modalidad: ModalidadCita
+        modalidad: ModalidadCita,
     ) {
         if (idCita <= 0) {
             _errorMessage.value = "ID de cita inválido"
             return
         }
 
-        val psychologistId = _userSession.value?.idPsicologo ?: run {
-            _errorMessage.value = "No hay sesión de psicólogo"
-            return
-        }
+        val psychologistId =
+            _userSession.value?.idPsicologo ?: run {
+                _errorMessage.value = "No hay sesión de psicólogo"
+                return
+            }
 
         viewModelScope.launch {
             _isLoading.value = true
@@ -360,19 +369,20 @@ class PsicologoAgendaViewModel(
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
             val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
-            val request = CrearCitaRequestDTO(
-                idPaciente = idPaciente,
-                idPsicologo = psychologistId,
-                startDatetime = startDatetime,
-                durationMinutes = duracionMinutos,
-                metodoPago = metodoPago,
-                estadoPago = estadoPago,  // ← USAR EL ESTADO RECIBIDO
-                monto = monto,
-                motivo = motivo,
-                estado = EstadoCita.pendiente,
-                idTipoTerapia = idTipoTerapia,
-                modalidad = modalidad
-            )
+            val request =
+                CrearCitaRequestDTO(
+                    idPaciente = idPaciente,
+                    idPsicologo = psychologistId,
+                    startDatetime = startDatetime,
+                    durationMinutes = duracionMinutos,
+                    metodoPago = metodoPago,
+                    estadoPago = estadoPago, // ← USAR EL ESTADO RECIBIDO
+                    monto = monto,
+                    motivo = motivo,
+                    estado = EstadoCita.PENDIENTE,
+                    idTipoTerapia = idTipoTerapia,
+                    modalidad = modalidad,
+                )
             android.util.Log.d("EDIT_CITA", "========== EDITAR CITA ==========")
             android.util.Log.d("EDIT_CITA", "idCita: $idCita")
             android.util.Log.d("EDIT_CITA", "idPaciente: $idPaciente")
@@ -383,38 +393,43 @@ class PsicologoAgendaViewModel(
             android.util.Log.d("EDIT_CITA", "monto: $monto")
             android.util.Log.d("EDIT_CITA", "modalidad: $modalidad")
             android.util.Log.d("EDIT_CITA", "request FINAL: $request")
-            citasRepository.editarCita(idCita, request)
+            citasRepository
+                .editarCita(idCita, request)
                 .onSuccess { citaActualizada ->
 
                     android.util.Log.d("EDIT_CITA", "✅ SUCCESS RESPONSE: $citaActualizada")
                     // Actualizar la lista localmente sin recargar todo
-                    _agendaMensual.value = _agendaMensual.value
-                        .map { if (it.id == idCita) citaActualizada else it }
-                        .sortedWith(
-                            compareBy<AgendaItemDTO> { it.fecha }
-                                .thenBy { it.horaInicio }
-                        )
+                    _agendaMensual.value =
+                        _agendaMensual.value
+                            .map { if (it.id == idCita) citaActualizada else it }
+                            .sortedWith(
+                                compareBy<AgendaItemDTO> { it.fecha }
+                                    .thenBy { it.horaInicio },
+                            )
 
                     // Recargar disponibilidad del día
                     cargarDisponibilidadDia(fecha, duracionMinutos)
 
                     _successMessage.value = "✏️ Cita editada correctamente"
-                }
-
-                .onFailure { e ->
+                }.onFailure { e ->
                     android.util.Log.e("EDIT_CITA", "❌ ERROR EDITANDO CITA", e)
                     android.util.Log.e("EDIT_CITA", "mensaje: ${e.message}")
                 }
-
 
             _isLoading.value = false
         }
     }
 
-    fun cancelarCita(idCita: Long, fecha: LocalDate, horaInicio: LocalTime, duracionMinutos: Int) {
+    fun cancelarCita(
+        idCita: Long,
+        fecha: LocalDate,
+        horaInicio: LocalTime,
+        duracionMinutos: Int,
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.cancelarCita(idCita)
+            citasRepository
+                .cancelarCita(idCita)
                 .onSuccess { citaActualizada ->
                     // Recargar la agenda mensual para eliminar la cita de la lista
                     cargarAgendaMensual(_mesVisible.value)
@@ -423,15 +438,15 @@ class PsicologoAgendaViewModel(
                     cargarDisponibilidadDia(fecha, duracionMinutos)
 
                     // Mostrar mensaje según el estado del pago
-                    val mensaje = when (citaActualizada?.estadoPago) {
-                        EstadoPago.REEMBOLSADO -> "✅ Cita cancelada. Se ha procesado el reembolso."
-                        EstadoPago.PENDIENTE -> "✅ Cita cancelada. No se realizó cargo."
-                        EstadoPago.FALLIDO -> "✅ Cita cancelada. El pago ya había fallado."
-                        else -> "✅ Cita cancelada correctamente"
-                    }
+                    val mensaje =
+                        when (citaActualizada?.estadoPago) {
+                            EstadoPago.REEMBOLSADO -> "✅ Cita cancelada. Se ha procesado el reembolso."
+                            EstadoPago.PENDIENTE -> "✅ Cita cancelada. No se realizó cargo."
+                            EstadoPago.FALLIDO -> "✅ Cita cancelada. El pago ya había fallado."
+                            else -> "✅ Cita cancelada correctamente"
+                        }
                     _successMessage.value = mensaje
-                }
-                .onFailure {
+                }.onFailure {
                     _errorMessage.value = it.message ?: "Error al cancelar la cita"
                 }
             _isLoading.value = false
@@ -448,7 +463,7 @@ class PsicologoAgendaViewModel(
         metodoPago: MetodoPago,
         estadoPago: EstadoPago,
         monto: BigDecimal,
-        modalidad: ModalidadCita
+        modalidad: ModalidadCita,
     ): Result<Unit> {
         val session = _userSession.value
         if (session == null) {
@@ -469,23 +484,25 @@ class PsicologoAgendaViewModel(
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
-        val startDatetime = LocalDateTime
-            .of(fecha, hora)
-            .format(formatter)
+        val startDatetime =
+            LocalDateTime
+                .of(fecha, hora)
+                .format(formatter)
 
-        val request = CrearCitaRequestDTO(
-            idPaciente = idPaciente,
-            idPsicologo = psychologistId,
-            startDatetime = startDatetime,
-            durationMinutes = duracionMinutos,
-            metodoPago = metodoPago,
-            estadoPago = estadoPago,  // ← USAR EL ESTADO RECIBIDO
-            monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
-            motivo = motivo.ifBlank { "Consulta psicológica" },
-            idTipoTerapia = idTipoTerapia,
-            estado = EstadoCita.pendiente,
-            modalidad = modalidad
-        )
+        val request =
+            CrearCitaRequestDTO(
+                idPaciente = idPaciente,
+                idPsicologo = psychologistId,
+                startDatetime = startDatetime,
+                durationMinutes = duracionMinutos,
+                metodoPago = metodoPago,
+                estadoPago = estadoPago, // ← USAR EL ESTADO RECIBIDO
+                monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
+                motivo = motivo.ifBlank { "Consulta psicológica" },
+                idTipoTerapia = idTipoTerapia,
+                estado = EstadoCita.PENDIENTE,
+                modalidad = modalidad,
+            )
 
         _isLoading.value = true
 
@@ -517,7 +534,6 @@ class PsicologoAgendaViewModel(
 
     // En PsicologoAgendaViewModel.kt, añadir este método:
 
-
     suspend fun crearCitaParaPaciente(
         idPaciente: Long,
         fecha: LocalDate,
@@ -528,7 +544,7 @@ class PsicologoAgendaViewModel(
         metodoPago: MetodoPago,
         estadoPago: EstadoPago,
         monto: BigDecimal,
-        modalidad: ModalidadCita
+        modalidad: ModalidadCita,
     ): Result<Unit> {
         Log.d("VM_CREAR_CITA", "========== INICIO crearCitaParaPaciente ==========")
         Log.d("VM_CREAR_CITA", "idPaciente: $idPaciente")
@@ -556,48 +572,69 @@ class PsicologoAgendaViewModel(
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
 
-        val request = CrearCitaRequestDTO(
-            idPaciente = idPaciente,
-            idPsicologo = psychologistId,
-            startDatetime = startDatetime,
-            durationMinutes = duracionMinutos,
-            metodoPago = metodoPago,
-            estadoPago = estadoPago,
-            monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
-            motivo = motivo.ifBlank { "Consulta psicológica" },
-            idTipoTerapia = idTipoTerapia,
-            modalidad = modalidad
-        )
+        val request =
+            CrearCitaRequestDTO(
+                idPaciente = idPaciente,
+                idPsicologo = psychologistId,
+                startDatetime = startDatetime,
+                durationMinutes = duracionMinutos,
+                metodoPago = metodoPago,
+                estadoPago = estadoPago,
+                monto = if (metodoPago == MetodoPago.TARJETA) monto else BigDecimal.ZERO,
+                motivo = motivo.ifBlank { "Consulta psicológica" },
+                idTipoTerapia = idTipoTerapia,
+                modalidad = modalidad,
+            )
+
+        _isLoading.value = true
 
         return try {
             val resultado = citasRepository.crearCita(request)
             if (resultado.isSuccess) {
+                _successMessage.value = "Cita creada exitosamente"
                 cargarAgendaMensual(_mesVisible.value)
                 cargarDisponibilidadDia(fecha, duracionMinutos)
                 Result.success(Unit)
             } else {
-                Result.failure(resultado.exceptionOrNull() ?: Exception("Error al crear cita"))
+                val error = resultado.exceptionOrNull() ?: Exception("Error al crear cita")
+                _errorMessage.value = error.message
+                Result.failure(error)
             }
         } catch (e: Exception) {
+            _errorMessage.value = e.message
             Result.failure(e)
+        } finally {
+            _isLoading.value = false
         }
     }
 
     // En PsicologoAgendaViewModel.kt
-    fun cambiarEstadoCita(idCita: Long, nuevoEstado: EstadoCita) {
+    fun cambiarEstadoCita(
+        idCita: Long,
+        nuevoEstado: EstadoCita,
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
-            citasRepository.cambiarEstadoCita(idCita, nuevoEstado)
-                .onSuccess {
-                    _agendaMensual.value = _agendaMensual.value.map {
-                        if (it.id == idCita) {
-                            it.copy(estado = nuevoEstado.name)
-                        } else it
+            try {
+                citasRepository
+                    .cambiarEstadoCita(idCita, nuevoEstado)
+                    .onSuccess {
+                        _agendaMensual.value =
+                            _agendaMensual.value.map {
+                                if (it.id == idCita) {
+                                    it.copy(estado = nuevoEstado.name)
+                                } else {
+                                    it
+                                }
+                            }
+                    }.onFailure {
+                        _errorMessage.value = it.message
                     }
-                }
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
-
 
     private val _citaSeleccionada = MutableStateFlow<AgendaItemDTO?>(null)
     val citaSeleccionada = _citaSeleccionada.asStateFlow()
@@ -609,5 +646,4 @@ class PsicologoAgendaViewModel(
         println("✅ Cita encontrada: ${cita != null}")
         _citaSeleccionada.value = cita
     }
-
 }

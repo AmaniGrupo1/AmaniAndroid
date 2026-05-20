@@ -1,6 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,18 +7,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -62,14 +55,14 @@ fun ChatInputBar(
     onStopRecording: () -> Unit,
     isRecording: Boolean,
     recordingSeconds: Int,
-    isOtherTyping: Boolean = false
+    isOtherTyping: Boolean = false,
+    modifier: Modifier = Modifier,
 ) {
-    // Usar imePadding() para adaptarse automáticamente a la altura del teclado
-    Column(modifier = Modifier.imePadding()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         if (isRecording) {
             RecordingBar(
                 recordingSeconds = recordingSeconds,
-                onStopClick = onStopRecording
+                onStopClick = onStopRecording,
             )
         } else {
             // Input con padding adecuado para estilo mensajería
@@ -78,38 +71,32 @@ fun ChatInputBar(
                 shadowElevation = 4.dp,
                 tonalElevation = 2.dp,
                 color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    AnimatedContent(
-                        targetState = text.isBlank(),
-                        transitionSpec = {
-                            (fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.8f, animationSpec = tween(200)))
-                                .togetherWith(fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200)))
-                        },
-                        label = "mic_attach_transition"
-                    ) { isBlank ->
-                        if (isBlank) {
-                            IconButton(onClick = onMicClick) {
-                                Icon(
-                                    imageVector = Icons.Default.Mic,
-                                    contentDescription = "Nota de voz",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = onAttachFile) {
-                                Icon(
-                                    imageVector = Icons.Default.AttachFile,
-                                    contentDescription = "Adjuntar",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                    // Botón de archivo siempre visible
+                    IconButton(onClick = onAttachFile) {
+                        Icon(
+                            imageVector = Icons.Default.AttachFile,
+                            contentDescription = "Adjuntar archivo",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+
+                    // Botón de micrófono siempre visible (si no se está grabando)
+                    if (!isRecording) {
+                        IconButton(onClick = onMicClick) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Nota de voz",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
 
@@ -117,7 +104,7 @@ fun ChatInputBar(
                         text = text,
                         onTextChange = onTextChange,
                         onSend = onSend,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
 
                     Spacer(modifier = Modifier.width(4.dp))
@@ -125,25 +112,30 @@ fun ChatInputBar(
                     val sendScale by animateFloatAsState(
                         targetValue = if (text.isNotBlank()) 1f else 0.85f,
                         animationSpec = spring(dampingRatio = 0.6f),
-                        label = "send_scale"
+                        label = "send_scale",
                     )
 
                     FilledIconButton(
                         onClick = onSend,
                         enabled = text.isNotBlank(),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        ),
-                        modifier = Modifier
-                            .size(44.dp)
-                            .graphicsLayer { scaleX = sendScale; scaleY = sendScale }
+                        colors =
+                            IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            ),
+                        modifier =
+                            Modifier
+                                .size(44.dp)
+                                .graphicsLayer {
+                                    scaleX = sendScale
+                                    scaleY = sendScale
+                                },
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Enviar mensaje"
+                            contentDescription = "Enviar mensaje",
                         )
                     }
                 }
@@ -159,15 +151,16 @@ fun ChatInputBar(
 @Composable
 private fun TypingIndicator() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 48.dp, bottom = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 48.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = "Escribiendo...",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
         )
     }
 }
@@ -177,57 +170,61 @@ private fun PillTextField(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BasicTextField(
         value = text,
         onValueChange = onTextChange,
-        modifier = modifier
-            .background(
-                MaterialTheme.colorScheme.surfaceVariant,
-                RoundedCornerShape(28.dp)
-            )
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        textStyle = TextStyle(
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize
-        ),
+        modifier =
+            modifier
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant,
+                    RoundedCornerShape(28.dp),
+                ).padding(horizontal = 12.dp, vertical = 8.dp),
+        textStyle =
+            TextStyle(
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         maxLines = 4,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = ImeAction.Send
-        ),
-        keyboardActions = KeyboardActions(
-            onSend = { if (text.isNotBlank()) onSend() }
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Send,
+            ),
+        keyboardActions =
+            KeyboardActions(
+                onSend = { if (text.isNotBlank()) onSend() },
+            ),
         decorationBox = { innerTextField ->
             if (text.isBlank()) {
                 Text(
                     text = "Escribe un mensaje\u2026",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 )
             }
             innerTextField()
-        }
+        },
     )
 }
 
 @Composable
 private fun RecordingBar(
     recordingSeconds: Int,
-    onStopClick: () -> Unit
+    onStopClick: () -> Unit,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse_alpha"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(800),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "pulse_alpha",
     )
 
     Surface(
@@ -235,39 +232,41 @@ private fun RecordingBar(
         shadowElevation = 4.dp,
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.error.copy(alpha = pulseAlpha))
+                modifier =
+                    Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.error.copy(alpha = pulseAlpha)),
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = formatDuration(recordingSeconds),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.weight(1f))
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
                 onClick = onStopClick,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(40.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Stop,
                         contentDescription = "Detener grabación",
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }

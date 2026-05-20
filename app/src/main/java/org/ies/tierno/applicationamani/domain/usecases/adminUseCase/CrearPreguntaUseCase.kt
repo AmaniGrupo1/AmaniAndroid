@@ -15,14 +15,14 @@ import org.ies.tierno.applicationamani.dto.opcionAdminDTO.PreguntaRequest
  * @see org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
  * @see org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
  */
-class CrearPreguntaUseCase(val repository: TestRepositoryApi) {
+class CrearPreguntaUseCase(
+    val repository: TestRepositoryApi,
+) {
     /**
      * Crea una pregunta en el backend.
      *
      * @param pregunta Datos de la pregunta a crear (texto, tipo y opciones).
      * @return [OpcionAdminDTO] con la pregunta creada, o `null` si ocurre un error.
      */
-    suspend operator fun invoke(pregunta: PreguntaRequest): OpcionAdminDTO? {
-        return repository.createPregunta(pregunta)
-    }
+    suspend operator fun invoke(pregunta: PreguntaRequest): OpcionAdminDTO? = repository.createPregunta(pregunta)
 }

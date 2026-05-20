@@ -1,29 +1,29 @@
-//package org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario
+// package org.ies.tierno.applicationamani.presentation.ui.screen.cuestionario
 //
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.itemsIndexed
-//import androidx.compose.foundation.shape.RoundedCornerShape
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.text.font.Font
-//import androidx.compose.ui.text.font.FontFamily
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import androidx.navigation.NavController
-//import kotlinx.coroutines.launch
-//import org.ies.tierno.applicationamani.R
-//import timber.log.Timber
-//import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
-//import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
-//import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
-//import org.koin.androidx.compose.koinViewModel
+// import androidx.compose.foundation.layout.*
+// import androidx.compose.foundation.lazy.LazyColumn
+// import androidx.compose.foundation.lazy.itemsIndexed
+// import androidx.compose.foundation.shape.RoundedCornerShape
+// import androidx.compose.material3.*
+// import androidx.compose.runtime.*
+// import androidx.compose.ui.Alignment
+// import androidx.compose.ui.Modifier
+// import androidx.compose.ui.graphics.Color
+// import androidx.compose.ui.text.font.Font
+// import androidx.compose.ui.text.font.FontFamily
+// import androidx.compose.ui.text.font.FontWeight
+// import androidx.compose.ui.unit.dp
+// import androidx.compose.ui.unit.sp
+// import androidx.navigation.NavController
+// import kotlinx.coroutines.launch
+// import org.ies.tierno.applicationamani.R
+// import timber.log.Timber
+// import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+// import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+// import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
+// import org.koin.androidx.compose.koinViewModel
 //
-///**
+// /**
 // * Pantalla del cuestionario para el paciente.
 // *
 // * Muestra una lista de preguntas con opciones de respuesta tipo radio button.
@@ -34,12 +34,12 @@
 // * @param loginViewModel ViewModel compartido para verificar el estado de sesión.
 // * @param viewModel ViewModel que provee las preguntas del cuestionario.
 // */
-//@Composable
-//fun Cuestionario(
+// @Composable
+// fun Cuestionario(
 //    navController: NavController,
 //    loginViewModel: LoginViewModel,
 //    viewModel: CuestionarioViewModel = koinViewModel()
-//) {
+// ) {
 //    val backgroundColor = Color(0xFFF3F1F8)
 //    val cardColor = Color.White
 //    val primaryColor = Color(0xFF5E35B1)
@@ -165,4 +165,4 @@
 //            }
 //        }
 //    }
-//}
+// }

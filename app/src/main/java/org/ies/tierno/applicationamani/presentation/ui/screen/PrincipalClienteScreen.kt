@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +24,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,6 +36,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
+import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 
 /**
@@ -44,23 +46,15 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteV
  * Presenta la información del psicólogo asignado (imagen, nombre, biografía
  * y especialidades) obtenida de [PrincipalClienteViewModel].
  *
- * Incluye:
- * - **Cajón de navegación lateral** con opciones de perfil, citas y cierre
- *   de sesión.
- * - **Barra de navegación inferior** con cinco secciones: Inicio, Chat,
- *   Citas, Diario y Ajustes.
- * - **Tarjetas** con el color primario del tema para la imagen y los datos
- *   del profesional.
- *
  * @param navController Controlador de navegación para transiciones entre pantallas.
  * @param viewModel ViewModel que provee los datos del psicólogo y sus especialidades.
- *
- * @see PrincipalClienteViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalClienteViewModel = viewModel()) {
-    val colors = MaterialTheme.colorScheme
+fun PrincipalClienteScreen(
+    navController: NavController,
+    viewModel: PrincipalClienteViewModel = viewModel(),
+) {
     val typography = MaterialTheme.typography
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -73,35 +67,38 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                 Text(
                     text = "Menú",
                     modifier = Modifier.padding(16.dp),
-                    style = typography.titleMedium
+                    style = typography.titleLarge, // M3: titleLarge for drawer header
                 )
                 HorizontalDivider()
                 Text(
                     text = "Perfil",
                     style = typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(16.dp),
                 )
                 Text(
                     text = "Mis citas",
                     style = typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(16.dp),
                 )
                 Text(
                     text = "Cerrar sesión",
                     style = typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(16.dp),
                 )
             }
-        }
+        },
     ) {
         Scaffold(
             topBar = {
@@ -113,71 +110,98 @@ fun PrincipalClienteScreen(navController: NavController, viewModel: PrincipalCli
                                 scope.launch {
                                     drawerState.open()
                                 }
-                            }
+                            },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu"
+                                contentDescription = "Menu",
                             )
                         }
-                    }
+                    },
+                    // M3: TopAppBar colors and scroll behavior (pinned by default in Scaffold)
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            titleContentColor = MaterialTheme.colorScheme.onSurface,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 )
-            }
+            },
+            bottomBar = {
+                // M3: Integrated AmaniBottomBar
+                AmaniBottomBar(
+                    navController = navController,
+                    config = BottomBarConfig.Paciente,
+                )
+            },
         ) { paddingValues ->
             Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                modifier =
+                    Modifier
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(24.dp), // M3: Spacing multiple of 8
             ) {
+                // M3: Card with surfaceContainerHigh for better depth
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = colors.primary
-                    )
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text("Imagen del psicólogo")
+                        Text(
+                            text = "Imagen del psicólogo",
+                            style = typography.bodyLarge,
+                        )
                     }
                 }
+
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = colors.primary
-                    )
+                    modifier = Modifier.fillMaxWidth(),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     ) {
                         Text(
                             text = "N. Psico",
                             style = typography.titleLarge,
-                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 8.dp),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            "Biografía",
+                            text = "Biografía",
                             style = typography.titleMedium,
-                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.primary, // M3: Primary for secondary headers
+                            modifier = Modifier.padding(vertical = 8.dp),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
 
                         especialidades.forEach { especialidad ->
                             Row(
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(vertical = 4.dp),
                             ) {
                                 Text(
-                                    especialidad,
-                                    style = typography.titleMedium,
-                                    modifier = Modifier.padding(16.dp),
+                                    text = especialidad,
+                                    style = typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }

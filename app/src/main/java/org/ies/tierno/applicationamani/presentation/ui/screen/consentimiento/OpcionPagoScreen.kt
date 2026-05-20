@@ -21,37 +21,34 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun OpcionPagoScreen(
-    navController: NavController,
-) {
-
+fun OpcionPagoScreen(navController: NavController) {
     var metodoPago by remember { mutableStateOf("") }
 
     Scaffold { padding ->
 
         Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(20.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-
             Text(
                 "Selecciona método de pago",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
             )
 
             Button(
                 onClick = { metodoPago = "PRESENCIAL" },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Pago presencial")
             }
 
             Button(
                 onClick = { metodoPago = "ONLINE" },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Pago online")
             }
@@ -61,7 +58,6 @@ fun OpcionPagoScreen(
             Button(
                 onClick = {
                     if (metodoPago.isNotEmpty()) {
-
                         // aquí podrías guardar el método de pago si quieres
 
 //                        navController.navigate(
@@ -69,7 +65,7 @@ fun OpcionPagoScreen(
 //                        )
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Continuar")
             }
