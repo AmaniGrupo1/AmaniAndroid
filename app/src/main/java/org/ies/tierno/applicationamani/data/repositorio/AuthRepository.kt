@@ -317,10 +317,16 @@ class AuthRepository(
      */
     fun getPsicologos(): Flow<List<PsicologoSelfResponseDTO>> =
         flow {
+            Timber.d("=== getPsicologos - INICIO ===")
             val response = api.getPsicologos()
+            Timber.d("Response code: ${response.code()}")
+
             if (response.isSuccessful) {
-                emit(response.body() ?: emptyList())
+                val body = response.body()
+                Timber.d("Body recibido: ${body?.size} psicólogos")
+                emit(body ?: emptyList())
             } else {
+                Timber.e("Error en response: ${response.code()} - ${response.message()}")
                 if (response.code() == 401) {
                     Timber.w("getPsicologos - received 401, emitting empty list")
                 }
@@ -335,24 +341,20 @@ class AuthRepository(
 
     fun getPsicologosBaja(): Flow<List<PsicologoSelfResponseDTO>> =
         flow {
-            try {
-                val response = api.getPsicologosBaja()
-                if (response.isSuccessful) {
-                    emit(response.body() ?: emptyList())
-                } else {
-                    if (response.code() == 401) {
-                        Timber.w("getPsicologos - received 401, emitting empty list")
-                        emit(emptyList())
-                    } else {
-                        emit(emptyList())
-                    }
+            val response = api.getPsicologosBaja()
+            if (response.isSuccessful) {
+                emit(response.body() ?: emptyList())
+            } else {
+                if (response.code() == 401) {
+                    Timber.w("getPsicologosBaja - received 401, emitting empty list")
                 }
-            } catch (e: HttpException) {
-                Timber.e(e, "HTTP exception while fetching psicologos")
-                emit(emptyList())
-            } catch (_: Exception) {
                 emit(emptyList())
             }
+        }.catch { e ->
+            if (e is HttpException) {
+                Timber.e(e, "HTTP exception while fetching psicologos")
+            }
+            emit(emptyList())
         }
 
     /**

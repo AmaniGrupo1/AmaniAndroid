@@ -169,7 +169,7 @@ val appModule =
         viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
         viewModel { CrearPreguntaViewModel(get()) }
         viewModel { ListarPacientesViewModel(get(), get(), get()) }
-        viewModel { ListarPsicologosAdminViewModel(get(), get()) }
+        viewModel { ListarPsicologosAdminViewModel(get(), get(), get()) }
         viewModel { PrincipalClienteViewModel() }
         viewModel { SettingsClienteViewModel(get(), get()) }
         viewModel { SituacionViewModel(get(), get()) }
@@ -220,7 +220,7 @@ val appModule =
         viewModel { PaymentViewModel(get()) }
 
         viewModel { SoporteTicketViewModel(get()) }
-        viewModel { IdiomaViewModel(get(), get()) }
+        viewModel { IdiomaViewModel(get(), get(), get()) }
         viewModel { ProfileAdminViewModel(get()) }
         viewModel { ProfilePacienteViewModel(get()) }
         viewModel { HistorialClinicoPacienteViewModel(get()) }

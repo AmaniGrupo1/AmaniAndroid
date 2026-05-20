@@ -11,4 +11,6 @@ data class PsicologoSelfResponseDTO(
     val descripcion: String?,
     /** Número de licencia o colegiación profesional. */
     val licencia: String?,
+    val telefono : String?,
+    val email: String
 )

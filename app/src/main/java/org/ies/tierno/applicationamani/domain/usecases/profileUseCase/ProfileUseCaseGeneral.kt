@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.domain.usecases.profileUseCase
 
 import okhttp3.MultipartBody
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
+import org.ies.tierno.applicationamani.domain.models.admin.PsicologoConPacientesDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.AdminDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.AdminResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.admin.UpdateAdminRequestDTO
@@ -10,6 +11,7 @@ import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.UpdatePsicologoRequestDTO
+import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 
 class ProfileUseCaseGeneral(
     val repository: ProfileRepository,
@@ -67,4 +69,16 @@ class ProfileUseCaseGeneral(
         id: Long,
         file: MultipartBody.Part,
     ): Result<PacienteProfileResponseDTO> = repository.updatePacientePhoto(id, file)
+
+    // =====================================================
+    // 🔵 ACTUALIZAR PSICÓLOGO DESDE ADMIN
+    // =====================================================
+
+    suspend fun updatePerfilPsicologoAdmin(
+        id: Long,
+        dto: PsicologoRequestDTO
+    ): Result<PsicologoConPacientesDTO> {
+
+        return repository.updatePerfilPsicologoAdmin(id, dto)
+    }
 }

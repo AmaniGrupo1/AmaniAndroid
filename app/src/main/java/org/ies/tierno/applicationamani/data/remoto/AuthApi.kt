@@ -47,12 +47,12 @@ interface AuthApi {
     @GET("/api/pacientes/admin")
     suspend fun getPacientes(): Response<List<DatosPacienteAdminDTO>>
 
-    @PUT("auth/pacientes/{id}/baja")
+    @PUT("/auth/pacientes/{id}/baja")
     suspend fun darBajaPaciente(
         @Path("id") id: Long,
     ): Response<MessageResponse>
 
-    @PUT("auth/psicologos/{id}/alta")
+    @PUT("/auth/psicologos/{id}/alta")
     suspend fun darAltaPsicologo(
         @Path("id") id: Long,
     ): Response<MessageResponse>

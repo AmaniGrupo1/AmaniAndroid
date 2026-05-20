@@ -159,3 +159,4 @@ val retrofitModule =
         single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }
         single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
     }
+

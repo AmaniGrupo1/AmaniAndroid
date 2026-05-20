@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Email
@@ -33,6 +34,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -67,62 +69,55 @@ import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResp
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.ui.theme.CardColors
+import org.ies.tierno.applicationamani.ui.theme.getCardColors
+import org.ies.tierno.applicationamani.ui.theme.getScreenColors
+import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
 import org.koin.compose.koinInject
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPacientePrincipalScreen(
     navController: NavController,
-    profilePsicologoViewModel: ProfilePsicologoViewModel, // Para datos del paciente
-    pacienteViewModel: PacienteViewModel = koinViewModel(), // Para el psicólogo asignado
-    userSessionDataStore: UserSessionDataStore = getKoin().get(),
+    profilePsicologoViewModel: ProfilePsicologoViewModel,
+    pacienteViewModel: PacienteViewModel = koinViewModel(),
+    userSessionDataStore: UserSessionDataStore = getKoin().get()
 ) {
+    val isDark = isDarkTheme()
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    // Estado del paciente desde ProfilePsicologoViewModel
     val pacienteInfo by profilePsicologoViewModel.pacientesProfile.collectAsState()
     val isLoadingPaciente by profilePsicologoViewModel.isLoading.collectAsState()
 
-    // Estado del psicólogo desde PacienteViewModel
     val psicologo by pacienteViewModel.psicologoAsignado.collectAsState()
     val isLoadingPsicologo by pacienteViewModel.isLoading.collectAsState()
     val errorPsicologo by pacienteViewModel.error.collectAsState()
 
-    // Cargar datos
     LaunchedEffect(session) {
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
-        // Cargar datos del paciente usando ProfilePsicologoViewModel
         profilePsicologoViewModel.fetchProfile(idPaciente)
-        // Cargar psicólogo asignado usando PacienteViewModel
         pacienteViewModel.cargarPsicologoAsignado(idPaciente)
     }
 
     val isLoading = isLoadingPaciente || isLoadingPsicologo
     val error = errorPsicologo
 
-    // Obtener nombre del paciente para el saludo
-    val nombrePaciente =
-        pacienteInfo
-            ?.usuario
-            ?.nombre
-            ?.split(" ")
-            ?.firstOrNull()
-            ?: session?.nombre?.split(" ")?.firstOrNull()
-            ?: "Paciente"
+    val nombrePaciente = pacienteInfo?.usuario?.nombre?.split(" ")?.firstOrNull()
+        ?: session?.nombre?.split(" ")?.firstOrNull()
+        ?: "Paciente"
 
-    // Hora del día para saludo personalizado
-    val hora =
-        java.time.LocalDateTime
-            .now()
-            .hour
-    val saludo =
-        when {
-            hora < 12 -> "🌅 Buenos días"
-            hora < 18 -> "☀️ Buenas tardes"
-            else -> "🌙 Buenas noches"
-        }
+    val hora = LocalDateTime.now().hour
+    val saludo = when {
+        hora < 12 -> "🌅 Buenos días"
+        hora < 18 -> "☀️ Buenas tardes"
+        else -> "🌙 Buenas noches"
+    }
 
     Scaffold(
         topBar = {
@@ -132,43 +127,52 @@ fun ViewPacientePrincipalScreen(
                         "Mi Psicólogo",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
+                        color = Color.White
                     )
                 },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White,
-                    ),
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
-        },
+        }
     ) { paddingValues ->
         Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(if (isDark) Color.Black else screenColors.background)
         ) {
             when {
                 isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
+                        contentAlignment = Alignment.Center
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
+                            verticalArrangement = Arrangement.Center
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(48.dp),
                                 color = MaterialTheme.colorScheme.primary,
-                                strokeWidth = 3.dp,
+                                strokeWidth = 3.dp
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "Cargando tu información...",
                                 fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -176,21 +180,21 @@ fun ViewPacientePrincipalScreen(
 
                 psicologo != null -> {
                     Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                     ) {
-                        // Saludo personalizado
                         GreetingCard(
                             nombrePaciente = nombrePaciente,
                             saludo = saludo,
+                            isDark = isDark
                         )
 
-                        // Contenido del psicólogo
                         PsicologoContent(
                             psicologo = psicologo!!,
                             navController = navController,
+                            isDark = isDark,
+                            cardColors = cardColors
                         )
                     }
                 }
@@ -203,11 +207,12 @@ fun ViewPacientePrincipalScreen(
                             pacienteViewModel.cargarPsicologoAsignado(idPaciente)
                             profilePsicologoViewModel.fetchProfile(idPaciente)
                         },
+                        isDark = isDark
                     )
                 }
 
                 else -> {
-                    NoPsicologoAssignedState(navController)
+                    NoPsicologoAssignedState(navController, isDark)
                 }
             }
         }
@@ -218,36 +223,36 @@ fun ViewPacientePrincipalScreen(
 fun GreetingCard(
     nombrePaciente: String,
     saludo: String,
+    isDark: Boolean
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-        color = MaterialTheme.colorScheme.primary,
+        color = if (isDark) Color.Black else MaterialTheme.colorScheme.primary
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
         ) {
             Text(
                 text = saludo,
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.9f),
-                fontWeight = FontWeight.Medium,
+                color = if (isDark) Color.White.copy(alpha = 0.9f) else Color.White.copy(alpha = 0.9f),
+                fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "$nombrePaciente 👋",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = if (isDark) Color.White else Color.White
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Tu bienestar es nuestra prioridad",
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.8f),
+                color = if (isDark) Color.White.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.8f)
             )
         }
     }
@@ -257,70 +262,71 @@ fun GreetingCard(
 fun ErrorState(
     error: String?,
     onRetry: () -> Unit,
+    isDark: Boolean
 ) {
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(
             Icons.Default.Error,
             contentDescription = "Error",
             modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.error,
+            tint = MaterialTheme.colorScheme.error
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Error al cargar los datos",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.error,
+            color = if (isDark) Color.White else MaterialTheme.colorScheme.error
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = error ?: "Error desconocido",
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
+            color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
-            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Reintentar")
+            Text("Reintentar", color = Color.White)
         }
     }
 }
 
 @Composable
-fun NoPsicologoAssignedState(navController: NavController) {
+fun NoPsicologoAssignedState(
+    navController: NavController,
+    isDark: Boolean
+) {
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Surface(
             modifier = Modifier.size(120.dp),
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Default.Psychology,
                     contentDescription = "Sin psicólogo",
                     modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -331,8 +337,8 @@ fun NoPsicologoAssignedState(navController: NavController) {
             text = "Aún no tienes un psicólogo asignado",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
+            color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -340,9 +346,9 @@ fun NoPsicologoAssignedState(navController: NavController) {
         Text(
             text = "Un administrador te asignará un profesional de la salud mental. Pronto podrás ver sus datos aquí.",
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -350,26 +356,26 @@ fun NoPsicologoAssignedState(navController: NavController) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                ),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isDark) Color(0xFF2D2D2D) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "📌 ¿Qué puedes hacer mientras tanto?",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "• Explora nuestros recursos informativos\n• Prepara tus preguntas para la primera sesión\n• Completa tu perfil de paciente",
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 18.sp,
+                    color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp
                 )
             }
         }
@@ -378,13 +384,12 @@ fun NoPsicologoAssignedState(navController: NavController) {
 
         Button(
             onClick = { navController.navigateUp() },
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White,
-                ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            ),
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Volver al inicio", modifier = Modifier.padding(vertical = 4.dp))
         }
@@ -407,92 +412,84 @@ fun buildFullImageUrl(relativeUrl: String?): String {
 fun PsicologoContent(
     psicologo: PsicologoProfileResponseDTO,
     navController: NavController,
+    isDark: Boolean,
+    cardColors: CardColors
 ) {
+    val cardBackgroundColor = cardColors.cardBackground
+    val cardContentColor = cardColors.cardContent
+    val cardContentSecondaryColor = cardColors.cardContent.copy(alpha = 0.7f)
+
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors =
-                CardDefaults.cardColors(
-                    containerColor = Color.White,
-                ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = cardBackgroundColor
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
-                    modifier =
-                        Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .background(
-                                brush =
-                                    Brush.linearGradient(
-                                        colors =
-                                            listOf(
-                                                MaterialTheme.colorScheme.primary,
-                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                                            ),
-                                    ),
-                                shape = CircleShape,
-                            ).padding(3.dp),
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                )
+                            ),
+                            shape = CircleShape
+                        )
+                        .padding(3.dp)
                 ) {
                     Box(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .background(Color.White),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(if (isDark) Color(0xFF2D2D2D) else Color.White)
                     ) {
                         val fotoUrl = buildFullImageUrl(psicologo.usuario?.fotoPerfilUrl)
-
-                        android.util.Log.d(
-                            "PacienteView",
-                            "URL original: ${psicologo.usuario?.fotoPerfilUrl}",
-                        )
-                        android.util.Log.d("PacienteView", "URL final: $fotoUrl")
 
                         val context = LocalContext.current
                         val tokenHolder = koinInject<TokenHolder>()
                         val token = tokenHolder.getToken()
 
-                        val request =
-                            remember(fotoUrl, token) {
-                                ImageRequest
-                                    .Builder(context)
-                                    .data(fotoUrl)
-                                    .addHeader("Authorization", "Bearer $token")
-                                    .crossfade(true)
-                                    .placeholder(R.drawable.ic_default_avatar)
-                                    .error(R.drawable.ic_default_avatar)
-                                    .build()
-                            }
+                        val request = remember(fotoUrl, token) {
+                            ImageRequest.Builder(context)
+                                .data(fotoUrl)
+                                .addHeader("Authorization", "Bearer $token")
+                                .crossfade(true)
+                                .placeholder(R.drawable.ic_default_avatar)
+                                .error(R.drawable.ic_default_avatar)
+                                .build()
+                        }
                         if (!fotoUrl.isNullOrBlank()) {
                             Image(
                                 painter = rememberAsyncImagePainter(model = request),
                                 contentDescription = "Foto de perfil",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.Crop
                             )
                         } else {
                             Image(
                                 painter = painterResource(R.drawable.ic_default_avatar),
                                 contentDescription = "Foto por defecto",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
@@ -504,21 +501,21 @@ fun PsicologoContent(
                     text = "${psicologo.usuario?.nombre ?: ""} ${psicologo.usuario?.apellido ?: ""}".trim(),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = cardContentColor
                 )
 
                 if (!psicologo.especialidad.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Surface(
                         shape = RoundedCornerShape(20.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.25f else 0.15f)
                     ) {
                         Text(
                             text = psicologo.especialidad ?: "",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                            color = if (isDark) Color.White else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                         )
                     }
                 }
@@ -528,19 +525,19 @@ fun PsicologoContent(
                 if (!psicologo.usuario?.email.isNullOrBlank()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 4.dp),
+                        modifier = Modifier.padding(vertical = 4.dp)
                     ) {
                         Icon(
                             Icons.Default.Email,
                             contentDescription = "Email",
                             modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = cardContentSecondaryColor
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = psicologo.usuario?.email ?: "",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = cardContentSecondaryColor
                         )
                     }
                 }
@@ -552,23 +549,21 @@ fun PsicologoContent(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors =
-                CardDefaults.cardColors(
-                    containerColor = Color.White,
-                ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = cardBackgroundColor
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
             ) {
                 Text(
                     text = "📋 Información Profesional",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = cardContentColor
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -579,6 +574,8 @@ fun PsicologoContent(
                         label = "Años de experiencia",
                         value = "${psicologo.experiencia} años",
                         iconColor = MaterialTheme.colorScheme.primary,
+                        labelColor = cardContentSecondaryColor,
+                        valueColor = cardContentColor
                     )
                 }
 
@@ -588,6 +585,8 @@ fun PsicologoContent(
                         label = "Número de Colegiado",
                         value = psicologo.licencia ?: "",
                         iconColor = MaterialTheme.colorScheme.primary,
+                        labelColor = cardContentSecondaryColor,
+                        valueColor = cardContentColor
                     )
                 }
 
@@ -596,6 +595,8 @@ fun PsicologoContent(
                     label = "Horario de atención",
                     value = "Lunes a Viernes: 9:00 - 20:00",
                     iconColor = MaterialTheme.colorScheme.primary,
+                    labelColor = cardContentSecondaryColor,
+                    valueColor = cardContentColor
                 )
 
                 ProfessionalInfoRow(
@@ -603,6 +604,8 @@ fun PsicologoContent(
                     label = "Modalidad",
                     value = "Presencial y Online",
                     iconColor = MaterialTheme.colorScheme.primary,
+                    labelColor = cardContentSecondaryColor,
+                    valueColor = cardContentColor
                 )
             }
         }
@@ -613,34 +616,32 @@ fun PsicologoContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors =
-                    CardDefaults.cardColors(
-                        containerColor = Color.White,
-                    ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = cardBackgroundColor
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = "💬 Sobre mí",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.weight(1f),
+                            color = cardContentColor,
+                            modifier = Modifier.weight(1f)
                         )
                         Icon(
                             Icons.Default.Psychology,
                             contentDescription = "Psicología",
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
@@ -650,7 +651,7 @@ fun PsicologoContent(
                         text = psicologo.descripcion ?: "",
                         fontSize = 14.sp,
                         lineHeight = 22.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = cardContentSecondaryColor
                     )
                 }
             }
@@ -660,34 +661,33 @@ fun PsicologoContent(
 
         Button(
             onClick = { navController.navigate(Screens.citas.route) },
-            modifier = Modifier.fillMaxWidth(),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            ),
             shape = RoundedCornerShape(12.dp),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
         ) {
-            Icon(Icons.Default.CalendarMonth, contentDescription = "Citas")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Ver mis citas", modifier = Modifier.padding(vertical = 4.dp))
+            Icon(
+                Icons.Default.CalendarMonth,
+                contentDescription = "Citas",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                "Ver mis citas",
+                modifier = Modifier.padding(vertical = 4.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.White
+            )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = { navController.navigate(Screens.chatList.route) },
-            modifier = Modifier.fillMaxWidth(),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                ),
-            shape = RoundedCornerShape(12.dp),
-        ) {
-            Text("Ir al chat", modifier = Modifier.padding(vertical = 4.dp))
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -697,32 +697,33 @@ fun ProfessionalInfoRow(
     label: String,
     value: String,
     iconColor: Color,
+    labelColor: Color,
+    valueColor: Color
 ) {
     Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top
     ) {
         Icon(
             icon,
             contentDescription = label,
             modifier = Modifier.size(20.dp),
-            tint = iconColor,
+            tint = iconColor
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                color = labelColor
             )
             Text(
                 text = value,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = valueColor
             )
         }
     }

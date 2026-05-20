@@ -546,15 +546,28 @@ class PsicologoAgendaViewModel(
         monto: BigDecimal,
         modalidad: ModalidadCita,
     ): Result<Unit> {
+        Log.d("VM_CREAR_CITA", "========== INICIO crearCitaParaPaciente ==========")
+        Log.d("VM_CREAR_CITA", "idPaciente: $idPaciente")
+        Log.d("VM_CREAR_CITA", "fecha: $fecha, hora: $hora")
+        Log.d("VM_CREAR_CITA", "idTipoTerapia: $idTipoTerapia")
+        Log.d("VM_CREAR_CITA", "metodoPago: $metodoPago, estadoPago: $estadoPago")
+
         val session = _userSession.value
+        Log.d("VM_CREAR_CITA", "session es null? ${session == null}")
+
         if (session == null) {
+            Log.e("VM_CREAR_CITA", "❌ ERROR: session es null")
             return Result.failure(Exception("No hay sesión"))
         }
 
         val psychologistId = session.idPsicologo
+        Log.d("VM_CREAR_CITA", "psychologistId: $psychologistId")
+
         if (psychologistId == null) {
+            Log.e("VM_CREAR_CITA", "❌ ERROR: psychologistId es null")
             return Result.failure(Exception("No hay ID del psicólogo"))
         }
+
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         val startDatetime = LocalDateTime.of(fecha, hora).format(formatter)
