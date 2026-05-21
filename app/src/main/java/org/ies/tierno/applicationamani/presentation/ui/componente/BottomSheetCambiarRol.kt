@@ -21,7 +21,7 @@ fun BottomSheetCambiarRol(
     onDismiss: () -> Unit,
     onConfirm: (Rol) -> Unit,
 ) {
-    var selectedRol by remember { mutableStateOf(user.rol ?: Rol.PACIENTE) }
+    var selectedRol by remember { mutableStateOf(user.rol ?: Rol.paciente) }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -76,18 +76,18 @@ fun BottomSheetCambiarRol(
                     ) {
                         Text("Rol actual:", fontSize = 14.sp)
                         Text(
-                            when (user.rol ?: Rol.PACIENTE) {
-                                Rol.ADMIN -> "👑 Administrador"
-                                Rol.PSICOLOGO -> "🧠 Psicólogo"
-                                Rol.PACIENTE -> "👤 Paciente"
+                            when (user.rol ?: Rol.paciente) {
+                                Rol.admin -> "👑 Administrador"
+                                Rol.psicologo -> "🧠 Psicólogo"
+                                Rol.paciente -> "👤 Paciente"
                             },
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color =
-                                when (user.rol ?: Rol.PACIENTE) {
-                                    Rol.ADMIN -> Color(0xFFE53935)
-                                    Rol.PSICOLOGO -> Color(0xFF43A047)
-                                    Rol.PACIENTE -> Color(0xFF1E88E5)
+                                when (user.rol ?: Rol.paciente) {
+                                    Rol.admin -> Color(0xFFE53935)
+                                    Rol.psicologo -> Color(0xFF43A047)
+                                    Rol.paciente -> Color(0xFF1E88E5)
                                 },
                         )
                     }
@@ -109,21 +109,21 @@ fun BottomSheetCambiarRol(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     RolOptionButton(
-                        rol = Rol.ADMIN,
-                        isSelected = selectedRol == Rol.ADMIN,
-                        onClick = { selectedRol = Rol.ADMIN },
+                        rol = Rol.admin,
+                        isSelected = selectedRol == Rol.admin,
+                        onClick = { selectedRol = Rol.admin },
                     )
 
                     RolOptionButton(
-                        rol = Rol.PSICOLOGO,
-                        isSelected = selectedRol == Rol.PSICOLOGO,
-                        onClick = { selectedRol = Rol.PSICOLOGO },
+                        rol = Rol.psicologo,
+                        isSelected = selectedRol == Rol.psicologo,
+                        onClick = { selectedRol = Rol.psicologo },
                     )
 
                     RolOptionButton(
-                        rol = Rol.PACIENTE,
-                        isSelected = selectedRol == Rol.PACIENTE,
-                        onClick = { selectedRol = Rol.PACIENTE },
+                        rol = Rol.paciente,
+                        isSelected = selectedRol == Rol.paciente,
+                        onClick = { selectedRol = Rol.paciente },
                     )
                 }
 
@@ -167,9 +167,9 @@ fun RolOptionButton(
 ) {
     val (icon, label, color) =
         when (rol) {
-            Rol.ADMIN -> Triple("👑", "Admin", Color(0xFFE53935))
-            Rol.PSICOLOGO -> Triple("🧠", "Psicólogo", Color(0xFF43A047))
-            Rol.PACIENTE -> Triple("👤", "Paciente", Color(0xFF1E88E5))
+            Rol.admin -> Triple("👑", "Admin", Color(0xFFE53935))
+            Rol.psicologo -> Triple("🧠", "Psicólogo", Color(0xFF43A047))
+            Rol.paciente -> Triple("👤", "Paciente", Color(0xFF1E88E5))
         }
 
     FilterChip(

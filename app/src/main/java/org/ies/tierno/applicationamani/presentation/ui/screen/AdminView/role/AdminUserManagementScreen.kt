@@ -224,8 +224,8 @@ fun AdminUserManagementScreen(
                                     ),
                             )
                             FilterChip(
-                                selected = selectedRol == Rol.ADMIN,
-                                onClick = { selectedRol = Rol.ADMIN },
+                                selected = selectedRol == Rol.admin,
+                                onClick = { selectedRol = Rol.admin },
                                 label = { Text("👑 Admins") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -237,8 +237,8 @@ fun AdminUserManagementScreen(
                                     ),
                             )
                             FilterChip(
-                                selected = selectedRol == Rol.PSICOLOGO,
-                                onClick = { selectedRol = Rol.PSICOLOGO },
+                                selected = selectedRol == Rol.psicologo,
+                                onClick = { selectedRol = Rol.psicologo },
                                 label = { Text("🧠 Psicólogos") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -250,8 +250,8 @@ fun AdminUserManagementScreen(
                                     ),
                             )
                             FilterChip(
-                                selected = selectedRol == Rol.PACIENTE,
-                                onClick = { selectedRol = Rol.PACIENTE },
+                                selected = selectedRol == Rol.paciente,
+                                onClick = { selectedRol = Rol.paciente },
                                 label = { Text("👤 Pacientes") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -355,8 +355,8 @@ fun AdminUserManagementScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Rol actual: ${when (selectedUser?.rol) {
-                            Rol.ADMIN -> "👑 Administrador"
-                            Rol.PSICOLOGO -> "🧠 Psicólogo"
+                            Rol.admin -> "👑 Administrador"
+                            Rol.psicologo -> "🧠 Psicólogo"
                             else -> "👤 Paciente"
                         }}",
                         style = typography.bodySmall,
@@ -364,16 +364,16 @@ fun AdminUserManagementScreen(
                     )
                     Text(
                         text = "Nuevo rol: ${when (pendingRol) {
-                            Rol.ADMIN -> "👑 Administrador"
-                            Rol.PSICOLOGO -> "🧠 Psicólogo"
+                            Rol.admin -> "👑 Administrador"
+                            Rol.psicologo -> "🧠 Psicólogo"
                             else -> "👤 Paciente"
                         }}",
                         style = typography.bodySmall,
                         fontWeight = FontWeight.Bold,
                         color =
                             when (pendingRol) {
-                                Rol.ADMIN -> colorScheme.error
-                                Rol.PSICOLOGO -> colorScheme.secondary
+                                Rol.admin -> colorScheme.error
+                                Rol.psicologo -> colorScheme.secondary
                                 else -> colorScheme.primary
                             },
                     )
@@ -436,8 +436,8 @@ fun UserCard(
     // Colores según rol
     val roleColor =
         when (user.rol) {
-            Rol.ADMIN -> colorScheme.error
-            Rol.PSICOLOGO -> colorScheme.tertiary
+            Rol.admin -> colorScheme.error
+            Rol.psicologo -> colorScheme.tertiary
             else -> colorScheme.primary
         }
 
@@ -445,15 +445,15 @@ fun UserCard(
 
     val roleLabel =
         when (user.rol) {
-            Rol.ADMIN -> "👑 Administrador"
-            Rol.PSICOLOGO -> "🧠 Psicólogo"
+            Rol.admin -> "👑 Administrador"
+            Rol.psicologo -> "🧠 Psicólogo"
             else -> "👤 Paciente"
         }
 
     val roleIcon =
         when (user.rol) {
-            Rol.ADMIN -> Icons.Default.AdminPanelSettings
-            Rol.PSICOLOGO -> Icons.Default.Psychology
+            Rol.admin -> Icons.Default.AdminPanelSettings
+            Rol.psicologo -> Icons.Default.Psychology
             else -> Icons.Default.Person
         }
 

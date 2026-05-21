@@ -9,4 +9,9 @@ data class CambiarRolResponseDTO(
     val rolAnterior: Rol,
     val nuevoRol: Rol,
     val mensaje: String,
+    val token: String? = null,
+    val idPsicologo: Long? = null,
+    val idPaciente: Long? = null,
+    val idioma: String? = null,
+    val tema: Boolean? = null
 )

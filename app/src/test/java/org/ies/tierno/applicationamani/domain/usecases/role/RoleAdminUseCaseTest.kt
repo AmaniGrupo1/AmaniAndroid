@@ -25,7 +25,7 @@ class RoleAdminUseCaseTest {
     fun `invoke should return response from repository`() =
         runTest {
             val idUsuario = 1L
-            val nuevoRol = Rol.ADMIN
+            val nuevoRol = Rol.admin
             val expected = Response.success(mockk<CambiarRolResponseDTO>())
 
             coEvery { repository.cambiarRol(any()) } returns expected

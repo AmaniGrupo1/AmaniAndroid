@@ -17,6 +17,7 @@ import org.ies.tierno.applicationamani.data.remoto.CitasApi
 import org.ies.tierno.applicationamani.data.remoto.DiarioApi
 import org.ies.tierno.applicationamani.data.remoto.DocumentoLegalApi
 import org.ies.tierno.applicationamani.data.remoto.HistorialApi
+import org.ies.tierno.applicationamani.data.remoto.HistorialCitaApi
 import org.ies.tierno.applicationamani.data.remoto.NotificacionApi
 import org.ies.tierno.applicationamani.data.remoto.PaymentApiService
 import org.ies.tierno.applicationamani.data.remoto.ProfileApi
@@ -138,6 +139,7 @@ val retrofitModule =
             Retrofit
                 .Builder()
                 .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+                //.baseUrl("http://192/168/1/175:8080/") // Para emulador Android Studio
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(get<okhttp3.OkHttpClient>()) // Usar el mismo cliente
                 .build()
@@ -158,5 +160,6 @@ val retrofitModule =
         single<HistorialApi> { get<Retrofit>().create(HistorialApi::class.java) }
         single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }
         single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
+        single<HistorialCitaApi> { get<Retrofit>().create(HistorialCitaApi::class.java) }
     }
 

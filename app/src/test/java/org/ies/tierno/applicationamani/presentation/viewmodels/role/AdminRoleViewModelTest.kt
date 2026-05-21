@@ -46,13 +46,13 @@ class AdminRoleViewModelTest {
                     idUsuario = 1L,
                     nombre = "Test",
                     email = "test@test.com",
-                    rolAnterior = Rol.PACIENTE,
-                    nuevoRol = Rol.ADMIN,
+                    rolAnterior = Rol.paciente,
+                    nuevoRol = Rol.admin,
                     mensaje = "ok",
                 )
             coEvery { useCase(any(), any()) } returns Response.success(body)
 
-            viewModel.cambiarRol(1L, Rol.ADMIN)
+            viewModel.cambiarRol(1L, Rol.admin)
             advanceUntilIdle()
 
             assertEquals("ok", viewModel.success.value)
@@ -64,7 +64,7 @@ class AdminRoleViewModelTest {
         runTest {
             coEvery { useCase(any(), any()) } returns Response.error(500, mockk(relaxed = true))
 
-            viewModel.cambiarRol(1L, Rol.ADMIN)
+            viewModel.cambiarRol(1L, Rol.admin)
             advanceUntilIdle()
 
             assertTrue(viewModel.error.value?.contains("500") == true)
@@ -75,7 +75,7 @@ class AdminRoleViewModelTest {
     fun `clearMessages resets messages`() =
         runTest {
             coEvery { useCase(any(), any()) } returns Response.success(mockk(relaxed = true))
-            viewModel.cambiarRol(1L, Rol.ADMIN)
+            viewModel.cambiarRol(1L, Rol.admin)
             advanceUntilIdle()
 
             viewModel.clearMessages()

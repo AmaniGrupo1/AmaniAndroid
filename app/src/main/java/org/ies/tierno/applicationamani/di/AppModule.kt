@@ -116,7 +116,7 @@ val appModule =
         single { AuthRepository(get(), get(), get(), get()) }
         single { TestRepositoryApi(get()) }
         single { SituacionRepository(get()) }
-        single { CitasRepository(get()) }
+        single { CitasRepository(get(), get()) }
         single { ProfileRepository(get()) }
         single { DiarioEmocionalRepository(get(), get()) }
         single { DiarioRemoteRepository(get()) }
@@ -183,7 +183,7 @@ val appModule =
         viewModel { EditProfilePsicologoViewModel(get()) }
         viewModel { PacienteViewModel(get()) }
         viewModel { ListarTerapiasViewModel(get(), get()) }
-        viewModel { ListarCitasViewModel(get(), get()) }
+        viewModel { ListarCitasViewModel(get(), get(),get()) }
         viewModel { DiarioEmocionalViewModel(get()) }
         viewModel { AdminRoleViewModel(get()) }
         viewModel { AdminUserViewModel(get()) }

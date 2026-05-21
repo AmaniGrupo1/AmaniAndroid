@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.data.repositorio
 
 import org.ies.tierno.applicationamani.data.remoto.CitasApi
+import org.ies.tierno.applicationamani.data.remoto.HistorialCitaApi
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
@@ -8,12 +9,14 @@ import org.ies.tierno.applicationamani.dto.agenda.request.HorarioRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.BloqueoRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.CrearCitaRequestDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
+import org.ies.tierno.applicationamani.dto.citas.HistorialCitaResponseDTO
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaRequest
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 
 class CitasRepository(
     private val citasApi: CitasApi,
+    private val historialCitaApi: HistorialCitaApi
 ) {
     suspend fun getAgendaPaciente(
         idPaciente: Long,
@@ -196,6 +199,14 @@ class CitasRepository(
         try {
             citasApi.eliminarTerapia(id)
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    suspend fun getHistorialCitas(): Result<List<HistorialCitaResponseDTO>> =
+        try {
+            val response = historialCitaApi.getHistorialCitas()
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -6,12 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
+import org.ies.tierno.applicationamani.domain.usecases.historialCita.HistorialCitaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarCitasUseCase
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
+import org.ies.tierno.applicationamani.dto.citas.HistorialCitaResponseDTO
 
 class ListarCitasViewModel(
     private val listarCitasUseCase: ListarCitasUseCase,
     private val citasRepository: CitasRepository,
+    val historialCitaUseCase : HistorialCitaUseCase
 ) : ViewModel() {
     var citas = mutableStateListOf<CitaPacienteViewResponseDTO>()
         private set
@@ -26,6 +29,9 @@ class ListarCitasViewModel(
         private set
 
     var selectedCita = mutableStateOf<CitaPacienteViewResponseDTO?>(null)
+        private set
+
+    var historialCitas = mutableStateListOf<HistorialCitaResponseDTO>()
         private set
 
     fun cargarCitas() {
@@ -66,6 +72,29 @@ class ListarCitasViewModel(
                 error.value = e.message ?: "Error al cancelar la cita"
             } finally {
                 isCancelling.value = false
+            }
+        }
+    }
+
+    fun cargarHistorialCitas() {
+        viewModelScope.launch {
+            try {
+                isLoading.value = true
+                error.value = null
+
+                val result = historialCitaUseCase.getHistorialCitas()
+
+                if (result.isSuccess) {
+                    historialCitas.clear()
+                    historialCitas.addAll(result.getOrDefault(emptyList()))
+                } else {
+                    error.value = result.exceptionOrNull()?.message ?: "Error al cargar historial de citas"
+                }
+
+            } catch (e: Exception) {
+                error.value = e.message ?: "Error al cargar historial de citas"
+            } finally {
+                isLoading.value = false
             }
         }
     }
