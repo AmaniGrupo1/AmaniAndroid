@@ -25,26 +25,43 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
+/**
+ * ViewModel que gestiona la visualización y reserva de citas desde la perspectiva del paciente.
+ *
+ * Obtiene el psicólogo asignado, carga la agenda mensual y la disponibilidad diaria,
+ * y permite reservar y cancelar citas. Reacciona a eventos de actualización de horario
+ * para refrescar la disponibilidad en tiempo real.
+ *
+ * @param citasRepository Repositorio para operaciones de citas y disponibilidad.
+ * @param profileRepository Repositorio para consultar el psicólogo asignado al paciente.
+ * @param userSessionDataStore Almacén local de la sesión del paciente autenticado.
+ */
 class CitasViewModel(
     private val citasRepository: CitasRepository,
     private val profileRepository: ProfileRepository,
     private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
+    /** Sesión del usuario autenticado. */
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
+    /** Identificador del psicólogo asignado al paciente. */
     private val _psicologoId = MutableStateFlow<Long?>(null)
     val psicologoId: StateFlow<Long?> = _psicologoId.asStateFlow()
 
+    /** Citas del mes visible en la agenda del paciente. */
     private val _agendaMensual = MutableStateFlow<List<AgendaItemDTO>>(emptyList())
     val agendaMensual: StateFlow<List<AgendaItemDTO>> = _agendaMensual.asStateFlow()
 
+    /** Disponibilidad horaria del psicólogo para la fecha seleccionada. */
     private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
     val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()
 
+    /** Indica si una operación de carga está en curso. */
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    /** Mensaje de error de la última operación fallida. */
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
@@ -82,10 +99,16 @@ class CitasViewModel(
         }
     }
 
+    /** Limpia el mensaje de error actual. */
     fun clearError() {
         _errorMessage.value = null
     }
 
+    /**
+     * Carga las citas del paciente para el mes especificado.
+     *
+     * @param month Mes y año del que se desea obtener la agenda.
+     */
     fun cargarAgendaMensual(month: YearMonth) {
         val session = _userSession.value ?: return
 
@@ -107,6 +130,11 @@ class CitasViewModel(
         }
     }
 
+    /**
+     * Consulta la disponibilidad horaria del psicólogo para una fecha concreta.
+     *
+     * @param fecha Fecha para la que se consulta la disponibilidad.
+     */
     fun cargarDisponibilidad(fecha: LocalDate) {
         val idPsicologo = _psicologoId.value ?: _userSession.value?.idPsicologo ?: return
 
@@ -178,6 +206,14 @@ class CitasViewModel(
         cargarDisponibilidad(fecha)
     }
 
+    /**
+     * Cancela una cita identificada por su ID.
+     *
+     * Lanza una corrutina que invoca [CitasRepository.cancelarCita] y actualiza
+     * el estado de carga.
+     *
+     * @param idCita Identificador de la cita a cancelar.
+     */
     fun cancelarCita(idCita: Long) {
         viewModelScope.launch {
             _isLoading.value = true

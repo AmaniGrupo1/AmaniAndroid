@@ -91,6 +91,18 @@ private const val TAG = "PsicologoProfileScreen"
 // Usar la MISMA URL que en Retrofit
 private const val BASE_URL = "http://192.168.1.175:8080"
 
+/**
+ * Pantalla de perfil del psicólogo con opción de edición y cambio de foto.
+ *
+ * Muestra los datos profesionales del psicólogo (nombre, especialidad,
+ * experiencia, licencia, email) y permite editar el perfil, cambiar la
+ * foto desde cámara o galería, y gestionar los permisos de cámara.
+ * Incluye gestión de estado de subida de imagen con indicador de carga.
+ *
+ * @param psicologoId Identificador del psicólogo cuyo perfil se muestra.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el estado del perfil del psicólogo.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PsicologoProfileScreen(
@@ -600,6 +612,13 @@ fun ProfileContent(
     }
 }
 
+/**
+ * Fila informativa con icono, etiqueta y valor para los datos del psicólogo.
+ *
+ * @param icon Icono vectorial representativo del campo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ */
 @Composable
 fun InfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -632,6 +651,12 @@ fun InfoRow(
     }
 }
 
+/**
+ * Pantalla de error con mensaje y botón de reintento para el perfil del psicólogo.
+ *
+ * @param error Mensaje descriptivo del error.
+ * @param onRetry Callback invocado al pulsar el botón de reintento.
+ */
 @Composable
 fun ErrorContent(
     error: String,

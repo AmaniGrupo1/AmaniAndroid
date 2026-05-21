@@ -18,6 +18,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Pantalla de confirmación de registro exitoso.
+ *
+ * Muestra un mensaje de éxito tras completar el proceso de registro y
+ * ofrece un botón para navegar a la pantalla de inicio de sesión.
+ *
+ * @param navController Controlador de navegación para ir al login.
+ */
 @Composable
 fun RegistroExitosoScreen(navController: NavController) {
     Scaffold(

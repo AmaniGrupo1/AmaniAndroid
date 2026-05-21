@@ -12,6 +12,14 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase.ListarPacientesByPsicologo
 
+/**
+ * Representa un interlocutor en la lista de chats.
+ *
+ * @property id Identificador único del interlocutor (ID de usuario).
+ * @property nombre Nombre completo o apelativo mostrado en la lista de chats.
+ * @property rol Rol del interlocutor (\"paciente\" o \"psicologo\").
+ * @property photoUrl URL opcional de la foto de perfil del interlocutor.
+ */
 data class ChatPartner(
     val id: Long,
     val nombre: String,
@@ -19,6 +27,17 @@ data class ChatPartner(
     val photoUrl: String? = null,
 )
 
+/**
+ * ViewModel que gestiona la lista de contactos de chat del usuario autenticado.
+ *
+ * Según el rol del usuario, carga el psicólogo asignado (para pacientes) o la
+ * lista de pacientes asignados (para psicólogos). Expone estados de carga, error
+ * y una lista de [ChatPartner] observables para la UI.
+ *
+ * @param userSessionDataStore Almacén local de la sesión del usuario.
+ * @param profileUseCaseGeneral Caso de uso genérico para consultar perfiles.
+ * @param listarPacientesByPsicologo Caso de uso para listar pacientes asignados a un psicólogo.
+ */
 class ChatListViewModel(
     private val userSessionDataStore: UserSessionDataStore,
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
@@ -28,18 +47,23 @@ class ChatListViewModel(
         private const val TAG = "ChatListViewModel"
     }
 
+    /** Identificador del usuario autenticado. */
     private val _currentUserId = MutableStateFlow<Long?>(null)
     val currentUserId: StateFlow<Long?> = _currentUserId.asStateFlow()
 
+    /** Rol del usuario autenticado ("paciente" o "psicologo"). */
     private val _currentUserRol = MutableStateFlow<String>("")
     val currentUserRol: StateFlow<String> = _currentUserRol.asStateFlow()
 
+    /** Lista de interlocutores disponibles para chatear. */
     private val _partners = MutableStateFlow<List<ChatPartner>>(emptyList())
     val partners: StateFlow<List<ChatPartner>> = _partners.asStateFlow()
 
+    /** Indica si la lista de contactos se está cargando. */
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    /** Mensaje de error de la última operación fallida. */
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
@@ -225,6 +249,7 @@ class ChatListViewModel(
         }
     }
 
+    /** Reinicia la carga de contactos limpiando el estado actual. */
     fun retry() {
         _partners.value = emptyList()
         _error.value = null

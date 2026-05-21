@@ -81,6 +81,19 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla principal del psicólogo con la lista de sus pacientes asignados.
+ *
+ * Muestra tarjetas expandibles con los datos de cada paciente, incluyendo
+ * información de contacto, tutores legales (si es menor) y un botón para
+ * crear una entrada en el historial clínico. Utiliza [MenuSetting] como
+ * barra superior.
+ *
+ * @param userSessionDataStore Almacén de sesión para obtener el ID del psicólogo.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de pacientes del psicólogo.
+ * @param profilePsicologoViewModel ViewModel que gestiona el perfil del psicólogo.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -779,6 +792,13 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
     }
 }
 
+/**
+ * Sección informativa genérica con título, icono y pares etiqueta-valor.
+ *
+ * @param title Título de la sección.
+ * @param icon Icono vectorial representativo.
+ * @param items Lista de pares (etiqueta, valor) a mostrar.
+ */
 @Composable
 fun InfoSection(
     title: String,

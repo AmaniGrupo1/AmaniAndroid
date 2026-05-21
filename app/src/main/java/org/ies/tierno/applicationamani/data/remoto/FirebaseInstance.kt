@@ -3,6 +3,13 @@ package org.ies.tierno.applicationamani.data.remoto
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 
+/**
+ * Singleton que centraliza la inicialización y acceso a las instancias de Firebase.
+ *
+ * Mantiene una única instancia de [FirebaseDatabase] (Realtime Database) y de
+ * [FirebaseStorage] con soporte para alternar entre entorno de producción y
+ * emulador local según la constante [USE_EMULATOR].
+ */
 object FirebaseInstance {
     private const val RTDB_URL = "https://amani-160bf-default-rtdb.europe-west1.firebasedatabase.app"
     private const val USE_EMULATOR = false
@@ -29,11 +36,33 @@ object FirebaseInstance {
         }
     }
 
+    /**
+     * Retorna la instancia inicializada de Realtime Database.
+     *
+     * @return Instancia única de [FirebaseDatabase].
+     */
     fun getDatabase(): FirebaseDatabase = databaseInstance
 
+    /**
+     * Retorna la instancia inicializada de Firebase Storage.
+     *
+     * @return Instancia única de [FirebaseStorage].
+     */
     fun getStorage(): FirebaseStorage = storageInstance
 
+    /**
+     * Obtiene una referencia a una ruta específica dentro de Realtime Database.
+     *
+     * @param path Ruta dentro de la base de datos en tiempo real.
+     * @return Referencia de Firebase al nodo solicitado.
+     */
     fun getReference(path: String) = databaseInstance.getReference(path)
 
+    /**
+     * Obtiene una referencia a una ruta dentro de Firebase Storage.
+     *
+     * @param path Ruta dentro del bucket de almacenamiento.
+     * @return Referencia de Storage al objeto o carpeta solicitada.
+     */
     fun getStorageReference(path: String) = storageInstance.getReference(path)
 }

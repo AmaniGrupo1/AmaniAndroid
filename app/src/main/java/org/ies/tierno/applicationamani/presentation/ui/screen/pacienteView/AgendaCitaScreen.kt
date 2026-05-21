@@ -38,6 +38,17 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Pantalla de agenda de citas del paciente.
+ *
+ * Muestra una lista de citas programadas con información del psicólogo,
+ * fecha, hora, estado de pago y modalidad. Permite cancelar citas, ver
+ * información de la terapia asociada y contactar con el psicólogo.
+ * Incluye un [FloatingActionButton] para agendar una nueva cita.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de citas.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgendaCitaScreen(
@@ -305,7 +316,7 @@ fun CitaCardAmani(
     val shapes = MaterialTheme.shapes
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
-    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     val fecha =
@@ -622,7 +633,7 @@ fun CitaCardAmani(
                             ),
                         shape = CircleShape,
                         border =
-                            ButtonDefaults.outlinedButtonBorder.copy(
+                            ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = Brush.horizontalGradient(listOf(colorScheme.error, colorScheme.error)),
                             ),
                     ) {
@@ -1031,6 +1042,17 @@ fun ContactInfoItemAmani(
     }
 }
 
+/**
+ * Diálogo de confirmación para cancelar una cita.
+ *
+ * Muestra los detalles de la cita (fecha, hora) y advierte que la acción
+ * es irreversible.
+ *
+ * @param cita Datos de la cita a cancelar.
+ * @param isCancelling Indica si la cancelación está en progreso.
+ * @param onConfirm Callback invocado al confirmar la cancelación.
+ * @param onDismiss Callback invocado al cerrar el diálogo sin cancelar.
+ */
 @Composable
 fun CancelConfirmationDialogAmani(
     cita: CitaPacienteViewResponseDTO,

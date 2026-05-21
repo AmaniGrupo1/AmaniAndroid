@@ -54,6 +54,14 @@ private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
 }
 
 // ✅ Definir SettingsOption localmente
+/**
+ * Modelo de datos para una opción de configuración en la pantalla de ajustes del psicólogo.
+ *
+ * @property id Identificador único de la opción.
+ * @property title Título descriptivo.
+ * @property subtitle Texto secundario con información adicional.
+ * @property icon Icono vectorial asociado.
+ */
 data class SettingsOption(
     val id: String,
     val title: String,
@@ -61,6 +69,17 @@ data class SettingsOption(
     val icon: ImageVector
 )
 
+/**
+ * Pantalla de ajustes del psicólogo con gestión de idioma, tema y horario.
+ *
+ * Permite al psicólogo cambiar el idioma, el tema visual (claro/oscuro)
+ * y configurar el horario semanal de disponibilidad. Los cambios de idioma
+ * provocan la recreación de la Activity.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ * @param idiomaViewModel ViewModel que gestiona el cambio de idioma, tema y horario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPsychologistScreen(

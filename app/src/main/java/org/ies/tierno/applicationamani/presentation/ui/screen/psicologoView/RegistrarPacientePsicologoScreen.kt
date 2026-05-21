@@ -7,9 +7,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,18 @@ import java.time.format.DateTimeFormatter
 private val SuccessColor = Color(0xFF81C784)
 private val ErrorColor = Color(0xFFE57373)
 
+/**
+ * Pantalla de registro de un nuevo paciente desde la vista del psicólogo.
+ *
+ * Presenta un formulario completo con campos personales, datos del tutor
+ * legal (si el paciente es menor de edad), dirección, selección de
+ * situaciones y aceptación de términos. Similar a [RegisterScreen] pero
+ * adaptada al flujo del psicólogo que registra pacientes manualmente.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel que gestiona el estado del registro.
+ * @param situacionViewModel ViewModel que gestiona la lista de situaciones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrarPacientePsicologoScreen(
@@ -456,7 +469,7 @@ fun RegistrarPacientePsicologoScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
@@ -764,7 +777,7 @@ fun RegistrarPacientePsicologoScreen(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                 shape = textFieldShape,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = textColor,
@@ -921,7 +934,7 @@ fun RegistrarPacientePsicologoScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             stringResource(R.string.situaciones_titulo),

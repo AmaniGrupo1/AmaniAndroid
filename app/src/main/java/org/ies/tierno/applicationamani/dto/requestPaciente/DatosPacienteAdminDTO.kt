@@ -19,6 +19,12 @@ import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
  * @property createdAt Fecha de creación del registro en formato ISO 8601.
  * @property updatedAt Fecha de última actualización en formato ISO 8601.
  * @property activo Indica si el paciente está activo (`true`) o dado de baja (`false`).
+ * @property metodoPago Método de pago configurado por el paciente.
+ * @property estadoPago Estado del último pago (pendiente, completado, etc.).
+ * @property situaciones Lista de situaciones clínicas o administrativas asociadas.
+ * @property tutores Lista de tutores legales asociados al paciente.
+ * @property direccion Lista de direcciones registradas del paciente.
+ * @property edad Edad calculada del paciente en años.
  */
 data class DatosPacienteAdminDTO(
     val idPaciente: Long,

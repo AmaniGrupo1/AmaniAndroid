@@ -74,10 +74,17 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
 /**
- * Modelo de datos para los items del menú
+ * Modelo de datos que define un elemento del menú de administración.
+ *
+ * @property titleRes Recurso de texto con la etiqueta del elemento.
+ * @property icon Icono vectorial asociado al elemento.
+ * @property route Ruta de navegación de destino.
+ * @property isDanger `true` si el elemento representa una acción peligrosa (ej: cerrar sesión).
+ * @property dividerBefore Indica si se debe mostrar un divisor antes del elemento.
+ * @property dividerAfter Indica si se debe mostrar un divisor después del elemento.
  */
 data class MenuAdministrador(
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val icon: ImageVector,
     val route: String,
     val isDanger: Boolean = false,
@@ -426,7 +433,15 @@ fun MenuAdministradorSimple(
 }
 
 /**
- * Menú lateral para navegación (Drawer)
+ * Menú lateral de navegación (Navigation Drawer) para el panel de administración.
+ *
+ * Muestra una cabecera con el logotipo, un título descriptivo y una lista
+ * de opciones de navegación. La opción de cierre de sesión ejecuta
+ * [onLogout] antes de navegar a la pantalla de login.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param onLogout Callback invocado al seleccionar la opción de cerrar sesión.
+ * @param currentRoute Ruta actual para resaltar el elemento activo.
  */
 @Composable
 fun MenuLateralAdministrador(

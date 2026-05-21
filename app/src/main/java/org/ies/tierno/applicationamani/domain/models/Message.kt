@@ -34,7 +34,9 @@ data class Message(
     val status: MessageStatus = MessageStatus.SENT,
 ) {
     /**
-     * Determina si el mensaje ha sido entregado basándose en la marca de tiempo [deliveredAt].
+     * Determina si el mensaje ha sido entregado al destinatario.
+     *
+     * @return `true` si existe una marca de tiempo de entrega ([deliveredAt]); `false` en caso contrario.
      */
     val isDelivered: Boolean
         get() = deliveredAt != null
@@ -42,14 +44,13 @@ data class Message(
 
 /**
  * Define los tipos de archivos adjuntos soportados en el chat.
+ *
+ * @property IMAGE Archivo de imagen (JPG, PNG, WEBP, etc.).
+ * @property DOCUMENT Documento de texto, PDF u hoja de cálculo.
+ * @property AUDIO Nota de voz o archivo de audio.
  */
 enum class AttachmentType {
-    /** Archivos de imagen (JPG, PNG, etc.). */
     IMAGE,
-
-    /** Documentos de texto o PDF. */
     DOCUMENT,
-
-    /** Notas de voz o archivos de audio. */
     AUDIO,
 }

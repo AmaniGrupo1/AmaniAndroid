@@ -30,6 +30,19 @@ import timber.log.Timber
 import java.time.LocalDate
 import java.time.Period
 
+/**
+ * ViewModel que gestiona el flujo de autenticación (inicio de sesión y registro).
+ *
+ * Centraliza los estados de login, registro de paciente y registro de psicólogo,
+ * incluyendo validaciones locales de contraseña y formulario. También maneja la
+ * creación de pacientes desde el perfil de psicólogo.
+ *
+ * @param loginUseCase Caso de uso para la operación de inicio de sesión.
+ * @param asignarPacienteAlPsicologoUseCase Caso de uso para asignar paciente a psicólogo tras registro.
+ * @param userSessionDataStore Almacén local de la sesión del usuario autenticado.
+ * @param tokenDataStore Almacén local seguro del token JWT.
+ * @param tokenHolder Contenedor en memoria del token JWT para inyección en interceptores.
+ */
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
     private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase,
@@ -62,25 +75,40 @@ class LoginViewModel(
     fun isValidPassword(password: String): Boolean = PASSWORD_REGEX.matches(password)
 
     // ── Login ──
+    /** Correo electrónico introducido por el usuario en el formulario de login. */
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
+    /** Contraseña introducida por el usuario en el formulario de login. */
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
+    /** Resultado de la última operación de inicio de sesión. `null` si no se ha intentado. */
     private val _loginResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
     val loginResult: StateFlow<Result<LoginResponseDTO>?> = _loginResult
 
+    /** Indica si una operación de inicio de sesión está en curso. */
     private val _isLoggingIn = MutableStateFlow(false)
     val isLoggingIn: StateFlow<Boolean> = _isLoggingIn
 
+    /** Mensaje de error de validación o del backend durante el inicio de sesión. */
     private val _loginError = MutableStateFlow<String?>(null)
     val loginError: StateFlow<String?> = _loginError
 
+    /**
+     * Actualiza el valor del campo de nombre de usuario (email).
+     *
+     * @param username Dirección de correo electrónico introducida.
+     */
     fun setUsername(username: String) {
         _username.value = username
     }
 
+    /**
+     * Actualiza el valor del campo de contraseña.
+     *
+     * @param password Contraseña introducida por el usuario.
+     */
     fun setPassword(password: String) {
         _password.value = password
     }
@@ -237,12 +265,15 @@ class LoginViewModel(
     val registroLicencia = MutableStateFlow<String?>(null)
 
     // ── Estados para control de registro ──
+    /** Indica si una operación de registro está en curso. */
     private val _isRegistering = MutableStateFlow(false)
     val isRegistering: StateFlow<Boolean> = _isRegistering
 
+    /** Mensaje de error durante el registro de paciente. */
     private val _registerError = MutableStateFlow<String?>(null)
     val registerError: StateFlow<String?> = _registerError
 
+    /** Indica si el registro de paciente se completó con éxito. */
     private val _registerSuccess = MutableStateFlow(false)
     val registerSuccess: StateFlow<Boolean> = _registerSuccess
 
@@ -449,7 +480,7 @@ class LoginViewModel(
             genero,
             fechaNacimiento,
             aceptaTerminos,
-        ) { array ->
+        ) { array: Array<Any> ->
             val n = array[0] as String
             val a = array[1] as String
             val d = array[2] as String
@@ -538,6 +569,14 @@ class LoginViewModel(
 
     /**
      * Registrar Paciente con validación de contraseña
+     */
+    /**
+     * Registra un nuevo paciente con los datos del formulario.
+     *
+     * Valida que el formulario esté completo y la contraseña cumpla los requisitos.
+     * Lanza una corrutina que invoca [LoginUseCase.registrarPaciente] y, si el
+     * registro tiene éxito, intenta asignar automáticamente el paciente al psicólogo
+     * mediante [AsignarPacienteAlPsicologoUseCase].
      */
     fun registrarPaciente() {
         if (!formularioCompletoValido.value) {
@@ -735,6 +774,14 @@ class LoginViewModel(
     /**
      * Ejecuta el proceso de registro de psicólogo con validación de contraseña
      */
+    /**
+     * Registra un nuevo psicólogo con los datos del formulario.
+     *
+     * Valida que los campos obligatorios estén completos y la contraseña sea válida.
+     * Lanza una corrutina que invoca [LoginUseCase.registrarPsicologo].
+     * En caso de error, si el mensaje contiene "email", asigna un error específico
+     * de correo duplicado.
+     */
     fun registrarPsicologo() {
         clearAllErrors()
 
@@ -795,15 +842,26 @@ class LoginViewModel(
 
     // ── Registrar paciente desde psicólogo con validación de contraseña ──
 
+    /** Indica si la creación de paciente desde el perfil de psicólogo fue exitosa. */
     private val _crearPacienteDesdePsicologoSuccess = MutableStateFlow(false)
     val crearPacienteDesdePsicologoSuccess: StateFlow<Boolean> = _crearPacienteDesdePsicologoSuccess
 
+    /** Mensaje de error al crear paciente desde el perfil de psicólogo. */
     private val _crearPacienteDesdePsicologoError = MutableStateFlow<String?>(null)
     val crearPacienteDesdePsicologoError: StateFlow<String?> = _crearPacienteDesdePsicologoError
 
+    /** Indica si la creación de paciente desde psicólogo está en curso. */
     private val _isCreandoPacienteDesdePsicologo = MutableStateFlow(false)
     val isCreandoPacienteDesdePsicologo: StateFlow<Boolean> = _isCreandoPacienteDesdePsicologo
 
+    /**
+     * Crea un nuevo paciente desde el perfil de psicólogo.
+     *
+     * Requiere que el formulario completo sea válido. Lanza una corrutina que
+     * construye la petición con tutores (si es menor), dirección y datos de usuario,
+     * y la envía mediante [LoginUseCase.registrarPacienteDesdePsicologo].
+     * Al finalizar, independientemente del resultado, desactiva el indicador de carga.
+     */
     fun registrarPacienteDesdePsicologo() {
         if (!formularioCompletoValido.value) {
             _crearPacienteDesdePsicologoError.value = "Complete todos los campos obligatorios"
@@ -883,6 +941,7 @@ class LoginViewModel(
         }
     }
 
+    /** Reinicia los estados de éxito y error de creación de paciente desde psicólogo. */
     fun resetCrearPacienteDesdePsicologoState() {
         _crearPacienteDesdePsicologoSuccess.value = false
         _crearPacienteDesdePsicologoError.value = null

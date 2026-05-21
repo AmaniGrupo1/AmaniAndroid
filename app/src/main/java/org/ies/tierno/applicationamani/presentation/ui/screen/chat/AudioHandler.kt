@@ -17,6 +17,18 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 
+/**
+ * Gestor de grabación de audio para notas de voz en el chat.
+ *
+ * Soporta grabación en formato OGG/Opus (Android O+) y M4A/AAC (versiones
+ * anteriores). Expone el estado de grabación y los segundos transcurridos
+ * mediante [StateFlow] para su consumo reactivo en la UI.
+ *
+ * @property context Contexto de la aplicación para acceder al directorio de caché.
+ * @property isUsingOggFormat `true` si el dispositivo soporta el formato OGG.
+ * @property isRecording Flujo que indica si se está grabando actualmente.
+ * @property recordingSeconds Flujo con los segundos transcurridos desde el inicio de la grabación.
+ */
 class AudioHandler(
     private val context: Context,
 ) {

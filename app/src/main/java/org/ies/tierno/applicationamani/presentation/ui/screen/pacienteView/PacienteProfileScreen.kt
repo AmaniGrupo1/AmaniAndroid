@@ -24,7 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.CameraAlt
@@ -60,6 +60,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -112,6 +114,19 @@ private const val BASE_URL = "http://192.168.1.175:8080"
 
 // Colores originales para el modo DEFECTO
 
+/**
+ * Pantalla de perfil del paciente.
+ *
+ * Muestra los datos personales del paciente (nombre, apellidos, email,
+ * teléfono, fecha de nacimiento, DNI) y permite editar el perfil y subir
+ * una foto desde la cámara o galería. Incluye gestión de permisos de
+ * cámara y un diálogo de éxito tras la actualización.
+ *
+ * @param pacienteId Identificador del paciente cuyo perfil se muestra.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el estado del perfil del paciente.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PacienteProfileScreen(
@@ -292,7 +307,7 @@ fun PacienteProfileScreen(
         if (fecha == null) return "No especificada"
         return try {
             fecha.format(
-                DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("es", "ES")),
+                DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()),
             )
         } catch (e: Exception) {
             fecha.toString()
@@ -322,7 +337,7 @@ fun PacienteProfileScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                             tint = if (isDark) colorScheme.onSurface else Color.White,
                         )
@@ -613,7 +628,7 @@ fun PacienteProfileScreen(
                                             modifier =
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .menuAnchor(),
+                                                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                             shape = MaterialTheme.shapes.small,
                                             colors =
                                                 OutlinedTextFieldDefaults.colors(
@@ -1039,6 +1054,15 @@ fun PacienteProfileScreen(
     }
 }
 
+/**
+ * Fila informativa con icono, etiqueta y valor para los datos del perfil del paciente.
+ *
+ * @param icon Icono vectorial representativo del campo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ * @param colorScheme Esquema de colores de Material 3.
+ * @param typography Tipografía de Material 3.
+ */
 @Composable
 fun InfoRowPaciente(
     icon: ImageVector,
@@ -1074,6 +1098,15 @@ fun InfoRowPaciente(
     }
 }
 
+/**
+ * Pantalla de error con mensaje y botón de reintento para el perfil del paciente.
+ *
+ * @param error Mensaje descriptivo del error.
+ * @param onRetry Callback invocado al pulsar el botón de reintento.
+ * @param colorScheme Esquema de colores de Material 3.
+ * @param typography Tipografía de Material 3.
+ * @param isDark Indica si el tema oscuro está activo.
+ */
 @Composable
 fun ErrorContentPaciente(
     error: String,

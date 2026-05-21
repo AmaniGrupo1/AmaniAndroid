@@ -63,7 +63,16 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Pantalla de inicio de sesión profesional de AMANI Psicología.
+ * Pantalla de inicio de sesión de la aplicación AMANI Psicología.
+ *
+ * Permite al usuario autenticarse con su correo electrónico y contraseña.
+ * Al iniciar sesión correctamente, redirige automáticamente a la pantalla
+ * correspondiente según el rol del usuario (admin, psicólogo o paciente).
+ * Incluye validación de campos, visualización de errores mediante
+ * [SnackbarHost] y enlace a la pantalla de registro.
+ *
+ * @param navController Controlador de navegación para redirigir tras el login.
+ * @param loginViewModel ViewModel que gestiona el estado de autenticación.
  */
 @Composable
 fun LoginScreen(

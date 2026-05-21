@@ -80,6 +80,17 @@ private val AmaniTextPrimary = Color(0xFF2D2D35)
 private val AmaniTextSecondary = Color(0xFF6B6B7A)
 private val AmaniDivider = Color(0xFFE8E2F3)
 
+/**
+ * Pantalla de gestión de terapias desde el panel de administración.
+ *
+ * Muestra una lista de terapias disponibles con su nombre, duración y
+ * precio. Permite crear nuevas terapias, editar las existentes y
+ * eliminarlas mediante un diálogo de confirmación. Incluye un
+ * [FloatingActionButton] para añadir nuevas terapias.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el CRUD de terapias.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TerapiasScreen(

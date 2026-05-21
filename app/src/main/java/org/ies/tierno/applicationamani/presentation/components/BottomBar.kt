@@ -36,7 +36,7 @@ import org.ies.tierno.applicationamani.R
  */
 private data class BottomBarDestination(
     val route: String,
-    @StringRes val labelRes: Int,
+    @param:StringRes val labelRes: Int,
     val iconFilled: ImageVector,
     val iconOutlined: ImageVector,
 )

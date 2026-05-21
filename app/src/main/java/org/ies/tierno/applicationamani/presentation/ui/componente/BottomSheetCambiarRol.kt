@@ -14,6 +14,17 @@ import androidx.compose.ui.window.DialogProperties
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 
+/**
+ * Diálogo modal para cambiar el rol de un usuario existente.
+ *
+ * Muestra la información actual del usuario (nombre, email, rol) y
+ * permite seleccionar un nuevo rol mediante [FilterChip] antes de
+ * confirmar o cancelar la operación.
+ *
+ * @param user Datos del usuario cuyo rol se desea modificar.
+ * @param onDismiss Callback invocado al cancelar o cerrar el diálogo.
+ * @param onConfirm Callback invocado al confirmar el cambio, recibe el nuevo [Rol] seleccionado.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetCambiarRol(
@@ -159,6 +170,18 @@ fun BottomSheetCambiarRol(
     }
 }
 
+/**
+ * Chip de selección que representa una opción de rol en el diálogo
+ * [BottomSheetCambiarRol].
+ *
+ * Muestra un emoji, una etiqueta descriptiva y un color distintivo
+ * para cada rol. El estado [isSelected] determina el estilo visual
+ * del chip.
+ *
+ * @param rol Rol representado por este chip.
+ * @param isSelected `true` si este chip es la opción activa.
+ * @param onClick Callback invocado al pulsar el chip.
+ */
 @Composable
 fun RolOptionButton(
     rol: Rol,

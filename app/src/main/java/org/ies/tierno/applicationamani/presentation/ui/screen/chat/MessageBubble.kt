@@ -50,6 +50,22 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybac
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.PsychologistInfo
 import androidx.compose.ui.Alignment as Alignment2
 
+/**
+ * Burbuja de mensaje individual en el chat, con soporte para texto, imágenes,
+ * documentos y audio.
+ *
+ * Renderiza el mensaje alineado a la derecha (mensajes propios) o a la
+ * izquierda (mensajes del interlocutor), con avatar, indicador de estado
+ * (enviado/entregado/leído) y estilos diferenciados según el tipo de adjunto.
+ *
+ * @param message Mensaje a mostrar.
+ * @param isFirstInGroup `true` si este mensaje es el primero de un grupo del mismo remitente.
+ * @param isLastInGroup `true` si este mensaje es el último de un grupo del mismo remitente.
+ * @param currentUserId Identificador del usuario actual para determinar la propiedad del mensaje.
+ * @param psychologistInfo Información del psicólogo asignado (avatar, nombre, estado).
+ * @param audioUiState Estado de reproducción de audio.
+ * @param onPlayPause Callback para reproducir/pausar un mensaje de audio.
+ */
 @Composable
 fun MessageBubble(
     message: Message,
@@ -311,6 +327,13 @@ fun PsychologistAvatar(
     }
 }
 
+/**
+ * Icono de estado del mensaje (enviado, entregado, leído).
+ *
+ * @param isRead `true` si el mensaje ha sido leído (doble check azul).
+ * @param isDelivered `true` si el mensaje ha sido entregado (check simple).
+ * @param tint Color opcional para el icono; si es `null`, se usa el color semántico.
+ */
 @Composable
 fun StatusIcon(
     isRead: Boolean,

@@ -29,6 +29,18 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla de visualización detallada de un documento legal.
+ *
+ * Muestra el contenido completo de un documento legal (Términos y Condiciones
+ * o Política de Privacidad) junto con sus metadatos: versión, estado
+ * (activo/inactivo), fecha de creación y última actualización. El contenido
+ * se carga desde [DocumentoLegalViewModel] según el [tipoDocumento].
+ *
+ * @param navController Controlador de navegación para volver atrás.
+ * @param tipoDocumento Tipo de documento a visualizar (\»terminos\» o \»privacidad\»).
+ * @param viewModel ViewModel que gestiona la carga del documento legal.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -224,6 +236,12 @@ fun DocumentoLegalDetailScreen(
     }
 }
 
+/**
+ * Contenido visual del documento legal con título, metadatos y texto completo.
+ *
+ * @param documento DTO con los datos del documento legal.
+ * @param roboto Familia tipográfica Roboto utilizada en los textos.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DocumentoContent(

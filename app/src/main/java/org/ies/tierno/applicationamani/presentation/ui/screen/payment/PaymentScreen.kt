@@ -31,6 +31,22 @@ import com.stripe.android.paymentsheet.rememberPaymentSheet
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
 
+/**
+ * Pantalla de pago de una cita mediante la integración con Stripe.
+ *
+ * Muestra un resumen de la cita (psicólogo, fecha, importe) y gestiona
+ * el flujo de pago seguro a través de Stripe Payment Sheet. Notifica al
+ * usuario el resultado del pago (éxito, cancelación o error) y permite
+ * reintentar en caso de fallo.
+ *
+ * @param citaId Identificador de la cita a pagar.
+ * @param psicologoName Nombre del psicólogo asociado a la cita.
+ * @param fecha Fecha de la cita en formato legible.
+ * @param monto Importe a pagar.
+ * @param viewModel ViewModel que gestiona el flujo de pago.
+ * @param onPaymentSuccess Callback invocado cuando el pago se completa con éxito.
+ * @param onPaymentCanceled Callback invocado cuando el usuario cancela el pago.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentScreen(

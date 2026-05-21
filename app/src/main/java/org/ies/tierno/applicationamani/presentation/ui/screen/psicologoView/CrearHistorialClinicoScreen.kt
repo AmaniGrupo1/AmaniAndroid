@@ -57,6 +57,9 @@ import org.ies.tierno.applicationamani.dto.historial.request.HistorialClinicoReq
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 
+/**
+ * Paleta de colores corporativos para la pantalla de creación de historial clínico.
+ */
 object HistorialClinicoColors {
     val Primary = Color(0xFF6B4E71)
     val PrimaryLight = Color(0xFF9B7E9F)
@@ -71,6 +74,18 @@ object HistorialClinicoColors {
     val Success = Color(0xFF81C784)
 }
 
+/**
+ * Pantalla de creación de una entrada en el historial clínico de un paciente.
+ *
+ * Permite al psicólogo registrar un título, diagnóstico, tratamiento y
+ * observaciones para el historial clínico del paciente. Al guardar, envía
+ * un [HistorialClinicoRequestDTO] al backend y muestra una notificación
+ * de éxito.
+ *
+ * @param navController Controlador de navegación para volver atrás tras guardar.
+ * @param pacienteId Identificador del paciente para el que se crea el historial.
+ * @param viewModel ViewModel que gestiona la creación del historial clínico.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearHistorialClinicoScreen(

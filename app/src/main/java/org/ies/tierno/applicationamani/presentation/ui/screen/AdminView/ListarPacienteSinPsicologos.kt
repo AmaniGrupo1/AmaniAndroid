@@ -73,6 +73,17 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla que lista los pacientes que aún no tienen un psicólogo asignado.
+ *
+ * Muestra tarjetas expandibles con los datos básicos del paciente, su
+ * dirección, tutor asignado (si es menor) y situaciones registradas.
+ * Permite al administrador revisar cada caso para proceder a la asignación
+ * de un profesional.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param pacientesViewModel ViewModel que gestiona la lista de pacientes sin psicólogo.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ListarPacienteSinPsicologos(
@@ -443,6 +454,12 @@ fun SubSection(
     }
 }
 
+/**
+ * Fila de detalle con etiqueta y valor para mostrar dentro de tarjetas informativas.
+ *
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ */
 @Composable
 fun DetailRow(
     label: String,
@@ -469,6 +486,11 @@ fun DetailRow(
     }
 }
 
+/**
+ * Tarjeta que muestra los datos de dirección de un paciente.
+ *
+ * @param direccion DTO con los campos de dirección (calle, ciudad, provincia, código postal, país).
+ */
 @Composable
 fun DireccionCard(direccion: DireccionResponseDTO) {
     Card(
@@ -498,6 +520,11 @@ fun DireccionCard(direccion: DireccionResponseDTO) {
     }
 }
 
+/**
+ * Tarjeta que muestra los datos del tutor legal de un paciente menor.
+ *
+ * @param tutor DTO con los campos del tutor (nombre, parentesco, teléfono, email, DNI).
+ */
 @Composable
 fun TutorCard(tutor: TutorResponseDTO) {
     Card(
@@ -527,6 +554,11 @@ fun TutorCard(tutor: TutorResponseDTO) {
     }
 }
 
+/**
+ * Tarjeta que muestra la información de una situación registrada para el paciente.
+ *
+ * @param situacion DTO con los campos de la situación (nombre, categoría, descripción).
+ */
 @Composable
 fun SituacionCard(situacion: SituacionDTO) {
     Card(

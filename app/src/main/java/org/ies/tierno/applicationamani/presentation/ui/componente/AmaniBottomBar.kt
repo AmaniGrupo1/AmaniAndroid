@@ -50,7 +50,7 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
  */
 data class AmaniBottomBarItem(
     val route: String?,
-    @StringRes val labelRes: Int,
+    @param:StringRes val labelRes: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 )

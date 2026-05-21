@@ -21,6 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 
+/**
+ * Pantalla de consentimiento informado durante el proceso de registro.
+ *
+ * Presenta al usuario las opciones de consentimiento (videoconferencia,
+ * comunicación) y permite continuar con el registro una vez aceptadas.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel que gestiona el estado del registro.
+ */
 @Composable
 fun ConsentimientoScreen(
     navController: NavController,

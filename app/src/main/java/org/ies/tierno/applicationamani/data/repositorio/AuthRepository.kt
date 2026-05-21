@@ -35,6 +35,7 @@ import timber.log.Timber
  * @property api Interfaz de acceso a la API de autenticación.
  * @property tokenDataStore Almacenamiento local para el token de acceso.
  * @property userSessionDataStore Almacenamiento local para los datos de la sesión de usuario.
+ * @property tokenHolder Contenedor en memoria para acceso inmediato al token JWT.
  */
 class AuthRepository(
     private val api: AuthApi,
@@ -339,6 +340,11 @@ class AuthRepository(
             emit(emptyList())
         }
 
+    /**
+     * Obtiene un flujo de datos con la lista de psicólogos dados de baja.
+     *
+     * @return [Flow] que emite la lista de perfiles de psicólogos en estado de baja.
+     */
     fun getPsicologosBaja(): Flow<List<PsicologoSelfResponseDTO>> =
         flow {
             val response = api.getPsicologosBaja()
@@ -378,6 +384,12 @@ class AuthRepository(
             emit(emptyList())
         }
 
+    /**
+     * Da de baja a un paciente del sistema.
+     *
+     * @param id Identificador único del paciente a dar de baja.
+     * @return [Result] con el mensaje de confirmación de la operación o el error correspondiente.
+     */
     suspend fun darBajaPaciente(id: Long): Result<MessageResponse> =
         withContext(Dispatchers.IO) {
             try {
@@ -408,6 +420,12 @@ class AuthRepository(
             }
         }
 
+    /**
+     * Reactiva a un psicólogo previamente dado de baja.
+     *
+     * @param id Identificador único del psicólogo a dar de alta.
+     * @return [Result] con el mensaje de confirmación de la operación o el error correspondiente.
+     */
     suspend fun darAltaPsicologo(id: Long): Result<MessageResponse> =
         withContext(Dispatchers.IO) {
             try {

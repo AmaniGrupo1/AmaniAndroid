@@ -62,6 +62,18 @@ import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 
+/**
+ * Pantalla de edición de los datos de un psicólogo desde el panel de administración.
+ *
+ * Carga los datos actuales del psicólogo identificado por [psicologoId] y
+ * permite modificar nombre, apellidos, email, especialidad, experiencia,
+ * descripción, licencia y teléfono. Al guardar, envía un
+ * [PsicologoRequestDTO] al ViewModel y muestra una notificación de éxito.
+ *
+ * @param navController Controlador de navegación para volver atrás tras guardar.
+ * @param viewModel ViewModel que gestiona la lista de psicólogos y su edición.
+ * @param psicologoId Identificador del psicólogo a editar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditarPsicologoAdminScreen(

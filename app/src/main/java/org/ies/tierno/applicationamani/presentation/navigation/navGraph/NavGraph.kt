@@ -82,6 +82,15 @@ import org.koin.java.KoinJavaComponent.getKoin
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
+/**
+ * Grafo de navegación principal de la aplicación Amani.
+ *
+ * Define todas las rutas de la aplicación mediante [NavHost] y configura
+ * la visibilidad condicional de la barra de navegación inferior según la
+ * pantalla activa y el rol del usuario autenticado.
+ *
+ * @param navController Controlador de navegación de Jetpack Compose.
+ */
 fun NavGraph(
     navController: NavHostController,
     startDestination: String = Screens.principal.route,

@@ -16,6 +16,20 @@ private val Context.userSessionDataStore: DataStore<Preferences> by preferencesD
     name = "user_session_prefs",
 )
 
+/**
+ * Representa la sesión activa del usuario en la aplicación.
+ *
+ * Contiene los identificadores, rol, nombre, idioma y preferencia de tema
+ * necesarios para personalizar la experiencia de cada tipo de usuario.
+ *
+ * @property idUsuario Identificador único del usuario en el sistema.
+ * @property nombre Nombre visible del usuario en la interfaz.
+ * @property rol Rol del usuario (paciente, psicólogo, administrador).
+ * @property idPsicologo Identificador del psicólogo asociado, si aplica.
+ * @property idPaciente Identificador del paciente asociado, si aplica.
+ * @property idioma Código ISO del idioma preferido (por defecto "es").
+ * @property tema Preferencia de tema: `false` para claro, `true` para oscuro.
+ */
 data class UserSession(
     val idUsuario: Long,
     val nombre: String?,
@@ -23,9 +37,17 @@ data class UserSession(
     val idPsicologo: Long? = null,
     val idPaciente: Long? = null,
     val idioma: String? = "es",
-    val tema: Boolean = false, // false = claro, true = oscuro
+    val tema: Boolean = false,
 )
 
+/**
+ * Almacén de persistencia de la sesión del usuario mediante DataStore.
+ *
+ * Permite guardar, recuperar y limpiar los datos de sesión activa. Además,
+ * incluye una migración automática del formato antiguo de tema (String) al nuevo (Boolean).
+ *
+ * @property context Contexto de la aplicación necesario para inicializar DataStore.
+ */
 class UserSessionDataStore(
     private val context: Context,
 ) {
@@ -38,39 +60,38 @@ class UserSessionDataStore(
         val LANGUAGE_KEY = stringPreferencesKey("language")
         val THEME_KEY = booleanPreferencesKey("theme")
 
-        // Clave antigua para migración (si se usaba String)
-        val OLD_THEME_KEY = stringPreferencesKey("theme") // Esta es la misma clave pero como String
+        val OLD_THEME_KEY = stringPreferencesKey("theme")
         val MIGRATION_DONE_KEY = booleanPreferencesKey("migration_done")
     }
 
-    // Flow con migración automática
+    /**
+     * Flow reactivo que emite la sesión actual del usuario.
+     *
+     * Realiza una migración automática del antiguo formato de tema (String "DARK"/"LIGHT")
+     * al nuevo formato (Boolean) en la primera lectura si aún no se ha migrado.
+     */
     val sessionFlow: Flow<UserSession?> =
         context.userSessionDataStore.data.transform { preferences ->
             var mutablePrefs = preferences
 
-            // Verificar si ya se migró
             val migrationDone = preferences[MIGRATION_DONE_KEY] ?: false
 
             if (!migrationDone) {
-                // Intentar leer el tema antiguo como String
                 val oldThemeString = preferences[OLD_THEME_KEY]
                 val newTheme =
                     when (oldThemeString) {
-                        "DARK" -> true // Oscuro
-                        "LIGHT" -> false // Claro
-                        "SYSTEM" -> false // Defecto -> claro
-                        else -> false // Por defecto claro
+                        "DARK" -> true
+                        "LIGHT" -> false
+                        "SYSTEM" -> false
+                        else -> false
                     }
 
-                // Guardar el nuevo valor y marcar migración completada
                 context.userSessionDataStore.edit { editor ->
                     editor[THEME_KEY] = newTheme
                     editor[MIGRATION_DONE_KEY] = true
-                    // Opcional: eliminar la clave antigua
                     editor.remove(OLD_THEME_KEY)
                 }
 
-                // Recargar los datos después de la migración
                 val updatedPrefs = context.userSessionDataStore.data.first()
                 mutablePrefs = updatedPrefs
             }
@@ -107,6 +128,11 @@ class UserSessionDataStore(
             }
         }
 
+    /**
+     * Persiste los datos de sesión del usuario en DataStore.
+     *
+     * @param session Objeto [UserSession] con los datos a almacenar.
+     */
     suspend fun saveSession(session: UserSession) {
         context.userSessionDataStore.edit { preferences ->
             preferences[USER_ID_KEY] = session.idUsuario
@@ -141,11 +167,19 @@ class UserSessionDataStore(
         }
     }
 
+    /**
+     * Elimina todos los datos de sesión del almacenamiento persistente.
+     */
     suspend fun clearSession() {
         context.userSessionDataStore.edit {
             it.clear()
         }
     }
 
+    /**
+     * Obtiene la sesión actual de forma suspendible.
+     *
+     * @return La sesión activa o `null` si no hay sesión almacenada.
+     */
     suspend fun getSession(): UserSession? = sessionFlow.first()
 }

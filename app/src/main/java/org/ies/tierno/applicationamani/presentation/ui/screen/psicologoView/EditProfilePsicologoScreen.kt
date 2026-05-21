@@ -1,6 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-import EditProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -59,6 +59,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Pantalla de edición del perfil del psicólogo.
+ *
+ * Permite al psicólogo modificar sus datos profesionales: nombre,
+ * apellidos, email, especialidad, experiencia, licencia y descripción.
+ * Al guardar, actualiza el perfil en el backend y muestra una notificación
+ * de éxito antes de volver atrás.
+ *
+ * @param navController Controlador de navegación para volver atrás tras guardar.
+ * @param identificador Identificador del psicólogo a editar.
+ * @param editProfilePsicologoViewModel ViewModel que gestiona la edición del perfil.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfilePsicologoScreen(

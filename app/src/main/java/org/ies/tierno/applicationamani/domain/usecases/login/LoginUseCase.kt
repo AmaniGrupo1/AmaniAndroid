@@ -12,7 +12,7 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
  * Caso de uso que agrupa las operaciones de autenticación y registro de usuarios.
  *
  * Proporciona métodos para iniciar sesión, registrar pacientes (públicos y
- * desde admin), administradores y psicólogos, delegando en [AuthRepository].
+ * desde admin o psicólogo), administradores y psicólogos, delegando en [AuthRepository].
  *
  * @property repository Repositorio que ejecuta las peticiones HTTP de autenticación.
  *
@@ -22,6 +22,13 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 class LoginUseCase(
     private val repository: AuthRepository,
 ) {
+    /**
+     * Inicia sesión con las credenciales proporcionadas.
+     *
+     * @param request Datos de inicio de sesión (correo y contraseña).
+     * @return [Result.success] con [LoginResponseDTO] que incluye el token JWT,
+     *         o [Result.failure] con la excepción correspondiente.
+     */
     suspend fun login(request: LoginRequestDTO): Result<LoginResponseDTO> = repository.login(request)
 
     /**
@@ -32,17 +39,6 @@ class LoginUseCase(
      *         o [Result.failure] con la excepción correspondiente.
      */
     suspend fun registerPaciente(request: PacienteRequest): Result<LoginResponseDTO> = repository.registerPaciente(request)
-
-    /**
-     * Registra un nuevo paciente desde el panel de administración.
-     *
-     * @param request Datos completos del paciente a registrar.
-     * @return [Result.success] con [LoginResponseDTO] del paciente creado,
-     *         o [Result.failure] con la excepción correspondiente.
-     */
-//    suspend fun registerPacienteAdmin(request: PacienteRequest): Result<DatosPacienteAdminDTO> {
-//        return repository.crearPacienteAdmin(request)
-//    }
 
     /**
      * Registra un nuevo usuario con rol de administrador.
@@ -57,11 +53,18 @@ class LoginUseCase(
      * Registra un nuevo usuario con rol de psicólogo.
      *
      * @param request Datos básicos del psicólogo.
-     * @return [Result.success] con [LoginResponseDTO] del psicólogo creado,
+     * @return [Result.success] con [PsicologoSelfResponseDTO] del psicólogo creado,
      *         o [Result.failure] con la excepción correspondiente.
      */
     suspend fun registrarPsicologo(request: PsicologoRequestDTO): Result<PsicologoSelfResponseDTO> = repository.registerPsicologo(request)
 
+    /**
+     * Registra un nuevo paciente creado desde el panel de un psicólogo.
+     *
+     * @param request Datos completos del paciente a registrar.
+     * @return [Result.success] con [LoginResponseDTO] del paciente creado,
+     *         o [Result.failure] con la excepción correspondiente.
+     */
     suspend fun registrarPacienteDesdePsicologo(request: PacienteRequest): Result<LoginResponseDTO> =
         repository.crearPacienteDesdePsicologo(request)
 }

@@ -38,11 +38,23 @@ data class SoporteUiState(
     val mostrarToastExito: Boolean = false,
 )
 
+/**
+ * Enumera las pantallas disponibles en la sección de soporte.
+ */
 enum class PantallaSoporte {
     NUEVO_TICKET,
     MIS_TICKETS,
 }
 
+/**
+ * ViewModel que gestiona los tickets de soporte del usuario.
+ *
+ * Permite listar los tickets existentes, crear nuevos tickets con validación
+ * de campos, aplicar filtros por estado y mostrar feedback mediante snackbar.
+ * Los tickets se obtienen y persisten a través de [SoporteTicketRepository].
+ *
+ * @param repository Repositorio para operaciones CRUD de tickets de soporte.
+ */
 class SoporteTicketViewModel(
     private val repository: SoporteTicketRepository,
 ) : ViewModel() {
@@ -58,6 +70,12 @@ class SoporteTicketViewModel(
         cargarTickets()
     }
 
+    /**
+     * Carga la lista de tickets del usuario desde el repositorio.
+     *
+     * Transforma los DTOs del backend en objetos [TicketSoporte] con fechas
+     * formateadas para su presentación en la UI.
+     */
     fun cargarTickets() {
         viewModelScope.launch {
             Timber.d("Iniciando carga de tickets...")
@@ -87,36 +105,73 @@ class SoporteTicketViewModel(
         }
     }
 
+    /**
+     * Cambia la pantalla activa en la sección de soporte.
+     *
+     * @param pantalla Pantalla de destino ([PantallaSoporte.NUEVO_TICKET] o [PantallaSoporte.MIS_TICKETS]).
+     */
     fun navegarA(pantalla: PantallaSoporte) {
         Timber.d("Navegando a: $pantalla")
         _uiState.update { it.copy(pantallaActual = pantalla) }
     }
 
+    /**
+     * Aplica un filtro sobre la lista de tickets.
+     *
+     * @param filtro Criterio de filtrado (todos, abiertos, cerrados).
+     */
     fun seleccionarFiltro(filtro: FiltroTicket) {
         Timber.d("Filtro seleccionado: $filtro")
         _uiState.update { it.copy(filtroSeleccionado = filtro) }
     }
 
+    /**
+     * Establece el tipo de ticket en el formulario de creación.
+     *
+     * @param tipo Tipo de ticket (problema, sugerencia, etc.).
+     */
     fun seleccionarTipo(tipo: TipoTicket) {
         Timber.d("Tipo de ticket seleccionado: $tipo")
         _uiState.update { it.copy(tipoTicket = tipo) }
     }
 
+    /**
+     * Actualiza el título del ticket en el formulario.
+     *
+     * @param value Nuevo valor del campo título.
+     */
     fun onTituloChange(value: String) {
         _uiState.update { it.copy(titulo = value) }
     }
 
+    /**
+     * Actualiza la descripción del ticket, con límite de 1000 caracteres.
+     *
+     * @param value Nuevo valor del campo descripción.
+     */
     fun onDescripcionChange(value: String) {
         if (value.length <= 1000) {
             _uiState.update { it.copy(descripcion = value) }
         }
     }
 
+    /**
+     * Establece la categoría del ticket en el formulario.
+     *
+     * @param categoria Categoría seleccionada (bug, funcionalidad, etc.).
+     */
     fun onCategoriaChange(categoria: CategoriaTicket) {
         Timber.d("Categor\u00eda seleccionada: $categoria")
         _uiState.update { it.copy(categoria = categoria) }
     }
 
+    /**
+     * Valida y envía el ticket de soporte al backend.
+     *
+     * Requiere que título y descripción no estén vacíos. Si la validación falla,
+     * emite un mensaje por snackbar. En caso de éxito, añade el nuevo ticket
+     * al principio de la lista y limpia el formulario.
+     */
     fun enviarTicket() {
         val state = _uiState.value
         Timber.d(
@@ -174,10 +229,12 @@ class SoporteTicketViewModel(
         }
     }
 
+    /** Oculta el toast de confirmación de creación de ticket. */
     fun dismissToast() {
         _uiState.update { it.copy(mostrarToastExito = false) }
     }
 
+    /** Limpia el mensaje de error actual. */
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }

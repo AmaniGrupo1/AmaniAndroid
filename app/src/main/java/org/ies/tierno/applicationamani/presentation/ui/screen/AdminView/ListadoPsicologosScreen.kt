@@ -64,6 +64,20 @@ val barlowCondensed =
         Font(R.font.barlow_condensed_black),
     )
 
+/**
+ * Pantalla que lista los psicólogos activos con opciones de gestión.
+ *
+ * Muestra una lista de psicólogos disponibles en el sistema. Permite al
+ * administrador asignar un psicólogo a un paciente específico, dar de baja
+ * a un psicólogo o editar sus datos. Incluye diálogos de confirmación
+ * para las acciones de baja y asignación.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel de autenticación para la asignación de pacientes.
+ * @param pacienteId Identificador del paciente al que se asignará el psicólogo.
+ * @param viewModel ViewModel que gestiona la lista de psicólogos.
+ * @param listarPacientesViewModel ViewModel para gestionar bajas y altas.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosScreen(

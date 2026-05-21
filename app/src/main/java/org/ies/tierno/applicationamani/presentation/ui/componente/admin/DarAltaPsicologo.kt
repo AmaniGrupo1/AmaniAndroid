@@ -22,6 +22,20 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 
+/**
+ * Barra superior (TopAppBar) para la pantalla de alta de psicólogo.
+ *
+ * Incluye animación de transición entre el logo y el título, un badge
+ * de notificaciones y un menú desplegable con la opción de dar de alta
+ * a un nuevo psicólogo. Utiliza los colores primarios del tema Material 3.
+ *
+ * @param title Título a mostrar en la barra.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param showBackButton Indica si se debe mostrar el botón de retroceso.
+ * @param showLogo Indica si se debe mostrar el logotipo junto al título.
+ * @param onLogout Callback opcional invocado al cerrar sesión.
+ * @param actions Contenido adicional a la derecha de la barra.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun DarAltaPsicologo(

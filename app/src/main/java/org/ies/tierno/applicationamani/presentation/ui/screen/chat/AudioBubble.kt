@@ -35,6 +35,18 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybac
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
 
 @Composable
+/**
+ * Componente visual que representa un mensaje de audio en el chat.
+ *
+ * Muestra los controles de reproducción (play/pause), una barra de progreso
+ * animada y el tiempo transcurrido/total del audio, con estados visuales
+ * para carga, reproducción y error.
+ *
+ * @param message Mensaje que contiene los metadatos del audio.
+ * @param isOwn Si es {@code true}, aplica el estilo de mensaje propio.
+ * @param audioUiState Estado actual de la reproducción de audio.
+ * @param onPlayPause Callback que recibe el ID del mensaje y la URL del audio.
+ */
 fun AudioBubble(
     message: Message,
     isOwn: Boolean,
@@ -140,6 +152,14 @@ fun AudioBubble(
 }
 
 @Composable
+/**
+ * Barra de progreso redondeada para visualizar el avance de reproducción de audio.
+ *
+ * @param progress Valor de progreso entre 0 y 1.
+ * @param color Color de la porción completada de la barra.
+ * @param trackColor Color de fondo de la barra.
+ * @param modifier Modificador opcional aplicado al contenedor de la barra.
+ */
 private fun RoundedAudioProgressBar(
     progress: Float,
     color: Color,

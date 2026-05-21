@@ -12,9 +12,25 @@ import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
 import retrofit2.HttpException
 
+/**
+ * Repositorio para la gestión de situaciones clínicas.
+ *
+ * Proporciona operaciones CRUD para el catálogo de situaciones clínicas
+ * (diagnósticos, contextos, etc.) utilizadas en la aplicación.
+ *
+ * @property api Interfaz Retrofit para los endpoints de situaciones.
+ */
 class SituacionRepository(
     private val api: SituacionApi,
 ) {
+    /**
+     * Obtiene un flujo reactivo con todas las situaciones clínicas.
+     *
+     * Realiza una llamada HTTP y emite la lista de situaciones. En caso de error,
+     * emite una lista vacía.
+     *
+     * @return [Flow] que emite la lista de [SituacionDTO].
+     */
     fun getSituaciones(): Flow<List<SituacionDTO>> =
         flow {
             val response = api.getSituaciones()
@@ -34,6 +50,12 @@ class SituacionRepository(
             }
         }.flowOn(Dispatchers.IO).catch { emit(emptyList()) }
 
+    /**
+     * Obtiene una situación clínica por su identificador.
+     *
+     * @param id Identificador único de la situación.
+     * @return [Result] con [SituacionDTO] si se encuentra, o error en caso contrario.
+     */
     suspend fun getSituacionById(id: Long): Result<SituacionDTO> =
         withContext(Dispatchers.IO) {
             try {
@@ -56,6 +78,12 @@ class SituacionRepository(
             }
         }
 
+    /**
+     * Crea una nueva situación clínica en el catálogo.
+     *
+     * @param request DTO con los datos de la situación a crear.
+     * @return [Result] con [SituacionDTO] de la situación creada.
+     */
     suspend fun createSituacion(request: SituacionRequest): Result<SituacionDTO> =
         try {
             val response = api.createSituacion(request)
@@ -68,6 +96,13 @@ class SituacionRepository(
             Result.failure(e)
         }
 
+    /**
+     * Actualiza una situación clínica existente.
+     *
+     * @param id Identificador de la situación a modificar.
+     * @param request DTO con los nuevos datos.
+     * @return [Result] con [SituacionDTO] actualizado.
+     */
     suspend fun updateSituacion(
         id: Long,
         request: SituacionRequest,
@@ -83,6 +118,12 @@ class SituacionRepository(
             Result.failure(e)
         }
 
+    /**
+     * Elimina una situación clínica del catálogo.
+     *
+     * @param id Identificador de la situación a eliminar.
+     * @return [Result] que indica éxito o fallo.
+     */
     suspend fun deleteSituacion(id: Long): Result<Unit> =
         try {
             val response = api.deleteSituacion(id)

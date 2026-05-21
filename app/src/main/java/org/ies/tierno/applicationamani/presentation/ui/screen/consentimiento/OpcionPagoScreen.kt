@@ -20,6 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+/**
+ * Pantalla de selección del método de pago durante el registro.
+ *
+ * Permite al usuario elegir entre pago presencial y pago online antes
+ * de finalizar el proceso de alta en la plataforma.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ */
 @Composable
 fun OpcionPagoScreen(navController: NavController) {
     var metodoPago by remember { mutableStateOf("") }

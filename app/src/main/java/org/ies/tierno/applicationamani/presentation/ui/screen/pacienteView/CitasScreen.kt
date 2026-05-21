@@ -71,6 +71,18 @@ object CitasScreenDefaultColors {
     val Warning = Color(0xFFFF9800)
 }
 
+/**
+ * Pantalla de creación de una nueva cita para el paciente.
+ *
+ * Permite seleccionar fecha, hora, terapia, modalidad (presencial/online)
+ * y método de pago. Incluye un [CalendarioView] para la selección visual
+ * de la fecha y un selector de franjas horarias disponibles. Al confirmar,
+ * agenda la cita y permite añadirla al calendario del dispositivo.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la agenda del psicólogo.
+ * @param listarTerapiasViewModel ViewModel que gestiona la lista de terapias disponibles.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CitasScreen(
@@ -530,7 +542,7 @@ fun CitasScreen(
                                                 text = fecha.format(
                                                     DateTimeFormatter.ofPattern(
                                                         "EEEE, d 'de' MMMM",
-                                                        Locale("es", "ES")
+                                                        java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
                                                     )
                                                 ).replaceFirstChar { it.uppercase() },
                                                 fontSize = 16.sp,
@@ -983,7 +995,7 @@ fun DialogoGestionCitaAmani(
                             )
                         },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                        modifier = Modifier.fillMaxWidth().menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                         shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = colors.textFieldText,
@@ -1172,6 +1184,19 @@ fun DialogoGestionCitaAmani(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Campo de selección desplegable personalizado con icono y etiqueta.
+ *
+ * @param label Etiqueta del campo.
+ * @param icono Icono vectorial a la izquierda.
+ * @param valor Valor actual seleccionado.
+ * @param expanded Indica si el menú desplegable está expandido.
+ * @param onExpandedChange Callback para cambiar el estado de expansión.
+ * @param error Indica si el campo está en estado de error.
+ * @param colors Conjunto de colores temáticos.
+ * @param roboto Familia tipográfica Roboto.
+ * @param content Contenido del menú desplegable.
+ */
 @Composable
 fun CampoSeleccionAmani(
     label: String,
@@ -1202,7 +1227,7 @@ fun CampoSeleccionAmani(
                     Icon(icono, contentDescription = label, modifier = Modifier.size(20.dp), tint = colors.primary)
                 },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                modifier = Modifier.fillMaxWidth().menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 isError = error,
@@ -1227,6 +1252,15 @@ fun CampoSeleccionAmani(
     }
 }
 
+/**
+ * Selector de fecha con navegación por días y formato localizado.
+ *
+ * @param fechaSeleccionada Fecha actualmente seleccionada.
+ * @param onFechaChange Callback invocado al cambiar la fecha.
+ * @param colors Conjunto de colores temáticos.
+ * @param roboto Familia tipográfica Roboto.
+ * @param isDark Indica si el tema oscuro está activo.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CampoFechaAmani(
@@ -1270,7 +1304,7 @@ fun CampoFechaAmani(
                         fontFamily = roboto
                     )
                     Text(
-                        fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", Locale("es", "ES"))).replaceFirstChar { it.uppercase() },
+                        fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())).replaceFirstChar { it.uppercase() },
                         fontSize = 12.sp,
                         color = colors.textSecondary,
                         fontFamily = roboto
@@ -1285,6 +1319,9 @@ fun CampoFechaAmani(
 }
 
 // Clase auxiliar para los colores del tema
+/**
+ * Conjunto de colores temáticos para la pantalla de citas.
+ */
 data class CitasScreenThemeColors(
     val primary: Color,
     val primaryLight: Color,

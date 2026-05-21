@@ -46,6 +46,16 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 
+/**
+ * Pantalla que lista las conversaciones disponibles para el usuario actual.
+ *
+ * Muestra las parejas de chat (psicólogo asignado para pacientes, o pacientes
+ * asignados para psicólogos) en tarjetas pulsables que navegan a [ChatScreen].
+ * Si no hay conversaciones disponibles, muestra un mensaje informativo.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de partners de chat.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(

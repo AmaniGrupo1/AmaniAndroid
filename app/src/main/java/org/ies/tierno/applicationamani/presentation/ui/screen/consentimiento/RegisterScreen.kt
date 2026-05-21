@@ -7,9 +7,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,20 @@ private val SuccessColor = Color(0xFF81C784)
 private val ErrorColor = Color(0xFFE57373)
 private val WarningColor = Color(0xFFFF9800)
 
+/**
+ * Pantalla de registro de un nuevo paciente en la plataforma Amani.
+ *
+ * Presenta un formulario completo con campos personales (nombre, apellidos,
+ * DNI, email, contraseña, teléfono, género, fecha de nacimiento), datos
+ * del tutor legal (si el paciente es menor de edad), dirección, selección
+ * de situaciones personales y aceptación de términos legales. Incluye
+ * validación de campos, selector de fecha con restricción de mayoría de
+ * edad y diálogos de confirmación de éxito o error.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param loginViewModel ViewModel que gestiona el estado del registro.
+ * @param situacionViewModel ViewModel que gestiona la lista de situaciones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
@@ -489,7 +504,7 @@ fun RegisterScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                             shape = textFieldShape,
                             isError = genero.isBlank(),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -799,7 +814,7 @@ fun RegisterScreen(
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                                 shape = textFieldShape,
                                 isError = tutorTipo.isBlank(),
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -959,7 +974,7 @@ fun RegisterScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.List, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Situaciones",

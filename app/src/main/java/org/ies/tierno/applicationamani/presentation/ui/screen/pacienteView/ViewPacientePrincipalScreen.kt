@@ -78,6 +78,19 @@ import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 
+/**
+ * Pantalla principal del paciente con la información de su psicólogo asignado.
+ *
+ * Muestra los datos del psicólogo (nombre, especialidad, experiencia,
+ * licencia, descripción) obtenidos desde [PacienteViewModel] y
+ * [ProfilePsicologoViewModel]. Incluye un botón para navegar a la agenda
+ * de citas.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param profilePsicologoViewModel ViewModel que gestiona el perfil del psicólogo.
+ * @param pacienteViewModel ViewModel que gestiona los datos del paciente.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPacientePrincipalScreen(
@@ -92,23 +105,23 @@ fun ViewPacientePrincipalScreen(
 
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    val pacienteInfo by profilePsicologoViewModel.pacientesProfile.collectAsState()
-    val isLoadingPaciente by profilePsicologoViewModel.isLoading.collectAsState()
+    val pacienteInfo by profilePsicologoViewModel.perfil.collectAsStateWithLifecycle()
+    val isLoadingPaciente by profilePsicologoViewModel.isLoading.collectAsStateWithLifecycle()
 
-    val psicologo by pacienteViewModel.psicologoAsignado.collectAsState()
-    val isLoadingPsicologo by pacienteViewModel.isLoading.collectAsState()
-    val errorPsicologo by pacienteViewModel.error.collectAsState()
+    val psicologo by pacienteViewModel.psicologoAsignado.collectAsStateWithLifecycle()
+    val isLoadingPsicologo by pacienteViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorPsicologo by pacienteViewModel.error.collectAsStateWithLifecycle()
 
     LaunchedEffect(session) {
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
-        profilePsicologoViewModel.fetchProfile(idPaciente)
+        // profilePsicologoViewModel.fetchProfile(idPaciente) // Incorrecto, idPaciente no es idPsicologo
         pacienteViewModel.cargarPsicologoAsignado(idPaciente)
     }
 
     val isLoading = isLoadingPaciente || isLoadingPsicologo
     val error = errorPsicologo
 
-    val nombrePaciente = pacienteInfo?.usuario?.nombre?.split(" ")?.firstOrNull()
+    val nombrePaciente = psicologo?.usuario?.nombre?.split(" ")?.firstOrNull()
         ?: session?.nombre?.split(" ")?.firstOrNull()
         ?: "Paciente"
 
@@ -691,6 +704,16 @@ fun PsicologoContent(
     }
 }
 
+/**
+ * Fila informativa profesional con icono, etiqueta y valor.
+ *
+ * @param icon Icono vectorial representativo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ * @param iconColor Color del icono.
+ * @param labelColor Color de la etiqueta.
+ * @param valueColor Color del valor.
+ */
 @Composable
 fun ProfessionalInfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,

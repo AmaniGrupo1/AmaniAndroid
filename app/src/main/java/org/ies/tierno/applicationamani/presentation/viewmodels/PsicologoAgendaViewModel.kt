@@ -29,29 +29,47 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
+/**
+ * ViewModel que gestiona la agenda del psicólogo.
+ *
+ * Permite visualizar la agenda mensual de citas, gestionar la disponibilidad
+ * diaria, crear y cancelar citas, cambiar el estado de las mismas y administrar
+ * el horario laboral. También expone la lista de pacientes asignados.
+ *
+ * @param citasRepository Repositorio para operaciones de citas y disponibilidad.
+ * @param authRepository Repositorio de autenticación para obtener pacientes asignados.
+ * @param userSessionDataStore Almacén local de la sesión del psicólogo autenticado.
+ */
 class PsicologoAgendaViewModel(
     private val citasRepository: CitasRepository,
     private val authRepository: AuthRepository,
     private val userSessionDataStore: UserSessionDataStore,
 ) : ViewModel() {
+    /** Sesión del psicólogo autenticado. `null` si no hay sesión activa. */
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
 
+    /** Lista de citas del mes visible en la agenda del psicólogo. */
     private val _agendaMensual = MutableStateFlow<List<AgendaItemDTO>>(emptyList())
     val agendaMensual: StateFlow<List<AgendaItemDTO>> = _agendaMensual.asStateFlow()
 
+    /** Mes actualmente visible en la vista de agenda. */
     private val _mesVisible = MutableStateFlow(YearMonth.now())
     val mesVisible: StateFlow<YearMonth> = _mesVisible.asStateFlow()
 
+    /** Indica si una operación de carga está en curso. */
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    /** Mensaje de error de la última operación fallida. */
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    /** Mensaje de confirmación de la última operación exitosa. */
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
+    /** Lista de pacientes asignados al psicólogo autenticado. */
     private val _pacientesAsignados =
         MutableStateFlow<List<PacientePsicologoResponseDTO>>(emptyList())
     val pacientesAsignados: StateFlow<List<PacientePsicologoResponseDTO>> =
@@ -60,15 +78,21 @@ class PsicologoAgendaViewModel(
     private val _pacientesError = MutableStateFlow<String?>(null)
     val pacientesError: StateFlow<String?> = _pacientesError.asStateFlow()
 
+    /** Disponibilidad horaria para la fecha seleccionada. */
     private val _disponibilidadDia = MutableStateFlow<DisponibilidadDiaResponse?>(null)
     val disponibilidadDia: StateFlow<DisponibilidadDiaResponse?> = _disponibilidadDia.asStateFlow()
 
+    /** Duración por defecto de las citas en minutos. */
     private val _duracionCita = MutableStateFlow(60)
     val duracionCita: StateFlow<Int> = _duracionCita.asStateFlow()
 
+    /** Horario laboral actual del psicólogo. */
     private val _horarioActual = MutableStateFlow<HorarioRequestDTO?>(null)
     val horarioActual = _horarioActual.asStateFlow()
 
+    /**
+     * Carga el horario laboral actual del psicólogo desde el backend.
+     */
     fun cargarHorarioActual() {
         val id = _userSession.value?.idPsicologo ?: return
 
@@ -97,14 +121,21 @@ class PsicologoAgendaViewModel(
         }
     }
 
+    /** Limpia el mensaje de error actual. */
     fun clearError() {
         _errorMessage.value = null
     }
 
+    /** Limpia el mensaje de confirmación actual. */
     fun clearSuccess() {
         _successMessage.value = null
     }
 
+    /**
+     * Carga la agenda de citas para el mes especificado.
+     *
+     * @param month Mes y año del que se desea obtener la agenda.
+     */
     fun cargarAgendaMensual(month: YearMonth) {
         Log.d("PSICOLOGO_AGENDA_VM", "📞 cargarAgendaMensual($month) - INICIO")
 
@@ -228,6 +259,9 @@ class PsicologoAgendaViewModel(
         }
     }
 
+    /**
+     * Carga la lista de pacientes asignados al psicólogo desde [AuthRepository].
+     */
     fun cargarPacientesAsignados() {
         viewModelScope.launch {
             _pacientesError.value = null
@@ -244,6 +278,12 @@ class PsicologoAgendaViewModel(
         cargarPacientesAsignados()
     }
 
+    /**
+     * Carga la disponibilidad horaria para una fecha y duración de cita específicas.
+     *
+     * @param fecha Fecha para la que se consulta la disponibilidad.
+     * @param duracionMinutos Duración de la cita en minutos para calcular huecos disponibles.
+     */
     fun cargarDisponibilidadDia(
         fecha: LocalDate,
         durationMinutes: Int = _duracionCita.value,
@@ -293,6 +333,9 @@ class PsicologoAgendaViewModel(
     }
 
     // ✅ Función para cargar la duración actual de las citas del psicólogo
+    /**
+     * Carga la duración por defecto de las citas desde el horario actual del psicólogo.
+     */
     fun cargarDuracionCita() {
         val psychologistId = _userSession.value?.idPsicologo ?: return
         viewModelScope.launch {
@@ -453,6 +496,25 @@ class PsicologoAgendaViewModel(
         }
     }
 
+    /**
+     * Crea una nueva cita desde la perspectiva del psicólogo para un paciente asignado.
+     *
+     * Es una función suspendida que construye la petición [CrearCitaRequestDTO]
+     * y la envía a [CitasRepository.crearCita]. Si la operación tiene éxito,
+     * refresca la agenda mensual y la disponibilidad del día. En caso de error,
+     * actualiza [_errorMessage] con el mensaje recibido.
+     *
+     * @param idPaciente Identificador del paciente para el que se crea la cita.
+     * @param fecha Fecha de la cita.
+     * @param hora Hora de inicio de la cita.
+     * @param duracionMinutos Duración en minutos de la cita.
+     * @param motivo Motivo o descripción de la consulta.
+     * @param idTipoTerapia Identificador del tipo de terapia.
+     * @param metodoPago Método de pago seleccionado.
+     * @param monto Importe de la cita.
+     * @param modalidad Modalidad de la cita (presencial, videoconferencia, etc.).
+     * @return [Result.success] si la cita se creó correctamente, [Result.failure] en caso contrario.
+     */
     suspend fun crearCitaDesdePsicologo(
         idPaciente: Long,
         fecha: LocalDate,
@@ -534,6 +596,25 @@ class PsicologoAgendaViewModel(
 
     // En PsicologoAgendaViewModel.kt, añadir este método:
 
+    /**
+     * Crea una cita para un paciente con control detallado del estado de pago y modalidad.
+     *
+     * Similar a [crearCitaDesdePsicologo] pero con parámetros adicionales de
+     * [metodoPago], [estadoPago] y [modalidad]. Es una función suspendida que
+     * retorna [Result] para que el llamante pueda reaccionar al éxito o fallo.
+     *
+     * @param idPaciente Identificador del paciente.
+     * @param fecha Fecha de la cita.
+     * @param hora Hora de inicio.
+     * @param duracionMinutos Duración en minutos.
+     * @param motivo Motivo de la consulta.
+     * @param idTipoTerapia Tipo de terapia.
+     * @param metodoPago Método de pago.
+     * @param estadoPago Estado inicial del pago.
+     * @param monto Importe a cobrar.
+     * @param modalidad Modalidad de la cita.
+     * @return [Result.success] con Unit si se creó correctamente.
+     */
     suspend fun crearCitaParaPaciente(
         idPaciente: Long,
         fecha: LocalDate,
@@ -609,6 +690,15 @@ class PsicologoAgendaViewModel(
     }
 
     // En PsicologoAgendaViewModel.kt
+    /**
+     * Cambia el estado de una cita (pendiente, confirmada, cancelada, etc.).
+     *
+     * Lanza una corrutina que invoca [CitasRepository.cambiarEstadoCita] y
+     * actualiza localmente la cita en [_agendaMensual] sin necesidad de recargar.
+     *
+     * @param idCita Identificador de la cita a modificar.
+     * @param nuevoEstado Nuevo estado a asignar a la cita.
+     */
     fun cambiarEstadoCita(
         idCita: Long,
         nuevoEstado: EstadoCita,
@@ -639,6 +729,11 @@ class PsicologoAgendaViewModel(
     private val _citaSeleccionada = MutableStateFlow<AgendaItemDTO?>(null)
     val citaSeleccionada = _citaSeleccionada.asStateFlow()
 
+    /**
+     * Selecciona una cita de la agenda por su ID y la expone en [citaSeleccionada].
+     *
+     * @param id Identificador de la cita a seleccionar.
+     */
     fun seleccionarCitaPorId(id: Long) {
         println("🔍 seleccionarCitaPorId llamado con id: $id")
         println("📋 Agenda actual tiene ${_agendaMensual.value.size} citas")

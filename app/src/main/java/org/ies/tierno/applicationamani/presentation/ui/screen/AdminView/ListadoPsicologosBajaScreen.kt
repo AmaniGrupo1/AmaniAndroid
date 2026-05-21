@@ -66,6 +66,18 @@ object AdminViewDefaultColors {
     val TextSecondary = Color(0xFF6B6B6B)
 }
 
+/**
+ * Pantalla que lista los psicólogos actualmente dados de baja en el sistema.
+ *
+ * Muestra una lista de psicólogos inactivos con opción de reactivarlos
+ * (dar de alta). Cada tarjeta muestra nombre, especialidad, licencia y
+ * descripción del psicólogo. Al confirmar el alta, se actualiza la lista
+ * y se notifica al usuario mediante un [SnackbarHost].
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la lista de psicólogos.
+ * @param listarPacienteViewModel ViewModel para gestionar el alta de psicólogos.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListadoPsicologosBajaScreen(

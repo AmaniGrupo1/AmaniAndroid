@@ -31,6 +31,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -72,6 +73,17 @@ import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla de registro de un nuevo psicólogo desde el panel de administración.
+ *
+ * Presenta un formulario completo con campos de nombre, apellidos, email,
+ * contraseña, especialidad, fecha de nacimiento y teléfono. Incluye
+ * validación de campos, selector de fecha con restricción de mayoría de
+ * edad y un botón de registro que invoca [LoginViewModel.registrarPsicologo].
+ *
+ * @param onBack Callback invocado para navegar hacia atrás.
+ * @param loginViewModel ViewModel que gestiona el registro y validación.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgregaPsicologoScreen(
@@ -696,7 +708,7 @@ fun AgregaPsicologoScreen(
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                        .menuAnchor(),
+                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
                                 shape = textFieldShape,
                                 trailingIcon = {
                                     ExposedDropdownMenuDefaults.TrailingIcon(

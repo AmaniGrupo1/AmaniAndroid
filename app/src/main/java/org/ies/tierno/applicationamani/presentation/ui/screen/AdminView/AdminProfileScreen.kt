@@ -24,7 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Edit
@@ -87,6 +87,18 @@ import java.io.File
 private const val TAG = "AdminProfileScreen"
 private const val BASE_URL = "http://192.168.1.175:8080"
 
+/**
+ * Pantalla de perfil del administrador.
+ *
+ * Muestra los datos personales del administrador (nombre, apellidos, email,
+ * nombre de usuario) y permite editar el perfil, cambiar la contraseña y
+ * subir una foto de perfil desde la cámara o galería. Incluye gestión de
+ * permisos de cámara y un diálogo de confirmación para el cambio de contraseña.
+ *
+ * @param adminId Identificador del administrador cuyo perfil se muestra.
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el estado del perfil del administrador.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminProfileScreen(
@@ -235,7 +247,7 @@ fun AdminProfileScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                         )
                     }
@@ -667,6 +679,13 @@ fun AdminProfileScreen(
     }
 }
 
+/**
+ * Fila informativa con icono, etiqueta y valor para los datos del perfil.
+ *
+ * @param icon Icono vectorial representativo del campo.
+ * @param label Etiqueta descriptiva del campo.
+ * @param value Valor del campo a mostrar.
+ */
 @Composable
 fun InfoRowAdmin(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -699,6 +718,12 @@ fun InfoRowAdmin(
     }
 }
 
+/**
+ * Pantalla de error con mensaje y botón de reintento para la carga del perfil.
+ *
+ * @param error Mensaje descriptivo del error.
+ * @param onRetry Callback invocado al pulsar el botón de reintento.
+ */
 @Composable
 fun ErrorContentAdmin(
     error: String,

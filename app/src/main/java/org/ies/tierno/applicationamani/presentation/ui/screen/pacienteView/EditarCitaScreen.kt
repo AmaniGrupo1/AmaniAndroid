@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -81,6 +82,19 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Pantalla de edición/reagendamiento de una cita existente.
+ *
+ * Carga los datos actuales de la cita y permite modificar la fecha, hora,
+ * terapia, modalidad, método de pago, estado de pago y monto. Al guardar,
+ * actualiza la cita en el backend y opcionalmente la reagenda en el
+ * calendario del dispositivo.
+ *
+ * @param navController Controlador de navegación para volver atrás.
+ * @param citaId Identificador de la cita a editar.
+ * @param viewModel ViewModel que gestiona la agenda del psicólogo.
+ * @param listarTerapiasViewModel ViewModel que gestiona las terapias disponibles.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -607,7 +621,7 @@ fun EditarCitaScreen(
                                             modifier =
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .menuAnchor(),
+                                                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
                                             shape = RoundedCornerShape(12.dp),
                                             colors =
                                                 OutlinedTextFieldDefaults.colors(
@@ -879,6 +893,9 @@ fun EditarCitaScreen(
 }
 
 // Clase auxiliar para los colores del tema
+/**
+ * Conjunto de colores temáticos para la pantalla de edición de citas.
+ */
 data class EditarCitaThemeColors(
     val primary: Color,
     val primaryContainer: Color,

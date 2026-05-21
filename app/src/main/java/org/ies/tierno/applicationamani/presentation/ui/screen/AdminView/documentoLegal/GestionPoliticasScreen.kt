@@ -21,7 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
@@ -80,6 +80,16 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla de gestión de políticas legales con enfoque en visualización y edición.
+ *
+ * Muestra una lista de políticas legales (términos y condiciones, privacidad)
+ * en tarjetas que se pueden expandir para ver el contenido completo. Permite
+ * editar el contenido de cada política mediante un diálogo de edición.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona el CRUD de documentos legales.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GestionPoliticasScreen(
@@ -124,7 +134,7 @@ fun GestionPoliticasScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                         )
                     }

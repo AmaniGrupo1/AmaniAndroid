@@ -77,6 +77,16 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Pantalla de estadísticas de bienestar para el psicólogo.
+ *
+ * Muestra gráficos de evolución emocional de los pacientes, métricas
+ * agregadas (promedio, mejor/peor sesión, total de sesiones) y una
+ * tarjeta de observaciones. Utiliza la librería Vico para los gráficos
+ * de líneas y columnas.
+ *
+ * @param viewModel ViewModel que gestiona el estado de las estadísticas.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -556,6 +566,16 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
     }
 }
 
+/**
+ * Tarjeta de métrica individual con icono, valor y subtítulo.
+ *
+ * @param title Título de la métrica.
+ * @param value Valor principal a mostrar.
+ * @param subtitle Texto secundario con información adicional.
+ * @param icon Icono vectorial representativo.
+ * @param color Color del icono y del valor.
+ * @param modifier Modificador de diseño opcional.
+ */
 @Composable
 fun MetricCard(
     title: String,
@@ -607,6 +627,11 @@ fun MetricCard(
     }
 }
 
+/**
+ * Tarjeta que muestra una observación cualitativa sobre las estadísticas.
+ *
+ * @param observacion Texto de la observación a mostrar.
+ */
 @Composable
 fun ObservationCard(observacion: String) {
     Card(
@@ -648,6 +673,12 @@ fun ObservationCard(observacion: String) {
     }
 }
 
+/**
+ * Determina el nivel emocional cualitativo a partir de un promedio numérico.
+ *
+ * @param promedio Valor promedio de intensidad emocional.
+ * @return Etiqueta descriptiva del nivel emocional.
+ */
 private fun getEmotionalLevel(promedio: Double): String =
     when {
         promedio >= 8 -> "Muy positivo"

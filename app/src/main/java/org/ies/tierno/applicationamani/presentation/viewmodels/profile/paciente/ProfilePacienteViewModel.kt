@@ -16,35 +16,69 @@ import org.ies.tierno.applicationamani.dto.perfil.paciente.PacienteProfileRespon
 import org.ies.tierno.applicationamani.dto.perfil.paciente.UpdatePacienteRequestDTO
 import java.io.File
 
+/**
+ * ViewModel que gestiona el perfil del paciente.
+ *
+ * Permite consultar, actualizar datos del perfil y subir una foto de perfil
+ * mediante [ProfileUseCaseGeneral]. Expone estados de carga, error y progreso
+ * de subida de imagen.
+ *
+ * @constructor Crea una instancia con el caso de uso de perfiles.
+ * @param profileUseCaseGeneral Caso de uso genérico para operaciones de perfil.
+ */
 class ProfilePacienteViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
 ) : ViewModel() {
+    /** Perfil completo del paciente autenticado. */
     private val _perfil = MutableStateFlow<PacienteProfileResponseDTO?>(null)
     val perfil: StateFlow<PacienteProfileResponseDTO?> = _perfil.asStateFlow()
 
+    /** Indica si una operación está en curso. */
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    /** Mensaje de error de la última operación fallida. */
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    /**
+     * Estado sellado que representa el progreso de subida de foto de perfil.
+     */
     sealed class UploadStatus {
+        /** Estado inicial: no hay subida en curso. */
         object Idle : UploadStatus()
 
+        /** La foto se está subiendo al backend. */
         object Loading : UploadStatus()
 
+        /**
+         * La subida se completó exitosamente.
+         *
+         * @property url URL de la foto almacenada.
+         */
         data class Success(
             val url: String,
         ) : UploadStatus()
 
+        /**
+         * La subida falló.
+         *
+         * @property message Descripción del error.
+         */
         data class Error(
             val message: String,
         ) : UploadStatus()
     }
 
+    /** Estado de la subida de foto de perfil. */
     private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
     val uploadStatus: StateFlow<UploadStatus> = _uploadStatus.asStateFlow()
 
+    /**
+     * Obtiene el perfil del paciente desde el backend.
+     *
+     * @param id Identificador del paciente.
+     */
     fun fetchProfile(id: Long) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -62,6 +96,14 @@ class ProfilePacienteViewModel(
         }
     }
 
+    /**
+     * Actualiza los datos del perfil del paciente en el backend.
+     *
+     * Tras una actualización exitosa, recarga automáticamente el perfil.
+     *
+     * @param id Identificador del paciente.
+     * @param update DTO con los nuevos datos del perfil.
+     */
     fun updateProfile(
         id: Long,
         update: UpdatePacienteRequestDTO,
@@ -85,6 +127,16 @@ class ProfilePacienteViewModel(
         }
     }
 
+    /**
+     * Sube una foto de perfil para el paciente.
+     *
+     * Convierte la URI de la imagen en un [MultipartBody.Part] y la envía al backend.
+     * Actualiza [uploadStatus] y recarga el perfil al finalizar.
+     *
+     * @param id Identificador del paciente.
+     * @param imageUri URI de la imagen seleccionada.
+     * @param context Contexto de la aplicación.
+     */
     fun uploadFoto(
         id: Long,
         imageUri: Uri,
@@ -116,8 +168,13 @@ class ProfilePacienteViewModel(
         }
     }
 
-    // En ProfilePacienteViewModel.kt, añade esta función:
-
+    /**
+     * Actualiza el perfil del paciente y notifica el resultado mediante un callback.
+     *
+     * @param id Identificador del paciente.
+     * @param update DTO con los nuevos datos.
+     * @param onResult Callback que recibe `true` si la operación tuvo éxito.
+     */
     fun updateProfile(
         id: Long,
         update: UpdatePacienteRequestDTO,
@@ -140,6 +197,13 @@ class ProfilePacienteViewModel(
         }
     }
 
+    /**
+     * Convierte una URI de contenido en un archivo temporal.
+     *
+     * @param uri URI del contenido a copiar.
+     * @param context Contexto de la aplicación.
+     * @return Archivo temporal, o `null` si falla.
+     */
     private fun getFile(
         uri: Uri,
         context: Context,
@@ -154,15 +218,17 @@ class ProfilePacienteViewModel(
         return file
     }
 
+    /** Reinicia el estado de subida de foto. */
     fun clearUpload() {
         _uploadStatus.value = UploadStatus.Idle
     }
 
-    // Añade esto al ProfilePacienteViewModel
+    /** Limpia el mensaje de error actual. */
     fun clearError() {
         _error.value = null
     }
 
+    /** Reinicia todos los estados del ViewModel a sus valores iniciales. */
     fun resetState() {
         _error.value = null
         _uploadStatus.value = UploadStatus.Idle

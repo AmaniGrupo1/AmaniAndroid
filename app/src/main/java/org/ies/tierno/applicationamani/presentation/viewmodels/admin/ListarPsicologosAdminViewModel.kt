@@ -14,6 +14,17 @@ import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUse
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import timber.log.Timber
 
+/**
+ * ViewModel que gestiona el listado de psicólogos desde el panel de administración.
+ *
+ * Mantiene dos listas separadas: psicólogos activos y psicólogos dados de baja.
+ * Permite editar localmente los datos de un psicólogo y sincronizar los cambios
+ * con el backend en segundo plano. También soporta recarga manual de ambas listas.
+ *
+ * @param listarPsicologoAdminUseCase Caso de uso que obtiene la lista de psicólogos activos y de baja.
+ * @param userSessionDataStore Almacén local de la sesión del administrador.
+ * @param profileUseCase Caso de uso genérico para operaciones de perfil (edición de psicólogo).
+ */
 class ListarPsicologosAdminViewModel(
     val listarPsicologoAdminUseCase: ListarPsicologoAdminUseCase,
     private val userSessionDataStore: UserSessionDataStore,
@@ -21,17 +32,21 @@ class ListarPsicologosAdminViewModel(
 ) : ViewModel() {
 
     // Psicólogos activos
+    /** Lista de psicólogos activos en el sistema. */
     private val _psicologos = MutableStateFlow<List<PsicologoSelfResponseDTO>>(emptyList())
     val psicologos: StateFlow<List<PsicologoSelfResponseDTO>> = _psicologos
 
     // Psicólogos dados de baja
+    /** Lista de psicólogos dados de baja. */
     private val _psicologosBaja = MutableStateFlow<List<PsicologoSelfResponseDTO>>(emptyList())
     val psicologosBaja: StateFlow<List<PsicologoSelfResponseDTO>> = _psicologosBaja
 
     // Estado de carga y error
+    /** Indica si los datos se están cargando desde el backend. */
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    /** Mensaje de error de la última operación fallida. */
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -100,6 +115,11 @@ class ListarPsicologosAdminViewModel(
     // =========================================================
     // ACTUALIZAR LOCALMENTE AL DAR ALTA
     // =========================================================
+    /**
+     * Mueve localmente un psicólogo de la lista de baja a la lista de activos.
+     *
+     * @param id Identificador del psicólogo que se da de alta.
+     */
     fun actualizarPsicologoAlta(id: Long) {
         val psicologo = _psicologosBaja.value.find { it.idPsicologo == id }
 
@@ -113,6 +133,11 @@ class ListarPsicologosAdminViewModel(
     // =========================================================
     // ACTUALIZAR LOCALMENTE AL DAR BAJA
     // =========================================================
+    /**
+     * Mueve localmente un psicólogo de la lista de activos a la lista de baja.
+     *
+     * @param id Identificador del psicólogo que se da de baja.
+     */
     fun actualizarPsicologoBaja(id: Long) {
         val psicologo = _psicologos.value.find { it.idPsicologo == id }
 
@@ -123,6 +148,15 @@ class ListarPsicologosAdminViewModel(
         }
     }
 
+    /**
+     * Actualiza localmente los datos de un psicólogo y sincroniza con el backend.
+     *
+     * La actualización local es instantánea; la sincronización con el backend
+     * se ejecuta en segundo plano mediante una corrutina.
+     *
+     * @param id Identificador del psicólogo a editar.
+     * @param dto DTO con los nuevos datos del perfil del psicólogo.
+     */
     fun editarPsicologo(
         id: Long,
         dto: PsicologoRequestDTO
@@ -195,6 +229,7 @@ class ListarPsicologosAdminViewModel(
     }
 
     // Método para recargar manualmente
+    /** Recarga ambas listas de psicólogos (activos y de baja) desde el backend. */
     fun recargarPsicologos() {
         cargarPsicologosActivos()
         cargarPsicologosBaja()

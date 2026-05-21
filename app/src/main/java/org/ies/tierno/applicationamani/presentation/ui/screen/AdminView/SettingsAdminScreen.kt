@@ -55,6 +55,14 @@ private fun getCurrentThemeSubtitle(currentTheme: Boolean): String {
     }
 }
 
+/**
+ * Modelo de datos para una opción de configuración en la pantalla de ajustes.
+ *
+ * @property id Identificador único de la opción.
+ * @property title Título descriptivo de la opción.
+ * @property subtitle Texto secundario con información adicional.
+ * @property icon Icono vectorial asociado a la opción.
+ */
 data class SettingsOption(
     val id: String,
     val title: String,
@@ -62,6 +70,18 @@ data class SettingsOption(
     val icon: ImageVector
 )
 
+/**
+ * Pantalla de ajustes del panel de administración.
+ *
+ * Permite al administrador cambiar el idioma de la aplicación, el tema
+ * visual (claro/oscuro) y configurar el horario de disponibilidad semanal
+ * (días y franjas horarias). Los cambios de idioma provocan la recreación
+ * de la Activity para aplicar la nueva configuración de recursos.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param userSessionDataStore Almacén de sesión del usuario.
+ * @param idiomaViewModel ViewModel que gestiona el cambio de idioma, tema y horario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsAdminScreen(

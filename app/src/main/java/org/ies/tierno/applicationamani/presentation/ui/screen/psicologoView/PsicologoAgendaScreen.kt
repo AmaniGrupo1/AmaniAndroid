@@ -57,6 +57,19 @@ val ColorScheme.success: Color
 val ColorScheme.warning: Color
     get() = Color(0xFFFF9800)
 
+/**
+ * Pantalla de agenda del psicólogo con vista de calendario mensual.
+ *
+ * Muestra un [CalendarioView] interactivo con las citas del mes, días
+ * bloqueados y no laborables. Permite al psicólogo crear nuevas citas,
+ * editar las existentes, cancelar citas y configurar su horario de
+ * disponibilidad semanal. Incluye diálogos de confirmación para las
+ * acciones destructivas y un [SnackbarHost] para notificaciones.
+ *
+ * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param viewModel ViewModel que gestiona la agenda del psicólogo.
+ * @param listarTerapiasViewModel ViewModel que gestiona las terapias disponibles.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PsicologoAgendaScreen(
@@ -713,7 +726,7 @@ fun LeyendaMejorada() {
 @Composable
 fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
+    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -948,7 +961,6 @@ fun TarjetaCitaMejorada(
                     when (cita.modalidad) {
                         ModalidadCita.PRESENCIAL -> Icons.Default.LocationOn
                         ModalidadCita.LLAMADA -> Icons.Default.Phone
-                        null -> Icons.Default.Info
                     },
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
@@ -959,7 +971,6 @@ fun TarjetaCitaMejorada(
                     text = when (cita.modalidad) {
                         ModalidadCita.PRESENCIAL -> "Presencial"
                         ModalidadCita.LLAMADA -> "Llamada"
-                        null -> "Modalidad no especificada"
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.primary,
@@ -1347,7 +1358,7 @@ fun DialogoNoDisponibleMejorado(
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("es", "ES"))
+    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
     var motivoBloqueo by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -1503,14 +1514,14 @@ fun DialogoCrearEditarCitaMejorado(
 
     val horasDisponibles = remember(slotsLibres, citaAEditar, fechaSeleccionada) {
         val libres = slotsLibres.filter { !it.ocupado }.map { it.hora }.sorted()
-        if (esEdicion && citaAEditar != null) {
+        if (esEdicion) {
             val horaEdicion = citaAEditar.horaInicio
             if (horaEdicion !in libres) (listOf(horaEdicion) + libres).distinct()
                 .sorted() else libres
         } else libres
     }
 
-    var horaSeleccionada by remember { mutableStateOf(if (esEdicion && citaAEditar != null) citaAEditar.horaInicio else horasDisponibles.firstOrNull()) }
+    var horaSeleccionada by remember { mutableStateOf(if (esEdicion) citaAEditar.horaInicio else horasDisponibles.firstOrNull()) }
     var horaDropdownExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(terapiaSeleccionada) {
@@ -2076,7 +2087,7 @@ fun CampoFecha(
                         fechaSeleccionada.format(
                             DateTimeFormatter.ofPattern(
                                 "EEEE",
-                                Locale("es", "ES")
+                                java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
                             )
                         ).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodySmall,
@@ -2096,6 +2107,16 @@ fun CampoFecha(
 
 // ==================== DIÁLOGO CONFIRMAR CANCELACIÓN ====================
 
+/**
+ * Diálogo de confirmación mejorado para cancelar una cita desde la agenda del psicólogo.
+ *
+ * Muestra los detalles de la cita (paciente, fecha, hora, motivo) y
+ * advierte que la acción es irreversible.
+ *
+ * @param cita Datos de la cita a cancelar.
+ * @param onConfirmar Callback invocado al confirmar la cancelación.
+ * @param onDismiss Callback invocado al cerrar el diálogo sin cancelar.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DialogoConfirmarCancelacionMejorado(
