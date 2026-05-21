@@ -1,0 +1,31 @@
+name: Publicar documentación MkDocs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar MkDocs y plugins
+        run: |
+          pip install mkdocs-material \
+                      mkdocs-minify-plugin \
+                      mkdocs-git-revision-date-localized-plugin
+
+      - name: Publicar en GitHub Pages
+        run: mkdocs gh-deploy --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

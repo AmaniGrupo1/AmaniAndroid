@@ -1,0 +1,111 @@
+site_name: AMANI Android — Documentación Técnica
+site_description: Plataforma de psicología digital. Documentación técnica del cliente Android.
+site_author: Equipo AMANI — IES Enrique Tierno Galván
+site_url: https://amanigrupo1.github.io/documentacion-amani
+repo_url: https://github.com/AmaniGrupo1/AmaniAndroid
+repo_name: AmaniGrupo1/AmaniAndroid
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Modo oscuro
+    - scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Modo claro
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.integrate
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+
+plugins:
+  - search:
+      lang: es
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/AmaniGrupo1
+  generator: false
+
+nav:
+  - Inicio: index.md
+  - Guía de inicio:
+    - Requisitos previos: getting-started/requisitos.md
+    - Configuración del entorno: getting-started/entorno.md
+    - Variables de entorno: getting-started/variables.md
+  - Arquitectura:
+    - Visión general: arquitectura/vision-general.md
+    - Clean Architecture: arquitectura/clean-architecture.md
+    - Módulos y capas: arquitectura/capas.md
+    - Inyección de dependencias (Koin): arquitectura/koin.md
+  - Funcionalidades:
+    - Autenticación: funcionalidades/autenticacion.md
+    - Chat (Firebase): funcionalidades/chat.md
+    - Gráfica de emociones: funcionalidades/grafica-emociones.md
+    - Agenda del psicólogo: funcionalidades/agenda.md
+    - Tickets de soporte: funcionalidades/tickets.md
+  - UI / Diseño:
+    - Material 3 y theming: ui/material3.md
+    - Componentes reutilizables: ui/componentes.md
+    - Navegación: ui/navegacion.md
+  - Integración con backend:
+    - API REST (Retrofit): integracion/api-rest.md
+    - Firebase Realtime Database: integracion/firebase.md
+    - Gestión de errores: integracion/errores.md
+  - Calidad y testing:
+    - Estrategia de pruebas: testing/estrategia.md
+    - Tests unitarios: testing/unit-tests.md
+    - Crash reporting (Sentry + n8n): testing/crash-reporting.md
+  - Despliegue:
+    - CI/CD con GitHub Actions: despliegue/ci-cd.md
+    - Firma y release: despliegue/firma.md
+  - Referencia:
+    - Glosario: referencia/glosario.md
+    - Decisiones de diseño (ADR): referencia/adr.md
+    - Changelog: referencia/changelog.md
