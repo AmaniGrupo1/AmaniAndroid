@@ -1,10 +1,13 @@
 package org.ies.tierno.applicationamani.data.repositorio.role
 
+import android.util.Log
 import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 import org.ies.tierno.applicationamani.dto.role.CambiarRolRequestDTO
 import org.ies.tierno.applicationamani.dto.role.CambiarRolResponseDTO
 import retrofit2.Response
+
+private const val TAG = "AdminRepository"
 
 /**
  * Repositorio para operaciones administrativas de gestión de roles y usuarios.
@@ -23,8 +26,11 @@ class AdminRepository(
      * @param cambiarRolRequestDTO DTO con el identificador del usuario y el nuevo rol a asignar.
      * @return [Response] con [CambiarRolResponseDTO] indicando el resultado del cambio.
      */
-    suspend fun cambiarRol(cambiarRolRequestDTO: CambiarRolRequestDTO): Response<CambiarRolResponseDTO> =
-        adminApiService.cambiarRol(cambiarRolRequestDTO)
+    suspend fun cambiarRol(cambiarRolRequestDTO: CambiarRolRequestDTO): Response<CambiarRolResponseDTO> {
+        Log.d(TAG, "📤 Cambiando rol - Usuario ID: ${cambiarRolRequestDTO.idUsuario}, " +
+                "Nuevo rol: ${cambiarRolRequestDTO.nuevoRol}")
+        return adminApiService.cambiarRol(cambiarRolRequestDTO)
+    }
 
     /**
      * Obtiene la lista de usuarios del sistema con filtros opcionales.
@@ -36,5 +42,19 @@ class AdminRepository(
     suspend fun getUsuarios(
         rol: String? = null,
         dni: String? = null,
-    ): Response<List<UsuarioDTO>> = adminApiService.getUsuarios(rol, dni)
+    ): Response<List<UsuarioDTO>> {
+        Log.d(TAG, "📥 Solicitando usuarios - Filtros: rol=$rol, dni=$dni")
+        val response = adminApiService.getUsuarios(rol, dni)
+        Log.d(TAG, "📥 Respuesta recibida - Código: ${response.code()}, " +
+                "Éxito: ${response.isSuccessful}")
+
+        if (response.isSuccessful) {
+            val body = response.body()
+            Log.d(TAG, "📥 Usuarios recibidos: ${body?.size ?: 0}")
+        } else {
+            Log.e(TAG, "📥 Error en respuesta: ${response.errorBody()?.string()}")
+        }
+
+        return response
+    }
 }

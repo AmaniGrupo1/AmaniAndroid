@@ -22,7 +22,7 @@ interface AdminApiService {
      * @param request Datos del cambio de rol (identificador del usuario y nuevo rol).
      * @return Respuesta HTTP con el resultado del cambio de rol.
      */
-    @PUT("api/admin/cambiar-rol")
+    @PUT("/api/admin/cambiar-rol")
     suspend fun cambiarRol(
         @Body request: CambiarRolRequestDTO,
     ): Response<CambiarRolResponseDTO>
@@ -34,7 +34,7 @@ interface AdminApiService {
      * @param dni DNI por el que filtrar (opcional).
      * @return Respuesta HTTP con la lista de usuarios que cumplen los criterios.
      */
-    @GET("api/admin/listarUsuarios")
+    @GET("/api/admin/listarUsuarios")
     suspend fun getUsuarios(
         @Query("rol") rol: String? = null,
         @Query("dni") dni: String? = null,

@@ -138,17 +138,24 @@ val retrofitModule =
                     ).registerTypeAdapter(
                         Rol::class.java,
                         JsonDeserializer<Rol> { json, _, _ ->
-                            // Normaliza a mayúsculas para soportar "paciente", "PACIENTE", "Paciente", etc.
-                            val value = json.asString.trim().uppercase()
-                                .removePrefix("ROLE_") // por si el backend envía "ROLE_PACIENTE"
-                            Rol.entries.firstOrNull { it.name == value } ?: Rol.PACIENTE
+                            // El backend envía "admin", "psicologo", "paciente" en minúsculas
+                            val value = json.asString.trim().lowercase()
+                            android.util.Log.d("RolAdapter", "Deserializando rol: '$value'")
+                            when (value) {
+                                "admin" -> Rol.admin
+                                "psicologo" -> Rol.psicologo
+                                "paciente" -> Rol.paciente
+                                else -> {
+                                    android.util.Log.e("RolAdapter", "Rol desconocido: $value, usando paciente por defecto")
+                                    Rol.paciente
+                                }
+                            }
                         },
                     ).create()
 
             Retrofit
                 .Builder()
                 .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
-                //.baseUrl("http://192/168/1/175:8080/") // Para emulador Android Studio
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(get<okhttp3.OkHttpClient>()) // Usar el mismo cliente
                 .build()

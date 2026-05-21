@@ -17,12 +17,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomSheetCambiarRol
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.androidx.compose.koinViewModel
+
+private const val TAG = "AdminUserScreen"
 
 /**
  * Pantalla de gestión de usuarios para el administrador.
@@ -60,10 +63,34 @@ fun AdminUserManagementScreen(
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
 
+    // 📍 LOG: Estado inicial de la pantalla
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "=== INICIALIZANDO PANTALLA DE ADMIN ===")
+        Log.d(TAG, "ColorScheme: ${colorScheme.primary}")
+        Log.d(TAG, "ViewModel inicializado correctamente")
+    }
+
+    // 📍 LOG: Seguimiento de cambios en usuarios filtrados
+    LaunchedEffect(usuarios) {
+        Log.d(TAG, "📊 LISTA ACTUALIZADA - Usuarios filtrados: ${usuarios.size}")
+        usuarios.forEach { user ->
+            Log.d(TAG, "   👤 Usuario: ID=${user.idUsuario}, Nombre=${user.nombre} ${user.apellido}, " +
+                    "Rol=${user.rol}, DNI=${user.dni ?: "null"}, Email=${user.email}")
+        }
+        if (usuarios.isEmpty()) {
+            Log.w(TAG, "⚠️ No hay usuarios en la lista filtrada")
+        }
+    }
+
+    // 📍 LOG: Seguimiento de estado de carga
+    LaunchedEffect(isLoading) {
+        Log.d(TAG, "🔄 Estado de carga: ${if (isLoading) "CARGANDO..." else "COMPLETADO"}")
+    }
+
     // Manejo de errores con Log
     LaunchedEffect(error) {
         error?.let {
-            Log.e("AdminScreen", "Error: $it")
+            Log.e(TAG, "❌ Error en AdminUserViewModel: $it")
             adminUserViewModel.clearError()
         }
     }
@@ -71,8 +98,9 @@ fun AdminUserManagementScreen(
     // Éxito al cambiar rol - Refresca automáticamente
     LaunchedEffect(adminRoleViewModel.success) {
         adminRoleViewModel.success?.let { message ->
-            Log.d("AdminScreen", "Success: $message")
+            Log.d(TAG, "✅ Éxito al cambiar rol: $message")
             adminRoleViewModel.clearMessages()
+            Log.d(TAG, "🔄 Recargando usuarios después de cambio de rol...")
             // Recargar usuarios después de cambiar rol
             adminUserViewModel.cargarUsuarios()
         }
@@ -80,24 +108,32 @@ fun AdminUserManagementScreen(
 
     LaunchedEffect(adminRoleViewModel.error) {
         adminRoleViewModel.error?.let { message ->
-            Log.e("AdminScreen", "Role Error: $message")
+            Log.e(TAG, "❌ Error al cambiar rol: $message")
             adminRoleViewModel.clearMessages()
         }
     }
 
-    // Carga inicial
-    LaunchedEffect(Unit) {
-        adminUserViewModel.cargarUsuarios()
-    }
-
-    // Filtros
+    // 📍 LOG: Seguimiento de filtros aplicados
     LaunchedEffect(selectedRol, searchDni) {
+        Log.d(TAG, "🔍 APLICANDO FILTROS - Rol: ${selectedRol?.name ?: "TODOS"}, " +
+                "Búsqueda: '${searchDni.ifEmpty { "vacío" }}'")
         adminUserViewModel.filtrarUsuarios(rol = selectedRol, dni = searchDni)
     }
 
-    // Función para confirmar el cambio de rol
+    // Carga inicial con log detallado
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "🚀 Iniciando carga inicial de usuarios...")
+        adminUserViewModel.cargarUsuarios()
+        // Pequeña pausa para permitir que se complete la carga
+        delay(500)
+        Log.d(TAG, "📋 Verificación post-carga inicial")
+    }
+
+    // Función para confirmar el cambio de rol con logs
     fun confirmRoleChange() {
         pendingRol?.let { nuevoRol ->
+            Log.d(TAG, "🔄 Confirmando cambio de rol para usuario ID=${selectedUser?.idUsuario}, " +
+                    "Nombre=${selectedUser?.nombre}, Nuevo rol=$nuevoRol")
             adminRoleViewModel.cambiarRol(
                 idUsuario = selectedUser!!.idUsuario ?: 0,
                 nuevoRol = nuevoRol,
@@ -136,7 +172,10 @@ fun AdminUserManagementScreen(
                     ),
                 actions = {
                     // Botón de refresco manual
-                    IconButton(onClick = { adminUserViewModel.cargarUsuarios() }) {
+                    IconButton(onClick = {
+                        Log.d(TAG, "🔄 Refresco manual solicitado por el usuario")
+                        adminUserViewModel.cargarUsuarios()
+                    }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refrescar", tint = colorScheme.onPrimary)
                     }
                 },
@@ -184,8 +223,11 @@ fun AdminUserManagementScreen(
 
                         OutlinedTextField(
                             value = searchDni,
-                            onValueChange = { searchDni = it },
-                            label = { Text("Buscar por DNI o Nombre") },
+                            onValueChange = {
+                                Log.d(TAG, "✏️ Cambiando búsqueda a: '$it'")
+                                searchDni = it
+                            },
+                            label = { Text("Buscar por DNI, Nombre o Email") },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Search,
@@ -225,7 +267,10 @@ fun AdminUserManagementScreen(
                         ) {
                             FilterChip(
                                 selected = selectedRol == null,
-                                onClick = { selectedRol = null },
+                                onClick = {
+                                    Log.d(TAG, "🎯 Filtro cambiado a: TODOS")
+                                    selectedRol = null
+                                },
                                 label = { Text("Todos") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -238,7 +283,10 @@ fun AdminUserManagementScreen(
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.admin,
-                                onClick = { selectedRol = Rol.admin },
+                                onClick = {
+                                    Log.d(TAG, "🎯 Filtro cambiado a: ADMIN")
+                                    selectedRol = Rol.admin
+                                },
                                 label = { Text("👑 Admins") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -251,7 +299,10 @@ fun AdminUserManagementScreen(
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.psicologo,
-                                onClick = { selectedRol = Rol.psicologo },
+                                onClick = {
+                                    Log.d(TAG, "🎯 Filtro cambiado a: PSICÓLOGO")
+                                    selectedRol = Rol.psicologo
+                                },
                                 label = { Text("🧠 Psicólogos") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -264,7 +315,10 @@ fun AdminUserManagementScreen(
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.paciente,
-                                onClick = { selectedRol = Rol.paciente },
+                                onClick = {
+                                    Log.d(TAG, "🎯 Filtro cambiado a: PACIENTE")
+                                    selectedRol = Rol.paciente
+                                },
                                 label = { Text("👤 Pacientes") },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -281,10 +335,12 @@ fun AdminUserManagementScreen(
 
                 // Lista de usuarios
                 if (isLoading) {
+                    Log.d(TAG, "⏳ Mostrando indicador de carga...")
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = colorScheme.primary)
                     }
                 } else if (usuarios.isEmpty()) {
+                    Log.w(TAG, "📭 No hay usuarios para mostrar - Lista vacía")
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
@@ -307,6 +363,7 @@ fun AdminUserManagementScreen(
                         }
                     }
                 } else {
+                    Log.d(TAG, "📋 Mostrando ${usuarios.size} usuarios en la lista")
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -319,6 +376,7 @@ fun AdminUserManagementScreen(
                             UserCard(
                                 user = user,
                                 onCambiarRol = {
+                                    Log.d(TAG, "🖱️ Click en cambiar rol para usuario: ${user.nombre} ${user.apellido} (ID: ${user.idUsuario})")
                                     selectedUser = user
                                     showBottomSheet = true
                                 },
@@ -332,8 +390,10 @@ fun AdminUserManagementScreen(
 
     // Diálogo de confirmación
     if (showConfirmDialog) {
+        Log.d(TAG, "💬 Mostrando diálogo de confirmación para usuario: ${selectedUser?.nombre}")
         AlertDialog(
             onDismissRequest = {
+                Log.d(TAG, "❌ Diálogo de confirmación cancelado")
                 showConfirmDialog = false
                 pendingRol = null
             },
@@ -395,6 +455,7 @@ fun AdminUserManagementScreen(
             confirmButton = {
                 Button(
                     onClick = {
+                        Log.d(TAG, "✅ Confirmando cambio de rol")
                         confirmRoleChange()
                     },
                     colors =
@@ -409,6 +470,7 @@ fun AdminUserManagementScreen(
             dismissButton = {
                 OutlinedButton(
                     onClick = {
+                        Log.d(TAG, "❌ Cancelando cambio de rol")
                         showConfirmDialog = false
                         pendingRol = null
                     },
@@ -423,13 +485,16 @@ fun AdminUserManagementScreen(
     }
 
     if (showBottomSheet && selectedUser != null) {
+        Log.d(TAG, "📱 Mostrando BottomSheet para seleccionar nuevo rol de usuario: ${selectedUser?.nombre}")
         BottomSheetCambiarRol(
             user = selectedUser!!,
             onDismiss = {
+                Log.d(TAG, "❌ BottomSheet cerrado sin selección")
                 showBottomSheet = false
                 selectedUser = null
             },
             onConfirm = { nuevoRol ->
+                Log.d(TAG, "🎯 Nuevo rol seleccionado: $nuevoRol para usuario ${selectedUser?.nombre}")
                 pendingRol = nuevoRol
                 showConfirmDialog = true
             },
@@ -451,6 +516,12 @@ fun UserCard(
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
+
+    // Log para depuración de cada tarjeta
+    LaunchedEffect(user) {
+        Log.d(TAG, "🎴 Renderizando tarjeta para: ${user.nombre} ${user.apellido}, " +
+                "Rol: ${user.rol}, DNI: ${user.dni ?: "null"}")
+    }
 
     // Colores según rol
     val roleColor =
@@ -528,6 +599,12 @@ fun UserCard(
                         text = "DNI: ${user.dni}",
                         style = typography.labelSmall,
                         color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    )
+                } else {
+                    Text(
+                        text = "DNI: No registrado",
+                        style = typography.labelSmall,
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     )
                 }
 
