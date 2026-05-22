@@ -802,8 +802,14 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "cerrar_sesion" -> {
-                        Log.d(TAG, "🚪 Cerrar sesión")
+                        navController.navigate(Screens.login.route) {
+                            popUpTo(0) // Limpia toda la pila de navegación
+                        }
                     }
+                    "reportar_problema" -> {
+                        navController.navigate(Screens.reportarProblema.route)
+                    }
+
                 }
             }
             .padding(vertical = 8.dp),

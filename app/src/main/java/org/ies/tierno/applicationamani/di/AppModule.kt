@@ -21,6 +21,7 @@ import org.ies.tierno.applicationamani.data.repositorio.HistorialRepository
 import org.ies.tierno.applicationamani.data.repositorio.NotificacionRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
+import org.ies.tierno.applicationamani.data.repositorio.TicketsRepository
 import org.ies.tierno.applicationamani.data.repositorio.role.AdminRepository
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.GetMessagesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
@@ -70,6 +71,7 @@ import org.ies.tierno.applicationamani.domain.usecases.notificacion.Notificacion
 import org.ies.tierno.applicationamani.domain.usecases.role.GetUsuariosUseCase
 import org.ies.tierno.applicationamani.domain.usecases.role.RoleAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ticketsUseCase.TicketsUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
@@ -80,15 +82,21 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.Pro
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente.ProfilePacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
+import org.ies.tierno.applicationamani.data.remoto.ProfileApi
+import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import com.google.firebase.database.FirebaseDatabase
 
 val appModule = module {
     single{ TokenDataStore(androidContext()) }
     single { TokenHolder(get()) }
     single { AuthEventChannel() }
     single { UserSessionDataStore(get()) }
+    single {
+        FirebaseDatabase.getInstance()
+    }
 
     single { AuthRepository(get(), get(), get(), get()) }
     single { TestRepositoryApi(get()) }
@@ -100,6 +108,7 @@ val appModule = module {
     single { HistorialRepository(get()) }
     single { DocumentoLegalRepository(get()) }
     single { AdminRepository(get()) }
+    single { TicketsRepository(get()) }
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
@@ -139,6 +148,7 @@ val appModule = module {
     factory { GetUsuariosUseCase(get()) }
     factory { RoleAdminUseCase(get()) }
     factory { HistorialCitaUseCase(get()) }
+    factory { TicketsUseCase(get()) }
 
 
     viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
@@ -161,6 +171,7 @@ val appModule = module {
     viewModel { ListarCitasViewModel(get(), get(), get()) }
     viewModel { AdminRoleViewModel(get()) }
     viewModel { AdminUserViewModel(get()) }
+    viewModel { TicketsViewModel(get(), get(), get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
     viewModel { (currentUserId: Long, otherUserId: Long) ->

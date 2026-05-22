@@ -124,5 +124,7 @@
         object documentoLegalDetail : Screens("documento_legal_detail/{tipo}") {
             fun createRoute(tipo: String) = "documento_legal_detail/$tipo"
         }
+
+        object reportarProblema : Screens("reportarProblema")
     }
 

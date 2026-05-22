@@ -161,6 +161,7 @@ class LoginViewModel(
                 idUsuario = loginResponse.idUsuario,
                 nombre = loginResponse.nombre,
                 rol = loginResponse.rol,
+                email = _username.value,
                 idPsicologo = loginResponse.idPsicologo,
                 idPaciente = loginResponse.idPaciente,
                 idioma = loginResponse.idioma ?: "es",

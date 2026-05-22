@@ -218,12 +218,6 @@ fun SettingsPsychologistScreen(
                             icon = Icons.Default.PersonOutline
                         ),
                         SettingsOption(
-                            id = "horario",
-                            title = stringResource(R.string.horario_laboral),
-                            subtitle = stringResource(R.string.configurar_horario_atencion),
-                            icon = Icons.Default.Schedule
-                        ),
-                        SettingsOption(
                             id = "especialidad",
                             title = stringResource(R.string.mis_especialidades),
                             subtitle = stringResource(R.string.agregar_especialidades),

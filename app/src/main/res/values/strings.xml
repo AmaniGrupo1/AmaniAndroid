@@ -364,4 +364,29 @@
     <string name="cerrar">Cerrar</string>
 
 
+    <string name="titulo">Título</string>
+    <string name="categoria">Categoría</string>
+    <string name="descripcion">Descripción</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_titulo">Breve descripción del problema</string>
+    <string name="placeholder_categoria">Selecciona una categoría</string>
+    <string name="placeholder_descripcion">Describe detalladamente el problema...</string>
+    <string name="placeholder_email">tu@email.com</string>
+
+    <!-- Información del dispositivo -->
+    <string name="info_dispositivo">Información del dispositivo</string>
+    <string name="dispositivo">Dispositivo</string>
+    <string name="android_version">Android</string>
+    <string name="app_version">App versión</string>
+
+    <!-- Errores -->
+    <string name="error_titulo_corto">El título debe tener al menos 5 caracteres</string>
+    <string name="error_descripcion_corta">Describe mejor el problema (mínimo 10 caracteres)</string>
+    <string name="error_email_invalido">Email no válido</string>
+
+    <!-- Mensajes -->
+    <string name="reporte_enviado_exito">Reporte enviado correctamente</string>
+    <string name="error_desconocido">Error desconocido</string>
+
 </resources>
