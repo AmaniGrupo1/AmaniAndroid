@@ -40,6 +40,7 @@ firebaseDatabase = "22.0.1"
 firebaseStorage = "21.0.1"
 timber = "5.0.1"
 workRuntimeKtx = "2.11.2"
+firebaseAuthKtx = "23.2.1"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -83,6 +84,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 retrofit-v290 = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

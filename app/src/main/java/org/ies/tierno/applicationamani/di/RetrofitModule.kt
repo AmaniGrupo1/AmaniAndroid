@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.di
 
+import com.google.firebase.BuildConfig
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -19,7 +20,7 @@ import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
-import org.ies.tierno.applicationamani.BuildConfig
+
 import org.ies.tierno.applicationamani.data.remoto.HistorialCitaApi
 import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.koin.dsl.module

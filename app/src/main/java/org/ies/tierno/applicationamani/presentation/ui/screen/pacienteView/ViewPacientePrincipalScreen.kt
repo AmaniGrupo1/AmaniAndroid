@@ -31,7 +31,7 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.runtime.livedata.observeAsState
+
 import org.ies.tierno.applicationamani.dto.tickets.TicketModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
 import androidx.compose.material3.Button
@@ -85,6 +85,7 @@ import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import android.content.Context
+import androidx.compose.runtime.livedata.observeAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
