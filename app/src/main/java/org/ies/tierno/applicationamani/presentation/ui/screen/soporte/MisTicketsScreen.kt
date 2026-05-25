@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.soporte
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -81,7 +83,7 @@ fun MisTicketsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mis tickets",
+                        text = stringResource(R.string.auto_mis_tickets),
                         style = typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                     )
                 },
@@ -89,7 +91,7 @@ fun MisTicketsScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atr\u00e1s",
+                            contentDescription = stringResource(R.string.auto_atru00e1s),
                         )
                     }
                 },
@@ -106,8 +108,9 @@ fun MisTicketsScreen(
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colors.surface,
-                        titleContentColor = colors.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -178,7 +181,7 @@ fun MisTicketsScreen(
                                 style = typography.bodyMedium,
                             )
                             Text(
-                                text = "Tocar para reintentar",
+                                text = stringResource(R.string.auto_tocar_para_reintentar),
                                 color = MaterialTheme.colorScheme.primary,
                                 style = typography.bodySmall.copy(fontWeight = FontWeight.Medium),
                                 modifier =
@@ -203,13 +206,11 @@ fun MisTicketsScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Text(
-                                "No hay tickets",
+                            Text(stringResource(R.string.auto_no_hay_tickets),
                                 style = typography.titleMedium,
                                 color = colors.onSurfaceVariant,
                             )
-                            Text(
-                                "Crea uno nuevo desde Ajustes",
+                            Text(stringResource(R.string.auto_crea_uno_nuevo_desde),
                                 style = typography.bodySmall,
                                 color = colors.onSurfaceVariant,
                             )

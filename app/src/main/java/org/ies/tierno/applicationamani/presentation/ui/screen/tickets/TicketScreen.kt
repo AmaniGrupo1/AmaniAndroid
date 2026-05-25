@@ -37,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,14 +127,16 @@ fun TicketScreen(
                     IconButton(onClick = { navController?.navigateUp() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = titleBarColor
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryBarColor
-                )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    )
             )
         }
     ) { paddingValues ->
@@ -210,7 +213,7 @@ fun TicketScreen(
                                 else null
                             },
                             label = { Text(stringResource(R.string.titulo)) },
-                            placeholder = { Text("Breve descripción del problema") },
+                            placeholder = { Text(stringResource(R.string.auto_breve_descripcion_del_problema)) },
                             shape = RoundedCornerShape(12.dp),
                             isError = tituloError != null,
                             supportingText = {
@@ -236,7 +239,7 @@ fun TicketScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor(),
-                                placeholder = { Text("Selecciona una categoría") }
+                                placeholder = { Text(stringResource(R.string.auto_selecciona_una_categoria)) }
                             )
 
                             ExposedDropdownMenu(
@@ -265,7 +268,7 @@ fun TicketScreen(
                                 else null
                             },
                             label = { Text(stringResource(R.string.descripcion)) },
-                            placeholder = { Text("Describe detalladamente el problema...") },
+                            placeholder = { Text(stringResource(R.string.auto_describe_detalladamente_el_problema)) },
                             minLines = 5,
                             maxLines = 10,
                             shape = RoundedCornerShape(12.dp),
@@ -288,7 +291,7 @@ fun TicketScreen(
                                 else null
                             },
                             label = { Text(stringResource(R.string.email)) },
-                            placeholder = { Text("tu@email.com") },
+                            placeholder = { Text(stringResource(R.string.auto_tuemailcom)) },
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             isError = emailError != null,
@@ -382,18 +385,18 @@ fun TicketScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Warning,
-                                contentDescription = "Sin reportes",
+                                contentDescription = stringResource(R.string.auto_sin_reportes),
                                 tint = if (isDark) Color.LightGray else Color.Gray,
                                 modifier = Modifier.size(48.dp)
                             )
                             Text(
-                                text = "Aún no tienes reportes enviados.",
+                                text = stringResource(R.string.auto_aun_no_tienes_reportes),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (isDark) Color.White else Color.Black
                             )
                             Text(
-                                text = "Si tienes algún problema con la aplicación, ve a la pestaña 'Reportar problema' para enviarnos un ticket.",
+                                text = stringResource(R.string.auto_si_tienes_algun_problema),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = if (isDark) Color.LightGray else Color.Gray,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -532,12 +535,12 @@ fun TicketCard(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Info,
-                                    contentDescription = "Respuesta del Administrador",
+                                    contentDescription = stringResource(R.string.auto_respuesta_del_administrador),
                                     tint = if (isDark) Color(0xFF81C784) else Color(0xFF2E7D32),
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Text(
-                                    text = "Respuesta del Administrador",
+                                    text = stringResource(R.string.auto_respuesta_del_administrador),
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isDark) Color(0xFF81C784) else Color(0xFF2E7D32)
@@ -568,12 +571,12 @@ fun TicketCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Info,
-                                contentDescription = "En proceso",
+                                contentDescription = stringResource(R.string.auto_en_proceso),
                                 tint = if (isDark) Color.LightGray else Color.Gray,
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
-                                text = "Reporte en revisión. Te responderemos lo antes posible.",
+                                text = stringResource(R.string.auto_reporte_en_revision_te),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (isDark) Color.LightGray else Color.Gray
                             )

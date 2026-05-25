@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -42,8 +44,7 @@ fun OpcionPagoScreen(navController: NavController) {
                     .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                "Selecciona método de pago",
+            Text(stringResource(R.string.auto_selecciona_metodo_de_pago),
                 style = MaterialTheme.typography.titleLarge,
             )
 
@@ -51,14 +52,14 @@ fun OpcionPagoScreen(navController: NavController) {
                 onClick = { metodoPago = "PRESENCIAL" },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Pago presencial")
+                Text(stringResource(R.string.auto_pago_presencial))
             }
 
             Button(
                 onClick = { metodoPago = "ONLINE" },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Pago online")
+                Text(stringResource(R.string.auto_pago_online))
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -75,7 +76,7 @@ fun OpcionPagoScreen(navController: NavController) {
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Continuar")
+                Text(stringResource(R.string.auto_continuar))
             }
         }
     }

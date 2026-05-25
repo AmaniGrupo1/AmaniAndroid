@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.components
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -84,7 +86,7 @@ fun ThemeModeSelector(
             onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
-                text = { Text("Claro", color = colors.cardContent) },
+                text = { Text(stringResource(R.string.auto_claro), color = colors.cardContent) },
                 onClick = {
                     expanded = false
                     scope.launch {
@@ -94,7 +96,7 @@ fun ThemeModeSelector(
             )
 
             DropdownMenuItem(
-                text = { Text("Oscuro", color = colors.cardContent) },
+                text = { Text(stringResource(R.string.auto_oscuro), color = colors.cardContent) },
                 onClick = {
                     expanded = false
                     scope.launch {

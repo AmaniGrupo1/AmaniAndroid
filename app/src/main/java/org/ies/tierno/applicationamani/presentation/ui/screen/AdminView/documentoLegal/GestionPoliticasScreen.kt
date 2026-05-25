@@ -1,4 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -127,7 +129,7 @@ fun GestionPoliticasScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Politicas y Privacidad",
+                        text = stringResource(R.string.auto_politicas_y_privacidad),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
@@ -135,7 +137,7 @@ fun GestionPoliticasScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                         )
                     }
                 },
@@ -235,7 +237,7 @@ fun LoadingState() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Cargando politicas...",
+                text = stringResource(R.string.auto_cargando_politicas),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -272,7 +274,7 @@ fun EmptyPoliticasState() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "No hay politicas creadas",
+                text = stringResource(R.string.auto_no_hay_politicas_creadas),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -280,7 +282,7 @@ fun EmptyPoliticasState() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Las politicas de privacidad y terminos\nse crearan automaticamente desde el sistema",
+                text = stringResource(R.string.auto_las_politicas_de_privacidad),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -390,7 +392,7 @@ fun PoliticaCard(
                     ) {
                         Icon(
                             Icons.Default.Edit,
-                            contentDescription = "Editar",
+                            contentDescription = stringResource(R.string.auto_editar),
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(18.dp),
                         )
@@ -443,7 +445,7 @@ fun PoliticaCard(
                             color = MaterialTheme.colorScheme.errorContainer,
                         ) {
                             Text(
-                                text = "Inactivo",
+                                text = stringResource(R.string.auto_inactivo),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -473,7 +475,7 @@ fun PoliticaCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Ver detalles completos",
+                        text = stringResource(R.string.auto_ver_detalles_completos),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
@@ -513,7 +515,7 @@ fun DialogoEditarPolitica(
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = "Modifica el contenido del documento legal",
+                    text = stringResource(R.string.auto_modifica_el_contenido_del),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -532,7 +534,7 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
-                    label = { Text("Titulo del documento") },
+                    label = { Text(stringResource(R.string.auto_titulo_del_documento)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -541,8 +543,8 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = version,
                     onValueChange = { version = it },
-                    label = { Text("Version") },
-                    placeholder = { Text("Ej: 2.0, 2.1, 2024") },
+                    label = { Text(stringResource(R.string.auto_version)) },
+                    placeholder = { Text(stringResource(R.string.auto_ej_20_21_2024)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -551,7 +553,7 @@ fun DialogoEditarPolitica(
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = { contenido = it },
-                    label = { Text("Contenido del documento") },
+                    label = { Text(stringResource(R.string.auto_contenido_del_documento)) },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -569,7 +571,7 @@ fun DialogoEditarPolitica(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Documento activo (visible para usuarios)",
+                        text = stringResource(R.string.auto_documento_activo_visible_para),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -598,7 +600,7 @@ fun DialogoEditarPolitica(
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Guardar cambios")
+                Text(stringResource(R.string.auto_guardar_cambios))
             }
         },
         dismissButton = {
@@ -606,7 +608,7 @@ fun DialogoEditarPolitica(
                 onClick = onDismiss,
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.auto_cancelar))
             }
         },
     )
@@ -706,7 +708,7 @@ fun DialogoVerPolitica(
                         IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
                             Icon(
                                 Icons.Default.Edit,
-                                contentDescription = "Editar",
+                                contentDescription = stringResource(R.string.auto_editar),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp),
                             )
@@ -714,7 +716,7 @@ fun DialogoVerPolitica(
                         IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Cerrar",
+                                contentDescription = stringResource(R.string.auto_cerrar),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp),
                             )
@@ -791,9 +793,9 @@ fun DialogoVerPolitica(
                             ),
                         shape = MaterialTheme.shapes.medium,
                     ) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.auto_editar), modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Editar", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.auto_editar), style = MaterialTheme.typography.labelLarge)
                     }
 
                     Button(
@@ -805,7 +807,7 @@ fun DialogoVerPolitica(
                             ),
                         shape = MaterialTheme.shapes.medium,
                     ) {
-                        Text("Cerrar", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.auto_cerrar), style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }

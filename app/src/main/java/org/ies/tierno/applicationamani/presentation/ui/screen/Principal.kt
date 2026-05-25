@@ -221,7 +221,7 @@ fun Principal(
                 ) {
                     Icon(
                         imageVector = Icons.Default.SelfImprovement,
-                        contentDescription = "Cambiar frase",
+                        contentDescription = stringResource(R.string.auto_cambiar_frase),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier =
                             Modifier

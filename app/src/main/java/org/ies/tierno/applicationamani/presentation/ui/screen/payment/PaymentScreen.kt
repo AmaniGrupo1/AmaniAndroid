@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.payment
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -101,7 +103,7 @@ fun PaymentScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Pago de sesión") },
+                title = { Text(stringResource(R.string.auto_pago_de_sesion)) },
             )
         },
     ) { paddingValues ->
@@ -123,7 +125,7 @@ fun PaymentScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = "Resumen de la cita",
+                        text = stringResource(R.string.auto_resumen_de_la_cita),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(text = "Psicólogo: $psicologoName")
@@ -137,11 +139,11 @@ fun PaymentScreen(
                 is PaymentUiState.Loading,
                 -> {
                     CircularProgressIndicator()
-                    Text(text = "Preparando pago seguro...")
+                    Text(text = stringResource(R.string.auto_preparando_pago_seguro))
                 }
                 is PaymentUiState.PaymentReady -> {
                     Text(
-                        text = "Procesando pago seguro con Stripe...",
+                        text = stringResource(R.string.auto_procesando_pago_seguro_con),
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -154,20 +156,20 @@ fun PaymentScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.preparePayment(citaId) }) {
-                        Text("Reintentar")
+                        Text(stringResource(R.string.auto_reintentar))
                     }
                     Button(onClick = onPaymentCanceled) {
-                        Text("Volver")
+                        Text(stringResource(R.string.auto_volver))
                     }
                 }
                 is PaymentUiState.Success -> {
                     Text(
-                        text = "Pago completado correctamente.",
+                        text = stringResource(R.string.auto_pago_completado_correctamente),
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center,
                     )
                     Button(onClick = onPaymentSuccess) {
-                        Text("Continuar")
+                        Text(stringResource(R.string.auto_continuar))
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -214,7 +215,7 @@ fun LoginScreenContent(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo de Amani Psicología",
+                    contentDescription = stringResource(R.string.auto_logo_de_amani_psicologia),
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -223,7 +224,7 @@ fun LoginScreenContent(
 
             // Nombre de la marca
             Text(
-                text = "AMANI",
+                text = stringResource(R.string.auto_amani),
                 style =
                     typography.displayLarge.copy(
                         fontWeight = FontWeight.Bold,
@@ -233,7 +234,7 @@ fun LoginScreenContent(
             )
 
             Text(
-                text = "Psicología y Bienestar",
+                text = stringResource(R.string.auto_psicologia_y_bienestar),
                 style =
                     typography.titleMedium.copy(
                         fontSize = 20.sp,
@@ -266,7 +267,7 @@ fun LoginScreenContent(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Bienvenido de vuelta",
+                            text = stringResource(R.string.auto_bienvenido_de_vuelta),
                             style =
                                 typography.headlineSmall.copy(
                                     fontWeight = FontWeight.Bold,
@@ -274,7 +275,7 @@ fun LoginScreenContent(
                                 ),
                         )
                         Text(
-                            text = "Accede a tu espacio terapéutico",
+                            text = stringResource(R.string.auto_accede_a_tu_espacio),
                             style = typography.bodyMedium,
                             color = colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -289,11 +290,10 @@ fun LoginScreenContent(
                         value = username,
                         onValueChange = onUsernameChange,
                         label = {
-                            Text("Correo electrónico")
+                            Text(stringResource(R.string.auto_correo_electronico))
                         },
                         placeholder = {
-                            Text(
-                                "usuario@ejemplo.com",
+                            Text(stringResource(R.string.auto_usuarioejemplocom),
                                 style = typography.bodyMedium,
                             )
                         },
@@ -302,21 +302,21 @@ fun LoginScreenContent(
                             when {
                                 !emailTouched && username.isBlank() -> {
                                     Text(
-                                        text = "📧 Introduce tu correo electrónico",
+                                        text = stringResource(R.string.auto__introduce_tu_correo),
                                         style = typography.bodySmall,
                                         color = colorScheme.onSurfaceVariant,
                                     )
                                 }
                                 emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
                                     Text(
-                                        text = "❌ Formato de correo inválido (ej: usuario@dominio.com)",
+                                        text = stringResource(R.string.auto__formato_de_correo),
                                         style = typography.bodySmall,
                                         color = colorScheme.error,
                                     )
                                 }
                                 emailTouched && username.isNotBlank() && username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
                                     Text(
-                                        text = "✅ Correo válido",
+                                        text = stringResource(R.string.auto__correo_valido),
                                         style = typography.bodySmall,
                                         color = colorScheme.primary, // Usando primary para éxito
                                     )
@@ -349,7 +349,7 @@ fun LoginScreenContent(
                         value = password,
                         onValueChange = onPasswordChange,
                         label = {
-                            Text("Contraseña")
+                            Text(stringResource(R.string.auto_contrasena))
                         },
                         placeholder = {
                             Text(
@@ -362,7 +362,7 @@ fun LoginScreenContent(
                             when {
                                 !passwordTouched && password.isBlank() -> {
                                     Text(
-                                        text = "🔒 Introduce tu contraseña",
+                                        text = stringResource(R.string.auto__introduce_tu_contrasena),
                                         style = typography.bodySmall,
                                         color = colorScheme.onSurfaceVariant,
                                     )
@@ -376,7 +376,7 @@ fun LoginScreenContent(
                                 }
                                 passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
                                     Text(
-                                        text = "✅ Contraseña válida",
+                                        text = stringResource(R.string.auto__contrasena_valida),
                                         style = typography.bodySmall,
                                         color = colorScheme.primary, // Usando primary para éxito
                                     )
@@ -442,14 +442,12 @@ fun LoginScreenContent(
                                     color = colorScheme.onPrimary,
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    "Iniciando sesión...",
+                                Text(stringResource(R.string.auto_iniciando_sesion),
                                     style = typography.labelLarge,
                                 )
                             }
                         } else {
-                            Text(
-                                "Iniciar sesión",
+                            Text(stringResource(R.string.auto_iniciar_sesion),
                                 style = typography.labelLarge,
                             )
                         }
@@ -469,7 +467,7 @@ fun LoginScreenContent(
                                     .background(colorScheme.outlineVariant),
                         )
                         Text(
-                            text = "¿Nuevo en AMANI?",
+                            text = stringResource(R.string.auto_nuevo_en_amani),
                             style = typography.bodySmall,
                             color = colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -490,7 +488,7 @@ fun LoginScreenContent(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Crear cuenta nueva",
+                            text = stringResource(R.string.auto_crear_cuenta_nueva),
                             style =
                                 typography.bodyLarge.copy(
                                     fontWeight = FontWeight.Medium,
@@ -504,7 +502,7 @@ fun LoginScreenContent(
             // Texto de ayuda
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "💜 Tu bienestar comienza aquí",
+                text = stringResource(R.string.auto__tu_bienestar_comienza),
                 style = typography.bodySmall,
                 color = colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

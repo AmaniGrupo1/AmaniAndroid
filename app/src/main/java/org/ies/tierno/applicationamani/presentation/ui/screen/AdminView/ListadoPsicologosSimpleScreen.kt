@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -213,7 +214,7 @@ fun ListadoPsicologosSimpleScreen(
             ) {
                 Icon(
                     Icons.Default.Person,
-                    contentDescription = "Agregar psicólogo",
+                    contentDescription = stringResource(R.string.auto_agregar_psicologo),
                     tint = Color.White
                 )
             }
@@ -242,7 +243,7 @@ fun ListadoPsicologosSimpleScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "📋 No hay psicólogos registrados",
+                        text = stringResource(R.string.auto__no_hay_psicologos),
                         style = typography.titleMedium?.copy(
                             fontSize = 18.sp,
                             color = textSecondaryColor
@@ -252,7 +253,7 @@ fun ListadoPsicologosSimpleScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Presiona el botón + para agregar uno",
+                        text = stringResource(R.string.auto_presiona_el_boton_para),
                         style = typography.bodyMedium?.copy(
                             fontSize = 14.sp,
                             color = textSecondaryColor
@@ -304,7 +305,7 @@ fun ListadoPsicologosSimpleScreen(
                 containerColor = surfaceColor,
                 title = {
                     Text(
-                        text = "Confirmar baja",
+                        text = stringResource(R.string.auto_confirmar_baja),
                         style = typography.headlineSmall?.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -355,7 +356,7 @@ fun ListadoPsicologosSimpleScreen(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryColor),
                         enabled = !isBajaInProgress
                     ) {
-                        Text("Cancelar", fontFamily = roboto)
+                        Text(stringResource(R.string.auto_cancelar), fontFamily = roboto)
                     }
                 }
             )
@@ -386,7 +387,7 @@ fun ListadoPsicologosSimpleScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "Editar Psicólogo",
+                            text = stringResource(R.string.auto_editar_psicologo),
                             style = typography.headlineSmall?.copy(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
@@ -408,7 +409,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editNombre,
                             onValueChange = { editNombre = it },
-                            label = { Text("Nombre *", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_nombre_), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -417,7 +418,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editApellido,
                             onValueChange = { editApellido = it },
-                            label = { Text("Apellido *", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_apellido_), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -426,7 +427,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editEmail,
                             onValueChange = { editEmail = it },
-                            label = { Text("Email", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_email), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -435,7 +436,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editTelefono,
                             onValueChange = { editTelefono = it },
-                            label = { Text("Teléfono", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_telefono), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -444,7 +445,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editEspecialidad,
                             onValueChange = { editEspecialidad = it },
-                            label = { Text("Especialidad *", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_especialidad_), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -453,7 +454,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editExperiencia,
                             onValueChange = { editExperiencia = it },
-                            label = { Text("Años de experiencia", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_anos_de_experiencia), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -462,7 +463,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editLicencia,
                             onValueChange = { editLicencia = it },
-                            label = { Text("Número de licencia", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_numero_de_licencia), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -471,7 +472,7 @@ fun ListadoPsicologosSimpleScreen(
                         OutlinedTextField(
                             value = editDescripcion,
                             onValueChange = { editDescripcion = it },
-                            label = { Text("Descripción profesional", fontFamily = roboto) },
+                            label = { Text(stringResource(R.string.auto_descripcion_profesional), fontFamily = roboto) },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 3,
                             shape = RoundedCornerShape(12.dp)
@@ -517,9 +518,9 @@ fun ListadoPsicologosSimpleScreen(
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Guardando...", fontFamily = roboto)
+                            Text(stringResource(R.string.auto_guardando), fontFamily = roboto)
                         } else {
-                            Text("💾 GUARDAR", fontFamily = roboto, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.auto__guardar), fontFamily = roboto, fontWeight = FontWeight.Bold)
                         }
                     }
                 },
@@ -535,7 +536,7 @@ fun ListadoPsicologosSimpleScreen(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
                         enabled = !isEditInProgress
                     ) {
-                        Text("Cancelar", fontFamily = roboto)
+                        Text(stringResource(R.string.auto_cancelar), fontFamily = roboto)
                     }
                 }
             )
@@ -606,7 +607,7 @@ fun PsicologoCardExpandable(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Email:",
+                        text = stringResource(R.string.auto_email_1),
                         style = typography.bodyMedium?.copy(
                             fontSize = 13.sp,
                             color = textSecondaryColor,
@@ -633,7 +634,7 @@ fun PsicologoCardExpandable(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Teléfono:",
+                            text = stringResource(R.string.auto_telefono_1),
                             style = typography.bodyMedium?.copy(
                                 fontSize = 13.sp,
                                 color = textSecondaryColor,
@@ -659,7 +660,7 @@ fun PsicologoCardExpandable(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Especialidad:",
+                        text = stringResource(R.string.auto_especialidad),
                         style = typography.bodyMedium?.copy(
                             fontSize = 13.sp,
                             color = textSecondaryColor,
@@ -686,7 +687,7 @@ fun PsicologoCardExpandable(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Experiencia:",
+                            text = stringResource(R.string.auto_experiencia),
                             style = typography.bodyMedium?.copy(
                                 fontSize = 13.sp,
                                 color = textSecondaryColor,
@@ -713,7 +714,7 @@ fun PsicologoCardExpandable(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Licencia:",
+                            text = stringResource(R.string.auto_licencia),
                             style = typography.bodyMedium?.copy(
                                 fontSize = 13.sp,
                                 color = textSecondaryColor,
@@ -736,7 +737,7 @@ fun PsicologoCardExpandable(
                 // Descripción
                 if (!psicologo.descripcion.isNullOrBlank()) {
                     Text(
-                        text = "Descripción:",
+                        text = stringResource(R.string.auto_descripcion),
                         style = typography.bodyMedium?.copy(
                             fontSize = 12.sp,
                             color = textSecondaryColor,
@@ -771,7 +772,7 @@ fun PsicologoCardExpandable(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Dar de baja", color = Color.White, fontFamily = roboto)
+                        Text(stringResource(R.string.auto_dar_de_baja), color = Color.White, fontFamily = roboto)
                     }
 
                     Button(
@@ -780,7 +781,7 @@ fun PsicologoCardExpandable(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Editar", color = Color.White, fontFamily = roboto)
+                        Text(stringResource(R.string.auto_editar), color = Color.White, fontFamily = roboto)
                     }
                 }
             } else {
@@ -797,7 +798,7 @@ fun PsicologoCardExpandable(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Dar de baja", color = Color.White, fontFamily = roboto)
+                        Text(stringResource(R.string.auto_dar_de_baja), color = Color.White, fontFamily = roboto)
                     }
 
                     Button(
@@ -806,7 +807,7 @@ fun PsicologoCardExpandable(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Editar", color = Color.Black, fontFamily = roboto)
+                        Text(stringResource(R.string.auto_editar), color = Color.Black, fontFamily = roboto)
                     }
                 }
             }

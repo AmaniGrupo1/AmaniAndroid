@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.diario
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -181,11 +183,11 @@ fun StepIndicator(
             val isSelected = step == currentStep
             val color by animateColorAsState(
                 targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer,
-                label = "color",
+                label = stringResource(R.string.auto_color),
             )
             val width by animateDpAsState(
                 targetValue = if (isSelected) 32.dp else 8.dp,
-                label = "width",
+                label = stringResource(R.string.auto_width),
             )
 
             Box(
@@ -407,7 +409,7 @@ private fun StepEmocion(
         OutlinedTextField(
             value = titulo,
             onValueChange = onTituloChange,
-            label = { Text("Título de la entrada") },
+            label = { Text(stringResource(R.string.auto_titulo_de_la_entrada)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             leadingIcon = { Icon(Icons.Default.Mood, contentDescription = null) },
@@ -415,13 +417,13 @@ private fun StepEmocion(
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Tu rueda de emociones",
+                text = stringResource(R.string.auto_tu_rueda_de_emociones),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = "Toca un segmento para identificar qué sientes",
+                text = stringResource(R.string.auto_toca_un_segmento_para),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -437,7 +439,7 @@ private fun StepEmocion(
         if (selectedPrimary != null && selectedPrimary.variants.isNotEmpty()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "¿Puedes ser más específico?",
+                    text = stringResource(R.string.auto_puedes_ser_mas_especifico),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                 )
@@ -482,7 +484,7 @@ private fun StepIntensidad(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "¿Qué tan fuerte es este sentimiento?",
+            text = stringResource(R.string.auto_que_tan_fuerte_es),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -502,9 +504,9 @@ private fun StepIntensidad(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Leve", style = MaterialTheme.typography.labelMedium)
-            Text("Moderado", style = MaterialTheme.typography.labelMedium)
-            Text("Extremo", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.auto_leve), style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.auto_moderado), style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.auto_extremo), style = MaterialTheme.typography.labelMedium)
         }
     }
 }
@@ -525,13 +527,13 @@ private fun StepContexto(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Cuéntanos más",
+                text = stringResource(R.string.auto_cuentanos_mas),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = "Expresar tus pensamientos ayuda a procesarlos",
+                text = stringResource(R.string.auto_expresar_tus_pensamientos_ayuda),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -540,7 +542,7 @@ private fun StepContexto(
         OutlinedTextField(
             value = contenido,
             onValueChange = onContenidoChange,
-            label = { Text("¿Qué está pasando por tu mente?") },
+            label = { Text(stringResource(R.string.auto_que_esta_pasando_por)) },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -571,7 +573,7 @@ private fun StepContexto(
                     modifier = Modifier.weight(1f).height(56.dp),
                     shape = RoundedCornerShape(14.dp),
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.auto_cancelar))
                 }
             }
             Button(
@@ -620,15 +622,16 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Diario Emocional", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.auto_mi_diario_emocional), fontWeight = FontWeight.Bold) },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 actions = {
                     IconButton(onClick = { viewModel.forzarSincronizacion() }) {
-                        Icon(Icons.Default.Info, contentDescription = "Sincronizar", tint = Color.White)
+                        Icon(Icons.Default.Info, contentDescription = stringResource(R.string.auto_sincronizar), tint = Color.White)
                     }
                 },
             )
@@ -707,7 +710,7 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                                         modifier = Modifier.weight(1f).height(48.dp),
                                         shape = RoundedCornerShape(12.dp),
                                     ) {
-                                        Text("Anterior")
+                                        Text(stringResource(R.string.auto_anterior))
                                     }
                                 }
                                 Button(
@@ -716,7 +719,7 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                                     shape = RoundedCornerShape(12.dp),
                                     enabled = if (state.currentStep == 0) state.emocion.isNotBlank() else true,
                                 ) {
-                                    Text("Siguiente")
+                                    Text(stringResource(R.string.auto_siguiente))
                                 }
                             }
                         }
@@ -755,7 +758,7 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                     Icon(Icons.Default.History, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Historial de Bienestar",
+                        text = stringResource(R.string.auto_historial_de_bienestar),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
@@ -769,7 +772,7 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "Tu diario está esperando tu primera entrada...",
+                            text = stringResource(R.string.auto_tu_diario_esta_esperando),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -901,7 +904,7 @@ fun HistoryEntryCard(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Intensidad:",
+                            text = stringResource(R.string.auto_intensidad),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -928,7 +931,7 @@ fun HistoryEntryCard(
                         IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
                             Icon(
                                 Icons.Default.Edit,
-                                contentDescription = "Editar",
+                                contentDescription = stringResource(R.string.auto_editar),
                                 modifier = Modifier.size(18.dp),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
@@ -936,7 +939,7 @@ fun HistoryEntryCard(
                         IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = "Eliminar",
+                                contentDescription = stringResource(R.string.auto_eliminar),
                                 modifier = Modifier.size(18.dp),
                                 tint = MaterialTheme.colorScheme.error,
                             )

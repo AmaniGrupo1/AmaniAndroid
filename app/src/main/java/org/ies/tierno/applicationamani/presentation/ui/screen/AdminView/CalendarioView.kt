@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -102,7 +104,7 @@ private fun CalendarioHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onMesAnterior) {
-            Icon(Icons.Default.ChevronLeft, contentDescription = "Mes anterior")
+            Icon(Icons.Default.ChevronLeft, contentDescription = stringResource(R.string.auto_mes_anterior))
         }
         Text(
             text = mesActual.format(formatter).replaceFirstChar { it.uppercase() },
@@ -110,7 +112,7 @@ private fun CalendarioHeader(
             fontWeight = FontWeight.SemiBold,
         )
         IconButton(onClick = onMesSiguiente) {
-            Icon(Icons.Default.ChevronRight, contentDescription = "Mes siguiente")
+            Icon(Icons.Default.ChevronRight, contentDescription = stringResource(R.string.auto_mes_siguiente))
         }
     }
 }

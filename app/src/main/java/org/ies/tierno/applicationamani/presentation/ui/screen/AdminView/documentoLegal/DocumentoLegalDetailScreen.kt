@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
 
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -28,6 +29,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.Do
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Pantalla de visualización detallada de un documento legal.
@@ -97,14 +99,16 @@ fun DocumentoLegalDetailScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = colorScheme.onPrimary,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -132,7 +136,7 @@ fun DocumentoLegalDetailScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Cargando documento...",
+                                text = stringResource(R.string.auto_cargando_documento),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto,
@@ -159,7 +163,7 @@ fun DocumentoLegalDetailScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Error al cargar el documento",
+                                text = stringResource(R.string.auto_error_al_cargar_el_1),
                                 style = typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.onSurface,
@@ -180,9 +184,9 @@ fun DocumentoLegalDetailScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                                 shape = shapes.medium,
                             ) {
-                                Icon(Icons.Default.Refresh, contentDescription = "Reintentar")
+                                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.auto_reintentar))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Reintentar", style = typography.labelLarge, fontFamily = roboto)
+                                Text(stringResource(R.string.auto_reintentar), style = typography.labelLarge, fontFamily = roboto)
                             }
                         }
                     }
@@ -206,7 +210,7 @@ fun DocumentoLegalDetailScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Documento no disponible",
+                                text = stringResource(R.string.auto_documento_no_disponible),
                                 style = typography.headlineSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colorScheme.onSurface,
@@ -215,7 +219,7 @@ fun DocumentoLegalDetailScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "El documento no está disponible en este momento.",
+                                text = stringResource(R.string.auto_el_documento_no_esta),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                                 fontFamily = roboto,

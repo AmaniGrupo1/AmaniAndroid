@@ -45,6 +45,7 @@ import android.app.Activity
 import android.util.Log
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import androidx.compose.material3.MaterialTheme
 
 private const val TAG = "SettingsPsychologist"
 
@@ -150,7 +151,7 @@ fun SettingsPsychologistScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Configuración",
+                        text = stringResource(R.string.auto_configuracion),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (isDark) Color.Black else Color.White,
@@ -158,8 +159,10 @@ fun SettingsPsychologistScreen(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor
-                )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    )
             )
         }
     ) { padding ->
@@ -180,7 +183,7 @@ fun SettingsPsychologistScreen(
                         ) {
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Cargando horario...", fontFamily = roboto)
+                            Text(stringResource(R.string.auto_cargando_horario), fontFamily = roboto)
                         }
                     }
                 }
@@ -644,7 +647,7 @@ fun SettingsOptionRowPsychologist(
                         containerColor = dropdownContainerColor
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Claro", color = textColor) },
+                            text = { Text(stringResource(R.string.auto_claro), color = textColor) },
                             onClick = {
                                 Log.d(TAG, "🎨 Psicólogo seleccionó TEMA CLARO")
                                 scope.launch {
@@ -654,7 +657,7 @@ fun SettingsOptionRowPsychologist(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Oscuro", color = textColor) },
+                            text = { Text(stringResource(R.string.auto_oscuro), color = textColor) },
                             onClick = {
                                 Log.d(TAG, "🎨 Psicólogo seleccionó TEMA OSCURO")
                                 scope.launch {
@@ -669,7 +672,7 @@ fun SettingsOptionRowPsychologist(
             else -> {
                 Icon(
                     Icons.Default.ChevronRight,
-                    contentDescription = "Ir",
+                    contentDescription = stringResource(R.string.auto_ir),
                     tint = textSecondaryColor,
                     modifier = Modifier.size(20.dp)
                 )
@@ -729,14 +732,14 @@ fun DialogHorarioSemanalPsychologist(
                 ) {
                     Column {
                         Text(
-                            text = "📅 Horario Semanal",
+                            text = stringResource(R.string.auto__horario_semanal),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isDark) Color.White else Color(0xFF6B4E71),
                             fontFamily = roboto
                         )
                         Text(
-                            text = "Días y horas de atención disponibles",
+                            text = stringResource(R.string.auto_dias_y_horas_de),
                             fontSize = 13.sp,
                             color = if (isDark) Color.LightGray else Color.Gray,
                             fontFamily = roboto,
@@ -750,7 +753,7 @@ fun DialogHorarioSemanalPsychologist(
                     ) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(R.string.auto_cerrar),
                             tint = if (isDark) Color.White else Color.Gray
                         )
                     }
@@ -773,7 +776,7 @@ fun DialogHorarioSemanalPsychologist(
                             Text(text = "⏰", fontSize = 48.sp)
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "No hay configuración de horario cargada",
+                                text = stringResource(R.string.auto_no_hay_configuracion_de),
                                 textAlign = TextAlign.Center,
                                 color = if (isDark) Color.LightGray else Color.Gray,
                                 fontFamily = roboto
@@ -827,7 +830,7 @@ fun DialogHorarioSemanalPsychologist(
                                             )
                                         } else if (!franja.activo) {
                                             Text(
-                                                text = "❌ No disponible",
+                                                text = stringResource(R.string.auto__no_disponible),
                                                 fontSize = 13.sp,
                                                 color = if (isDark) Color(0xFFEF9A9A) else Color(0xFFE53935),
                                                 fontFamily = roboto,
@@ -871,7 +874,7 @@ fun DialogHorarioSemanalPsychologist(
                         containerColor = if (isDark) Color(0xFF6B4E71) else Color(0xFF6B4E71)
                     )
                 ) {
-                    Text("Cerrar", color = Color.White, fontFamily = roboto, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.auto_cerrar), color = Color.White, fontFamily = roboto, fontWeight = FontWeight.Medium)
                 }
             }
         }

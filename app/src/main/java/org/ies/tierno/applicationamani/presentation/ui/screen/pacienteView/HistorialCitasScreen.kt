@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +31,7 @@ import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +69,7 @@ fun HistorialCitasScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Historial de Citas",
+                        text = stringResource(R.string.auto_historial_de_citas),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (isDark) Color.Black else Color.White,
@@ -78,14 +80,16 @@ fun HistorialCitasScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = if (isDark) Color.Black else Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = primaryColor
-                )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    )
             )
         }
     ) { padding ->
@@ -108,7 +112,7 @@ fun HistorialCitasScreen(
                             CircularProgressIndicator(color = primaryColor)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Cargando historial...",
+                                text = stringResource(R.string.auto_cargando_historial),
                                 color = textSecondaryColor,
                                 fontFamily = roboto
                             )
@@ -143,7 +147,7 @@ fun HistorialCitasScreen(
                                 onClick = { viewModel.cargarHistorialCitas() },
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor)
                             ) {
-                                Text("Reintentar", color = Color.White, fontFamily = roboto)
+                                Text(stringResource(R.string.auto_reintentar), color = Color.White, fontFamily = roboto)
                             }
                         }
                     }
@@ -166,13 +170,13 @@ fun HistorialCitasScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "No tienes citas en tu historial",
+                                text = stringResource(R.string.auto_no_tienes_citas_en),
                                 fontSize = 16.sp,
                                 color = textSecondaryColor,
                                 fontFamily = roboto
                             )
                             Text(
-                                text = "Las citas completadas aparecerán aquí",
+                                text = stringResource(R.string.auto_las_citas_completadas_apareceran),
                                 fontSize = 14.sp,
                                 color = textSecondaryColor.copy(alpha = 0.7f),
                                 fontFamily = roboto

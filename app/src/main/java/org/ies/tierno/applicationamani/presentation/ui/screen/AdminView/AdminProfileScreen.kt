@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.ui.res.stringResource
 import android.Manifest.permission.CAMERA
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
@@ -240,7 +241,7 @@ fun AdminProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mi Perfil",
+                        text = stringResource(R.string.auto_mi_perfil),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
@@ -248,7 +249,7 @@ fun AdminProfileScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                         )
                     }
                 },
@@ -303,7 +304,7 @@ fun AdminProfileScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
-                                    text = "Foto de Perfil",
+                                    text = stringResource(R.string.auto_foto_de_perfil_1),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(bottom = 16.dp),
@@ -330,7 +331,7 @@ fun AdminProfileScreen(
                                                 .placeholder(R.drawable.ic_default_avatar)
                                                 .build(),
                                         imageLoader = imageLoader,
-                                        contentDescription = "Foto de perfil",
+                                        contentDescription = stringResource(R.string.auto_foto_de_perfil),
                                         modifier =
                                             Modifier
                                                 .fillMaxSize()
@@ -352,7 +353,7 @@ fun AdminProfileScreen(
                                     ) {
                                         Icon(
                                             Icons.Default.CameraAlt,
-                                            contentDescription = "Cambiar foto",
+                                            contentDescription = stringResource(R.string.auto_cambiar_foto),
                                             modifier = Modifier.size(20.dp),
                                         )
                                     }
@@ -390,7 +391,7 @@ fun AdminProfileScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
-                                        text = "Informacion Personal",
+                                        text = stringResource(R.string.auto_informacion_personal_1),
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.primary,
                                     )
@@ -400,11 +401,11 @@ fun AdminProfileScreen(
                                         ) {
                                             Icon(
                                                 Icons.Default.Edit,
-                                                contentDescription = "Editar",
+                                                contentDescription = stringResource(R.string.auto_editar),
                                                 modifier = Modifier.size(18.dp),
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Editar")
+                                            Text(stringResource(R.string.auto_editar))
                                         }
                                     }
                                 }
@@ -416,7 +417,7 @@ fun AdminProfileScreen(
                                     OutlinedTextField(
                                         value = nombreEdit,
                                         onValueChange = { nombreEdit = it },
-                                        label = { Text("Nombre") },
+                                        label = { Text(stringResource(R.string.auto_nombre)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.medium,
@@ -427,7 +428,7 @@ fun AdminProfileScreen(
                                     OutlinedTextField(
                                         value = apellidoEdit,
                                         onValueChange = { apellidoEdit = it },
-                                        label = { Text("Apellido (opcional)") },
+                                        label = { Text(stringResource(R.string.auto_apellido_opcional)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.medium,
@@ -438,7 +439,7 @@ fun AdminProfileScreen(
                                     OutlinedTextField(
                                         value = emailEdit,
                                         onValueChange = { emailEdit = it },
-                                        label = { Text("Correo electronico") },
+                                        label = { Text(stringResource(R.string.auto_correo_electronico_1)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.medium,
@@ -467,12 +468,11 @@ fun AdminProfileScreen(
                                         ) {
                                             Icon(
                                                 Icons.Default.Save,
-                                                contentDescription = "Guardar",
+                                                contentDescription = stringResource(R.string.auto_guardar),
                                                 modifier = Modifier.size(18.dp),
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text(
-                                                "Guardar",
+                                            Text(stringResource(R.string.auto_guardar),
                                                 style = MaterialTheme.typography.labelLarge,
                                             )
                                         }
@@ -482,14 +482,14 @@ fun AdminProfileScreen(
                                             modifier = Modifier.weight(1f).height(48.dp),
                                             shape = MaterialTheme.shapes.medium,
                                         ) {
-                                            Text("Cancelar")
+                                            Text(stringResource(R.string.auto_cancelar))
                                         }
                                     }
                                 } else {
                                     // Modo visualizacion
                                     InfoRowAdmin(
                                         icon = Icons.Default.Person,
-                                        label = "Nombre completo",
+                                        label = stringResource(R.string.auto_nombre_completo),
                                         value = "${perfil!!.nombre} ${perfil!!.apellido ?: ""}".trim(),
                                     )
 
@@ -497,7 +497,7 @@ fun AdminProfileScreen(
 
                                     InfoRowAdmin(
                                         icon = Icons.Default.Email,
-                                        label = "Correo electronico",
+                                        label = stringResource(R.string.auto_correo_electronico_1),
                                         value = perfil!!.email,
                                     )
 
@@ -505,7 +505,7 @@ fun AdminProfileScreen(
 
                                     InfoRowAdmin(
                                         icon = Icons.Default.Badge,
-                                        label = "Rol",
+                                        label = stringResource(R.string.auto_rol),
                                         value = "Administrador",
                                     )
 
@@ -513,7 +513,7 @@ fun AdminProfileScreen(
 
                                     InfoRowAdmin(
                                         icon = Icons.Default.Lock,
-                                        label = "ID de usuario",
+                                        label = stringResource(R.string.auto_id_de_usuario),
                                         value = perfil!!.idUsuario.toString(),
                                     )
                                 }
@@ -537,20 +537,20 @@ fun AdminProfileScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
-                                    text = "AMANI Psicologia",
+                                    text = stringResource(R.string.auto_amani_psicologia),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Plataforma de gestion terapeutica",
+                                    text = stringResource(R.string.auto_plataforma_de_gestion_terapeutica),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = "Version 1.0.0",
+                                    text = stringResource(R.string.auto_version_100),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -577,13 +577,13 @@ fun AdminProfileScreen(
             shape = MaterialTheme.shapes.extraLarge,
             title = {
                 Text(
-                    text = "Cambiar foto de perfil",
+                    text = stringResource(R.string.auto_cambiar_foto_de_perfil),
                     style = MaterialTheme.typography.headlineSmall,
                 )
             },
             text = {
                 Text(
-                    text = "Selecciona una opcion para obtener la imagen",
+                    text = stringResource(R.string.auto_selecciona_una_opcion_para),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -606,12 +606,11 @@ fun AdminProfileScreen(
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
-                            contentDescription = "Camara",
+                            contentDescription = stringResource(R.string.auto_camara),
                             modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            "Camara",
+                        Text(stringResource(R.string.auto_camara),
                             style = MaterialTheme.typography.labelLarge,
                         )
                     }
@@ -630,12 +629,11 @@ fun AdminProfileScreen(
                     ) {
                         Icon(
                             Icons.Default.PhotoLibrary,
-                            contentDescription = "Galeria",
+                            contentDescription = stringResource(R.string.auto_galeria),
                             modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            "Galeria",
+                        Text(stringResource(R.string.auto_galeria),
                             style = MaterialTheme.typography.labelLarge,
                         )
                     }
@@ -643,7 +641,7 @@ fun AdminProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showImageOptions = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.auto_cancelar))
                 }
             },
         )
@@ -670,7 +668,7 @@ fun AdminProfileScreen(
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Subiendo foto...",
+                        text = stringResource(R.string.auto_subiendo_foto),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -745,7 +743,7 @@ fun ErrorContentAdmin(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Error al cargar el perfil",
+            text = stringResource(R.string.auto_error_al_cargar_el),
             style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -765,7 +763,7 @@ fun ErrorContentAdmin(
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Reintentar")
+            Text(stringResource(R.string.auto_reintentar))
         }
     }
 }

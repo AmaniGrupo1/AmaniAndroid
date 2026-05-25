@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
@@ -226,11 +228,11 @@ private fun TarjetaFranja(
 
     val borderColor by animateColorAsState(
         targetValue = if (franja.activo) amani.citaLibre else amani.citaOcupada,
-        label = "borderColor",
+        label = stringResource(R.string.auto_bordercolor),
     )
     val containerColor by animateColorAsState(
         targetValue = if (franja.activo) amani.textFieldContainer else amani.citaOcupadaBg,
-        label = "containerColor",
+        label = stringResource(R.string.auto_containercolor),
     )
 
     Card(
@@ -296,7 +298,7 @@ private fun TarjetaFranja(
             if (franja.activo) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
-                    contentDescription = "Seleccionar",
+                    contentDescription = stringResource(R.string.auto_seleccionar),
                     tint = amani.citaLibre.copy(alpha = 0.5f),
                     modifier = Modifier.size(20.dp),
                 )

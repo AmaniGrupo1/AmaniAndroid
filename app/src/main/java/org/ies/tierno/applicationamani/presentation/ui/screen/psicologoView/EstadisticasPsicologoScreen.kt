@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -98,8 +100,7 @@ fun EstadisticasPsicologoScreen(viewModel: EstadisticasPsicologoViewModel = koin
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        "Estadísticas de Bienestar",
+                    Text(stringResource(R.string.auto_estadisticas_de_bienestar),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.onPrimary,
@@ -107,7 +108,9 @@ fun EstadisticasPsicologoScreen(viewModel: EstadisticasPsicologoViewModel = koin
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -182,7 +185,7 @@ fun FiltersSection(
                     value = "${pacienteSeleccionado?.nombre ?: ""} ${pacienteSeleccionado?.apellido ?: ""}",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Paciente") },
+                    label = { Text(stringResource(R.string.auto_paciente)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPaciente)
                     },
@@ -223,7 +226,7 @@ fun FiltersSection(
                         value = periodoSeleccionado,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Periodo") },
+                        label = { Text(stringResource(R.string.auto_periodo)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPeriodo)
                         },
@@ -264,7 +267,7 @@ fun FiltersSection(
                         value = vistaSeleccionada,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Vista") },
+                        label = { Text(stringResource(R.string.auto_vista)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedVista)
                         },
@@ -307,8 +310,7 @@ fun ChartCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                "Evolución emocional",
+            Text(stringResource(R.string.auto_evolucion_emocional),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -347,12 +349,12 @@ private fun EmptyStateContent() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Sin datos disponibles",
+            text = stringResource(R.string.auto_sin_datos_disponibles),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = "Este paciente no tiene registros en el periodo seleccionado",
+            text = stringResource(R.string.auto_este_paciente_no_tiene),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -477,7 +479,7 @@ private fun SinglePointChart(point: Pair<LocalDate, Float>) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Solo hay una entrada registrada en este periodo.",
+            text = stringResource(R.string.auto_solo_hay_una_entrada),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -655,8 +657,7 @@ fun ObservationCard(observacion: String) {
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(
-                    "Observación",
+                Text(stringResource(R.string.auto_observacion),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,

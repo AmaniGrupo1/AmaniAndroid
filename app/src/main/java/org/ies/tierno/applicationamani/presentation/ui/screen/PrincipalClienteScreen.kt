@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,13 +67,13 @@ fun PrincipalClienteScreen(
         drawerContent = {
             ModalDrawerSheet {
                 Text(
-                    text = "Menú",
+                    text = stringResource(R.string.auto_menu_1),
                     modifier = Modifier.padding(16.dp),
                     style = typography.titleLarge, // M3: titleLarge for drawer header
                 )
                 HorizontalDivider()
                 Text(
-                    text = "Perfil",
+                    text = stringResource(R.string.auto_perfil),
                     style = typography.bodyLarge,
                     modifier =
                         Modifier
@@ -80,7 +82,7 @@ fun PrincipalClienteScreen(
                             .padding(16.dp),
                 )
                 Text(
-                    text = "Mis citas",
+                    text = stringResource(R.string.auto_mis_citas),
                     style = typography.bodyLarge,
                     modifier =
                         Modifier
@@ -89,7 +91,7 @@ fun PrincipalClienteScreen(
                             .padding(16.dp),
                 )
                 Text(
-                    text = "Cerrar sesión",
+                    text = stringResource(R.string.auto_cerrar_sesion),
                     style = typography.bodyLarge,
                     modifier =
                         Modifier
@@ -103,7 +105,7 @@ fun PrincipalClienteScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Inicio") },
+                    title = { Text(stringResource(R.string.auto_inicio)) },
                     navigationIcon = {
                         IconButton(
                             onClick = {
@@ -114,7 +116,7 @@ fun PrincipalClienteScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu",
+                                contentDescription = stringResource(R.string.auto_menu),
                             )
                         }
                     },
@@ -161,7 +163,7 @@ fun PrincipalClienteScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "Imagen del psicólogo",
+                            text = stringResource(R.string.auto_imagen_del_psicologo),
                             style = typography.bodyLarge,
                         )
                     }
@@ -180,14 +182,14 @@ fun PrincipalClienteScreen(
                         modifier = Modifier.padding(16.dp),
                     ) {
                         Text(
-                            text = "N. Psico",
+                            text = stringResource(R.string.auto_n_psico),
                             style = typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp),
                         )
 
                         Text(
-                            text = "Biografía",
+                            text = stringResource(R.string.auto_biografia),
                             style = typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary, // M3: Primary for secondary headers
                             modifier = Modifier.padding(vertical = 8.dp),

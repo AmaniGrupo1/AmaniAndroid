@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +43,7 @@ fun RegistroExitosoScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Registro completado correctamente",
+                text = stringResource(R.string.auto_registro_completado_correctamente),
                 style = MaterialTheme.typography.titleLarge,
             )
 
@@ -51,7 +53,7 @@ fun RegistroExitosoScreen(navController: NavController) {
                     navController.navigate(Screens.login.route)
                 },
             ) {
-                Text("Ir al login")
+                Text(stringResource(R.string.auto_ir_al_login))
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.*
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Barra superior (TopAppBar) para la pantalla de alta de psicólogo.
@@ -55,11 +57,10 @@ fun DarAltaPsicologo(
                 .shadow(elevation = 4.dp, shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp)),
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = colors.primary,
-                titleContentColor = colors.onPrimary,
-                navigationIconContentColor = colors.onPrimary,
-                actionIconContentColor = colors.onPrimary,
-            ),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
         title = {
             AnimatedContent(
                 targetState = showLogo to title,
@@ -74,7 +75,7 @@ fun DarAltaPsicologo(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
-                            contentDescription = "Logo",
+                            contentDescription = stringResource(R.string.auto_logo),
                             modifier = Modifier.size(32.dp),
                             tint = Color.Unspecified,
                         )
@@ -113,7 +114,7 @@ fun DarAltaPsicologo(
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
+                    contentDescription = stringResource(R.string.auto_notificaciones),
                     tint = colors.onPrimary,
                 )
             }
@@ -123,7 +124,7 @@ fun DarAltaPsicologo(
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Menú de navegación",
+                    contentDescription = stringResource(R.string.auto_menu_de_navegacion),
                     tint = colors.onPrimary,
                 )
             }
@@ -151,7 +152,7 @@ fun DarAltaPsicologo(
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
-                                text = "Dar de alta psicólogo",
+                                text = stringResource(R.string.auto_dar_de_alta_psicologo),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurface,

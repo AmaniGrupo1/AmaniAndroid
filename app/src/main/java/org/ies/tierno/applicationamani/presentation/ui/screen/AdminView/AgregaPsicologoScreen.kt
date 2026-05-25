@@ -1,4 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -213,7 +214,7 @@ fun AgregaPsicologoScreen(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = primaryColor,
                             modifier = Modifier.size(24.dp),
                         )
@@ -222,7 +223,7 @@ fun AgregaPsicologoScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Registrar Nuevo Psicólogo",
+                        text = stringResource(R.string.auto_registrar_nuevo_psicologo),
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = roboto,
@@ -231,7 +232,7 @@ fun AgregaPsicologoScreen(
                     )
 
                     Text(
-                        text = "Completa la información profesional",
+                        text = stringResource(R.string.auto_completa_la_informacion_profesional),
                         fontSize = 14.sp,
                         fontFamily = roboto,
                         color = textSecondary,
@@ -284,8 +285,7 @@ fun AgregaPsicologoScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                "Información Personal",
+                            Text(stringResource(R.string.auto_informacion_personal),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = roboto,
@@ -300,15 +300,13 @@ fun AgregaPsicologoScreen(
                             value = name,
                             onValueChange = { loginViewModel.setNombre(it) },
                             label = {
-                                Text(
-                                    "Nombre completo",
+                                Text(stringResource(R.string.auto_nombre_completo),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Ej: María",
+                                Text(stringResource(R.string.auto_ej_maria),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -331,15 +329,13 @@ fun AgregaPsicologoScreen(
                             value = surname,
                             onValueChange = { loginViewModel.setApellido(it) },
                             label = {
-                                Text(
-                                    "Apellidos",
+                                Text(stringResource(R.string.auto_apellidos),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Ej: González Pérez",
+                                Text(stringResource(R.string.auto_ej_gonzalez_perez),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -365,15 +361,13 @@ fun AgregaPsicologoScreen(
                                 emailTouched = true
                             },
                             label = {
-                                Text(
-                                    "Correo electrónico",
+                                Text(stringResource(R.string.auto_correo_electronico),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "psicologo@amani.com",
+                                Text(stringResource(R.string.auto_psicologoamanicom),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -391,8 +385,7 @@ fun AgregaPsicologoScreen(
                             supportingText = {
                                 when {
                                     !emailTouched && email.isBlank() -> {
-                                        Text(
-                                            "📧 Introduce el correo electrónico",
+                                        Text(stringResource(R.string.auto__introduce_el_correo),
                                             fontFamily = roboto,
                                             color = textSecondary,
                                             fontSize = 12.sp,
@@ -407,8 +400,7 @@ fun AgregaPsicologoScreen(
                                         )
                                     }
                                     emailTouched && email.isNotBlank() && emailError == null -> {
-                                        Text(
-                                            "✅ Correo válido",
+                                        Text(stringResource(R.string.auto__correo_valido),
                                             fontFamily = roboto,
                                             color = successColor,
                                             fontSize = 12.sp,
@@ -428,8 +420,7 @@ fun AgregaPsicologoScreen(
                                 passwordTouched = true
                             },
                             label = {
-                                Text(
-                                    "Contraseña",
+                                Text(stringResource(R.string.auto_contrasena),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
@@ -480,8 +471,7 @@ fun AgregaPsicologoScreen(
                             supportingText = {
                                 when {
                                     !passwordTouched && password.isBlank() -> {
-                                        Text(
-                                            "🔒 Introduce una contraseña",
+                                        Text(stringResource(R.string.auto__introduce_una_contrasena),
                                             fontFamily = roboto,
                                             color = textSecondary,
                                             fontSize = 12.sp,
@@ -496,8 +486,7 @@ fun AgregaPsicologoScreen(
                                         )
                                     }
                                     passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
-                                        Text(
-                                            "✅ Contraseña válida",
+                                        Text(stringResource(R.string.auto__contrasena_valida),
                                             fontFamily = roboto,
                                             color = successColor,
                                             fontSize = 12.sp,
@@ -514,15 +503,13 @@ fun AgregaPsicologoScreen(
                             value = dateOfBirth?.format(dateFormatter) ?: "",
                             onValueChange = {},
                             label = {
-                                Text(
-                                    "Fecha de nacimiento",
+                                Text(stringResource(R.string.auto_fecha_de_nacimiento_1),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "DD/MM/AAAA",
+                                Text(stringResource(R.string.auto_ddmmaaaa),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -537,7 +524,7 @@ fun AgregaPsicologoScreen(
                                 IconButton(onClick = { loginViewModel.setShowDatePicker(true) }) {
                                     Icon(
                                         Icons.Default.CalendarToday,
-                                        contentDescription = "Seleccionar fecha",
+                                        contentDescription = stringResource(R.string.auto_seleccionar_fecha),
                                         tint = textSecondary,
                                     )
                                 }
@@ -559,15 +546,13 @@ fun AgregaPsicologoScreen(
                                         fontSize = 12.sp,
                                     )
                                 } else if (dateOfBirth != null) {
-                                    Text(
-                                        "✅ Fecha válida",
+                                    Text(stringResource(R.string.auto__fecha_valida),
                                         fontFamily = roboto,
                                         color = successColor,
                                         fontSize = 12.sp,
                                     )
                                 } else {
-                                    Text(
-                                        "📅 Selecciona tu fecha de nacimiento",
+                                    Text(stringResource(R.string.auto__selecciona_tu_fecha),
                                         fontFamily = roboto,
                                         color = textSecondary,
                                         fontSize = 12.sp,
@@ -583,8 +568,7 @@ fun AgregaPsicologoScreen(
                             value = telefono,
                             onValueChange = { loginViewModel.setTelefonoPsicologo(it.filter { c -> c.isDigit() }) },
                             label = {
-                                Text(
-                                    "Teléfono de contacto",
+                                Text(stringResource(R.string.auto_telefono_de_contacto),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
@@ -609,24 +593,21 @@ fun AgregaPsicologoScreen(
                             supportingText = {
                                 when {
                                     telefono.isBlank() -> {
-                                        Text(
-                                            "📞 Introduce el número de teléfono",
+                                        Text(stringResource(R.string.auto__introduce_el_numero),
                                             fontFamily = roboto,
                                             color = textSecondary,
                                             fontSize = 12.sp,
                                         )
                                     }
                                     telefono.length != 9 -> {
-                                        Text(
-                                            "❌ El teléfono debe tener 9 dígitos",
+                                        Text(stringResource(R.string.auto__el_telefono_debe),
                                             fontFamily = roboto,
                                             color = errorColor,
                                             fontSize = 12.sp,
                                         )
                                     }
                                     telefono.length == 9 -> {
-                                        Text(
-                                            "✅ Teléfono válido",
+                                        Text(stringResource(R.string.auto__telefono_valido),
                                             fontFamily = roboto,
                                             color = successColor,
                                             fontSize = 12.sp,
@@ -671,8 +652,7 @@ fun AgregaPsicologoScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                "Información Profesional",
+                            Text(stringResource(R.string.auto_informacion_profesional),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = roboto,
@@ -692,15 +672,13 @@ fun AgregaPsicologoScreen(
                                 onValueChange = {},
                                 readOnly = true,
                                 label = {
-                                    Text(
-                                        "Especialidad",
+                                    Text(stringResource(R.string.auto_especialidad_1),
                                         fontFamily = roboto,
                                         color = textSecondary,
                                     )
                                 },
                                 placeholder = {
-                                    Text(
-                                        "Selecciona una especialidad",
+                                    Text(stringResource(R.string.auto_selecciona_una_especialidad),
                                         fontFamily = roboto,
                                         color = textSecondary.copy(alpha = 0.5f),
                                     )
@@ -752,15 +730,13 @@ fun AgregaPsicologoScreen(
                             value = experiencia?.toString() ?: "",
                             onValueChange = { loginViewModel.setRegistroExperiencia(it.toIntOrNull()) },
                             label = {
-                                Text(
-                                    "Años de experiencia",
+                                Text(stringResource(R.string.auto_anos_de_experiencia),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Ej: 5",
+                                Text(stringResource(R.string.auto_ej_5),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -783,15 +759,13 @@ fun AgregaPsicologoScreen(
                             value = descripcion ?: "",
                             onValueChange = { loginViewModel.setRegistroDescripcion(it) },
                             label = {
-                                Text(
-                                    "Descripción profesional",
+                                Text(stringResource(R.string.auto_descripcion_profesional),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Describe tu enfoque terapéutico...",
+                                Text(stringResource(R.string.auto_describe_tu_enfoque_terapeutico),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -815,15 +789,13 @@ fun AgregaPsicologoScreen(
                             value = licencia ?: "",
                             onValueChange = { loginViewModel.setRegistroLicencia(it) },
                             label = {
-                                Text(
-                                    "Número de licencia",
+                                Text(stringResource(R.string.auto_numero_de_licencia),
                                     fontFamily = roboto,
                                     color = textSecondary,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Ej: COP-12345",
+                                Text(stringResource(R.string.auto_ej_cop_12345),
                                     fontFamily = roboto,
                                     color = textSecondary.copy(alpha = 0.5f),
                                 )
@@ -875,16 +847,14 @@ fun AgregaPsicologoScreen(
                             strokeWidth = 2.dp,
                         )
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            "Registrando...",
+                        Text(stringResource(R.string.auto_registrando),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             fontFamily = roboto,
                             letterSpacing = 0.5.sp,
                         )
                     } else {
-                        Text(
-                            "CREAR CUENTA PROFESIONAL",
+                        Text(stringResource(R.string.auto_crear_cuenta_profesional),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = roboto,
@@ -937,14 +907,14 @@ fun AgregaPsicologoScreen(
                         }
                     },
                 ) {
-                    Text("Aceptar", fontFamily = roboto, color = primaryColor)
+                    Text(stringResource(R.string.auto_aceptar), fontFamily = roboto, color = primaryColor)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { loginViewModel.setShowDatePicker(false) },
                 ) {
-                    Text("Cancelar", fontFamily = roboto, color = textSecondary)
+                    Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = textSecondary)
                 }
             },
         ) {

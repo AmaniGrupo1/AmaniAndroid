@@ -174,14 +174,16 @@ fun SettingsPacienteScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = Color.White,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -696,7 +698,7 @@ fun SettingsOptionRowPaciente(
                         containerColor = colorScheme.surfaceContainerHigh,
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Claro", style = typography.bodyMedium) },
+                            text = { Text(stringResource(R.string.auto_claro), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarTema(false) // false = claro
@@ -705,7 +707,7 @@ fun SettingsOptionRowPaciente(
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Oscuro", style = typography.bodyMedium) },
+                            text = { Text(stringResource(R.string.auto_oscuro), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarTema(true) // true = oscuro
@@ -719,7 +721,7 @@ fun SettingsOptionRowPaciente(
             else -> {
                 Icon(
                     Icons.Default.ChevronRight,
-                    contentDescription = "Ir",
+                    contentDescription = stringResource(R.string.auto_ir),
                     tint = colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp),
                 )

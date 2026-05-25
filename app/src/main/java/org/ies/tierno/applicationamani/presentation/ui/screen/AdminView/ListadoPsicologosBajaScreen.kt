@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -150,7 +151,7 @@ fun ListadoPsicologosBajaScreen(
         containerColor = backgroundColor,
         topBar = {
             Text(
-                text = "Psicólogos dados de baja",
+                text = stringResource(R.string.auto_psicologos_dados_de_baja),
                 style =
                     typography.headlineMedium?.copy(
                         fontSize = 22.sp,
@@ -196,7 +197,7 @@ fun ListadoPsicologosBajaScreen(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = "✅ No hay psicólogos dados de baja",
+                        text = stringResource(R.string.auto__no_hay_psicologos_1),
                         style =
                             typography.titleMedium?.copy(
                                 fontSize = 18.sp,
@@ -207,7 +208,7 @@ fun ListadoPsicologosBajaScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Todos los psicólogos están activos",
+                        text = stringResource(R.string.auto_todos_los_psicologos_estan),
                         style =
                             typography.bodyMedium?.copy(
                                 fontSize = 14.sp,
@@ -260,7 +261,7 @@ fun ListadoPsicologosBajaScreen(
                 containerColor = surfaceColor,
                 title = {
                     Text(
-                        text = "Confirmar alta",
+                        text = stringResource(R.string.auto_confirmar_alta),
                         style =
                             typography.headlineSmall?.copy(
                                 fontSize = 20.sp,
@@ -320,8 +321,7 @@ fun ListadoPsicologosBajaScreen(
                             ),
                         enabled = !isAltaInProgress,
                     ) {
-                        Text(
-                            "Cancelar",
+                        Text(stringResource(R.string.auto_cancelar),
                             style =
                                 typography.labelLarge?.copy(
                                     fontSize = 14.sp,
@@ -387,7 +387,7 @@ fun PsicologoBajaCard(
                             ).padding(horizontal = 8.dp, vertical = 4.dp),
                 ) {
                     Text(
-                        text = "DADO DE BAJA",
+                        text = stringResource(R.string.auto_dado_de_baja),
                         style =
                             typography.labelSmall?.copy(
                                 fontSize = 10.sp,
@@ -407,7 +407,7 @@ fun PsicologoBajaCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "Especialidad:",
+                    text = stringResource(R.string.auto_especialidad),
                     style =
                         typography.bodyMedium?.copy(
                             fontSize = 13.sp,
@@ -436,7 +436,7 @@ fun PsicologoBajaCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "Licencia:",
+                        text = stringResource(R.string.auto_licencia),
                         style =
                             typography.bodyMedium?.copy(
                                 fontSize = 13.sp,
@@ -461,7 +461,7 @@ fun PsicologoBajaCard(
             // Descripción
             if (!psicologo.descripcion.isNullOrBlank()) {
                 Text(
-                    text = "Descripción:",
+                    text = stringResource(R.string.auto_descripcion),
                     style =
                         typography.bodyMedium?.copy(
                             fontSize = 12.sp,
@@ -497,12 +497,11 @@ fun PsicologoBajaCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Dar de alta",
+                    contentDescription = stringResource(R.string.auto_dar_de_alta),
                     tint = Color.White,
                     modifier = Modifier.padding(end = 8.dp),
                 )
-                Text(
-                    "Dar de alta",
+                Text(stringResource(R.string.auto_dar_de_alta),
                     style =
                         typography.labelMedium?.copy(
                             fontSize = 13.sp,

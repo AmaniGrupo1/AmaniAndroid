@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
+import androidx.compose.material3.MaterialTheme
 
 // Colores para validaciones
 private val SuccessColor = Color(0xFF81C784)
@@ -186,13 +188,13 @@ fun RegisterScreen(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = Color.White
                         )
                     }
 
                     Text(
-                        text = "REGISTRAR PACIENTE",
+                        text = stringResource(R.string.auto_registrar_paciente),
                         color = Color.White,
                         fontFamily = roboto,
                         fontSize = 20.sp,
@@ -229,8 +231,7 @@ fun RegisterScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Datos Personales",
+                        Text(stringResource(R.string.auto_datos_personales),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
@@ -242,7 +243,7 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { loginViewModel.setNombre(it) },
-                        label = { Text("Nombre *", fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_nombre_), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -261,7 +262,7 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = apellido,
                         onValueChange = { loginViewModel.setApellido(it) },
-                        label = { Text("Apellido *", fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_apellido_), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -283,8 +284,8 @@ fun RegisterScreen(
                             loginViewModel.setDni(it.uppercase())
                             dniTouched = true
                         },
-                        label = { Text("DNI *", fontFamily = roboto, color = textColor) },
-                        placeholder = { Text("12345678A", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.auto_dni_), fontFamily = roboto, color = textColor) },
+                        placeholder = { Text(stringResource(R.string.auto_12345678a), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
@@ -299,24 +300,21 @@ fun RegisterScreen(
                         supportingText = {
                             when {
                                 !dniTouched && dni.isBlank() -> {
-                                    Text(
-                                        "🆔 Introduce el DNI",
+                                    Text(stringResource(R.string.auto__introduce_el_dni_1),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                    Text(
-                                        "❌ Formato inválido (8 números + 1 letra)",
+                                    Text(stringResource(R.string.auto__formato_invalido_8),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 dniTouched && dni.isNotBlank() && dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                    Text(
-                                        "✅ DNI válido",
+                                    Text(stringResource(R.string.auto__dni_valido),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -335,7 +333,7 @@ fun RegisterScreen(
                             loginViewModel.setEmail(it)
                             emailTouched = true
                         },
-                        label = { Text("Email *", fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_email_), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         isError = emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
@@ -350,24 +348,21 @@ fun RegisterScreen(
                         supportingText = {
                             when {
                                 !emailTouched && email.isBlank() -> {
-                                    Text(
-                                        "📧 Introduce el correo electrónico",
+                                    Text(stringResource(R.string.auto__introduce_el_correo),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                    Text(
-                                        "❌ Formato de correo inválido (ej: usuario@dominio.com)",
+                                    Text(stringResource(R.string.auto__formato_de_correo),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 emailTouched && email.isNotBlank() && email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                    Text(
-                                        "✅ Correo válido",
+                                    Text(stringResource(R.string.auto__correo_valido),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -386,7 +381,7 @@ fun RegisterScreen(
                             loginViewModel.setRegPassword(it)
                             passwordTouched = true
                         },
-                        label = { Text("Contraseña *", fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_contrasena_), fontFamily = roboto, color = textColor) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -402,32 +397,28 @@ fun RegisterScreen(
                         supportingText = {
                             when {
                                 !passwordTouched && regPassword.isBlank() -> {
-                                    Text(
-                                        "🔒 Introduce una contraseña",
+                                    Text(stringResource(R.string.auto__introduce_una_contrasena),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && regPassword.length < 8 -> {
-                                    Text(
-                                        "⚠️ La contraseña debe tener al menos 8 caracteres",
+                                    Text(stringResource(R.string.auto__la_contrasena_debe_1),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = WarningColor
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword) -> {
-                                    Text(
-                                        "❌ La contraseña debe tener letras y números",
+                                    Text(stringResource(R.string.auto__la_contrasena_debe_2),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && loginViewModel.isValidPassword(regPassword) -> {
-                                    Text(
-                                        "✅ Contraseña válida",
+                                    Text(stringResource(R.string.auto__contrasena_valida),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -446,7 +437,7 @@ fun RegisterScreen(
                             loginViewModel.setTelefono(it)
                             telefonoTouched = true
                         },
-                        label = { Text("Teléfono *", fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_telefono_), fontFamily = roboto, color = textColor) },
                         placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
@@ -462,24 +453,21 @@ fun RegisterScreen(
                         supportingText = {
                             when {
                                 !telefonoTouched && telefono.isBlank() -> {
-                                    Text(
-                                        "📞 Introduce el número de teléfono",
+                                    Text(stringResource(R.string.auto__introduce_el_numero),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")) -> {
-                                    Text(
-                                        "❌ Debe tener 9 dígitos",
+                                    Text(stringResource(R.string.auto__debe_tener_9),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 telefonoTouched && telefono.isNotBlank() && telefono.matches(Regex("^[0-9]{9}$")) -> {
-                                    Text(
-                                        "✅ Teléfono válido",
+                                    Text(stringResource(R.string.auto__telefono_valido),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -500,7 +488,7 @@ fun RegisterScreen(
                             value = genero,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Género *", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_genero_), fontFamily = roboto, color = textColor) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -539,8 +527,8 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = selectedDate?.format(dateFormatter) ?: "",
                         onValueChange = {},
-                        label = { Text("Fecha de nacimiento *", fontFamily = roboto, color = textColor) },
-                        placeholder = { Text("DD/MM/AAAA", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.auto_fecha_de_nacimiento_), fontFamily = roboto, color = textColor) },
+                        placeholder = { Text(stringResource(R.string.auto_ddmmaaaa), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showDatePicker = true },
@@ -550,7 +538,7 @@ fun RegisterScreen(
                             IconButton(onClick = { showDatePicker = true }) {
                                 Icon(
                                     Icons.Default.CalendarToday,
-                                    contentDescription = "Seleccionar fecha",
+                                    contentDescription = stringResource(R.string.auto_seleccionar_fecha),
                                     tint = textColor
                                 )
                             }
@@ -575,16 +563,14 @@ fun RegisterScreen(
                                     )
                                 }
                                 selectedDate != null -> {
-                                    Text(
-                                        "✅ Fecha válida",
+                                    Text(stringResource(R.string.auto__fecha_valida),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
                                     )
                                 }
                                 else -> {
-                                    Text(
-                                        "📅 Selecciona tu fecha de nacimiento",
+                                    Text(stringResource(R.string.auto__selecciona_tu_fecha),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
@@ -612,15 +598,13 @@ fun RegisterScreen(
                                 tint = Color(0xFFE67E22)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Datos del Tutor",
+                            Text(stringResource(R.string.auto_datos_del_tutor),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = Color(0xFFE67E22),
                                 fontFamily = roboto
                             )
                         }
-                        Text(
-                            "Obligatorio por ser menor de edad",
+                        Text(stringResource(R.string.auto_obligatorio_por_ser_menor),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFFE67E22),
                             fontFamily = roboto
@@ -631,7 +615,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = tutorNombre,
                             onValueChange = { loginViewModel.setTutorNombre(it) },
-                            label = { Text("Nombre completo *", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_nombre_completo_), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -653,7 +637,7 @@ fun RegisterScreen(
                                 loginViewModel.setTutorTelefono(it)
                                 tutorTelefonoTouched = true
                             },
-                            label = { Text("Teléfono *", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_telefono_), fontFamily = roboto, color = textColor) },
                             placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
@@ -669,24 +653,21 @@ fun RegisterScreen(
                             supportingText = {
                                 when {
                                     !tutorTelefonoTouched && tutorTelefono.isBlank() -> {
-                                        Text(
-                                            "📞 Introduce el teléfono del tutor",
+                                        Text(stringResource(R.string.auto__introduce_el_telefono),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = textColor.copy(alpha = 0.6f)
                                         )
                                     }
                                     tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
-                                        Text(
-                                            "❌ Debe tener 9 dígitos",
+                                        Text(stringResource(R.string.auto__debe_tener_9),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = ErrorColor
                                         )
                                     }
                                     tutorTelefonoTouched && tutorTelefono.isNotBlank() && tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
-                                        Text(
-                                            "✅ Teléfono válido",
+                                        Text(stringResource(R.string.auto__telefono_valido),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = SuccessColor
@@ -705,7 +686,7 @@ fun RegisterScreen(
                                 loginViewModel.setTutorEmail(it)
                                 tutorEmailTouched = true
                             },
-                            label = { Text("Email *", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_email_), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             isError = tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
@@ -720,24 +701,21 @@ fun RegisterScreen(
                             supportingText = {
                                 when {
                                     !tutorEmailTouched && tutorEmail.isBlank() -> {
-                                        Text(
-                                            "📧 Introduce el email del tutor",
+                                        Text(stringResource(R.string.auto__introduce_el_email),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = textColor.copy(alpha = 0.6f)
                                         )
                                     }
                                     tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                        Text(
-                                            "❌ Formato de email inválido",
+                                        Text(stringResource(R.string.auto__formato_de_email),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = ErrorColor
                                         )
                                     }
                                     tutorEmailTouched && tutorEmail.isNotBlank() && tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                        Text(
-                                            "✅ Email válido",
+                                        Text(stringResource(R.string.auto__email_valido),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = SuccessColor
@@ -756,8 +734,8 @@ fun RegisterScreen(
                                 loginViewModel.setTutorDni(it.uppercase())
                                 tutorDniTouched = true
                             },
-                            label = { Text("DNI *", fontFamily = roboto, color = textColor) },
-                            placeholder = { Text("12345678A", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                            label = { Text(stringResource(R.string.auto_dni_), fontFamily = roboto, color = textColor) },
+                            placeholder = { Text(stringResource(R.string.auto_12345678a), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
                             isError = tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
@@ -772,24 +750,21 @@ fun RegisterScreen(
                             supportingText = {
                                 when {
                                     !tutorDniTouched && tutorDni.isBlank() -> {
-                                        Text(
-                                            "🆔 Introduce el DNI del tutor",
+                                        Text(stringResource(R.string.auto__introduce_el_dni),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = textColor.copy(alpha = 0.6f)
                                         )
                                     }
                                     tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                        Text(
-                                            "❌ Formato inválido (8 números + 1 letra)",
+                                        Text(stringResource(R.string.auto__formato_invalido_8),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = ErrorColor
                                         )
                                     }
                                     tutorDniTouched && tutorDni.isNotBlank() && tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                        Text(
-                                            "✅ DNI válido",
+                                        Text(stringResource(R.string.auto__dni_valido),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = SuccessColor
@@ -810,7 +785,7 @@ fun RegisterScreen(
                                 value = tutorTipo,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Parentesco *", fontFamily = roboto, color = textColor) },
+                                label = { Text(stringResource(R.string.auto_parentesco_), fontFamily = roboto, color = textColor) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -861,8 +836,7 @@ fun RegisterScreen(
                             tint = primaryColor
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Dirección",
+                        Text(stringResource(R.string.auto_direccion),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
@@ -874,7 +848,7 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = calle,
                         onValueChange = { loginViewModel.setCalle(it) },
-                        label = { Text("Calle y número *", fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_calle_y_numero_), fontFamily = roboto, color = textColor) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = textFieldShape,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -896,7 +870,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = ciudad,
                             onValueChange = { loginViewModel.setCiudad(it) },
-                            label = { Text("Ciudad", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_ciudad), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -911,7 +885,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = provincia,
                             onValueChange = { loginViewModel.setProvincia(it) },
-                            label = { Text("Provincia", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_provincia), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -934,7 +908,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = codigoPostal,
                             onValueChange = { loginViewModel.setCodigoPostal(it) },
-                            label = { Text("Código Postal", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_codigo_postal), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -949,7 +923,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = pais,
                             onValueChange = { loginViewModel.setPais(it) },
-                            label = { Text("País", fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_pais), fontFamily = roboto, color = textColor) },
                             modifier = Modifier.weight(1f),
                             shape = textFieldShape,
                             colors = OutlinedTextFieldDefaults.colors(
@@ -976,15 +950,13 @@ fun RegisterScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Situaciones",
+                        Text(stringResource(R.string.auto_situaciones_1),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
                         )
                     }
-                    Text(
-                        "Seleccione una o más situaciones *",
+                    Text(stringResource(R.string.auto_seleccione_una_o_mas),
                         style = MaterialTheme.typography.bodySmall,
                         fontFamily = roboto,
                         color = textColor.copy(alpha = 0.7f)
@@ -1033,8 +1005,7 @@ fun RegisterScreen(
                             if (listaSituaciones.isEmpty()) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(
-                                            "No hay situaciones disponibles",
+                                        Text(stringResource(R.string.auto_no_hay_situaciones_disponibles),
                                             fontFamily = roboto,
                                             color = textColor
                                         )
@@ -1099,8 +1070,7 @@ fun RegisterScreen(
                             tint = primaryColor
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Consentimientos",
+                        Text(stringResource(R.string.auto_consentimientos),
                             style = MaterialTheme.typography.titleLarge,
                             color = primaryColor,
                             fontFamily = roboto
@@ -1117,8 +1087,7 @@ fun RegisterScreen(
                             onCheckedChange = { loginViewModel.aceptaTerminos.value = it },
                             colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                         )
-                        Text(
-                            "Acepto los términos y condiciones *",
+                        Text(stringResource(R.string.auto_acepto_los_terminos_y),
                             fontFamily = roboto,
                             color = textColor,
                             modifier = Modifier.clickable {
@@ -1136,8 +1105,7 @@ fun RegisterScreen(
                             onCheckedChange = { loginViewModel.aceptaVideoconferencia.value = it },
                             colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                         )
-                        Text(
-                            "Acepto videoconferencia",
+                        Text(stringResource(R.string.auto_acepto_videoconferencia),
                             fontFamily = roboto,
                             color = textColor,
                             modifier = Modifier.clickable {
@@ -1156,8 +1124,7 @@ fun RegisterScreen(
                             onCheckedChange = { loginViewModel.aceptaComunicacion.value = it },
                             colors = CheckboxDefaults.colors(checkedColor = primaryColor)
                         )
-                        Text(
-                            "Acepto comunicaciones",
+                        Text(stringResource(R.string.auto_acepto_comunicaciones),
                             fontFamily = roboto,
                             color = textColor,
                             modifier = Modifier.clickable {
@@ -1199,7 +1166,7 @@ fun RegisterScreen(
                 enabled = formularioCompletoValido && isDateValid
             ) {
                 Text(
-                    text = "📝 Registrar Paciente",
+                    text = stringResource(R.string.auto__registrar_paciente),
                     color = Color.White,
                     fontFamily = roboto,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize
@@ -1258,14 +1225,14 @@ fun RegisterScreen(
                         }
                     }
                 ) {
-                    Text("Aceptar", fontFamily = roboto, color = primaryColor)
+                    Text(stringResource(R.string.auto_aceptar), fontFamily = roboto, color = primaryColor)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDatePicker = false }
                 ) {
-                    Text("Cancelar", fontFamily = roboto, color = textColor)
+                    Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = textColor)
                 }
             }
         ) {
@@ -1291,16 +1258,14 @@ fun RegisterScreen(
                 )
             },
             title = {
-                Text(
-                    "¡Registro Exitoso!",
+                Text(stringResource(R.string.auto_registro_exitoso),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 )
             },
             text = {
-                Text(
-                    "El paciente ha sido registrado correctamente en el sistema.",
+                Text(stringResource(R.string.auto_el_paciente_ha_sido),
                     fontFamily = roboto,
                     color = textColor.copy(alpha = 0.8f)
                 )
@@ -1312,7 +1277,7 @@ fun RegisterScreen(
                         navController.navigateUp()
                     }
                 ) {
-                    Text("Aceptar", color = primaryColor, fontFamily = roboto)
+                    Text(stringResource(R.string.auto_aceptar), color = primaryColor, fontFamily = roboto)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -1333,8 +1298,7 @@ fun RegisterScreen(
                 )
             },
             title = {
-                Text(
-                    "Error en el Registro",
+                Text(stringResource(R.string.auto_error_en_el_registro),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     color = textColor
@@ -1351,7 +1315,7 @@ fun RegisterScreen(
                 TextButton(
                     onClick = { showErrorDialog = false }
                 ) {
-                    Text("Aceptar", color = primaryColor, fontFamily = roboto)
+                    Text(stringResource(R.string.auto_aceptar), color = primaryColor, fontFamily = roboto)
                 }
             },
             shape = RoundedCornerShape(16.dp),

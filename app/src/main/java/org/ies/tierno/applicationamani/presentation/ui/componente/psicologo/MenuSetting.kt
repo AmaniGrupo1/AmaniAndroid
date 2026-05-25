@@ -57,9 +57,10 @@ fun MenuSetting(
         modifier = Modifier.shadow(elevation = 8.dp),
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = colors.primary,
-                titleContentColor = colors.onPrimary,
-            ),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
         navigationIcon = {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),

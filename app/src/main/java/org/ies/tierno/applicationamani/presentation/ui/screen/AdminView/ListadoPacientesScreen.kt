@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.admin
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,14 +113,14 @@ fun ListadoPacientesScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp),
                         )
                     }
 
                     Text(
-                        text = "LISTADO DE PACIENTES",
+                        text = stringResource(R.string.auto_listado_de_pacientes),
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontFamily = roboto,
                         fontSize = 20.sp,
@@ -145,7 +146,7 @@ fun ListadoPacientesScreen(
             ) {
                 Icon(
                     Icons.Default.People,
-                    contentDescription = "Agregar paciente",
+                    contentDescription = stringResource(R.string.auto_agregar_paciente),
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
@@ -167,12 +168,12 @@ fun ListadoPacientesScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.People,
-                        contentDescription = "Sin pacientes",
+                        contentDescription = stringResource(R.string.auto_sin_pacientes),
                         modifier = Modifier.size(80.dp),
                         tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                     )
                     Text(
-                        text = "No hay pacientes registrados",
+                        text = stringResource(R.string.auto_no_hay_pacientes_registrados),
                         fontFamily = roboto,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -182,7 +183,7 @@ fun ListadoPacientesScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text("Agregar primer paciente", fontFamily = roboto)
+                        Text(stringResource(R.string.auto_agregar_primer_paciente), fontFamily = roboto)
                     }
                 }
             }
@@ -305,7 +306,7 @@ fun PacienteCard(
             // Email
             InfoRow(
                 icon = Icons.Default.Email,
-                label = "Email",
+                label = stringResource(R.string.auto_email),
                 value = paciente.emailUsuario,
                 iconColor = MaterialTheme.colorScheme.primary,
                 roboto = roboto,
@@ -314,7 +315,7 @@ fun PacienteCard(
             // Teléfono
             InfoRow(
                 icon = Icons.Default.Phone,
-                label = "Teléfono",
+                label = stringResource(R.string.auto_telefono),
                 value = paciente.telefono,
                 iconColor = MaterialTheme.colorScheme.primary,
                 roboto = roboto,
@@ -330,7 +331,7 @@ fun PacienteCard(
                 // Fecha de Nacimiento
                 InfoRowCompact(
                     icon = Icons.Default.Cake,
-                    label = "Fecha de Nacimiento",
+                    label = stringResource(R.string.auto_fecha_de_nacimiento),
                     value = paciente.fechaNacimiento,
                     iconColor = MaterialTheme.colorScheme.primary,
                     roboto = roboto,
@@ -340,7 +341,7 @@ fun PacienteCard(
                 // Género
                 InfoRowCompact(
                     icon = Icons.Default.Wc,
-                    label = "Género",
+                    label = stringResource(R.string.auto_genero),
                     value = paciente.genero,
                     iconColor = MaterialTheme.colorScheme.primary,
                     roboto = roboto,
@@ -352,7 +353,7 @@ fun PacienteCard(
             if (!paciente.direccion.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Direcciones:",
+                    text = stringResource(R.string.auto_direcciones),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
@@ -406,7 +407,7 @@ fun PacienteCard(
             if (!paciente.tutores.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Tutores:",
+                    text = stringResource(R.string.auto_tutores),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
@@ -464,7 +465,7 @@ fun PacienteCard(
             if (!paciente.situaciones.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Situaciones:",
+                    text = stringResource(R.string.auto_situaciones),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
@@ -513,7 +514,7 @@ fun PacienteCard(
                 ) {
                     Icon(
                         imageVector = metodoIcono,
-                        contentDescription = "Método de pago",
+                        contentDescription = stringResource(R.string.auto_metodo_de_pago),
                         tint =
                             when (metodoPagoStr) {
                                 "ONLINE" -> MaterialTheme.colorScheme.primary
@@ -524,7 +525,7 @@ fun PacienteCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Método de pago:",
+                        text = stringResource(R.string.auto_metodo_de_pago_1),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontFamily = roboto,
                         fontSize = 13.sp,
@@ -554,7 +555,7 @@ fun PacienteCard(
 
                 InfoRowCompact(
                     icon = Icons.Default.DateRange,
-                    label = "Fecha de Registro",
+                    label = stringResource(R.string.auto_fecha_de_registro),
                     value = paciente.createdAt.split("T")[0],
                     iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     roboto = roboto,
@@ -574,13 +575,12 @@ fun PacienteCard(
             ) {
                 Icon(
                     Icons.Default.Edit,
-                    contentDescription = "Editar",
+                    contentDescription = stringResource(R.string.auto_editar),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Editar datos",
+                Text(stringResource(R.string.auto_editar_datos),
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = roboto,
                     fontWeight = FontWeight.Medium,

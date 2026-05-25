@@ -135,14 +135,16 @@ fun SituacionAdminScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = primaryColor,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -220,7 +222,7 @@ fun SituacionAdminScreen(
             containerColor = cardBackgroundColor,
             title = {
                 Text(
-                    text = "Confirmar eliminacion",
+                    text = stringResource(R.string.auto_confirmar_eliminacion),
                     fontWeight = FontWeight.Bold,
                     color = textPrimaryColor,
                     fontFamily = roboto,
@@ -228,7 +230,7 @@ fun SituacionAdminScreen(
             },
             text = {
                 Text(
-                    text = "Estas seguro de que quieres eliminar la situacion \"${situacionAEliminar!!.nombre}\"?\n\nEsta accion no se puede deshacer.",
+                    text = "¿Estás seguro de que quieres eliminar la situación \"${situacionAEliminar!!.nombre}\"?\n\nEsta acción no se puede deshacer.",
                     color = textSecondaryColor,
                     fontFamily = roboto,
                 )
@@ -254,12 +256,12 @@ fun SituacionAdminScreen(
                             contentColor = Color.White,
                         ),
                 ) {
-                    Text("Eliminar", fontFamily = roboto)
+                    Text(stringResource(R.string.auto_eliminar), fontFamily = roboto)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { situacionAEliminar = null }) {
-                    Text("Cancelar", fontFamily = roboto, color = primaryColor)
+                    Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = primaryColor)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -349,10 +351,10 @@ fun TarjetaSituacion(
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = onEditClick, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = primaryColor)
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.auto_editar), tint = primaryColor)
                     }
                     IconButton(onClick = onDeleteClick, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = errorColor)
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.auto_eliminar), tint = errorColor)
                     }
                 }
             }
@@ -416,7 +418,7 @@ fun EmptySituacionesScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No hay situaciones disponibles",
+            text = stringResource(R.string.auto_no_hay_situaciones_disponibles),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = textPrimaryColor,
@@ -424,7 +426,7 @@ fun EmptySituacionesScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Presiona el boton + para agregar una situacion",
+            text = stringResource(R.string.auto_presiona_el_boton_para_1),
             fontSize = 14.sp,
             color = textSecondaryColor,
             fontFamily = roboto,
@@ -437,7 +439,7 @@ fun EmptySituacionesScreen(
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Agregar Situacion", fontFamily = roboto)
+            Text(stringResource(R.string.auto_agregar_situacion), fontFamily = roboto)
         }
     }
 }
@@ -497,7 +499,7 @@ fun SituacionDialog(
                 OutlinedTextField(
                     value = nombre,
                     onValueChange = { nombre = it },
-                    label = { Text("Nombre de la situacion", fontFamily = roboto) },
+                    label = { Text(stringResource(R.string.auto_nombre_de_la_situacion), fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors =
@@ -511,7 +513,7 @@ fun SituacionDialog(
                 OutlinedTextField(
                     value = categoria,
                     onValueChange = { categoria = it },
-                    label = { Text("Categoria", fontFamily = roboto) },
+                    label = { Text(stringResource(R.string.auto_categoria), fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors =
@@ -522,8 +524,7 @@ fun SituacionDialog(
                             unfocusedTextColor = textPrimaryColor,
                         ),
                     placeholder = {
-                        Text(
-                            "Ej: Personal, Laboral, Social...",
+                        Text(stringResource(R.string.auto_ej_personal_laboral_social),
                             color = textSecondaryColor.copy(alpha = 0.5f),
                             fontFamily = roboto,
                         )
@@ -532,7 +533,7 @@ fun SituacionDialog(
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { descripcion = it },
-                    label = { Text("Descripcion (opcional)", fontFamily = roboto) },
+                    label = { Text(stringResource(R.string.auto_descripcion_opcional), fontFamily = roboto) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4,
@@ -562,7 +563,7 @@ fun SituacionDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar", fontFamily = roboto, color = primaryColor)
+                Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = primaryColor)
             }
         },
         shape = RoundedCornerShape(20.dp),

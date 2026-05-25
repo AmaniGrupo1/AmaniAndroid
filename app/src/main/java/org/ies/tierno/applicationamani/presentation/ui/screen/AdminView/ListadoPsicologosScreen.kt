@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -130,8 +131,7 @@ fun ListadoPsicologosScreen(
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
-            Text(
-                "Listado de psicólogos",
+            Text(stringResource(R.string.auto_listado_de_psicologos),
                 color = topBarTextColor,
                 fontSize = 20.sp,
                 fontFamily = barlowCondensed,
@@ -149,8 +149,7 @@ fun ListadoPsicologosScreen(
                         .padding(8.dp),
                 shape = RoundedCornerShape(24.dp),
             ) {
-                Text(
-                    "Cancelar",
+                Text(stringResource(R.string.auto_cancelar),
                     color = fabTextColor,
                     fontFamily = robotoFont,
                     fontSize = 14.sp,
@@ -188,8 +187,7 @@ fun ListadoPsicologosScreen(
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Text(
-                                "📚 Especialidad:",
+                            Text(stringResource(R.string.auto__especialidad),
                                 color = textSecondaryColor,
                                 fontFamily = robotoFont,
                                 fontSize = 13.sp,
@@ -211,8 +209,7 @@ fun ListadoPsicologosScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Text(
-                                    "📝 Descripción:",
+                                Text(stringResource(R.string.auto__descripcion),
                                     color = textSecondaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
@@ -234,8 +231,7 @@ fun ListadoPsicologosScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Text(
-                                    "📜 Licencia:",
+                                Text(stringResource(R.string.auto__licencia),
                                     color = textSecondaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
@@ -257,8 +253,7 @@ fun ListadoPsicologosScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Text(
-                                    "⭐ Experiencia:",
+                                Text(stringResource(R.string.auto__experiencia),
                                     color = textSecondaryColor,
                                     fontFamily = robotoFont,
                                     fontSize = 13.sp,
@@ -289,7 +284,7 @@ fun ListadoPsicologosScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
                                 modifier = Modifier.weight(1f),
                             ) {
-                                Text("Dar de baja", color = buttonTextColor, fontFamily = robotoFont)
+                                Text(stringResource(R.string.auto_dar_de_baja), color = buttonTextColor, fontFamily = robotoFont)
                             }
 
                             Button(
@@ -300,7 +295,7 @@ fun ListadoPsicologosScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                                 modifier = Modifier.weight(1f),
                             ) {
-                                Text("Editar", color = buttonTextColor, fontFamily = robotoFont)
+                                Text(stringResource(R.string.auto_editar), color = buttonTextColor, fontFamily = robotoFont)
                             }
                         }
 
@@ -334,9 +329,9 @@ fun ListadoPsicologosScreen(
                                     strokeWidth = 2.dp,
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Asignando...", color = buttonTextColor, fontFamily = robotoFont)
+                                Text(stringResource(R.string.auto_asignando), color = buttonTextColor, fontFamily = robotoFont)
                             } else {
-                                Text("✓ Asignar a paciente", color = buttonTextColor, fontFamily = robotoFont)
+                                Text(stringResource(R.string.auto__asignar_a_paciente), color = buttonTextColor, fontFamily = robotoFont)
                             }
                         }
 
@@ -364,8 +359,7 @@ fun ListadoPsicologosScreen(
                 },
                 containerColor = cardBackgroundColor,
                 title = {
-                    Text(
-                        "Confirmar baja",
+                    Text(stringResource(R.string.auto_confirmar_baja),
                         fontFamily = barlowCondensed,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -408,7 +402,7 @@ fun ListadoPsicologosScreen(
                                 contentColor = primaryColor,
                             ),
                     ) {
-                        Text("Cancelar", fontFamily = robotoFont, color = textPrimaryColor)
+                        Text(stringResource(R.string.auto_cancelar), fontFamily = robotoFont, color = textPrimaryColor)
                     }
                 },
             )

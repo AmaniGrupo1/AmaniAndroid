@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -75,7 +77,7 @@ fun TestScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "Crear pregunta",
+                text = stringResource(R.string.auto_crear_pregunta),
                 fontSize = 26.sp,
                 fontFamily = roboto,
                 color = Color.Black,
@@ -147,8 +149,7 @@ fun TestScreen(
                             contentColor = Color.Black,
                         ),
                 ) {
-                    Text(
-                        "Guardar pregunta",
+                    Text(stringResource(R.string.auto_guardar_pregunta),
                         fontSize = 16.sp,
                         fontFamily = roboto,
                     )

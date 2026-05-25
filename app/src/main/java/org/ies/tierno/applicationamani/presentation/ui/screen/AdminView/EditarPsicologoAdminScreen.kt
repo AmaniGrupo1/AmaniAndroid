@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -163,7 +164,7 @@ fun EditarPsicologoAdminScreen(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = primaryColor,
                             modifier = Modifier.size(24.dp)
                         )
@@ -172,7 +173,7 @@ fun EditarPsicologoAdminScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Editar Psicólogo",
+                        text = stringResource(R.string.auto_editar_psicologo),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = roboto,
@@ -238,8 +239,7 @@ fun EditarPsicologoAdminScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                "Información Personal",
+                            Text(stringResource(R.string.auto_informacion_personal),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = roboto,
@@ -254,8 +254,7 @@ fun EditarPsicologoAdminScreen(
                             value = nombre,
                             onValueChange = { nombre = it },
                             label = {
-                                Text(
-                                    "Nombre *",
+                                Text(stringResource(R.string.auto_nombre_),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -277,8 +276,7 @@ fun EditarPsicologoAdminScreen(
                             value = apellido,
                             onValueChange = { apellido = it },
                             label = {
-                                Text(
-                                    "Apellido *",
+                                Text(stringResource(R.string.auto_apellido_),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -300,8 +298,7 @@ fun EditarPsicologoAdminScreen(
                             value = email,
                             onValueChange = {},
                             label = {
-                                Text(
-                                    "Email",
+                                Text(stringResource(R.string.auto_email),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -349,8 +346,7 @@ fun EditarPsicologoAdminScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                "Información Profesional",
+                            Text(stringResource(R.string.auto_informacion_profesional),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = roboto,
@@ -365,8 +361,7 @@ fun EditarPsicologoAdminScreen(
                             value = especialidad,
                             onValueChange = { especialidad = it },
                             label = {
-                                Text(
-                                    "Especialidad *",
+                                Text(stringResource(R.string.auto_especialidad_),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -388,8 +383,7 @@ fun EditarPsicologoAdminScreen(
                             value = experiencia,
                             onValueChange = { experiencia = it },
                             label = {
-                                Text(
-                                    "Años de experiencia",
+                                Text(stringResource(R.string.auto_anos_de_experiencia),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -411,8 +405,7 @@ fun EditarPsicologoAdminScreen(
                             value = licencia,
                             onValueChange = { licencia = it },
                             label = {
-                                Text(
-                                    "Número de licencia",
+                                Text(stringResource(R.string.auto_numero_de_licencia),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -434,8 +427,7 @@ fun EditarPsicologoAdminScreen(
                             value = telefono,
                             onValueChange = { telefono = it },
                             label = {
-                                Text(
-                                    "Teléfono",
+                                Text(stringResource(R.string.auto_telefono),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -457,8 +449,7 @@ fun EditarPsicologoAdminScreen(
                             value = descripcion,
                             onValueChange = { descripcion = it },
                             label = {
-                                Text(
-                                    "Descripción profesional",
+                                Text(stringResource(R.string.auto_descripcion_profesional),
                                     fontFamily = roboto,
                                     color = textSecondary
                                 )
@@ -522,10 +513,9 @@ fun EditarPsicologoAdminScreen(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Guardando...", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.auto_guardando), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     } else {
-                        Text(
-                            "💾 GUARDAR CAMBIOS",
+                        Text(stringResource(R.string.auto__guardar_cambios),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )

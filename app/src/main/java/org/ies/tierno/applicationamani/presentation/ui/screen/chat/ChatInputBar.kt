@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -102,7 +104,7 @@ fun ChatInputBar(
                     IconButton(onClick = onAttachFile) {
                         Icon(
                             imageVector = Icons.Default.AttachFile,
-                            contentDescription = "Adjuntar archivo",
+                            contentDescription = stringResource(R.string.auto_adjuntar_archivo),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
@@ -112,7 +114,7 @@ fun ChatInputBar(
                         IconButton(onClick = onMicClick) {
                             Icon(
                                 imageVector = Icons.Default.Mic,
-                                contentDescription = "Nota de voz",
+                                contentDescription = stringResource(R.string.auto_nota_de_voz),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -130,7 +132,7 @@ fun ChatInputBar(
                     val sendScale by animateFloatAsState(
                         targetValue = if (text.isNotBlank()) 1f else 0.85f,
                         animationSpec = spring(dampingRatio = 0.6f),
-                        label = "send_scale",
+                        label = stringResource(R.string.auto_send_scale),
                     )
 
                     FilledIconButton(
@@ -153,7 +155,7 @@ fun ChatInputBar(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Enviar mensaje",
+                            contentDescription = stringResource(R.string.auto_enviar_mensaje),
                         )
                     }
                 }
@@ -176,7 +178,7 @@ private fun TypingIndicator() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Escribiendo...",
+            text = stringResource(R.string.auto_escribiendo),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
         )
@@ -218,7 +220,7 @@ private fun PillTextField(
         decorationBox = { innerTextField ->
             if (text.isBlank()) {
                 Text(
-                    text = "Escribe un mensaje\u2026",
+                    text = stringResource(R.string.auto_escribe_un_mensajeu2026),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 )
@@ -233,7 +235,7 @@ private fun RecordingBar(
     recordingSeconds: Int,
     onStopClick: () -> Unit,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val infiniteTransition = rememberInfiniteTransition(label = stringResource(R.string.auto_pulse))
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
@@ -242,7 +244,7 @@ private fun RecordingBar(
                 animation = tween(800),
                 repeatMode = RepeatMode.Reverse,
             ),
-        label = "pulse_alpha",
+        label = stringResource(R.string.auto_pulse_alpha),
     )
 
     Surface(
@@ -282,7 +284,7 @@ private fun RecordingBar(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Stop,
-                        contentDescription = "Detener grabación",
+                        contentDescription = stringResource(R.string.auto_detener_grabacion),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp),
                     )

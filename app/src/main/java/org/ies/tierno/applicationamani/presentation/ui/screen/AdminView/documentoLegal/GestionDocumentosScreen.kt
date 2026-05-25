@@ -1,4 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -122,8 +124,7 @@ fun GestionDocumentosScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Gestion de Documentos",
+                    Text(stringResource(R.string.auto_gestion_de_documentos),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
@@ -131,7 +132,7 @@ fun GestionDocumentosScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                         )
                     }
                 },
@@ -139,7 +140,7 @@ fun GestionDocumentosScreen(
                     IconButton(onClick = { mostrarDialogoCrear = true }) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Nuevo documento",
+                            contentDescription = stringResource(R.string.auto_nuevo_documento),
                         )
                     }
                 },
@@ -175,8 +176,7 @@ fun GestionDocumentosScreen(
                                 modifier = Modifier.size(48.dp),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                "Cargando documentos...",
+                            Text(stringResource(R.string.auto_cargando_documentos),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -277,7 +277,7 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "No hay documentos creados",
+                text = stringResource(R.string.auto_no_hay_documentos_creados),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -285,7 +285,7 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Crea politicas de seguridad, terminos y condiciones, o cualquier documento legal para tus pacientes",
+                text = stringResource(R.string.auto_crea_politicas_de_seguridad),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -297,9 +297,9 @@ fun EmptyDocumentState(onCreateClick: () -> Unit) {
                 onClick = onCreateClick,
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Crear")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.auto_crear))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Crear primer documento")
+                Text(stringResource(R.string.auto_crear_primer_documento))
             }
         }
     }
@@ -401,7 +401,7 @@ fun DocumentoCard(
                         if (!documento.activo) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Documento inactivo",
+                                text = stringResource(R.string.auto_documento_inactivo),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.error,
                             )
@@ -419,7 +419,7 @@ fun DocumentoCard(
                     ) {
                         Icon(
                             Icons.Default.Edit,
-                            contentDescription = "Editar",
+                            contentDescription = stringResource(R.string.auto_editar),
                             modifier = Modifier.size(18.dp),
                             tint = MaterialTheme.colorScheme.primary,
                         )
@@ -431,7 +431,7 @@ fun DocumentoCard(
                     ) {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = "Eliminar",
+                            contentDescription = stringResource(R.string.auto_eliminar),
                             modifier = Modifier.size(18.dp),
                             tint = MaterialTheme.colorScheme.error,
                         )
@@ -507,8 +507,8 @@ fun DialogoCrearEditarDocumento(
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
-                    label = { Text("Titulo del documento") },
-                    placeholder = { Text("Ej: Terminos y Condiciones de Uso") },
+                    label = { Text(stringResource(R.string.auto_titulo_del_documento)) },
+                    placeholder = { Text(stringResource(R.string.auto_ej_terminos_y_condiciones)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -522,7 +522,7 @@ fun DialogoCrearEditarDocumento(
                         value = tiposDocumento.find { it.first == tipoSeleccionado }?.second ?: "",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Tipo de documento legal") },
+                        label = { Text(stringResource(R.string.auto_tipo_de_documento_legal)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tipoExpanded) },
                         modifier =
                             Modifier
@@ -550,8 +550,8 @@ fun DialogoCrearEditarDocumento(
                 OutlinedTextField(
                     value = version,
                     onValueChange = { version = it },
-                    label = { Text("Version") },
-                    placeholder = { Text("Ej: 1.0, 2.0, 2024") },
+                    label = { Text(stringResource(R.string.auto_version)) },
+                    placeholder = { Text(stringResource(R.string.auto_ej_10_20_2024)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -562,8 +562,8 @@ fun DialogoCrearEditarDocumento(
                     onValueChange = {
                         ordenVisualizacion = it.toIntOrNull() ?: 0
                     },
-                    label = { Text("Orden de visualizacion") },
-                    placeholder = { Text("Ej: 0, 1, 2...") },
+                    label = { Text(stringResource(R.string.auto_orden_de_visualizacion)) },
+                    placeholder = { Text(stringResource(R.string.auto_ej_0_1_2)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -572,8 +572,8 @@ fun DialogoCrearEditarDocumento(
                 OutlinedTextField(
                     value = icono,
                     onValueChange = { icono = it },
-                    label = { Text("Icono (opcional)") },
-                    placeholder = { Text("Ej: description, gavel, lock") },
+                    label = { Text(stringResource(R.string.auto_icono_opcional)) },
+                    placeholder = { Text(stringResource(R.string.auto_ej_description_gavel_lock)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 )
@@ -582,8 +582,8 @@ fun DialogoCrearEditarDocumento(
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = { contenido = it },
-                    label = { Text("Contenido del documento") },
-                    placeholder = { Text("Escribe aqui el contenido completo del documento legal...") },
+                    label = { Text(stringResource(R.string.auto_contenido_del_documento)) },
+                    placeholder = { Text(stringResource(R.string.auto_escribe_aqui_el_contenido)) },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -601,7 +601,7 @@ fun DialogoCrearEditarDocumento(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Documento activo (visible para usuarios)",
+                        text = stringResource(R.string.auto_documento_activo_visible_para),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -637,7 +637,7 @@ fun DialogoCrearEditarDocumento(
                 onClick = onDismiss,
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.auto_cancelar))
             }
         },
     )
@@ -738,7 +738,7 @@ fun DialogoVerDocumento(
                     }
 
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.auto_cerrar))
                     }
                 }
 
@@ -799,7 +799,7 @@ fun DialogoVerDocumento(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 ) {
-                    Text("Cerrar")
+                    Text(stringResource(R.string.auto_cerrar))
                 }
             }
         }

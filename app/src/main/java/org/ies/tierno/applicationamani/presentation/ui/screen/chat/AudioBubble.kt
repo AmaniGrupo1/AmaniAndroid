@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -103,7 +105,7 @@ fun AudioBubble(
         if (isError && audioUiState.errorMessage != null) {
             Icon(
                 imageVector = Icons.Default.Refresh,
-                contentDescription = "Reintentar",
+                contentDescription = stringResource(R.string.auto_reintentar),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(20.dp),
             )
@@ -169,7 +171,7 @@ private fun RoundedAudioProgressBar(
     val animatedProgress by animateFloatAsState(
         targetValue = progress.coerceIn(0f, 1f),
         animationSpec = tween(durationMillis = 200),
-        label = "audio_progress",
+        label = stringResource(R.string.auto_audio_progress),
     )
 
     Row(

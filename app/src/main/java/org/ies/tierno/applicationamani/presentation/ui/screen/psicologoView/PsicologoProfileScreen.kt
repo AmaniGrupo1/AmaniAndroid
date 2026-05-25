@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.screens.profile
 
+import androidx.compose.ui.res.stringResource
 import android.Manifest.permission.CAMERA
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
@@ -183,18 +184,19 @@ fun PsicologoProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mi Perfil Profesional",
+                        text = stringResource(R.string.auto_mi_perfil_profesional),
                         fontWeight = FontWeight.Bold,
                     )
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.auto_volver), tint = Color.White)
                     }
                 },
             )
@@ -384,7 +386,7 @@ fun ProfileContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Foto de Perfil",
+                    text = stringResource(R.string.auto_foto_de_perfil_1),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
@@ -427,7 +429,7 @@ fun ProfileContent(
                                     },
                                 ).build(),
                         imageLoader = imageLoader,
-                        contentDescription = "Foto de perfil",
+                        contentDescription = stringResource(R.string.auto_foto_de_perfil),
                         modifier =
                             Modifier
                                 .fillMaxSize()
@@ -450,7 +452,7 @@ fun ProfileContent(
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
-                            contentDescription = "Cambiar foto",
+                            contentDescription = stringResource(R.string.auto_cambiar_foto),
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -487,7 +489,7 @@ fun ProfileContent(
                         .padding(20.dp),
             ) {
                 Text(
-                    text = "Información Profesional",
+                    text = stringResource(R.string.auto_informacion_profesional),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
@@ -496,7 +498,7 @@ fun ProfileContent(
 
                 InfoRow(
                     icon = Icons.Default.Work,
-                    label = "Especialidad",
+                    label = stringResource(R.string.auto_especialidad_1),
                     value = perfil.especialidad ?: "No especificada",
                 )
 
@@ -504,7 +506,7 @@ fun ProfileContent(
 
                 InfoRow(
                     icon = Icons.Default.Timeline,
-                    label = "Experiencia",
+                    label = stringResource(R.string.auto_experiencia_1),
                     value = if (perfil.experiencia != null) "${perfil.experiencia} años" else "No especificada",
                 )
 
@@ -512,14 +514,14 @@ fun ProfileContent(
 
                 InfoRow(
                     icon = Icons.Default.Badge,
-                    label = "Número de Licencia",
+                    label = stringResource(R.string.auto_numero_de_licencia_1),
                     value = perfil.licencia ?: "No especificada",
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Descripción",
+                    text = stringResource(R.string.auto_descripcion_1),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary,
@@ -553,7 +555,7 @@ fun ProfileContent(
             ) {
                 Icon(Icons.Default.Edit, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Editar Perfil")
+                Text(stringResource(R.string.auto_editar_perfil))
             }
 
             Button(
@@ -565,7 +567,7 @@ fun ProfileContent(
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Cancelar")
+                Text(stringResource(R.string.auto_cancelar))
             }
         }
     }
@@ -578,8 +580,8 @@ fun ProfileContent(
                 Log.d(TAG, "Diálogo cerrado sin selección")
                 showOptions = false
             },
-            title = { Text("Cambiar foto de perfil") },
-            text = { Text("Selecciona una opción para actualizar tu foto de perfil") },
+            title = { Text(stringResource(R.string.auto_cambiar_foto_de_perfil)) },
+            text = { Text(stringResource(R.string.auto_selecciona_una_opcion_para_2)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -588,7 +590,7 @@ fun ProfileContent(
                         galleryLauncher.launch("image/*")
                     },
                 ) {
-                    Text("Galería")
+                    Text(stringResource(R.string.auto_galeria_1))
                 }
             },
             dismissButton = {
@@ -605,7 +607,7 @@ fun ProfileContent(
                         }
                     },
                 ) {
-                    Text("Cámara")
+                    Text(stringResource(R.string.auto_camara_1))
                 }
             },
         )
@@ -680,7 +682,7 @@ fun ErrorContent(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Error al cargar el perfil",
+            text = stringResource(R.string.auto_error_al_cargar_el),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -701,7 +703,7 @@ fun ErrorContent(
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Reintentar")
+            Text(stringResource(R.string.auto_reintentar))
         }
     }
 }

@@ -2,6 +2,8 @@
 
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
@@ -49,6 +51,7 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
+import androidx.compose.material3.MaterialTheme
 
 // Extensiones de color
 val ColorScheme.success: Color
@@ -202,7 +205,7 @@ fun PsicologoAgendaScreen(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Añadir Cita",
+                    contentDescription = stringResource(R.string.auto_anadir_cita),
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -227,14 +230,14 @@ fun PsicologoAgendaScreen(
                 ) {
                     Column {
                         Text(
-                            text = "Mi Agenda",
+                            text = stringResource(R.string.auto_mi_agenda),
                             style = typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.primary,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         Text(
-                            text = "Gestiona tus citas y horarios profesionales",
+                            text = stringResource(R.string.auto_gestiona_tus_citas_y),
                             style = typography.bodyMedium,
                             color = colors.onSurfaceVariant,
                         )
@@ -335,7 +338,7 @@ fun PsicologoAgendaScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = "Citas del día",
+                                                text = stringResource(R.string.auto_citas_del_dia),
                                                 style = typography.titleLarge,
                                                 fontWeight = FontWeight.Bold
                                             )
@@ -405,13 +408,13 @@ fun PsicologoAgendaScreen(
                                                 )
                                                 Spacer(modifier = Modifier.height(12.dp))
                                                 Text(
-                                                    text = "Sin citas programadas",
+                                                    text = stringResource(R.string.auto_sin_citas_programadas),
                                                     style = typography.titleMedium,
                                                     fontWeight = FontWeight.Medium,
                                                     color = colors.onSurfaceVariant
                                                 )
                                                 Text(
-                                                    text = "Este día está disponible para nuevas citas",
+                                                    text = stringResource(R.string.auto_este_dia_esta_disponible),
                                                     style = typography.bodySmall,
                                                     color = colors.onSurfaceVariant.copy(alpha = 0.7f)
                                                 )
@@ -448,8 +451,7 @@ fun PsicologoAgendaScreen(
                                 modifier = Modifier.size(48.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                "Cargando agenda...",
+                            Text(stringResource(R.string.auto_cargando_agenda),
                                 style = typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
@@ -698,8 +700,7 @@ fun LeyendaMejorada() {
                         .background(colors.primary)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Seleccionado",
+                Text(stringResource(R.string.auto_seleccionado),
                     style = MaterialTheme.typography.labelSmall,
                     color = colors.onSurfaceVariant
                 )
@@ -712,8 +713,7 @@ fun LeyendaMejorada() {
                         .background(colors.tertiary)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Con citas",
+                Text(stringResource(R.string.auto_con_citas),
                     style = MaterialTheme.typography.labelSmall,
                     color = colors.onSurfaceVariant
                 )
@@ -750,14 +750,12 @@ fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
                     color = if (esDiaNoDisponible) colors.error else colors.onSurface
                 )
                 if (esDiaNoDisponible) {
-                    Text(
-                        "⚠️ Día no disponible para citas",
+                    Text(stringResource(R.string.auto__dia_no_disponible),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.error
                     )
                 } else {
-                    Text(
-                        "Horario disponible según configuración",
+                    Text(stringResource(R.string.auto_horario_disponible_segun_configuracion),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant
                     )
@@ -858,7 +856,7 @@ fun TarjetaCitaMejorada(
                                         "COMPLETADA" -> Icons.Default.DoneAll
                                         else -> Icons.Default.Schedule
                                     },
-                                    contentDescription = "Cambiar estado",
+                                    contentDescription = stringResource(R.string.auto_cambiar_estado),
                                     modifier = Modifier.size(20.dp),
                                     tint = when (cita.estado?.uppercase()) {
                                         "CONFIRMADA" -> colors.primary
@@ -1100,7 +1098,7 @@ fun TarjetaCitaMejorada(
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Editar", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.auto_editar), style = MaterialTheme.typography.labelMedium)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 TextButton(
@@ -1110,7 +1108,7 @@ fun TarjetaCitaMejorada(
                 ) {
                     Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Cancelar", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.auto_cancelar), style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
@@ -1144,14 +1142,12 @@ fun DiaNoDisponibleCardMejorado() {
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                "Día no disponible",
+            Text(stringResource(R.string.auto_dia_no_disponible),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = colors.error
             )
-            Text(
-                "No se pueden agendar citas en esta fecha",
+            Text(stringResource(R.string.auto_no_se_pueden_agendar),
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -1205,14 +1201,12 @@ fun DialogoModificarHorarioMejorado(
         shape = RoundedCornerShape(28.dp),
         title = {
             Column {
-                Text(
-                    "⏰ Configurar Horario",
+                Text(stringResource(R.string.auto__configurar_horario),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.primary
                 )
-                Text(
-                    "Define tus días y horas de atención",
+                Text(stringResource(R.string.auto_define_tus_dias_y),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.onSurfaceVariant
                 )
@@ -1279,13 +1273,13 @@ fun DialogoModificarHorarioMejorado(
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text("Hora inicio")
+                                            Text(stringResource(R.string.auto_hora_inicio))
                                             HoraSelector(horaActual = franja.horaInicio) { nueva ->
                                                 state.value = franja.copy(horaInicio = nueva)
                                             }
                                         }
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text("Hora fin")
+                                            Text(stringResource(R.string.auto_hora_fin))
                                             HoraSelector(horaActual = franja.horaFin) { nueva ->
                                                 state.value = franja.copy(horaFin = nueva)
                                             }
@@ -1296,8 +1290,7 @@ fun DialogoModificarHorarioMejorado(
                                     val fin =
                                         runCatching { LocalTime.parse(franja.horaFin) }.getOrNull()
                                     if (inicio != null && fin != null && !inicio.isBefore(fin)) {
-                                        Text(
-                                            "⚠️ La hora de inicio debe ser anterior a la hora de fin",
+                                        Text(stringResource(R.string.auto__la_hora_de),
                                             color = colors.error,
                                             style = MaterialTheme.typography.labelSmall
                                         )
@@ -1314,11 +1307,11 @@ fun DialogoModificarHorarioMejorado(
                 onClick = { onConfirmar(franjasEditables.map { it.value }) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("💾 Guardar horario")
+                Text(stringResource(R.string.auto__guardar_horario))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.auto_cancelar)) }
         }
     )
 }
@@ -1389,21 +1382,19 @@ fun DialogoNoDisponibleMejorado(
                     color = colors.primary
                 )
                 if (yaNoDisponible) {
-                    Text(
-                        "¿Deseas habilitar este día para recibir citas?",
+                    Text(stringResource(R.string.auto_deseas_habilitar_este_dia),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 } else {
-                    Text(
-                        "¿Deseas bloquear este día? No se podrán agendar nuevas citas.",
+                    Text(stringResource(R.string.auto_deseas_bloquear_este_dia),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = motivoBloqueo,
                         onValueChange = { motivoBloqueo = it },
-                        label = { Text("Motivo (opcional)") },
-                        placeholder = { Text("Ej: Formación, Vacaciones, etc.") },
+                        label = { Text(stringResource(R.string.auto_motivo_opcional)) },
+                        placeholder = { Text(stringResource(R.string.auto_ej_formacion_vacaciones_etc)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
                         minLines = 2,
@@ -1428,8 +1419,7 @@ fun DialogoNoDisponibleMejorado(
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Las citas existentes no se cancelarán automáticamente",
+                            Text(stringResource(R.string.auto_las_citas_existentes_no),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.onSurfaceVariant
                             )
@@ -1459,7 +1449,7 @@ fun DialogoNoDisponibleMejorado(
             TextButton(
                 onClick = { motivoBloqueo = ""; onDismiss() },
                 shape = RoundedCornerShape(14.dp)
-            ) { Text("Cancelar") }
+            ) { Text(stringResource(R.string.auto_cancelar)) }
         }
     )
 }
@@ -1565,7 +1555,7 @@ fun DialogoCrearEditarCitaMejorado(
             ) {
                 // Paciente
                 CampoSeleccionConIcono(
-                    label = "Paciente",
+                    label = stringResource(R.string.auto_paciente),
                     icono = Icons.Default.Person,
                     valor = pacienteSeleccionado?.let { "${it.nombre} ${it.apellido}" } ?: "",
                     expanded = pacienteDropdownExpanded,
@@ -1581,8 +1571,7 @@ fun DialogoCrearEditarCitaMejorado(
                                         contentDescription = "",
                                         tint = colors.error
                                     ); Spacer(modifier = Modifier.width(8.dp)); Column {
-                                    Text(
-                                        "Error al cargar pacientes",
+                                    Text(stringResource(R.string.auto_error_al_cargar_pacientes),
                                         color = colors.error
                                     ); Text(
                                     pacientesError!!,
@@ -1596,7 +1585,7 @@ fun DialogoCrearEditarCitaMejorado(
                         )
 
                         pacientes.isEmpty() -> DropdownMenuItem(
-                            text = { Text("No hay pacientes asignados") },
+                            text = { Text(stringResource(R.string.auto_no_hay_pacientes_asignados)) },
                             onClick = { pacienteDropdownExpanded = false },
                             enabled = false
                         )
@@ -1626,7 +1615,7 @@ fun DialogoCrearEditarCitaMejorado(
 
                 // Terapia
                 CampoSeleccionConIcono(
-                    label = "Tipo de terapia",
+                    label = stringResource(R.string.auto_tipo_de_terapia),
                     icono = Icons.Default.MedicalServices,
                     valor = terapiaSeleccionada?.nombre ?: "",
                     expanded = terapiaDropdownExpanded,
@@ -1634,7 +1623,7 @@ fun DialogoCrearEditarCitaMejorado(
                     error = terapias.isEmpty()
                 ) {
                     if (terapias.isEmpty()) DropdownMenuItem(
-                        text = { Text("No hay tipos de terapia disponibles") },
+                        text = { Text(stringResource(R.string.auto_no_hay_tipos_de)) },
                         onClick = { terapiaDropdownExpanded = false },
                         enabled = false
                     )
@@ -1665,7 +1654,7 @@ fun DialogoCrearEditarCitaMejorado(
 
                 // Hora
                 CampoSeleccionConIcono(
-                    label = "Hora de inicio",
+                    label = stringResource(R.string.auto_hora_de_inicio),
                     icono = Icons.Default.Schedule,
                     valor = horaSeleccionada?.format(formatterHora) ?: "Sin horarios disponibles",
                     expanded = horaDropdownExpanded,
@@ -1675,11 +1664,9 @@ fun DialogoCrearEditarCitaMejorado(
                     if (horasDisponibles.isEmpty() && !esEdicion) {
                         DropdownMenuItem(text = {
                             Column {
-                                Text(
-                                    "❌ No hay horarios libres",
+                                Text(stringResource(R.string.auto__no_hay_horarios),
                                     color = colors.error
-                                ); Text(
-                                "Prueba con otra fecha",
+                                ); Text(stringResource(R.string.auto_prueba_con_otra_fecha),
                                 style = MaterialTheme.typography.bodySmall
                             )
                             }
@@ -1752,7 +1739,7 @@ fun DialogoCrearEditarCitaMejorado(
                 OutlinedTextField(
                     value = motivo,
                     onValueChange = { motivo = it },
-                    label = { Text("Motivo de la cita (opcional)") },
+                    label = { Text(stringResource(R.string.auto_motivo_de_la_cita)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 3,
@@ -1760,8 +1747,7 @@ fun DialogoCrearEditarCitaMejorado(
                 )
 
                 // Modalidad
-                Text(
-                    "Modalidad de la cita",
+                Text(stringResource(R.string.auto_modalidad_de_la_cita),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface
@@ -1779,7 +1765,7 @@ fun DialogoCrearEditarCitaMejorado(
                         leadingIcon = {
                             Icon(
                                 if (modalidadSeleccionada == ModalidadCita.PRESENCIAL) Icons.Default.LocationOn else Icons.Default.Phone,
-                                contentDescription = "Modalidad"
+                                contentDescription = stringResource(R.string.auto_modalidad)
                             )
                         },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
@@ -1798,7 +1784,7 @@ fun DialogoCrearEditarCitaMejorado(
                                         Icons.Default.LocationOn,
                                         contentDescription = "",
                                         modifier = Modifier.size(20.dp)
-                                    ); Spacer(modifier = Modifier.width(8.dp)); Text("Presencial")
+                                    ); Spacer(modifier = Modifier.width(8.dp)); Text(stringResource(R.string.auto_presencial))
                                 }
                             },
                             onClick = {
@@ -1812,7 +1798,7 @@ fun DialogoCrearEditarCitaMejorado(
                                         Icons.Default.Phone,
                                         contentDescription = "",
                                         modifier = Modifier.size(20.dp)
-                                    ); Spacer(modifier = Modifier.width(8.dp)); Text("Llamada")
+                                    ); Spacer(modifier = Modifier.width(8.dp)); Text(stringResource(R.string.auto_llamada))
                                 }
                             },
                             onClick = {
@@ -1823,8 +1809,7 @@ fun DialogoCrearEditarCitaMejorado(
                 }
 
                 // Información de pago
-                Text(
-                    "Información de pago",
+                Text(stringResource(R.string.auto_informacion_de_pago),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface
@@ -1837,8 +1822,7 @@ fun DialogoCrearEditarCitaMejorado(
                     )
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            "Método de pago",
+                        Text(stringResource(R.string.auto_metodo_de_pago),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant
                         )
@@ -1854,7 +1838,7 @@ fun DialogoCrearEditarCitaMejorado(
                                 RadioButton(
                                     selected = metodoPagoSeleccionado == MetodoPago.EFECTIVO,
                                     onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO })
-                                Text("Efectivo")
+                                Text(stringResource(R.string.auto_efectivo))
                             }
                             Row(
                                 modifier = Modifier.weight(1f),
@@ -1863,13 +1847,12 @@ fun DialogoCrearEditarCitaMejorado(
                                 RadioButton(
                                     selected = metodoPagoSeleccionado == MetodoPago.TARJETA,
                                     onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA })
-                                Text("Tarjeta")
+                                Text(stringResource(R.string.auto_tarjeta))
                             }
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "Estado del pago",
+                        Text(stringResource(R.string.auto_estado_del_pago),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant
                         )
@@ -1923,11 +1906,11 @@ fun DialogoCrearEditarCitaMejorado(
                         OutlinedTextField(
                             value = monto,
                             onValueChange = { monto = it; montoError = !validarMonto(it) },
-                            label = { Text("Monto (€)") },
-                            placeholder = { Text("Ej: 50.00") },
+                            label = { Text(stringResource(R.string.auto_monto_)) },
+                            placeholder = { Text(stringResource(R.string.auto_ej_5000)) },
                             isError = montoError,
                             supportingText = {
-                                if (montoError) Text("Ingresa un monto válido") else if (terapiaSeleccionada != null && monto.isNotBlank()) Text(
+                                if (montoError) Text(stringResource(R.string.auto_ingresa_un_monto_valido)) else if (terapiaSeleccionada != null && monto.isNotBlank()) Text(
                                     "Precio sugerido: ${terapiaSeleccionada!!.precio} €",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.primary
@@ -1990,8 +1973,7 @@ fun DialogoCrearEditarCitaMejorado(
         },
         dismissButton = {
             TextButton(onClick = onDismiss, shape = RoundedCornerShape(14.dp)) {
-                Text(
-                    "Cancelar"
+                Text(stringResource(R.string.auto_cancelar)
                 )
             }
         }
@@ -2052,8 +2034,7 @@ fun CampoFecha(
     formatterFecha: DateTimeFormatter
 ) {
     Column {
-        Text(
-            "Fecha",
+        Text(stringResource(R.string.auto_fecha),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurface
@@ -2074,7 +2055,7 @@ fun CampoFecha(
                 IconButton(onClick = { onFechaChange(fechaSeleccionada.minusDays(1)) }) {
                     Icon(
                         Icons.Default.ChevronLeft,
-                        contentDescription = "Día anterior"
+                        contentDescription = stringResource(R.string.auto_dia_anterior)
                     )
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -2097,7 +2078,7 @@ fun CampoFecha(
                 IconButton(onClick = { onFechaChange(fechaSeleccionada.plusDays(1)) }) {
                     Icon(
                         Icons.Default.ChevronRight,
-                        contentDescription = "Día siguiente"
+                        contentDescription = stringResource(R.string.auto_dia_siguiente)
                     )
                 }
             }
@@ -2141,8 +2122,7 @@ fun DialogoConfirmarCancelacionMejorado(
                     modifier = Modifier.size(28.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    "Cancelar cita",
+                Text(stringResource(R.string.auto_cancelar_cita_1),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -2150,7 +2130,7 @@ fun DialogoConfirmarCancelacionMejorado(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("¿Estás seguro de que deseas cancelar esta cita?")
+                Text(stringResource(R.string.auto_estas_seguro_de_que_2))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -2182,8 +2162,7 @@ fun DialogoConfirmarCancelacionMejorado(
                         }
                     }
                 }
-                Text(
-                    "⚠️ Esta acción no se puede deshacer.",
+                Text(stringResource(R.string.auto__esta_accion_no),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.error
                 )
@@ -2196,11 +2175,11 @@ fun DialogoConfirmarCancelacionMejorado(
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("🗑️ Cancelar cita", modifier = Modifier.padding(vertical = 4.dp))
+                Text(stringResource(R.string.auto__cancelar_cita), modifier = Modifier.padding(vertical = 4.dp))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss, shape = RoundedCornerShape(14.dp)) { Text("Volver") }
+            TextButton(onClick = onDismiss, shape = RoundedCornerShape(14.dp)) { Text(stringResource(R.string.auto_volver)) }
         }
     )
 }

@@ -71,8 +71,6 @@ import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
 import java.math.BigDecimal
 
 // Colores de la marca Amani
-private val AmaniPrimary = Color(0xFF9B87F5) // Morado suave
-private val AmaniPrimaryLight = Color(0xFFEDE7FF) // Morado muy claro para fondos
 private val AmaniSecondary = Color(0xFF7E69D6) // Morado mas oscuro para acentos
 private val AmaniBackground = Color(0xFFFDF8FF) // Fondo blanco con tono lila muy suave
 private val AmaniCardBackground = Color.White
@@ -145,14 +143,16 @@ fun TerapiasScreen(
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = AmaniPrimary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.mostrarDialogCrear() },
-                containerColor = AmaniPrimary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = Color.White,
                 elevation = FloatingActionButtonDefaults.elevation(4.dp),
             ) {
@@ -171,7 +171,7 @@ fun TerapiasScreen(
                 loading && terapias.isEmpty() -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = AmaniPrimary,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
                 terapias.isEmpty() -> {
@@ -298,7 +298,7 @@ fun TarjetaTerapia(
                     text = terapia.nombre,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = AmaniPrimary,
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
                 Row(
@@ -311,7 +311,7 @@ fun TarjetaTerapia(
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = stringResource(R.string.editar),
-                            tint = AmaniPrimary,
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
 
@@ -361,14 +361,14 @@ fun TarjetaTerapia(
                         Icons.Default.AttachMoney,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
-                        tint = AmaniPrimary,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.precio_formato, terapia.precio.toString()),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = AmaniPrimary,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -387,7 +387,7 @@ fun EmptyTerapiasScreen(onAddClick: () -> Unit) {
             Icons.Default.FitnessCenter,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
-            tint = AmaniPrimary.copy(alpha = 0.4f),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -414,7 +414,7 @@ fun EmptyTerapiasScreen(onAddClick: () -> Unit) {
             shape = RoundedCornerShape(12.dp),
             colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = AmaniPrimary,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = Color.White,
                 ),
         ) {
@@ -446,7 +446,7 @@ fun TerapiaDialog(
             Text(
                 text = titulo,
                 fontWeight = FontWeight.Bold,
-                color = AmaniPrimary,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 20.sp,
             )
         },
@@ -462,9 +462,9 @@ fun TerapiaDialog(
                     singleLine = true,
                     colors =
                         OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AmaniPrimary,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = AmaniDivider,
-                            focusedLabelColor = AmaniPrimary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
                         ),
                 )
 
@@ -480,9 +480,9 @@ fun TerapiaDialog(
                         ),
                     colors =
                         OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AmaniPrimary,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = AmaniDivider,
-                            focusedLabelColor = AmaniPrimary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
                         ),
                 )
 
@@ -492,16 +492,16 @@ fun TerapiaDialog(
                     label = { Text(stringResource(R.string.precio_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    leadingIcon = { Text("EUR", color = AmaniTextSecondary) },
+                    leadingIcon = { Text(stringResource(R.string.auto_eur), color = AmaniTextSecondary) },
                     keyboardOptions =
                         androidx.compose.foundation.text.KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal,
                         ),
                     colors =
                         OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AmaniPrimary,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = AmaniDivider,
-                            focusedLabelColor = AmaniPrimary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
                         ),
                 )
             }
@@ -529,7 +529,7 @@ fun TerapiaDialog(
                         precio.toBigDecimalOrNull()!! > BigDecimal.ZERO,
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = AmaniPrimary,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = Color.White,
                     ),
                 shape = RoundedCornerShape(10.dp),

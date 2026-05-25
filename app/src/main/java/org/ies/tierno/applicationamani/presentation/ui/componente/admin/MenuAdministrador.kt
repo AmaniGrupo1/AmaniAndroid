@@ -171,11 +171,10 @@ fun MenuAdministrador(
         modifier = Modifier,
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = colors.primary,
-                titleContentColor = colors.onPrimary,
-                navigationIconContentColor = colors.onPrimary,
-                actionIconContentColor = colors.onPrimary,
-            ),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
         navigationIcon = {
             AnimatedVisibility(
                 visible = showBackButton,
@@ -204,7 +203,7 @@ fun MenuAdministrador(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
-                            contentDescription = "Logo",
+                            contentDescription = stringResource(R.string.auto_logo),
                             modifier = Modifier.size(32.dp),
                             tint = Color.Unspecified,
                         )
@@ -243,7 +242,7 @@ fun MenuAdministrador(
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
+                    contentDescription = stringResource(R.string.auto_notificaciones),
                     tint = colors.onPrimary,
                 )
             }
@@ -376,11 +375,10 @@ fun MenuAdministradorSimple(
         modifier = Modifier,
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = colors.primary,
-                titleContentColor = colors.onPrimary,
-                navigationIconContentColor = colors.onPrimary,
-                actionIconContentColor = colors.onPrimary,
-            ),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = { navController.navigateUp() }) {
@@ -398,7 +396,7 @@ fun MenuAdministradorSimple(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.logo_original),
-                        contentDescription = "Logo",
+                        contentDescription = stringResource(R.string.auto_logo),
                         modifier = Modifier.size(32.dp),
                         tint = Color.Unspecified,
                     )
@@ -476,18 +474,18 @@ fun MenuLateralAdministrador(
                     Column {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
-                            contentDescription = "Logo",
+                            contentDescription = stringResource(R.string.auto_logo),
                             modifier = Modifier.size(48.dp),
                             tint = Color.Unspecified,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Panel Admin",
+                            text = stringResource(R.string.auto_panel_admin),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimary,
                         )
                         Text(
-                            text = "Gestión de usuarios",
+                            text = stringResource(R.string.auto_gestion_de_usuarios),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         )

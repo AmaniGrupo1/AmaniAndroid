@@ -1,4 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -121,14 +123,13 @@ fun ListarPacienteSinPsicologos(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp),
                         )
                     }
 
-                    Text(
-                        "Pacientes sin Psicologo",
+                    Text(stringResource(R.string.auto_pacientes_sin_psicologo),
                         color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
@@ -141,7 +142,7 @@ fun ListarPacienteSinPsicologos(
                     }) {
                         Icon(
                             Icons.Default.Refresh,
-                            contentDescription = "Refrescar",
+                            contentDescription = stringResource(R.string.auto_refrescar),
                             tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
@@ -182,12 +183,12 @@ fun ListarPacienteSinPsicologos(
                                 modifier = Modifier.size(80.dp),
                             )
                             Text(
-                                text = "No hay pacientes sin asignar",
+                                text = stringResource(R.string.auto_no_hay_pacientes_sin),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
-                                text = "Todos los pacientes ya tienen psicologo asignado",
+                                text = stringResource(R.string.auto_todos_los_pacientes_ya),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -413,8 +414,7 @@ fun PacienteExpandableCard(
                                 modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Asignar Psicologo",
+                            Text(stringResource(R.string.auto_asignar_psicologo),
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }

@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -75,13 +77,11 @@ fun QuestionnaireScreen(
                 trackColor = ProgressIndicatorDefaults.linearTrackColor,
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
-            Text(
-                "Intenta marcar las respuestas o frases que encajen contigo, te asignaremos un psicólogo en base a ellas.",
+            Text(stringResource(R.string.auto_intenta_marcar_las_respuestas),
                 style = typography.headlineSmall,
                 modifier = Modifier.padding(16.dp),
             )
-            Text(
-                "No te preocupes si no encajais, puedes cambiar de profesional sin problema más adelante.",
+            Text(stringResource(R.string.auto_no_te_preocupes_si),
                 style = typography.headlineSmall,
                 modifier = Modifier.padding(16.dp),
             )
@@ -127,7 +127,7 @@ fun QuestionnaireScreen(
                     }
                 },
             ) {
-                Text("Continuar")
+                Text(stringResource(R.string.auto_continuar))
             }
         }
     }

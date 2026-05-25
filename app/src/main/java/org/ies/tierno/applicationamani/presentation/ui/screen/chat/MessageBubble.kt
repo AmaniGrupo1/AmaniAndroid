@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -110,7 +112,20 @@ fun MessageBubble(
             tonalElevation = if (isOwn) 1.dp else 0.dp,
             modifier = Modifier.widthIn(max = (screenWidth * 0.78f).dp),
         ) {
-            Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            val isImage = message.attachmentUrl != null && message.attachmentType == AttachmentType.IMAGE
+            val hasRealText = message.content.isNotBlank() &&
+                    message.content != "📸 Imagen" &&
+                    message.content != "📄 Documento" &&
+                    message.content != "🎙️ Nota de voz"
+            val showTimestampInsideImage = isImage && !hasRealText
+            
+            val columnPadding = if (isImage) {
+                Modifier.padding(4.dp)
+            } else {
+                Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            }
+
+            Column(modifier = columnPadding) {
                 // Priorizar el contenido multimedia (adjuntos)
                 if (message.attachmentUrl != null) {
                     when (message.attachmentType) {
@@ -118,6 +133,7 @@ fun MessageBubble(
                             AttachmentImage(
                                 message = message,
                                 isOwn = isOwn,
+                                showTimestampInside = showTimestampInsideImage
                             )
                         }
                         AttachmentType.DOCUMENT -> {
@@ -140,19 +156,17 @@ fun MessageBubble(
                         }
                     }
 
-                    // Si hay texto acompañando al adjunto, poner un pequeño espacio
-                    if (message.content.isNotBlank() &&
-                        message.content != "📸 Imagen" &&
-                        message.content != "📄 Documento" &&
-                        message.content != "🎙️ Nota de voz"
-                    ) {
-                        Spacer(modifier = Modifier.height(6.dp))
-                        MessageWithTimestamp(
-                            message = message,
-                            isOwn = isOwn,
-                        )
-                    } else {
-                        // Si no hay texto extra (o solo es el placeholder), poner solo el timestamp
+                    // Si hay texto acompañando al adjunto
+                    if (hasRealText) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Box(modifier = if (isImage) Modifier.padding(start = 4.dp, end = 4.dp, bottom = 2.dp) else Modifier) {
+                            MessageWithTimestamp(
+                                message = message,
+                                isOwn = isOwn,
+                            )
+                        }
+                    } else if (!isImage) {
+                        // Si no hay texto extra y no es imagen, mostrar el timestamp debajo
                         Spacer(modifier = Modifier.height(4.dp))
                         TimestampOnly(message = message, isOwn = isOwn)
                     }
@@ -373,6 +387,7 @@ fun StatusIcon(
 private fun AttachmentImage(
     message: Message,
     isOwn: Boolean,
+    showTimestampInside: Boolean = false
 ) {
     val contentColor =
         if (isOwn) {
@@ -387,12 +402,11 @@ private fun AttachmentImage(
             Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, contentColor.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                 .clickable { /* Preview image */ },
     ) {
         AsyncImage(
             model = message.attachmentUrl,
-            contentDescription = "Imagen adjunta",
+            contentDescription = stringResource(R.string.auto_imagen_adjunta),
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -400,37 +414,25 @@ private fun AttachmentImage(
             contentScale = ContentScale.Crop,
         )
 
-        // Botón de descarga en esquina inferior derecha
-        Box(
-            modifier =
-                Modifier
-                    .align(Alignment2.BottomEnd)
-                    .padding(8.dp)
-                    .background(color = contentColor.copy(alpha = 0.8f))
-                    .clip(CircleShape)
-                    .padding(8.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Default.Download,
-                contentDescription = "Descargar",
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(18.dp),
-            )
-        }
-    }
-
-    if (message.attachmentName != null) {
-        Spacer(modifier = Modifier.height(6.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = message.attachmentName,
-                style = MaterialTheme.typography.labelSmall,
-                color = contentColor.copy(alpha = 0.8f),
-                fontWeight = FontWeight.Medium,
-            )
+        if (showTimestampInside) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(6.dp)
+                    .background(Color.Black.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = formatTimestamp(message.timestamp),
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                    color = Color.White,
+                )
+                if (isOwn) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    StatusIcon(isRead = message.isRead, isDelivered = message.isDelivered, tint = Color.White)
+                }
+            }
         }
     }
 }
@@ -447,46 +449,60 @@ private fun AttachmentDocument(
             MaterialTheme.colorScheme.onSurfaceVariant
         }
 
-    // Estilo WhatsApp: tarjeta simple con icono y nombre
-    Surface(
-        color = if (isOwn) contentColor.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier.fillMaxWidth(),
+    val iconContainerColor =
+        if (isOwn) {
+            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
+        } else {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+        }
+
+    val iconColor = 
+        if (isOwn) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.primary
+        }
+
+    val fileName = message.attachmentName ?: "Documento adjunto"
+    val extension = if (fileName.contains(".")) fileName.substringAfterLast('.').uppercase() else "DOC"
+
+    // Estilo WhatsApp
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 6.dp)
+            .clickable { /* Descargar o abrir documento */ },
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier =
-                Modifier
-                    .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(iconContainerColor),
+            contentAlignment = Alignment.Center,
         ) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(color = contentColor.copy(alpha = 0.2f)),
-                contentAlignment = Alignment2.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Description,
-                    contentDescription = "Documento",
-                    tint = contentColor,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
+            Icon(
+                imageVector = Icons.Default.Description,
+                contentDescription = stringResource(R.string.auto_documento),
+                tint = iconColor,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = fileName,
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = message.attachmentName ?: "Documento adjunto",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = contentColor,
-                    maxLines = 1,
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Toca para descargar",
+                    text = "$extension • 1.2 MB", // Genérico simulado
                     style = MaterialTheme.typography.labelSmall,
-                    color = contentColor.copy(alpha = 0.7f),
+                    color = contentColor.copy(alpha = 0.6f),
                 )
             }
         }

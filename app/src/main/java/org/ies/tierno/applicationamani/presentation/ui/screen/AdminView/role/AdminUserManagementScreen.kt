@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,6 +26,7 @@ import org.ies.tierno.applicationamani.presentation.ui.componente.BottomSheetCam
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.material3.MaterialTheme
 
 private const val TAG = "AdminUserScreen"
 
@@ -149,8 +152,7 @@ fun AdminUserManagementScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Gestión de Usuarios",
+                    Text(stringResource(R.string.auto_gestion_de_usuarios_1),
                         style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         color = colorScheme.onPrimary,
                     )
@@ -159,16 +161,16 @@ fun AdminUserManagementScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = colorScheme.onPrimary,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primary,
-                        titleContentColor = colorScheme.onPrimary,
-                        navigationIconContentColor = colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 actions = {
                     // Botón de refresco manual
@@ -176,7 +178,7 @@ fun AdminUserManagementScreen(
                         Log.d(TAG, "🔄 Refresco manual solicitado por el usuario")
                         adminUserViewModel.cargarUsuarios()
                     }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refrescar", tint = colorScheme.onPrimary)
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.auto_refrescar), tint = colorScheme.onPrimary)
                     }
                 },
             )
@@ -213,8 +215,7 @@ fun AdminUserManagementScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
-                        Text(
-                            "Filtros",
+                        Text(stringResource(R.string.auto_filtros),
                             style = typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = colorScheme.primary,
@@ -227,7 +228,7 @@ fun AdminUserManagementScreen(
                                 Log.d(TAG, "✏️ Cambiando búsqueda a: '$it'")
                                 searchDni = it
                             },
-                            label = { Text("Buscar por DNI, Nombre o Email") },
+                            label = { Text(stringResource(R.string.auto_buscar_por_dni_nombre)) },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Search,
@@ -254,8 +255,7 @@ fun AdminUserManagementScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(
-                            "Filtrar por Rol:",
+                        Text(stringResource(R.string.auto_filtrar_por_rol),
                             style = typography.labelLarge,
                             color = colorScheme.onSurface,
                         )
@@ -271,7 +271,7 @@ fun AdminUserManagementScreen(
                                     Log.d(TAG, "🎯 Filtro cambiado a: TODOS")
                                     selectedRol = null
                                 },
-                                label = { Text("Todos") },
+                                label = { Text(stringResource(R.string.auto_todos)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
                                     FilterChipDefaults.filterChipColors(
@@ -287,7 +287,7 @@ fun AdminUserManagementScreen(
                                     Log.d(TAG, "🎯 Filtro cambiado a: ADMIN")
                                     selectedRol = Rol.admin
                                 },
-                                label = { Text("👑 Admins") },
+                                label = { Text(stringResource(R.string.auto__admins)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
                                     FilterChipDefaults.filterChipColors(
@@ -303,7 +303,7 @@ fun AdminUserManagementScreen(
                                     Log.d(TAG, "🎯 Filtro cambiado a: PSICÓLOGO")
                                     selectedRol = Rol.psicologo
                                 },
-                                label = { Text("🧠 Psicólogos") },
+                                label = { Text(stringResource(R.string.auto__psicologos)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
                                     FilterChipDefaults.filterChipColors(
@@ -319,7 +319,7 @@ fun AdminUserManagementScreen(
                                     Log.d(TAG, "🎯 Filtro cambiado a: PACIENTE")
                                     selectedRol = Rol.paciente
                                 },
-                                label = { Text("👤 Pacientes") },
+                                label = { Text(stringResource(R.string.auto__pacientes)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
                                     FilterChipDefaults.filterChipColors(
@@ -350,13 +350,11 @@ fun AdminUserManagementScreen(
                                 tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                "No se encontraron usuarios",
+                            Text(stringResource(R.string.auto_no_se_encontraron_usuarios),
                                 style = typography.titleMedium,
                                 color = colorScheme.onSurfaceVariant,
                             )
-                            Text(
-                                "Prueba con otros filtros",
+                            Text(stringResource(R.string.auto_prueba_con_otros_filtros),
                                 style = typography.bodySmall,
                                 color = colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
                             )
@@ -398,8 +396,7 @@ fun AdminUserManagementScreen(
                 pendingRol = null
             },
             title = {
-                Text(
-                    "Confirmar cambio de rol",
+                Text(stringResource(R.string.auto_confirmar_cambio_de_rol),
                     style = typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.primary,
@@ -407,8 +404,7 @@ fun AdminUserManagementScreen(
             },
             text = {
                 Column {
-                    Text(
-                        "¿Estás seguro de que quieres cambiar el rol de?",
+                    Text(stringResource(R.string.auto_estas_seguro_de_que),
                         style = typography.bodyMedium,
                         color = colorScheme.onSurface,
                     )
@@ -464,7 +460,7 @@ fun AdminUserManagementScreen(
                         ),
                     shape = shapes.small,
                 ) {
-                    Text("Sí, cambiar rol", color = colorScheme.onPrimary)
+                    Text(stringResource(R.string.auto_si_cambiar_rol), color = colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -476,7 +472,7 @@ fun AdminUserManagementScreen(
                     },
                     shape = shapes.small,
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.auto_cancelar))
                 }
             },
             containerColor = colorScheme.surface,
@@ -602,7 +598,7 @@ fun UserCard(
                     )
                 } else {
                     Text(
-                        text = "DNI: No registrado",
+                        text = stringResource(R.string.auto_dni_no_registrado),
                         style = typography.labelSmall,
                         color = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     )
@@ -633,7 +629,7 @@ fun UserCard(
             ) {
                 Icon(
                     Icons.Default.SwapHoriz,
-                    contentDescription = "Cambiar rol",
+                    contentDescription = stringResource(R.string.auto_cambiar_rol),
                     modifier = Modifier.size(24.dp),
                     tint = colorScheme.primary.copy(alpha = 0.8f),
                 )

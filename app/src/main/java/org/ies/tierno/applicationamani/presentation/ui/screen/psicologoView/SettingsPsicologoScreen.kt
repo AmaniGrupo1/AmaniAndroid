@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -119,17 +120,17 @@ fun SettingsPsicologoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ajustes de Perfil", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.auto_ajustes_de_perfil), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.auto_volver))
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colors.primary,
-                        titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -173,7 +174,7 @@ fun SettingsPsicologoScreen(
                                             .error(R.drawable.ic_default_avatar)
                                             .placeholder(R.drawable.ic_default_avatar)
                                             .build(),
-                                    contentDescription = "Foto de perfil",
+                                    contentDescription = stringResource(R.string.auto_foto_de_perfil),
                                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                                     contentScale = ContentScale.Crop,
                                 )
@@ -192,7 +193,7 @@ fun SettingsPsicologoScreen(
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Psicólogo Colegiado",
+                                text = stringResource(R.string.auto_psicologo_colegiado),
                                 style = typography.labelLarge,
                                 color = colors.primary,
                                 fontWeight = FontWeight.Bold,
@@ -276,7 +277,7 @@ fun SettingsPsicologoScreen(
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Guardar Cambios", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.auto_guardar_cambios_1), fontWeight = FontWeight.Bold)
                     }
 
                     // Soporte y Ayuda
@@ -287,7 +288,7 @@ fun SettingsPsicologoScreen(
                     ) {
                         Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Centro de Ayuda y Soporte")
+                        Text(stringResource(R.string.auto_centro_de_ayuda_y))
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))

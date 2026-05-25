@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -81,19 +83,20 @@ fun ChatListScreen(
         containerColor = amaniColors.screenBackground,
         topBar = {
             TopAppBar(
-                title = { Text("Mensajes") },
+                title = { Text(stringResource(R.string.auto_mensajes)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colors.surface,
-                        titleContentColor = colors.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -132,7 +135,7 @@ fun ChatListScreen(
                                 onClick = viewModel::retry,
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                             ) {
-                                Text("Reintentar")
+                                Text(stringResource(R.string.auto_reintentar))
                             }
                         }
                     }
@@ -170,7 +173,7 @@ fun ChatListScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Text(
-                            text = "Tu conversación",
+                            text = stringResource(R.string.auto_tu_conversacion),
                             style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.onSurface,

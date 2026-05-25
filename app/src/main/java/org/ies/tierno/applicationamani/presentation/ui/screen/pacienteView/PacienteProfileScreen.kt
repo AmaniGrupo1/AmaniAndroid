@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.screens.profile
 
+import androidx.compose.ui.res.stringResource
 import android.Manifest.permission.CAMERA
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
@@ -328,7 +329,7 @@ fun PacienteProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mi Perfil",
+                        text = stringResource(R.string.auto_mi_perfil),
                         style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = if (isDark) colorScheme.onSurface else Color.White,
@@ -338,14 +339,16 @@ fun PacienteProfileScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = if (isDark) colorScheme.onSurface else Color.White,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -403,7 +406,7 @@ fun PacienteProfileScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
-                                    text = "Foto de Perfil",
+                                    text = stringResource(R.string.auto_foto_de_perfil_1),
                                     style = typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     color = colorScheme.primary,
@@ -431,7 +434,7 @@ fun PacienteProfileScreen(
                                                 .placeholder(R.drawable.ic_default_avatar)
                                                 .build(),
                                         imageLoader = imageLoader,
-                                        contentDescription = "Foto de perfil",
+                                        contentDescription = stringResource(R.string.auto_foto_de_perfil),
                                         modifier =
                                             Modifier
                                                 .fillMaxSize()
@@ -453,7 +456,7 @@ fun PacienteProfileScreen(
                                     ) {
                                         Icon(
                                             Icons.Default.CameraAlt,
-                                            contentDescription = "Cambiar foto",
+                                            contentDescription = stringResource(R.string.auto_cambiar_foto),
                                             modifier = Modifier.size(20.dp),
                                         )
                                     }
@@ -494,7 +497,7 @@ fun PacienteProfileScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
-                                        text = "Información Personal",
+                                        text = stringResource(R.string.auto_informacion_personal),
                                         style = typography.titleMedium,
                                         fontWeight = FontWeight.SemiBold,
                                         color = colorScheme.primary,
@@ -509,11 +512,11 @@ fun PacienteProfileScreen(
                                         ) {
                                             Icon(
                                                 Icons.Default.Edit,
-                                                contentDescription = "Editar",
+                                                contentDescription = stringResource(R.string.auto_editar),
                                                 modifier = Modifier.size(18.dp),
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Editar", style = typography.labelLarge)
+                                            Text(stringResource(R.string.auto_editar), style = typography.labelLarge)
                                         }
                                     }
                                 }
@@ -525,7 +528,7 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = nombreEdit,
                                         onValueChange = { nombreEdit = it },
-                                        label = { Text("Nombre") },
+                                        label = { Text(stringResource(R.string.auto_nombre)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
@@ -543,7 +546,7 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = apellidoEdit,
                                         onValueChange = { apellidoEdit = it },
-                                        label = { Text("Apellido (opcional)") },
+                                        label = { Text(stringResource(R.string.auto_apellido_opcional)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
@@ -561,7 +564,7 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = emailEdit,
                                         onValueChange = { emailEdit = it },
-                                        label = { Text("Correo electrónico") },
+                                        label = { Text(stringResource(R.string.auto_correo_electronico)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
@@ -579,7 +582,7 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = telefonoEdit,
                                         onValueChange = { telefonoEdit = it },
-                                        label = { Text("Teléfono") },
+                                        label = { Text(stringResource(R.string.auto_telefono)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
@@ -597,7 +600,7 @@ fun PacienteProfileScreen(
                                     OutlinedTextField(
                                         value = fechaNacimientoEdit,
                                         onValueChange = { fechaNacimientoEdit = it },
-                                        label = { Text("Fecha de nacimiento (YYYY-MM-DD)") },
+                                        label = { Text(stringResource(R.string.auto_fecha_de_nacimiento_yyyy)) },
                                         modifier = Modifier.fillMaxWidth(),
                                         singleLine = true,
                                         shape = MaterialTheme.shapes.small,
@@ -621,7 +624,7 @@ fun PacienteProfileScreen(
                                             value = generoEdit,
                                             onValueChange = {},
                                             readOnly = true,
-                                            label = { Text("Género") },
+                                            label = { Text(stringResource(R.string.auto_genero)) },
                                             trailingIcon = {
                                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = showGeneroDropdown)
                                             },
@@ -723,12 +726,11 @@ fun PacienteProfileScreen(
                                                 Row {
                                                     Icon(
                                                         Icons.Default.Save,
-                                                        contentDescription = "Guardar",
+                                                        contentDescription = stringResource(R.string.auto_guardar),
                                                         modifier = Modifier.size(18.dp),
                                                     )
                                                     Spacer(modifier = Modifier.width(6.dp))
-                                                    Text(
-                                                        "Guardar",
+                                                    Text(stringResource(R.string.auto_guardar),
                                                         style = typography.labelLarge,
                                                         fontWeight = FontWeight.Medium,
                                                     )
@@ -755,14 +757,14 @@ fun PacienteProfileScreen(
                                                 ),
                                             shape = CircleShape,
                                         ) {
-                                            Text("Cancelar", style = typography.labelLarge)
+                                            Text(stringResource(R.string.auto_cancelar), style = typography.labelLarge)
                                         }
                                     }
                                 } else {
                                     // Modo visualización
                                     InfoRowPaciente(
                                         icon = Icons.Default.Person,
-                                        label = "Nombre completo",
+                                        label = stringResource(R.string.auto_nombre_completo),
                                         value = "${perfil!!.usuario?.nombre ?: ""} ${perfil!!.usuario?.apellido ?: ""}".trim(),
                                         colorScheme = colorScheme,
                                         typography = typography,
@@ -772,7 +774,7 @@ fun PacienteProfileScreen(
 
                                     InfoRowPaciente(
                                         icon = Icons.Default.Email,
-                                        label = "Correo electrónico",
+                                        label = stringResource(R.string.auto_correo_electronico),
                                         value = perfil!!.usuario?.email ?: "No especificado",
                                         colorScheme = colorScheme,
                                         typography = typography,
@@ -782,7 +784,7 @@ fun PacienteProfileScreen(
 
                                     InfoRowPaciente(
                                         icon = Icons.Default.Phone,
-                                        label = "Teléfono",
+                                        label = stringResource(R.string.auto_telefono),
                                         value = perfil!!.telefono ?: "No especificado",
                                         colorScheme = colorScheme,
                                         typography = typography,
@@ -792,7 +794,7 @@ fun PacienteProfileScreen(
 
                                     InfoRowPaciente(
                                         icon = Icons.Default.Cake,
-                                        label = "Fecha de nacimiento",
+                                        label = stringResource(R.string.auto_fecha_de_nacimiento_1),
                                         value = formatFecha(perfil!!.fechaNacimiento),
                                         colorScheme = colorScheme,
                                         typography = typography,
@@ -802,7 +804,7 @@ fun PacienteProfileScreen(
 
                                     InfoRowPaciente(
                                         icon = Icons.Default.Face,
-                                        label = "Género",
+                                        label = stringResource(R.string.auto_genero),
                                         value = perfil!!.genero ?: "No especificado",
                                         colorScheme = colorScheme,
                                         typography = typography,
@@ -812,7 +814,7 @@ fun PacienteProfileScreen(
 
                                     InfoRowPaciente(
                                         icon = Icons.Default.Badge,
-                                        label = "ID de paciente",
+                                        label = stringResource(R.string.auto_id_de_paciente),
                                         value = perfil!!.idPaciente?.toString() ?: "No disponible",
                                         colorScheme = colorScheme,
                                         typography = typography,
@@ -838,21 +840,21 @@ fun PacienteProfileScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
-                                    text = "💜 AMANI Psicología",
+                                    text = stringResource(R.string.auto__amani_psicologia),
                                     style = typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = colorScheme.primary,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Tu bienestar es nuestra prioridad",
+                                    text = stringResource(R.string.auto_tu_bienestar_es_nuestra),
                                     style = typography.bodySmall,
                                     color = colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = "Versión 1.0.0",
+                                    text = stringResource(R.string.auto_version_100_1),
                                     style = typography.labelSmall,
                                     color = colorScheme.onSurfaceVariant,
                                 )
@@ -883,7 +885,7 @@ fun PacienteProfileScreen(
             shape = MaterialTheme.shapes.extraLarge,
             title = {
                 Text(
-                    text = "Cambiar foto de perfil",
+                    text = stringResource(R.string.auto_cambiar_foto_de_perfil),
                     style = typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface,
@@ -891,7 +893,7 @@ fun PacienteProfileScreen(
             },
             text = {
                 Text(
-                    text = "Selecciona una opción para obtener la imagen",
+                    text = stringResource(R.string.auto_selecciona_una_opcion_para_1),
                     style = typography.bodyMedium,
                     color = colorScheme.onSurfaceVariant,
                 )
@@ -916,12 +918,11 @@ fun PacienteProfileScreen(
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
-                            contentDescription = "Cámara",
+                            contentDescription = stringResource(R.string.auto_camara_1),
                             modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            "Cámara",
+                        Text(stringResource(R.string.auto_camara_1),
                             style = typography.labelLarge,
                         )
                     }
@@ -936,12 +937,11 @@ fun PacienteProfileScreen(
                     ) {
                         Icon(
                             Icons.Default.PhotoLibrary,
-                            contentDescription = "Galería",
+                            contentDescription = stringResource(R.string.auto_galeria_1),
                             modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            "Galería",
+                        Text(stringResource(R.string.auto_galeria_1),
                             style = typography.labelLarge,
                         )
                     }
@@ -949,7 +949,7 @@ fun PacienteProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showImageOptions = false }) {
-                    Text("Cancelar", style = typography.labelLarge, color = colorScheme.primary)
+                    Text(stringResource(R.string.auto_cancelar), style = typography.labelLarge, color = colorScheme.primary)
                 }
             },
         )
@@ -963,7 +963,7 @@ fun PacienteProfileScreen(
             shape = MaterialTheme.shapes.extraLarge,
             title = {
                 Text(
-                    text = "Correo actualizado",
+                    text = stringResource(R.string.auto_correo_actualizado),
                     style = typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.primary,
@@ -981,14 +981,14 @@ fun PacienteProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Tu correo electrónico ha sido actualizado correctamente.",
+                        text = stringResource(R.string.auto_tu_correo_electronico_ha),
                         style = typography.bodyMedium,
                         color = colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Serás redirigido al inicio de sesión para que ingreses con tu nuevo correo.",
+                        text = stringResource(R.string.auto_seras_redirigido_al_inicio),
                         style = typography.bodySmall,
                         color = colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -1013,8 +1013,7 @@ fun PacienteProfileScreen(
                             strokeWidth = 2.dp,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Redirigiendo...",
+                        Text(stringResource(R.string.auto_redirigiendo),
                             style = typography.labelLarge,
                         )
                     }
@@ -1044,7 +1043,7 @@ fun PacienteProfileScreen(
                     CircularProgressIndicator(color = colorScheme.primary)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Subiendo foto...",
+                        text = stringResource(R.string.auto_subiendo_foto),
                         style = typography.bodyMedium,
                         color = colorScheme.onSurface,
                     )
@@ -1131,7 +1130,7 @@ fun ErrorContentPaciente(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Error al cargar el perfil",
+            text = stringResource(R.string.auto_error_al_cargar_el),
             style = typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = colorScheme.onSurface,
@@ -1154,8 +1153,7 @@ fun ErrorContentPaciente(
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                "Reintentar",
+            Text(stringResource(R.string.auto_reintentar),
                 style = typography.labelLarge,
             )
         }

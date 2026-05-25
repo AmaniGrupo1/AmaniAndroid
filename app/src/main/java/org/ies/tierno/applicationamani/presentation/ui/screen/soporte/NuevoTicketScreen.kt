@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.soporte
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -127,11 +129,11 @@ fun NuevoTicketScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Nuevo ticket",
+                            text = stringResource(R.string.auto_nuevo_ticket),
                             style = typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                         )
                         Text(
-                            text = "Cu\u00e9ntanos el problema o tu sugerencia",
+                            text = stringResource(R.string.auto_cuu00e9ntanos_el_problema_o),
                             style = typography.bodySmall.copy(color = colors.onSurfaceVariant),
                         )
                     }
@@ -140,14 +142,15 @@ fun NuevoTicketScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atr\u00e1s",
+                            contentDescription = stringResource(R.string.auto_atru00e1s),
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colors.surface,
-                        titleContentColor = colors.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -239,7 +242,7 @@ fun NuevoTicketScreen(
             OutlinedTextField(
                 value = uiState.titulo,
                 onValueChange = { viewModel.onTituloChange(it) },
-                placeholder = { Text("Ej.: La app se cierra al abrir mis citas", color = colors.onSurfaceVariant) },
+                placeholder = { Text(stringResource(R.string.auto_ej_la_app_se), color = colors.onSurfaceVariant) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
@@ -256,7 +259,7 @@ fun NuevoTicketScreen(
                 OutlinedTextField(
                     value = uiState.descripcion,
                     onValueChange = { viewModel.onDescripcionChange(it) },
-                    placeholder = { Text("Describe el problema con el mayor detalle posible...", color = colors.onSurfaceVariant) },
+                    placeholder = { Text(stringResource(R.string.auto_describe_el_problema_con), color = colors.onSurfaceVariant) },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -323,7 +326,7 @@ fun NuevoTicketScreen(
                         strokeWidth = 2.dp,
                     )
                 } else {
-                    Text("Enviar ticket", fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                    Text(stringResource(R.string.auto_enviar_ticket), fontWeight = FontWeight.Medium, fontSize = 16.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         Icons.AutoMirrored.Filled.Send,

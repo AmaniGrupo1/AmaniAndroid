@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import androidx.compose.ui.res.stringResource
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -81,6 +82,7 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Pantalla de edición/reagendamiento de una cita existente.
@@ -370,7 +372,7 @@ fun EditarCitaScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Reagendar Cita",
+                        text = stringResource(R.string.auto_reagendar_cita),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = colors.onPrimary,
@@ -381,14 +383,16 @@ fun EditarCitaScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = colors.onPrimary,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colors.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -411,7 +415,7 @@ fun EditarCitaScreen(
                     ) {
                         CircularProgressIndicator(color = colors.primary)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Cargando datos de la cita...", color = colors.onSurface, fontFamily = roboto)
+                        Text(stringResource(R.string.auto_cargando_datos_de_la), color = colors.onSurface, fontFamily = roboto)
                     }
                 }
             } else if (errorMessage != null) {
@@ -433,7 +437,7 @@ fun EditarCitaScreen(
                         Text(errorMessage!!, color = colors.error, fontFamily = roboto)
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { navController.navigateUp() }) {
-                            Text("Volver", fontFamily = roboto)
+                            Text(stringResource(R.string.auto_volver), fontFamily = roboto)
                         }
                     }
                 }
@@ -448,7 +452,7 @@ fun EditarCitaScreen(
                     ) {
                         CircularProgressIndicator(color = colors.primary)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Buscando cita...", color = colors.onSurface, fontFamily = roboto)
+                        Text(stringResource(R.string.auto_buscando_cita), color = colors.onSurface, fontFamily = roboto)
                     }
                 }
             } else {
@@ -470,7 +474,7 @@ fun EditarCitaScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "📋 Cita actual",
+                                text = stringResource(R.string.auto__cita_actual),
                                 fontWeight = FontWeight.Bold,
                                 color = colors.primary,
                                 fontFamily = roboto,
@@ -511,7 +515,7 @@ fun EditarCitaScreen(
 
                     // Calendario para nueva fecha
                     Text(
-                        text = "📅 Selecciona nueva fecha",
+                        text = stringResource(R.string.auto__selecciona_nueva_fecha),
                         fontWeight = FontWeight.Bold,
                         color = colors.onSurface,
                         fontFamily = roboto,
@@ -595,7 +599,7 @@ fun EditarCitaScreen(
                                 if (tieneDisponibilidad) {
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
-                                        text = "Selecciona nueva hora",
+                                        text = stringResource(R.string.auto_selecciona_nueva_hora),
                                         fontWeight = FontWeight.SemiBold,
                                         color = colors.onSurface,
                                         fontFamily = roboto,
@@ -679,7 +683,7 @@ fun EditarCitaScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "🎯 Tipo de terapia",
+                                text = stringResource(R.string.auto__tipo_de_terapia),
                                 fontWeight = FontWeight.SemiBold,
                                 color = colors.onSurfaceVariant,
                                 fontFamily = roboto,
@@ -705,8 +709,8 @@ fun EditarCitaScreen(
                     OutlinedTextField(
                         value = motivo,
                         onValueChange = { motivo = it },
-                        label = { Text("Motivo de la cita (opcional)", fontFamily = roboto) },
-                        placeholder = { Text("Ej: Seguimiento de tratamiento, Consulta inicial, etc.", fontFamily = roboto) },
+                        label = { Text(stringResource(R.string.auto_motivo_de_la_cita), fontFamily = roboto) },
+                        placeholder = { Text(stringResource(R.string.auto_ej_seguimiento_de_tratamiento), fontFamily = roboto) },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2,
                         maxLines = 3,
@@ -724,7 +728,7 @@ fun EditarCitaScreen(
 
                     // Modalidad
                     Text(
-                        text = "Modalidad de la cita",
+                        text = stringResource(R.string.auto_modalidad_de_la_cita),
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface,
                         fontFamily = roboto,
@@ -743,7 +747,7 @@ fun EditarCitaScreen(
                                 onClick = { modalidadSeleccionada = ModalidadCita.PRESENCIAL },
                                 colors = RadioButtonDefaults.colors(selectedColor = colors.primary),
                             )
-                            Text("Presencial", color = colors.onSurface, fontFamily = roboto)
+                            Text(stringResource(R.string.auto_presencial), color = colors.onSurface, fontFamily = roboto)
                         }
                         Row(
                             modifier = Modifier.weight(1f),
@@ -754,7 +758,7 @@ fun EditarCitaScreen(
                                 onClick = { modalidadSeleccionada = ModalidadCita.LLAMADA },
                                 colors = RadioButtonDefaults.colors(selectedColor = colors.primary),
                             )
-                            Text("Llamada", color = colors.onSurface, fontFamily = roboto)
+                            Text(stringResource(R.string.auto_llamada), color = colors.onSurface, fontFamily = roboto)
                         }
                     }
 
@@ -775,7 +779,7 @@ fun EditarCitaScreen(
                                     contentColor = colors.primary,
                                 ),
                         ) {
-                            Text("Cancelar", fontFamily = roboto)
+                            Text(stringResource(R.string.auto_cancelar), fontFamily = roboto)
                         }
 
                         Button(
@@ -843,7 +847,7 @@ fun EditarCitaScreen(
                                     color = colors.onPrimary,
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Guardando...", color = colors.onPrimary, fontFamily = roboto)
+                                Text(stringResource(R.string.auto_guardando), color = colors.onPrimary, fontFamily = roboto)
                             } else {
                                 Icon(
                                     Icons.Default.Save,
@@ -852,7 +856,7 @@ fun EditarCitaScreen(
                                     tint = colors.onPrimary,
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Guardar cambios", color = colors.onPrimary, fontFamily = roboto)
+                                Text(stringResource(R.string.auto_guardar_cambios), color = colors.onPrimary, fontFamily = roboto)
                             }
                         }
                     }
@@ -879,7 +883,7 @@ fun EditarCitaScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "No has realizado cambios. Modifica la fecha u hora para reagendar.",
+                                    text = stringResource(R.string.auto_no_has_realizado_cambios),
                                     color = colors.warning,
                                     fontFamily = roboto,
                                 )

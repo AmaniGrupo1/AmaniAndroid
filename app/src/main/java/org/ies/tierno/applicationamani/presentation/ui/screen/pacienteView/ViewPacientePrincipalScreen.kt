@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -147,8 +148,7 @@ fun ViewPacientePrincipalScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Mi Psicólogo",
+                    Text(stringResource(R.string.auto_mi_psicologo),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = Color.White
@@ -158,16 +158,16 @@ fun ViewPacientePrincipalScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    )
             )
         }
     ) { paddingValues ->
@@ -193,8 +193,7 @@ fun ViewPacientePrincipalScreen(
                                 strokeWidth = 3.dp
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                "Cargando tu información...",
+                            Text(stringResource(R.string.auto_cargando_tu_informacion),
                                 fontSize = 14.sp,
                                 color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -278,7 +277,7 @@ fun GreetingCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Tu bienestar es nuestra prioridad",
+                text = stringResource(R.string.auto_tu_bienestar_es_nuestra),
                 fontSize = 14.sp,
                 color = if (isDark) Color.White.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.8f)
             )
@@ -301,13 +300,13 @@ fun ErrorState(
     ) {
         Icon(
             Icons.Default.Error,
-            contentDescription = "Error",
+            contentDescription = stringResource(R.string.auto_error),
             modifier = Modifier.size(80.dp),
             tint = MaterialTheme.colorScheme.error
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Error al cargar los datos",
+            text = stringResource(R.string.auto_error_al_cargar_los),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = if (isDark) Color.White else MaterialTheme.colorScheme.error
@@ -327,7 +326,7 @@ fun ErrorState(
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Reintentar", color = Color.White)
+            Text(stringResource(R.string.auto_reintentar), color = Color.White)
         }
     }
 }
@@ -352,7 +351,7 @@ fun NoPsicologoAssignedState(
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Default.Psychology,
-                    contentDescription = "Sin psicólogo",
+                    contentDescription = stringResource(R.string.auto_sin_psicologo),
                     modifier = Modifier.size(64.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -362,7 +361,7 @@ fun NoPsicologoAssignedState(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Aún no tienes un psicólogo asignado",
+            text = stringResource(R.string.auto_aun_no_tienes_un),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface,
@@ -372,7 +371,7 @@ fun NoPsicologoAssignedState(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Un administrador te asignará un profesional de la salud mental. Pronto podrás ver sus datos aquí.",
+            text = stringResource(R.string.auto_un_administrador_te_asignara),
             fontSize = 14.sp,
             color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -393,14 +392,14 @@ fun NoPsicologoAssignedState(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "📌 ¿Qué puedes hacer mientras tanto?",
+                    text = stringResource(R.string.auto__que_puedes_hacer),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "• Explora nuestros recursos informativos\n• Prepara tus preguntas para la primera sesión\n• Completa tu perfil de paciente",
+                    text = stringResource(R.string.auto__explora_nuestros_recursos),
                     fontSize = 12.sp,
                     color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 18.sp
@@ -419,7 +418,7 @@ fun NoPsicologoAssignedState(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Volver al inicio", modifier = Modifier.padding(vertical = 4.dp))
+            Text(stringResource(R.string.auto_volver_al_inicio), modifier = Modifier.padding(vertical = 4.dp))
         }
     }
 }
@@ -509,14 +508,14 @@ fun PsicologoContent(
                         if (!fotoUrl.isNullOrBlank()) {
                             Image(
                                 painter = rememberAsyncImagePainter(model = request),
-                                contentDescription = "Foto de perfil",
+                                contentDescription = stringResource(R.string.auto_foto_de_perfil),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
                             Image(
                                 painter = painterResource(R.drawable.ic_default_avatar),
-                                contentDescription = "Foto por defecto",
+                                contentDescription = stringResource(R.string.auto_foto_por_defecto),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
@@ -558,7 +557,7 @@ fun PsicologoContent(
                     ) {
                         Icon(
                             Icons.Default.Email,
-                            contentDescription = "Email",
+                            contentDescription = stringResource(R.string.auto_email),
                             modifier = Modifier.size(18.dp),
                             tint = cardContentSecondaryColor
                         )
@@ -589,7 +588,7 @@ fun PsicologoContent(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "📋 Información Profesional",
+                    text = stringResource(R.string.auto__informacion_profesional),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = cardContentColor
@@ -600,7 +599,7 @@ fun PsicologoContent(
                 if (psicologo.experiencia != null && psicologo.experiencia > 0) {
                     ProfessionalInfoRow(
                         icon = Icons.Default.School,
-                        label = "Años de experiencia",
+                        label = stringResource(R.string.auto_anos_de_experiencia),
                         value = "${psicologo.experiencia} años",
                         iconColor = MaterialTheme.colorScheme.primary,
                         labelColor = cardContentSecondaryColor,
@@ -611,7 +610,7 @@ fun PsicologoContent(
                 if (!psicologo.licencia.isNullOrBlank()) {
                     ProfessionalInfoRow(
                         icon = Icons.Default.Badge,
-                        label = "Número de Colegiado",
+                        label = stringResource(R.string.auto_numero_de_colegiado),
                         value = psicologo.licencia ?: "",
                         iconColor = MaterialTheme.colorScheme.primary,
                         labelColor = cardContentSecondaryColor,
@@ -621,7 +620,7 @@ fun PsicologoContent(
 
                 ProfessionalInfoRow(
                     icon = Icons.Outlined.AccessTime,
-                    label = "Horario de atención",
+                    label = stringResource(R.string.auto_horario_de_atencion),
                     value = "Lunes a Viernes: 9:00 - 20:00",
                     iconColor = MaterialTheme.colorScheme.primary,
                     labelColor = cardContentSecondaryColor,
@@ -630,7 +629,7 @@ fun PsicologoContent(
 
                 ProfessionalInfoRow(
                     icon = Icons.Outlined.LocationOn,
-                    label = "Modalidad",
+                    label = stringResource(R.string.auto_modalidad),
                     value = "Presencial y Online",
                     iconColor = MaterialTheme.colorScheme.primary,
                     labelColor = cardContentSecondaryColor,
@@ -660,7 +659,7 @@ fun PsicologoContent(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "💬 Sobre mí",
+                            text = stringResource(R.string.auto__sobre_mi),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = cardContentColor,
@@ -668,7 +667,7 @@ fun PsicologoContent(
                         )
                         Icon(
                             Icons.Default.Psychology,
-                            contentDescription = "Psicología",
+                            contentDescription = stringResource(R.string.auto_psicologia),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                             modifier = Modifier.size(24.dp)
                         )
@@ -732,13 +731,13 @@ fun PsicologoContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Información de Reportes",
+                            contentDescription = stringResource(R.string.auto_informacion_de_reportes),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "Seguimiento de tu Reporte",
+                            text = stringResource(R.string.auto_seguimiento_de_tu_reporte),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = cardContentColor
@@ -748,7 +747,7 @@ fun PsicologoContent(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Queremos garantizar tu tranquilidad. Aquí puedes ver el estado en tiempo real del reporte \"${latestTicket.titulo}\":",
+                        text = "Queremos garantizar tu tranquilidad y hemos comenzado a trabajar en el ticket \"${latestTicket.titulo}\":",
                         fontSize = 13.sp,
                         lineHeight = 19.sp,
                         color = cardContentSecondaryColor
@@ -845,13 +844,12 @@ fun PsicologoContent(
         ) {
             Icon(
                 Icons.Default.CalendarMonth,
-                contentDescription = "Citas",
+                contentDescription = stringResource(R.string.auto_citas),
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                "Ver mis citas",
+            Text(stringResource(R.string.auto_ver_mis_citas),
                 modifier = Modifier.padding(vertical = 4.dp),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,

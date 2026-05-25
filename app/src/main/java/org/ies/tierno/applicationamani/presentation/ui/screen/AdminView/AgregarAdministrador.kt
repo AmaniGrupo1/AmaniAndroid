@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -98,7 +100,7 @@ fun AgregarAdministrador(
                 modifier = Modifier.fillMaxWidth(),
                 value = name,
                 onValueChange = { loginViewModel.setNombre(it) },
-                placeholder = { Text("Nombre", fontFamily = roboto) },
+                placeholder = { Text(stringResource(R.string.auto_nombre), fontFamily = roboto) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 colors =
@@ -122,7 +124,7 @@ fun AgregarAdministrador(
                 modifier = Modifier.fillMaxWidth(),
                 value = surname,
                 onValueChange = { loginViewModel.setApellido(it) },
-                placeholder = { Text("Apellido", fontFamily = roboto) },
+                placeholder = { Text(stringResource(R.string.auto_apellido), fontFamily = roboto) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 colors =
@@ -149,7 +151,7 @@ fun AgregarAdministrador(
                     loginViewModel.setEmail(it)
                     emailTouched = true
                 },
-                placeholder = { Text("Email", fontFamily = roboto) },
+                placeholder = { Text(stringResource(R.string.auto_email), fontFamily = roboto) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 isError = emailTouched && email.isNotBlank() && emailError != null,
@@ -169,7 +171,7 @@ fun AgregarAdministrador(
                     when {
                         !emailTouched && email.isBlank() -> {
                             Text(
-                                text = "📧 Introduce el correo electrónico",
+                                text = stringResource(R.string.auto__introduce_el_correo),
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
                                 color = tokens.cardContent.copy(alpha = 0.6f),
@@ -185,7 +187,7 @@ fun AgregarAdministrador(
                         }
                         emailTouched && email.isNotBlank() && emailError == null -> {
                             Text(
-                                text = "✅ Correo válido",
+                                text = stringResource(R.string.auto__correo_valido),
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
                                 color = SuccessColor,
@@ -205,7 +207,7 @@ fun AgregarAdministrador(
                     loginViewModel.setRegPassword(it)
                     passwordTouched = true
                 },
-                placeholder = { Text("Contraseña", fontFamily = roboto) },
+                placeholder = { Text(stringResource(R.string.auto_contrasena), fontFamily = roboto) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -242,7 +244,7 @@ fun AgregarAdministrador(
                     when {
                         !passwordTouched && password.isBlank() -> {
                             Text(
-                                text = "🔒 Introduce una contraseña",
+                                text = stringResource(R.string.auto__introduce_una_contrasena),
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
                                 color = tokens.cardContent.copy(alpha = 0.6f),
@@ -258,7 +260,7 @@ fun AgregarAdministrador(
                         }
                         passwordTouched && password.isNotBlank() && loginViewModel.isValidPassword(password) -> {
                             Text(
-                                text = "✅ Contraseña válida",
+                                text = stringResource(R.string.auto__contrasena_valida),
                                 fontSize = 11.sp,
                                 fontFamily = roboto,
                                 color = SuccessColor,
@@ -288,8 +290,7 @@ fun AgregarAdministrador(
                         disabledContentColor = tokens.cardContent.copy(alpha = 0.5f),
                     ),
             ) {
-                Text(
-                    "Registrarse administrador",
+                Text(stringResource(R.string.auto_registrarse_administrador),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
@@ -313,8 +314,7 @@ fun AgregarAdministrador(
                         contentColor = tokens.cardContent,
                     ),
             ) {
-                Text(
-                    "Cancelar",
+                Text(stringResource(R.string.auto_cancelar),
                     fontFamily = roboto,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,

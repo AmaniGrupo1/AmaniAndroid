@@ -33,6 +33,7 @@ import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
+import androidx.compose.material3.MaterialTheme
 
 // Colores para validaciones
 private val SuccessColor = Color(0xFF81C784)
@@ -160,7 +161,11 @@ fun RegistrarPacientePsicologoScreen(
                         fontFamily = roboto
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
+                colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
@@ -264,24 +269,21 @@ fun RegistrarPacientePsicologoScreen(
                         supportingText = {
                             when {
                                 !dniTouched && dni.isBlank() -> {
-                                    Text(
-                                        "🆔 Introduce el DNI",
+                                    Text(stringResource(R.string.auto__introduce_el_dni_1),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                    Text(
-                                        "❌ Formato inválido (8 números + 1 letra)",
+                                    Text(stringResource(R.string.auto__formato_invalido_8),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 dniTouched && dni.isNotBlank() && dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                    Text(
-                                        "✅ DNI válido",
+                                    Text(stringResource(R.string.auto__dni_valido),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -315,24 +317,21 @@ fun RegistrarPacientePsicologoScreen(
                         supportingText = {
                             when {
                                 !emailTouched && email.isBlank() -> {
-                                    Text(
-                                        "📧 Introduce el correo electrónico",
+                                    Text(stringResource(R.string.auto__introduce_el_correo),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                    Text(
-                                        "❌ Formato de correo inválido",
+                                    Text(stringResource(R.string.auto__formato_de_correo_1),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 emailTouched && email.isNotBlank() && email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                    Text(
-                                        "✅ Correo válido",
+                                    Text(stringResource(R.string.auto__correo_valido),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -367,32 +366,28 @@ fun RegistrarPacientePsicologoScreen(
                         supportingText = {
                             when {
                                 !passwordTouched && regPassword.isBlank() -> {
-                                    Text(
-                                        "🔒 Introduce una contraseña",
+                                    Text(stringResource(R.string.auto__introduce_una_contrasena),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && regPassword.length < 8 -> {
-                                    Text(
-                                        "⚠️ La contraseña debe tener al menos 8 caracteres",
+                                    Text(stringResource(R.string.auto__la_contrasena_debe_1),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword) -> {
-                                    Text(
-                                        "❌ La contraseña debe tener al menos 8 caracteres y contener letras y números",
+                                    Text(stringResource(R.string.auto__la_contrasena_debe),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && loginViewModel.isValidPassword(regPassword) -> {
-                                    Text(
-                                        "✅ Contraseña válida",
+                                    Text(stringResource(R.string.auto__contrasena_valida),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -427,24 +422,21 @@ fun RegistrarPacientePsicologoScreen(
                         supportingText = {
                             when {
                                 !telefonoTouched && telefono.isBlank() -> {
-                                    Text(
-                                        "📞 Introduce el número de teléfono",
+                                    Text(stringResource(R.string.auto__introduce_el_numero),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
                                     )
                                 }
                                 telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")) -> {
-                                    Text(
-                                        "❌ El teléfono debe tener 9 dígitos",
+                                    Text(stringResource(R.string.auto__el_telefono_debe),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = ErrorColor
                                     )
                                 }
                                 telefonoTouched && telefono.isNotBlank() && telefono.matches(Regex("^[0-9]{9}$")) -> {
-                                    Text(
-                                        "✅ Teléfono válido",
+                                    Text(stringResource(R.string.auto__telefono_valido),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
@@ -503,7 +495,7 @@ fun RegistrarPacientePsicologoScreen(
                         value = selectedDate?.format(dateFormatter) ?: "",
                         onValueChange = {},
                         label = { Text(stringResource(R.string.fecha_nacimiento_label), fontFamily = roboto, color = textColor) },
-                        placeholder = { Text("DD/MM/AAAA", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        placeholder = { Text(stringResource(R.string.auto_ddmmaaaa), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showDatePicker = true },
@@ -513,7 +505,7 @@ fun RegistrarPacientePsicologoScreen(
                             IconButton(onClick = { showDatePicker = true }) {
                                 Icon(
                                     Icons.Default.CalendarToday,
-                                    contentDescription = "Seleccionar fecha",
+                                    contentDescription = stringResource(R.string.auto_seleccionar_fecha),
                                     tint = textColor
                                 )
                             }
@@ -538,16 +530,14 @@ fun RegistrarPacientePsicologoScreen(
                                     )
                                 }
                                 selectedDate != null -> {
-                                    Text(
-                                        "✅ Fecha válida",
+                                    Text(stringResource(R.string.auto__fecha_valida),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = SuccessColor
                                     )
                                 }
                                 else -> {
-                                    Text(
-                                        "📅 Selecciona tu fecha de nacimiento",
+                                    Text(stringResource(R.string.auto__selecciona_tu_fecha),
                                         fontSize = 11.sp,
                                         fontFamily = roboto,
                                         color = textColor.copy(alpha = 0.6f)
@@ -632,24 +622,21 @@ fun RegistrarPacientePsicologoScreen(
                             supportingText = {
                                 when {
                                     !tutorTelefonoTouched && tutorTelefono.isBlank() -> {
-                                        Text(
-                                            "📞 Introduce el teléfono del tutor",
+                                        Text(stringResource(R.string.auto__introduce_el_telefono),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = textColor.copy(alpha = 0.6f)
                                         )
                                     }
                                     tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
-                                        Text(
-                                            "❌ El teléfono debe tener 9 dígitos",
+                                        Text(stringResource(R.string.auto__el_telefono_debe),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = ErrorColor
                                         )
                                     }
                                     tutorTelefonoTouched && tutorTelefono.isNotBlank() && tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
-                                        Text(
-                                            "✅ Teléfono válido",
+                                        Text(stringResource(R.string.auto__telefono_valido),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = SuccessColor
@@ -683,24 +670,21 @@ fun RegistrarPacientePsicologoScreen(
                             supportingText = {
                                 when {
                                     !tutorEmailTouched && tutorEmail.isBlank() -> {
-                                        Text(
-                                            "📧 Introduce el email del tutor",
+                                        Text(stringResource(R.string.auto__introduce_el_email),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = textColor.copy(alpha = 0.6f)
                                         )
                                     }
                                     tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                        Text(
-                                            "❌ Formato de email inválido",
+                                        Text(stringResource(R.string.auto__formato_de_email),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = ErrorColor
                                         )
                                     }
                                     tutorEmailTouched && tutorEmail.isNotBlank() && tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                        Text(
-                                            "✅ Email válido",
+                                        Text(stringResource(R.string.auto__email_valido),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = SuccessColor
@@ -735,24 +719,21 @@ fun RegistrarPacientePsicologoScreen(
                             supportingText = {
                                 when {
                                     !tutorDniTouched && tutorDni.isBlank() -> {
-                                        Text(
-                                            "🆔 Introduce el DNI del tutor",
+                                        Text(stringResource(R.string.auto__introduce_el_dni),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = textColor.copy(alpha = 0.6f)
                                         )
                                     }
                                     tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                        Text(
-                                            "❌ Formato inválido (8 números + 1 letra)",
+                                        Text(stringResource(R.string.auto__formato_invalido_8),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = ErrorColor
                                         )
                                     }
                                     tutorDniTouched && tutorDni.isNotBlank() && tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                        Text(
-                                            "✅ DNI válido",
+                                        Text(stringResource(R.string.auto__dni_valido),
                                             fontSize = 11.sp,
                                             fontFamily = roboto,
                                             color = SuccessColor
@@ -1218,14 +1199,14 @@ fun RegistrarPacientePsicologoScreen(
                         }
                     }
                 ) {
-                    Text("Aceptar", fontFamily = roboto, color = primaryColor)
+                    Text(stringResource(R.string.auto_aceptar), fontFamily = roboto, color = primaryColor)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDatePicker = false }
                 ) {
-                    Text("Cancelar", fontFamily = roboto, color = textColor)
+                    Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = textColor)
                 }
             }
         ) {

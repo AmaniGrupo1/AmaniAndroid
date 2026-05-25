@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -49,7 +51,7 @@ fun ConsentimientoScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                text = "Consentimiento informado",
+                text = stringResource(R.string.auto_consentimiento_informado),
                 style = MaterialTheme.typography.titleLarge,
             )
 
@@ -61,7 +63,7 @@ fun ConsentimientoScreen(
 //                        loginViewModel.setAceptaVideo(it)
 //                    }
 //                )
-//                Text("Acepto videoconferencia")
+//                Text(stringResource(R.string.auto_acepto_videoconferencia))
 //            }
 //
 //            Row(verticalAlignment = Alignment.CenterVertically) {
@@ -72,7 +74,7 @@ fun ConsentimientoScreen(
 //                        loginViewModel.setAceptaComunicacion(it)
 //                    }
 //                )
-//                Text("Acepto comunicación")
+//                Text(stringResource(R.string.auto_acepto_comunicacion))
 //            }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -89,7 +91,7 @@ fun ConsentimientoScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Continuar")
+                Text(stringResource(R.string.auto_continuar))
             }
         }
     }

@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,7 +151,7 @@ fun CrearHistorialClinicoScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Nuevo Historial Clínico",
+                            text = stringResource(R.string.auto_nuevo_historial_clinico),
                             style =
                                 typography.titleLarge?.copy(
                                     fontWeight = FontWeight.Bold,
@@ -168,14 +170,16 @@ fun CrearHistorialClinicoScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = Color.White,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -207,7 +211,7 @@ fun CrearHistorialClinicoScreen(
             ) {
                 // Título de la sección
                 Text(
-                    text = "Información del Historial",
+                    text = stringResource(R.string.auto_informacion_del_historial),
                     style =
                         typography.headlineSmall?.copy(
                             fontSize = 28.sp,
@@ -222,7 +226,7 @@ fun CrearHistorialClinicoScreen(
                 )
 
                 Text(
-                    text = "Registra la información clínica del paciente",
+                    text = stringResource(R.string.auto_registra_la_informacion_clinica),
                     style =
                         typography.bodyMedium?.copy(
                             fontSize = 14.sp,
@@ -255,16 +259,14 @@ fun CrearHistorialClinicoScreen(
                             value = titulo,
                             onValueChange = { titulo = it },
                             label = {
-                                Text(
-                                    "Título *",
+                                Text(stringResource(R.string.auto_titulo_),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Ej: Sesión de terapia inicial",
+                                Text(stringResource(R.string.auto_ej_sesion_de_terapia),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
@@ -275,7 +277,7 @@ fun CrearHistorialClinicoScreen(
                             supportingText = {
                                 if (titulo.isBlank()) {
                                     Text(
-                                        text = "El título es obligatorio",
+                                        text = stringResource(R.string.auto_el_titulo_es_obligatorio),
                                         style =
                                             typography.bodySmall?.copy(fontSize = 12.sp)
                                                 ?: MaterialTheme.typography.bodySmall,
@@ -309,16 +311,14 @@ fun CrearHistorialClinicoScreen(
                             value = diagnostico,
                             onValueChange = { diagnostico = it },
                             label = {
-                                Text(
-                                    "Diagnóstico",
+                                Text(stringResource(R.string.auto_diagnostico),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Descripción del diagnóstico clínico",
+                                Text(stringResource(R.string.auto_descripcion_del_diagnostico_clinico),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
@@ -352,16 +352,14 @@ fun CrearHistorialClinicoScreen(
                             value = tratamiento,
                             onValueChange = { tratamiento = it },
                             label = {
-                                Text(
-                                    "Tratamiento",
+                                Text(stringResource(R.string.auto_tratamiento),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Tratamiento recomendado o en curso",
+                                Text(stringResource(R.string.auto_tratamiento_recomendado_o_en),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
@@ -395,16 +393,14 @@ fun CrearHistorialClinicoScreen(
                             value = observaciones,
                             onValueChange = { observaciones = it },
                             label = {
-                                Text(
-                                    "Observaciones",
+                                Text(stringResource(R.string.auto_observaciones),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
                                 )
                             },
                             placeholder = {
-                                Text(
-                                    "Notas adicionales sobre el paciente",
+                                Text(stringResource(R.string.auto_notas_adicionales_sobre_el),
                                     style =
                                         typography.bodyMedium?.copy(fontSize = 14.sp)
                                             ?: MaterialTheme.typography.bodyMedium,
@@ -473,16 +469,14 @@ fun CrearHistorialClinicoScreen(
                                         color = Color.White,
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        "Guardando...",
+                                    Text(stringResource(R.string.auto_guardando),
                                         style =
                                             typography.labelLarge?.copy(fontSize = 15.sp)
                                                 ?: MaterialTheme.typography.labelLarge,
                                     )
                                 }
                             } else {
-                                Text(
-                                    "Guardar Historial Clínico",
+                                Text(stringResource(R.string.auto_guardar_historial_clinico),
                                     style =
                                         typography.labelLarge?.copy(
                                             fontSize = 16.sp,
@@ -497,7 +491,7 @@ fun CrearHistorialClinicoScreen(
                 // Texto de ayuda
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "💜 Registra la información con precisión y empatía",
+                    text = stringResource(R.string.auto__registra_la_informacion),
                     style =
                         typography.bodySmall?.copy(
                             fontSize = 12.sp,

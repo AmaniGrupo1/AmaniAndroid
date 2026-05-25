@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -144,17 +146,21 @@ fun EditProfilePsicologoScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Editar Perfil Profesional",
+                        text = stringResource(R.string.auto_editar_perfil_profesional),
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = primaryColor),
+                colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = Color.White,
                         )
                     }
@@ -181,8 +187,7 @@ fun EditProfilePsicologoScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Datos Personales",
+                    Text(stringResource(R.string.auto_datos_personales),
                         style = MaterialTheme.typography.titleLarge,
                         color = primaryColor,
                         fontWeight = FontWeight.Bold,
@@ -193,7 +198,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.usuario?.nombre ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onNombreChange(it) },
-                        label = { Text("Nombre *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_nombre_), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
                         },
@@ -212,7 +217,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.usuario?.apellido ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onApellidoChange(it) },
-                        label = { Text("Apellido *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_apellido_), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
                         },
@@ -231,7 +236,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.usuario?.email ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onEmailChange(it) },
-                        label = { Text("Email *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_email_), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.Email, contentDescription = null, tint = primaryColor)
                         },
@@ -254,8 +259,7 @@ fun EditProfilePsicologoScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Datos Profesionales",
+                    Text(stringResource(R.string.auto_datos_profesionales),
                         style = MaterialTheme.typography.titleLarge,
                         color = primaryColor,
                         fontWeight = FontWeight.Bold,
@@ -266,7 +270,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.especialidad ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onEspecialidadChange(it) },
-                        label = { Text("Especialidad *", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_especialidad_), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.MedicalServices, contentDescription = null, tint = primaryColor)
                         },
@@ -285,7 +289,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.experiencia?.toString() ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onExperienciaChange(it) },
-                        label = { Text("Experiencia (años)", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_experiencia_anos), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.Timeline, contentDescription = null, tint = primaryColor)
                         },
@@ -304,7 +308,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.licencia ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onLicenciaChange(it) },
-                        label = { Text("Licencia Colegiada", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_licencia_colegiada), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.Badge, contentDescription = null, tint = primaryColor)
                         },
@@ -323,7 +327,7 @@ fun EditProfilePsicologoScreen(
                     OutlinedTextField(
                         value = state.descripcion ?: "",
                         onValueChange = { editProfilePsicologoViewModel.onDescripcionChange(it) },
-                        label = { Text("Descripción", fontWeight = FontWeight.SemiBold) },
+                        label = { Text(stringResource(R.string.auto_descripcion_1), fontWeight = FontWeight.SemiBold) },
                         leadingIcon = {
                             Icon(Icons.Default.Description, contentDescription = null, tint = primaryColor)
                         },
@@ -383,9 +387,9 @@ fun EditProfilePsicologoScreen(
                         strokeWidth = 2.dp,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Guardando...", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.auto_guardando), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 } else {
-                    Text("Guardar Cambios", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.auto_guardar_cambios_1), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -394,7 +398,7 @@ fun EditProfilePsicologoScreen(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Cancelar", color = Color.Gray)
+                Text(stringResource(R.string.auto_cancelar), color = Color.Gray)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

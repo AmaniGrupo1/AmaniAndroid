@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -13,6 +15,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Diálogo modal para cambiar el rol de un usuario existente.
@@ -50,8 +53,7 @@ fun BottomSheetCambiarRol(
                 modifier = Modifier.padding(20.dp),
             ) {
                 // Header
-                Text(
-                    "Cambiar Rol de Usuario",
+                Text(stringResource(R.string.auto_cambiar_rol_de_usuario),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -85,7 +87,7 @@ fun BottomSheetCambiarRol(
                                 .padding(12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Rol actual:", fontSize = 14.sp)
+                        Text(stringResource(R.string.auto_rol_actual), fontSize = 14.sp)
                         Text(
                             when (user.rol ?: Rol.paciente) {
                                 Rol.admin -> "👑 Administrador"
@@ -107,8 +109,7 @@ fun BottomSheetCambiarRol(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Selector de nuevo rol
-                Text(
-                    "Nuevo rol:",
+                Text(stringResource(R.string.auto_nuevo_rol),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                 )
@@ -150,7 +151,7 @@ fun BottomSheetCambiarRol(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp),
                     ) {
-                        Text("Cancelar")
+                        Text(stringResource(R.string.auto_cancelar))
                     }
 
                     Button(
@@ -162,7 +163,7 @@ fun BottomSheetCambiarRol(
                                 containerColor = MaterialTheme.colorScheme.primary,
                             ),
                     ) {
-                        Text("Confirmar")
+                        Text(stringResource(R.string.auto_confirmar))
                     }
                 }
             }

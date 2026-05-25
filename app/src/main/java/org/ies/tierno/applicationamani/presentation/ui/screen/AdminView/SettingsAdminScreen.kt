@@ -168,7 +168,7 @@ fun SettingsAdminScreen(
                         ) {
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Cargando horario...", fontFamily = roboto)
+                            Text(stringResource(R.string.auto_cargando_horario), fontFamily = roboto)
                         }
                     }
                 }
@@ -667,14 +667,14 @@ fun SettingsOptionRow(
                         containerColor = dropdownContainerColor
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Claro", color = onSurfaceColor) },
+                            text = { Text(stringResource(R.string.auto_claro), color = onSurfaceColor) },
                             onClick = {
                                 scope.launch { idiomaViewModel.cambiarTema(false) }
                                 expandedTheme = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Oscuro", color = onSurfaceColor) },
+                            text = { Text(stringResource(R.string.auto_oscuro), color = onSurfaceColor) },
                             onClick = {
                                 scope.launch { idiomaViewModel.cambiarTema(true) }
                                 expandedTheme = false
@@ -686,7 +686,7 @@ fun SettingsOptionRow(
             else -> {
                 Icon(
                     Icons.Default.ChevronRight,
-                    contentDescription = "Ir",
+                    contentDescription = stringResource(R.string.auto_ir),
                     tint = onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
@@ -737,14 +737,14 @@ fun DialogHorarioSemanal(
                 ) {
                     Column {
                         Text(
-                            text = "📅 Horario Semanal",
+                            text = stringResource(R.string.auto__horario_semanal),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isDark) Color.White else Color(0xFF6B4E71),
                             fontFamily = roboto
                         )
                         Text(
-                            text = "Días y horas de atención disponibles",
+                            text = stringResource(R.string.auto_dias_y_horas_de),
                             fontSize = 13.sp,
                             color = if (isDark) Color.LightGray else Color.Gray,
                             fontFamily = roboto,
@@ -758,7 +758,7 @@ fun DialogHorarioSemanal(
                     ) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(R.string.auto_cerrar),
                             tint = if (isDark) Color.White else Color.Gray
                         )
                     }
@@ -781,7 +781,7 @@ fun DialogHorarioSemanal(
                             Text(text = "⏰", fontSize = 48.sp)
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "No hay configuración de horario cargada",
+                                text = stringResource(R.string.auto_no_hay_configuracion_de),
                                 textAlign = TextAlign.Center,
                                 color = if (isDark) Color.LightGray else Color.Gray,
                                 fontFamily = roboto
@@ -835,7 +835,7 @@ fun DialogHorarioSemanal(
                                             )
                                         } else if (!franja.activo) {
                                             Text(
-                                                text = "❌ No disponible",
+                                                text = stringResource(R.string.auto__no_disponible),
                                                 fontSize = 13.sp,
                                                 color = if (isDark) Color(0xFFEF9A9A) else Color(0xFFE53935),
                                                 fontFamily = roboto,
@@ -879,7 +879,7 @@ fun DialogHorarioSemanal(
                         containerColor = if (isDark) Color(0xFF6B4E71) else Color(0xFF6B4E71)
                     )
                 ) {
-                    Text("Cerrar", color = Color.White, fontFamily = roboto, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.auto_cerrar), color = Color.White, fontFamily = roboto, fontWeight = FontWeight.Medium)
                 }
             }
         }

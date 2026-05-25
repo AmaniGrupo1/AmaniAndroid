@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
+import androidx.compose.ui.res.stringResource
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -40,6 +41,7 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Encuentra la [Activity] asociada a un [Context], recorriendo los
@@ -125,7 +127,7 @@ fun HistorialClinicoScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
-                            text = "Historial Clínico",
+                            text = stringResource(R.string.auto_historial_clinico),
                             style = typography.titleLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = if (isDark) colorScheme.onSurface else Color.White,
@@ -186,7 +188,7 @@ fun HistorialClinicoScreen(
                         ) {
                             Icon(
                                 Icons.Default.Share,
-                                contentDescription = "Compartir PDF",
+                                contentDescription = stringResource(R.string.auto_compartir_pdf),
                                 tint = if (isDark) colorScheme.onSurface else Color.White,
                             )
                         }
@@ -196,14 +198,16 @@ fun HistorialClinicoScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.auto_volver),
                             tint = if (isDark) colorScheme.onSurface else Color.White,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -238,7 +242,7 @@ fun HistorialClinicoScreen(
                             CircularProgressIndicator(color = colorScheme.primary)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Cargando historial clínico...",
+                                text = stringResource(R.string.auto_cargando_historial_clinico),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                             )
@@ -264,7 +268,7 @@ fun HistorialClinicoScreen(
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(
-                                text = "No hay registros en tu historial clínico",
+                                text = stringResource(R.string.auto_no_hay_registros_en),
                                 style = typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
                                 color = colorScheme.onSurface,
@@ -272,7 +276,7 @@ fun HistorialClinicoScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Las consultas con tu psicólogo aparecerán aquí",
+                                text = stringResource(R.string.auto_las_consultas_con_tu),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
@@ -299,7 +303,7 @@ fun HistorialClinicoScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Error al cargar el historial",
+                                text = stringResource(R.string.auto_error_al_cargar_el_2),
                                 style = typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.onSurface,
@@ -325,11 +329,10 @@ fun HistorialClinicoScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Refresh,
-                                    contentDescription = "Reintentar",
+                                    contentDescription = stringResource(R.string.auto_reintentar),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    "Reintentar",
+                                Text(stringResource(R.string.auto_reintentar),
                                     style = typography.labelLarge,
                                 )
                             }
@@ -411,7 +414,7 @@ fun HistorialCard(
                     ) {
                         Icon(
                             Icons.Default.DateRange,
-                            contentDescription = "Fecha",
+                            contentDescription = stringResource(R.string.auto_fecha),
                             modifier = Modifier.size(14.dp),
                             tint = colorScheme.onSurfaceVariant,
                         )
@@ -439,13 +442,13 @@ fun HistorialCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.Healing,
-                            contentDescription = "Diagnóstico",
+                            contentDescription = stringResource(R.string.auto_diagnostico),
                             modifier = Modifier.size(16.dp),
                             tint = colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Diagnóstico",
+                            text = stringResource(R.string.auto_diagnostico),
                             style = typography.labelSmall,
                             fontWeight = FontWeight.Medium,
                             color = colorScheme.primary,
@@ -477,13 +480,13 @@ fun HistorialCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.Favorite,
-                                contentDescription = "Tratamiento",
+                                contentDescription = stringResource(R.string.auto_tratamiento),
                                 modifier = Modifier.size(16.dp),
                                 tint = colorScheme.primary.copy(alpha = 0.8f),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Tratamiento",
+                                text = stringResource(R.string.auto_tratamiento),
                                 style = typography.labelSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colorScheme.primary.copy(alpha = 0.8f),
@@ -514,13 +517,13 @@ fun HistorialCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.AutoMirrored.Filled.Note,
-                                contentDescription = "Observaciones",
+                                contentDescription = stringResource(R.string.auto_observaciones),
                                 modifier = Modifier.size(16.dp),
                                 tint = colorScheme.onSurfaceVariant,
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Observaciones",
+                                text = stringResource(R.string.auto_observaciones),
                                 style = typography.labelSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colorScheme.onSurfaceVariant,

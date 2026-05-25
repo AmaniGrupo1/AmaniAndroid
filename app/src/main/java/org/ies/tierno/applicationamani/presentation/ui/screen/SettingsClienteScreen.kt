@@ -124,11 +124,12 @@ fun SettingsClienteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Configuración", style = typography.titleLarge) },
+                title = { Text(stringResource(R.string.auto_mi_configuracion), style = typography.titleLarge) },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = colors.surface,
-                        titleContentColor = colors.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
@@ -212,7 +213,7 @@ fun SettingsClienteScreen(
                         // Selector de Género
                         Column {
                             Text(
-                                text = "Género",
+                                text = stringResource(R.string.auto_genero),
                                 style = typography.labelMedium,
                                 color = colors.onSurfaceVariant,
                                 modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
@@ -286,7 +287,7 @@ fun SettingsClienteScreen(
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.UploadFile, contentDescription = null)
-                                    Text("Consentimiento", style = typography.labelSmall)
+                                    Text(stringResource(R.string.auto_consentimiento), style = typography.labelSmall)
                                 }
                             }
                             OutlinedButton(
@@ -296,7 +297,7 @@ fun SettingsClienteScreen(
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.GppGood, contentDescription = null)
-                                    Text("Prot. Datos", style = typography.labelSmall)
+                                    Text(stringResource(R.string.auto_prot_datos), style = typography.labelSmall)
                                 }
                             }
                         }
@@ -311,7 +312,7 @@ fun SettingsClienteScreen(
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Guardar cambios", style = typography.labelLarge)
+                        Text(stringResource(R.string.auto_guardar_cambios), style = typography.labelLarge)
                     }
 
                     // Theme selector
@@ -334,7 +335,7 @@ fun SettingsClienteScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Text("Apariencia", style = typography.titleMedium, color = colors.onSurface)
+                                Text(stringResource(R.string.auto_apariencia), style = typography.titleMedium, color = colors.onSurface)
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -371,9 +372,8 @@ fun SettingsClienteScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
-                            Text("¿Necesitas ayuda?", style = typography.titleMedium)
-                            Text(
-                                "Reporta un bug o envía una sugerencia al equipo de soporte.",
+                            Text(stringResource(R.string.auto_necesitas_ayuda), style = typography.titleMedium)
+                            Text(stringResource(R.string.auto_reporta_un_bug_o),
                                 style = typography.bodySmall,
                                 textAlign = TextAlign.Center,
                             )
@@ -383,7 +383,7 @@ fun SettingsClienteScreen(
                                 shape = CircleShape,
                                 colors = ButtonDefaults.buttonColors(containerColor = colors.secondary),
                             ) {
-                                Text("Abrir ticket de soporte", style = typography.labelLarge)
+                                Text(stringResource(R.string.auto_abrir_ticket_de_soporte), style = typography.labelLarge)
                             }
                         }
                     }
@@ -395,7 +395,7 @@ fun SettingsClienteScreen(
                     ) {
                         Icon(Icons.Default.DeleteForever, contentDescription = null, tint = colors.error)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Eliminar mi cuenta", color = colors.error, style = typography.labelLarge)
+                        Text(stringResource(R.string.auto_eliminar_mi_cuenta), color = colors.error, style = typography.labelLarge)
                     }
 
                     // Mensaje de Error

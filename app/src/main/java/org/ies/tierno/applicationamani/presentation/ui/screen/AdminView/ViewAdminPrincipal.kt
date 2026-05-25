@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screens.admin
 
+import org.ies.tierno.applicationamani.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
@@ -128,7 +130,7 @@ fun ViewAdminPrincipal(
                     }) {
                         Icon(
                             Icons.Default.Refresh,
-                            contentDescription = "Actualizar",
+                            contentDescription = stringResource(R.string.auto_actualizar),
                             tint = colorScheme.primary,
                         )
                     }
@@ -169,7 +171,7 @@ fun ViewAdminPrincipal(
                     modifier = Modifier.padding(8.dp),
                 ) {
                     Text(
-                        text = "Desliza para ver mas",
+                        text = stringResource(R.string.auto_desliza_para_ver_mas),
                         style = typography.labelSmall,
                         color = colorScheme.primary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
@@ -193,7 +195,7 @@ private fun LoadingState() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Cargando psicologos...",
+                text = stringResource(R.string.auto_cargando_psicologos),
                 color = colorScheme.onSurfaceVariant,
                 style = typography.bodyMedium,
             )
@@ -218,14 +220,14 @@ private fun EmptyState() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "No hay psicologos registrados",
+                text = stringResource(R.string.auto_no_hay_psicologos_registrados),
                 style = typography.headlineSmall,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Los psicologos apareceran aqui una vez registrados",
+                text = stringResource(R.string.auto_los_psicologos_apareceran_aqui),
                 style = typography.bodyMedium,
                 color = colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -290,7 +292,7 @@ private fun HeaderStats(totalPsicologos: Int) {
         ) {
             Column {
                 Text(
-                    text = "Total de Psicologos",
+                    text = stringResource(R.string.auto_total_de_psicologos),
                     style = typography.labelLarge,
                     color = colorScheme.onPrimary.copy(alpha = 0.9f),
                 )
@@ -576,7 +578,7 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Pacientes Asignados",
+                text = stringResource(R.string.auto_pacientes_asignados),
                 style = typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = colorScheme.onSurface,
@@ -610,7 +612,7 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "No hay pacientes asignados",
+                        text = stringResource(R.string.auto_no_hay_pacientes_asignados),
                         style = typography.bodySmall,
                         color = colorScheme.onSurfaceVariant,
                     )
@@ -646,7 +648,7 @@ fun ExpandedContent(psicologo: ListaPacientesAndPsicologo) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Asignar nuevo paciente",
+                text = stringResource(R.string.auto_asignar_nuevo_paciente),
                 style = typography.labelLarge,
                 fontWeight = FontWeight.Medium,
             )
