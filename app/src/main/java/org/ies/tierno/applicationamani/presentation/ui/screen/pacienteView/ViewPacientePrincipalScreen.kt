@@ -135,20 +135,11 @@ fun ViewPacientePrincipalScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Mi Psicólogo",
+                        "AMANI - Mi Psicólogo",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = Color.White
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White
-                        )
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,

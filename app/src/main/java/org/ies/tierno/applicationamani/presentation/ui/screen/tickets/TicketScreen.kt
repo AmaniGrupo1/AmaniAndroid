@@ -63,11 +63,11 @@ fun TicketScreen(
     var titulo by remember { mutableStateOf("") }
     var categoria by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+
+    // Email ya no es un estado mutable editable, usaremos userEmailState directamente
 
     var tituloError by remember { mutableStateOf<String?>(null) }
     var descripcionError by remember { mutableStateOf<String?>(null) }
-    var emailError by remember { mutableStateOf<String?>(null) }
 
     val categorias = listOf(
         "Error técnico",
@@ -82,13 +82,6 @@ fun TicketScreen(
     // Cargar datos al iniciar
     LaunchedEffect(Unit) {
         viewModel.cargarEmailUsuario()
-    }
-
-    // Rellenar email cuando se obtenga de la sesión
-    LaunchedEffect(userEmailState) {
-        if (userEmailState.isNotEmpty()) {
-            email = userEmailState
-        }
     }
 
     // Manejar mensajes del ViewModel
@@ -278,27 +271,36 @@ fun TicketScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        // Email
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = {
-                                email = it
-                                emailError = if (it.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches())
-                                    "Email no válido"
-                                else null
-                            },
-                            label = { Text(stringResource(R.string.email)) },
-                            placeholder = { Text("tu@email.com") },
-                            shape = RoundedCornerShape(12.dp),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                            isError = emailError != null,
-                            supportingText = {
-                                if (emailError != null) {
-                                    Text(emailError!!, color = MaterialTheme.colorScheme.error)
+                        // Mostrar el email del usuario (solo texto informativo, no editable)
+                        if (userEmailState.isNotEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isDark) Color(0xFF333333) else Color(0xFFF5F5F5)
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Email del usuario",
+                                        tint = if (isDark) Color.LightGray else Color.Gray,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Text(
+                                        text = "Reporte enviado desde: ${userEmailState}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (isDark) Color.LightGray else Color.Gray
+                                    )
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            }
+                        }
 
                         // Botón de enviar
                         Button(
@@ -307,7 +309,7 @@ fun TicketScreen(
                                     titulo = titulo,
                                     categoria = categoria,
                                     descripcion = descripcion,
-                                    email = email
+                                    email = userEmailState  // Usar el email del usuario logueado
                                 )
 
                                 val validation = ticket.validar()
@@ -324,8 +326,6 @@ fun TicketScreen(
                                             ).show()
                                         descripcion.isBlank() || descripcion.length < 10 ->
                                             descripcionError = validation.message
-                                        email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
-                                            emailError = validation.message
                                     }
                                 } else {
                                     viewModel.enviarTicket(ticket)

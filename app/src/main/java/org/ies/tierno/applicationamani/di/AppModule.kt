@@ -88,6 +88,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 
 val appModule = module {
@@ -96,7 +97,7 @@ val appModule = module {
     single { AuthEventChannel() }
     single { UserSessionDataStore(get()) }
     single {
-        FirebaseDatabase.getInstance()
+        FirebaseFirestore.getInstance()
     }
 
     single { AuthRepository(get(), get(), get(), get(), get()) }
