@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
+
+import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -409,6 +409,25 @@ fun SettingsPsychologistScreen(
                             title = stringResource(R.string.politica_privacidad),
                             subtitle = stringResource(R.string.ver_politica),
                             icon = Icons.Default.Lock
+                        ),
+                        // ✅ NUEVAS OPCIONES DE AYUDA Y SOPORTE
+                        SettingsOption(
+                            id = "ayuda",
+                            title = stringResource(R.string.ayuda),
+                            subtitle = stringResource(R.string.preguntas_frecuentes),
+                            icon = Icons.Default.Help
+                        ),
+                        SettingsOption(
+                            id = "contacto",
+                            title = stringResource(R.string.contacto),
+                            subtitle = stringResource(R.string.contactar_soporte),
+                            icon = Icons.AutoMirrored.Filled.ContactSupport
+                        ),
+                        SettingsOption(
+                            id = "reportar_problema",
+                            title = stringResource(R.string.reportar_problema),
+                            subtitle = stringResource(R.string.enviar_reporte),
+                            icon = Icons.Default.ReportProblem
                         )
                     )
                 )
@@ -563,6 +582,16 @@ fun SettingsOptionRowPsychologist(
                     }
                     "privacidad" -> {
                         navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
+                    }
+                    // ✅ NUEVAS NAVEGACIONES PARA AYUDA Y SOPORTE
+                    "ayuda" -> {
+                       // navController.navigate(Screens.ayuda.route)
+                    }
+                    "contacto" -> {
+                       // navController.navigate(Screens.contacto.route)
+                    }
+                    "reportar_problema" -> {
+                        navController.navigate(Screens.reportarProblema.route)
                     }
                 }
             }

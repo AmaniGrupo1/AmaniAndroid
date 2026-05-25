@@ -84,6 +84,15 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
+import android.app.Activity
+import android.content.Intent
+import android.provider.CalendarContract
+import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ContactSupport
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 private const val TAG = "SettingsPaciente"
 
@@ -613,7 +622,12 @@ fun SettingsOptionRowPaciente(
                         }
 
                         "cerrar_sesion" -> {
-                            Log.d(TAG, "🚪 Cerrar sesión")
+                            navController.navigate(Screens.login.route) {
+                                popUpTo(0)
+                            }
+                        }
+                        "reportar_problema" -> {
+                            navController.navigate(Screens.reportarProblema.route)
                         }
                     }
                 }

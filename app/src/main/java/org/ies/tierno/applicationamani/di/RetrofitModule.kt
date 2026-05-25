@@ -137,3 +137,11 @@ val retrofitModule =
         single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
         single<HistorialCitaApi> { get<Retrofit>().create(HistorialCitaApi::class.java) }
     }
+    // ✅ Proveer el ImageLoader usando el OkHttpClient
+    single<coil.ImageLoader> {
+        coil.ImageLoader.Builder(get())
+            .okHttpClient { get<okhttp3.OkHttpClient>() }
+            .crossfade(true)
+            .build()
+    }
+}

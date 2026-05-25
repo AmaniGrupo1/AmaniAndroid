@@ -101,6 +101,7 @@ import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import com.google.firebase.database.FirebaseDatabase
+import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 
 /**
  * Módulo principal de inyección de dependencias con Koin.
@@ -132,7 +133,7 @@ val appModule = module {
 
     single { FirebaseDatabase.getInstance() }
 
-    single { AuthRepository(get(), get(), get(), get()) }
+    single { AuthRepository(get(), get(), get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get(), get()) }
@@ -186,6 +187,7 @@ val appModule = module {
     factory { RoleAdminUseCase(get()) }
     factory { HistorialCitaUseCase(get()) }
     factory { TicketsUseCase(get()) }
+    factory { FirebaseAuthManager() }
 
     viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
