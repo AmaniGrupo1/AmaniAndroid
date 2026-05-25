@@ -316,12 +316,6 @@ fun SettingsAdminScreen(
                             icon = Icons.Default.Timer,
                         ),
                         SettingsOption(
-                            id = "working_hours",
-                            title = stringResource(R.string.horario_laboral),
-                            subtitle = stringResource(R.string.horario_08_18),
-                            icon = Icons.Default.Schedule
-                        ),
-                        SettingsOption(
                             id = "available_days",
                             title = stringResource(R.string.dias_disponibles),
                             subtitle = stringResource(R.string.lunes_viernes),
@@ -422,12 +416,6 @@ fun SettingsAdminScreen(
                             title = stringResource(R.string.roles),
                             subtitle = stringResource(R.string.admin_psicologo_recepcionista),
                             icon = Icons.Default.AdminPanelSettings
-                        ),
-                        SettingsOption(
-                            id = "permissions",
-                            title = stringResource(R.string.permisos),
-                            subtitle = stringResource(R.string.descripcion_permisos),
-                            icon = Icons.Default.Lock
                         )
                     )
                 )

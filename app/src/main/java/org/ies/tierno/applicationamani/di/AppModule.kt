@@ -27,6 +27,7 @@ import org.ies.tierno.applicationamani.data.repositorio.PaymentRepository
 import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
+import org.ies.tierno.applicationamani.data.repositorio.TicketsRepository
 import org.ies.tierno.applicationamani.data.repositorio.role.AdminRepository
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
@@ -46,6 +47,7 @@ import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingU
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
+import org.ies.tierno.applicationamani.domain.usecases.historialCita.HistorialCitaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
@@ -59,6 +61,7 @@ import org.ies.tierno.applicationamani.domain.usecases.role.GetUsuariosUseCase
 import org.ies.tierno.applicationamani.domain.usecases.role.RoleAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.situaciones.SituacionUseCase
 import org.ies.tierno.applicationamani.domain.usecases.terapia.TerapiasGeneralUseCase
+import org.ies.tierno.applicationamani.domain.usecases.ticketsUseCase.TicketsUseCase
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
@@ -91,10 +94,13 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserVie
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.data.remoto.ProfileApi
+import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import com.google.firebase.database.FirebaseDatabase
 
 /**
  * Módulo principal de inyección de dependencias con Koin.
@@ -108,133 +114,138 @@ import org.koin.dsl.module
  * Las dependencias se resuelven de forma automática a través de los
  * constructores anotados de cada clase, respetando la arquitectura limpia.
  */
-val appModule =
-    module {
-        single { TokenDataStore(androidContext()) }
-        single { TokenHolder(get()) }
-        single { AuthEventChannel() }
-        single { UserSessionDataStore(get()) }
-        single {
-            Room
-                .databaseBuilder(
-                    androidContext(),
-                    AmaniDatabase::class.java,
-                    "amani_local.db",
-                ).addMigrations(AmaniDatabase.MIGRATION_1_2)
-                .build()
-        }
-        single { get<AmaniDatabase>().diarioEmocionalDao() }
-
-        single { AuthRepository(get(), get(), get(), get()) }
-        single { TestRepositoryApi(get()) }
-        single { SituacionRepository(get()) }
-        single { CitasRepository(get(), get()) }
-        single { ProfileRepository(get()) }
-        single { DiarioEmocionalRepository(get(), get()) }
-        single { DiarioRemoteRepository(get()) }
-        single { DiarioSyncManager(androidContext(), get(), get(), get()) }
-        single { NotificacionRepository(get()) }
-        single { SoporteTicketRepository(get()) }
-        single { AjustesRepository(get()) }
-        single { HistorialRepository(get()) }
-        single { DocumentoLegalRepository(get()) }
-        single { AdminRepository(get()) }
-
-        single { FirebaseInstance }
-        single { ChatFirebaseService(get()) }
-        single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
-        single { FileStorageService(get(), androidContext()) }
-
-        factory { LoginUseCase(get()) }
-        factory { GetAllClientAndPsicologoUseCase(get()) }
-        factory { CrearPreguntaUseCase(get()) }
-        factory { ListarPreguntasUseCase(get()) }
-        factory { DarBajaPacienteUseCase(get()) }
-        factory { TodosLosPacientesUseCase(get()) }
-        factory { ListarPsicologoAdminUseCase(get()) }
-        factory { AsignarPacienteAlPsicologoUseCase(get()) }
-        factory { ResponderTestUseCase(get()) }
-        factory { SituacionUseCase(get()) }
-        factory { ProfileUseCaseGeneral(get()) }
-        factory { NotificacionUseCase(get()) }
-        factory { GetPacientesSinPsicologoUseCase(get()) }
-        factory { ListarPacientesByPsicologo(get()) }
-        factory { HistorialClinicoUseCase(get()) }
-        factory { DocumentoLegalUseCase(get()) }
-
-        factory { SendMessageUseCase(get()) }
-        factory { GetMessagesUseCase(get()) }
-        factory { MarkMessagesAsReadUseCase(get()) }
-        factory { ListarCitasUseCase(get()) }
-        factory { StartTypingUseCase(get()) }
-        factory { StopTypingUseCase(get()) }
-        factory { ObserveTypingUseCase(get()) }
-        factory { ObserveUserOnlineUseCase(get()) }
-        factory { MarkMessageDeliveredUseCase(get()) }
-        factory { UpdateUserOnlineUseCase(get()) }
-        factory { IdiomaUseCase(get()) }
-        factory { TerapiasGeneralUseCase(get()) }
-        factory { GetUsuariosUseCase(get()) }
-        factory { RoleAdminUseCase(get()) }
-
-        viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
-        viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
-        viewModel { CrearPreguntaViewModel(get()) }
-        viewModel { ListarPacientesViewModel(get(), get(), get()) }
-        viewModel { ListarPsicologosAdminViewModel(get(), get(), get()) }
-        viewModel { PrincipalClienteViewModel() }
-        viewModel { SettingsClienteViewModel(get(), get()) }
-        viewModel { SituacionViewModel(get(), get()) }
-        viewModel { CitasViewModel(get(), get(), get()) }
-        viewModel { QuestionnaireViewModel() }
-        viewModel { PsicologoAgendaViewModel(get(), get(), get()) }
-        viewModel { CuestionarioViewModel(get()) }
-        viewModel { ListarPacientesByPsicologoViewModel(get(), get()) }
-        viewModel { EstadisticasPsicologoViewModel(get(), get()) }
-        viewModel { ProfilePsicologoViewModel(get()) }
-        viewModel { EditProfilePsicologoViewModel(get()) }
-        viewModel { PacienteViewModel(get()) }
-        viewModel { ListarTerapiasViewModel(get(), get()) }
-        viewModel { ListarCitasViewModel(get(), get(),get()) }
-        viewModel { DiarioEmocionalViewModel(get()) }
-        viewModel { AdminRoleViewModel(get()) }
-        viewModel { AdminUserViewModel(get()) }
-
-        worker { SyncDiarioWorker(get(), get(), get()) }
-
-        viewModel { ChatListViewModel(get(), get(), get()) }
-        viewModel { (currentUserId: Long, otherUserId: Long, otherUserName: String) ->
-            ChatViewModel(
-                currentUserId = currentUserId,
-                otherUserId = otherUserId,
-                otherUserName = otherUserName,
-                sendMessageUseCase = get(),
-                getMessagesUseCase = get(),
-                markMessagesAsReadUseCase = get(),
-                markMessageDeliveredUseCase = get(),
-                fileStorageService = get(),
-                startTypingUseCase = get(),
-                stopTypingUseCase = get(),
-                observeTypingUseCase = get(),
-                observeUserOnlineUseCase = get(),
-                updateUserOnlineUseCase = get(),
-                profileUseCaseGeneral = get(),
-                authRepository = get(),
-                appContext = androidContext(),
-            )
-        }
-
-        viewModel { NotificacionViewModel(get()) }
-        viewModel { PacientesViewModel(get()) }
-
-        single { PaymentRepository(get()) }
-        factory { CreatePaymentIntentUseCase(get()) }
-        viewModel { PaymentViewModel(get()) }
-
-        viewModel { SoporteTicketViewModel(get()) }
-        viewModel { IdiomaViewModel(get(), get(), get()) }
-        viewModel { ProfileAdminViewModel(get()) }
-        viewModel { ProfilePacienteViewModel(get()) }
-        viewModel { HistorialClinicoPacienteViewModel(get()) }
-        viewModel { DocumentoLegalViewModel(get()) }
+val appModule = module {
+    single { TokenDataStore(androidContext()) }
+    single { TokenHolder(get()) }
+    single { AuthEventChannel() }
+    single { UserSessionDataStore(get()) }
+    single {
+        Room
+            .databaseBuilder(
+                androidContext(),
+                AmaniDatabase::class.java,
+                "amani_local.db",
+            ).addMigrations(AmaniDatabase.MIGRATION_1_2)
+            .build()
     }
+    single { get<AmaniDatabase>().diarioEmocionalDao() }
+
+    single { FirebaseDatabase.getInstance() }
+
+    single { AuthRepository(get(), get(), get(), get()) }
+    single { TestRepositoryApi(get()) }
+    single { SituacionRepository(get()) }
+    single { CitasRepository(get(), get()) }
+    single { ProfileRepository(get()) }
+    single { DiarioEmocionalRepository(get(), get()) }
+    single { DiarioRemoteRepository(get()) }
+    single { DiarioSyncManager(androidContext(), get(), get(), get()) }
+    single { NotificacionRepository(get()) }
+    single { SoporteTicketRepository(get()) }
+    single { AjustesRepository(get()) }
+    single { HistorialRepository(get()) }
+    single { DocumentoLegalRepository(get()) }
+    single { AdminRepository(get()) }
+    single { TicketsRepository(get()) }
+
+    single { FirebaseInstance }
+    single { ChatFirebaseService(get()) }
+    single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
+    single { FileStorageService(get(), androidContext()) }
+
+    factory { LoginUseCase(get()) }
+    factory { GetAllClientAndPsicologoUseCase(get()) }
+    factory { CrearPreguntaUseCase(get()) }
+    factory { ListarPreguntasUseCase(get()) }
+    factory { DarBajaPacienteUseCase(get()) }
+    factory { TodosLosPacientesUseCase(get()) }
+    factory { ListarPsicologoAdminUseCase(get()) }
+    factory { AsignarPacienteAlPsicologoUseCase(get()) }
+    factory { ResponderTestUseCase(get()) }
+    factory { SituacionUseCase(get()) }
+    factory { ProfileUseCaseGeneral(get()) }
+    factory { NotificacionUseCase(get()) }
+    factory { GetPacientesSinPsicologoUseCase(get()) }
+    factory { ListarPacientesByPsicologo(get()) }
+    factory { HistorialClinicoUseCase(get()) }
+    factory { DocumentoLegalUseCase(get()) }
+
+    factory { SendMessageUseCase(get()) }
+    factory { GetMessagesUseCase(get()) }
+    factory { MarkMessagesAsReadUseCase(get()) }
+    factory { ListarCitasUseCase(get()) }
+    factory { StartTypingUseCase(get()) }
+    factory { StopTypingUseCase(get()) }
+    factory { ObserveTypingUseCase(get()) }
+    factory { ObserveUserOnlineUseCase(get()) }
+    factory { MarkMessageDeliveredUseCase(get()) }
+    factory { UpdateUserOnlineUseCase(get()) }
+    factory { IdiomaUseCase(get()) }
+    factory { TerapiasGeneralUseCase(get()) }
+    factory { GetUsuariosUseCase(get()) }
+    factory { RoleAdminUseCase(get()) }
+    factory { HistorialCitaUseCase(get()) }
+    factory { TicketsUseCase(get()) }
+
+    viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
+    viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
+    viewModel { CrearPreguntaViewModel(get()) }
+    viewModel { ListarPacientesViewModel(get(), get(), get()) }
+    viewModel { ListarPsicologosAdminViewModel(get(), get(), get()) }
+    viewModel { PrincipalClienteViewModel() }
+    viewModel { SettingsClienteViewModel(get(), get()) }
+    viewModel { SituacionViewModel(get(), get()) }
+    viewModel { CitasViewModel(get(), get(), get()) }
+    viewModel { QuestionnaireViewModel() }
+    viewModel { PsicologoAgendaViewModel(get(), get(), get()) }
+    viewModel { CuestionarioViewModel(get()) }
+    viewModel { ListarPacientesByPsicologoViewModel(get(), get()) }
+    viewModel { EstadisticasPsicologoViewModel(get(), get()) }
+    viewModel { ProfilePsicologoViewModel(get()) }
+    viewModel { EditProfilePsicologoViewModel(get()) }
+    viewModel { PacienteViewModel(get()) }
+    viewModel { ListarTerapiasViewModel(get(), get()) }
+    viewModel { ListarCitasViewModel(get(), get(), get()) }
+    viewModel { DiarioEmocionalViewModel(get()) }
+    viewModel { AdminRoleViewModel(get()) }
+    viewModel { AdminUserViewModel(get()) }
+    viewModel { TicketsViewModel(get(), get(), get()) }
+
+    worker { SyncDiarioWorker(get(), get(), get()) }
+
+    viewModel { ChatListViewModel(get(), get(), get()) }
+    viewModel { (currentUserId: Long, otherUserId: Long, otherUserName: String) ->
+        ChatViewModel(
+            currentUserId = currentUserId,
+            otherUserId = otherUserId,
+            otherUserName = otherUserName,
+            sendMessageUseCase = get(),
+            getMessagesUseCase = get(),
+            markMessagesAsReadUseCase = get(),
+            markMessageDeliveredUseCase = get(),
+            fileStorageService = get(),
+            startTypingUseCase = get(),
+            stopTypingUseCase = get(),
+            observeTypingUseCase = get(),
+            observeUserOnlineUseCase = get(),
+            updateUserOnlineUseCase = get(),
+            profileUseCaseGeneral = get(),
+            authRepository = get(),
+            appContext = androidContext(),
+        )
+    }
+
+    viewModel { NotificacionViewModel(get()) }
+    viewModel { PacientesViewModel(get()) }
+
+    single { PaymentRepository(get()) }
+    factory { CreatePaymentIntentUseCase(get()) }
+    viewModel { PaymentViewModel(get()) }
+
+    viewModel { SoporteTicketViewModel(get()) }
+    viewModel { IdiomaViewModel(get(), get(), get()) }
+    viewModel { ProfileAdminViewModel(get()) }
+    viewModel { ProfilePacienteViewModel(get()) }
+    viewModel { HistorialClinicoPacienteViewModel(get()) }
+    viewModel { DocumentoLegalViewModel(get()) }
+}

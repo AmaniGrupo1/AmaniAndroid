@@ -76,6 +76,10 @@ android {
 
 dependencies {
 
+
+    // Para usar LiveData en Compose
+    implementation("androidx.compose.runtime:runtime-livedata")
+
     // PDF Generation
     implementation("com.itextpdf:itext7-core:7.2.5") {
         exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
@@ -92,6 +96,7 @@ dependencies {
 
     // Imágenes
     implementation(libs.coil.compose)
+    implementation(libs.firebase.auth.ktx)
 
     // DI
     implementation(libs.koin.android)

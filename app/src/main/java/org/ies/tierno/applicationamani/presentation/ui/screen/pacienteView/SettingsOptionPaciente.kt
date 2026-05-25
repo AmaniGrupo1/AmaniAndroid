@@ -614,7 +614,8 @@ fun SettingsOptionRowPaciente(
                             Log.d(TAG, "🚪 Cerrar sesión")
                         }
                     }
-                }.padding(vertical = 8.dp),
+                }
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

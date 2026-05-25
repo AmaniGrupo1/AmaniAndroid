@@ -195,16 +195,16 @@ class LoginViewModel(
      */
     private suspend fun saveUserSession(loginResponse: LoginResponseDTO) {
         try {
-            val session =
-                UserSession(
-                    idUsuario = loginResponse.idUsuario,
-                    nombre = loginResponse.nombre,
-                    rol = loginResponse.rol,
-                    idPsicologo = loginResponse.idPsicologo,
-                    idPaciente = loginResponse.idPaciente,
-                    idioma = loginResponse.idioma ?: "es",
-                    tema = loginResponse.tema ?: false,
-                )
+            val session = UserSession(
+                idUsuario = loginResponse.idUsuario,
+                nombre = loginResponse.nombre,
+                rol = loginResponse.rol,
+                email = _username.value,
+                idPsicologo = loginResponse.idPsicologo,
+                idPaciente = loginResponse.idPaciente,
+                idioma = loginResponse.idioma ?: "es",
+                tema = loginResponse.tema ?: false
+            )
 
             userSessionDataStore.saveSession(session)
 

@@ -21,12 +21,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.LocationOn
+
+import org.ies.tierno.applicationamani.dto.tickets.TicketModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -77,6 +84,8 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
+import android.content.Context
+import androidx.compose.runtime.livedata.observeAsState
 
 /**
  * Pantalla principal del paciente con la información de su psicólogo asignado.
@@ -97,6 +106,7 @@ fun ViewPacientePrincipalScreen(
     navController: NavController,
     profilePsicologoViewModel: ProfilePsicologoViewModel,
     pacienteViewModel: PacienteViewModel = koinViewModel(),
+    ticketsViewModel: TicketsViewModel = koinViewModel(),
     userSessionDataStore: UserSessionDataStore = getKoin().get()
 ) {
     val isDark = isDarkTheme()
@@ -116,6 +126,7 @@ fun ViewPacientePrincipalScreen(
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
         // profilePsicologoViewModel.fetchProfile(idPaciente) // Incorrecto, idPaciente no es idPsicologo
         pacienteViewModel.cargarPsicologoAsignado(idPaciente)
+        ticketsViewModel.cargarEmailUsuario()
     }
 
     val isLoading = isLoadingPaciente || isLoadingPsicologo
@@ -203,11 +214,15 @@ fun ViewPacientePrincipalScreen(
                             isDark = isDark
                         )
 
+                        val ticketsState by ticketsViewModel.tickets.observeAsState(emptyList())
+                        val latestTicket = ticketsState.firstOrNull()
+
                         PsicologoContent(
                             psicologo = psicologo!!,
                             navController = navController,
                             isDark = isDark,
-                            cardColors = cardColors
+                            cardColors = cardColors,
+                            latestTicket = latestTicket
                         )
                     }
                 }
@@ -426,7 +441,8 @@ fun PsicologoContent(
     psicologo: PsicologoProfileResponseDTO,
     navController: NavController,
     isDark: Boolean,
-    cardColors: CardColors
+    cardColors: CardColors,
+    latestTicket: TicketModel?
 ) {
     val cardBackgroundColor = cardColors.cardBackground
     val cardContentColor = cardColors.cardContent
@@ -670,6 +686,149 @@ fun PsicologoContent(
             }
         }
 
+        val context = LocalContext.current
+        val showReportCard = remember(latestTicket) {
+            if (latestTicket == null) {
+                false
+            } else {
+                val status = latestTicket.estado.lowercase()
+                if (status !in listOf("resuelto", "cerrado")) {
+                    true
+                } else {
+                    val prefs = context.getSharedPreferences("ticket_cierre_prefs", Context.MODE_PRIVATE)
+                    val key = "cierre_${latestTicket.id}"
+                    var timestamp = prefs.getLong(key, 0L)
+                    if (timestamp == 0L) {
+                        timestamp = System.currentTimeMillis()
+                        prefs.edit().putLong(key, timestamp).apply()
+                    }
+                    System.currentTimeMillis() - timestamp < 12 * 60 * 60 * 1000L
+                }
+            }
+        }
+
+        if (showReportCard && latestTicket != null) {
+            val status = latestTicket.estado.lowercase()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Tarjeta del proceso de reporte dinámica
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = cardBackgroundColor
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Información de Reportes",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Seguimiento de tu Reporte",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = cardContentColor
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Queremos garantizar tu tranquilidad. Aquí puedes ver el estado en tiempo real del reporte \"${latestTicket.titulo}\":",
+                        fontSize = 13.sp,
+                        lineHeight = 19.sp,
+                        color = cardContentSecondaryColor
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Paso 1: Envío y Registro
+                    val isStep1Completed = status in listOf("en-proceso", "resuelto", "cerrado")
+                    val isStep1Active = status == "abierto"
+                    ReportStepRow(
+                        stepNumber = "1",
+                        title = "Envío y Registro",
+                        description = "El problema se ha registrado y nuestro equipo técnico ha sido notificado.",
+                        icon = Icons.Default.Send,
+                        iconColor = MaterialTheme.colorScheme.primary,
+                        isCompleted = isStep1Completed,
+                        isActive = isStep1Active,
+                        contentColor = cardContentColor,
+                        secondaryColor = cardContentSecondaryColor
+                    )
+
+                    // Paso 2: Revisión y Proceso
+                    val isStep2Completed = status in listOf("resuelto", "cerrado")
+                    val isStep2Active = status == "en-proceso"
+                    ReportStepRow(
+                        stepNumber = "2",
+                        title = "Revisión y Proceso",
+                        description = "El equipo de soporte técnico está analizando y resolviendo la incidencia.",
+                        icon = Icons.Default.HourglassEmpty,
+                        iconColor = Color(0xFFF2A104),
+                        isCompleted = isStep2Completed,
+                        isActive = isStep2Active,
+                        contentColor = cardContentColor,
+                        secondaryColor = cardContentSecondaryColor
+                    )
+
+                    // Paso 3: Resolución con Éxito / Cerrado
+                    val isStep3Completed = status in listOf("resuelto", "cerrado")
+                    val isStep3Active = status in listOf("resuelto", "cerrado")
+                    ReportStepRow(
+                        stepNumber = "3",
+                        title = if (status == "cerrado") "Cerrado" else "Resolución con Éxito",
+                        description = if (latestTicket.respuestaAdmin.isNotBlank()) {
+                            "Solución: ${latestTicket.respuestaAdmin}"
+                        } else {
+                            "El ticket ha sido marcado como resuelto. La solución se aplicará a la brevedad."
+                        },
+                        icon = Icons.Default.CheckCircle,
+                        iconColor = Color(0xFF2E7D32),
+                        isCompleted = isStep3Completed,
+                        isActive = isStep3Active,
+                        contentColor = cardContentColor,
+                        secondaryColor = cardContentSecondaryColor
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.15f else 0.08f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = if (status in listOf("resuelto", "cerrado")) {
+                                "Este seguimiento desaparecerá automáticamente en unas horas ya que el reporte ha finalizado."
+                            } else {
+                                "Puedes ver el historial completo de tus reportes en cualquier momento en Ajustes -> Reportar problema -> Mis reportes."
+                            },
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = if (isDark) Color.White.copy(alpha = 0.9f) else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
@@ -747,6 +906,61 @@ fun ProfessionalInfoRow(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = valueColor
+            )
+        }
+    }
+}
+
+@Composable
+fun ReportStepRow(
+    stepNumber: String,
+    title: String,
+    description: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconColor: Color,
+    isCompleted: Boolean,
+    isActive: Boolean,
+    contentColor: Color,
+    secondaryColor: Color
+) {
+    val tintColor = if (isCompleted) Color(0xFF2E7D32) else if (isActive) iconColor else Color.Gray.copy(alpha = 0.5f)
+    val bgColor = if (isCompleted) Color(0xFFE8F5E9) else if (isActive) iconColor.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.08f)
+    val displayIcon = if (isCompleted) Icons.Default.CheckCircle else icon
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(bgColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = displayIcon,
+                contentDescription = null,
+                tint = tintColor,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "$stepNumber. $title",
+                fontSize = 14.sp,
+                fontWeight = if (isActive || isCompleted) FontWeight.Bold else FontWeight.Medium,
+                color = if (isActive || isCompleted) contentColor else contentColor.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = description,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+                color = if (isActive || isCompleted) secondaryColor else secondaryColor.copy(alpha = 0.5f)
             )
         }
     }

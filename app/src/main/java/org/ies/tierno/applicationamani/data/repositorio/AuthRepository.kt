@@ -74,6 +74,7 @@ class AuthRepository(
                                 idUsuario = body.idUsuario,
                                 nombre = body.nombre,
                                 rol = body.rol,
+                                email = request.email,
                                 idPsicologo = body.idPsicologo,
                                 idPaciente = body.idPaciente,
                             ),

@@ -391,5 +391,29 @@
     <string name="reintentar">Retry</string>
     <string name="cerrar">Close</string>
 
+    <string name="titulo">Title</string>
+    <string name="categoria">Category</string>
+    <string name="descripcion">Description</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_titulo">Brief description of the problem</string>
+    <string name="placeholder_categoria">Select a category</string>
+    <string name="placeholder_descripcion">Describe the problem in detail...</string>
+    <string name="placeholder_email">your@email.com</string>
+
+    <!-- Device information -->
+    <string name="info_dispositivo">Device Information</string>
+    <string name="dispositivo">Device</string>
+    <string name="android_version">Android</string>
+    <string name="app_version">App version</string>
+
+    <!-- Errors -->
+    <string name="error_titulo_corto">Title must be at least 5 characters</string>
+    <string name="error_descripcion_corta">Please describe the problem better (minimum 10 characters)</string>
+    <string name="error_email_invalido">Invalid email</string>
+
+    <!-- Messages -->
+    <string name="reporte_enviado_exito">Report sent successfully</string>
+    <string name="error_desconocido">Unknown error</string>
 
 </resources>

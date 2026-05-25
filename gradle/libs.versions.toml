@@ -55,6 +55,7 @@ firebaseCrashlytics = "20.0.5"
 googleFirebaseCrashlytics = "3.0.7"
 material = "1.12.0"
 vico = "1.15.0"
+firebaseAuthKtx = "23.2.1"
 
 [libraries]
 androidx-camera-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraView" }
@@ -119,6 +120,7 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 vico-compose-m3 = { module = "com.patrykandpatrick.vico:compose-m3", version.ref = "vico" }
 vico-core = { module = "com.patrykandpatrick.vico:core", version.ref = "vico" }
 vico-views = { module = "com.patrykandpatrick.vico:views", version.ref = "vico" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

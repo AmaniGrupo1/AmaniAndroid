@@ -64,6 +64,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.MisTickets
 import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.NuevoTicketScreen
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
+import org.ies.tierno.applicationamani.presentation.ui.screen.tickets.TicketScreen
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
@@ -467,6 +468,10 @@ fun NavGraph(
                     navController = navController,
                     tipoDocumento = tipo,
                 )
+            }
+
+            composable(Screens.reportarProblema.route){
+                TicketScreen(navController = navController)
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.di
 
+import com.google.firebase.BuildConfig
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -8,7 +9,7 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import okhttp3.logging.HttpLoggingInterceptor
-import org.ies.tierno.applicationamani.BuildConfig
+import org.ies.tierno.applicationamani.BuildConfig as AppBuildConfig
 import org.ies.tierno.applicationamani.data.remoto.AjustesApi
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
 import org.ies.tierno.applicationamani.data.remoto.AuthInterceptor
@@ -37,26 +38,14 @@ import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 
 /**
  * Módulo Koin para la configuración de Retrofit.
- *
- * Provee una instancia singleton de [Retrofit] configurada con la URL
- * base del backend local y el convertidor Gson, así como la implementación
- * generada de [CustomerClient].
- *
- * @see appModule
  */
-
 val retrofitModule =
     module {
 
-        single {
-            AuthInterceptor(get())
-        }
+        single { AuthInterceptor(get()) }
 
-        single {
-            TokenRefreshInterceptor(get())
-        }
+        single { TokenRefreshInterceptor(get()) }
 
-        // ✅ Proveer el OkHttpClient como singleton
         single<okhttp3.OkHttpClient> {
             val builder =
                 okhttp3.OkHttpClient
@@ -64,8 +53,7 @@ val retrofitModule =
                     .addInterceptor(get<AuthInterceptor>())
                     .addInterceptor(get<TokenRefreshInterceptor>())
 
-            // Añadir logging en modo debug para inspeccionar cabeceras (incluye Authorization)
-            if (BuildConfig.DEBUG) {
+            if (AppBuildConfig.DEBUG) {
                 val logging =
                     HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.BODY
@@ -76,7 +64,6 @@ val retrofitModule =
             builder.build()
         }
 
-        // ✅ Proveer el ImageLoader usando el OkHttpClient
         single<coil.ImageLoader> {
             coil.ImageLoader
                 .Builder(get())
@@ -85,7 +72,6 @@ val retrofitModule =
                 .build()
         }
 
-        // ✅ Proveer Retrofit usando el mismo OkHttpClient
         single<Retrofit> {
             val gson =
                 GsonBuilder()
@@ -93,60 +79,32 @@ val retrofitModule =
                     .registerTypeAdapter(
                         LocalDate::class.java,
                         object : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
-                            override fun serialize(
-                                src: LocalDate,
-                                typeOfSrc: Type,
-                                context: JsonSerializationContext,
-                            ): JsonElement = JsonPrimitive(src.toString())
-
-                            override fun deserialize(
-                                json: JsonElement,
-                                typeOfT: Type,
-                                context: JsonDeserializationContext,
-                            ): LocalDate = LocalDate.parse(json.asString)
+                            override fun serialize(src: LocalDate, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(src.toString())
+                            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDate = LocalDate.parse(json.asString)
                         },
                     ).registerTypeAdapter(
                         LocalTime::class.java,
                         object : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
-                            override fun serialize(
-                                src: LocalTime,
-                                typeOfSrc: Type,
-                                context: JsonSerializationContext,
-                            ): JsonElement = JsonPrimitive(src.toString())
-
-                            override fun deserialize(
-                                json: JsonElement,
-                                typeOfT: Type,
-                                context: JsonDeserializationContext,
-                            ): LocalTime = LocalTime.parse(json.asString)
+                            override fun serialize(src: LocalTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(src.toString())
+                            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalTime = LocalTime.parse(json.asString)
                         },
                     ).registerTypeAdapter(
                         LocalDateTime::class.java,
                         object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-                            override fun serialize(
-                                src: LocalDateTime,
-                                typeOfSrc: Type,
-                                context: JsonSerializationContext,
-                            ): JsonElement = JsonPrimitive(src.toString())
-
-                            override fun deserialize(
-                                json: JsonElement,
-                                typeOfT: Type,
-                                context: JsonDeserializationContext,
-                            ): LocalDateTime = LocalDateTime.parse(json.asString)
+                            override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(src.toString())
+                            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime = LocalDateTime.parse(json.asString)
                         },
                     ).registerTypeAdapter(
                         Rol::class.java,
                         JsonDeserializer<Rol> { json, _, _ ->
-                            // El backend envía "admin", "psicologo", "paciente" en minúsculas
                             val value = json.asString.trim().lowercase()
-                            android.util.Log.d("RolAdapter", "Deserializando rol: '$value'")
+                            android.util.Log.d("RolAdapter", "Deserializando rol: '\$value'")
                             when (value) {
                                 "admin" -> Rol.admin
                                 "psicologo" -> Rol.psicologo
                                 "paciente" -> Rol.paciente
                                 else -> {
-                                    android.util.Log.e("RolAdapter", "Rol desconocido: $value, usando paciente por defecto")
+                                    android.util.Log.e("RolAdapter", "Rol desconocido: \$value, usando paciente por defecto")
                                     Rol.paciente
                                 }
                             }
@@ -155,9 +113,10 @@ val retrofitModule =
 
             Retrofit
                 .Builder()
-                .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+                //.baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+                .baseUrl("http://192.168.1.175:8080/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(get<okhttp3.OkHttpClient>()) // Usar el mismo cliente
+                .client(get<okhttp3.OkHttpClient>())
                 .build()
         }
 
@@ -178,4 +137,3 @@ val retrofitModule =
         single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
         single<HistorialCitaApi> { get<Retrofit>().create(HistorialCitaApi::class.java) }
     }
-

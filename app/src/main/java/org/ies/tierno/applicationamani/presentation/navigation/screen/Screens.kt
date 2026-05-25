@@ -90,7 +90,10 @@ sealed class Screens(
             val encodedName = Uri.encode(otherUserName)
             return "chat/$currentUserId/$otherUserId/$encodedName"
         }
+
     }
+
+    object reportarProblema : Screens("reportarProblema")
 
     object agendaCitaScreen : Screens("agendaCitaScreen")
 

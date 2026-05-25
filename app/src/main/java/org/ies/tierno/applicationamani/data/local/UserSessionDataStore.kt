@@ -34,6 +34,7 @@ data class UserSession(
     val idUsuario: Long,
     val nombre: String?,
     val rol: String,
+    val email: String? = null,
     val idPsicologo: Long? = null,
     val idPaciente: Long? = null,
     val idioma: String? = "es",
@@ -55,6 +56,7 @@ class UserSessionDataStore(
         val USER_ID_KEY = longPreferencesKey("user_id")
         val USER_NAME_KEY = stringPreferencesKey("user_name")
         val USER_ROLE_KEY = stringPreferencesKey("user_role")
+        val USER_EMAIL_KEY = stringPreferencesKey("user_email")
         val PSYCHOLOGIST_ID_KEY = longPreferencesKey("psychologist_id")
         val PATIENT_ID_KEY = longPreferencesKey("patient_id")
         val LANGUAGE_KEY = stringPreferencesKey("language")
@@ -99,6 +101,7 @@ class UserSessionDataStore(
             val idUsuario = mutablePrefs[USER_ID_KEY]
             val nombre = mutablePrefs[USER_NAME_KEY]
             val rol = mutablePrefs[USER_ROLE_KEY]
+            val email = mutablePrefs[USER_EMAIL_KEY]
             val idPsicologo = mutablePrefs[PSYCHOLOGIST_ID_KEY]
             val idPaciente = mutablePrefs[PATIENT_ID_KEY]
             val idioma = mutablePrefs[LANGUAGE_KEY]
@@ -117,6 +120,7 @@ class UserSessionDataStore(
                         idUsuario = idUsuario,
                         nombre = nombre,
                         rol = rol,
+                        email = email,
                         idPsicologo = normalizedPsychologistId,
                         idPaciente = idPaciente,
                         idioma = idioma,
@@ -144,6 +148,12 @@ class UserSessionDataStore(
             }
 
             preferences[USER_ROLE_KEY] = session.rol
+
+            if (session.email != null) {
+                preferences[USER_EMAIL_KEY] = session.email
+            } else {
+                preferences.remove(USER_EMAIL_KEY)
+            }
 
             if (session.idPsicologo != null) {
                 preferences[PSYCHOLOGIST_ID_KEY] = session.idPsicologo

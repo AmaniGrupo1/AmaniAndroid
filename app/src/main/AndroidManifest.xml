@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- INTERNET -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- AUDIO -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- Notificaciones: obligatorio pedirlo en runtime desde Android 13 (API 33) -->
+
+    <!-- NOTIFICACIONES -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Permisos necesarios -->
+
+    <!-- CÁMARA -->
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- STORAGE -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
-    <!-- Características de la cámara -->
+    <!-- FEATURES -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
-
 
     <application
         android:name=".AmaniApplication"
@@ -33,6 +42,8 @@
         android:theme="@style/Theme.ApplicationAmani"
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true">
+
+        <!-- MAIN ACTIVITY -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -44,16 +55,22 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
+
+
+        <!-- FILE PROVIDER -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
+
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
+
         </provider>
 
         <provider
