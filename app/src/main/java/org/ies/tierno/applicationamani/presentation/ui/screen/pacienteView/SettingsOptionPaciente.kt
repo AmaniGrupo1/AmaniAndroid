@@ -292,12 +292,6 @@ fun SettingsPacienteScreen(
                             icon = Icons.Default.PersonOutline
                         ),
                         SettingsOptionPaciente(
-                            id = "mi_psicologo",
-                            title = stringResource(R.string.mi_psicologo),
-                            subtitle = stringResource(R.string.ver_info_psicologo),
-                            icon = Icons.Default.Psychology
-                        ),
-                        SettingsOptionPaciente(
                             id = "historial",
                             title = stringResource(R.string.historial_clinico),
                             subtitle = stringResource(R.string.ver_historial),

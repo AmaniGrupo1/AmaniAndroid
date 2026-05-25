@@ -26,7 +26,7 @@ class TicketsRepository(
             // 🟡 CREAR EMAIL (FIREBASE EXTENSION)
 
             val emailData = hashMapOf(
-                "to" to "admin@gmail.com",
+                "to" to "amanireporte@gmail.com",
 
                 "message" to hashMapOf(
                     "subject" to "📩 Nuevo ticket: ${ticket.titulo}",
