@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
@@ -28,7 +29,8 @@ class AuthRepository(
     private val api: AuthApi,
     private val tokenDataStore: TokenDataStore,
     private val tokenHolder: org.ies.tierno.applicationamani.data.local.TokenHolder,
-    private val userSessionDataStore: UserSessionDataStore
+    private val userSessionDataStore: UserSessionDataStore,
+    private val firebaseAuthManager: FirebaseAuthManager
 ) {
 
     suspend fun login(request: LoginRequestDTO): Result<LoginResponseDTO> {
@@ -45,8 +47,12 @@ class AuthRepository(
                         tokenDataStore.saveToken(body.token)
                         // Actualizar cache en memoria inmediatamente para evitar condiciones de carrera
                         tokenHolder.setToken(body.token)
+
+                        firebaseAuthManager.loginAnonymous()
+
                         // Log para depuración: confirmar token guardado
-                        timber.log.Timber.d("Saved token: %s", body.token)
+                        Timber.d("Saved token: %s", body.token)
+
 
                         // GUARDAR SESION
                         userSessionDataStore.saveSession(

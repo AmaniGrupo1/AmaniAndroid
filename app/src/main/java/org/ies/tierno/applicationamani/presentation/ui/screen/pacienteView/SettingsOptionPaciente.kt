@@ -41,6 +41,7 @@ import android.provider.CalendarContract
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -515,7 +516,7 @@ fun SettingsPacienteScreen(
                             id = "contacto",
                             title = stringResource(R.string.contacto),
                             subtitle = stringResource(R.string.contactar_soporte),
-                            icon = Icons.Default.ContactSupport
+                            icon = Icons.AutoMirrored.Filled.ContactSupport
                         ),
                         SettingsOptionPaciente(
                             id = "reportar_problema",
@@ -787,11 +788,11 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "ayuda" -> {
-                        Log.d(TAG, "❓ Navegar a ayuda")
+                       // navController.navigate(Screens.ayuda.route)
                     }
 
                     "contacto" -> {
-                        Log.d(TAG, "📧 Navegar a contacto")
+                        //navController.navigate(Screens.contacto.route)
                     }
 
                     "terminos" -> {
