@@ -112,6 +112,7 @@ data class ChatUiState(
     val error: String? = null,
     val isOtherTyping: Boolean = false,
     val psychologistOnline: Boolean = false,
+    val pendingAttachmentUri: android.net.Uri? = null,
 )
 
 /**
@@ -150,6 +151,7 @@ class ChatViewModel(
     private val _assignedPsychologist = MutableStateFlow<PsychologistInfo?>(null)
     private val _isOtherTyping = MutableStateFlow(false)
     private val _psychologistOnline = MutableStateFlow(false)
+    private val _pendingAttachmentUri = MutableStateFlow<android.net.Uri?>(null)
 
     /** Flujo de estado de la reproducción de audio. */
     val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
@@ -172,16 +174,17 @@ class ChatViewModel(
             )
         }
 
-    /** Flujo de estado principal de la interfaz de chat. */
     val uiState: StateFlow<ChatUiState> =
         combine(
             baseUiState,
             _isOtherTyping,
             _psychologistOnline,
-        ) { base, isTyping, isOnline ->
+            _pendingAttachmentUri
+        ) { base, isTyping, isOnline, pendingUri ->
             base.copy(
                 isOtherTyping = isTyping,
                 psychologistOnline = isOnline,
+                pendingAttachmentUri = pendingUri
             )
         }.stateIn(
             scope = viewModelScope,
@@ -605,12 +608,18 @@ class ChatViewModel(
         }
     }
 
+    
+    fun setPendingAttachment(uri: android.net.Uri?) {
+        _pendingAttachmentUri.value = uri
+    }
+
     /**
-     * Sube y envía un archivo adjunto.
+     * Sube un archivo adjunto al Storage y envía el mensaje correspondiente con el texto opcional.
      *
      * @param uri URI local del archivo a enviar.
+     * @param text Texto que acompaña a la imagen.
      */
-    fun sendAttachment(uri: Uri) {
+    fun sendAttachment(uri: android.net.Uri, text: String = "") {
         viewModelScope.launch {
             _error.value = null
             stopTyping()
@@ -631,7 +640,7 @@ class ChatViewModel(
                     sendMessageUseCase(
                         senderId = currentUserId,
                         receiverId = otherUserId,
-                        content = "",
+                        content = text,
                         attachmentUrl = result.url,
                         attachmentType = result.type,
                         attachmentName = result.fileName,
@@ -734,13 +743,19 @@ class ChatViewModel(
         }
     }
 
-    /**
-     * Envía el contenido actual del campo de entrada del chat.
-     */
     fun sendMessage() {
-        val text = _inputText.value
-        if (text.isBlank()) return
-        sendTextMessage(text)
+        val text = _inputText.value.trim()
+        val attachment = _pendingAttachmentUri.value
+        
+        if (text.isBlank() && attachment == null) return
+
+        if (attachment != null) {
+            sendAttachment(attachment, text)
+            _pendingAttachmentUri.value = null
+        } else {
+            sendTextMessage(text)
+        }
+        
         _inputText.value = ""
     }
 

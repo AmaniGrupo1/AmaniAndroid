@@ -112,7 +112,7 @@ fun ChatScreen(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent(),
         ) { uri: Uri? ->
-            uri?.let { viewModel.sendAttachment(it) }
+            uri?.let { viewModel.setPendingAttachment(it) }
         }
 
     LaunchedEffect(chatItems.size) {
@@ -169,6 +169,8 @@ fun ChatScreen(
                 isRecording = isRecording,
                 recordingSeconds = recordingSeconds,
                 isOtherTyping = uiState.isOtherTyping,
+                pendingAttachmentUri = uiState.pendingAttachmentUri,
+                onClearAttachment = { viewModel.setPendingAttachment(null) }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

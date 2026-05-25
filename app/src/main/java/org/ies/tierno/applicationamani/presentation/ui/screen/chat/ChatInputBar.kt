@@ -26,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.FilledIconButton
@@ -76,9 +77,42 @@ fun ChatInputBar(
     isRecording: Boolean,
     recordingSeconds: Int,
     isOtherTyping: Boolean = false,
+    pendingAttachmentUri: android.net.Uri? = null,
+    onClearAttachment: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
+        if (pendingAttachmentUri != null) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                coil.compose.AsyncImage(
+                    model = pendingAttachmentUri,
+                    contentDescription = "Preview adjunto",
+                    modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp)),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+                IconButton(
+                    onClick = onClearAttachment,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(24.dp)
+                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Eliminar",
+                        tint = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+
         if (isRecording) {
             RecordingBar(
                 recordingSeconds = recordingSeconds,
@@ -130,14 +164,14 @@ fun ChatInputBar(
                     Spacer(modifier = Modifier.width(4.dp))
 
                     val sendScale by animateFloatAsState(
-                        targetValue = if (text.isNotBlank()) 1f else 0.85f,
+                        targetValue = if (text.isNotBlank() || pendingAttachmentUri != null) 1f else 0.85f,
                         animationSpec = spring(dampingRatio = 0.6f),
                         label = stringResource(R.string.auto_send_scale),
                     )
 
                     FilledIconButton(
                         onClick = onSend,
-                        enabled = text.isNotBlank(),
+                        enabled = text.isNotBlank() || pendingAttachmentUri != null,
                         colors =
                             IconButtonDefaults.filledIconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
