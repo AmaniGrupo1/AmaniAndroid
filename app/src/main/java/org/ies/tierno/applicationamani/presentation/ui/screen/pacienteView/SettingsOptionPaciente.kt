@@ -112,8 +112,10 @@ fun SettingsPacienteScreen(
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
     // Estados para diálogos
+    var mostrarDialogoFuturo by remember { mutableStateOf(false) }
+    var mensajeDialogoFuturo by remember { mutableStateOf("") }
     var mostrarDialogoFacturacion by remember { mutableStateOf(false) }
-    var mensajeDialogo by remember { mutableStateOf("") }
+    var mensajeDialogoFacturacion by remember { mutableStateOf("") }
 
     // Estado para la alerta de calendario
     var mostrarAlertaCalendario by remember { mutableStateOf(false) }
@@ -121,6 +123,12 @@ fun SettingsPacienteScreen(
     // Control de recreación para evitar loops
     var previousLanguage by remember { mutableStateOf(currentLanguage) }
     var isRecreating by remember { mutableStateOf(false) }
+
+    // Función auxiliar para mostrar diálogo de "Proceso futuro"
+    fun mostrarDialogoFuturo(mensaje: String) {
+        mensajeDialogoFuturo = mensaje
+        mostrarDialogoFuturo = true
+    }
 
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
     LaunchedEffect(currentLanguage) {
@@ -152,6 +160,61 @@ fun SettingsPacienteScreen(
             )
         }
     ) { padding ->
+
+        // Diálogo para "Proceso futuro"
+        if (mostrarDialogoFuturo) {
+            Dialog(
+                onDismissRequest = { mostrarDialogoFuturo = false }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = surfaceColor
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color(0xFF3498DB),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "🚧 En desarrollo",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor,
+                            fontFamily = roboto
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = mensajeDialogoFuturo,
+                            fontSize = 14.sp,
+                            color = textSecondaryColor,
+                            fontFamily = roboto,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(
+                            onClick = { mostrarDialogoFuturo = false },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primaryColor
+                            )
+                        ) {
+                            Text("Entendido", color = Color.White, fontFamily = roboto)
+                        }
+                    }
+                }
+            }
+        }
 
         // Diálogo para mensajes de facturación
         if (mostrarDialogoFacturacion) {
@@ -187,7 +250,7 @@ fun SettingsPacienteScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = mensajeDialogo,
+                            text = mensajeDialogoFacturacion,
                             fontSize = 14.sp,
                             color = textSecondaryColor,
                             fontFamily = roboto,
@@ -269,9 +332,12 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
-                    onMostrarDialogo = { mensaje ->
-                        mensajeDialogo = mensaje
+                    onMostrarDialogoFacturacion = { mensaje ->
+                        mensajeDialogoFacturacion = mensaje
                         mostrarDialogoFacturacion = true
+                    },
+                    onMostrarDialogoFuturo = { mensaje ->
+                        mostrarDialogoFuturo(mensaje)
                     },
                     onAbrirCalendario = {
                         mostrarAlertaCalendario = true
@@ -279,7 +345,7 @@ fun SettingsPacienteScreen(
                             delay(3000)
                             mostrarAlertaCalendario = false
                             abrirCalendario(context, onMostrarDialogo = { msg ->
-                                mensajeDialogo = msg
+                                mensajeDialogoFacturacion = msg
                                 mostrarDialogoFacturacion = true
                             })
                         }
@@ -319,9 +385,12 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
-                    onMostrarDialogo = { mensaje ->
-                        mensajeDialogo = mensaje
+                    onMostrarDialogoFacturacion = { mensaje ->
+                        mensajeDialogoFacturacion = mensaje
                         mostrarDialogoFacturacion = true
+                    },
+                    onMostrarDialogoFuturo = { mensaje ->
+                        mostrarDialogoFuturo(mensaje)
                     },
                     onAbrirCalendario = {
                         mostrarAlertaCalendario = true
@@ -329,7 +398,7 @@ fun SettingsPacienteScreen(
                             delay(3000)
                             mostrarAlertaCalendario = false
                             abrirCalendario(context, onMostrarDialogo = { msg ->
-                                mensajeDialogo = msg
+                                mensajeDialogoFacturacion = msg
                                 mostrarDialogoFacturacion = true
                             })
                         }
@@ -378,9 +447,12 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
-                    onMostrarDialogo = { mensaje ->
-                        mensajeDialogo = mensaje
+                    onMostrarDialogoFacturacion = { mensaje ->
+                        mensajeDialogoFacturacion = mensaje
                         mostrarDialogoFacturacion = true
+                    },
+                    onMostrarDialogoFuturo = { mensaje ->
+                        mostrarDialogoFuturo(mensaje)
                     },
                     onAbrirCalendario = {
                         mostrarAlertaCalendario = true
@@ -388,7 +460,7 @@ fun SettingsPacienteScreen(
                             delay(3000)
                             mostrarAlertaCalendario = false
                             abrirCalendario(context, onMostrarDialogo = { msg ->
-                                mensajeDialogo = msg
+                                mensajeDialogoFacturacion = msg
                                 mostrarDialogoFacturacion = true
                             })
                         }
@@ -428,9 +500,12 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
-                    onMostrarDialogo = { mensaje ->
-                        mensajeDialogo = mensaje
+                    onMostrarDialogoFacturacion = { mensaje ->
+                        mensajeDialogoFacturacion = mensaje
                         mostrarDialogoFacturacion = true
+                    },
+                    onMostrarDialogoFuturo = { mensaje ->
+                        mostrarDialogoFuturo(mensaje)
                     },
                     onAbrirCalendario = {
                         mostrarAlertaCalendario = true
@@ -438,7 +513,7 @@ fun SettingsPacienteScreen(
                             delay(3000)
                             mostrarAlertaCalendario = false
                             abrirCalendario(context, onMostrarDialogo = { msg ->
-                                mensajeDialogo = msg
+                                mensajeDialogoFacturacion = msg
                                 mostrarDialogoFacturacion = true
                             })
                         }
@@ -484,9 +559,12 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
-                    onMostrarDialogo = { mensaje ->
-                        mensajeDialogo = mensaje
+                    onMostrarDialogoFacturacion = { mensaje ->
+                        mensajeDialogoFacturacion = mensaje
                         mostrarDialogoFacturacion = true
+                    },
+                    onMostrarDialogoFuturo = { mensaje ->
+                        mostrarDialogoFuturo(mensaje)
                     },
                     onAbrirCalendario = {
                         mostrarAlertaCalendario = true
@@ -494,7 +572,7 @@ fun SettingsPacienteScreen(
                             delay(3000)
                             mostrarAlertaCalendario = false
                             abrirCalendario(context, onMostrarDialogo = { msg ->
-                                mensajeDialogo = msg
+                                mensajeDialogoFacturacion = msg
                                 mostrarDialogoFacturacion = true
                             })
                         }
@@ -540,9 +618,12 @@ fun SettingsPacienteScreen(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColor,
                     isDark = isDark,
-                    onMostrarDialogo = { mensaje ->
-                        mensajeDialogo = mensaje
+                    onMostrarDialogoFacturacion = { mensaje ->
+                        mensajeDialogoFacturacion = mensaje
                         mostrarDialogoFacturacion = true
+                    },
+                    onMostrarDialogoFuturo = { mensaje ->
+                        mostrarDialogoFuturo(mensaje)
                     },
                     onAbrirCalendario = {
                         mostrarAlertaCalendario = true
@@ -550,7 +631,7 @@ fun SettingsPacienteScreen(
                             delay(3000)
                             mostrarAlertaCalendario = false
                             abrirCalendario(context, onMostrarDialogo = { msg ->
-                                mensajeDialogo = msg
+                                mensajeDialogoFacturacion = msg
                                 mostrarDialogoFacturacion = true
                             })
                         }
@@ -622,7 +703,8 @@ fun SettingsCategoryCardPaciente(
     dividerColor: Color,
     iconColorGeneral: Color,
     isDark: Boolean,
-    onMostrarDialogo: (String) -> Unit,
+    onMostrarDialogoFacturacion: (String) -> Unit,
+    onMostrarDialogoFuturo: (String) -> Unit,
     onAbrirCalendario: () -> Unit
 ) {
     Card(
@@ -684,7 +766,8 @@ fun SettingsCategoryCardPaciente(
                     dividerColor = dividerColor,
                     iconColorGeneral = iconColorGeneral,
                     isDark = isDark,
-                    onMostrarDialogo = onMostrarDialogo,
+                    onMostrarDialogoFacturacion = onMostrarDialogoFacturacion,
+                    onMostrarDialogoFuturo = onMostrarDialogoFuturo,
                     onAbrirCalendario = onAbrirCalendario
                 )
             }
@@ -706,7 +789,8 @@ fun SettingsOptionRowPaciente(
     dividerColor: Color,
     iconColorGeneral: Color,
     isDark: Boolean,
-    onMostrarDialogo: (String) -> Unit,
+    onMostrarDialogoFacturacion: (String) -> Unit,
+    onMostrarDialogoFuturo: (String) -> Unit,
     onAbrirCalendario: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -728,15 +812,15 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "metodos_pago" -> {
-                        onMostrarDialogo("Aún no se ha implementado el módulo de métodos de pago, pero en futuro lo haremos.")
+                        onMostrarDialogoFacturacion("Aún no se ha implementado el módulo de métodos de pago, pero en futuro lo haremos.")
                     }
 
                     "historial_pagos" -> {
-                        onMostrarDialogo("Aún no se ha implementado el historial de pagos, pero en futuro lo haremos.")
+                        onMostrarDialogoFacturacion("Aún no se ha implementado el historial de pagos, pero en futuro lo haremos.")
                     }
 
                     "facturas" -> {
-                        onMostrarDialogo("Aún no se ha implementado la descarga de facturas, pero en futuro lo haremos.")
+                        onMostrarDialogoFacturacion("Aún no se ha implementado la descarga de facturas, pero en futuro lo haremos.")
                     }
 
                     "mi_perfil" -> {
@@ -749,7 +833,7 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "mi_psicologo" -> {
-                        Log.d(TAG, "👨‍⚕️ Navegar a información del psicólogo")
+                        onMostrarDialogoFuturo("Información del psicólogo estará disponible próximamente.")
                     }
 
                     "historial" -> {
@@ -766,15 +850,15 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "notificaciones" -> {
-                        Log.d(TAG, "🔔 Navegar a notificaciones")
+                        onMostrarDialogoFuturo("Configuración de notificaciones estará disponible próximamente.")
                     }
 
                     "recordatorios" -> {
-                        Log.d(TAG, "⏰ Navegar a recordatorios")
+                        onMostrarDialogoFuturo("Recordatorios estarán disponibles próximamente.")
                     }
 
                     "proximas_citas" -> {
-                        Log.d(TAG, "📅 Navegar a próximas citas")
+                        onMostrarDialogoFuturo("Próximas citas estarán disponibles próximamente.")
                     }
 
                     "historial_citas" -> {
@@ -782,11 +866,11 @@ fun SettingsOptionRowPaciente(
                     }
 
                     "ayuda" -> {
-                       // navController.navigate(Screens.ayuda.route)
+                        onMostrarDialogoFuturo("Centro de ayuda estará disponible próximamente.")
                     }
 
                     "contacto" -> {
-                        //navController.navigate(Screens.contacto.route)
+                        onMostrarDialogoFuturo("Contacto con soporte estará disponible próximamente.")
                     }
 
                     "terminos" -> {
@@ -804,7 +888,6 @@ fun SettingsOptionRowPaciente(
                     "reportar_problema" -> {
                         navController.navigate(Screens.reportarProblema.route)
                     }
-
                 }
             }
             .padding(vertical = 8.dp),

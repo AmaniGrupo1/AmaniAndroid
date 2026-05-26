@@ -110,6 +110,16 @@ fun SettingsAdminScreen(
     var previousLanguage by remember { mutableStateOf(currentLanguage) }
     var isRecreating by remember { mutableStateOf(false) }
 
+    // Estado para el diálogo de "Proceso futuro"
+    var mostrarDialogoFuturo by remember { mutableStateOf(false) }
+    var mensajeDialogoFuturo by remember { mutableStateOf("") }
+
+    // Función auxiliar para mostrar diálogo de "Proceso futuro"
+    fun mostrarDialogoFuturo(mensaje: String) {
+        mensajeDialogoFuturo = mensaje
+        mostrarDialogoFuturo = true
+    }
+
     // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
     LaunchedEffect(currentLanguage) {
         Log.d(TAG, "🚀 [LaunchedEffect] currentLanguage=$currentLanguage, previousLanguage=$previousLanguage")
@@ -131,6 +141,61 @@ fun SettingsAdminScreen(
     Scaffold(
         containerColor = backgroundColor,
     ) { padding ->
+
+        // Diálogo de "Proceso futuro"
+        if (mostrarDialogoFuturo) {
+            Dialog(
+                onDismissRequest = { mostrarDialogoFuturo = false }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = surfaceColor
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color(0xFF3498DB),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "🚧 En desarrollo",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = onSurfaceColor,
+                            fontFamily = roboto
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = mensajeDialogoFuturo,
+                            fontSize = 14.sp,
+                            color = onSurfaceVariant,
+                            fontFamily = roboto,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(
+                            onClick = { mostrarDialogoFuturo = false },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primaryColor
+                            )
+                        ) {
+                            Text("Entendido", color = Color.White, fontFamily = roboto)
+                        }
+                    }
+                }
+            }
+        }
 
         // Diálogo de horario
         if (mostrarConfigHorario) {
@@ -196,6 +261,7 @@ fun SettingsAdminScreen(
                             cargandoHorario = false
                         }
                     },
+                    onMostrarDialogoFuturo = { mensaje -> mostrarDialogoFuturo(mensaje) },
                     options = listOf(
                         SettingsOption(
                             id = "perfil",
@@ -289,6 +355,7 @@ fun SettingsAdminScreen(
                             cargandoHorario = false
                         }
                     },
+                    onMostrarDialogoFuturo = { mensaje -> mostrarDialogoFuturo(mensaje) },
                     options = listOf(
                         SettingsOption(
                             id = "appointment_duration",
@@ -337,6 +404,7 @@ fun SettingsAdminScreen(
                             cargandoHorario = false
                         }
                     },
+                    onMostrarDialogoFuturo = { mensaje -> mostrarDialogoFuturo(mensaje) },
                     options = listOf(
                         SettingsOption(
                             id = "send_reminder",
@@ -391,6 +459,7 @@ fun SettingsAdminScreen(
                             cargandoHorario = false
                         }
                     },
+                    onMostrarDialogoFuturo = { mensaje -> mostrarDialogoFuturo(mensaje) },
                     options = listOf(
                         SettingsOption(
                             id = "roles",
@@ -427,6 +496,7 @@ fun SettingsAdminScreen(
                             cargandoHorario = false
                         }
                     },
+                    onMostrarDialogoFuturo = { mensaje -> mostrarDialogoFuturo(mensaje) },
                     options = listOf(
                         SettingsOption(
                             id = "backup",
@@ -440,7 +510,6 @@ fun SettingsAdminScreen(
                             subtitle = stringResource(R.string.version_100),
                             icon = Icons.Default.Info
                         ),
-                        // ✅ NUEVAS OPCIONES DE AYUDA Y SOPORTE
                         SettingsOption(
                             id = "ayuda",
                             title = stringResource(R.string.ayuda),
@@ -482,7 +551,8 @@ fun SettingsCategoryCard(
     onSurfaceColor: Color,
     onSurfaceVariant: Color,
     primaryColor: Color,
-    onOpenHorario: () -> Unit = {}
+    onOpenHorario: () -> Unit = {},
+    onMostrarDialogoFuturo: (String) -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -541,7 +611,8 @@ fun SettingsCategoryCard(
                     onSurfaceColor = onSurfaceColor,
                     onSurfaceVariant = onSurfaceVariant,
                     primaryColor = primaryColor,
-                    onOpenHorario = onOpenHorario
+                    onOpenHorario = onOpenHorario,
+                    onMostrarDialogoFuturo = onMostrarDialogoFuturo
                 )
             }
         }
@@ -560,7 +631,8 @@ fun SettingsOptionRow(
     onSurfaceColor: Color,
     onSurfaceVariant: Color,
     primaryColor: Color,
-    onOpenHorario: () -> Unit = {}
+    onOpenHorario: () -> Unit = {},
+    onMostrarDialogoFuturo: (String) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     var expandedLanguage by remember { mutableStateOf(false) }
@@ -590,16 +662,23 @@ fun SettingsOptionRow(
                     "roles" -> navController.navigate(Screens.cambiarRol.route)
                     "terminos" -> navController.navigate(Screens.documentoLegalDetail.createRoute("terminos"))
                     "privacidad" -> navController.navigate(Screens.documentoLegalDetail.createRoute("privacidad"))
-                    // ✅ NUEVAS NAVEGACIONES PARA AYUDA Y SOPORTE
-                    "ayuda" -> {
-                       // navController.navigate(Screens.ayuda.route)
-                    }
-                    "contacto" -> {
-                        //navController.navigate(Screens.contacto.route)
-                    }
                     "reportar_problema" -> {
                         navController.navigate(Screens.reportarProblema.route)
                     }
+                    // Opciones que muestran diálogo de "Proceso futuro"
+                    "clinic_name" -> onMostrarDialogoFuturo("Configuración del nombre de la clínica estará disponible próximamente.")
+                    "timezone" -> onMostrarDialogoFuturo("Configuración de zona horaria estará disponible próximamente.")
+                    "currency" -> onMostrarDialogoFuturo("Configuración de moneda estará disponible próximamente.")
+                    "theme_color" -> onMostrarDialogoFuturo("Cambio de color del sistema estará disponible próximamente.")
+                    "appointment_duration" -> onMostrarDialogoFuturo("Configuración de duración de citas estará disponible próximamente.")
+                    "appointment_interval" -> onMostrarDialogoFuturo("Configuración de tiempo entre citas estará disponible próximamente.")
+                    "send_reminder" -> onMostrarDialogoFuturo("Configuración de recordatorios estará disponible próximamente.")
+                    "reminder_time" -> onMostrarDialogoFuturo("Configuración de tiempo de recordatorio estará disponible próximamente.")
+                    "email_notification" -> onMostrarDialogoFuturo("Configuración de notificaciones por email estará disponible próximamente.")
+                    "sms_notification" -> onMostrarDialogoFuturo("Configuración de notificaciones por SMS estará disponible próximamente.")
+                    "backup" -> onMostrarDialogoFuturo("Configuración de copias de seguridad estará disponible próximamente.")
+                    "ayuda" -> onMostrarDialogoFuturo("Centro de ayuda estará disponible próximamente.")
+                    "contacto" -> onMostrarDialogoFuturo("Contacto con soporte estará disponible próximamente.")
                 }
             }
             .padding(vertical = 8.dp),
