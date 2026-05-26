@@ -114,7 +114,7 @@ val retrofitModule =
             Retrofit
                 .Builder()
                 //.baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
-                .baseUrl("http://10.0.2.2:8080/")
+                .baseUrl("https://amani-api-560473593904.europe-west1.run.app/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(get<okhttp3.OkHttpClient>())
                 .build()
