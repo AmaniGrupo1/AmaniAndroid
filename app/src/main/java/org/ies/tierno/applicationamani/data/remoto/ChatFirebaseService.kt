@@ -49,11 +49,16 @@ class ChatFirebaseService(
     private fun DataSnapshot.longValue(vararg keys: String): Long? {
         for (key in keys) {
             val node = child(key)
-            val asLong = node.getValue(Long::class.java)
-            if (asLong != null) return asLong
-            val asString = node.getValue(String::class.java)
-            val parsed = asString?.toLongOrNull()
-            if (parsed != null) return parsed
+            val value = node.getValue() ?: continue
+            val longVal =
+                when (value) {
+                    is Long -> value
+                    is Int -> value.toLong()
+                    is Double -> value.toLong()
+                    is String -> value.toLongOrNull()
+                    else -> null
+                }
+            if (longVal != null) return longVal
         }
         return null
     }
@@ -64,9 +69,15 @@ class ChatFirebaseService(
 
         val result = mutableMapOf<String, Long>()
         for (entry in mapNode.children) {
+            val value = entry.getValue()
             val parsed =
-                entry.getValue(Long::class.java)
-                    ?: entry.getValue(String::class.java)?.toLongOrNull()
+                when (value) {
+                    is Long -> value
+                    is Int -> value.toLong()
+                    is Double -> value.toLong()
+                    is String -> value.toLongOrNull()
+                    else -> null
+                }
             if (parsed != null && entry.key != null) {
                 result[entry.key!!] = parsed
             }
@@ -76,8 +87,11 @@ class ChatFirebaseService(
 
     private fun DataSnapshot.stringValue(vararg keys: String): String? {
         for (key in keys) {
-            val value = child(key).getValue(String::class.java)
-            if (!value.isNullOrBlank()) return value
+            val node = child(key)
+            val value = node.getValue() ?: continue
+            if (value is Map<*, *> || value is List<*>) continue
+            val s = value.toString()
+            if (s.isNotBlank()) return s
         }
         return null
     }
