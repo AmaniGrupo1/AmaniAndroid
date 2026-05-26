@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -43,8 +45,24 @@ android {
     // ✅ NDK moderno
     ndkVersion = "26.1.10909125"
 
+    signingConfigs {
+        create("release") {
+            val properties = Properties()
+            val propertiesFile = project.rootProject.file("local.properties")
+            if (propertiesFile.exists()) {
+                properties.load(propertiesFile.inputStream())
+            }
+
+            storeFile = file(properties.getProperty("RELEASE_KEYSTORE_FILE") ?: "release.keystore")
+            storePassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+            keyAlias = properties.getProperty("RELEASE_KEYSTORE_ALIAS")
+            keyPassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

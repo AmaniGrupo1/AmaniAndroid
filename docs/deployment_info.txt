@@ -1,0 +1,18 @@
+DETALLES DEL DESPLIEGUE - AMANI ANDROID
+----------------------------------------
+Fecha: 26 de mayo de 2026
+Versión: 1.0 (1) - Producción Firmada
+
+FIREBASE APP DISTRIBUTION:
+--------------------------
+Consola Firebase (Administradores):
+https://console.firebase.google.com/project/amani-160bf/appdistribution/app/android:org.ies.tierno.applicationamani/releases/6nf29vriutbd0
+
+Enlace de Invitación para Testers:
+https://appdistribution.firebase.google.com/testerapps/1:560473593904:android:5a43a5e5347042a04ff5f5/releases/6nf29vriutbd0
+
+CONFIGURACIÓN DE FIRMA:
+-----------------------
+Keystore: app/release.keystore
+Alias: amani
+Credenciales guardadas en local.properties y GCP Secret Manager (RELEASE_KEYSTORE_PASSWORD).
