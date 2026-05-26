@@ -75,6 +75,12 @@ import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.platform.LocalContext
 // Colores originales para el modo DEFECTO (como LoginScreen)
 object AdminViewDefaultColors {
     val Primary = Color(0xFF6B4E71)
@@ -531,6 +537,7 @@ fun ListadoPsicologosSimpleScreen(
     }
 }
 
+
 @Composable
 fun PsicologoCardExpandable(
     psicologo: PsicologoSelfResponseDTO,
@@ -546,6 +553,7 @@ fun PsicologoCardExpandable(
     roboto: FontFamily
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current // ✅ Contexto para intent de llamada
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -563,17 +571,87 @@ fun PsicologoCardExpandable(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Nombre completo
-                Text(
-                    text = "${psicologo.nombre} ${psicologo.apellido}",
-                    style = typography.titleLarge?.copy(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = primaryColor
-                    ) ?: MaterialTheme.typography.titleLarge,
-                    fontFamily = roboto,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    // Nombre completo
+                    Text(
+                        text = "${psicologo.nombre} ${psicologo.apellido}",
+                        style = typography.titleLarge?.copy(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryColor
+                        ) ?: MaterialTheme.typography.titleLarge,
+                        fontFamily = roboto
+                    )
+
+                    // Mostrar teléfono y email en versión compacta (con botón de llamada)
+                    if (!psicologo.telefono.isNullOrBlank() || psicologo.email.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Teléfono con botón de llamada
+                            if (!psicologo.telefono.isNullOrBlank()) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    // Botón de llamada
+                                    IconButton(
+                                        onClick = {
+                                            psicologo.telefono?.let { telefono ->
+                                                val intent = Intent(Intent.ACTION_DIAL).apply {
+                                                    data = Uri.parse("tel:$telefono")
+                                                }
+                                                context.startActivity(intent)
+                                            }
+                                        },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Phone,
+                                            contentDescription = "Llamar al psicólogo",
+                                            modifier = Modifier.size(16.dp),
+                                            tint = primaryColor
+                                        )
+                                    }
+
+                                    Text(
+                                        text = psicologo.telefono,
+                                        style = typography.bodySmall?.copy(
+                                            fontSize = 12.sp,
+                                            color = textSecondaryColor
+                                        ) ?: MaterialTheme.typography.bodySmall,
+                                        fontFamily = roboto
+                                    )
+                                }
+                            }
+
+                            // Email
+                            if (psicologo.email.isNotBlank()) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text = "✉️",
+                                        fontSize = 12.sp
+                                    )
+                                    Text(
+                                        text = psicologo.email,
+                                        style = typography.bodySmall?.copy(
+                                            fontSize = 12.sp,
+                                            color = textSecondaryColor
+                                        ) ?: MaterialTheme.typography.bodySmall,
+                                        fontFamily = roboto,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Icono de expandir/colapsar
                 Icon(
@@ -584,169 +662,121 @@ fun PsicologoCardExpandable(
                 )
             }
 
-            // Información expandible
+            // Información expandible (MUESTRA TODOS LOS DATOS)
             if (expanded) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Email
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Email:",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                    Text(
-                        text = psicologo.email,
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                }
+                HorizontalDivider(
+                    Modifier,
+                    thickness = 1.dp,
+                    color = textSecondaryColor.copy(alpha = 0.2f)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                Spacer(modifier = Modifier.height(4.dp))
+                // ============================================
+                // INFORMACIÓN COMPLETA DEL PSICÓLOGO
+                // ============================================
 
-                // Teléfono
-                if (!psicologo.telefono.isNullOrBlank()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Teléfono:",
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textSecondaryColor,
-                                fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                            fontFamily = roboto
-                        )
-                        Text(
-                            text = psicologo.telefono,
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textPrimaryColor
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                            fontFamily = roboto
-                        )
+                // Email (con acción de email)
+                InfoRowWithAction(
+                    label = "Email",
+                    value = psicologo.email,
+                    icon = "✉️",
+                    typography = typography,
+                    textPrimaryColor = textPrimaryColor,
+                    textSecondaryColor = textSecondaryColor,
+                    roboto = roboto,
+                    onClick = {
+                        // Abrir cliente de email
+                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:${psicologo.email}")
+                        }
+                        context.startActivity(intent)
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Teléfono con botón de llamada (destacado)
+                if (!psicologo.telefono.isNullOrBlank()) {
+                    InfoRowWithCallButton(
+                        label = "Teléfono",
+                        value = psicologo.telefono,
+                        typography = typography,
+                        textPrimaryColor = textPrimaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        roboto = roboto,
+                        context = context,
+                        primaryColor = primaryColor
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 // Especialidad
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Especialidad:",
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                    Text(
-                        text = psicologo.especialidad,
-                        style = typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto
-                    )
-                }
+                InfoRow(
+                    label = "Especialidad",
+                    value = psicologo.especialidad,
+                    typography = typography,
+                    textPrimaryColor = textPrimaryColor,
+                    textSecondaryColor = textSecondaryColor,
+                    roboto = roboto
+                )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Experiencia
                 if (psicologo.experiencia != null && psicologo.experiencia > 0) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Experiencia:",
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textSecondaryColor,
-                                fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                            fontFamily = roboto
-                        )
-                        Text(
-                            text = "${psicologo.experiencia} años",
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textPrimaryColor
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                            fontFamily = roboto
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    InfoRow(
+                        label = "Años de experiencia",
+                        value = "${psicologo.experiencia} años",
+                        typography = typography,
+                        textPrimaryColor = textPrimaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        roboto = roboto
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 // Licencia
                 if (!psicologo.licencia.isNullOrBlank()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Licencia:",
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textSecondaryColor,
-                                fontWeight = FontWeight.Medium
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                            fontFamily = roboto
-                        )
-                        Text(
-                            text = psicologo.licencia,
-                            style = typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textPrimaryColor
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                            fontFamily = roboto
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    InfoRow(
+                        label = "N° Licencia",
+                        value = psicologo.licencia,
+                        typography = typography,
+                        textPrimaryColor = textPrimaryColor,
+                        textSecondaryColor = textSecondaryColor,
+                        roboto = roboto
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 // Descripción
                 if (!psicologo.descripcion.isNullOrBlank()) {
                     Text(
-                        text = "Descripción:",
+                        text = "Descripción profesional:",
                         style = typography.bodyMedium?.copy(
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             color = textSecondaryColor,
                             fontWeight = FontWeight.Medium
                         ) ?: MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 8.dp),
                         fontFamily = roboto
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = psicologo.descripcion,
-                        style = typography.bodySmall?.copy(
-                            fontSize = 12.sp,
-                            color = textSecondaryColor
-                        ) ?: MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 2.dp),
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
+                        style = typography.bodyMedium?.copy(
+                            fontSize = 13.sp,
+                            color = textPrimaryColor,
+                            lineHeight = 20.sp
+                        ) ?: MaterialTheme.typography.bodyMedium,
                         fontFamily = roboto
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                Divider(color = textSecondaryColor.copy(alpha = 0.2f), thickness = 1.dp)
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Botones de acción
                 Row(
@@ -768,12 +798,26 @@ fun PsicologoCardExpandable(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Editar", color = Color.White, fontFamily = roboto)
+                        Text("Editar", color = if (isDark) Color.White else Color.Black, fontFamily = roboto)
                     }
                 }
             } else {
-                // Cuando está colapsado, solo mostramos los botones
-                Spacer(modifier = Modifier.height(16.dp))
+                // Cuando está colapsado, mostramos info resumida y botones
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Mostrar especialidad en modo colapsado
+                Text(
+                    text = psicologo.especialidad,
+                    style = typography.bodyMedium?.copy(
+                        fontSize = 13.sp,
+                        color = textSecondaryColor
+                    ) ?: MaterialTheme.typography.bodyMedium,
+                    fontFamily = roboto,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -794,10 +838,156 @@ fun PsicologoCardExpandable(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Editar", color = Color.Black, fontFamily = roboto)
+                        Text("Editar", color = if (isDark) Color.White else Color.Black, fontFamily = roboto)
                     }
                 }
             }
         }
+    }
+}
+
+// Componente para fila de información con botón de llamada
+@Composable
+fun InfoRowWithCallButton(
+    label: String,
+    value: String,
+    typography: androidx.compose.material3.Typography,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    roboto: FontFamily,
+    context: android.content.Context,
+    primaryColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "$label:",
+            style = typography.bodyMedium?.copy(
+                fontSize = 13.sp,
+                color = textSecondaryColor,
+                fontWeight = FontWeight.Bold
+            ) ?: MaterialTheme.typography.bodyMedium,
+            fontFamily = roboto
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = value,
+                style = typography.bodyMedium?.copy(
+                    fontSize = 13.sp,
+                    color = Color(0xFF4CAF50),
+                    fontWeight = FontWeight.Bold
+                ) ?: MaterialTheme.typography.bodyMedium,
+                fontFamily = roboto
+            )
+
+            IconButton(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                        data = Uri.parse("tel:$value")
+                    }
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Phone,
+                    contentDescription = "Llamar al psicólogo",
+                    modifier = Modifier.size(18.dp),
+                    tint = primaryColor
+                )
+            }
+        }
+    }
+}
+
+// Componente para fila de información con acción (ej: email)
+@Composable
+fun InfoRowWithAction(
+    label: String,
+    value: String,
+    icon: String,
+    typography: androidx.compose.material3.Typography,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    roboto: FontFamily,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "$label:",
+            style = typography.bodyMedium?.copy(
+                fontSize = 13.sp,
+                color = textSecondaryColor,
+                fontWeight = FontWeight.Medium
+            ) ?: MaterialTheme.typography.bodyMedium,
+            fontFamily = roboto
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = icon,
+                fontSize = 14.sp
+            )
+            Text(
+                text = value,
+                style = typography.bodyMedium?.copy(
+                    fontSize = 13.sp,
+                    color = textPrimaryColor
+                ) ?: MaterialTheme.typography.bodyMedium,
+                fontFamily = roboto
+            )
+        }
+    }
+}
+
+// Componente auxiliar para filas de información simple
+@Composable
+fun InfoRow(
+    label: String,
+    value: String,
+    typography: androidx.compose.material3.Typography,
+    textPrimaryColor: Color,
+    textSecondaryColor: Color,
+    roboto: FontFamily
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            text = "$label:",
+            style = typography.bodyMedium?.copy(
+                fontSize = 13.sp,
+                color = textSecondaryColor,
+                fontWeight = FontWeight.Medium
+            ) ?: MaterialTheme.typography.bodyMedium,
+            fontFamily = roboto
+        )
+        Text(
+            text = value,
+            style = typography.bodyMedium?.copy(
+                fontSize = 13.sp,
+                color = textPrimaryColor
+            ) ?: MaterialTheme.typography.bodyMedium,
+            fontFamily = roboto,
+            textAlign = TextAlign.End
+        )
     }
 }

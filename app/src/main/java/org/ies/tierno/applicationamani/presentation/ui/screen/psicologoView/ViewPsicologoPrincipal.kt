@@ -1,6 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.ui.screens.psicologo
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
@@ -65,6 +67,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -472,6 +475,8 @@ fun PacienteHeader(
     colors: PsicologoThemeColors,
     isDark: Boolean
 ) {
+    val context = LocalContext.current
+
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
     Surface(
@@ -583,12 +588,29 @@ fun PacienteHeader(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Phone,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = colors.textSecondary
-                        )
+
+                        IconButton(
+                            onClick = {
+
+                                paciente.telefono?.let { telefono ->
+
+                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                        data = Uri.parse("tel:$telefono")
+                                    }
+
+                                    context.startActivity(intent)
+                                }
+                            },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Phone,
+                                contentDescription = "Llamar paciente",
+                                modifier = Modifier.size(18.dp),
+                                tint = colors.primary
+                            )
+                        }
+
                         Text(
                             text = paciente.telefono ?: stringResource(R.string.telefono_no_disponible),
                             fontSize = 12.sp,
