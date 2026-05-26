@@ -74,17 +74,51 @@ class ChatFirebaseService(
         return result.ifEmpty { null }
     }
 
+    private fun DataSnapshot.stringValue(vararg keys: String): String? {
+        for (key in keys) {
+            val value = child(key).getValue(String::class.java)
+            if (!value.isNullOrBlank()) return value
+        }
+        return null
+    }
+
+    private fun inferAttachmentType(
+        rawType: String?,
+        attachmentUrl: String?,
+        attachmentName: String?,
+        messageText: String,
+    ): org.ies.tierno.applicationamani.domain.models.AttachmentType? {
+        rawType
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.uppercase()
+            ?.let {
+                runCatching {
+                    org.ies.tierno.applicationamani.domain.models.AttachmentType.valueOf(it)
+                }.getOrNull()
+            }?.let { return it }
+
+        val probe = listOfNotNull(attachmentName, attachmentUrl, messageText).joinToString(" ").lowercase()
+        return when {
+            "🎙" in messageText || probe.contains(".ogg") || probe.contains(".m4a") || probe.contains(".mp3") || probe.contains(".wav") -> org.ies.tierno.applicationamani.domain.models.AttachmentType.AUDIO
+            "📸" in messageText || probe.contains(".jpg") || probe.contains(".jpeg") || probe.contains(".png") || probe.contains(".webp") || probe.contains(".gif") -> org.ies.tierno.applicationamani.domain.models.AttachmentType.IMAGE
+            attachmentUrl != null || attachmentName != null || "📄" in messageText -> org.ies.tierno.applicationamani.domain.models.AttachmentType.DOCUMENT
+            else -> null
+        }
+    }
+
     private fun parseMessage(
         child: DataSnapshot,
         currentUserId: Long? = null,
     ): Message {
         val idMensaje = child.longValue("idMensaje") ?: 0L
         val senderId = child.longValue("idSender", "senderId") ?: 0L
-        val mensaje = child.child("mensaje").getValue(String::class.java) ?: ""
-        val enviadoEnRaw = child.child("enviadoEn").getValue()
+        val mensaje = child.stringValue("mensaje", "message", "content") ?: ""
+        val enviadoEnRaw = child.child("enviadoEn").getValue() ?: child.child("timestamp").getValue()
         val timestamp =
             when (enviadoEnRaw) {
                 is Long -> enviadoEnRaw
+                is Double -> enviadoEnRaw.toLong()
                 is String ->
                     enviadoEnRaw.toLongOrNull() ?: try {
                         java.time.OffsetDateTime
@@ -97,17 +131,15 @@ class ChatFirebaseService(
                 else -> System.currentTimeMillis()
             }
         val leido = child.child("leido").getValue(Boolean::class.java) ?: false
-        val attachmentUrl = child.child("attachmentUrl").getValue(String::class.java)
+        val attachmentUrl = child.stringValue("attachmentUrl", "fileUrl", "urlArchivo", "archivoUrl")
+        val attachmentName = child.stringValue("attachmentName", "fileName", "nombreArchivo")
         val attachmentType =
-            child.child("attachmentType").getValue(String::class.java)?.let {
-                try {
-                    org.ies.tierno.applicationamani.domain.models.AttachmentType
-                        .valueOf(it)
-                } catch (e: IllegalArgumentException) {
-                    null
-                }
-            }
-        val attachmentName = child.child("attachmentName").getValue(String::class.java)
+            inferAttachmentType(
+                rawType = child.stringValue("attachmentType", "fileType", "tipoAdjunto"),
+                attachmentUrl = attachmentUrl,
+                attachmentName = attachmentName,
+                messageText = mensaje,
+            )
 
         val readBy = child.longMapValue("readBy")
         val deliveredAt = if (currentUserId != null) child.longMapValue("deliveredTo")?.get(currentUserId.toString()) else null
@@ -211,17 +243,33 @@ class ChatFirebaseService(
         try {
             val roomId = generateRoomId(senderId, receiverId)
             val messagesRef = chatsRef.child(roomId).child("messages")
+            val updateMap = mutableMapOf<String, Any>("attachmentUrl" to attachmentUrl)
+            attachmentType?.let { updateMap["attachmentType"] = it }
+            attachmentName?.let { updateMap["attachmentName"] = it }
 
-            val query = messagesRef.orderByChild("idMensaje").equalTo(messageId.toDouble())
-            val snapshot = query.get().await()
+            var updated = false
+            repeat(6) { attempt ->
+                val snapshot = messagesRef.get().await()
+                val matchingChildren =
+                    snapshot.children.filter { child ->
+                        child.longValue("idMensaje") == messageId ||
+                            child.stringValue("idMensaje") == messageId.toString()
+                    }
 
-            for (child in snapshot.children) {
-                val updateMap = mutableMapOf<String, Any>("attachmentUrl" to attachmentUrl)
-                attachmentType?.let { updateMap["attachmentType"] = it }
-                attachmentName?.let { updateMap["attachmentName"] = it }
-                child.ref.updateChildren(updateMap).await()
+                for (child in matchingChildren) {
+                    child.ref.updateChildren(updateMap).await()
+                    updated = true
+                }
+
+                if (updated) return@repeat
+                if (attempt < 5) kotlinx.coroutines.delay(350)
             }
-            Result.success(Unit)
+
+            if (updated) {
+                Result.success(Unit)
+            } else {
+                Result.failure(IllegalStateException("No se encontró el mensaje en Firebase para asociar el adjunto"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

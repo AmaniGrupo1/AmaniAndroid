@@ -78,7 +78,13 @@ class ChatRepositoryImpl(
                         attachmentUrl,
                         attachmentType?.name,
                         attachmentName,
-                    )
+                    ).onFailure { throwable ->
+                        android.util.Log.e(
+                            "ChatRepository",
+                            "No se pudieron asociar los metadatos del adjunto al mensaje ${body.idMensaje}",
+                            throwable,
+                        )
+                    }
                 }
                 Result.success(Unit)
             } else {

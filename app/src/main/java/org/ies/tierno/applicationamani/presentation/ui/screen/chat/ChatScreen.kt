@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 import org.ies.tierno.applicationamani.R
 import androidx.compose.ui.res.stringResource
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import android.webkit.MimeTypeMap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
@@ -243,6 +245,9 @@ fun ChatScreen(
                                         onPlayPause = { messageId, url ->
                                             viewModel.toggleAudioPlayback(messageId, url)
                                         },
+                                        onOpenAttachment = { url ->
+                                            openAttachment(context, url)
+                                        },
                                     )
                             }
                         }
@@ -250,6 +255,32 @@ fun ChatScreen(
                 }
             }
         }
+    }
+}
+
+private fun openAttachment(context: android.content.Context, url: String) {
+    runCatching {
+        val lowerUrl = url.lowercase()
+        val extension = lowerUrl.substringAfterLast('.', missingDelimiterValue = "")
+            .substringBefore('?')
+            .substringBefore('&')
+        val mimeType =
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension).orEmpty().ifBlank {
+                when {
+                    lowerUrl.contains(".pdf") -> "application/pdf"
+                    lowerUrl.contains(".jpg") || lowerUrl.contains(".jpeg") -> "image/jpeg"
+                    lowerUrl.contains(".png") -> "image/png"
+                    lowerUrl.contains(".webp") -> "image/webp"
+                    else -> "*/*"
+                }
+            }
+
+        val intent =
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(Uri.parse(url), mimeType)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        context.startActivity(intent)
     }
 }
 

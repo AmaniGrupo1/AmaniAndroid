@@ -46,25 +46,36 @@ sealed class MessageUiContent {
     data class Image(val url: String, val caption: String?) : MessageUiContent()
     data class Audio(val url: String) : MessageUiContent()
     data class Document(val url: String, val name: String) : MessageUiContent()
+    data class AttachmentPlaceholder(val label: String) : MessageUiContent()
     object Unknown : MessageUiContent()
 }
 
 fun Message.toUiContent(): MessageUiContent {
     val isRealText = content.isNotBlank() && content != "📸 Imagen" && content != "📄 Documento" && content != "🎙️ Nota de voz"
     val realCaption = if (isRealText) content else null
+    val fallbackLabel =
+        when {
+            content == "📸 Imagen" -> "Imagen adjunta"
+            content == "📄 Documento" -> attachmentName ?: "Documento adjunto"
+            content == "🎙️ Nota de voz" -> "Nota de voz"
+            else -> content
+        }
 
     return when {
         attachmentUrl != null -> {
+            // Fix previously corrupted URLs that had ?alt=media appended to the token
+            val cleanUrl = attachmentUrl.replace("?alt=media?alt=media", "?alt=media")
+                .replace(Regex("(&token=[a-zA-Z0-9-]+)\\?alt=media$"), "$1")
+
             when (attachmentType) {
-                AttachmentType.IMAGE -> MessageUiContent.Image(attachmentUrl, realCaption)
-                AttachmentType.AUDIO -> MessageUiContent.Audio(attachmentUrl)
-                AttachmentType.DOCUMENT -> MessageUiContent.Document(attachmentUrl, attachmentName ?: "Documento adjunto")
-                else -> MessageUiContent.Unknown
+                AttachmentType.IMAGE -> MessageUiContent.Image(cleanUrl, realCaption)
+                AttachmentType.AUDIO -> MessageUiContent.Audio(cleanUrl)
+                AttachmentType.DOCUMENT -> MessageUiContent.Document(cleanUrl, attachmentName ?: "Documento adjunto")
+                else -> MessageUiContent.Document(cleanUrl, attachmentName ?: fallbackLabel.ifBlank { "Archivo adjunto" })
             }
         }
-        else -> {
-            MessageUiContent.Text(if (isRealText) content else "")
-        }
+        !isRealText && fallbackLabel.isNotBlank() -> MessageUiContent.AttachmentPlaceholder(fallbackLabel)
+        else -> MessageUiContent.Text(content)
     }
 }
 
@@ -77,6 +88,7 @@ fun MessageBubble(
     psychologistInfo: PsychologistInfo?,
     audioUiState: AudioPlaybackUiState,
     onPlayPause: (String, String) -> Unit,
+    onOpenAttachment: (String) -> Unit,
 ) {
     val isOwn = message.senderId == currentUserId
     val bottomPadding = if (isLastInGroup) 8.dp else 2.dp
@@ -152,9 +164,24 @@ fun MessageBubble(
                         AttachmentDocument(
                             fileName = uiContent.name,
                             isOwn = isOwn,
+                            onOpen = { onOpenAttachment(uiContent.url) },
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         TimestampOnly(message = message, isOwn = isOwn)
+                    }
+                }
+            }
+            is MessageUiContent.AttachmentPlaceholder -> {
+                DefaultMessageBubble(
+                    isOwn = isOwn,
+                    shape = shape
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                        MessageWithTimestamp(
+                            text = uiContent.label,
+                            message = message,
+                            isOwn = isOwn,
+                        )
                     }
                 }
             }
@@ -452,6 +479,7 @@ fun StatusIcon(
 private fun AttachmentDocument(
     fileName: String,
     isOwn: Boolean,
+    onOpen: () -> Unit,
 ) {
     val contentColor =
         if (isOwn) {
@@ -480,7 +508,7 @@ private fun AttachmentDocument(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
-            .clickable { /* Descargar o abrir documento */ },
+            .clickable(onClick = onOpen),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(

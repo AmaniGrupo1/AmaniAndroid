@@ -117,7 +117,7 @@ class FileStorageService(
                 val taskSnapshot = uploadTask.await()
 
                 if (taskSnapshot.task.isSuccessful) {
-                    val downloadUrl = fileRef.downloadUrl.await().toString() + "?alt=media"
+                    val downloadUrl = fileRef.downloadUrl.await().toString()
                     UploadResult.Success(downloadUrl, attachmentType, fileName)
                 } else {
                     UploadResult.Error("Error al subir archivo")
@@ -176,7 +176,7 @@ class FileStorageService(
                     }
 
                 if (taskSnapshot.task.isSuccessful) {
-                    val downloadUrl = fileRef.downloadUrl.await().toString() + "?alt=media"
+                    val downloadUrl = fileRef.downloadUrl.await().toString()
                     UploadResult.Success(downloadUrl, AttachmentType.AUDIO, fileName)
                 } else {
                     UploadResult.Error("Error al subir nota de voz")

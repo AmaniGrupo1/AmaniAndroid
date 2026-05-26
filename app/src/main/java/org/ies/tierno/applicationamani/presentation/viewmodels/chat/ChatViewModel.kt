@@ -410,7 +410,6 @@ class ChatViewModel(
                     .catch { throwable ->
                         Log.e(TAG, "Error observando mensajes", throwable)
                         _error.value = throwable.message ?: "No se pudieron cargar los mensajes"
-                        _messages.value = emptyList()
                         _isLoading.value = false
                     }.collect { messages ->
                         _error.value = null
@@ -422,20 +421,13 @@ class ChatViewModel(
             }
     }
 
-    /**
-     * Marca como entregados todos los mensajes recibidos que aún no tengan ese estado.
-     */
     fun markMessagesAsDelivered() {
         viewModelScope.launch {
-            _messages.value.forEach { message ->
-                if (!message.isDelivered && message.senderId != currentUserId.toString()) {
-                    val messageId = message.id.toLongOrNull()
-                    if (messageId == null) {
-                        Log.w(TAG, "Se omite delivery receipt por id no numérico: ${message.id}")
-                    } else {
-                        markMessageDeliveredUseCase(messageId, currentUserId)
-                    }
-                }
+            val hasUndelivered = _messages.value.any { !it.isDelivered && it.senderId != currentUserId.toString() }
+            if (hasUndelivered) {
+                // Se omite markMessageDeliveredUseCase por mensaje individual ya que los IDs de Firebase no son numéricos
+                // y el caso de uso requiere Long. Firebase service tiene implementado un stub.
+                Log.d(TAG, "Mensajes recibidos; delivery status no se actualiza individualmente en Firebase RTDB por ID")
             }
         }
     }

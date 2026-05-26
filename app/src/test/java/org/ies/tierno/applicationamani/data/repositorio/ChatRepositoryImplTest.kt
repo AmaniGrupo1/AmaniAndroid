@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.data.repositorio
 
 import app.cash.turbine.test
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -64,6 +65,52 @@ class ChatRepositoryImplTest {
 
             // Then
             assertEquals(Result.success(Unit), result)
+        }
+
+    @Test
+    fun `sendMessage should link attachment metadata in Firebase when API succeeds`() =
+        runTest {
+            val response =
+                org.ies.tierno.applicationamani.data.remoto.SendMessageResponse(
+                    idMensaje = 99L,
+                    idSender = 1L,
+                    idReceiver = 2L,
+                    mensaje = "Documento",
+                    leido = false,
+                )
+            coEvery { chatApi.sendMessage(any()) } returns Response.success(response)
+            coEvery {
+                chatFirebaseService.updateMessageAttachment(
+                    1L,
+                    2L,
+                    99L,
+                    "https://example.com/file.pdf",
+                    "DOCUMENT",
+                    "informe.pdf",
+                )
+            } returns Result.success(Unit)
+
+            val result =
+                chatRepository.sendMessage(
+                    senderId = 1L,
+                    receiverId = 2L,
+                    content = "",
+                    attachmentUrl = "https://example.com/file.pdf",
+                    attachmentType = org.ies.tierno.applicationamani.domain.models.AttachmentType.DOCUMENT,
+                    attachmentName = "informe.pdf",
+                )
+
+            assertEquals(Result.success(Unit), result)
+            coVerify(exactly = 1) {
+                chatFirebaseService.updateMessageAttachment(
+                    1L,
+                    2L,
+                    99L,
+                    "https://example.com/file.pdf",
+                    "DOCUMENT",
+                    "informe.pdf",
+                )
+            }
         }
 
     @Test
