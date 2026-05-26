@@ -81,7 +81,7 @@ class ChatRepositoryImpl(
                     ).onFailure { throwable ->
                         android.util.Log.e(
                             "ChatRepository",
-                            "No se pudieron asociar los metadatos del adjunto al mensaje ${body.idMensaje}",
+                            "No se pudieron asociar los metadatos del adjunto al mensaje ${body.idMensaje} (Sender: $senderId, Receiver: $receiverId)",
                             throwable,
                         )
                     }

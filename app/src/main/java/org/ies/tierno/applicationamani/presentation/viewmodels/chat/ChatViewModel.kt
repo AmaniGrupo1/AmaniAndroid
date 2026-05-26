@@ -38,6 +38,7 @@ import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOn
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import timber.log.Timber
 import java.io.File
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState
 
 /**
  * Define los posibles estados de la reproducción de audio en el chat.
@@ -91,29 +92,7 @@ data class PsychologistInfo(
     val isOnline: Boolean,
 )
 
-/**
- * Estado integral de la pantalla de chat.
- *
- * @property messages Lista de mensajes de la conversación.
- * @property assignedPsychologist Información del psicólogo con el que se chatea.
- * @property currentUserId Identificador del usuario que usa la aplicación.
- * @property inputText Texto actual en el campo de entrada del chat.
- * @property isLoading Indica si se están cargando mensajes.
- * @property error Mensaje de error para mostrar al usuario.
- * @property isOtherTyping Indica si el interlocutor está escribiendo.
- * @property psychologistOnline Indica si el interlocutor está en línea.
- */
-data class ChatUiState(
-    val messages: List<Message> = emptyList(),
-    val assignedPsychologist: PsychologistInfo? = null,
-    val currentUserId: String = "",
-    val inputText: String = "",
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val isOtherTyping: Boolean = false,
-    val psychologistOnline: Boolean = false,
-    val pendingAttachmentUri: android.net.Uri? = null,
-)
+
 
 /**
  * ViewModel que gestiona la lógica de la pantalla de chat individual.
@@ -156,40 +135,46 @@ class ChatViewModel(
     /** Flujo de estado de la reproducción de audio. */
     val audioUiState: StateFlow<AudioPlaybackUiState> get() = _audioUiState.asStateFlow()
 
-    private val baseUiState =
+    val uiState: StateFlow<ChatUiState> =
         combine(
             _messages,
             _assignedPsychologist,
             _isLoading,
             _error,
             _inputText,
-        ) { messages, psychologist, loading, error, input ->
-            ChatUiState(
-                messages = messages,
-                assignedPsychologist = psychologist,
-                currentUserId = currentUserId.toString(),
-                inputText = input,
-                isLoading = loading,
-                error = error,
-            )
-        }
-
-    val uiState: StateFlow<ChatUiState> =
-        combine(
-            baseUiState,
             _isOtherTyping,
             _psychologistOnline,
             _pendingAttachmentUri
-        ) { base, isTyping, isOnline, pendingUri ->
-            base.copy(
-                isOtherTyping = isTyping,
-                psychologistOnline = isOnline,
-                pendingAttachmentUri = pendingUri
-            )
+        ) { args: Array<Any?> ->
+            @Suppress("UNCHECKED_CAST")
+            val messages = args[0] as List<Message>
+            val psychologist = args[1] as? PsychologistInfo
+            val loading = args[2] as Boolean
+            val error = args[3] as? String
+            val input = args[4] as String
+            val isTyping = args[5] as Boolean
+            val isOnline = args[6] as Boolean
+            val pendingUri = args[7] as? android.net.Uri
+
+            if (loading && messages.isEmpty()) {
+                ChatUiState.Loading
+            } else if (error != null && messages.isEmpty()) {
+                ChatUiState.Error(error)
+            } else {
+                ChatUiState.Success(
+                    messages = messages,
+                    assignedPsychologist = psychologist,
+                    currentUserId = currentUserId.toString(),
+                    inputText = input,
+                    isOtherTyping = isTyping,
+                    psychologistOnline = isOnline,
+                    pendingAttachmentUri = pendingUri
+                )
+            }
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ChatUiState(currentUserId = currentUserId.toString()),
+            initialValue = ChatUiState.Loading,
         )
 
     /** Flujo que combina los estados de presencia y actividad de escritura del interlocutor. */

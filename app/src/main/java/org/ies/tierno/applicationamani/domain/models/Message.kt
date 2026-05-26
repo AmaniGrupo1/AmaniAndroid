@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.domain.models
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Representa un mensaje dentro de una conversación de chat.
  *
@@ -19,6 +21,7 @@ package org.ies.tierno.applicationamani.domain.models
  * @property readBy Mapa de identificadores de usuarios y el momento en que leyeron el mensaje.
  * @property status Estado actual del mensaje (enviado, entregado, leído, error).
  */
+@Immutable
 data class Message(
     val id: String = "",
     val conversationId: String = "",

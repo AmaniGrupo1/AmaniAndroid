@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "chats": {
+      "$roomId": {
+        // Read access if the user is authenticated and their ID is part of the roomId (format: minId_maxId)
+        ".read": "auth != null && ($roomId.contains(auth.uid + '_') || $roomId.contains('_' + auth.uid))",
+        ".write": "auth != null && ($roomId.contains(auth.uid + '_') || $roomId.contains('_' + auth.uid))",
+        "messages": {
+          "$messageId": {
+            // Validate new messages
+            ".validate": "newData.hasChildren(['idMensaje', 'idSender', 'idReceiver']) && 
+                          (
+                            (newData.hasChild('mensaje') && newData.child('mensaje').val().length > 0 && newData.child('mensaje').val().length <= 2000) || 
+                            newData.hasChild('attachmentUrl')
+                          )"
+          }
+        }
+      }
+    },
+    "users": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "auth != null && $userId === auth.uid"
+      }
+    },
+    "typing": {
+      "$roomId": {
+        ".read": "auth != null && ($roomId.contains(auth.uid + '_') || $roomId.contains('_' + auth.uid))",
+        ".write": "auth != null && ($roomId.contains(auth.uid + '_') || $roomId.contains('_' + auth.uid))"
+      }
+    }
+  }
+}

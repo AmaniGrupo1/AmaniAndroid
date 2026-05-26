@@ -86,7 +86,7 @@ class FileStorageService(
 
                 val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
                 val fileName = "${UUID.randomUUID()}.$extension"
-                val path = "amani-chat/attachments/$conversationId/$fileName"
+                val path = "chat_images/${user.uid}/$fileName"
 
                 Timber.d("📁 Intentando subir a path: $path")
 
@@ -98,30 +98,44 @@ class FileStorageService(
                         setCustomMetadata("uploadedBy", user.uid)
                     }
 
-                val uploadTask: UploadTask =
-                    if (attachmentType == AttachmentType.IMAGE) {
-                        val compressedUri = compressImage(uri)
-                        val inputStream =
-                            context.contentResolver.openInputStream(compressedUri)
-                                ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
+                var currentAttempt = 0
+                val maxAttempts = 3
+                var lastException: Exception? = null
 
-                        fileRef.putStream(inputStream, metadata)
-                    } else {
-                        val inputStream =
-                            context.contentResolver.openInputStream(uri)
-                                ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
+                while (currentAttempt < maxAttempts) {
+                    try {
+                        val uploadTask: UploadTask =
+                            if (attachmentType == AttachmentType.IMAGE) {
+                                val compressedUri = compressImage(uri)
+                                val inputStream =
+                                    context.contentResolver.openInputStream(compressedUri)
+                                        ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
 
-                        fileRef.putStream(inputStream, metadata)
+                                fileRef.putStream(inputStream, metadata)
+                            } else {
+                                val inputStream =
+                                    context.contentResolver.openInputStream(uri)
+                                        ?: return@withContext UploadResult.Error("No se pudo leer el archivo")
+
+                                fileRef.putStream(inputStream, metadata)
+                            }
+
+                        val taskSnapshot = uploadTask.await()
+
+                        if (taskSnapshot.task.isSuccessful) {
+                            val downloadUrl = fileRef.downloadUrl.await().toString()
+                            return@withContext UploadResult.Success(downloadUrl, attachmentType, fileName)
+                        } else {
+                            throw Exception("Error al subir archivo (isSuccessful false)")
+                        }
+                    } catch (e: Exception) {
+                        lastException = e
+                        currentAttempt++
+                        kotlinx.coroutines.delay(1000L * currentAttempt) // Exponential backoff
                     }
-
-                val taskSnapshot = uploadTask.await()
-
-                if (taskSnapshot.task.isSuccessful) {
-                    val downloadUrl = fileRef.downloadUrl.await().toString()
-                    UploadResult.Success(downloadUrl, attachmentType, fileName)
-                } else {
-                    UploadResult.Error("Error al subir archivo")
                 }
+                
+                return@withContext UploadResult.Error(lastException?.message ?: "Error desconocido tras reintentos")
             } catch (e: Exception) {
                 UploadResult.Error(e.message ?: "Error desconocido")
             }

@@ -111,7 +111,7 @@ class ChatFirebaseService(
         child: DataSnapshot,
         currentUserId: Long? = null,
     ): Message {
-        val idMensaje = child.longValue("idMensaje") ?: 0L
+        val idMensaje = child.longValue("idMensaje", "messageId", "id") ?: child.key?.toLongOrNull() ?: 0L
         val senderId = child.longValue("idSender", "senderId") ?: 0L
         val mensaje = child.stringValue("mensaje", "message", "content") ?: ""
         val enviadoEnRaw = child.child("enviadoEn").getValue() ?: child.child("timestamp").getValue()
@@ -131,7 +131,7 @@ class ChatFirebaseService(
                 else -> System.currentTimeMillis()
             }
         val leido = child.child("leido").getValue(Boolean::class.java) ?: false
-        val attachmentUrl = child.stringValue("attachmentUrl", "fileUrl", "urlArchivo", "archivoUrl")
+        val attachmentUrl = child.stringValue("attachmentUrl", "fileUrl", "urlArchivo", "archivoUrl", "url", "file_url", "mediaUrl")
         val attachmentName = child.stringValue("attachmentName", "fileName", "nombreArchivo")
         val attachmentType =
             inferAttachmentType(
@@ -252,8 +252,12 @@ class ChatFirebaseService(
                 val snapshot = messagesRef.get().await()
                 val matchingChildren =
                     snapshot.children.filter { child ->
-                        child.longValue("idMensaje") == messageId ||
-                            child.stringValue("idMensaje") == messageId.toString()
+                        val idMatches = child.longValue("idMensaje", "messageId", "id") == messageId ||
+                                child.stringValue("idMensaje", "messageId", "id") == messageId.toString()
+                        val keyMatches = child.key == messageId.toString()
+                        val senderMatches = child.longValue("idSender", "senderId") == senderId
+
+                        (idMatches || keyMatches) && senderMatches
                     }
 
                 for (child in matchingChildren) {

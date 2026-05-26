@@ -82,7 +82,7 @@ fun ChatScreen(
     onNavigateBack: () -> Unit,
     otherUserName: String = "",
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiStateWrapper by viewModel.uiState.collectAsStateWithLifecycle()
     val audioUiState by viewModel.audioUiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,9 +96,18 @@ fun ChatScreen(
         onDispose { audioHandler.release() }
     }
 
+    // Extracción segura del estado Success
+    val successState = uiStateWrapper as? org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success
+    val messages = successState?.messages ?: emptyList()
+    val currentUserId = successState?.currentUserId ?: ""
+    val psychologistInfo = successState?.assignedPsychologist
+    val inputText = successState?.inputText ?: ""
+    val isOtherTyping = successState?.isOtherTyping ?: false
+    val pendingAttachmentUri = successState?.pendingAttachmentUri
+
     val chatItems =
-        remember(uiState.messages) {
-            buildChatItems(uiState.messages, uiState.currentUserId)
+        remember(messages) {
+            buildChatItems(messages, currentUserId)
         }
 
     val audioPermissionLauncher =
@@ -130,30 +139,26 @@ fun ChatScreen(
         previousSize.intValue = chatItems.size
     }
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { error ->
+    LaunchedEffect(uiStateWrapper) {
+        if (uiStateWrapper is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error) {
+            val error = (uiStateWrapper as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error).message
             snackbarHostState.showSnackbar(error)
             viewModel.clearError()
         }
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = Modifier.fillMaxSize().imePadding(),
         topBar = {
             ChatTopBar(
-                psychologistInfo = uiState.assignedPsychologist,
+                psychologistInfo = psychologistInfo,
                 onNavigateBack = onNavigateBack,
                 otherUserName = otherUserName,
             )
         },
         bottomBar = {
-            ChatInputBar(
-                modifier =
-                    Modifier
-                        .navigationBarsPadding()
-                        .imePadding(),
-                text = uiState.inputText,
+            MessageInput(
+                text = inputText,
                 onTextChange = viewModel::onInputChanged,
                 onSend = viewModel::sendMessage,
                 onMicClick = {
@@ -179,8 +184,8 @@ fun ChatScreen(
                 },
                 isRecording = isRecording,
                 recordingSeconds = recordingSeconds,
-                isOtherTyping = uiState.isOtherTyping,
-                pendingAttachmentUri = uiState.pendingAttachmentUri,
+                isOtherTyping = isOtherTyping,
+                pendingAttachmentUri = pendingAttachmentUri,
                 onClearAttachment = { viewModel.setPendingAttachment(null) }
             )
         },
@@ -194,8 +199,8 @@ fun ChatScreen(
                     .padding(paddingValues)
                     .consumeWindowInsets(paddingValues),
         ) {
-            when {
-                uiState.isLoading -> {
+            when (uiStateWrapper) {
+                is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
@@ -204,60 +209,60 @@ fun ChatScreen(
                     }
                 }
 
-                chatItems.isEmpty() -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ChatBubbleOutline,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            text = stringResource(R.string.auto_aun_no_hay_mensajes),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        state = listState,
-                        reverseLayout = true,
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
-                    ) {
-                        items(
-                            items = chatItems,
-                            key = { item ->
+                    if (chatItems.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.ChatBubbleOutline,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Text(
+                                text = stringResource(R.string.auto_aun_no_hay_mensajes),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            state = listState,
+                            reverseLayout = true,
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
+                        ) {
+                            items(
+                                items = chatItems,
+                                key = { item ->
+                                    when (item) {
+                                        is ChatListItem.MessageItem -> item.msg.id
+                                        is ChatListItem.DateSeparator -> "sep_${item.label}"
+                                    }
+                                },
+                            ) { item ->
                                 when (item) {
-                                    is ChatListItem.MessageItem -> item.msg.id
-                                    is ChatListItem.DateSeparator -> "sep_${item.label}"
+                                    is ChatListItem.DateSeparator -> DateSeparatorChip(item.label)
+                                    is ChatListItem.MessageItem ->
+                                        MessageBubble(
+                                            message = item.msg,
+                                            isFirstInGroup = item.isFirstInGroup,
+                                            isLastInGroup = item.isLastInGroup,
+                                            currentUserId = currentUserId,
+                                            psychologistInfo = psychologistInfo,
+                                            audioUiState = audioUiState,
+                                            onPlayPause = { messageId, url ->
+                                                viewModel.toggleAudioPlayback(messageId, url)
+                                            },
+                                            onOpenAttachment = { url ->
+                                                openAttachment(context, url)
+                                            },
+                                        )
                                 }
-                            },
-                        ) { item ->
-                            when (item) {
-                                is ChatListItem.DateSeparator -> DateSeparatorChip(item.label)
-                                is ChatListItem.MessageItem ->
-                                    MessageBubble(
-                                        message = item.msg,
-                                        isFirstInGroup = item.isFirstInGroup,
-                                        isLastInGroup = item.isLastInGroup,
-                                        currentUserId = uiState.currentUserId,
-                                        psychologistInfo = uiState.assignedPsychologist,
-                                        audioUiState = audioUiState,
-                                        onPlayPause = { messageId, url ->
-                                            viewModel.toggleAudioPlayback(messageId, url)
-                                        },
-                                        onOpenAttachment = { url ->
-                                            openAttachment(context, url)
-                                        },
-                                    )
                             }
                         }
                     }

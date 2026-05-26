@@ -762,7 +762,7 @@ fun PsicologoContent(
                         stepNumber = "1",
                         title = "Envío y Registro",
                         description = "El problema se ha registrado y nuestro equipo técnico ha sido notificado.",
-                        icon = Icons.Default.Send,
+                        icon = Icons.Filled.Send,
                         iconColor = MaterialTheme.colorScheme.primary,
                         isCompleted = isStep1Completed,
                         isActive = isStep1Active,

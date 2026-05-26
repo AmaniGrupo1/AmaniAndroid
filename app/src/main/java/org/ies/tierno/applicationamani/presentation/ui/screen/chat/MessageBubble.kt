@@ -242,15 +242,9 @@ private fun ImageMessageBubble(
     ) {
         Column(modifier = Modifier.padding(2.dp)) {
             Box {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(content.url)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = stringResource(R.string.auto_imagen_adjunta),
-                    contentScale = ContentScale.Crop,
+                ImageMessage(
+                    imageUrl = content.url,
                     modifier = Modifier
-                        .clip(shape)
                         .widthIn(min = 120.dp, max = (screenWidth * 0.75f).dp)
                         .heightIn(min = 120.dp, max = 350.dp)
                         .clickable { /* Preview image */ }
