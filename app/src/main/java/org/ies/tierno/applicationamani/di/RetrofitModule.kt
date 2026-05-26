@@ -50,6 +50,9 @@ val retrofitModule =
             val builder =
                 okhttp3.OkHttpClient
                     .Builder()
+                    .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                     .addInterceptor(get<AuthInterceptor>())
                     .addInterceptor(get<TokenRefreshInterceptor>())
 

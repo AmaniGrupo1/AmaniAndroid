@@ -68,10 +68,20 @@ fun buildChatItems(
             items.add(ChatListItem.DateSeparator(label))
         }
 
-        val isFirstInGroup = i == 0 || sortedAsc[i - 1].senderId != msg.senderId
-        val isLastInGroup =
-            i == sortedAsc.lastIndex ||
-                sortedAsc[i + 1].senderId != msg.senderId
+        fun Message.toLocalDate(): LocalDate =
+            Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate()
+
+        val prevMsg = if (i > 0) sortedAsc[i - 1] else null
+        val nextMsg = if (i < sortedAsc.lastIndex) sortedAsc[i + 1] else null
+
+        val isFirstInGroup = prevMsg == null
+            || prevMsg.senderId != msg.senderId
+            || prevMsg.toLocalDate() != msg.toLocalDate()
+
+        val isLastInGroup = nextMsg == null
+            || nextMsg.senderId != msg.senderId
+            || nextMsg.toLocalDate() != msg.toLocalDate()
+
         items.add(ChatListItem.MessageItem(msg, isFirstInGroup, isLastInGroup))
     }
 

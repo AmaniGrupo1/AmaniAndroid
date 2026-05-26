@@ -49,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -117,8 +118,16 @@ fun ChatScreen(
             uri?.let { viewModel.setPendingAttachment(it) }
         }
 
+    val previousSize = remember { mutableIntStateOf(0) }
+
     LaunchedEffect(chatItems.size) {
-        if (chatItems.isNotEmpty()) listState.animateScrollToItem(0)
+        val grew = chatItems.size > previousSize.intValue
+        val isAtBottom = !listState.canScrollBackward // reverseLayout: "backward" = toward bottom
+
+        if (grew && (isAtBottom || previousSize.intValue == 0)) {
+            listState.animateScrollToItem(0)
+        }
+        previousSize.intValue = chatItems.size
     }
 
     LaunchedEffect(uiState.error) {

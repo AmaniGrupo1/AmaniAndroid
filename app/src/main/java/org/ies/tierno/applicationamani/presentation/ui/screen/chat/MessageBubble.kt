@@ -44,8 +44,8 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.Psychologist
 sealed class MessageUiContent {
     data class Text(val text: String) : MessageUiContent()
     data class Image(val url: String, val caption: String?) : MessageUiContent()
-    data class Audio(val url: String) : MessageUiContent()
-    data class Document(val url: String, val name: String) : MessageUiContent()
+    data class Audio(val url: String, val caption: String?) : MessageUiContent()
+    data class Document(val url: String, val name: String, val caption: String?) : MessageUiContent()
     data class AttachmentPlaceholder(val label: String) : MessageUiContent()
     object Unknown : MessageUiContent()
 }
@@ -69,9 +69,9 @@ fun Message.toUiContent(): MessageUiContent {
 
             when (attachmentType) {
                 AttachmentType.IMAGE -> MessageUiContent.Image(cleanUrl, realCaption)
-                AttachmentType.AUDIO -> MessageUiContent.Audio(cleanUrl)
-                AttachmentType.DOCUMENT -> MessageUiContent.Document(cleanUrl, attachmentName ?: "Documento adjunto")
-                else -> MessageUiContent.Document(cleanUrl, attachmentName ?: fallbackLabel.ifBlank { "Archivo adjunto" })
+                AttachmentType.AUDIO -> MessageUiContent.Audio(cleanUrl, realCaption)
+                AttachmentType.DOCUMENT -> MessageUiContent.Document(cleanUrl, attachmentName ?: "Documento adjunto", realCaption)
+                else -> MessageUiContent.Document(cleanUrl, attachmentName ?: fallbackLabel.ifBlank { "Archivo adjunto" }, realCaption)
             }
         }
         !isRealText && fallbackLabel.isNotBlank() -> MessageUiContent.AttachmentPlaceholder(fallbackLabel)
@@ -150,8 +150,13 @@ fun MessageBubble(
                             audioUiState = audioUiState,
                             onPlayPause = onPlayPause,
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        TimestampOnly(message = message, isOwn = isOwn)
+                        if (!uiContent.caption.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            MessageWithTimestamp(text = uiContent.caption, message = message, isOwn = isOwn)
+                        } else {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            TimestampOnly(message = message, isOwn = isOwn)
+                        }
                     }
                 }
             }
@@ -166,8 +171,13 @@ fun MessageBubble(
                             isOwn = isOwn,
                             onOpen = { onOpenAttachment(uiContent.url) },
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        TimestampOnly(message = message, isOwn = isOwn)
+                        if (!uiContent.caption.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            MessageWithTimestamp(text = uiContent.caption, message = message, isOwn = isOwn)
+                        } else {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            TimestampOnly(message = message, isOwn = isOwn)
+                        }
                     }
                 }
             }
@@ -342,7 +352,7 @@ private fun MessageWithTimestamp(
             mapOf(
                 "statusIcon" to
                     InlineTextContent(
-                        Placeholder(14.sp, 14.sp, PlaceholderVerticalAlign.Center),
+                        Placeholder(14.sp, 14.sp, PlaceholderVerticalAlign.TextCenter),
                     ) {
                         StatusIcon(isRead = message.isRead, isDelivered = message.isDelivered, tint = timestampColor)
                     },
@@ -391,7 +401,7 @@ private fun messageBubbleShape(
 
     return if (isOwn) {
         RoundedCornerShape(
-            topStart = if (isFirstInGroup) full else reduced,
+            topStart = full,
             topEnd = if (isFirstInGroup) full else reduced,
             bottomStart = full,
             bottomEnd = if (isLastInGroup) tail else reduced,
@@ -399,7 +409,7 @@ private fun messageBubbleShape(
     } else {
         RoundedCornerShape(
             topStart = if (isFirstInGroup) full else reduced,
-            topEnd = if (isFirstInGroup) full else reduced,
+            topEnd = full,
             bottomStart = if (isLastInGroup) tail else reduced,
             bottomEnd = full,
         )
