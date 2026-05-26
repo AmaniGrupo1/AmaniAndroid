@@ -101,6 +101,7 @@ import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 
 /**
@@ -129,6 +130,7 @@ val appModule = module {
             ).addMigrations(AmaniDatabase.MIGRATION_1_2)
             .build()
     }
+    single { FirebaseFirestore.getInstance() }
     single { get<AmaniDatabase>().diarioEmocionalDao() }
 
     single { FirebaseDatabase.getInstance() }
