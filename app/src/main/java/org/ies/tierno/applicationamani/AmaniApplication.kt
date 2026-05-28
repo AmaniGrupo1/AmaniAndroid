@@ -60,6 +60,12 @@ class AmaniApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Inicializar Stripe con clave pública de prueba
+        com.stripe.android.PaymentConfiguration.init(
+            applicationContext,
+            "pk_test_TYooMQauvdEDq54NiTphI7jx" // Reemplaza con tu clave de Stripe
+        )
+
         // Inicializar Firebase y configurar Crashlytics
         FirebaseApp.initializeApp(this)
         // Desactivar la recolección automática en DEBUG para evitar ruido durante el desarrollo

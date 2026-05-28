@@ -17,6 +17,7 @@ import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.data.remoto.HistorialCitaApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -28,12 +29,14 @@ import java.time.LocalTime
 
 class CitasRepositoryTest {
     private lateinit var citasApi: CitasApi
+    private lateinit var historialCitaApi: HistorialCitaApi
     private lateinit var repository: CitasRepository
 
     @Before
     fun setUp() {
         citasApi = mockk()
-        repository = CitasRepository(citasApi)
+        historialCitaApi = mockk(relaxed = true)
+        repository = CitasRepository(citasApi, historialCitaApi)
     }
 
     private fun agendaItem(

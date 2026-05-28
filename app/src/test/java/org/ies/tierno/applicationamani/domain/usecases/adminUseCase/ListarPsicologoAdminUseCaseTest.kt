@@ -45,6 +45,8 @@ class ListarPsicologoAdminUseCaseTest {
                     experiencia = 10,
                     descripcion = "TCC",
                     licencia = "LIC1",
+                    telefono = "123",
+                    email = "test@test.com",
                 )
             every { repository.getPsicologos() } returns flowOf(listOf(psicologo))
 

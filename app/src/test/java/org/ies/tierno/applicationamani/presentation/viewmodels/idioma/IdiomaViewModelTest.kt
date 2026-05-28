@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.setMain
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
+import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +29,7 @@ class IdiomaViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: IdiomaUseCase
     private lateinit var dataStore: UserSessionDataStore
+    private lateinit var citasRepository: CitasRepository
     private lateinit var viewModel: IdiomaViewModel
 
     @Before
@@ -35,6 +37,7 @@ class IdiomaViewModelTest {
         Dispatchers.setMain(testDispatcher)
         useCase = mockk(relaxed = true)
         dataStore = mockk(relaxed = true)
+        citasRepository = mockk(relaxed = true)
         mockkStatic(AppCompatDelegate::class)
         mockkStatic(LocaleListCompat::class)
     }
@@ -52,7 +55,7 @@ class IdiomaViewModelTest {
             every { dataStore.sessionFlow } returns flowOf(session)
             coEvery { dataStore.getSession() } returns session
 
-            viewModel = IdiomaViewModel(useCase, dataStore)
+            viewModel = IdiomaViewModel(useCase, dataStore, citasRepository)
             advanceUntilIdle()
 
             viewModel.cambiarIdioma("en")
@@ -69,7 +72,7 @@ class IdiomaViewModelTest {
             every { dataStore.sessionFlow } returns flowOf(session)
             coEvery { dataStore.getSession() } returns session
 
-            viewModel = IdiomaViewModel(useCase, dataStore)
+            viewModel = IdiomaViewModel(useCase, dataStore, citasRepository)
             advanceUntilIdle()
 
             viewModel.cambiarTema(true)

@@ -1916,7 +1916,7 @@ fun DialogoCrearEditarCitaMejorado(
                                     color = colors.primary
                                 )
                             },
-                            leadingIcon = { Text("€") },
+                            leadingIcon = { Text(stringResource(R.string.)) },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth()

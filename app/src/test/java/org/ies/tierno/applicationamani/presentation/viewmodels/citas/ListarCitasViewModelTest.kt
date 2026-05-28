@@ -13,6 +13,7 @@ import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.usecases.historialCita.HistorialCitaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase.ListarCitasUseCase
 import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.junit.After
@@ -29,6 +30,7 @@ class ListarCitasViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val listarCitasUseCase: ListarCitasUseCase = mockk()
     private val citasRepository: CitasRepository = mockk()
+    private val historialCitaUseCase: HistorialCitaUseCase = mockk()
 
     private val testAgendaItem =
         AgendaItemDTO(
@@ -81,7 +83,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -96,7 +98,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } throws Exception("Error de red")
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -111,7 +113,7 @@ class ListarCitasViewModelTest {
             val deferred = kotlinx.coroutines.CompletableDeferred<List<CitaPacienteViewResponseDTO>>()
             coEvery { listarCitasUseCase() } coAnswers { deferred.await() }
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             assertTrue(viewModel.isLoading.value)
 
@@ -125,7 +127,7 @@ class ListarCitasViewModelTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
             coEvery { citasRepository.cancelarCita(1L) } returns Result.success(testAgendaItem)
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -143,7 +145,7 @@ class ListarCitasViewModelTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
             coEvery { citasRepository.cancelarCita(1L) } returns Result.failure(Exception("No se puede cancelar"))
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -159,7 +161,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -175,7 +177,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } throws Exception("fail")
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
             viewModel.cargarCitas()
             advanceUntilIdle()
 

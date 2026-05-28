@@ -626,7 +626,7 @@ class PsicologoAgendaViewModel(
         estadoPago: EstadoPago,
         monto: BigDecimal,
         modalidad: ModalidadCita,
-    ): Result<Unit> {
+    ): Result<Long> {
         Log.d("VM_CREAR_CITA", "========== INICIO crearCitaParaPaciente ==========")
         Log.d("VM_CREAR_CITA", "idPaciente: $idPaciente")
         Log.d("VM_CREAR_CITA", "fecha: $fecha, hora: $hora")
@@ -675,7 +675,7 @@ class PsicologoAgendaViewModel(
                 _successMessage.value = "Cita creada exitosamente"
                 cargarAgendaMensual(_mesVisible.value)
                 cargarDisponibilidadDia(fecha, duracionMinutos)
-                Result.success(Unit)
+                Result.success(resultado.getOrNull()?.id ?: 0L)
             } else {
                 val error = resultado.exceptionOrNull() ?: Exception("Error al crear cita")
                 _errorMessage.value = error.message

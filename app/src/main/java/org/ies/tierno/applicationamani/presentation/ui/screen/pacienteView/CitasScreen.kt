@@ -626,8 +626,25 @@ fun CitasScreen(
                         viewModel.cargarAgendaMensual(mesVisible)
                         viewModel.cargarDisponibilidadDia(fecha)
 
-                        delay(3000)
-                        navController.navigateUp()
+                        if (metodoPago == MetodoPago.TARJETA) {
+                            val citaId = result.getOrNull() ?: 0L
+                            if (citaId > 0) {
+                                navController.navigate(
+                                    Screens.paymentScreen.createRoute(
+                                        citaId = citaId,
+                                        psicologoName = "Tu psicólogo",
+                                        fecha = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                        monto = "$monto €"
+                                    )
+                                )
+                            } else {
+                                delay(3000)
+                                navController.navigateUp()
+                            }
+                        } else {
+                            delay(3000)
+                            navController.navigateUp()
+                        }
                     } else {
                         snackbarHostState.showSnackbar("❌ Error al crear cita")
                     }
@@ -1083,7 +1100,7 @@ fun DialogoGestionCitaAmani(
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(R.string.auto_monto_), color = colors.textSecondary, fontFamily = roboto) },
-                            leadingIcon = { Text("€", color = colors.primary, fontFamily = roboto) },
+                            leadingIcon = { Text(stringResource(R.string.), color = colors.primary, fontFamily = roboto) },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth(),

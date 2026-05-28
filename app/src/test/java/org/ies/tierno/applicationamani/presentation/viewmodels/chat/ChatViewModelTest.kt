@@ -130,10 +130,13 @@ class ChatViewModelTest {
     fun `initial state is correct`() =
         runTest {
             viewModel.uiState.test {
-                val state = awaitItem()
+                var state = awaitItem()
+                if (state is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Loading) {
+                    state = awaitItem()
+                }
+                state as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success
                 assertEquals("1", state.currentUserId)
                 assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), state.messages)
-                assertNull(state.error)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -148,10 +151,15 @@ class ChatViewModelTest {
             viewModel = createViewModel()
 
             viewModel.uiState.test {
-                assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), awaitItem().messages)
+                var state = awaitItem()
+                if (state is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Loading) {
+                    state = awaitItem()
+                }
+                assertEquals(emptyList<org.ies.tierno.applicationamani.domain.models.Message>(), (state as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success).messages)
 
                 messagesFlow.value = messages
-                assertEquals(messages, awaitItem().messages)
+                var nextState = awaitItem()
+                assertEquals(messages, (nextState as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success).messages)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -168,12 +176,11 @@ class ChatViewModelTest {
             viewModel = createViewModel()
 
             viewModel.uiState.test {
-                // Skip initial state and potentially intermediate loading states
                 var lastState = awaitItem()
-                while (lastState.error == null) {
+                while (lastState !is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error) {
                     lastState = awaitItem()
                 }
-                assertEquals("Network Error", lastState.error)
+                assertEquals("Network Error", lastState.message)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -184,19 +191,22 @@ class ChatViewModelTest {
             coEvery { sendMessageUseCase(any(), any(), any()) } returns Result.success(Unit)
 
             viewModel.uiState.test {
-                awaitItem() // Initial
+                var state = awaitItem()
+                if (state is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Loading) {
+                    state = awaitItem()
+                }
 
                 viewModel.onInputChanged("Hello")
-                assertEquals("Hello", awaitItem().inputText)
+                state = awaitItem()
+                assertEquals("Hello", (state as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success).inputText)
 
                 viewModel.sendMessage()
 
-                // Wait for input to be cleared
-                var state = awaitItem()
-                while (state.inputText != "") {
+                state = awaitItem()
+                while ((state as? org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success)?.inputText != "") {
                     state = awaitItem()
                 }
-                assertEquals("", state.inputText)
+                assertEquals("", (state as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success).inputText)
                 cancelAndIgnoreRemainingEvents()
             }
             coVerify { sendMessageUseCase(1L, 2L, "Hello") }
@@ -208,19 +218,21 @@ class ChatViewModelTest {
             coEvery { sendMessageUseCase(any(), any(), any()) } returns Result.failure(Exception("Failed to send"))
 
             viewModel.uiState.test {
-                awaitItem() // Initial
+                var state = awaitItem()
+                if (state is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Loading) {
+                    state = awaitItem()
+                }
 
                 viewModel.onInputChanged("Hello")
-                awaitItem() // Input changed
+                awaitItem()
 
                 viewModel.sendMessage()
 
-                // Wait for error
-                var state = awaitItem()
-                while (state.error == null) {
+                state = awaitItem()
+                while (state !is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error) {
                     state = awaitItem()
                 }
-                assertEquals("Failed to send", state.error)
+                assertEquals("Failed to send", state.message)
                 cancelAndIgnoreRemainingEvents()
             }
         }

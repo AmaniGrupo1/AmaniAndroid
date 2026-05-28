@@ -18,6 +18,7 @@ import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.remoto.AuthApi
+import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 import org.ies.tierno.applicationamani.domain.models.login.LoginRequestDTO
 import org.ies.tierno.applicationamani.domain.models.login.LoginResponseDTO
 import org.ies.tierno.applicationamani.domain.models.login.RegistryPacienteDTO
@@ -36,6 +37,7 @@ class AuthRepositoryTest {
     private lateinit var tokenDataStore: TokenDataStore
     private lateinit var tokenHolder: TokenHolder
     private lateinit var userSessionDataStore: UserSessionDataStore
+    private lateinit var firebaseAuthManager: FirebaseAuthManager
     private lateinit var repository: AuthRepository
     private lateinit var firebaseAuth: FirebaseAuth
 
@@ -53,7 +55,8 @@ class AuthRepositoryTest {
         tokenDataStore = mockk(relaxed = true)
         tokenHolder = mockk(relaxed = true)
         userSessionDataStore = mockk(relaxed = true)
-        repository = AuthRepository(api, tokenDataStore, tokenHolder, userSessionDataStore)
+        firebaseAuthManager = mockk(relaxed = true)
+        repository = AuthRepository(api, tokenDataStore, tokenHolder, userSessionDataStore, firebaseAuthManager)
     }
 
     @After
@@ -178,6 +181,8 @@ class AuthRepositoryTest {
                     experiencia = null,
                     descripcion = null,
                     licencia = null,
+                    telefono = "123",
+                    email = "test@test.com",
                 )
             coEvery { api.registerPsicologo(any()) } returns Response.success(body)
 

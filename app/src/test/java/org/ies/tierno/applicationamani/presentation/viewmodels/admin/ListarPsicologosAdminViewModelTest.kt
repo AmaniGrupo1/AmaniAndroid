@@ -15,6 +15,7 @@ import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicologoAdminUseCase
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
+import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,6 +27,7 @@ class ListarPsicologosAdminViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val listarPsicologoAdminUseCase: ListarPsicologoAdminUseCase = mockk()
     private val userSessionDataStore: UserSessionDataStore = mockk(relaxed = true)
+    private val profileUseCaseGeneral: ProfileUseCaseGeneral = mockk(relaxed = true)
 
     private val testPsicologo =
         PsicologoSelfResponseDTO(
@@ -36,6 +38,8 @@ class ListarPsicologosAdminViewModelTest {
             experiencia = 10,
             descripcion = "TCC",
             licencia = "LIC1",
+            telefono = "123456789",
+            email = "dr.garcia@test.com"
         )
 
     @Before
@@ -56,7 +60,7 @@ class ListarPsicologosAdminViewModelTest {
         runTest {
             every { listarPsicologoAdminUseCase() } returns flowOf(listOf(testPsicologo))
 
-            val viewModel = ListarPsicologosAdminViewModel(listarPsicologoAdminUseCase, userSessionDataStore)
+            val viewModel = ListarPsicologosAdminViewModel(listarPsicologoAdminUseCase, userSessionDataStore, profileUseCaseGeneral)
             advanceUntilIdle()
 
             assertEquals(1, viewModel.psicologos.value.size)
@@ -68,7 +72,7 @@ class ListarPsicologosAdminViewModelTest {
         runTest {
             every { listarPsicologoAdminUseCase() } returns flowOf(emptyList())
 
-            val viewModel = ListarPsicologosAdminViewModel(listarPsicologoAdminUseCase, userSessionDataStore)
+            val viewModel = ListarPsicologosAdminViewModel(listarPsicologoAdminUseCase, userSessionDataStore, profileUseCaseGeneral)
             advanceUntilIdle()
 
             assertTrue(viewModel.psicologos.value.isEmpty())
@@ -87,6 +91,8 @@ class ListarPsicologosAdminViewModelTest {
                         experiencia = 10,
                         descripcion = "TCC",
                         licencia = "LIC1",
+                        telefono = "111",
+                        email = "1@test.com",
                     ),
                     PsicologoSelfResponseDTO(
                         idPsicologo = 2L,
@@ -96,6 +102,8 @@ class ListarPsicologosAdminViewModelTest {
                         experiencia = 5,
                         descripcion = null,
                         licencia = "LIC2",
+                        telefono = "222",
+                        email = "2@test.com",
                     ),
                     PsicologoSelfResponseDTO(
                         idPsicologo = 3L,
@@ -105,11 +113,13 @@ class ListarPsicologosAdminViewModelTest {
                         experiencia = 8,
                         descripcion = null,
                         licencia = "LIC3",
+                        telefono = "333",
+                        email = "3@test.com",
                     ),
                 )
             every { listarPsicologoAdminUseCase() } returns flowOf(psicologos)
 
-            val viewModel = ListarPsicologosAdminViewModel(listarPsicologoAdminUseCase, userSessionDataStore)
+            val viewModel = ListarPsicologosAdminViewModel(listarPsicologoAdminUseCase, userSessionDataStore, profileUseCaseGeneral)
             advanceUntilIdle()
 
             assertEquals(3, viewModel.psicologos.value.size)
