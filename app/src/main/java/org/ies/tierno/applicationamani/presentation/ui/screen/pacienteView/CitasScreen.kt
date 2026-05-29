@@ -323,7 +323,7 @@ fun CitasScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Mostrar citas existentes del día seleccionado
+                // En CitasScreen, dentro del AnimatedVisibility donde muestras las citas programadas
                 AnimatedVisibility(
                     visible = fechaSeleccionada != null && citasDelDia.isNotEmpty(),
                     enter = fadeIn() + expandVertically(),
@@ -338,152 +338,189 @@ fun CitasScreen(
                             fontFamily = roboto,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
-                        citasDelDia.forEach { cita ->
-                            // Card rediseñado más elegante
+
+                        // ✅ FILTRAR: Solo mostrar citas que NO estén canceladas
+                        val citasActivas = citasDelDia.filter { cita ->
+                            cita.estado?.lowercase() != "cancelada"
+                        }
+
+                        if (citasActivas.isEmpty()) {
+                            // Mensaje cuando no hay citas activas
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 8.dp),
                                 shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = colors.surface
-                                ),
-                                elevation = CardDefaults.cardElevation(
-                                    defaultElevation = 2.dp,
-                                    pressedElevation = 4.dp
-                                )
+                                colors = CardDefaults.cardColors(containerColor = colors.surface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                             ) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                        .padding(24.dp),
+                                    horizontalArrangement = Arrangement.Center,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Información principal de la cita
-                                    Column(
-                                        modifier = Modifier.weight(1f),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    Icon(
+                                        Icons.Default.EventBusy,
+                                        contentDescription = "Sin citas",
+                                        tint = colors.textSecondary,
+                                        modifier = Modifier.size(32.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "No tienes citas activas para este día",
+                                        fontSize = 14.sp,
+                                        color = colors.textSecondary,
+                                        fontFamily = roboto
+                                    )
+                                }
+                            }
+                        } else {
+                            // Mostrar solo citas activas (no canceladas)
+                            citasActivas.forEach { cita ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = colors.surface
+                                    ),
+                                    elevation = CardDefaults.cardElevation(
+                                        defaultElevation = 2.dp,
+                                        pressedElevation = 4.dp
+                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        // Hora y duración
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        // Información principal de la cita
+                                        Column(
+                                            modifier = Modifier.weight(1f),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
-                                            Icon(
-                                                Icons.Default.AccessTime,
-                                                contentDescription = "Hora",
-                                                modifier = Modifier.size(18.dp),
-                                                tint = colors.primary
-                                            )
-                                            Text(
-                                                text = "${cita.horaInicio.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 15.sp,
-                                                color = colors.textPrimary,
-                                                fontFamily = roboto
-                                            )
+                                            // Hora y duración
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.AccessTime,
+                                                    contentDescription = "Hora",
+                                                    modifier = Modifier.size(18.dp),
+                                                    tint = colors.primary
+                                                )
+                                                Text(
+                                                    text = "${cita.horaInicio.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp,
+                                                    color = colors.textPrimary,
+                                                    fontFamily = roboto
+                                                )
 
-                                            // Duración
+                                                // Duración
+                                                Surface(
+                                                    shape = RoundedCornerShape(12.dp),
+                                                    color = colors.primary.copy(alpha = 0.1f),
+                                                    modifier = Modifier.padding(start = 4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "${cita.duracionMinutos ?: 60} min",
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = colors.primary,
+                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                                        fontFamily = roboto
+                                                    )
+                                                }
+                                            }
+
+                                            // Motivo de la cita (si existe)
+                                            if (!cita.motivo.isNullOrBlank()) {
+                                                Text(
+                                                    text = cita.motivo,
+                                                    fontSize = 13.sp,
+                                                    color = colors.textSecondary,
+                                                    fontFamily = roboto,
+                                                    maxLines = 2,
+                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                )
+                                            }
+
+                                            // Estado de la cita (solo mostrar si no es cancelada)
                                             Surface(
                                                 shape = RoundedCornerShape(12.dp),
-                                                color = colors.primary.copy(alpha = 0.1f),
-                                                modifier = Modifier.padding(start = 4.dp)
+                                                color = when (cita.estado?.lowercase()) {
+                                                    "confirmada" -> colors.success.copy(alpha = 0.15f)
+                                                    else -> colors.primaryLight.copy(alpha = 0.15f)
+                                                }
                                             ) {
                                                 Text(
-                                                    text = "${cita.duracionMinutos ?: 60} min",
+                                                    text = when (cita.estado?.lowercase()) {
+                                                        "confirmada" -> "✓ Confirmada"
+                                                        "pendiente" -> "⏳ Pendiente"
+                                                        else -> cita.estado?.replaceFirstChar { it.uppercase() } ?: "Pendiente"
+                                                    },
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Medium,
-                                                    color = colors.primary,
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                                    color = when (cita.estado?.lowercase()) {
+                                                        "confirmada" -> colors.success
+                                                        else -> colors.primary
+                                                    },
+                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                                     fontFamily = roboto
                                                 )
                                             }
                                         }
 
-                                        // Motivo de la cita (si existe)
-                                        if (!cita.motivo.isNullOrBlank()) {
+                                        Spacer(modifier = Modifier.width(12.dp))
+
+                                        // Botón para agregar al calendario
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            IconButton(
+                                                onClick = {
+                                                    enviarCitaAlCalendario(
+                                                        context = context,
+                                                        titulo = "Cita en Amani",
+                                                        descripcion = cita.motivo ?: "Cita psicológica",
+                                                        fecha = cita.fecha,
+                                                        hora = cita.horaInicio,
+                                                        duracionMinutos = cita.duracionMinutos ?: 60
+                                                    )
+                                                },
+                                                modifier = Modifier
+                                                    .size(44.dp)
+                                                    .background(
+                                                        brush = Brush.linearGradient(
+                                                            colors = listOf(colors.primary, colors.primaryLight)
+                                                        ),
+                                                        shape = RoundedCornerShape(12.dp)
+                                                    )
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.CalendarMonth,
+                                                    contentDescription = "Agregar a calendario",
+                                                    tint = if (isDark) Color.Black else Color.White,
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                            }
+
                                             Text(
-                                                text = cita.motivo,
-                                                fontSize = 13.sp,
+                                                text = "Calendario",
+                                                fontSize = 10.sp,
                                                 color = colors.textSecondary,
                                                 fontFamily = roboto,
-                                                maxLines = 2,
-                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                modifier = Modifier.padding(top = 4.dp)
                                             )
                                         }
-
-                                        // Estado de la cita
-                                        Surface(
-                                            shape = RoundedCornerShape(12.dp),
-                                            color = when (cita.estado?.lowercase()) {
-                                                "confirmada" -> colors.success.copy(alpha = 0.15f)
-                                                "cancelada" -> colors.error.copy(alpha = 0.15f)
-                                                else -> colors.primaryLight.copy(alpha = 0.15f)
-                                            }
-                                        ) {
-                                            Text(
-                                                text = when (cita.estado?.lowercase()) {
-                                                    "confirmada" -> "✓ Confirmada"
-                                                    "cancelada" -> "✗ Cancelada"
-                                                    "pendiente" -> "⏳ Pendiente"
-                                                    else -> cita.estado?.replaceFirstChar { it.uppercase() } ?: "Pendiente"
-                                                },
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.Medium,
-                                                color = when (cita.estado?.lowercase()) {
-                                                    "confirmada" -> colors.success
-                                                    "cancelada" -> colors.error
-                                                    else -> colors.primary
-                                                },
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                                fontFamily = roboto
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.width(12.dp))
-
-                                    // Botón para agregar al calendario
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        IconButton(
-                                            onClick = {
-                                                enviarCitaAlCalendario(
-                                                    context = context,
-                                                    titulo = "Cita en Amani",
-                                                    descripcion = cita.motivo ?: "Cita psicológica",
-                                                    fecha = cita.fecha,
-                                                    hora = cita.horaInicio,
-                                                    duracionMinutos = cita.duracionMinutos ?: 60
-                                                )
-                                            },
-                                            modifier = Modifier
-                                                .size(44.dp)
-                                                .background(
-                                                    brush = Brush.linearGradient(
-                                                        colors = listOf(colors.primary, colors.primaryLight)
-                                                    ),
-                                                    shape = RoundedCornerShape(12.dp)
-                                                )
-                                        ) {
-                                            Icon(
-                                                Icons.Default.CalendarMonth,
-                                                contentDescription = "Agregar a calendario",
-                                                tint = if (isDark) Color.Black else Color.White,
-                                                modifier = Modifier.size(22.dp)
-                                            )
-                                        }
-
-                                        Text(
-                                            text = "Calendario",
-                                            fontSize = 10.sp,
-                                            color = colors.textSecondary,
-                                            fontFamily = roboto,
-                                            modifier = Modifier.padding(top = 4.dp)
-                                        )
                                     }
                                 }
                             }
