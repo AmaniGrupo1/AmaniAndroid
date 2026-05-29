@@ -20,7 +20,10 @@ data class CitaPacienteViewResponseDTO(
     val minutosRestantes: Long?,
     val esProxima: Boolean?,
     val metodoPago: MetodoPago?,
-    val estadoPago: EstadoPago?
+    val estadoPago: EstadoPago?,
+    val idPsicologo: Long? = null,
+    val idPaciente: Long? = null,
+    val idTipoTerapia: Long? = null
 )
 
 // Información de contacto del psicólogo

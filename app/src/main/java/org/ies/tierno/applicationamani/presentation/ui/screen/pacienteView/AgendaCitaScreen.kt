@@ -39,6 +39,13 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.Calendar
+import java.math.BigDecimal
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
+import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
+import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
+import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 
 // Colores originales para el modo DEFECTO (Amani)
 object AgendaCitaDefaultColors {
@@ -117,9 +124,11 @@ fun AgendaCitaScreen(
     var citaToCancel by remember { mutableStateOf<CitaPacienteViewResponseDTO?>(null) }
     var showTerapiaInfoDialog by remember { mutableStateOf(false) }
     var terapiaInfoSeleccionada by remember { mutableStateOf<CitaPacienteViewResponseDTO?>(null) }
+    var citaIdEditando by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.cargarCitas()
+        viewModel.cargarTerapias()
     }
 
     LaunchedEffect(error) {
@@ -240,41 +249,70 @@ fun AgendaCitaScreen(
                 }
 
                 else -> {
+                    val disponibilidadDia by viewModel.disponibilidadDia.collectAsState()
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(citas) { cita ->
-                            CitaCardAmani(
-                                cita = cita,
-                                onCancelClick = {
-                                    citaToCancel = cita
-                                    showCancelDialog = true
-                                },
-                                onRescheduleClick = {
-                                    val citaId = cita.idCita
-                                    if (citaId != null && citaId > 0) {
-                                        navController.navigate(Screens.editarCitaScreen.pass(citaId.toString()))
-                                    } else {
-                                        android.widget.Toast.makeText(
-                                            context,
-                                            "No se puede reagendar esta cita",
-                                            android.widget.Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                },
-                                onCardClick = {
-                                    viewModel.selectCita(cita)
-                                },
-                                onTerapiaClick = {
-                                    terapiaInfoSeleccionada = cita
-                                    showTerapiaInfoDialog = true
-                                },
-                                colors = colors,
-                                roboto = roboto,
-                                isDark = isDark
-                            )
+                            if (citaIdEditando == cita.idCita) {
+                                CitaCardEditableInline(
+                                    cita = cita,
+                                    viewModel = viewModel,
+                                    disponibilidadDia = disponibilidadDia,
+                                    onCancelEdit = {
+                                        citaIdEditando = null
+                                        viewModel.limpiarDisponibilidad()
+                                    },
+                                    onSaveSuccess = {
+                                        citaIdEditando = null
+                                        viewModel.limpiarDisponibilidad()
+                                    },
+                                    colors = colors,
+                                    roboto = roboto,
+                                    isDark = isDark
+                                )
+                            } else {
+                                CitaCardAmani(
+                                    cita = cita,
+                                    onCancelClick = {
+                                        citaToCancel = cita
+                                        showCancelDialog = true
+                                    },
+                                    onRescheduleClick = {
+                                        val citaId = cita.idCita
+                                        if (citaId != null && citaId > 0) {
+                                            citaIdEditando = citaId
+                                            val fechaCita = try {
+                                                cita.fecha?.let { LocalDate.parse(it) }
+                                            } catch (e: Exception) { null }
+                                            if (fechaCita != null) {
+                                                val matchedTerapia = viewModel.listTerapias.find { it.nombre == cita.tipoTerapia }
+                                                val duracion = matchedTerapia?.duracionMinutos ?: cita.durationMinutes ?: 60
+                                                viewModel.cargarDisponibilidadDia(fechaCita, cita.idPsicologo, duracion)
+                                            }
+                                        } else {
+                                            android.widget.Toast.makeText(
+                                                context,
+                                                "No se puede reagendar esta cita",
+                                                android.widget.Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    },
+                                    onCardClick = {
+                                        viewModel.selectCita(cita)
+                                    },
+                                    onTerapiaClick = {
+                                        terapiaInfoSeleccionada = cita
+                                        showTerapiaInfoDialog = true
+                                    },
+                                    colors = colors,
+                                    roboto = roboto,
+                                    isDark = isDark
+                                )
+                            }
                         }
                     }
                 }
@@ -340,6 +378,7 @@ fun CitaCardAmani(
     roboto: FontFamily,
     isDark: Boolean
 ) {
+    val context = LocalContext.current
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -587,17 +626,42 @@ fun CitaCardAmani(
                 }
 
                 cita.modalidad?.let { modalidad ->
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = colors.primaryLight.copy(alpha = 0.1f)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
-                            text = modalidad,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            color = colors.primaryLight,
-                            fontFamily = roboto
-                        )
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = colors.primaryLight.copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text = modalidad,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                color = colors.primaryLight,
+                                fontFamily = roboto
+                            )
+                        }
+
+                        if (modalidad.uppercase() == "LLAMADA") {
+                            IconButton(
+                                onClick = {
+                                    val options = JitsiMeetConferenceOptions.Builder()
+                                        .setRoom("AmaniSession_${cita.idCita ?: 0L}")
+                                        .setFeatureFlag("welcomepage.enabled", false)
+                                        .build()
+                                    JitsiMeetActivity.launch(context, options)
+                                },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.VideoCall,
+                                    contentDescription = "Iniciar Videollamada Jitsi",
+                                    tint = colors.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -1144,6 +1208,325 @@ fun CancelConfirmationDialogAmani(
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CitaCardEditableInline(
+    cita: CitaPacienteViewResponseDTO,
+    viewModel: ListarCitasViewModel,
+    disponibilidadDia: org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse?,
+    onCancelEdit: () -> Unit,
+    onSaveSuccess: () -> Unit,
+    colors: AgendaCitaThemeColors,
+    roboto: FontFamily,
+    isDark: Boolean
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Original appointment values
+    val originalFecha = try {
+        cita.fecha?.let { LocalDate.parse(it) }
+    } catch (e: Exception) { null }
+
+    val originalHora = try {
+        cita.horaInicio?.let { LocalTime.parse(it) }
+    } catch (e: Exception) { null }
+
+    val originalModalidad = when (cita.modalidad?.uppercase()) {
+        "LLAMADA" -> ModalidadCita.LLAMADA
+        else -> ModalidadCita.PRESENCIAL
+    }
+
+    // State variables for form
+    var fechaSeleccionada by remember { mutableStateOf(originalFecha) }
+    var horaSeleccionada by remember { mutableStateOf(originalHora) }
+    var motivo by remember { mutableStateOf(cita.motivo ?: "") }
+    var modalidadSeleccionada by remember { mutableStateOf(originalModalidad) }
+
+    // Find therapy details from ListarCitasViewModel.listTerapias
+    val matchedTerapia = remember(cita.tipoTerapia, viewModel.listTerapias) {
+        viewModel.listTerapias.find { it.nombre == cita.tipoTerapia }
+    }
+    val idTipoTerapia = matchedTerapia?.idTipo ?: 1L
+    val monto = matchedTerapia?.precio ?: BigDecimal.ZERO
+    val duracionMinutos = matchedTerapia?.duracionMinutos ?: cita.durationMinutes ?: 60
+
+    val slotsLibres = remember(disponibilidadDia) {
+        disponibilidadDia?.slotsLibres?.filter { !it.ocupado }?.map { it.hora } ?: emptyList()
+    }
+
+    val horasDisponibles = remember(slotsLibres, originalHora, fechaSeleccionada) {
+        if (fechaSeleccionada == originalFecha && originalHora != null) {
+            (listOf(originalHora) + slotsLibres).distinct().sorted()
+        } else {
+            slotsLibres.sorted()
+        }
+    }
+
+    var horaDropdownExpanded by remember { mutableStateOf(false) }
+    var isSaving by remember { mutableStateOf(false) }
+
+    val hasChanges = remember(fechaSeleccionada, horaSeleccionada, motivo, modalidadSeleccionada) {
+        fechaSeleccionada != originalFecha ||
+        horaSeleccionada != originalHora ||
+        motivo != (cita.motivo ?: "") ||
+        modalidadSeleccionada != originalModalidad
+    }
+
+    val saveEnabled = fechaSeleccionada != null && horaSeleccionada != null && hasChanges && !isSaving
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = colors.surface)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "✏️ Reagendar Cita",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = colors.primary,
+                fontFamily = roboto
+            )
+
+            // Date Selection
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "📅 Fecha",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.textSecondary,
+                        fontFamily = roboto
+                    )
+                    Text(
+                        text = fechaSeleccionada?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "No seleccionada",
+                        fontSize = 14.sp,
+                        color = colors.textPrimary,
+                        fontFamily = roboto
+                    )
+                }
+                Button(
+                    onClick = {
+                        val calendar = Calendar.getInstance()
+                        val datePickerDialog = android.app.DatePickerDialog(
+                            context,
+                            { _, year, month, dayOfMonth ->
+                                val selected = LocalDate.of(year, month + 1, dayOfMonth)
+                                fechaSeleccionada = selected
+                                horaSeleccionada = null
+                                viewModel.cargarDisponibilidadDia(selected, cita.idPsicologo, duracionMinutos)
+                            },
+                            fechaSeleccionada?.year ?: calendar.get(Calendar.YEAR),
+                            fechaSeleccionada?.monthValue?.minus(1) ?: calendar.get(Calendar.MONTH),
+                            fechaSeleccionada?.dayOfMonth ?: calendar.get(Calendar.DAY_OF_MONTH)
+                        )
+                        datePickerDialog.show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Cambiar", color = if (isDark) Color.Black else Color.White, fontSize = 12.sp, fontFamily = roboto)
+                }
+            }
+
+            // Time Slot Dropdown
+            if (fechaSeleccionada != null) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "⏰ Hora de la cita",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.textSecondary,
+                        fontFamily = roboto,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = horaDropdownExpanded,
+                        onExpandedChange = { horaDropdownExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = horaSeleccionada?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "Selecciona horario",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = horaDropdownExpanded)
+                            },
+                            modifier = Modifier.fillMaxWidth().menuAnchor(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = colors.textPrimary,
+                                unfocusedTextColor = colors.textPrimary,
+                                focusedBorderColor = colors.primary,
+                                unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.5f),
+                                focusedContainerColor = colors.textFieldContainer,
+                                unfocusedContainerColor = colors.textFieldContainer
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = horaDropdownExpanded,
+                            onDismissRequest = { horaDropdownExpanded = false }
+                        ) {
+                            if (horasDisponibles.isEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("No hay horarios disponibles", color = colors.textSecondary, fontFamily = roboto) },
+                                    onClick = {}
+                                )
+                            } else {
+                                horasDisponibles.forEach { hora ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    Icons.Default.AccessTime,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(16.dp),
+                                                    tint = colors.primary
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = hora.format(DateTimeFormatter.ofPattern("HH:mm")),
+                                                    color = colors.textPrimary,
+                                                    fontFamily = roboto
+                                                )
+                                            }
+                                        },
+                                        onClick = {
+                                            horaSeleccionada = hora
+                                            horaDropdownExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Modality Selection
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "📍 Modalidad",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.textSecondary,
+                    fontFamily = roboto
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = modalidadSeleccionada == ModalidadCita.PRESENCIAL,
+                            onClick = { modalidadSeleccionada = ModalidadCita.PRESENCIAL },
+                            colors = RadioButtonDefaults.colors(selectedColor = colors.primary)
+                        )
+                        Text("Presencial", color = colors.textPrimary, fontSize = 13.sp, fontFamily = roboto)
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = modalidadSeleccionada == ModalidadCita.LLAMADA,
+                            onClick = { modalidadSeleccionada = ModalidadCita.LLAMADA },
+                            colors = RadioButtonDefaults.colors(selectedColor = colors.primary)
+                        )
+                        Text("Llamada", color = colors.textPrimary, fontSize = 13.sp, fontFamily = roboto)
+                    }
+                }
+            }
+
+            // Motivo text field
+            OutlinedTextField(
+                value = motivo,
+                onValueChange = { motivo = it },
+                label = { Text("Motivo de la cita", fontFamily = roboto) },
+                placeholder = { Text("Ej: Seguimiento o primera consulta", fontFamily = roboto) },
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 2,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = colors.textPrimary,
+                    unfocusedTextColor = colors.textPrimary,
+                    focusedBorderColor = colors.primary,
+                    unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.5f),
+                    focusedContainerColor = colors.textFieldContainer,
+                    unfocusedContainerColor = colors.textFieldContainer
+                )
+            )
+
+            // Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onCancelEdit,
+                    modifier = Modifier.weight(1f).height(44.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.error),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        brush = Brush.horizontalGradient(listOf(colors.error, colors.error))
+                    )
+                ) {
+                    Text("Cancelar", fontSize = 13.sp, fontFamily = roboto)
+                }
+
+                Button(
+                    onClick = {
+                        if (fechaSeleccionada != null && horaSeleccionada != null && !isSaving) {
+                            isSaving = true
+                            viewModel.editarCita(
+                                idCita = cita.idCita ?: 0L,
+                                idPaciente = cita.idPaciente,
+                                idPsicologo = cita.idPsicologo,
+                                fecha = fechaSeleccionada!!,
+                                hora = horaSeleccionada!!,
+                                duracionMinutos = duracionMinutos,
+                                motivo = motivo,
+                                idTipoTerapia = idTipoTerapia,
+                                metodoPago = cita.metodoPago ?: MetodoPago.EFECTIVO,
+                                estadoPago = cita.estadoPago ?: EstadoPago.PENDIENTE,
+                                monto = monto,
+                                modalidad = modalidadSeleccionada,
+                                onSuccess = {
+                                    isSaving = false
+                                    onSaveSuccess()
+                                },
+                                onError = { errorMsg ->
+                                    isSaving = false
+                                    android.widget.Toast.makeText(context, errorMsg, android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        }
+                    },
+                    enabled = saveEnabled,
+                    modifier = Modifier.weight(1f).height(44.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
+                ) {
+                    if (isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = if (isDark) Color.Black else Color.White
+                        )
+                    } else {
+                        Text("Guardar", color = if (isDark) Color.Black else Color.White, fontSize = 13.sp, fontFamily = roboto)
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Clase auxiliar para los colores del tema
