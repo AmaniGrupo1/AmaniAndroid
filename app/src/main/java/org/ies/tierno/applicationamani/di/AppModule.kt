@@ -209,7 +209,7 @@ val appModule = module {
     viewModel { EditProfilePsicologoViewModel(get()) }
     viewModel { PacienteViewModel(get()) }
     viewModel { ListarTerapiasViewModel(get(), get()) }
-    viewModel { ListarCitasViewModel(get(), get(), get()) }
+    viewModel { ListarCitasViewModel(get(), get(), get(), get()) }
     viewModel { DiarioEmocionalViewModel(get()) }
     viewModel { AdminRoleViewModel(get()) }
     viewModel { AdminUserViewModel(get()) }

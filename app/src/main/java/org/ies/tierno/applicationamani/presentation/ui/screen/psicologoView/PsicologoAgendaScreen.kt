@@ -32,6 +32,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
@@ -359,8 +364,11 @@ fun PsicologoAgendaScreen(
                                         }
                                         Spacer(modifier = Modifier.height(16.dp))
                                         citasDelDia.forEachIndexed { index, cita ->
+                                            val paciente = pacientesAsignados.find { it.idPaciente == cita.idPaciente }
+                                            val telefonoPaciente = paciente?.telefono
                                             TarjetaCitaMejorada(
                                                 cita = cita,
+                                                pacienteTelefono = telefonoPaciente,
                                                 onEdit = {
                                                     citaParaEditar = cita
                                                     mostrarDialogoCrearEditar = true
@@ -770,10 +778,12 @@ fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
 fun TarjetaCitaMejorada(
     scope: CoroutineScope,
     cita: AgendaItemDTO,
+    pacienteTelefono: String?,
     onEdit: () -> Unit,
     onCancel: () -> Unit,
     onChangeEstado: (EstadoCita) -> Unit
 ) {
+    val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
     val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
     var menuExpanded by remember { mutableStateOf(false) }
@@ -814,11 +824,34 @@ fun TarjetaCitaMejorada(
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        cita.nombrePaciente ?: "Paciente",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            cita.nombrePaciente ?: "Paciente",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (!pacienteTelefono.isNullOrBlank()) {
+                            IconButton(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                        data = Uri.parse("tel:${pacienteTelefono}")
+                                    }
+                                    context.startActivity(intent)
+                                },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Phone,
+                                    contentDescription = "Llamar al paciente",
+                                    tint = colors.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
                 }
 
                 // Indicador visual del estado actual
@@ -954,26 +987,54 @@ fun TarjetaCitaMejorada(
 
             // ✅ Modalidad de la cita
             Spacer(modifier = Modifier.height(4.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Icon(
-                    when (cita.modalidad) {
-                        ModalidadCita.PRESENCIAL -> Icons.Default.LocationOn
-                        ModalidadCita.LLAMADA -> Icons.Default.Phone
-                    },
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = colors.primary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = when (cita.modalidad) {
-                        ModalidadCita.PRESENCIAL -> "Presencial"
-                        ModalidadCita.LLAMADA -> "Llamada"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.primary,
-                    fontWeight = FontWeight.Medium
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    Icon(
+                        when (cita.modalidad) {
+                            ModalidadCita.PRESENCIAL -> Icons.Default.LocationOn
+                            ModalidadCita.LLAMADA -> Icons.Default.Phone
+                            null -> Icons.Default.Info
+                        },
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = colors.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (cita.modalidad) {
+                            ModalidadCita.PRESENCIAL -> "Presencial"
+                            ModalidadCita.LLAMADA -> "Llamada"
+                            null -> "Modalidad no especificada"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                if (cita.modalidad == ModalidadCita.LLAMADA) {
+                    IconButton(
+                        onClick = {
+                            val options = JitsiMeetConferenceOptions.Builder()
+                                .setRoom("AmaniSession_${cita.id}")
+                                .setFeatureFlag("welcomepage.enabled", false)
+                                .build()
+                            JitsiMeetActivity.launch(context, options)
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.VideoCall,
+                            contentDescription = "Iniciar Videollamada Jitsi",
+                            tint = colors.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
 
             // ✅ Método de pago
