@@ -120,7 +120,8 @@ class CitasViewModel(
             citasRepository
                 .getAgendaPaciente(idPaciente, month.toString())
                 .onSuccess { agenda ->
-                    _agendaMensual.value = agenda
+                    val filteredAgenda = agenda.filter { it.idPaciente == idPaciente }
+                    _agendaMensual.value = filteredAgenda
                     _errorMessage.value = null
                 }.onFailure { error ->
                     _errorMessage.value = error.message ?: "Error cargando agenda"

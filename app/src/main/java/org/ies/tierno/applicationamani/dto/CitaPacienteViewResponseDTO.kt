@@ -37,6 +37,9 @@ data class CitaPacienteViewResponseDTO(
     val esProxima: Boolean?,
     val metodoPago: MetodoPago?,
     val estadoPago: EstadoPago?,
+    val idPsicologo: Long? = null,
+    val idPaciente: Long? = null,
+    val idTipoTerapia: Long? = null
 )
 
 /**
