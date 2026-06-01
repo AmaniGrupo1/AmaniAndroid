@@ -74,7 +74,14 @@ class ListarCitasViewModel(
                 error.value = null
                 val result = listarCitasUseCase()
                 citas.clear()
-                citas.addAll(result)
+                val session = userSession.value
+                val filteredResult = if (session != null && session.rol.lowercase().trim() == "paciente") {
+                    val patientId = session.idPaciente ?: session.idUsuario
+                    result.filter { it.idPaciente == patientId }
+                } else {
+                    result
+                }
+                citas.addAll(filteredResult)
             } catch (e: Exception) {
                 error.value = e.message ?: "Error al cargar citas"
             } finally {
@@ -118,8 +125,20 @@ class ListarCitasViewModel(
                 val result = historialCitaUseCase.getHistorialCitas()
 
                 if (result.isSuccess) {
+                    val list = result.getOrDefault(emptyList())
+                    val session = userSession.value
+                    val filteredList = if (session != null && session.rol.lowercase().trim() == "paciente") {
+                        val patientName = session.nombre
+                        if (!patientName.isNullOrBlank()) {
+                            list.filter { it.nombrePaciente.equals(patientName, ignoreCase = true) }
+                        } else {
+                            list
+                        }
+                    } else {
+                        list
+                    }
                     historialCitas.clear()
-                    historialCitas.addAll(result.getOrDefault(emptyList()))
+                    historialCitas.addAll(filteredList)
                 } else {
                     error.value = result.exceptionOrNull()?.message ?: "Error al cargar historial de citas"
                 }
@@ -214,7 +233,7 @@ class ListarCitasViewModel(
                     estadoPago = estadoPago,
                     monto = monto,
                     motivo = motivo,
-                    estado = EstadoCita.pendiente,
+                    estado = EstadoCita.PENDIENTE,
                     idTipoTerapia = idTipoTerapia,
                     modalidad = modalidad
                 )
@@ -239,4 +258,4 @@ class ListarCitasViewModel(
         }
     }
 }
->>>>>>> login
+

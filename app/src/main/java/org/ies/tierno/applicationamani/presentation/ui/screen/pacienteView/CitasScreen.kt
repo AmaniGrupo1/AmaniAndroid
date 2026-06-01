@@ -213,13 +213,18 @@ fun CitasScreen(
         }
     }
 
-    val fechasConCitas = remember(agendaMensual) {
-        agendaMensual.map { it.fecha }.toSet()
+    // Filtrar la agenda del psicólogo para que el paciente solo vea sus propias citas
+    val agendaFiltrada = remember(agendaMensual, idPaciente) {
+        agendaMensual.filter { it.idPaciente == idPaciente }
     }
 
-    val citasDelDia = remember(fechaSeleccionada, agendaMensual) {
+    val fechasConCitas = remember(agendaFiltrada) {
+        agendaFiltrada.map { it.fecha }.toSet()
+    }
+
+    val citasDelDia = remember(fechaSeleccionada, agendaFiltrada) {
         fechaSeleccionada?.let { fecha ->
-            agendaMensual.filter { it.fecha == fecha }
+            agendaFiltrada.filter { it.fecha == fecha }
         } ?: emptyList()
     }
 
@@ -1141,7 +1146,7 @@ fun DialogoGestionCitaAmani(
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(R.string.auto_monto_), color = colors.textSecondary, fontFamily = roboto) },
-                            leadingIcon = { Text(stringResource(R.string.), color = colors.primary, fontFamily = roboto) },
+                            leadingIcon = { Text(stringResource(R.string.euro_symbol), color = colors.primary, fontFamily = roboto) },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth(),

@@ -1977,7 +1977,7 @@ fun DialogoCrearEditarCitaMejorado(
                                     color = colors.primary
                                 )
                             },
-                            leadingIcon = { Text(stringResource(R.string.)) },
+                            leadingIcon = { Text(stringResource(R.string.euro_symbol)) },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth()

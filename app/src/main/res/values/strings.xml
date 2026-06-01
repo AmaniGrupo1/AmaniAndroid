@@ -979,7 +979,7 @@
     <string name="no_hay_horarios_libres">❌ No hay horarios libres</string>
     <string name="pacientes">👤 Pacientes</string>
     <string name="psic_logos">🧠 Psicólogos</string>
-    <string name="">€</string>
+    <string name="euro_symbol">€</string>
     <string name="abrir_ticket_de_soporte">Abrir ticket de soporte</string>
     <string name="acepto_comunicaci_n">Acepto comunicación</string>
     <string name="agregar_primer_paciente">Agregar primer paciente</string>

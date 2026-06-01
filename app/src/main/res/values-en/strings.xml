@@ -977,7 +977,7 @@
     <string name="no_hay_horarios_libres">❌ No available slots</string>
     <string name="pacientes">👤 Patients</string>
     <string name="psic_logos">🧠 Psychologists</string>
-    <string name="">€</string>
+    <string name="euro_symbol">€</string>
     <string name="abrir_ticket_de_soporte">Open support ticket</string>
     <string name="acepto_comunicaci_n">Accept communication</string>
     <string name="agregar_primer_paciente">Add first patient</string>
@@ -1065,7 +1065,7 @@
     <string name="periodo">Period</string>
     <string name="prot_datos">Data Prot.</string>
     <string name="prueba_con_otra_fecha">Try another date</string>
-    <string name="qu_est_pasando_por_tu_mente">What's on your mind?</string>
+    <string name="qu_est_pasando_por_tu_mente">What\'s on your mind?</string>
     <string name="rol_actual">Current role:</string>
     <string name="selecciona_una_opci_n_para_act">Select an option to update your profile picture</string>
     <string name="s_cambiar_rol">Yes, change role</string>

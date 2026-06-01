@@ -90,6 +90,46 @@ fun AgendaCitaScreen(
     val isDark = isDarkTheme()
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
 
+    val screenColors = getScreenColors()
+    val cardColors = getCardColors()
+
+    // Determinar colores según el tema
+    val colors = if (isDark) {
+        AgendaCitaThemeColors(
+            primary = Color.White,
+            primaryLight = Color.White.copy(alpha = 0.7f),
+            primaryDark = Color.DarkGray,
+            secondary = Color.Gray,
+            accent = cardColors.cardBackground,
+            background = screenColors.background,
+            surface = cardColors.cardBackground,
+            textPrimary = cardColors.cardContent,
+            textSecondary = cardColors.cardContent.copy(alpha = 0.7f),
+            error = AgendaCitaDefaultColors.Error,
+            success = AgendaCitaDefaultColors.Success,
+            warning = AgendaCitaDefaultColors.Warning,
+            textFieldContainer = Color.DarkGray,
+            textFieldText = Color.White
+        )
+    } else {
+        AgendaCitaThemeColors(
+            primary = AgendaCitaDefaultColors.Primary,
+            primaryLight = AgendaCitaDefaultColors.PrimaryLight,
+            primaryDark = AgendaCitaDefaultColors.PrimaryDark,
+            secondary = AgendaCitaDefaultColors.Secondary,
+            accent = AgendaCitaDefaultColors.Accent,
+            background = AgendaCitaDefaultColors.Background,
+            surface = AgendaCitaDefaultColors.Surface,
+            textPrimary = AgendaCitaDefaultColors.TextPrimary,
+            textSecondary = AgendaCitaDefaultColors.TextSecondary,
+            error = AgendaCitaDefaultColors.Error,
+            success = AgendaCitaDefaultColors.Success,
+            warning = AgendaCitaDefaultColors.Warning,
+            textFieldContainer = Color.White,
+            textFieldText = Color.Black
+        )
+    }
+
     val citas = viewModel.citas
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
@@ -314,7 +354,6 @@ fun AgendaCitaScreen(
                                 )
                             }
                         }
-                    }
                     }
                 }
             }
