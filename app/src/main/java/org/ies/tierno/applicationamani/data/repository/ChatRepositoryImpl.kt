@@ -1,0 +1,341 @@
+// data/repository/ChatRepositoryImpl.kt
+package org.ies.tierno.applicationamani.data.repository
+
+import android.net.Uri
+import android.util.Log
+import androidx.annotation.WorkerThread
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import org.ies.tierno.applicationamani.domain.models.ChatMessage
+import org.ies.tierno.applicationamani.domain.models.MessageContent
+import org.ies.tierno.applicationamani.domain.models.MessageStatus
+import org.ies.tierno.applicationamani.domain.repository.ChatRepository
+import org.ies.tierno.applicationamani.domain.repository.ChatResult
+import org.ies.tierno.applicationamani.domain.repository.MediaType
+
+/*
+ * ESTRUCTURA FIREBASE RTDB (PLANA Y OPTIMIZADA)
+ * ─────────────────────────────────────────────
+ * {
+ *   "chats": {
+ *     "{chatId}": {
+ *       "messages": {
+ *         "{messageId}": {
+ *           "senderId":   "uid1",
+ *           "receiverId": "uid2",
+ *           "type":       "text | image | audio",
+ *           "body":       "Hola",
+ *           "storageRef": "chats/{chatId}/{fileName}",
+ *           "timestamp":  1700000000000,
+ *           "status":     "sent"
+ *         }
+ *       }
+ *     }
+ *   }
+ * }
+ *
+ * Por qué esta estructura evita over-fetching:
+ * 1. Los perfiles de usuario (nombre, avatar) viven en /users/{uid}, SEPARADOS de /chats.
+ *    Cuando se abre el chat SOLO se descarga el nodo de mensajes, no datos de usuario.
+ * 2. storageRef guarda la RUTA de Storage ("chats/123/foto.jpg"), NO la downloadUrl.
+ *    Las downloadUrls de Firebase Storage caducan a las 24h. La ruta es permanente y permite
+ *    generar una URL fresca en cualquier momento sin re-escribir el nodo del mensaje.
+ * 3. Con limitToLast(N) solo se transfieren los N mensajes más recientes, ignorando
+ *    el historial completo que puede tener miles de nodos.
+ */
+
+/**
+ * Implementación concreta de [ChatRepository] que usa Firebase Realtime Database
+ * para mensajería en tiempo real y Firebase Storage para archivos multimedia.
+ *
+ * Principios aplicados:
+ * - setPersistenceEnabled(true): activa la caché SQLite nativa de Firebase para soporte offline.
+ * - keepSynced(true): mantiene el nodo del chat sincronizado activamente cuando hay red.
+ * - callbackFlow: convierte los listeners de Firebase en Flows reactivos seguros con Coroutines.
+ * - Retry con backoff exponencial para subidas a Storage fallidas por red inestable.
+ */
+class ChatRepositoryImpl(
+    private val database: FirebaseDatabase,
+    private val storage: FirebaseStorage,
+) : ChatRepository {
+
+    companion object {
+        private const val TAG = "ChatRepositoryImpl"
+        private const val NODE_CHATS = "chats"
+        private const val NODE_MESSAGES = "messages"
+        private const val STORAGE_BASE_PATH = "chats"
+
+        private const val FIELD_SENDER_ID = "senderId"
+        private const val FIELD_RECEIVER_ID = "receiverId"
+        private const val FIELD_TYPE = "type"
+        private const val FIELD_BODY = "body"
+        private const val FIELD_STORAGE_REF = "storageRef"
+        private const val FIELD_TIMESTAMP = "timestamp"
+        private const val FIELD_STATUS = "status"
+
+        private const val TYPE_TEXT = "text"
+        private const val TYPE_IMAGE = "image"
+        private const val TYPE_AUDIO = "audio"
+
+        private const val MAX_UPLOAD_RETRIES = 3
+        private const val RETRY_BASE_DELAY_MS = 2_000L
+    }
+
+    init {
+        // La persistencia debe habilitarse UNA SOLA VEZ antes de cualquier uso de la DB.
+        // Si ya fue habilitada (p. ej. en Application.onCreate), Firebase ignora la llamada.
+        runCatching { database.setPersistenceEnabled(true) }
+    }
+
+    private fun messagesRef(chatId: String) =
+        database.getReference("$NODE_CHATS/$chatId/$NODE_MESSAGES")
+
+    // ─── 1. Observar mensajes en tiempo real (paginado) ───────────────────────
+
+    /**
+     * Observa los [pageSize] mensajes más recientes usando [ChildEventListener].
+     *
+     * Por qué ChildEventListener en lugar de ValueEventListener:
+     * Con ValueEventListener, cada nuevo mensaje descarga TODA la lista ordenada de nuevo.
+     * Con ChildEventListener, Firebase solo emite el delta (el nodo hijo añadido/cambiado),
+     * lo que reduce drásticamente el ancho de banda en conversaciones largas.
+     */
+    override fun observeMessages(
+        chatId: String,
+        pageSize: Int,
+    ): Flow<ChatResult<List<ChatMessage>>> = callbackFlow {
+        val ref = messagesRef(chatId)
+
+        // keepSynced asegura que este nodo se sincroniza agresivamente mientras el Flow esté activo
+        ref.keepSynced(true)
+
+        val messages = mutableListOf<ChatMessage>()
+
+        val query = ref
+            .orderByChild(FIELD_TIMESTAMP)
+            .limitToLast(pageSize)
+
+        val listener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                snapshot.toChatMessage()?.let { msg ->
+                    messages.removeIf { it.id == msg.id }
+                    messages.add(msg)
+                    messages.sortBy { it.timestamp }
+                    trySend(ChatResult.Success(messages.toList()))
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                snapshot.toChatMessage()?.let { updated ->
+                    val idx = messages.indexOfFirst { it.id == updated.id }
+                    if (idx >= 0) {
+                        messages[idx] = updated
+                        trySend(ChatResult.Success(messages.toList()))
+                    }
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val id = snapshot.key ?: return
+                messages.removeIf { it.id == id }
+                trySend(ChatResult.Success(messages.toList()))
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) = Unit
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "observeMessages cancelado: ${error.message}")
+                close(error.toException())
+            }
+        }
+
+        query.addChildEventListener(listener)
+
+        // awaitClose garantiza que el listener se elimina cuando el Flow se cancela (p. ej. al salir de la pantalla)
+        awaitClose {
+            query.removeEventListener(listener)
+            ref.keepSynced(false)
+            Log.d(TAG, "observeMessages: listener eliminado para chatId=$chatId")
+        }
+    }
+
+    // ─── 2. Cargar mensajes más antiguos (paginación hacia atrás) ─────────────
+
+    /**
+     * Carga mensajes anteriores a [beforeTimestamp] de forma puntual (no en stream).
+     *
+     * La consulta `endAt(beforeTimestamp - 1)` excluye el mensaje ancla ya visible
+     * en la UI para evitar duplicados al hacer merge con la lista existente.
+     */
+    @WorkerThread
+    override suspend fun loadOlderMessages(
+        chatId: String,
+        beforeTimestamp: Long,
+        pageSize: Int,
+    ): ChatResult<List<ChatMessage>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val snapshot = messagesRef(chatId)
+                .orderByChild(FIELD_TIMESTAMP)
+                .endAt((beforeTimestamp - 1).toDouble())
+                .limitToLast(pageSize)
+                .get()
+                .await()
+
+            val older = snapshot.children
+                .mapNotNull { it.toChatMessage() }
+                .sortedBy { it.timestamp }
+
+            ChatResult.Success(older)
+        }.getOrElse { e ->
+            Log.e(TAG, "loadOlderMessages error: ${e.message}", e)
+            ChatResult.Error(e)
+        }
+    }
+
+    // ─── 3. Enviar mensaje de texto ────────────────────────────────────────────
+
+    /**
+     * Escribe el mensaje en Firebase RTDB.
+     *
+     * Si el dispositivo está offline, Firebase encola la escritura localmente
+     * gracias a setPersistenceEnabled(true) y la sincroniza al recuperar la red.
+     */
+    @WorkerThread
+    override suspend fun sendTextMessage(
+        chatId: String,
+        message: ChatMessage,
+    ): ChatResult<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val ref = messagesRef(chatId)
+            val key = if (message.id.isBlank()) requireNotNull(ref.push().key) {
+                "Firebase no pudo generar una clave para el mensaje"
+            } else message.id
+
+            val body = (message.content as? MessageContent.Text)?.body.orEmpty()
+
+            val payload = mapOf(
+                FIELD_SENDER_ID to message.senderId,
+                FIELD_RECEIVER_ID to message.receiverId,
+                FIELD_TYPE to TYPE_TEXT,
+                FIELD_BODY to body,
+                FIELD_TIMESTAMP to message.timestamp,
+                FIELD_STATUS to MessageStatus.SENT.name.lowercase(),
+            )
+
+            ref.child(key).setValue(payload).await()
+            ChatResult.Success(Unit)
+        }.getOrElse { e ->
+            Log.e(TAG, "sendTextMessage error: ${e.message}", e)
+            ChatResult.Error(e)
+        }
+    }
+
+    // ─── 4. Subir archivo multimedia con reintentos ────────────────────────────
+
+    /**
+     * Sube un archivo a Firebase Storage y devuelve la ruta de Storage (no la URL).
+     *
+     * Estrategia de reintentos con backoff exponencial:
+     * intento 1 → espera 2s → intento 2 → espera 4s → intento 3 → Error.
+     * Solo se reintenta si el error es transitorio (red); los errores de permisos
+     * o cuota se propagan inmediatamente.
+     */
+    @WorkerThread
+    override suspend fun uploadMedia(
+        chatId: String,
+        uri: Uri,
+        type: MediaType,
+    ): ChatResult<String> = withContext(Dispatchers.IO) {
+        val extension = when (type) {
+            MediaType.IMAGE -> "jpg"
+            MediaType.AUDIO -> "ogg"
+        }
+        val fileName = "${System.currentTimeMillis()}.$extension"
+        val storagePath = "$STORAGE_BASE_PATH/$chatId/$fileName"
+        val storageRef = storage.reference.child(storagePath)
+
+        var attempt = 0
+        var lastException: Exception? = null
+
+        while (attempt < MAX_UPLOAD_RETRIES) {
+            try {
+                storageRef.putFile(uri).await()
+                Log.d(TAG, "uploadMedia exitoso en intento ${attempt + 1}: $storagePath")
+                return@withContext ChatResult.Success(storagePath)
+            } catch (e: StorageException) {
+                // Errores no recuperables (permisos, cuota): fallar inmediatamente
+                if (e.errorCode == StorageException.ERROR_NOT_AUTHORIZED ||
+                    e.errorCode == StorageException.ERROR_QUOTA_EXCEEDED
+                ) {
+                    Log.e(TAG, "Error de Storage no recuperable: ${e.message}", e)
+                    return@withContext ChatResult.Error(e)
+                }
+                lastException = e
+                attempt++
+                val delayMs = RETRY_BASE_DELAY_MS * attempt
+                Log.w(TAG, "uploadMedia intento $attempt fallido, reintentando en ${delayMs}ms: ${e.message}")
+                delay(delayMs)
+            } catch (e: Exception) {
+                lastException = e
+                attempt++
+                val delayMs = RETRY_BASE_DELAY_MS * attempt
+                Log.w(TAG, "uploadMedia excepción inesperada intento $attempt: ${e.message}")
+                delay(delayMs)
+            }
+        }
+
+        val finalError = lastException ?: Exception("uploadMedia: max reintentos alcanzados")
+        Log.e(TAG, "uploadMedia fallido tras $MAX_UPLOAD_RETRIES intentos", finalError)
+        ChatResult.Error(finalError)
+    }
+
+    // ─── Mapper: DataSnapshot → ChatMessage ───────────────────────────────────
+
+    /**
+     * Convierte un nodo de Firebase en un objeto de dominio [ChatMessage].
+     *
+     * Devuelve `null` si el nodo no tiene los campos mínimos obligatorios,
+     * evitando el uso del operador !! y propagación de NullPointerException.
+     */
+    private fun DataSnapshot.toChatMessage(): ChatMessage? {
+        val id = key ?: return null
+        val senderId = child(FIELD_SENDER_ID).getValue(String::class.java) ?: return null
+        val receiverId = child(FIELD_RECEIVER_ID).getValue(String::class.java).orEmpty()
+        val type = child(FIELD_TYPE).getValue(String::class.java) ?: TYPE_TEXT
+        val body = child(FIELD_BODY).getValue(String::class.java).orEmpty()
+        val storageRef = child(FIELD_STORAGE_REF).getValue(String::class.java).orEmpty()
+        val timestamp = child(FIELD_TIMESTAMP).getValue(Long::class.java) ?: return null
+        val statusRaw = child(FIELD_STATUS).getValue(String::class.java).orEmpty()
+
+        val content: MessageContent = when (type) {
+            TYPE_IMAGE -> MessageContent.Image(storageRef)
+            TYPE_AUDIO -> MessageContent.Audio(storageRef)
+            else -> MessageContent.Text(body)
+        }
+
+        val status = runCatching {
+            MessageStatus.valueOf(statusRaw.uppercase())
+        }.getOrDefault(MessageStatus.SENT)
+
+        return ChatMessage(
+            id = id,
+            senderId = senderId,
+            receiverId = receiverId,
+            content = content,
+            timestamp = timestamp,
+            status = status,
+        )
+    }
+}

@@ -14,6 +14,8 @@ package org.ies.tierno.applicationamani.domain.models
  * @property FAILED El envío falló de forma definitiva y requiere intervención del usuario.
  */
 enum class MessageStatus {
+    /** El mensaje se está enviando (inserción optimista en la UI). */
+    SENDING,
     SENT,
     DELIVERED,
     READ,

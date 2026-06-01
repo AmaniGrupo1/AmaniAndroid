@@ -63,6 +63,29 @@ class ChatFirebaseService(
         return null
     }
 
+    /**
+     * Extrae el timestamp de creación codificado en un push key de Firebase.
+     *
+     * Firebase genera push keys con el formato "-N<base62>" donde los primeros
+     * 8 bytes del valor base62 representan el timestamp Unix en milisegundos.
+     * Esto permite recuperar la hora real de creación del mensaje incluso cuando
+     * el backend no escribe explícitamente un campo timestamp en el nodo.
+     *
+     * @param pushKey Clave generada por Firebase push() (ej. "-NxY7kRtU2abc...").
+     * @return Timestamp en milisegundos o lanza excepción si el formato no es válido.
+     */
+    private fun decodeFirebasePushTimestamp(pushKey: String): Long {
+        if (pushKey.length < 8) return System.currentTimeMillis()
+        val PUSH_CHARS = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
+        var timestamp = 0L
+        for (i in 0 until 8) {
+            val charIndex = PUSH_CHARS.indexOf(pushKey[i])
+            if (charIndex < 0) return System.currentTimeMillis()
+            timestamp = timestamp * 64 + charIndex
+        }
+        return timestamp
+    }
+
     private fun DataSnapshot.longMapValue(key: String): Map<String, Long>? {
         val mapNode = child(key)
         if (!mapNode.exists()) return null
@@ -125,10 +148,17 @@ class ChatFirebaseService(
         child: DataSnapshot,
         currentUserId: Long? = null,
     ): Message {
-        val idMensaje = child.longValue("idMensaje", "messageId", "id") ?: child.key?.toLongOrNull() ?: 0L
+        val idMensaje = child.longValue("idMensaje", "messageId", "id", "id_mensaje") ?: child.key?.toLongOrNull() ?: 0L
         val senderId = child.longValue("idSender", "senderId") ?: 0L
         val mensaje = child.stringValue("mensaje", "message", "content") ?: ""
-        val enviadoEnRaw = child.child("enviadoEn").getValue() ?: child.child("timestamp").getValue()
+        val enviadoEnRaw = child.child("enviadoEn").getValue()
+            ?: child.child("timestamp").getValue()
+            ?: child.child("enviado_en").getValue()
+            ?: child.child("createdAt").getValue()
+            ?: child.child("created_at").getValue()
+            ?: child.child("fecha").getValue()
+            ?: child.child("sentAt").getValue()
+            ?: child.child("sent_at").getValue()
         val timestamp =
             when (enviadoEnRaw) {
                 is Long -> enviadoEnRaw
@@ -140,9 +170,17 @@ class ChatFirebaseService(
                             .toInstant()
                             .toEpochMilli()
                     } catch (e: Exception) {
-                        System.currentTimeMillis()
+                        // Si el campo no existe o es inválido se usa el key de Firebase (push key)
+                        // que codifica el timestamp de creación en sus primeros 8 bytes
+                        child.key
+                            ?.let { runCatching { decodeFirebasePushTimestamp(it) }.getOrNull() }
+                            ?: System.currentTimeMillis()
                     }
-                else -> System.currentTimeMillis()
+                else ->
+                    // Intentar decodificar el timestamp del push key antes de usar la hora actual
+                    child.key
+                        ?.let { runCatching { decodeFirebasePushTimestamp(it) }.getOrNull() }
+                        ?: System.currentTimeMillis()
             }
         val leido = child.child("leido").getValue(Boolean::class.java) ?: false
         val attachmentUrl = child.stringValue("attachmentUrl", "fileUrl", "urlArchivo", "archivoUrl", "url", "file_url", "mediaUrl")
@@ -213,9 +251,10 @@ class ChatFirebaseService(
                     }
                 }
 
-            messagesRef.addValueEventListener(listener)
+            val query = messagesRef.limitToLast(100)
+            query.addValueEventListener(listener)
             awaitClose {
-                messagesRef.removeEventListener(listener)
+                query.removeEventListener(listener)
                 messagesRef.keepSynced(false)
             }
         }
@@ -307,7 +346,8 @@ class ChatFirebaseService(
                     "idSender" to senderId,
                     "idReceiver" to receiverId,
                     "mensaje" to content,
-                    "enviadoEn" to messageId.toString(),
+                    "enviadoEn" to messageId,
+                    "timestamp" to messageId,
                     "leido" to false,
                 )
 

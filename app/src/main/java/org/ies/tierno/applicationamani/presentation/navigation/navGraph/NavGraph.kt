@@ -361,8 +361,8 @@ fun NavGraph(
                 val citaId = backStackEntry.arguments?.getLong("citaId") ?: 0L
                 val psicologoName =
                     Uri.decode(backStackEntry.arguments?.getString("psicologoName") ?: "")
-                val fecha = backStackEntry.arguments?.getString("fecha") ?: ""
-                val monto = backStackEntry.arguments?.getString("monto") ?: ""
+                val fecha = Uri.decode(backStackEntry.arguments?.getString("fecha") ?: "")
+                val monto = Uri.decode(backStackEntry.arguments?.getString("monto") ?: "")
 
                 val viewModel: PaymentViewModel = koinViewModel()
                 PaymentScreen(

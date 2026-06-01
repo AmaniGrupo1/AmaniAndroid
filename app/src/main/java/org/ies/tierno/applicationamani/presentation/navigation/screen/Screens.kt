@@ -115,7 +115,7 @@ sealed class Screens(
             psicologoName: String,
             fecha: String,
             monto: String,
-        ) = "paymentScreen/$citaId/${Uri.encode(psicologoName)}/$fecha/$monto"
+        ) = "paymentScreen/$citaId/${Uri.encode(psicologoName)}/${Uri.encode(fecha)}/${Uri.encode(monto)}"
     }
 
     object misTickets : Screens("misTickets")

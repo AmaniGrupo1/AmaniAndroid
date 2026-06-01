@@ -18,6 +18,7 @@ sealed class ChatListItem {
         val msg: Message,
         val isFirstInGroup: Boolean,
         val isLastInGroup: Boolean,
+        val uiContent: MessageUiContent,
     ) : ChatListItem()
 
     data class DateSeparator(
@@ -82,7 +83,7 @@ fun buildChatItems(
             || nextMsg.senderId != msg.senderId
             || nextMsg.toLocalDate() != msg.toLocalDate()
 
-        items.add(ChatListItem.MessageItem(msg, isFirstInGroup, isLastInGroup))
+        items.add(ChatListItem.MessageItem(msg, isFirstInGroup, isLastInGroup, msg.toUiContent()))
     }
 
     return items.reversed()

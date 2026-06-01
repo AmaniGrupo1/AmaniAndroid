@@ -250,6 +250,7 @@ fun ChatScreen(
                                     is ChatListItem.MessageItem ->
                                         MessageBubble(
                                             message = item.msg,
+                                            uiContent = item.uiContent,
                                             isFirstInGroup = item.isFirstInGroup,
                                             isLastInGroup = item.isLastInGroup,
                                             currentUserId = currentUserId,

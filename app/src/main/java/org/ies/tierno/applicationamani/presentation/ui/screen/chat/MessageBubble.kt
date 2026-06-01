@@ -82,6 +82,7 @@ fun Message.toUiContent(): MessageUiContent {
 @Composable
 fun MessageBubble(
     message: Message,
+    uiContent: MessageUiContent,
     isFirstInGroup: Boolean,
     isLastInGroup: Boolean,
     currentUserId: String,
@@ -110,8 +111,6 @@ fun MessageBubble(
                 Spacer(modifier = Modifier.width(38.dp))
             }
         }
-
-        val uiContent = message.toUiContent()
 
         when (uiContent) {
             is MessageUiContent.Image -> {
