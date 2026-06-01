@@ -138,6 +138,13 @@ class UserSessionDataStore(
      * @param session Objeto [UserSession] con los datos a almacenar.
      */
     suspend fun saveSession(session: UserSession) {
+        if (session.idioma != null) {
+            context.getSharedPreferences("amani_lang_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putString("language", session.idioma)
+                .apply()
+        }
+
         context.userSessionDataStore.edit { preferences ->
             preferences[USER_ID_KEY] = session.idUsuario
 

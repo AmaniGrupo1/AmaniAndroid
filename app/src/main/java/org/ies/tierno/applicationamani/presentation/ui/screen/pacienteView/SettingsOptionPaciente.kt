@@ -654,7 +654,11 @@ fun SettingsOptionRowPaciente(
 
                 val displaySubtitle =
                     when (option.id) {
-                        "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                        "language" -> when(currentLanguage) {
+                             "en" -> stringResource(R.string.ingles)
+                             "ca" -> stringResource(R.string.catalan)
+                             else -> stringResource(R.string.espanol)
+                        }
                         "tema" -> getCurrentThemeSubtitle(currentTema)
                         else -> option.subtitle
                     }
@@ -692,6 +696,16 @@ fun SettingsOptionRowPaciente(
                             onClick = {
                                 scope.launch {
                                     idiomaViewModel.cambiarIdioma("en")
+                                }
+                                expandedIdioma = false
+                            },
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.catalan), style = typography.bodyMedium) },
+                            onClick = {
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("ca")
                                 }
                                 expandedIdioma = false
                             },

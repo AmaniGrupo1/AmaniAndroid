@@ -35,8 +35,8 @@ import kotlinx.coroutines.launch
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
-import org.jitsi.meet.sdk.JitsiMeetActivity
-import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
+// import org.jitsi.meet.sdk.JitsiMeetActivity
+// import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoCita
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
@@ -1017,6 +1017,7 @@ fun TarjetaCitaMejorada(
                 }
 
                 if (cita.modalidad == ModalidadCita.LLAMADA) {
+                    /*
                     IconButton(
                         onClick = {
                             val options = JitsiMeetConferenceOptions.Builder()
@@ -1034,6 +1035,7 @@ fun TarjetaCitaMejorada(
                             modifier = Modifier.size(24.dp)
                         )
                     }
+                    */
                 }
             }
 

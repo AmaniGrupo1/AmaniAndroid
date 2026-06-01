@@ -194,7 +194,10 @@ class DiarioSyncManager(
      * @return [Result.success] si todo se procesó, [Result.failure] en caso contrario.
      */
     suspend fun pullRemoteEntries(): Result<Unit> {
-        val remoteResult = remoteRepository.getAll()
+        val session = userSessionDataStore.getSession()
+        val idPaciente = session?.idPaciente ?: return Result.failure(IllegalStateException("Sesión no encontrada"))
+
+        val remoteResult = remoteRepository.getByPaciente(idPaciente)
         remoteResult
             .onSuccess { remoteEntries ->
                 for (remote in remoteEntries) {

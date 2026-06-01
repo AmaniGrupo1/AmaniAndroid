@@ -727,7 +727,11 @@ fun SettingsOptionRow(
                 )
 
                 val displaySubtitle = when (option.id) {
-                    "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                    "language" -> when(currentLanguage) {
+                         "en" -> stringResource(R.string.ingles)
+                         "ca" -> stringResource(R.string.catalan)
+                         else -> stringResource(R.string.espanol)
+                    }
                     "dark_mode" -> getCurrentThemeSubtitle(currentTema)
                     else -> option.subtitle
                 }
@@ -761,6 +765,13 @@ fun SettingsOptionRow(
                             text = { Text(stringResource(R.string.ingles), color = onSurfaceColor) },
                             onClick = {
                                 scope.launch { idiomaViewModel.cambiarIdioma("en") }
+                                expandedLanguage = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.catalan), color = onSurfaceColor) },
+                            onClick = {
+                                scope.launch { idiomaViewModel.cambiarIdioma("ca") }
                                 expandedLanguage = false
                             }
                         )

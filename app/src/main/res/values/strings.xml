@@ -54,6 +54,7 @@
     <string name="cambiar_idioma">Cambiar idioma</string>
     <string name="espanol">Español</string>
     <string name="ingles">Inglés</string>
+    <string name="catalan">Catalán</string>
 
     <!-- Textos para pantalla Principal -->
     <string name="amani">AMANI</string>

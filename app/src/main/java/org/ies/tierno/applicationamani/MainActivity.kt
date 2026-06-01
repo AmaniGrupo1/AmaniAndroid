@@ -32,8 +32,11 @@ class MainActivity : ComponentActivity() {
      * @param newBase Contexto base proporcionado por el sistema.
      */
     override fun attachBaseContext(newBase: Context) {
-        val lang =
-            runBlocking {
+        val sharedPrefs = newBase.getSharedPreferences("amani_lang_prefs", Context.MODE_PRIVATE)
+        var lang = sharedPrefs.getString("language", null)
+
+        if (lang == null) {
+            lang = runBlocking {
                 try {
                     UserSessionDataStore(newBase)
                         .sessionFlow
@@ -43,6 +46,8 @@ class MainActivity : ComponentActivity() {
                     "es"
                 }
             }
+            sharedPrefs.edit().putString("language", lang).apply()
+        }
 
         val context = LanguageManager.setLocale(newBase, lang)
         super.attachBaseContext(context)

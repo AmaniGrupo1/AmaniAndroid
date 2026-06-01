@@ -685,7 +685,11 @@ fun SettingsOptionRowPsychologist(
                 )
 
                 val displaySubtitle = when (option.id) {
-                    "language" -> if (currentLanguage == "es") stringResource(R.string.espanol) else stringResource(R.string.ingles)
+                    "language" -> when(currentLanguage) {
+                         "en" -> stringResource(R.string.ingles)
+                         "ca" -> stringResource(R.string.catalan)
+                         else -> stringResource(R.string.espanol)
+                    }
                     "tema" -> getCurrentThemeSubtitle(currentTema)
                     else -> option.subtitle
                 }
@@ -724,6 +728,16 @@ fun SettingsOptionRowPsychologist(
                                 Log.d(TAG, "🇬🇧 Psicólogo seleccionó INGLÉS")
                                 scope.launch {
                                     idiomaViewModel.cambiarIdioma("en")
+                                }
+                                expandedLanguage = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.catalan), color = textColor) },
+                            onClick = {
+                                Log.d(TAG, "Catalan")
+                                scope.launch {
+                                    idiomaViewModel.cambiarIdioma("ca")
                                 }
                                 expandedLanguage = false
                             }
