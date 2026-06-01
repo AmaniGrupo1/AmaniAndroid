@@ -61,6 +61,9 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
@@ -68,6 +71,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = true
+                nativeSymbolUploadEnabled = true
+            }
         }
     }
 
@@ -134,7 +142,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.firebase.crashlytics)
     ksp(libs.androidx.room.compiler)
 
     // Coroutines
@@ -143,6 +150,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
 
     // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.firestore)

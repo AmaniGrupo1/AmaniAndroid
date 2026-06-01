@@ -135,7 +135,7 @@ val appModule = module {
 
     single { FirebaseDatabase.getInstance() }
 
-    single { AuthRepository(get(), get(), get(), get(), get()) }
+    single { AuthRepository(get(), get(), get(), get(), get(), get()) }
     single { TestRepositoryApi(get()) }
     single { SituacionRepository(get()) }
     single { CitasRepository(get(), get()) }
@@ -192,7 +192,7 @@ val appModule = module {
     factory { TicketsUseCase(get()) }
     factory { FirebaseAuthManager() }
 
-    viewModel { LoginViewModel(get(), get(), get(), get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { GetAllPacientAndPsicologoVeiwModel(get()) }
     viewModel { CrearPreguntaViewModel(get()) }
     viewModel { ListarPacientesViewModel(get(), get(), get()) }
@@ -200,7 +200,7 @@ val appModule = module {
     viewModel { PrincipalClienteViewModel() }
     viewModel { SettingsClienteViewModel(get(), get()) }
     viewModel { SituacionViewModel(get(), get()) }
-    viewModel { CitasViewModel(get(), get(), get()) }
+    viewModel { CitasViewModel(get(), get(), get(), get()) }
     viewModel { QuestionnaireViewModel() }
     viewModel { PsicologoAgendaViewModel(get(), get(), get()) }
     viewModel { CuestionarioViewModel(get()) }
@@ -237,6 +237,7 @@ val appModule = module {
             profileUseCaseGeneral = get(),
             authRepository = get(),
             chatRepositoryImpl = get(),
+            crashReporter = get(),
             appContext = androidContext(),
         )
     }
@@ -246,7 +247,7 @@ val appModule = module {
 
     single { PaymentRepository(get()) }
     factory { CreatePaymentIntentUseCase(get()) }
-    viewModel { PaymentViewModel(get()) }
+    viewModel { PaymentViewModel(get(), get()) }
 
     viewModel { SoporteTicketViewModel(get()) }
     viewModel { IdiomaViewModel(get(), get(), get()) }

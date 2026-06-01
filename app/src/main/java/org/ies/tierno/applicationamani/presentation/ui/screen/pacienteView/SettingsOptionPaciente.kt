@@ -203,6 +203,13 @@ fun SettingsPacienteScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            // DEV ONLY — remove before prod release
+            // item {
+            //     androidx.compose.material3.Button(onClick = { throw RuntimeException("Crashlytics test crash") }) {
+            //         Text("Test Crash")
+            //     }
+            // }
+
             // ==================== PERFIL (Paciente) ====================
             item {
                 SettingsCategoryCardPaciente(

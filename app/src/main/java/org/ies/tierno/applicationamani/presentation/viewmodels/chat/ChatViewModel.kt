@@ -118,6 +118,7 @@ class ChatViewModel(
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
     private val authRepository: org.ies.tierno.applicationamani.data.AuthRepository,
     private val chatRepositoryImpl: org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl,
+    private val crashReporter: org.ies.tierno.applicationamani.core.crash.CrashReporter,
     appContext: Context,
 ) : ViewModel() {
     companion object {
@@ -268,11 +269,15 @@ class ChatViewModel(
 
                 runCatching { initChatFeatures() }
                     .onFailure { throwable ->
+                        crashReporter.log("Error initializing chat features")
+                        crashReporter.recordException(throwable)
                         Log.e(TAG, "Error iniciando features de chat", throwable)
                         _error.value = throwable.message ?: "Error al inicializar chat"
                     }
                 runCatching { loadPsychologistInfo() }
                     .onFailure { throwable ->
+                        crashReporter.log("Error loading psychologist info in chat")
+                        crashReporter.recordException(throwable)
                         Log.e(TAG, "Error cargando info de interlocutor", throwable)
                     }
                 observeMessages()
@@ -394,6 +399,8 @@ class ChatViewModel(
                 _isLoading.value = true
                 getMessagesUseCase(currentUserId, otherUserId)
                     .catch { throwable ->
+                        crashReporter.log("Error observing messages")
+                        crashReporter.recordException(throwable)
                         Log.e(TAG, "Error observando mensajes", throwable)
                         _error.value = throwable.message ?: "No se pudieron cargar los mensajes"
                         _isLoading.value = false
@@ -416,6 +423,8 @@ class ChatViewModel(
                 chatRepositoryImpl
                     .markAllMessagesDelivered(currentUserId, otherUserId)
                     .onFailure { e ->
+                        crashReporter.log("markAllMessagesDelivered failed")
+                        crashReporter.recordException(e)
                         Timber.w(e, "No se pudieron marcar mensajes como entregados")
                     }
             }
@@ -584,6 +593,8 @@ class ChatViewModel(
             sendMessageUseCase(currentUserId, otherUserId, content)
                 .onSuccess {
                 }.onFailure { e ->
+                    crashReporter.log("sendTextMessage failed")
+                    crashReporter.recordException(e)
                     Log.e(TAG, "Error enviando mensaje de texto", e)
                     _error.value = e.message
                 }
@@ -628,6 +639,8 @@ class ChatViewModel(
                         attachmentName = result.fileName,
                     ).onSuccess {
                     }.onFailure { e ->
+                        crashReporter.log("sendAttachment failed")
+                        crashReporter.recordException(e)
                         Log.e(TAG, "Error enviando adjunto", e)
                         _error.value = e.message
                     }

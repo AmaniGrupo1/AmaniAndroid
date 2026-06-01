@@ -21,8 +21,11 @@ import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentInte
  * @see PaymentUiState
  * @see CreatePaymentIntentUseCase
  */
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
+
 class PaymentViewModel(
     private val createPaymentIntentUseCase: CreatePaymentIntentUseCase,
+    private val crashReporter: CrashReporter,
 ) : ViewModel() {
     /**
      * Estado observable que representa la fase actual del flujo de pago.
@@ -56,6 +59,9 @@ class PaymentViewModel(
                             currency = response.currency,
                         )
                 }.onFailure { throwable ->
+                    crashReporter.log("preparePayment failed for citaId=$citaId")
+                    crashReporter.setCustomKey("cita_id", citaId.toString())
+                    crashReporter.recordException(throwable)
                     _uiState.value =
                         PaymentUiState.Error(
                             throwable.message ?: "Error al preparar el pago",

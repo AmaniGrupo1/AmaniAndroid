@@ -43,80 +43,48 @@ import java.time.Period
  * @param tokenDataStore Almacén local seguro del token JWT.
  * @param tokenHolder Contenedor en memoria del token JWT para inyección en interceptores.
  */
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
+
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
     private val asignarPacienteAlPsicologoUseCase: AsignarPacienteAlPsicologoUseCase,
     private val userSessionDataStore: UserSessionDataStore,
     private val tokenDataStore: TokenDataStore,
     private val tokenHolder: TokenHolder,
+    private val crashReporter: CrashReporter,
 ) : ViewModel() {
     // ==================== VALIDACIONES DE CONTRASEÑA ====================
 
     companion object {
-        /**
-         * Regex para validar contraseña:
-         * - Mínimo 8 caracteres
-         * - Al menos una letra
-         * - Al menos un número
-         */
         private val PASSWORD_REGEX = Regex("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")
-
-        /**
-         * Mensaje de error para la contraseña
-         */
         fun getPasswordErrorMessage(): String = "La contraseña debe tener al menos 8 caracteres y contener letras y números"
     }
 
-    /**
-     * Valida una contraseña
-     * @param password Contraseña a validar
-     * @return true si la contraseña es válida, false en caso contrario
-     */
     fun isValidPassword(password: String): Boolean = PASSWORD_REGEX.matches(password)
 
-    // ── Login ──
-    /** Correo electrónico introducido por el usuario en el formulario de login. */
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
-    /** Contraseña introducida por el usuario en el formulario de login. */
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
-    /** Resultado de la última operación de inicio de sesión. `null` si no se ha intentado. */
     private val _loginResult = MutableStateFlow<Result<LoginResponseDTO>?>(null)
     val loginResult: StateFlow<Result<LoginResponseDTO>?> = _loginResult
 
-    /** Indica si una operación de inicio de sesión está en curso. */
     private val _isLoggingIn = MutableStateFlow(false)
     val isLoggingIn: StateFlow<Boolean> = _isLoggingIn
 
-    /** Mensaje de error de validación o del backend durante el inicio de sesión. */
     private val _loginError = MutableStateFlow<String?>(null)
     val loginError: StateFlow<String?> = _loginError
 
-    /**
-     * Actualiza el valor del campo de nombre de usuario (email).
-     *
-     * @param username Dirección de correo electrónico introducida.
-     */
     fun setUsername(username: String) {
         _username.value = username
     }
 
-    /**
-     * Actualiza el valor del campo de contraseña.
-     *
-     * @param password Contraseña introducida por el usuario.
-     */
     fun setPassword(password: String) {
         _password.value = password
     }
 
-    /**
-     * Ejecuta el proceso de inicio de sesión.
-     * Válida los campos antes de realizar la llamada al caso de uso.
-     */
     fun login() {
         val usernameValue = _username.value
         val passwordValue = _password.value
@@ -156,6 +124,8 @@ class LoginViewModel(
 
                 result
                     .onSuccess { loginResponse ->
+                        crashReporter.setUserId(loginResponse.idUsuario.toString())
+                        crashReporter.setUserRole(loginResponse.rol.toString())
                         tokenDataStore.saveToken(loginResponse.token)
                         tokenHolder.setToken(loginResponse.token)
                         Timber.d("Login: token saved and cached in memory")
@@ -163,6 +133,9 @@ class LoginViewModel(
                         _loginResult.value = Result.success(loginResponse)
                         _loginError.value = null
                     }.onFailure { error ->
+                        crashReporter.log("login failed for email=$usernameValue")
+                        crashReporter.setCustomKey("login_email", usernameValue)
+                        crashReporter.recordException(error)
                         _loginResult.value = Result.failure(error)
                         _loginError.value =
                             when (error) {
@@ -178,6 +151,9 @@ class LoginViewModel(
                             }
                     }
             } catch (e: Exception) {
+                crashReporter.log("login failed unexpectedly for email=$usernameValue")
+                crashReporter.setCustomKey("login_email", usernameValue)
+                crashReporter.recordException(e)
                 _loginError.value = e.message ?: "Error inesperado al iniciar sesión"
                 _loginResult.value = Result.failure(e)
             } finally {

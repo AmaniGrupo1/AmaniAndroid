@@ -36,10 +36,13 @@ import java.time.format.DateTimeFormatter
  * @param profileRepository Repositorio para consultar el psicólogo asignado al paciente.
  * @param userSessionDataStore Almacén local de la sesión del paciente autenticado.
  */
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
+
 class CitasViewModel(
     private val citasRepository: CitasRepository,
     private val profileRepository: ProfileRepository,
     private val userSessionDataStore: UserSessionDataStore,
+    private val crashReporter: CrashReporter,
 ) : ViewModel() {
     /** Sesión del usuario autenticado. */
     private val _userSession = MutableStateFlow<UserSession?>(null)
@@ -94,6 +97,9 @@ class CitasViewModel(
                 .onSuccess { psicologo ->
                     _psicologoId.value = psicologo.idPsicologo
                 }.onFailure { e ->
+                    crashReporter.log("cargarPsicologoAsignado failed for idPaciente=$idPaciente")
+                    crashReporter.setCustomKey("paciente_id", idPaciente.toString())
+                    crashReporter.recordException(e)
                     _errorMessage.value = "No se pudo obtener el psicólogo asignado: ${e.message}"
                 }
         }
@@ -124,6 +130,8 @@ class CitasViewModel(
                     _agendaMensual.value = filteredAgenda
                     _errorMessage.value = null
                 }.onFailure { error ->
+                    crashReporter.log("cargarAgendaMensual failed for month=$month")
+                    crashReporter.recordException(error)
                     _errorMessage.value = error.message ?: "Error cargando agenda"
                     _agendaMensual.value = emptyList()
                 }
@@ -147,6 +155,8 @@ class CitasViewModel(
                     _disponibilidadDia.value = it
                     _errorMessage.value = null
                 }.onFailure {
+                    crashReporter.log("cargarDisponibilidad failed for fecha=$fecha")
+                    crashReporter.recordException(it)
                     _errorMessage.value = it.message ?: "Error disponibilidad"
                 }
             _isLoading.value = false
@@ -223,6 +233,9 @@ class CitasViewModel(
                 .onSuccess {
                     _errorMessage.value = null
                 }.onFailure { e ->
+                    crashReporter.log("cancelarCita failed for idCita=$idCita")
+                    crashReporter.setCustomKey("cita_id", idCita.toString())
+                    crashReporter.recordException(e)
                     _errorMessage.value = e.message ?: "Error al cancelar la cita"
                 }
             _isLoading.value = false

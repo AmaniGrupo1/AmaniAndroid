@@ -38,12 +38,15 @@ import timber.log.Timber
  * @property userSessionDataStore Almacenamiento local para los datos de la sesión de usuario.
  * @property tokenHolder Contenedor en memoria para acceso inmediato al token JWT.
  */
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
+
 class AuthRepository(
     private val api: AuthApi,
     private val tokenDataStore: TokenDataStore,
     private val tokenHolder: org.ies.tierno.applicationamani.data.local.TokenHolder,
     private val userSessionDataStore: UserSessionDataStore,
-    private val firebaseAuthManager: FirebaseAuthManager
+    private val firebaseAuthManager: FirebaseAuthManager,
+    private val crashReporter: CrashReporter,
 ) {
     /**
      * Realiza el proceso de inicio de sesión.
@@ -509,6 +512,7 @@ class AuthRepository(
      * Cierra la sesión actual eliminando el token y los datos de sesión almacenados.
      */
     suspend fun logout() {
+        crashReporter.clearUser()
         FirebaseAuth.getInstance().signOut()
         tokenDataStore.clearToken()
         userSessionDataStore.clearSession()

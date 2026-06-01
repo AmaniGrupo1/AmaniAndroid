@@ -68,8 +68,6 @@ class AmaniApplication : Application() {
 
         // Inicializar Firebase y configurar Crashlytics
         FirebaseApp.initializeApp(this)
-        // Desactivar la recolección automática en DEBUG para evitar ruido durante el desarrollo
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
         Timber.plant(FileLoggingTree(this))
@@ -82,7 +80,16 @@ class AmaniApplication : Application() {
             modules(
                 appModule,
                 retrofitModule,
+                org.ies.tierno.applicationamani.di.crashModule,
             )
+        }
+
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            if (!BuildConfig.DEBUG) {
+                FirebaseCrashlytics.getInstance().recordException(throwable)
+            }
+            defaultHandler?.uncaughtException(thread, throwable)
         }
     }
 
