@@ -190,41 +190,22 @@ class ChatFirebaseService(
             val roomId = generateRoomId(userId1, userId2)
             val messagesRef = chatsRef.child(roomId).child("messages")
 
-            val messagesMap = LinkedHashMap<String, Message>()
-
-            fun emitList() {
-                trySend(messagesMap.values.sortedBy { it.timestamp })
-            }
+            messagesRef.keepSynced(true)
 
             val listener =
-                object : ChildEventListener {
-                    override fun onChildAdded(
-                        snapshot: DataSnapshot,
-                        previousChildName: String?,
-                    ) {
-                        val msg = parseMessage(snapshot, userId1)
-                        messagesMap[snapshot.key ?: msg.id] = msg
-                        emitList()
+                object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val messages = snapshot.children.mapNotNull { child ->
+                            try {
+                                parseMessage(child, userId1)
+                            } catch (e: Exception) {
+                                android.util.Log.e("ChatFirebaseService", "Error parsing message: \${e.message}")
+                                null
+                            }
+                        }.sortedBy { it.timestamp }
+                        
+                        trySend(messages)
                     }
-
-                    override fun onChildChanged(
-                        snapshot: DataSnapshot,
-                        previousChildName: String?,
-                    ) {
-                        val msg = parseMessage(snapshot, userId1)
-                        messagesMap[snapshot.key ?: msg.id] = msg
-                        emitList()
-                    }
-
-                    override fun onChildRemoved(snapshot: DataSnapshot) {
-                        messagesMap.remove(snapshot.key)
-                        emitList()
-                    }
-
-                    override fun onChildMoved(
-                        snapshot: DataSnapshot,
-                        previousChildName: String?,
-                    ) {}
 
                     override fun onCancelled(error: DatabaseError) {
                         android.util.Log.e("ChatFirebaseService", "Error Firebase (Room: $roomId): ${error.message} (Code: ${error.code})")
@@ -232,8 +213,11 @@ class ChatFirebaseService(
                     }
                 }
 
-            messagesRef.addChildEventListener(listener)
-            awaitClose { messagesRef.removeEventListener(listener) }
+            messagesRef.addValueEventListener(listener)
+            awaitClose {
+                messagesRef.removeEventListener(listener)
+                messagesRef.keepSynced(false)
+            }
         }
 
     /**
@@ -409,16 +393,14 @@ class ChatFirebaseService(
     ): Flow<Boolean> =
         callbackFlow {
             val roomId = generateRoomId(userId1, userId2)
-            val typingRefChild = typingRef.child(roomId)
+            // Solo escuchamos el estado de escritura del OTRO usuario (userId2)
+            val typingRefChild = typingRef.child(roomId).child(userId2.toString())
 
             val listener =
                 object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val hasTyping =
-                            snapshot.children.any { child ->
-                                child.getValue(Boolean::class.java) == true
-                            }
-                        trySend(hasTyping)
+                        val isTyping = snapshot.getValue(Boolean::class.java) == true
+                        trySend(isTyping)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -551,11 +533,49 @@ class ChatFirebaseService(
     // ==================== DELIVERY & READ RECEIPTS ====================
 
     /**
-     * Marca un mensaje como entregado al destinatario.
+     * Marca como entregados todos los mensajes pendientes de una conversación.
      *
-     * @param messageId Identificador del mensaje.
-     * @param receiverId Identificador del destinatario.
+     * Recorre la sala de chat y escribe `deliveredTo/{receiverId} = timestamp`
+     * en cada mensaje que aún no tenga esa entrada, excluyendo los propios.
+     *
+     * @param currentUserId Identificador del receptor (quien abre el chat).
+     * @param otherUserId   Identificador del otro participante.
      * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun markAllMessagesDelivered(
+        currentUserId: Long,
+        otherUserId: Long,
+    ): Result<Unit> =
+        try {
+            val roomId = generateRoomId(currentUserId, otherUserId)
+            val messagesRef = chatsRef.child(roomId).child("messages")
+            val snapshot = messagesRef.get().await()
+            val nowMs = System.currentTimeMillis()
+            val receiverKey = currentUserId.toString()
+
+            for (child in snapshot.children) {
+                // Ignorar mensajes propios
+                val senderIdValue = child.longValue("idSender", "senderId") ?: 0L
+                if (senderIdValue == currentUserId) continue
+
+                // Solo marcar si aún no existe la entrada deliveredTo para este receptor
+                val alreadyDelivered = child.child("deliveredTo").child(receiverKey).exists()
+                if (!alreadyDelivered) {
+                    child.ref
+                        .child("deliveredTo")
+                        .child(receiverKey)
+                        .setValue(nowMs)
+                        .await()
+                }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    /**
+     * @deprecated Usar [markAllMessagesDelivered] en su lugar.
+     * Conservado por compatibilidad con la interfaz del repositorio.
      */
     suspend fun markMessageDelivered(
         messageId: Long,

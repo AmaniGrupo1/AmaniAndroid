@@ -1100,7 +1100,7 @@ fun DialogoGestionCitaAmani(
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(R.string.auto_monto_), color = colors.textSecondary, fontFamily = roboto) },
-                            leadingIcon = { Text(stringResource(R.string.), color = colors.primary, fontFamily = roboto) },
+                            leadingIcon = { Text(stringResource(R.string.auto_euro_symbol), color = colors.primary, fontFamily = roboto) },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth(),

@@ -117,6 +117,7 @@ class ChatViewModel(
     private val updateUserOnlineUseCase: UpdateUserOnlineUseCase,
     private val profileUseCaseGeneral: ProfileUseCaseGeneral,
     private val authRepository: org.ies.tierno.applicationamani.data.AuthRepository,
+    private val chatRepositoryImpl: org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl,
     appContext: Context,
 ) : ViewModel() {
     companion object {
@@ -408,11 +409,15 @@ class ChatViewModel(
 
     fun markMessagesAsDelivered() {
         viewModelScope.launch {
-            val hasUndelivered = _messages.value.any { !it.isDelivered && it.senderId != currentUserId.toString() }
+            val hasUndelivered = _messages.value.any {
+                !it.isDelivered && it.senderId != currentUserId.toString()
+            }
             if (hasUndelivered) {
-                // Se omite markMessageDeliveredUseCase por mensaje individual ya que los IDs de Firebase no son numéricos
-                // y el caso de uso requiere Long. Firebase service tiene implementado un stub.
-                Log.d(TAG, "Mensajes recibidos; delivery status no se actualiza individualmente en Firebase RTDB por ID")
+                chatRepositoryImpl
+                    .markAllMessagesDelivered(currentUserId, otherUserId)
+                    .onFailure { e ->
+                        Timber.w(e, "No se pudieron marcar mensajes como entregados")
+                    }
             }
         }
     }

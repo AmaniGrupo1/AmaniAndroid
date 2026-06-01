@@ -658,7 +658,7 @@
     <string name="auto_agregar_situacion">Add Situation</string>
     <string name="auto_presiona_el_boton_para_1">Press the + button to add a situation</string>
     <string name="auto_no_hay_situaciones_disponibles">No situations available</string>
-    <string name="auto_estas_seguro_de_que_1">Are you sure you want to eliminate the situation \</string>
+    <string name="auto_estas_seguro_de_que_1">Are you sure you want to eliminate the situation </string>
     <string name="auto_confirmar_eliminacion">Confirm deletion</string>
     <string name="auto_mensajes">Messages</string>
     <string name="auto_tu_conversacion">Your conversation</string>
@@ -667,7 +667,7 @@
     <string name="auto_enviar_mensaje">Send message</string>
     <string name="auto_nota_de_voz">voice memo</string>
     <string name="auto_adjuntar_archivo">Attach file</string>
-    <string name="auto_escribe_un_mensajeu2026">Write a message\u2026</string>
+    <string name="auto_escribe_un_mensajeu2026">Write a message...</string>
     <string name="auto_escribiendo">Writing...</string>
     <string name="auto_pulse_alpha">pulse_alpha</string>
     <string name="auto_pulse">press</string>
@@ -730,7 +730,7 @@
     <string name="auto_foto_por_defecto">Default photo</string>
     <string name="auto_sin_psicologo">No psychologist</string>
     <string name="auto_error">Mistake</string>
-    <string name="auto_queremos_garantizar_tu_tranquilidad">We want to guarantee your peace of mind. Here you can see the real-time status of the report \</string>
+    <string name="auto_queremos_garantizar_tu_tranquilidad">We want to guarantee your peace of mind. Here you can see the real-time status of the report </string>
     <string name="auto_seguimiento_de_tu_reporte">Track your Report</string>
     <string name="auto__sobre_mi">💬 About me</string>
     <string name="auto__informacion_profesional">📋 Professional Information</string>
@@ -977,7 +977,7 @@
     <string name="no_hay_horarios_libres">❌ No available slots</string>
     <string name="pacientes">👤 Patients</string>
     <string name="psic_logos">🧠 Psychologists</string>
-    <string name="">€</string>
+    <string name="auto_euro_symbol">€</string>
     <string name="abrir_ticket_de_soporte">Open support ticket</string>
     <string name="acepto_comunicaci_n">Accept communication</string>
     <string name="agregar_primer_paciente">Add first patient</string>
@@ -1065,7 +1065,7 @@
     <string name="periodo">Period</string>
     <string name="prot_datos">Data Prot.</string>
     <string name="prueba_con_otra_fecha">Try another date</string>
-    <string name="qu_est_pasando_por_tu_mente">What's on your mind?</string>
+    <string name="qu_est_pasando_por_tu_mente">What\'s on your mind?</string>
     <string name="rol_actual">Current role:</string>
     <string name="selecciona_una_opci_n_para_act">Select an option to update your profile picture</string>
     <string name="s_cambiar_rol">Yes, change role</string>

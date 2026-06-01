@@ -400,7 +400,7 @@ fun ProfileContent(
                     val imageUrl: Any? =
                         if (fullImageUrl.isEmpty()) {
                             Log.d(TAG, "AsyncImage - Usando avatar por defecto (URL vacía)")
-                            R.drawable.ic_default_avatar
+                            null
                         } else {
                             val urlWithTimestamp = "$fullImageUrl?t=$refreshTrigger"
                             Log.d(TAG, "AsyncImage - URL construida: $urlWithTimestamp")

@@ -151,18 +151,26 @@ class ChatRepositoryImpl(
     ): Result<Unit> = chatFirebaseService.updateLastSeen(userId, lastSeen)
 
     /**
-     * Marca un mensaje como entregado. Actualmente delegado como operación no implementada.
+     * Marca como entregados todos los mensajes no propios de la conversación
+     * que aún no tengan la entrada `deliveredTo/{currentUserId}` en Firebase.
      *
-     * @param messageId Identificador del mensaje.
-     * @param receiverId Identificador del destinatario.
-     * @return [Result] exitoso por defecto.
+     * @param currentUserId Identificador del receptor (quien abre el chat).
+     * @param otherUserId   Identificador del otro participante.
+     * @return [Result] que indica éxito o fallo.
+     */
+    suspend fun markAllMessagesDelivered(
+        currentUserId: Long,
+        otherUserId: Long,
+    ): Result<Unit> = chatFirebaseService.markAllMessagesDelivered(currentUserId, otherUserId)
+
+    /**
+     * @deprecated Usar [markAllMessagesDelivered].
+     * Conservado por compatibilidad con la interfaz del repositorio.
      */
     override suspend fun markMessageDelivered(
         messageId: Long,
         receiverId: Long,
-    ): Result<Unit> {
-        return chatFirebaseService.markMessageDelivered(messageId, receiverId)
-    }
+    ): Result<Unit> = chatFirebaseService.markMessageDelivered(messageId, receiverId)
 
     /**
      * Marca un mensaje individual como leído. Actualmente delegado como operación no implementada.

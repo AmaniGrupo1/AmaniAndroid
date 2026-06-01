@@ -154,6 +154,7 @@ fun ChatScreen(
                 psychologistInfo = psychologistInfo,
                 onNavigateBack = onNavigateBack,
                 otherUserName = otherUserName,
+                isOtherTyping = isOtherTyping,
             )
         },
         bottomBar = {
@@ -184,7 +185,6 @@ fun ChatScreen(
                 },
                 isRecording = isRecording,
                 recordingSeconds = recordingSeconds,
-                isOtherTyping = isOtherTyping,
                 pendingAttachmentUri = pendingAttachmentUri,
                 onClearAttachment = { viewModel.setPendingAttachment(null) }
             )
@@ -309,6 +309,7 @@ private fun ChatTopBar(
     psychologistInfo: PsychologistInfo?,
     onNavigateBack: () -> Unit,
     otherUserName: String = "",
+    isOtherTyping: Boolean = false,
 ) {
     val amaniColors = LocalAmaniColors.current
 
@@ -328,24 +329,33 @@ private fun ChatTopBar(
                             style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .size(6.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (psychologistInfo.isOnline) {
-                                                amaniColors.citaLibre
-                                            } else {
-                                                MaterialTheme.colorScheme.outline
-                                            },
-                                        ),
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            if (!isOtherTyping) {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .size(6.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (psychologistInfo.isOnline) {
+                                                    amaniColors.citaLibre
+                                                } else {
+                                                    MaterialTheme.colorScheme.outline
+                                                },
+                                            ),
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                            }
                             Text(
-                                text = if (psychologistInfo.isOnline) "En línea" else "Desconectado",
+                                text = when {
+                                    isOtherTyping -> "escribiendo..."
+                                    psychologistInfo.isOnline -> "En línea"
+                                    else -> "Desconectado"
+                                },
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = when {
+                                    isOtherTyping -> amaniColors.citaLibre
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                             )
                         }
                     }

@@ -660,7 +660,7 @@
     <string name="auto_agregar_situacion">Agregar Situacion</string>
     <string name="auto_presiona_el_boton_para_1">Presiona el boton + para agregar una situacion</string>
     <string name="auto_no_hay_situaciones_disponibles">No hay situaciones disponibles</string>
-    <string name="auto_estas_seguro_de_que_1">Estas seguro de que quieres eliminar la situacion \</string>
+    <string name="auto_estas_seguro_de_que_1">Estas seguro de que quieres eliminar la situacion </string>
     <string name="auto_confirmar_eliminacion">Confirmar eliminacion</string>
     <string name="auto_mensajes">Mensajes</string>
     <string name="auto_tu_conversacion">Tu conversación</string>
@@ -669,7 +669,7 @@
     <string name="auto_enviar_mensaje">Enviar mensaje</string>
     <string name="auto_nota_de_voz">Nota de voz</string>
     <string name="auto_adjuntar_archivo">Adjuntar archivo</string>
-    <string name="auto_escribe_un_mensajeu2026">Escribe un mensaje\u2026</string>
+    <string name="auto_escribe_un_mensajeu2026">Escribe un mensaje...</string>
     <string name="auto_escribiendo">Escribiendo...</string>
     <string name="auto_pulse_alpha">pulse_alpha</string>
     <string name="auto_pulse">pulse</string>
@@ -732,7 +732,7 @@
     <string name="auto_foto_por_defecto">Foto por defecto</string>
     <string name="auto_sin_psicologo">Sin psicólogo</string>
     <string name="auto_error">Error</string>
-    <string name="auto_queremos_garantizar_tu_tranquilidad">Queremos garantizar tu tranquilidad. Aquí puedes ver el estado en tiempo real del reporte \</string>
+    <string name="auto_queremos_garantizar_tu_tranquilidad">Queremos garantizar tu tranquilidad. Aquí puedes ver el estado en tiempo real del reporte </string>
     <string name="auto_seguimiento_de_tu_reporte">Seguimiento de tu Reporte</string>
     <string name="auto__sobre_mi">💬 Sobre mí</string>
     <string name="auto__informacion_profesional">📋 Información Profesional</string>
@@ -936,8 +936,8 @@
     <string name="auto_enviar_ticket">Enviar ticket</string>
     <string name="auto_describe_el_problema_con">Describe el problema con el mayor detalle posible...</string>
     <string name="auto_ej_la_app_se">Ej.: La app se cierra al abrir mis citas</string>
-    <string name="auto_atru00e1s">Atr\u00e1s</string>
-    <string name="auto_cuu00e9ntanos_el_problema_o">Cu\u00e9ntanos el problema o tu sugerencia</string>
+    <string name="auto_atru00e1s">Atrás</string>
+    <string name="auto_cuu00e9ntanos_el_problema_o">Cuéntanos el problema o tu sugerencia</string>
     <string name="auto_nuevo_ticket">Nuevo ticket</string>
     <string name="auto_crea_uno_nuevo_desde">Crea uno nuevo desde Ajustes</string>
     <string name="auto_no_hay_tickets">No hay tickets</string>
@@ -979,7 +979,7 @@
     <string name="no_hay_horarios_libres">❌ No hay horarios libres</string>
     <string name="pacientes">👤 Pacientes</string>
     <string name="psic_logos">🧠 Psicólogos</string>
-    <string name="">€</string>
+    <string name="auto_euro_symbol">€</string>
     <string name="abrir_ticket_de_soporte">Abrir ticket de soporte</string>
     <string name="acepto_comunicaci_n">Acepto comunicación</string>
     <string name="agregar_primer_paciente">Agregar primer paciente</string>

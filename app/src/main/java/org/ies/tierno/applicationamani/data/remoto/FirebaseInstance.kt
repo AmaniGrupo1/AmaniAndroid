@@ -22,6 +22,11 @@ object FirebaseInstance {
             } else {
                 android.util.Log.d("FirebaseInstance", "MODO PRODUCCIÓN: Conectando a Firebase Real...")
             }
+            // Persistencia en disco: los mensajes se cachean entre sesiones
+            // y el chat funciona sin conexión leyendo la caché local.
+            setPersistenceEnabled(true)
+            // Tamaño máximo de caché en disco: 10 MB (defecto 10 MB, máx 100 MB)
+            setPersistenceCacheSizeBytes(10L * 1024 * 1024)
         }
     }
 

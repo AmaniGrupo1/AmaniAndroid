@@ -76,7 +76,6 @@ fun ChatInputBar(
     onStopRecording: () -> Unit,
     isRecording: Boolean,
     recordingSeconds: Int,
-    isOtherTyping: Boolean = false,
     pendingAttachmentUri: android.net.Uri? = null,
     onClearAttachment: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -194,30 +193,10 @@ fun ChatInputBar(
                     }
                 }
             }
-
-            if (isOtherTyping) {
-                TypingIndicator()
-            }
         }
     }
 }
 
-@Composable
-private fun TypingIndicator() {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 48.dp, bottom = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.auto_escribiendo),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-        )
-    }
-}
 
 @Composable
 private fun PillTextField(

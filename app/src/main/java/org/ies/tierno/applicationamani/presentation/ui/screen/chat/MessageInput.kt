@@ -19,7 +19,6 @@ fun MessageInput(
     onStopRecording: () -> Unit,
     isRecording: Boolean,
     recordingSeconds: Int,
-    isOtherTyping: Boolean = false,
     pendingAttachmentUri: android.net.Uri? = null,
     onClearAttachment: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -37,7 +36,6 @@ fun MessageInput(
         onStopRecording = onStopRecording,
         isRecording = isRecording,
         recordingSeconds = recordingSeconds,
-        isOtherTyping = isOtherTyping,
         pendingAttachmentUri = pendingAttachmentUri,
         onClearAttachment = onClearAttachment,
         modifier = modifier

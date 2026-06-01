@@ -68,6 +68,12 @@ class DiarioEmocionalRepository(
             dao.insertar(entry)
         } else {
             val existing = dao.getEntradaById(id)
+            val newSyncStatus = if (existing?.remoteId == null) {
+                SyncStatus.PENDING_CREATE
+            } else {
+                SyncStatus.PENDING_UPDATE
+            }
+
             val entry =
                 EntradaDiarioEntity(
                     id = id,
@@ -78,7 +84,7 @@ class DiarioEmocionalRepository(
                     createdAt = existing?.createdAt ?: now,
                     updatedAt = now,
                     remoteId = existing?.remoteId,
-                    syncStatus = SyncStatus.PENDING_UPDATE,
+                    syncStatus = newSyncStatus,
                 )
             dao.actualizar(entry)
         }

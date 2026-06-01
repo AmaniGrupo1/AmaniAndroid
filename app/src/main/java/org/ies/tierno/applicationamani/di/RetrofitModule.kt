@@ -82,20 +82,47 @@ val retrofitModule =
                     .registerTypeAdapter(
                         LocalDate::class.java,
                         object : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
-                            override fun serialize(src: LocalDate, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(src.toString())
-                            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDate = LocalDate.parse(json.asString)
+                            override fun serialize(
+                                src: LocalDate,
+                                typeOfSrc: Type,
+                                context: JsonSerializationContext
+                            ): JsonElement = JsonPrimitive(src.toString())
+
+                            override fun deserialize(
+                                json: JsonElement,
+                                typeOfT: Type,
+                                context: JsonDeserializationContext
+                            ): LocalDate = LocalDate.parse(json.asString)
                         },
                     ).registerTypeAdapter(
                         LocalTime::class.java,
                         object : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
-                            override fun serialize(src: LocalTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(src.toString())
-                            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalTime = LocalTime.parse(json.asString)
+                            override fun serialize(
+                                src: LocalTime,
+                                typeOfSrc: Type,
+                                context: JsonSerializationContext
+                            ): JsonElement = JsonPrimitive(src.toString())
+
+                            override fun deserialize(
+                                json: JsonElement,
+                                typeOfT: Type,
+                                context: JsonDeserializationContext
+                            ): LocalTime = LocalTime.parse(json.asString)
                         },
                     ).registerTypeAdapter(
                         LocalDateTime::class.java,
                         object : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-                            override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(src.toString())
-                            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime = LocalDateTime.parse(json.asString)
+                            override fun serialize(
+                                src: LocalDateTime,
+                                typeOfSrc: Type,
+                                context: JsonSerializationContext
+                            ): JsonElement = JsonPrimitive(src.toString())
+
+                            override fun deserialize(
+                                json: JsonElement,
+                                typeOfT: Type,
+                                context: JsonDeserializationContext
+                            ): LocalDateTime = LocalDateTime.parse(json.asString)
                         },
                     ).registerTypeAdapter(
                         Rol::class.java,
@@ -107,7 +134,10 @@ val retrofitModule =
                                 "psicologo" -> Rol.psicologo
                                 "paciente" -> Rol.paciente
                                 else -> {
-                                    android.util.Log.e("RolAdapter", "Rol desconocido: \$value, usando paciente por defecto")
+                                    android.util.Log.e(
+                                        "RolAdapter",
+                                        "Rol desconocido: \$value, usando paciente por defecto"
+                                    )
                                     Rol.paciente
                                 }
                             }
@@ -139,12 +169,5 @@ val retrofitModule =
         single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }
         single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
         single<HistorialCitaApi> { get<Retrofit>().create(HistorialCitaApi::class.java) }
-        // ✅ Proveer el ImageLoader usando el OkHttpClient
-        single<coil.ImageLoader> {
-            coil.ImageLoader.Builder(get())
-                .okHttpClient { get<okhttp3.OkHttpClient>() }
-                .crossfade(true)
-                .build()
-        }
     }
 

@@ -153,7 +153,8 @@ val appModule = module {
 
     single { FirebaseInstance }
     single { ChatFirebaseService(get()) }
-    single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
+    single<ChatRepositoryImpl> { ChatRepositoryImpl(get(), get()) }
+    single<ChatRepository> { get<ChatRepositoryImpl>() }
     single { FileStorageService(get(), androidContext()) }
 
     factory { LoginUseCase(get()) }
@@ -235,6 +236,7 @@ val appModule = module {
             updateUserOnlineUseCase = get(),
             profileUseCaseGeneral = get(),
             authRepository = get(),
+            chatRepositoryImpl = get(),
             appContext = androidContext(),
         )
     }

@@ -314,9 +314,9 @@ fun AdminProfileScreen(
                                     modifier = Modifier.size(130.dp),
                                     contentAlignment = Alignment.BottomEnd,
                                 ) {
-                                    val imageUrl =
+                                    val imageUrl: Any? =
                                         if (fullImageUrl.isEmpty()) {
-                                            R.drawable.ic_default_avatar
+                                            null
                                         } else {
                                             "$fullImageUrl?t=$refreshTrigger"
                                         }
