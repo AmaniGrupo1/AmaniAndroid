@@ -44,6 +44,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreenV2
 import org.ies.tierno.applicationamani.presentation.ui.screen.diario.DiarioEmocionalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
@@ -71,6 +72,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacie
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
@@ -302,15 +304,21 @@ fun NavGraph(
                     return@composable
                 }
 
-                val viewModel: ChatViewModel = koinViewModel(parameters = {
-                    parametersOf(
-                        currentUserId,
-                        otherUserId,
-                        otherUserName
-                    )
-                })
+                // chatId con el mismo formato que ChatFirebaseService.generateRoomId:
+                // "{minId}_{maxId}" para que ambos usuarios accedan al mismo nodo.
+                val chatId = "${minOf(currentUserId, otherUserId)}_${maxOf(currentUserId, otherUserId)}"
 
-                ChatScreen(
+                val viewModel: ChatViewModelV2 = koinViewModel(
+                    parameters = {
+                        parametersOf(
+                            chatId,
+                            currentUserId.toString(),
+                            otherUserId.toString(),
+                        )
+                    },
+                )
+
+                ChatScreenV2(
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() },
                     otherUserName = otherUserName,

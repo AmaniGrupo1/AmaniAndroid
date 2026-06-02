@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.LanguageManager
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.di.appModule
+import org.ies.tierno.applicationamani.di.chatModule
 import org.ies.tierno.applicationamani.di.retrofitModule
 import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
 import org.ies.tierno.applicationamani.utils.FileLoggingTree
@@ -24,15 +25,16 @@ import timber.log.Timber
  * Clase [Application] personalizada para la aplicación Amani.
  *
  * Inicializa el framework de inyección de dependencias **Koin** al
- * arrancar la aplicación, registrando los módulos [appModule] y
- * [retrofitModule]. También crea el canal de notificaciones para
- * los recordatorios de citas.
+ * arrancar la aplicación, registrando los módulos [appModule],
+ * [retrofitModule] y [chatModule]. También crea el canal de
+ * notificaciones para los recordatorios de citas.
  *
  * Debe declararse en el `AndroidManifest.xml` como atributo
  * `android:name` de la etiqueta `<application>`.
  *
  * @see appModule
  * @see retrofitModule
+ * @see chatModule
  */
 class AmaniApplication : Application() {
     // Bug 3 Fix: Envolver el applicationContext con el Locale personalizado
@@ -81,6 +83,7 @@ class AmaniApplication : Application() {
                 appModule,
                 retrofitModule,
                 org.ies.tierno.applicationamani.di.crashModule,
+                chatModule,
             )
         }
 

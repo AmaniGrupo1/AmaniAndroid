@@ -276,7 +276,7 @@
     <string name="preguntas_frecuentes">Preguntes freqüents</string>
     <string name="contacto">Contacte</string>
     <string name="contactar_soporte">Contactar amb suport</string>
-    <string name="reportar_problema">Reportar Problema</string>
+    <string name="reportar_problema">Informar d\'un problema</string>
     <string name="enviar_reporte">Enviar un reporti de problema</string>
     <string name="cerrar_sesion">Tancar Sessió</string>
     <string name="salir_aplicacion">Sortir de l\'aplicació</string>
@@ -390,7 +390,7 @@
     <string name="error_cargar_documento">Error en carregar el document</string>
     <string name="documento_no_disponible">Document no disponible</string>
     <string name="documento_no_disponible_mensaje">El document no està disponible en aquest moment.</string>
-    <string name="reintentar">Reintentar</string>
+    <string name="reintentar">Tornar a intentar</string>
     <string name="cerrar">Tancar</string>
 
 
@@ -487,7 +487,7 @@
     <string name="auto__horario_semanal">📅 Horari Setmanal</string>
     <string name="auto_editar">Edita</string>
     <string name="auto_dar_de_baja">Donar de baixa</string>
-    <string name="auto__guardar">💾 GUARDAR</string>
+    <string name="auto__guardar">💾 DESAR</string>
     <string name="auto_guardando">Desant...</string>
     <string name="auto_descripcion_profesional">Descripció professional</string>
     <string name="auto_numero_de_licencia">Número de llicència</string>
@@ -568,7 +568,7 @@
     <string name="auto_seleccionar_fecha">Seleccionar data</string>
     <string name="auto_completa_la_informacion_profesional">Completa la informació professional</string>
     <string name="auto_registrar_nuevo_psicologo">Registrar Nou Psicòleg</string>
-    <string name="auto_reintentar">Reintentar</string>
+    <string name="auto_reintentar">Tornar a intentar</string>
     <string name="auto_galeria">Galeria</string>
     <string name="auto_camara">Cambra</string>
     <string name="auto_guardar">Desa</string>
@@ -594,7 +594,7 @@
     <string name="auto__guardar_cambios">💾 GUARDAR CANVIS</string>
     <string name="auto_asignar_psicologo">Assignar Psicòleg</string>
     <string name="auto_pacientes_sin_psicologo">Pacients sense Psicòleg</string>
-    <string name="auto_refrescar">Refrescar</string>
+    <string name="auto_refrescar">Actualitzar</string>
     <string name="auto_todos_los_pacientes_ya">Tots els pacients ja tenen psicòleg assignat</string>
     <string name="auto_no_hay_pacientes_sin">No hi ha pacients sense assignar</string>
     <string name="auto_eur">EUR</string>
@@ -751,7 +751,7 @@
     <string name="auto_reagendar">Reagendar</string>
     <string name="auto_cargando_tus_citas">Carregant les teves cites...</string>
     <string name="auto_info_terapia">Info teràpia</string>
-    <string name="auto_agendar_cita">Agendar Cita</string>
+    <string name="auto_agendar_cita">Programar Cita</string>
     <string name="auto_contacto">Contacte</string>
     <string name="auto_esta_accion_no_se">Aquesta acció no es pot desfer.</string>
     <string name="auto_estas_seguro_de_que_2">Estàs segur que vols cancel·lar aquesta cita?</string>
@@ -953,7 +953,7 @@
     <string name="anios_experiencia">Anys d\'experiència</string>
     <string name="numero_licencia">Número de llicència</string>
     <string name="descripcion_profesional">Descripció professional</string>
-    <string name="guardar_icono">💾 GUARDAR</string>
+    <string name="guardar_icono">💾 DESAR</string>
     <string name="dar_de_baja">Donar de baixa</string>
 
     <string name="buscar_dni_nombre_email">Buscar per DNI, Nom o Email</string>
@@ -975,12 +975,12 @@
     <string name="admins">👑 Admins</string>
     <string name="asignar_a_paciente">✓ Assignar pacient</string>
     <string name="cancelar_cita">🗑️ Cancel·la cita</string>
-    <string name="guardar">💾 GUARDAR</string>
+    <string name="guardar">💾 DESAR</string>
     <string name="guardar_horario">💾 Desar horari</string>
     <string name="no_hay_horarios_libres">❌ No hi ha horaris lliures</string>
     <string name="pacientes">👤 Pacients</string>
     <string name="psic_logos">🧠 Psicòlegs</string>
-    <string name="auto_euro_symbol" />
+    <string name="auto_euro_symbol">€</string>
     <string name="abrir_ticket_de_soporte">Obrir tiquet de suport</string>
     <string name="acepto_comunicaci_n">Accepto comunicació</string>
     <string name="agregar_primer_paciente">Afegir primer pacient</string>
@@ -1082,4 +1082,5 @@
     <string name="titulo_del_documento">Títol del document</string>
     <string name="vista">Vista</string>
     <string name="volver_al_inicio">Tornar a l\'inici</string>
+    <string name="catalan">Català</string>
 </resources>

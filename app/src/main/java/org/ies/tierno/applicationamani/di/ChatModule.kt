@@ -6,7 +6,7 @@ import com.google.firebase.storage.FirebaseStorage
 import org.ies.tierno.applicationamani.data.repository.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.domain.repository.ChatRepository
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 /*
@@ -47,8 +47,7 @@ import org.koin.dsl.module
 val chatModule = module {
 
     // ── Firebase instances ────────────────────────────────────────────────────
-    // Si ya están registradas en AppModule, elimina estas líneas para evitar conflictos.
-    single { FirebaseDatabase.getInstance() }
+    // FirebaseDatabase ya está registrado en appModule — no se duplica aquí.
     single { FirebaseStorage.getInstance() }
 
     // ── Repository ────────────────────────────────────────────────────────────
@@ -59,13 +58,14 @@ val chatModule = module {
         )
     }
 
-    // ── ViewModel ─────────────────────────────────────────────────────────────
-    viewModel { (chatId: String, currentUserId: String, otherUserId: String) ->
+    // ── ViewModel ─────────────────────────────────────────────────────
+    // DSL moderno de Koin (org.koin.core.module.dsl) con parámetros de runtime.
+    viewModel { params ->
         ChatViewModelV2(
             repo = get(),
-            chatId = chatId,
-            currentUserId = currentUserId,
-            otherUserId = otherUserId,
+            chatId = params.get(),
+            currentUserId = params.get(),
+            otherUserId = params.get(),
         )
     }
 }

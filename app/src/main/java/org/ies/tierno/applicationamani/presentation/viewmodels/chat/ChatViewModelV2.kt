@@ -102,18 +102,30 @@ class ChatViewModelV2(
                         is ChatResult.Success -> {
                             val incomingIds = result.data.map { it.id }.toSet()
 
-                            // Merge: conservar mensajes optimistas (SENDING) que el servidor aún no ha confirmado
-                            val optimisticMessages = _uiState.value.messages.filter { local ->
-                                local.status == MessageStatus.SENDING && local.id !in incomingIds
-                            }
+                            // Merge atómico: todas las lecturas y escrituras sobre _uiState
+                            // ocurren dentro del bloque update{}, que aplica la lambda
+                            // sobre el estado más reciente en el momento de la escritura,
+                            // eliminando la ventana de carrera entre la lectura optimista
+                            // y el update final.
+                            var wasEmpty = false
+                            var shouldScroll = false
 
-                            val merged = (optimisticMessages + result.data)
-                                .sortedBy { it.timestamp }
+                            _uiState.update { currentState ->
+                                wasEmpty = currentState.messages.isEmpty()
 
-                            val wasEmpty = _uiState.value.messages.isEmpty()
+                                // Conservar mensajes optimistas (SENDING) que Firebase
+                                // aún no ha confirmado (su id real aún no está en incomingIds)
+                                val optimisticMessages = currentState.messages.filter { local ->
+                                    local.status == MessageStatus.SENDING && local.id !in incomingIds
+                                }
 
-                            _uiState.update { state ->
-                                state.copy(
+                                val merged = (optimisticMessages + result.data)
+                                    .sortedBy { it.timestamp }
+
+                                // Decidir scroll dentro del bloque para usar el tamaño real
+                                shouldScroll = wasEmpty || result.data.size > currentState.messages.size
+
+                                currentState.copy(
                                     messages = merged,
                                     isLoadingInitial = false,
                                     error = null,
@@ -121,10 +133,11 @@ class ChatViewModelV2(
                             }
 
                             // Scroll al fondo solo en la carga inicial o cuando llega un mensaje nuevo
-                            if (wasEmpty || result.data.size > _uiState.value.messages.size) {
+                            if (shouldScroll) {
                                 _events.emit(ChatEvent.ScrollToBottom)
                             }
                         }
+
 
                         is ChatResult.Error -> {
                             _uiState.update {

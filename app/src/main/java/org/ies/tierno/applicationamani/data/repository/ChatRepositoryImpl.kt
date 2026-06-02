@@ -77,17 +77,17 @@ class ChatRepositoryImpl(
         private const val NODE_MESSAGES = "messages"
         private const val STORAGE_BASE_PATH = "chats"
 
-        private const val FIELD_SENDER_ID = "senderId"
-        private const val FIELD_RECEIVER_ID = "receiverId"
-        private const val FIELD_TYPE = "type"
-        private const val FIELD_BODY = "body"
-        private const val FIELD_STORAGE_REF = "storageRef"
-        private const val FIELD_TIMESTAMP = "timestamp"
-        private const val FIELD_STATUS = "status"
+        private const val FIELD_SENDER_ID = "idSender"
+        private const val FIELD_RECEIVER_ID = "idReceiver"
+        private const val FIELD_TYPE = "attachmentType"
+        private const val FIELD_BODY = "mensaje"
+        private const val FIELD_STORAGE_REF = "attachmentUrl"
+        private const val FIELD_TIMESTAMP = "enviadoEn"
+        private const val FIELD_STATUS = "leido" // En la DB es un boolean
 
-        private const val TYPE_TEXT = "text"
-        private const val TYPE_IMAGE = "image"
-        private const val TYPE_AUDIO = "audio"
+        private const val TYPE_TEXT = "TEXT"
+        private const val TYPE_IMAGE = "IMAGE"
+        private const val TYPE_AUDIO = "AUDIO"
 
         private const val MAX_UPLOAD_RETRIES = 3
         private const val RETRY_BASE_DELAY_MS = 2_000L
@@ -163,6 +163,26 @@ class ChatRepositoryImpl(
 
         query.addChildEventListener(listener)
 
+        // Listener de un solo disparo para apagar isLoadingInitial en cuanto Firebase
+        // confirme que ha entregado todos los hijos iniciales — incluso si el nodo
+        // está vacío (ChildEventListener nunca llama onChildAdded si no hay mensajes,
+        // por lo que el spinner quedaría activo indefinidamente sin este mecanismo).
+        query.addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // Si el nodo está vacío emitimos lista vacía para que la UI
+                // salga del estado Loading y muestre el estado "sin mensajes".
+                if (!snapshot.hasChildren()) {
+                    trySend(ChatResult.Success(emptyList()))
+                }
+                // Si tiene hijos, el ChildEventListener ya los habrá emitido.
+                // No hacemos nada extra: el estado Loading se apaga en el primer onChildAdded.
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w(TAG, "singleValueEvent cancelado: ${error.message}")
+            }
+        })
+
         // awaitClose garantiza que el listener se elimina cuando el Flow se cancela (p. ej. al salir de la pantalla)
         awaitClose {
             query.removeEventListener(listener)
@@ -225,14 +245,31 @@ class ChatRepositoryImpl(
 
             val body = (message.content as? MessageContent.Text)?.body.orEmpty()
 
-            val payload = mapOf(
-                FIELD_SENDER_ID to message.senderId,
-                FIELD_RECEIVER_ID to message.receiverId,
-                FIELD_TYPE to TYPE_TEXT,
+            val payload = mutableMapOf<String, Any>(
+                FIELD_SENDER_ID to (message.senderId.toLongOrNull() ?: 0L),
+                FIELD_RECEIVER_ID to (message.receiverId.toLongOrNull() ?: 0L),
                 FIELD_BODY to body,
-                FIELD_TIMESTAMP to message.timestamp,
-                FIELD_STATUS to MessageStatus.SENT.name.lowercase(),
+                FIELD_TIMESTAMP to message.timestamp.toString(), // La DB vieja guarda timestamp como String
+                FIELD_STATUS to false, // leido = false
+                "idMensaje" to message.timestamp // El ID numérico que usa el backend viejo
             )
+
+            // Si es contenido multimedia, añadimos los campos adicionales
+            when (val content = message.content) {
+                is MessageContent.Image -> {
+                    payload[FIELD_TYPE] = TYPE_IMAGE
+                    payload[FIELD_STORAGE_REF] = content.storageRef // Aquí viene la URL
+                    payload["attachmentName"] = "image_${System.currentTimeMillis()}.jpg"
+                }
+                is MessageContent.Audio -> {
+                    payload[FIELD_TYPE] = TYPE_AUDIO
+                    payload[FIELD_STORAGE_REF] = content.storageRef // Aquí viene la URL
+                    payload["attachmentName"] = "voice_${System.currentTimeMillis()}.ogg"
+                }
+                else -> {
+                    // Texto plano, no hay attachmentType
+                }
+            }
 
             ref.child(key).setValue(payload).await()
             ChatResult.Success(Unit)
@@ -271,9 +308,10 @@ class ChatRepositoryImpl(
 
         while (attempt < MAX_UPLOAD_RETRIES) {
             try {
-                storageRef.putFile(uri).await()
-                Log.d(TAG, "uploadMedia exitoso en intento ${attempt + 1}: $storagePath")
-                return@withContext ChatResult.Success(storagePath)
+                val snapshot = storageRef.putFile(uri).await()
+                val downloadUrl = snapshot.storage.downloadUrl.await().toString()
+                Log.d(TAG, "uploadMedia exitoso en intento ${attempt + 1}: $downloadUrl")
+                return@withContext ChatResult.Success(downloadUrl)
             } catch (e: StorageException) {
                 // Errores no recuperables (permisos, cuota): fallar inmediatamente
                 if (e.errorCode == StorageException.ERROR_NOT_AUTHORIZED ||
@@ -311,23 +349,41 @@ class ChatRepositoryImpl(
      */
     private fun DataSnapshot.toChatMessage(): ChatMessage? {
         val id = key ?: return null
-        val senderId = child(FIELD_SENDER_ID).getValue(String::class.java) ?: return null
-        val receiverId = child(FIELD_RECEIVER_ID).getValue(String::class.java).orEmpty()
+        // Los IDs en la base de datos vieja son Long, hay que pasarlos a String
+        val senderId = child(FIELD_SENDER_ID).getValue(Long::class.java)?.toString() ?: return null
+        val receiverId = child(FIELD_RECEIVER_ID).getValue(Long::class.java)?.toString().orEmpty()
         val type = child(FIELD_TYPE).getValue(String::class.java) ?: TYPE_TEXT
         val body = child(FIELD_BODY).getValue(String::class.java).orEmpty()
         val storageRef = child(FIELD_STORAGE_REF).getValue(String::class.java).orEmpty()
-        val timestamp = child(FIELD_TIMESTAMP).getValue(Long::class.java) ?: return null
-        val statusRaw = child(FIELD_STATUS).getValue(String::class.java).orEmpty()
+        
+        // enviadoEn puede venir como Long o como String (ISO date o unix timestamp en string)
+        val timestamp = try {
+            val tsObj = child(FIELD_TIMESTAMP).value
+            when (tsObj) {
+                is Long -> tsObj
+                is String -> {
+                    if (tsObj.contains("T")) {
+                        // Fecha ISO (ej: 2026-05-26T09:01:38.875604537)
+                        java.time.LocalDateTime.parse(tsObj).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    } else {
+                        tsObj.toLongOrNull() ?: System.currentTimeMillis()
+                    }
+                }
+                else -> System.currentTimeMillis()
+            }
+        } catch (e: Exception) {
+            System.currentTimeMillis()
+        }
+
+        val leido = child(FIELD_STATUS).getValue(Boolean::class.java) ?: false
 
         val content: MessageContent = when (type) {
-            TYPE_IMAGE -> MessageContent.Image(storageRef)
+            TYPE_IMAGE -> MessageContent.Image(storageRef) // storageRef ahora trae la URL completa
             TYPE_AUDIO -> MessageContent.Audio(storageRef)
             else -> MessageContent.Text(body)
         }
 
-        val status = runCatching {
-            MessageStatus.valueOf(statusRaw.uppercase())
-        }.getOrDefault(MessageStatus.SENT)
+        val status = if (leido) MessageStatus.READ else MessageStatus.SENT
 
         return ChatMessage(
             id = id,
