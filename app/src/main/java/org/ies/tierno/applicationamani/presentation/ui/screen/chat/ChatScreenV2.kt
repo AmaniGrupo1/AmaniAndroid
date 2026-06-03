@@ -73,6 +73,18 @@ import org.ies.tierno.applicationamani.domain.models.MessageContent
 import org.ies.tierno.applicationamani.domain.models.MessageStatus
 import org.ies.tierno.applicationamani.domain.repository.MediaType
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.ui.unit.sp
+
+sealed class ChatV2ListItem {
+    data class MessageItem(val msg: ChatMessage) : ChatV2ListItem()
+    data class DateSeparator(val label: String) : ChatV2ListItem()
+}
 
 /*
  * Por qué reverseLayout = true en LazyColumn:
@@ -98,6 +110,31 @@ fun ChatScreenV2(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val chatItems = remember(state.messages) {
+        val sortedAsc = state.messages.sortedBy { it.timestamp }
+        val items = mutableListOf<ChatV2ListItem>()
+        var lastDate: LocalDate? = null
+
+        for (msg in sortedAsc) {
+            val messageDate = Instant.ofEpochMilli(msg.timestamp)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+
+            if (lastDate != messageDate) {
+                lastDate = messageDate
+                val label = when {
+                    messageDate == LocalDate.now() -> "Hoy"
+                    messageDate == LocalDate.now().minusDays(1) -> "Ayer"
+                    else -> messageDate.format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("es")))
+                }
+                items.add(ChatV2ListItem.DateSeparator(label))
+            }
+
+            items.add(ChatV2ListItem.MessageItem(msg))
+        }
+        items.reversed()
+    }
 
     // ── Trigger de paginación ─────────────────────────────────────────────────
     // derivedStateOf evita recomposiciones: solo re-evalúa cuando firstVisibleItemIndex cambia.
@@ -142,6 +179,21 @@ fun ChatScreenV2(
         uri?.let { viewModel.sendMedia(it, MediaType.IMAGE) }
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val audioHandler = remember { AudioHandler(context) }
+    val isRecording by audioHandler.isRecording.collectAsStateWithLifecycle()
+    val recordingSeconds by audioHandler.recordingSeconds.collectAsStateWithLifecycle()
+
+    val recordPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            audioHandler.startRecording()
+        }
+    }
+
+    var text by remember { mutableStateOf("") }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -157,9 +209,34 @@ fun ChatScreenV2(
                 // Indicador de progreso de subida
                 UploadProgressBar(uploadState = state.uploadState)
 
-                MessageInputBar(
-                    onSend = viewModel::sendText,
+                MessageInput(
+                    text = text,
+                    onTextChange = { text = it },
+                    onSend = {
+                        viewModel.sendText(text)
+                        text = ""
+                    },
+                    onMicClick = {
+                        val permission = android.Manifest.permission.RECORD_AUDIO
+                        val isGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+                            context, permission
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        if (isGranted) {
+                            audioHandler.startRecording()
+                        } else {
+                            recordPermissionLauncher.launch(permission)
+                        }
+                    },
                     onAttachFile = { fileLauncher.launch("image/*") },
+                    onStopRecording = {
+                        val file = audioHandler.stopRecording()
+                        if (file != null) {
+                            val uri = Uri.fromFile(file)
+                            viewModel.sendMedia(uri, MediaType.AUDIO)
+                        }
+                    },
+                    isRecording = isRecording,
+                    recordingSeconds = recordingSeconds
                 )
             }
         },
@@ -204,14 +281,25 @@ fun ChatScreenV2(
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             items(
-                                items = state.messages.asReversed(),
-                                // key estable: evita recomposiciones innecesarias y animaciones incorrectas
-                                key = { message -> message.id },
-                            ) { message ->
-                                MessageBubbleV2(
-                                    message = message,
-                                    isOwnMessage = message.senderId == viewModel.currentUserId,
-                                )
+                                items = chatItems,
+                                key = { item -> 
+                                    when(item) {
+                                        is ChatV2ListItem.MessageItem -> item.msg.id
+                                        is ChatV2ListItem.DateSeparator -> "sep_${item.label}"
+                                    }
+                                },
+                            ) { item ->
+                                when (item) {
+                                    is ChatV2ListItem.DateSeparator -> {
+                                        DateSeparatorChipV2(item.label)
+                                    }
+                                    is ChatV2ListItem.MessageItem -> {
+                                        MessageBubbleV2(
+                                            message = item.msg,
+                                            isOwnMessage = item.msg.senderId == viewModel.currentUserId,
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -249,6 +337,27 @@ private fun ChatTopBarV2(
         ),
         windowInsets = WindowInsets(0, 0, 0, 0),
     )
+}
+
+@Composable
+private fun DateSeparatorChipV2(label: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        SuggestionChip(
+            onClick = { },
+            shape = MaterialTheme.shapes.small,
+            label = {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            },
+        )
+    }
 }
 
 // ─── Burbuja de mensaje ────────────────────────────────────────────────────────
@@ -290,25 +399,33 @@ private fun MessageBubbleV2(
             color = bubbleColor,
             modifier = Modifier.wrapContentHeight(),
         ) {
-            when (val content = message.content) {
-                is MessageContent.Text -> {
-                    Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                        Text(
-                            text = content.body,
-                            color = textColor,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        if (message.status == MessageStatus.FAILED) {
+            val timeString = remember(message.timestamp) {
+                Instant.ofEpochMilli(message.timestamp)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalTime()
+                    .format(DateTimeFormatter.ofPattern("HH:mm"))
+            }
+            
+            Column {
+                when (val content = message.content) {
+                    is MessageContent.Text -> {
+                        Column(modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 2.dp)) {
                             Text(
-                                text = "⚠ No enviado",
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.labelSmall,
+                                text = content.body,
+                                color = textColor,
+                                style = MaterialTheme.typography.bodyMedium,
                             )
+                            if (message.status == MessageStatus.FAILED) {
+                                Text(
+                                    text = "⚠ No enviado",
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
                         }
                     }
-                }
 
-                is MessageContent.Image -> {
+                    is MessageContent.Image -> {
                     /*
                      * Coil resuelve el storageRef SOLO si es una URL. Para rutas de Storage,
                      * necesitas un Fetcher personalizado o resolver la downloadUrl antes
@@ -336,7 +453,7 @@ private fun MessageBubbleV2(
 
                 is MessageContent.Audio -> {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 2.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
@@ -347,7 +464,17 @@ private fun MessageBubbleV2(
                     }
                 }
             }
-        }
+            
+            Text(
+                text = timeString,
+                color = textColor.copy(alpha = 0.7f),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 8.dp, bottom = 6.dp)
+            )
+            } // Fin de Column interior
+        } // Fin de Surface
 
         // Indicador de estado del mensaje
         if (message.status == MessageStatus.SENDING) {
@@ -361,84 +488,7 @@ private fun MessageBubbleV2(
     }
 }
 
-// ─── Barra de entrada ──────────────────────────────────────────────────────────
 
-/**
- * Barra de composición de mensaje con campo de texto, botón de adjuntar y botón de envío.
- */
-@Composable
-private fun MessageInputBar(
-    onSend: (String) -> Unit,
-    onAttachFile: () -> Unit,
-) {
-    var text by remember { mutableStateOf("") }
-
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        tonalElevation = 4.dp,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onAttachFile) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Adjuntar archivo",
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-
-            Spacer(modifier = Modifier.width(4.dp))
-
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Escribe un mensaje…") },
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                ),
-                singleLine = false,
-                maxLines = 5,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
-                keyboardActions = KeyboardActions(
-                    onSend = {
-                        onSend(text)
-                        text = ""
-                    },
-                ),
-            )
-
-            Spacer(modifier = Modifier.width(4.dp))
-
-            IconButton(
-                onClick = {
-                    if (text.isNotBlank()) {
-                        onSend(text)
-                        text = ""
-                    }
-                },
-                enabled = text.isNotBlank(),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Enviar mensaje",
-                    tint = if (text.isNotBlank()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                    },
-                )
-            }
-        }
-    }
-}
 
 // ─── Indicador de progreso de subida ─────────────────────────────────────────
 

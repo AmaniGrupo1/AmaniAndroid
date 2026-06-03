@@ -59,13 +59,12 @@ val chatModule = module {
     }
 
     // ── ViewModel ─────────────────────────────────────────────────────
-    // DSL moderno de Koin (org.koin.core.module.dsl) con parámetros de runtime.
     viewModel { params ->
         ChatViewModelV2(
             repo = get(),
-            chatId = params.get(),
-            currentUserId = params.get(),
-            otherUserId = params.get(),
+            chatId = params[0],
+            currentUserId = params[1],
+            otherUserId = params[2],
         )
     }
 }
