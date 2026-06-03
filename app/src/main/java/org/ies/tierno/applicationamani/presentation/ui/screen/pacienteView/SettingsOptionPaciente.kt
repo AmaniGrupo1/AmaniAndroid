@@ -149,21 +149,6 @@ fun SettingsPacienteScreen(
 
     Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
 
-    // Control de recreación para evitar loops
-    var previousLanguage by remember { mutableStateOf(currentLanguage) }
-    var isRecreating by remember { mutableStateOf(false) }
-
-    // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
-    LaunchedEffect(currentLanguage) {
-        if (previousLanguage != currentLanguage && !isRecreating) {
-            Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage'")
-            isRecreating = true
-            delay(150)
-            (context as? Activity)?.recreate()
-        }
-        previousLanguage = currentLanguage
-    }
-
     Scaffold(
         containerColor = colorScheme.background,
         topBar = {

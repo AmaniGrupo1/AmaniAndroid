@@ -16,6 +16,8 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
 
+import androidx.appcompat.app.AppCompatActivity
+
 /**
  * Actividad principal de la aplicación Amani.
  *
@@ -23,7 +25,7 @@ import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
  * {@code attachBaseContext}, habilita el modo edge-to-edge, y despliega el
  * grafo de navegación principal con el tema de la aplicación.
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     /**
      * Aplica el idioma almacenado en la sesión del usuario antes de que la
      * actividad se inicialice, garantizando que los recursos se carguen

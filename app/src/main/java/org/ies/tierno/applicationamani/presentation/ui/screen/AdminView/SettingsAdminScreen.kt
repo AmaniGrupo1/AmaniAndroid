@@ -140,19 +140,7 @@ fun SettingsAdminScreen(
         mostrarDialogoFuturo = true
     }
 
-    // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
-    LaunchedEffect(currentLanguage) {
-        Log.d(TAG, "🚀 [LaunchedEffect] currentLanguage=$currentLanguage, previousLanguage=$previousLanguage")
-
-        if (!isRecreating && previousLanguage != currentLanguage) {
-            Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage' - Recreando Activity")
-
-            previousLanguage = currentLanguage
-            isRecreating = true
-            delay(150)
-            (context as? Activity)?.recreate()
-        }
-    }
+    // Control de recreación manejado automáticamente por AppCompatDelegate
 
     // Estados para el diálogo de horario
     var mostrarConfigHorario by remember { mutableStateOf(false) }

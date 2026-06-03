@@ -78,6 +78,10 @@ class IdiomaViewModel(
                     )
                 )
 
+                // Actualizar locale de la aplicación mediante AndroidX
+                val localeList = androidx.core.os.LocaleListCompat.forLanguageTags(nuevoIdioma)
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
+
             } catch (e: Exception) {
 
                 println("Error al cambiar idioma: ${e.message}")

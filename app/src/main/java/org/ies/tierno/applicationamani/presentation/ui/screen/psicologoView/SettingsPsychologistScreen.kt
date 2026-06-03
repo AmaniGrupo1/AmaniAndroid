@@ -140,16 +140,7 @@ fun SettingsPsychologistScreen(
         mostrarDialogoFuturo = true
     }
 
-    // Detectar cambio de idioma y recrear la Activity (UNA VEZ)
-    LaunchedEffect(currentLanguage) {
-        if (!isRecreating && previousLanguage != currentLanguage) {
-            Log.w(TAG, "⚠️ [Cambio detectado] De '$previousLanguage' a '$currentLanguage'")
-            previousLanguage = currentLanguage
-            isRecreating = true
-            delay(150)
-            (context as? Activity)?.recreate()
-        }
-    }
+    // Control de recreación manejado automáticamente por AppCompatDelegate
 
     // Estados para el diálogo de horario
     var mostrarConfigHorario by remember { mutableStateOf(false) }
