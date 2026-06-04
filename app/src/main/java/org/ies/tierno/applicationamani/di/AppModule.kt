@@ -9,15 +9,10 @@ import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.local.diario.AmaniDatabase
-import org.ies.tierno.applicationamani.data.remoto.ChatFirebaseService
 import org.ies.tierno.applicationamani.data.remoto.DiarioRemoteRepository
 import org.ies.tierno.applicationamani.data.remoto.DiarioSyncManager
-import org.ies.tierno.applicationamani.data.remoto.FileStorageService
-import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance
 import org.ies.tierno.applicationamani.data.remoto.SyncDiarioWorker
 import org.ies.tierno.applicationamani.data.repositorio.AjustesRepository
-import org.ies.tierno.applicationamani.data.repositorio.ChatRepository
-import org.ies.tierno.applicationamani.data.repositorio.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
 import org.ies.tierno.applicationamani.data.repositorio.DiarioEmocionalRepository
 import org.ies.tierno.applicationamani.data.repositorio.DocumentoLegalRepository
@@ -37,15 +32,6 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientes
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicologoAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
 import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.GetMessagesUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessageDeliveredUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.MarkMessagesAsReadUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.ObserveUserOnlineUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.SendMessageUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
-import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialCita.HistorialCitaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
@@ -73,7 +59,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacie
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
@@ -151,11 +136,7 @@ val appModule = module {
     single { AdminRepository(get()) }
     single { TicketsRepository(get()) }
 
-    single { FirebaseInstance }
-    single { ChatFirebaseService(get()) }
-    single<ChatRepositoryImpl> { ChatRepositoryImpl(get(), get()) }
-    single<ChatRepository> { get<ChatRepositoryImpl>() }
-    single { FileStorageService(get(), androidContext()) }
+
 
     factory { LoginUseCase(get()) }
     factory { GetAllClientAndPsicologoUseCase(get()) }
@@ -174,16 +155,7 @@ val appModule = module {
     factory { HistorialClinicoUseCase(get()) }
     factory { DocumentoLegalUseCase(get()) }
 
-    factory { SendMessageUseCase(get()) }
-    factory { GetMessagesUseCase(get()) }
-    factory { MarkMessagesAsReadUseCase(get()) }
     factory { ListarCitasUseCase(get()) }
-    factory { StartTypingUseCase(get()) }
-    factory { StopTypingUseCase(get()) }
-    factory { ObserveTypingUseCase(get()) }
-    factory { ObserveUserOnlineUseCase(get()) }
-    factory { MarkMessageDeliveredUseCase(get()) }
-    factory { UpdateUserOnlineUseCase(get()) }
     factory { IdiomaUseCase(get()) }
     factory { TerapiasGeneralUseCase(get()) }
     factory { GetUsuariosUseCase(get()) }
@@ -219,28 +191,6 @@ val appModule = module {
     worker { SyncDiarioWorker(get(), get(), get()) }
 
     viewModel { ChatListViewModel(get(), get(), get()) }
-    viewModel { (currentUserId: Long, otherUserId: Long, otherUserName: String) ->
-        ChatViewModel(
-            currentUserId = currentUserId,
-            otherUserId = otherUserId,
-            otherUserName = otherUserName,
-            sendMessageUseCase = get(),
-            getMessagesUseCase = get(),
-            markMessagesAsReadUseCase = get(),
-            markMessageDeliveredUseCase = get(),
-            fileStorageService = get(),
-            startTypingUseCase = get(),
-            stopTypingUseCase = get(),
-            observeTypingUseCase = get(),
-            observeUserOnlineUseCase = get(),
-            updateUserOnlineUseCase = get(),
-            profileUseCaseGeneral = get(),
-            authRepository = get(),
-            chatRepositoryImpl = get(),
-            crashReporter = get(),
-            appContext = androidContext(),
-        )
-    }
 
     viewModel { NotificacionViewModel(get()) }
     viewModel { PacientesViewModel(get()) }

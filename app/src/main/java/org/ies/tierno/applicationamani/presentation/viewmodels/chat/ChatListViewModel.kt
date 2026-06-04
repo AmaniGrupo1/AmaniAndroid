@@ -89,13 +89,8 @@ class ChatListViewModel(
 
                 when (normalizeRole(session.rol)) {
                     "paciente" -> {
-                        if (session.idPsicologo != null) {
-                            loadPsicologoNombre(session.idPsicologo)
-                        } else {
-                            // Fallback cuando la sesión no trae idPsicologo pero el paciente sí tiene asignación.
-                            val idPaciente = session.idPaciente ?: session.idUsuario
-                            resolvePsychologistForPatient(idPaciente)
-                        }
+                        val idPaciente = session.idPaciente ?: session.idUsuario
+                        resolvePsychologistForPatient(idPaciente)
                     }
 
                     "psicologo", "psicologa" -> {
@@ -156,11 +151,30 @@ class ChatListViewModel(
             try {
                 val pacientes = listarPacientesByPsicologo().first()
                 if (pacientes.isNotEmpty()) {
-                    pacientes.forEach { paciente ->
-                        val pacienteId = paciente.idUsuario ?: paciente.idPaciente
-                        if (pacienteId != null) {
-                            resolveAndAddPaciente(pacienteId)
+                    val nuevosPartners = pacientes.mapNotNull { paciente ->
+                        // ⚠️ Para construir el chatId correcto necesitamos idUsuario,
+                        // NO idPaciente. El nodo Firebase es "{min(idUsuario1,idUsuario2)}_{max(...)}"
+                        val userId = paciente.idUsuario
+                        if (userId == null) {
+                            Log.w(TAG, "Paciente sin idUsuario (idPaciente=${paciente.idPaciente}), " +
+                                    "no se puede abrir chat sin idUsuario")
+                            return@mapNotNull null
                         }
+                        val nombre = buildString {
+                            paciente.nombre?.let { append(it) }
+                            paciente.apellido?.let {
+                                if (isNotEmpty()) append(" ")
+                                append(it)
+                            }
+                        }.ifEmpty { "Paciente $userId" }
+
+                        ChatPartner(id = userId, nombre = nombre, rol = "paciente")
+                    }
+
+                    if (nuevosPartners.isNotEmpty()) {
+                        _partners.value = nuevosPartners.distinctBy { it.id }
+                    } else {
+                        _error.value = "No se pudo resolver el ID de usuario de los pacientes"
                     }
                 } else {
                     _error.value = "No tienes pacientes asignados aún"
@@ -182,12 +196,12 @@ class ChatListViewModel(
                 val result = profileUseCaseGeneral.obtenerPsicologoAsignado(idPaciente)
                 result
                     .onSuccess { profile ->
-                        val psicologoUserId = profile.usuario?.idUsuario ?: profile.idPsicologo
+                        val psicologoUserId = profile.usuario?.idUsuario
                         if (psicologoUserId != null) {
                             val nombre =
                                 buildString {
-                                    profile.usuario?.nombre?.let { append(it) }
-                                    profile.usuario?.apellido?.let {
+                                    profile.usuario.nombre?.let { append(it) }
+                                    profile.usuario.apellido?.let {
                                         if (isNotEmpty()) append(" ")
                                         append(it)
                                     }
@@ -202,7 +216,8 @@ class ChatListViewModel(
                                     ),
                                 )
                         } else {
-                            _error.value = "No tienes un psicólogo asignado"
+                            Log.w(TAG, "El backend no devolvió usuario.idUsuario para el psicólogo")
+                            _error.value = "No se pudo obtener el identificador de chat del psicólogo"
                         }
                     }.onFailure {
                         Log.e(TAG, "Error resolviendo psicólogo asignado", it)
@@ -214,40 +229,7 @@ class ChatListViewModel(
         }
     }
 
-    private fun loadPsicologoNombre(idUsuarioPsicologo: Long) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _partners.value = emptyList()
-            try {
-                val result = profileUseCaseGeneral.getPsicologoById(idUsuarioPsicologo)
-                result
-                    .onSuccess { profile ->
-                        val nombre =
-                            buildString {
-                                profile.usuario?.nombre?.let { append(it) }
-                                profile.usuario?.apellido?.let {
-                                    if (isNotEmpty()) append(" ")
-                                    append(it)
-                                }
-                            }.ifEmpty { "Tu Psicólogo" }
 
-                        _partners.value =
-                            listOf(
-                                ChatPartner(
-                                    id = idUsuarioPsicologo,
-                                    nombre = nombre,
-                                    rol = "psicologo",
-                                ),
-                            )
-                    }.onFailure {
-                        Log.e(TAG, "Error cargando nombre de psicólogo", it)
-                        _error.value = it.message ?: "No se pudo cargar el psicólogo"
-                    }
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
 
     /** Reinicia la carga de contactos limpiando el estado actual. */
     fun retry() {
