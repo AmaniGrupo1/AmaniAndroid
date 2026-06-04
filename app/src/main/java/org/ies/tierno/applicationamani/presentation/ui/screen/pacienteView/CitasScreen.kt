@@ -1325,7 +1325,7 @@ fun DialogoGestionCitaAmani(
                             },
                             leadingIcon = {
                                 Text(
-                                    stringResource(R.string.euro_symbol),
+                                    stringResource(R.string.auto_euro_symbol),
                                     color = colors.primary,
                                     fontFamily = roboto
                                 )
