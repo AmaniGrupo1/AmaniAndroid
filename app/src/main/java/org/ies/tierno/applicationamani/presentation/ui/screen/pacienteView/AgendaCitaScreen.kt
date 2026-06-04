@@ -714,6 +714,8 @@ fun CitaCardAmani(
                                         val options = JitsiMeetConferenceOptions.Builder()
                                             .setRoom(roomName)
                                             .setFeatureFlag("welcomepage.enabled", false)
+                                            .setFeatureFlag("prejoinpage.enabled", false)
+                                            .setFeatureFlag("invite.enabled", false)
                                             .setFeatureFlag("conference.shortcuts.enabled", false)
                                             .setFeatureFlag("filmstrip.enabled", true)
                                             .build()

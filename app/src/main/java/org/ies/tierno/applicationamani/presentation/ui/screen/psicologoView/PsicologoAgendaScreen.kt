@@ -1022,6 +1022,8 @@ fun TarjetaCitaMejorada(
                             val options = JitsiMeetConferenceOptions.Builder()
                                 .setRoom("AmaniSession_${cita.id}")
                                 .setFeatureFlag("welcomepage.enabled", false)
+                                .setFeatureFlag("prejoinpage.enabled", false)
+                                .setFeatureFlag("invite.enabled", false)
                                 .build()
                             JitsiMeetActivity.launch(context, options)
                         },
