@@ -22,8 +22,9 @@ sealed class MessageContent {
      * @property storageRef Ruta del archivo en Firebase Storage (NO la URL de descarga).
      * Las URLs de Storage caducan; la referencia de Storage es permanente y permite
      * regenerar la URL en cualquier momento mediante [StorageReference.downloadUrl].
+     * @property caption Texto opcional que acompaña a la imagen.
      */
-    data class Image(val storageRef: String) : MessageContent()
+    data class Image(val storageRef: String, val caption: String = "") : MessageContent()
 
     /**
      * Mensaje con audio adjunto (nota de voz).

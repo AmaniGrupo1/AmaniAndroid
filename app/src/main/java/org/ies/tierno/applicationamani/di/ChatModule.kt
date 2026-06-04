@@ -61,6 +61,7 @@ val chatModule = module {
     // ── ViewModel ─────────────────────────────────────────────────────
     viewModel { params ->
         ChatViewModelV2(
+            appContext = get(),
             repo = get(),
             chatId = params[0],
             currentUserId = params[1],

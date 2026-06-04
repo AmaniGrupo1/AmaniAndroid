@@ -38,6 +38,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 import androidx.compose.material3.MaterialTheme
 import java.util.Calendar
 import java.math.BigDecimal
@@ -84,6 +86,8 @@ fun AgendaCitaScreen(
     viewModel: ListarCitasViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val citasRepository: org.ies.tierno.applicationamani.data.repositorio.CitasRepository = org.koin.compose.koinInject()
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
@@ -415,6 +419,8 @@ fun CitaCardAmani(
     isDark: Boolean,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val citasRepository: org.ies.tierno.applicationamani.data.repositorio.CitasRepository = org.koin.compose.koinInject()
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
@@ -709,23 +715,37 @@ fun CitaCardAmani(
                         if (modalidad.uppercase() == "LLAMADA") {
                             IconButton(
                                 onClick = {
-                                    try {
-                                        val roomName = "AmaniSession_${cita.idCita ?: 0L}".replace(Regex("[^a-zA-Z0-9-]"), "")
-                                        val options = JitsiMeetConferenceOptions.Builder()
-                                            .setRoom(roomName)
-                                            .setFeatureFlag("welcomepage.enabled", false)
-                                            .setFeatureFlag("prejoinpage.enabled", false)
-                                            .setFeatureFlag("invite.enabled", false)
-                                            .setFeatureFlag("conference.shortcuts.enabled", false)
-                                            .setFeatureFlag("filmstrip.enabled", true)
-                                            .build()
-                                        JitsiMeetActivity.launch(context, options)
-                                    } catch (e: Exception) {
-                                        android.widget.Toast.makeText(
-                                            context,
-                                            "Error al iniciar videollamada: ${e.message}",
-                                            android.widget.Toast.LENGTH_SHORT
-                                        ).show()
+                                    val roomName = "AmaniSession_${cita.idCita ?: 0L}".replace(Regex("[^a-zA-Z0-9-]"), "")
+                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        try {
+                                            val result = citasRepository.getJitsiToken(roomName)
+                                            val jwtToken = result.getOrNull()
+                                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                val options = JitsiMeetConferenceOptions.Builder()
+                                                    .setServerURL(java.net.URL("https://jitsi.amanipsicologia.org/"))
+                                                    .setRoom(roomName)
+                                                    .setFeatureFlag("welcomepage.enabled", false)
+                                                    .setFeatureFlag("prejoinpage.enabled", false)
+                                                    .setFeatureFlag("invite.enabled", false)
+                                                    .setFeatureFlag("conference.shortcuts.enabled", false)
+                                                    .setFeatureFlag("filmstrip.enabled", true)
+                                                    .apply {
+                                                        if (!jwtToken.isNullOrEmpty()) {
+                                                            setToken(jwtToken)
+                                                        }
+                                                    }
+                                                    .build()
+                                                JitsiMeetActivity.launch(context, options)
+                                            }
+                                        } catch (e: Exception) {
+                                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                android.widget.Toast.makeText(
+                                                    context,
+                                                    "Error al iniciar videollamada: ${e.message}",
+                                                    android.widget.Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
                                     }
                                 },
                                 modifier = Modifier.size(32.dp)

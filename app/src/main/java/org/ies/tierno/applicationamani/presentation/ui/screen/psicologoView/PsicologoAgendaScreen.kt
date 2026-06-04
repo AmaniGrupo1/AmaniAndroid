@@ -56,6 +56,7 @@ import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlinx.coroutines.launch
 import androidx.compose.material3.MaterialTheme
 
 // Extensiones de color
@@ -87,6 +88,8 @@ fun PsicologoAgendaScreen(
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+    val context = LocalContext.current
+    val citasRepository: org.ies.tierno.applicationamani.data.repositorio.CitasRepository = org.koin.compose.koinInject()
 
     val agendaMensual by viewModel.agendaMensual.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
@@ -383,8 +386,7 @@ fun PsicologoAgendaScreen(
                                                         cita.id,
                                                         nuevoEstado
                                                     )
-                                                },
-                                                scope = scope
+                                                }
                                             )
                                             if (index < citasDelDia.size - 1) {
                                                 Spacer(modifier = Modifier.height(12.dp))
@@ -776,7 +778,6 @@ fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TarjetaCitaMejorada(
-    scope: CoroutineScope,
     cita: AgendaItemDTO,
     pacienteTelefono: String?,
     onEdit: () -> Unit,
@@ -785,6 +786,8 @@ fun TarjetaCitaMejorada(
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
+    val scope = rememberCoroutineScope()
+    val citasRepository: org.ies.tierno.applicationamani.data.repositorio.CitasRepository = org.koin.compose.koinInject()
     val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
     var menuExpanded by remember { mutableStateOf(false) }
     var isUpdating by remember { mutableStateOf(false) }
@@ -1012,20 +1015,43 @@ fun TarjetaCitaMejorada(
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.primary,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
                     )
                 }
 
                 if (cita.modalidad == ModalidadCita.LLAMADA) {
                     IconButton(
                         onClick = {
-                            val options = JitsiMeetConferenceOptions.Builder()
-                                .setRoom("AmaniSession_${cita.id}")
-                                .setFeatureFlag("welcomepage.enabled", false)
-                                .setFeatureFlag("prejoinpage.enabled", false)
-                                .setFeatureFlag("invite.enabled", false)
-                                .build()
-                            JitsiMeetActivity.launch(context, options)
+                            val roomName = "AmaniSession_${cita.id}"
+                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                try {
+                                    val result = citasRepository.getJitsiToken(roomName)
+                                    val jwtToken = result.getOrNull()
+                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                        val options = JitsiMeetConferenceOptions.Builder()
+                                            .setServerURL(java.net.URL("https://jitsi.amanipsicologia.org/"))
+                                            .setRoom(roomName)
+                                            .setFeatureFlag("welcomepage.enabled", false)
+                                            .setFeatureFlag("prejoinpage.enabled", false)
+                                            .setFeatureFlag("invite.enabled", false)
+                                            .apply {
+                                                if (!jwtToken.isNullOrEmpty()) {
+                                                    setToken(jwtToken)
+                                                }
+                                            }
+                                            .build()
+                                        JitsiMeetActivity.launch(context, options)
+                                    }
+                                } catch (e: Exception) {
+                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            "Error al iniciar videollamada: ${e.message}",
+                                            android.widget.Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }
                         },
                         modifier = Modifier.size(32.dp)
                     ) {

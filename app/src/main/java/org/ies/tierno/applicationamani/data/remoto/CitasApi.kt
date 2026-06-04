@@ -46,6 +46,11 @@ interface CitasApi {
         @Query("duracion") duracion: Int? = null,
     ): DisponibilidadDiaResponse
 
+    @GET("/api/jitsi/token/{room}")
+    suspend fun getJitsiToken(
+        @Path("room") room: String
+    ): org.ies.tierno.applicationamani.dto.citas.JitsiTokenResponse
+
 //    @POST("/api/citas/admin")
 //    suspend fun crearCita(
 //        @Body request: CrearCitaRequestDTO

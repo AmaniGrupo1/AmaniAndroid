@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -70,6 +71,13 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.flow.collectLatest
 import org.ies.tierno.applicationamani.domain.models.ChatMessage
 import org.ies.tierno.applicationamani.domain.models.MessageContent
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatEvent
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiStateV2
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.UploadState
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.StatusIcon
+import androidx.compose.foundation.layout.wrapContentWidth
 import org.ies.tierno.applicationamani.domain.models.MessageStatus
 import org.ies.tierno.applicationamani.domain.repository.MediaType
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
@@ -175,10 +183,12 @@ fun ChatScreenV2(
     }
 
     // ── Picker de archivos ────────────────────────────────────────────────────
+    var pendingAttachmentUri by remember { mutableStateOf<Uri?>(null) }
+    
     val fileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
     ) { uri: Uri? ->
-        uri?.let { viewModel.sendMedia(it, MediaType.IMAGE) }
+        uri?.let { pendingAttachmentUri = it }
     }
 
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -215,7 +225,12 @@ fun ChatScreenV2(
                     text = text,
                     onTextChange = { text = it },
                     onSend = {
-                        viewModel.sendText(text)
+                        if (pendingAttachmentUri != null) {
+                            viewModel.sendMedia(pendingAttachmentUri!!, MediaType.IMAGE, text)
+                            pendingAttachmentUri = null
+                        } else {
+                            viewModel.sendText(text)
+                        }
                         text = ""
                     },
                     onMicClick = {
@@ -238,7 +253,9 @@ fun ChatScreenV2(
                         }
                     },
                     isRecording = isRecording,
-                    recordingSeconds = recordingSeconds
+                    recordingSeconds = recordingSeconds,
+                    pendingAttachmentUri = pendingAttachmentUri,
+                    onClearAttachment = { pendingAttachmentUri = null }
                 )
             }
         },
@@ -299,6 +316,10 @@ fun ChatScreenV2(
                                         MessageBubbleV2(
                                             message = item.msg,
                                             isOwnMessage = item.msg.senderId == viewModel.currentUserId,
+                                            audioUiState = state.audioUiState,
+                                            onPlayPause = { messageId, url ->
+                                                viewModel.toggleAudioPlayback(messageId, url)
+                                            }
                                         )
                                     }
                                 }
@@ -374,6 +395,8 @@ private fun DateSeparatorChipV2(label: String) {
 private fun MessageBubbleV2(
     message: ChatMessage,
     isOwnMessage: Boolean,
+    audioUiState: org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState,
+    onPlayPause: (String, String) -> Unit,
 ) {
     val alignment = if (isOwnMessage) Alignment.End else Alignment.Start
     val bubbleColor = if (isOwnMessage) {
@@ -411,7 +434,7 @@ private fun MessageBubbleV2(
             Column {
                 when (val content = message.content) {
                     is MessageContent.Text -> {
-                        Column(modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 2.dp)) {
+                        Column(modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 6.dp)) {
                             Text(
                                 text = content.body,
                                 color = textColor,
@@ -424,57 +447,131 @@ private fun MessageBubbleV2(
                                     style = MaterialTheme.typography.labelSmall,
                                 )
                             }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Row(
+                                modifier = Modifier.wrapContentWidth().align(Alignment.End).padding(top = 2.dp),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = timeString,
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    color = textColor.copy(alpha = 0.7f)
+                                )
+                                if (isOwnMessage) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    StatusIcon(isRead = message.status == MessageStatus.READ, isDelivered = message.status == MessageStatus.SENT, tint = textColor.copy(alpha = 0.7f))
+                                }
+                            }
                         }
                     }
 
                     is MessageContent.Image -> {
-                    /*
-                     * Coil resuelve el storageRef SOLO si es una URL. Para rutas de Storage,
-                     * necesitas un Fetcher personalizado o resolver la downloadUrl antes
-                     * de pasársela. La implementación completa del StorageFetcher de Coil
-                     * queda fuera del scope de este archivo; aquí se muestra el patrón correcto.
-                     */
-                    AsyncImage(
-                        model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
-                            .data(content.storageRef)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Imagen adjunta",
-                        contentScale = ContentScale.Crop,
-                        placeholder = androidx.compose.ui.graphics.painter.ColorPainter(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-                        error = androidx.compose.ui.graphics.painter.ColorPainter(
-                            MaterialTheme.colorScheme.errorContainer,
-                        ),
-                        modifier = Modifier
-                            .size(200.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                    )
-                }
+                        Column {
+                            Box(modifier = Modifier.padding(2.dp)) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                                        .data(content.storageRef)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "Imagen adjunta",
+                                    contentScale = ContentScale.Crop,
+                                    placeholder = androidx.compose.ui.graphics.painter.ColorPainter(
+                                        MaterialTheme.colorScheme.surfaceVariant,
+                                    ),
+                                    error = androidx.compose.ui.graphics.painter.ColorPainter(
+                                        MaterialTheme.colorScheme.errorContainer,
+                                    ),
+                                    modifier = Modifier
+                                        .size(240.dp)
+                                        .clip(RoundedCornerShape(
+                                            topStart = 14.dp,
+                                            topEnd = 14.dp,
+                                            bottomStart = if (isOwnMessage) 14.dp else 2.dp,
+                                            bottomEnd = if (isOwnMessage) 2.dp else 14.dp,
+                                        )),
+                                )
+                                // Solo mostramos el timestamp flotante oscuro si NO hay texto (estilo WhatsApp)
+                                if (content.caption.isBlank()) {
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .padding(6.dp)
+                                            .background(
+                                                color = Color.Black.copy(alpha = 0.4f), 
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = timeString,
+                                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                            color = Color.White
+                                        )
+                                        if (isOwnMessage) {
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            StatusIcon(isRead = message.status == MessageStatus.READ, isDelivered = message.status == MessageStatus.SENT, tint = Color.White)
+                                        }
+                                    }
+                                }
+                            }
+                            if (content.caption.isNotBlank()) {
+                                Column(modifier = Modifier.padding(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 6.dp)) {
+                                    Text(
+                                        text = content.caption,
+                                        color = textColor,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.widthIn(max = 240.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Row(
+                                        modifier = Modifier.wrapContentWidth().align(Alignment.End),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = timeString,
+                                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                            color = textColor.copy(alpha = 0.7f)
+                                        )
+                                        if (isOwnMessage) {
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            StatusIcon(isRead = message.status == MessageStatus.READ, isDelivered = message.status == MessageStatus.SENT, tint = textColor.copy(alpha = 0.7f))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                is MessageContent.Audio -> {
-                    Row(
-                        modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "🎙 Nota de voz",
-                            color = textColor,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
+                    is MessageContent.Audio -> {
+                        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                            AudioBubbleV2(
+                                message = message,
+                                isOwn = isOwnMessage,
+                                audioUiState = audioUiState,
+                                onPlayPause = onPlayPause,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(
+                                modifier = Modifier.wrapContentWidth().align(Alignment.End),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = timeString,
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                                    color = textColor.copy(alpha = 0.7f)
+                                )
+                                if (isOwnMessage) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    StatusIcon(isRead = message.status == MessageStatus.READ, isDelivered = message.status == MessageStatus.SENT, tint = textColor.copy(alpha = 0.7f))
+                                }
+                            }
+                        }
                     }
                 }
-            }
-            
-            Text(
-                text = timeString,
-                color = textColor.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 8.dp, bottom = 6.dp)
-            )
             } // Fin de Column interior
         } // Fin de Surface
 

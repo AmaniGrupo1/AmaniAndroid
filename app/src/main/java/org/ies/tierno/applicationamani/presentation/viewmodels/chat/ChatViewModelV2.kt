@@ -15,6 +15,17 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.isActive
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackStatus
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
 import org.ies.tierno.applicationamani.domain.models.ChatMessage
 import org.ies.tierno.applicationamani.domain.models.MessageContent
 import org.ies.tierno.applicationamani.domain.models.MessageStatus
@@ -46,6 +57,7 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.chat.UploadState
  * @param otherUserId UID del interlocutor.
  */
 class ChatViewModelV2(
+    appContext: android.content.Context,
     private val repo: ChatRepository,
     private val chatId: String,
     internal val currentUserId: String,
@@ -274,8 +286,9 @@ class ChatViewModelV2(
      *
      * @param uri URI local del archivo seleccionado por el usuario.
      * @param type Tipo de multimedia ([MediaType.IMAGE] o [MediaType.AUDIO]).
+     * @param caption Texto opcional que acompaña a la imagen.
      */
-    fun sendMedia(uri: Uri, type: MediaType) {
+    fun sendMedia(uri: Uri, type: MediaType, caption: String = "") {
         viewModelScope.launch {
             _uiState.update { it.copy(uploadState = UploadState.Uploading(progress = 0f)) }
 
@@ -283,7 +296,7 @@ class ChatViewModelV2(
                 is ChatResult.Success -> {
                     val storageRef = result.data
                     val content: MessageContent = when (type) {
-                        MediaType.IMAGE -> MessageContent.Image(storageRef)
+                        MediaType.IMAGE -> MessageContent.Image(storageRef, caption)
                         MediaType.AUDIO -> MessageContent.Audio(storageRef)
                     }
 
@@ -338,5 +351,178 @@ class ChatViewModelV2(
     /** Resetea el estado de subida a Idle (p. ej. al cerrar el indicador de progreso). */
     fun resetUploadState() {
         _uiState.update { it.copy(uploadState = UploadState.Idle) }
+    }
+
+    // ─── Reproductor de Audio (ExoPlayer) ─────────────────────────────────────
+
+    private val applicationContext = appContext.applicationContext
+    private var exoPlayer: ExoPlayer? = null
+    private var progressJob: Job? = null
+
+    private val playerListener = object : Player.Listener {
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            val player = exoPlayer ?: return
+            val current = _uiState.value.audioUiState
+
+            when (playbackState) {
+                Player.STATE_BUFFERING -> {
+                    _uiState.update { it.copy(audioUiState = current.copy(status = AudioPlaybackStatus.LOADING)) }
+                }
+                Player.STATE_READY -> {
+                    if (player.isPlaying) {
+                        _uiState.update { 
+                            it.copy(audioUiState = current.copy(
+                                status = AudioPlaybackStatus.PLAYING,
+                                durationMs = maxOf(player.duration, 0L)
+                            )) 
+                        }
+                        startProgressUpdates()
+                    }
+                }
+                Player.STATE_ENDED -> {
+                    stopProgressUpdates()
+                    _uiState.update { it.copy(audioUiState = AudioPlaybackUiState()) }
+                }
+            }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            val player = exoPlayer ?: return
+            val current = _uiState.value.audioUiState
+            if (current.activeMessageId == null) return
+
+            if (isPlaying) {
+                _uiState.update {
+                    it.copy(audioUiState = current.copy(
+                        status = AudioPlaybackStatus.PLAYING,
+                        durationMs = maxOf(player.duration, 0L)
+                    ))
+                }
+                startProgressUpdates()
+            } else if (player.playbackState != Player.STATE_ENDED) {
+                stopProgressUpdates()
+                _uiState.update {
+                    it.copy(audioUiState = current.copy(
+                        status = AudioPlaybackStatus.PAUSED,
+                        positionMs = maxOf(player.currentPosition, 0L),
+                        durationMs = maxOf(player.duration, 0L)
+                    ))
+                }
+            }
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            Log.e(TAG, "Error de reproducción: ${error.message}", error)
+            stopProgressUpdates()
+            _uiState.update { 
+                it.copy(audioUiState = it.audioUiState.copy(
+                    status = AudioPlaybackStatus.ERROR,
+                    errorMessage = "Error al reproducir el audio"
+                ))
+            }
+        }
+    }
+
+    private fun initPlayer() {
+        if (exoPlayer != null) return
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+            .setUsage(C.USAGE_MEDIA)
+            .build()
+        exoPlayer = ExoPlayer.Builder(applicationContext).build().apply {
+            setAudioAttributes(audioAttributes, true)
+            addListener(playerListener)
+        }
+    }
+
+    private fun startProgressUpdates() {
+        val player = exoPlayer ?: return
+        progressJob?.cancel()
+        progressJob = viewModelScope.launch {
+            while (isActive && exoPlayer != null) {
+                val currentState = _uiState.value.audioUiState
+                if (currentState.activeMessageId == null) break
+
+                _uiState.update { 
+                    it.copy(audioUiState = currentState.copy(
+                        positionMs = maxOf(player.currentPosition, 0L),
+                        durationMs = maxOf(player.duration, 0L)
+                    ))
+                }
+                delay(300)
+            }
+        }
+    }
+
+    private fun stopProgressUpdates() {
+        progressJob?.cancel()
+        progressJob = null
+    }
+
+    fun toggleAudioPlayback(messageId: String, remoteUrl: String) {
+        if (!remoteUrl.startsWith("http")) {
+            _uiState.update { 
+                it.copy(audioUiState = AudioPlaybackUiState(
+                    status = AudioPlaybackStatus.ERROR,
+                    activeMessageId = messageId,
+                    errorMessage = "URL de audio inválida"
+                )) 
+            }
+            return
+        }
+
+        initPlayer()
+        val player = exoPlayer ?: run {
+            Log.e(TAG, "ExoPlayer no se pudo inicializar")
+            _uiState.update { 
+                it.copy(audioUiState = AudioPlaybackUiState(
+                    status = AudioPlaybackStatus.ERROR,
+                    activeMessageId = messageId,
+                    errorMessage = "Error al inicializar el reproductor"
+                )) 
+            }
+            return
+        }
+        val current = _uiState.value.audioUiState
+
+        if (current.activeMessageId == messageId) {
+            if (player.isPlaying) player.pause() else player.play()
+            return
+        }
+
+        stopProgressUpdates()
+        _uiState.update { 
+            it.copy(audioUiState = AudioPlaybackUiState(
+                status = AudioPlaybackStatus.LOADING,
+                activeMessageId = messageId
+            )) 
+        }
+
+        val mimeType = when {
+            remoteUrl.contains(".ogg", ignoreCase = true) -> "audio/ogg"
+            remoteUrl.contains(".m4a", ignoreCase = true) -> "audio/mp4"
+            remoteUrl.contains(".mp3", ignoreCase = true) -> "audio/mpeg"
+            remoteUrl.contains(".wav", ignoreCase = true) -> "audio/wav"
+            else -> null
+        }
+
+        val mediaItem = if (mimeType != null) {
+            MediaItem.Builder().setUri(remoteUrl).setMimeType(mimeType).build()
+        } else {
+            MediaItem.fromUri(remoteUrl)
+        }
+
+        Log.d(TAG, "Reproduciendo: $remoteUrl (mime=$mimeType)")
+        player.setMediaItem(mediaItem)
+        player.playWhenReady = true
+        player.prepare()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopProgressUpdates()
+        exoPlayer?.removeListener(playerListener)
+        exoPlayer?.release()
+        exoPlayer = null
     }
 }

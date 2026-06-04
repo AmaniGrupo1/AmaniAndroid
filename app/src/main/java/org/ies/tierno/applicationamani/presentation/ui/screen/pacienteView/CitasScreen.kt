@@ -56,7 +56,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
+import kotlinx.coroutines.launch
 
 // Colores originales para el modo DEFECTO (Amani)
 object CitasScreenDefaultColors {
@@ -96,6 +97,7 @@ fun CitasScreen(
 ) {
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val context = LocalContext.current
+    val citasRepository: org.ies.tierno.applicationamani.data.repositorio.CitasRepository = org.koin.compose.koinInject()
 
     // Obtener estado del tema
     val isDark = isDarkTheme()
@@ -574,13 +576,36 @@ fun CitasScreen(
                                                 ) {
                                                     IconButton(
                                                         onClick = {
-                                                            val options = JitsiMeetConferenceOptions.Builder()
-                                                                .setRoom("AmaniSession_${cita.id}")
-                                                                .setFeatureFlag("welcomepage.enabled", false)
-                                                                .setFeatureFlag("prejoinpage.enabled", false)
-                                                                .setFeatureFlag("invite.enabled", false)
-                                                                .build()
-                                                            JitsiMeetActivity.launch(context, options)
+                                                            val roomName = "AmaniSession_${cita.id}"
+                                                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                                try {
+                                                                    val result = citasRepository.getJitsiToken(roomName)
+                                                                    val jwtToken = result.getOrNull()
+                                                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                                        val options = JitsiMeetConferenceOptions.Builder()
+                                                                            .setServerURL(java.net.URL("https://jitsi.amanipsicologia.org/"))
+                                                                            .setRoom(roomName)
+                                                                            .setFeatureFlag("welcomepage.enabled", false)
+                                                                            .setFeatureFlag("prejoinpage.enabled", false)
+                                                                            .setFeatureFlag("invite.enabled", false)
+                                                                            .apply {
+                                                                                if (!jwtToken.isNullOrEmpty()) {
+                                                                                    setToken(jwtToken)
+                                                                                }
+                                                                            }
+                                                                            .build()
+                                                                        JitsiMeetActivity.launch(context, options)
+                                                                    }
+                                                                } catch (e: Exception) {
+                                                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                                        android.widget.Toast.makeText(
+                                                                            context,
+                                                                            "Error al iniciar videollamada: ${e.message}",
+                                                                            android.widget.Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    }
+                                                                }
+                                                            }
                                                         },
                                                         modifier = Modifier
                                                             .size(44.dp)

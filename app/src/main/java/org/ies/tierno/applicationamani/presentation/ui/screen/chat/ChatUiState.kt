@@ -74,6 +74,7 @@ data class ChatUiStateV2(
     val uploadState: UploadState = UploadState.Idle,
     val error: String? = null,
     val hasMoreMessages: Boolean = true,
+    val audioUiState: org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState = org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState(),
 )
 
 /**

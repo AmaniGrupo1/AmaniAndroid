@@ -58,6 +58,11 @@ class CitasRepository(
             citasApi.getAgendaPsicologo(idPsicologo, month)
         }
 
+    suspend fun getJitsiToken(room: String): Result<String> =
+        runCatching {
+            citasApi.getJitsiToken(room).token
+        }
+
     /**
      * Obtiene la duración predeterminada de las sesiones de un psicólogo.
      *

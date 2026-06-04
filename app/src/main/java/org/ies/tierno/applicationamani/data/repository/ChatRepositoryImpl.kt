@@ -295,7 +295,8 @@ class ChatRepositoryImpl(
                 "Firebase no pudo generar una clave para el mensaje"
             } else message.id
 
-            val body = (message.content as? MessageContent.Text)?.body.orEmpty()
+            val body = (message.content as? MessageContent.Text)?.body 
+                ?: (message.content as? MessageContent.Image)?.caption.orEmpty()
 
             val payload = mutableMapOf<String, Any>(
                 FIELD_SENDER_ID to (message.senderId.toLongOrNull() ?: 0L),
