@@ -43,7 +43,6 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.QuestionnaireScree
 import org.ies.tierno.applicationamani.presentation.ui.screen.RegisterScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacientesScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreenV2
 import org.ies.tierno.applicationamani.presentation.ui.screen.diario.DiarioEmocionalScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
@@ -71,7 +70,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaVi
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel

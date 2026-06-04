@@ -139,10 +139,11 @@ fun ChatScreen(
         previousSize.intValue = chatItems.size
     }
 
-    LaunchedEffect(uiStateWrapper) {
-        if (uiStateWrapper is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error) {
-            val error = (uiStateWrapper as org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error).message
-            snackbarHostState.showSnackbar(error)
+    // Solo se re-ejecuta cuando hay un mensaje de error nuevo (no en cada cambio de mensajes)
+    val errorMessage = (uiStateWrapper as? org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error)?.message
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }
     }

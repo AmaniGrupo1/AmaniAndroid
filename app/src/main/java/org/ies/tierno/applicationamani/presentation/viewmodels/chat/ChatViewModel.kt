@@ -391,8 +391,9 @@ class ChatViewModel(
 
     /**
      * Inicia la observación de los mensajes de la conversación actual.
+     * Privada: solo se llama desde el bloque init del ViewModel.
      */
-    fun observeMessages() {
+    private fun observeMessages() {
         observeMessagesJob?.cancel()
         observeMessagesJob =
             viewModelScope.launch {

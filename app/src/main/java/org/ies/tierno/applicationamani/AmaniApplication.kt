@@ -105,7 +105,7 @@ class AmaniApplication : Application() {
      */
     private fun crearCanalNotificaciones() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel =
+            val channelCitas =
                 NotificationChannel(
                     CitaNotificationWorker.CANAL_CITAS_ID,
                     "Recordatorio de citas",
@@ -114,7 +114,18 @@ class AmaniApplication : Application() {
                     description = "Notificaciones de recordatorio de tus citas en Amani"
                 }
             val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            manager.createNotificationChannel(channelCitas)
+            
+            // Canal para el Chat
+            val channelChat =
+                NotificationChannel(
+                    org.ies.tierno.applicationamani.services.AmaniFirebaseMessagingService.CANAL_CHAT_ID,
+                    "Mensajes de chat",
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    description = "Notificaciones de nuevos mensajes en el chat"
+                }
+            manager.createNotificationChannel(channelChat)
         }
     }
 }

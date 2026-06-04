@@ -149,7 +149,9 @@ fun ChatScreenV2(
     }
 
     // ── Eventos de un solo disparo ────────────────────────────────────────────
-    LaunchedEffect(Unit) {
+    // key = viewModel: si la instancia del ViewModel cambia (hot reload, recreación),
+    // se cancela el collector anterior y se crea uno nuevo ligado al nuevo ViewModel.
+    LaunchedEffect(viewModel) {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is ChatEvent.ScrollToBottom -> {
