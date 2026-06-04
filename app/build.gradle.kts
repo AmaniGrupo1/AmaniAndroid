@@ -138,6 +138,9 @@ dependencies {
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
+    // Jitsi Meet para Videollamadas
+    implementation("org.jitsi.react:jitsi-meet-sdk:8.6.0")
+
     // DataStore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.room.runtime)

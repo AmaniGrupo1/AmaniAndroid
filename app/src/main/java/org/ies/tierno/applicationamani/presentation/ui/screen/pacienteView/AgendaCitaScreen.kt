@@ -41,8 +41,8 @@ import java.util.Locale
 import androidx.compose.material3.MaterialTheme
 import java.util.Calendar
 import java.math.BigDecimal
-// import org.jitsi.meet.sdk.JitsiMeetActivity
-// import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
@@ -707,7 +707,6 @@ fun CitaCardAmani(
                         }
 
                         if (modalidad.uppercase() == "LLAMADA") {
-                            /*
                             IconButton(
                                 onClick = {
                                     val options = JitsiMeetConferenceOptions.Builder()
@@ -725,7 +724,6 @@ fun CitaCardAmani(
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
-                            */
                         }
                     }
                 }

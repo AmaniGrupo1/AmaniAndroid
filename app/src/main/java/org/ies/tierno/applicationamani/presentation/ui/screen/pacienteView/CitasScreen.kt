@@ -38,6 +38,8 @@ import org.ies.tierno.applicationamani.domain.models.citas.AgendaItemDTO
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
@@ -501,46 +503,92 @@ fun CitasScreen(
 
                                         Spacer(modifier = Modifier.width(12.dp))
 
-                                        // Botón para agregar al calendario
-                                        Column(
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
+                                        // Botones de acción (Llamada y Calendario)
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            IconButton(
-                                                onClick = {
-                                                    enviarCitaAlCalendario(
-                                                        context = context,
-                                                        titulo = "Cita en Amani",
-                                                        descripcion = cita.motivo ?: "Cita psicológica",
-                                                        fecha = cita.fecha,
-                                                        hora = cita.horaInicio,
-                                                        duracionMinutos = cita.duracionMinutos ?: 60
+                                            if (cita.modalidad == ModalidadCita.LLAMADA) {
+                                                Column(
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Center
+                                                ) {
+                                                    IconButton(
+                                                        onClick = {
+                                                            val options = JitsiMeetConferenceOptions.Builder()
+                                                                .setRoom("AmaniSession_${cita.id}")
+                                                                .setFeatureFlag("welcomepage.enabled", false)
+                                                                .build()
+                                                            JitsiMeetActivity.launch(context, options)
+                                                        },
+                                                        modifier = Modifier
+                                                            .size(44.dp)
+                                                            .background(
+                                                                brush = Brush.linearGradient(
+                                                                    colors = listOf(colors.primary, colors.primaryLight)
+                                                                ),
+                                                                shape = RoundedCornerShape(12.dp)
+                                                            )
+                                                    ) {
+                                                        Icon(
+                                                            Icons.Default.VideoCall,
+                                                            contentDescription = "Iniciar Videollamada Jitsi",
+                                                            tint = if (isDark) Color.Black else Color.White,
+                                                            modifier = Modifier.size(26.dp)
+                                                        )
+                                                    }
+
+                                                    Text(
+                                                        text = "Llamada",
+                                                        fontSize = 10.sp,
+                                                        color = colors.textSecondary,
+                                                        fontFamily = roboto,
+                                                        modifier = Modifier.padding(top = 4.dp)
                                                     )
-                                                },
-                                                modifier = Modifier
-                                                    .size(44.dp)
-                                                    .background(
-                                                        brush = Brush.linearGradient(
-                                                            colors = listOf(colors.primary, colors.primaryLight)
-                                                        ),
-                                                        shape = RoundedCornerShape(12.dp)
-                                                    )
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.CalendarMonth,
-                                                    contentDescription = stringResource(R.string.auto_agregar_a_calendario),
-                                                    tint = if (isDark) Color.Black else Color.White,
-                                                    modifier = Modifier.size(22.dp)
-                                                )
+                                                }
                                             }
 
-                                            Text(
-                                                text = stringResource(R.string.auto_calendario),
-                                                fontSize = 10.sp,
-                                                color = colors.textSecondary,
-                                                fontFamily = roboto,
-                                                modifier = Modifier.padding(top = 4.dp)
-                                            )
+                                            // Botón para agregar al calendario
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                IconButton(
+                                                    onClick = {
+                                                        enviarCitaAlCalendario(
+                                                            context = context,
+                                                            titulo = "Cita en Amani",
+                                                            descripcion = cita.motivo ?: "Cita psicológica",
+                                                            fecha = cita.fecha,
+                                                            hora = cita.horaInicio,
+                                                            duracionMinutos = cita.duracionMinutos ?: 60
+                                                        )
+                                                    },
+                                                    modifier = Modifier
+                                                        .size(44.dp)
+                                                        .background(
+                                                            brush = Brush.linearGradient(
+                                                                colors = listOf(colors.primary, colors.primaryLight)
+                                                            ),
+                                                            shape = RoundedCornerShape(12.dp)
+                                                        )
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.CalendarMonth,
+                                                        contentDescription = stringResource(R.string.auto_agregar_a_calendario),
+                                                        tint = if (isDark) Color.Black else Color.White,
+                                                        modifier = Modifier.size(22.dp)
+                                                    )
+                                                }
+
+                                                Text(
+                                                    text = stringResource(R.string.auto_calendario),
+                                                    fontSize = 10.sp,
+                                                    color = colors.textSecondary,
+                                                    fontFamily = roboto,
+                                                    modifier = Modifier.padding(top = 4.dp)
+                                                )
+                                            }
                                         }
 
                                     }
