@@ -84,6 +84,7 @@ object CitasScreenDefaultColors {
  * @param viewModel ViewModel que gestiona la agenda del psicólogo.
  * @param listarTerapiasViewModel ViewModel que gestiona la lista de terapias disponibles.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CitasScreen(
@@ -240,6 +241,33 @@ fun CitasScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = colors.background,
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.auto_volver),
+                            tint = colors.textPrimary
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colors.background,
+                    navigationIconContentColor = colors.textPrimary
+                ),
+                modifier = Modifier.background(
+                    brush = Brush.verticalGradient(
+                        colors = if (isDark) {
+                            listOf(colors.background, colors.background)
+                        } else {
+                            listOf(colors.accent, Color.White)
+                        }
+                    )
+                )
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -254,7 +282,11 @@ fun CitasScreen(
                 shape = RoundedCornerShape(16.dp),
                 elevation = FloatingActionButtonDefaults.elevation(8.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.auto_nueva_cita), modifier = Modifier.size(24.dp))
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.auto_nueva_cita),
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     ) { innerPadding ->
@@ -309,8 +341,18 @@ fun CitasScreen(
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     LeyendaItemAmani(colors.primary, "Con citas", colors.textSecondary, roboto)
-                    LeyendaItemAmani(colors.primaryLight, "Día disponible", colors.textSecondary, roboto)
-                    LeyendaItemAmani(colors.error, "Sin disponibilidad", colors.textSecondary, roboto)
+                    LeyendaItemAmani(
+                        colors.primaryLight,
+                        "Día disponible",
+                        colors.textSecondary,
+                        roboto
+                    )
+                    LeyendaItemAmani(
+                        colors.error,
+                        "Sin disponibilidad",
+                        colors.textSecondary,
+                        roboto
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -434,7 +476,17 @@ fun CitasScreen(
                                                     tint = colors.primary
                                                 )
                                                 Text(
-                                                    text = "${cita.horaInicio.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${cita.horaFin.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                                                    text = "${
+                                                        cita.horaInicio.format(
+                                                            DateTimeFormatter.ofPattern("HH:mm")
+                                                        )
+                                                    } - ${
+                                                        cita.horaFin.format(
+                                                            DateTimeFormatter.ofPattern(
+                                                                "HH:mm"
+                                                            )
+                                                        )
+                                                    }",
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 15.sp,
                                                     color = colors.textPrimary,
@@ -452,7 +504,10 @@ fun CitasScreen(
                                                         fontSize = 11.sp,
                                                         fontWeight = FontWeight.Medium,
                                                         color = colors.primary,
-                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                                        modifier = Modifier.padding(
+                                                            horizontal = 8.dp,
+                                                            vertical = 3.dp
+                                                        ),
                                                         fontFamily = roboto
                                                     )
                                                 }
@@ -484,7 +539,8 @@ fun CitasScreen(
                                                         "confirmada" -> "✓ Confirmada"
                                                         "cancelada" -> "✗ Cancelada"
                                                         "pendiente" -> "⏳ Pendiente"
-                                                        else -> cita.estado?.replaceFirstChar { it.uppercase() } ?: "Pendiente"
+                                                        else -> cita.estado?.replaceFirstChar { it.uppercase() }
+                                                            ?: "Pendiente"
                                                     },
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Medium,
@@ -493,7 +549,10 @@ fun CitasScreen(
                                                         "cancelada" -> colors.error
                                                         else -> colors.primary
                                                     },
-                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                                    modifier = Modifier.padding(
+                                                        horizontal = 10.dp,
+                                                        vertical = 4.dp
+                                                    ),
                                                     fontFamily = roboto
                                                 )
                                             }
@@ -511,7 +570,8 @@ fun CitasScreen(
                                                     enviarCitaAlCalendario(
                                                         context = context,
                                                         titulo = "Cita en Amani",
-                                                        descripcion = cita.motivo ?: "Cita psicológica",
+                                                        descripcion = cita.motivo
+                                                            ?: "Cita psicológica",
                                                         fecha = cita.fecha,
                                                         hora = cita.horaInicio,
                                                         duracionMinutos = cita.duracionMinutos ?: 60
@@ -521,7 +581,10 @@ fun CitasScreen(
                                                     .size(44.dp)
                                                     .background(
                                                         brush = Brush.linearGradient(
-                                                            colors = listOf(colors.primary, colors.primaryLight)
+                                                            colors = listOf(
+                                                                colors.primary,
+                                                                colors.primaryLight
+                                                            )
                                                         ),
                                                         shape = RoundedCornerShape(12.dp)
                                                     )
@@ -589,7 +652,8 @@ fun CitasScreen(
                                                 text = fecha.format(
                                                     DateTimeFormatter.ofPattern(
                                                         "EEEE, d 'de' MMMM",
-                                                        java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                                        java.util.Locale.Builder().setLanguage("es")
+                                                            .setRegion("ES").build()
                                                     )
                                                 ).replaceFirstChar { it.uppercase() },
                                                 fontSize = 16.sp,
@@ -598,13 +662,15 @@ fun CitasScreen(
                                                 fontFamily = roboto
                                             )
                                             if (tieneDisponibilidad) {
-                                                Text(stringResource(R.string.auto__hay_horarios_disponibles),
+                                                Text(
+                                                    stringResource(R.string.auto__hay_horarios_disponibles),
                                                     fontSize = 13.sp,
                                                     color = colors.primary,
                                                     fontFamily = roboto
                                                 )
                                             } else {
-                                                Text(stringResource(R.string.auto__no_hay_disponibilidad),
+                                                Text(
+                                                    stringResource(R.string.auto__no_hay_disponibilidad),
                                                     fontSize = 13.sp,
                                                     color = colors.error,
                                                     fontFamily = roboto
@@ -795,13 +861,14 @@ fun DialogoGestionCitaAmani(
     var duracionMinutos by remember { mutableIntStateOf(60) }
     var montoCalculado by remember { mutableStateOf(BigDecimal.ZERO) }
 
-    val horasDisponibles = remember(slotsLibres, citasExistentes, fechaSeleccionada, modoEdicion, citaExistente) {
-        val horasLibres = slotsLibres.map { it.hora }.sorted()
-        val horasOcupadas = citasExistentes.filter {
-            if (modoEdicion && citaExistente != null) it.id != citaExistente.id else true
-        }.map { it.horaInicio }
-        horasLibres.filter { hora -> hora !in horasOcupadas }
-    }
+    val horasDisponibles =
+        remember(slotsLibres, citasExistentes, fechaSeleccionada, modoEdicion, citaExistente) {
+            val horasLibres = slotsLibres.map { it.hora }.sorted()
+            val horasOcupadas = citasExistentes.filter {
+                if (modoEdicion && citaExistente != null) it.id != citaExistente.id else true
+            }.map { it.horaInicio }
+            horasLibres.filter { hora -> hora !in horasOcupadas }
+        }
 
     var horaSeleccionada by remember {
         mutableStateOf(
@@ -815,7 +882,8 @@ fun DialogoGestionCitaAmani(
     LaunchedEffect(terapiaSeleccionada) {
         terapiaSeleccionada?.let { terapia ->
             duracionMinutos = terapia.duracionMinutos
-            montoCalculado = if (metodoPagoSeleccionado == MetodoPago.TARJETA) terapia.precio else BigDecimal.ZERO
+            montoCalculado =
+                if (metodoPagoSeleccionado == MetodoPago.TARJETA) terapia.precio else BigDecimal.ZERO
         }
     }
 
@@ -872,7 +940,13 @@ fun DialogoGestionCitaAmani(
                 ) {
                     if (terapias.isEmpty()) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.auto_no_hay_tipos_de), color = colors.textSecondary, fontFamily = roboto) },
+                            text = {
+                                Text(
+                                    stringResource(R.string.auto_no_hay_tipos_de),
+                                    color = colors.textSecondary,
+                                    fontFamily = roboto
+                                )
+                            },
                             onClick = { terapiaDropdownExpanded = false },
                             enabled = false
                         )
@@ -928,8 +1002,17 @@ fun DialogoGestionCitaAmani(
                         DropdownMenuItem(
                             text = {
                                 Column {
-                                    Text(stringResource(R.string.auto__no_hay_horarios), color = colors.error, fontFamily = roboto)
-                                    Text(stringResource(R.string.auto_prueba_con_otra_fecha), fontSize = 12.sp, color = colors.textSecondary, fontFamily = roboto)
+                                    Text(
+                                        stringResource(R.string.auto__no_hay_horarios),
+                                        color = colors.error,
+                                        fontFamily = roboto
+                                    )
+                                    Text(
+                                        stringResource(R.string.auto_prueba_con_otra_fecha),
+                                        fontSize = 12.sp,
+                                        color = colors.textSecondary,
+                                        fontFamily = roboto
+                                    )
                                 }
                             },
                             onClick = { horaDropdownExpanded = false },
@@ -984,7 +1067,8 @@ fun DialogoGestionCitaAmani(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text(stringResource(R.string.auto_duracion_de_la_terapia),
+                            Text(
+                                stringResource(R.string.auto_duracion_de_la_terapia),
                                 fontSize = 12.sp,
                                 color = colors.primary,
                                 fontFamily = roboto
@@ -1010,7 +1094,13 @@ fun DialogoGestionCitaAmani(
                 OutlinedTextField(
                     value = motivo,
                     onValueChange = { motivo = it },
-                    label = { Text(stringResource(R.string.auto_motivo_de_la_cita), color = colors.textSecondary, fontFamily = roboto) },
+                    label = {
+                        Text(
+                            stringResource(R.string.auto_motivo_de_la_cita),
+                            color = colors.textSecondary,
+                            fontFamily = roboto
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 3,
@@ -1029,7 +1119,8 @@ fun DialogoGestionCitaAmani(
                 )
 
                 // Modalidad
-                Text(stringResource(R.string.auto_modalidad_de_la_cita),
+                Text(
+                    stringResource(R.string.auto_modalidad_de_la_cita),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
@@ -1055,7 +1146,12 @@ fun DialogoGestionCitaAmani(
                             )
                         },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modalidadDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(
+                                type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                                enabled = true
+                            ),
                         shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = colors.textFieldText,
@@ -1073,9 +1169,18 @@ fun DialogoGestionCitaAmani(
                         DropdownMenuItem(
                             text = {
                                 Row {
-                                    Icon(Icons.Default.LocationOn, contentDescription = "", modifier = Modifier.size(20.dp), tint = colors.primary)
+                                    Icon(
+                                        Icons.Default.LocationOn,
+                                        contentDescription = "",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = colors.primary
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(R.string.auto_presencial), color = colors.textPrimary, fontFamily = roboto)
+                                    Text(
+                                        stringResource(R.string.auto_presencial),
+                                        color = colors.textPrimary,
+                                        fontFamily = roboto
+                                    )
                                 }
                             },
                             onClick = {
@@ -1086,9 +1191,18 @@ fun DialogoGestionCitaAmani(
                         DropdownMenuItem(
                             text = {
                                 Row {
-                                    Icon(Icons.Default.Phone, contentDescription = "", modifier = Modifier.size(20.dp), tint = colors.primary)
+                                    Icon(
+                                        Icons.Default.Phone,
+                                        contentDescription = "",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = colors.primary
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(R.string.auto_llamada), color = colors.textPrimary, fontFamily = roboto)
+                                    Text(
+                                        stringResource(R.string.auto_llamada),
+                                        color = colors.textPrimary,
+                                        fontFamily = roboto
+                                    )
                                 }
                             },
                             onClick = {
@@ -1100,7 +1214,8 @@ fun DialogoGestionCitaAmani(
                 }
 
                 // Información de pago
-                Text(stringResource(R.string.auto_informacion_de_pago),
+                Text(
+                    stringResource(R.string.auto_informacion_de_pago),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
@@ -1112,7 +1227,8 @@ fun DialogoGestionCitaAmani(
                     colors = CardDefaults.cardColors(containerColor = colors.surface.copy(alpha = 0.7f))
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.auto_metodo_de_pago),
+                        Text(
+                            stringResource(R.string.auto_metodo_de_pago),
                             fontSize = 12.sp,
                             color = colors.textSecondary,
                             fontFamily = roboto
@@ -1128,7 +1244,11 @@ fun DialogoGestionCitaAmani(
                                     onClick = { metodoPagoSeleccionado = MetodoPago.EFECTIVO },
                                     colors = RadioButtonDefaults.colors(selectedColor = colors.primary)
                                 )
-                                Text(stringResource(R.string.auto_presencial), color = colors.textPrimary, fontFamily = roboto)
+                                Text(
+                                    stringResource(R.string.auto_presencial),
+                                    color = colors.textPrimary,
+                                    fontFamily = roboto
+                                )
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(
@@ -1136,7 +1256,11 @@ fun DialogoGestionCitaAmani(
                                     onClick = { metodoPagoSeleccionado = MetodoPago.TARJETA },
                                     colors = RadioButtonDefaults.colors(selectedColor = colors.primary)
                                 )
-                                Text(stringResource(R.string.auto_online), color = colors.textPrimary, fontFamily = roboto)
+                                Text(
+                                    stringResource(R.string.auto_online),
+                                    color = colors.textPrimary,
+                                    fontFamily = roboto
+                                )
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
@@ -1145,8 +1269,20 @@ fun DialogoGestionCitaAmani(
                             value = montoCalculado.toString(),
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text(stringResource(R.string.auto_monto_), color = colors.textSecondary, fontFamily = roboto) },
-                            leadingIcon = { Text(stringResource(R.string.euro_symbol), color = colors.primary, fontFamily = roboto) },
+                            label = {
+                                Text(
+                                    stringResource(R.string.auto_monto_),
+                                    color = colors.textSecondary,
+                                    fontFamily = roboto
+                                )
+                            },
+                            leadingIcon = {
+                                Text(
+                                    stringResource(R.string.euro_symbol),
+                                    color = colors.primary,
+                                    fontFamily = roboto
+                                )
+                            },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth(),
@@ -1175,7 +1311,8 @@ fun DialogoGestionCitaAmani(
             }
         },
         confirmButton = {
-            val habilitado = terapiaSeleccionada != null && horaSeleccionada != null && (horasDisponibles.isNotEmpty() || modoEdicion)
+            val habilitado =
+                terapiaSeleccionada != null && horaSeleccionada != null && (horasDisponibles.isNotEmpty() || modoEdicion)
             Button(
                 onClick = {
                     val terapia = terapiaSeleccionada ?: return@Button
@@ -1212,7 +1349,9 @@ fun DialogoGestionCitaAmani(
                     onDismiss()
                 },
                 enabled = habilitado,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
                 shape = RoundedCornerShape(26.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colors.primary,
@@ -1235,7 +1374,12 @@ fun DialogoGestionCitaAmani(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(14.dp)
             ) {
-                Text(stringResource(R.string.auto_cancelar), color = colors.textSecondary, fontSize = 14.sp, fontFamily = roboto)
+                Text(
+                    stringResource(R.string.auto_cancelar),
+                    color = colors.textSecondary,
+                    fontSize = 14.sp,
+                    fontFamily = roboto
+                )
             }
         }
     )
@@ -1282,10 +1426,20 @@ fun CampoSeleccionAmani(
                 onValueChange = {},
                 readOnly = true,
                 leadingIcon = {
-                    Icon(icono, contentDescription = label, modifier = Modifier.size(20.dp), tint = colors.primary)
+                    Icon(
+                        icono,
+                        contentDescription = label,
+                        modifier = Modifier.size(20.dp),
+                        tint = colors.primary
+                    )
                 },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(
+                        type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                        enabled = true
+                    ),
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 isError = error,
@@ -1331,7 +1485,8 @@ fun CampoFechaAmani(
     val formatterFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     Column {
-        Text(stringResource(R.string.auto_fecha),
+        Text(
+            stringResource(R.string.auto_fecha),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.textPrimary,
@@ -1345,12 +1500,18 @@ fun CampoFechaAmani(
             elevation = CardDefaults.cardElevation(2.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { onFechaChange(fechaSeleccionada.minusDays(1)) }) {
-                    Icon(Icons.Default.ChevronLeft, contentDescription = stringResource(R.string.auto_dia_anterior), tint = colors.primary)
+                    Icon(
+                        Icons.Default.ChevronLeft,
+                        contentDescription = stringResource(R.string.auto_dia_anterior),
+                        tint = colors.primary
+                    )
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
@@ -1361,14 +1522,23 @@ fun CampoFechaAmani(
                         fontFamily = roboto
                     )
                     Text(
-                        fechaSeleccionada.format(DateTimeFormatter.ofPattern("EEEE", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())).replaceFirstChar { it.uppercase() },
+                        fechaSeleccionada.format(
+                            DateTimeFormatter.ofPattern(
+                                "EEEE",
+                                java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
+                            )
+                        ).replaceFirstChar { it.uppercase() },
                         fontSize = 12.sp,
                         color = colors.textSecondary,
                         fontFamily = roboto
                     )
                 }
                 IconButton(onClick = { onFechaChange(fechaSeleccionada.plusDays(1)) }) {
-                    Icon(Icons.Default.ChevronRight, contentDescription = stringResource(R.string.auto_dia_siguiente), tint = colors.primary)
+                    Icon(
+                        Icons.Default.ChevronRight,
+                        contentDescription = stringResource(R.string.auto_dia_siguiente),
+                        tint = colors.primary
+                    )
                 }
             }
         }
