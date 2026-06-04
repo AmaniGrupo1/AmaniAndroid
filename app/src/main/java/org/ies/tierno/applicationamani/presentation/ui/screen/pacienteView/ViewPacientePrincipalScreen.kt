@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.LocationOn
 
 import org.ies.tierno.applicationamani.dto.tickets.TicketModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -53,7 +54,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,21 +89,12 @@ import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import android.content.Context
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.livedata.observeAsState
 
-/**
- * Pantalla principal del paciente con la información de su psicólogo asignado.
- *
- * Muestra los datos del psicólogo (nombre, especialidad, experiencia,
- * licencia, descripción) obtenidos desde [PacienteViewModel] y
- * [ProfilePsicologoViewModel]. Incluye un botón para navegar a la agenda
- * de citas.
- *
- * @param navController Controlador de navegación para transiciones entre pantallas.
- * @param profilePsicologoViewModel ViewModel que gestiona el perfil del psicólogo.
- * @param pacienteViewModel ViewModel que gestiona los datos del paciente.
- * @param userSessionDataStore Almacén de sesión del usuario.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPacientePrincipalScreen(
@@ -123,9 +117,10 @@ fun ViewPacientePrincipalScreen(
     val isLoadingPsicologo by pacienteViewModel.isLoading.collectAsStateWithLifecycle()
     val errorPsicologo by pacienteViewModel.error.collectAsStateWithLifecycle()
 
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(session) {
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
-        // profilePsicologoViewModel.fetchProfile(idPaciente) // Incorrecto, idPaciente no es idPsicologo
         pacienteViewModel.cargarPsicologoAsignado(idPaciente)
         ticketsViewModel.cargarEmailUsuario()
     }
@@ -144,33 +139,54 @@ fun ViewPacientePrincipalScreen(
         else -> "🌙 Buenas noches"
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(stringResource(R.string.auto_mi_psicologo),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color.White
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = {
+                Text(
+                    text = "Cerrar Sesión",
+                    fontWeight = FontWeight.Bold,
+                    color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Estás seguro de que deseas cerrar sesión?",
+                    color = if (isDark) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        navController.navigate(Screens.login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.auto_volver),
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                ) {
+                    Text("Cerrar Sesión", color = Color.White)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showLogoutDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
-            )
-        }
-    ) { paddingValues ->
+                ) {
+                    Text("Cancelar")
+                }
+            },
+            containerColor = if (isDark) Color(0xFF2D2D2D) else MaterialTheme.colorScheme.surface,
+            titleContentColor = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface,
+            textContentColor = if (isDark) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    Scaffold { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -193,7 +209,8 @@ fun ViewPacientePrincipalScreen(
                                 strokeWidth = 3.dp
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(stringResource(R.string.auto_cargando_tu_informacion),
+                            Text(
+                                stringResource(R.string.auto_cargando_tu_informacion),
                                 fontSize = 14.sp,
                                 color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -210,7 +227,8 @@ fun ViewPacientePrincipalScreen(
                         GreetingCard(
                             nombrePaciente = nombrePaciente,
                             saludo = saludo,
-                            isDark = isDark
+                            isDark = isDark,
+                            onLogoutClick = { showLogoutDialog = true }
                         )
 
                         val ticketsState by ticketsViewModel.tickets.observeAsState(emptyList())
@@ -250,13 +268,32 @@ fun ViewPacientePrincipalScreen(
 fun GreetingCard(
     nombrePaciente: String,
     saludo: String,
-    isDark: Boolean
+    isDark: Boolean,
+    onLogoutClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
         color = if (isDark) Color.Black else MaterialTheme.colorScheme.primary
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                "Cerrar sesión",
+                fontSize = 14.sp,
+                color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable{
+                        onLogoutClick()
+                    }
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -384,7 +421,9 @@ fun NoPsicologoAssignedState(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (isDark) Color(0xFF2D2D2D) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                containerColor = if (isDark) Color(0xFF2D2D2D) else MaterialTheme.colorScheme.surfaceVariant.copy(
+                    alpha = 0.5f
+                )
             )
         ) {
             Column(
@@ -418,7 +457,10 @@ fun NoPsicologoAssignedState(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.auto_volver_al_inicio), modifier = Modifier.padding(vertical = 4.dp))
+            Text(
+                stringResource(R.string.auto_volver_al_inicio),
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
         }
     }
 }
@@ -694,7 +736,8 @@ fun PsicologoContent(
                 if (status !in listOf("resuelto", "cerrado")) {
                     true
                 } else {
-                    val prefs = context.getSharedPreferences("ticket_cierre_prefs", Context.MODE_PRIVATE)
+                    val prefs =
+                        context.getSharedPreferences("ticket_cierre_prefs", Context.MODE_PRIVATE)
                     val key = "cierre_${latestTicket.id}"
                     var timestamp = prefs.getLong(key, 0L)
                     if (timestamp == 0L) {
@@ -711,7 +754,6 @@ fun PsicologoContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Tarjeta del proceso de reporte dinámica
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -755,7 +797,6 @@ fun PsicologoContent(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Paso 1: Envío y Registro
                     val isStep1Completed = status in listOf("en-proceso", "resuelto", "cerrado")
                     val isStep1Active = status == "abierto"
                     ReportStepRow(
@@ -770,7 +811,6 @@ fun PsicologoContent(
                         secondaryColor = cardContentSecondaryColor
                     )
 
-                    // Paso 2: Revisión y Proceso
                     val isStep2Completed = status in listOf("resuelto", "cerrado")
                     val isStep2Active = status == "en-proceso"
                     ReportStepRow(
@@ -785,7 +825,6 @@ fun PsicologoContent(
                         secondaryColor = cardContentSecondaryColor
                     )
 
-                    // Paso 3: Resolución con Éxito / Cerrado
                     val isStep3Completed = status in listOf("resuelto", "cerrado")
                     val isStep3Active = status in listOf("resuelto", "cerrado")
                     ReportStepRow(
@@ -849,7 +888,8 @@ fun PsicologoContent(
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(12.dp))
-            Text(stringResource(R.string.auto_ver_mis_citas),
+            Text(
+                stringResource(R.string.auto_ver_mis_citas),
                 modifier = Modifier.padding(vertical = 4.dp),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
@@ -861,16 +901,6 @@ fun PsicologoContent(
     }
 }
 
-/**
- * Fila informativa profesional con icono, etiqueta y valor.
- *
- * @param icon Icono vectorial representativo.
- * @param label Etiqueta descriptiva del campo.
- * @param value Valor del campo a mostrar.
- * @param iconColor Color del icono.
- * @param labelColor Color de la etiqueta.
- * @param valueColor Color del valor.
- */
 @Composable
 fun ProfessionalInfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -921,8 +951,12 @@ fun ReportStepRow(
     contentColor: Color,
     secondaryColor: Color
 ) {
-    val tintColor = if (isCompleted) Color(0xFF2E7D32) else if (isActive) iconColor else Color.Gray.copy(alpha = 0.5f)
-    val bgColor = if (isCompleted) Color(0xFFE8F5E9) else if (isActive) iconColor.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.08f)
+    val tintColor =
+        if (isCompleted) Color(0xFF2E7D32) else if (isActive) iconColor else Color.Gray.copy(alpha = 0.5f)
+    val bgColor =
+        if (isCompleted) Color(0xFFE8F5E9) else if (isActive) iconColor.copy(alpha = 0.15f) else Color.Gray.copy(
+            alpha = 0.08f
+        )
     val displayIcon = if (isCompleted) Icons.Default.CheckCircle else icon
 
     Row(
