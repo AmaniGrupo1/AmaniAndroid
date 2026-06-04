@@ -1,8 +1,8 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,14 +41,14 @@ import java.util.Locale
 import androidx.compose.material3.MaterialTheme
 import java.util.Calendar
 import java.math.BigDecimal
-import org.jitsi.meet.sdk.JitsiMeetActivity
-import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import org.ies.tierno.applicationamani.domain.models.enumm.ModalidadCita
 import org.ies.tierno.applicationamani.domain.models.enumm.MetodoPago
 import org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
 import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import androidx.compose.foundation.shape.RoundedCornerShape
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 
 // Colores originales para el modo DEFECTO (Amani)
 object AgendaCitaDefaultColors {
@@ -165,13 +165,13 @@ fun AgendaCitaScreen(
                         text = stringResource(R.string.auto_mis_citas_1),
                         style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) colorScheme.onSurface else Color.White,
+                        color = if (isDark) colorScheme.onSurface else Color.Black,
                         fontFamily = roboto,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.auto_volver), tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.auto_volver), tint = Color.Black)
                     }
                 },
                 actions = {
@@ -709,11 +709,22 @@ fun CitaCardAmani(
                         if (modalidad.uppercase() == "LLAMADA") {
                             IconButton(
                                 onClick = {
-                                    val options = JitsiMeetConferenceOptions.Builder()
-                                        .setRoom("AmaniSession_${cita.idCita ?: 0L}")
-                                        .setFeatureFlag("welcomepage.enabled", false)
-                                        .build()
-                                    JitsiMeetActivity.launch(context, options)
+                                    try {
+                                        val roomName = "AmaniSession_${cita.idCita ?: 0L}".replace(Regex("[^a-zA-Z0-9-]"), "")
+                                        val options = JitsiMeetConferenceOptions.Builder()
+                                            .setRoom(roomName)
+                                            .setFeatureFlag("welcomepage.enabled", false)
+                                            .setFeatureFlag("conference.shortcuts.enabled", false)
+                                            .setFeatureFlag("filmstrip.enabled", true)
+                                            .build()
+                                        JitsiMeetActivity.launch(context, options)
+                                    } catch (e: Exception) {
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            "Error al iniciar videollamada: ${e.message}",
+                                            android.widget.Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 },
                                 modifier = Modifier.size(32.dp)
                             ) {
