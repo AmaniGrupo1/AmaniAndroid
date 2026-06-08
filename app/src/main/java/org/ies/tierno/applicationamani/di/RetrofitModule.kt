@@ -26,6 +26,7 @@ import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.SoporteTicketApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
+import org.ies.tierno.applicationamani.data.remoto.copiloto.CopilotoAi
 import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -116,8 +117,8 @@ val retrofitModule =
 
             Retrofit
                 .Builder()
-                //.baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
-                .baseUrl("https://amani-api-560473593904.europe-west1.run.app/")
+                .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+                //.baseUrl("https://amani-api-560473593904.europe-west1.run.app/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(get<okhttp3.OkHttpClient>())
                 .build()
@@ -139,6 +140,7 @@ val retrofitModule =
         single<DocumentoLegalApi> { get<Retrofit>().create(DocumentoLegalApi::class.java) }
         single<AdminApiService> { get<Retrofit>().create(AdminApiService::class.java) }
         single<HistorialCitaApi> { get<Retrofit>().create(HistorialCitaApi::class.java) }
+        single<CopilotoAi> { get<Retrofit>().create(CopilotoAi::class.java) }
         // ✅ Proveer el ImageLoader usando el OkHttpClient
         single<coil.ImageLoader> {
             coil.ImageLoader.Builder(get())

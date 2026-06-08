@@ -95,6 +95,22 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.livedata.observeAsState
 
+// Imports para el Copiloto
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material.icons.filled.QuestionAnswer
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Divider
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.draw.shadow
+import org.ies.tierno.applicationamani.presentation.viewmodels.copiloto.CopilotoAiViewModel
+import org.ies.tierno.applicationamani.dto.copiloto.ChunkResponseDto
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPacientePrincipalScreen(
@@ -102,6 +118,7 @@ fun ViewPacientePrincipalScreen(
     profilePsicologoViewModel: ProfilePsicologoViewModel,
     pacienteViewModel: PacienteViewModel = koinViewModel(),
     ticketsViewModel: TicketsViewModel = koinViewModel(),
+    copilotoViewModel: CopilotoAiViewModel = koinViewModel(),
     userSessionDataStore: UserSessionDataStore = getKoin().get()
 ) {
     val isDark = isDarkTheme()
@@ -118,6 +135,12 @@ fun ViewPacientePrincipalScreen(
     val errorPsicologo by pacienteViewModel.error.collectAsStateWithLifecycle()
 
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showCopilotDialog by remember { mutableStateOf(false) }
+
+    // Estados del copiloto
+    val chunks by copilotoViewModel.chunks.collectAsStateWithLifecycle()
+    val loadingCopilot by copilotoViewModel.loading.collectAsStateWithLifecycle()
+    val errorCopilot by copilotoViewModel.error.collectAsStateWithLifecycle()
 
     LaunchedEffect(session) {
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
@@ -260,10 +283,357 @@ fun ViewPacientePrincipalScreen(
                     NoPsicologoAssignedState(navController, isDark)
                 }
             }
+
+            // Botón flotante del Copiloto
+            FloatingActionButton(
+                onClick = { showCopilotDialog = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
+                elevation = FloatingActionButtonDefaults.elevation(8.dp)
+            ) {
+                Icon(
+                    Icons.Default.QuestionAnswer,
+                    contentDescription = "Asistente IA",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
+
+    // Diálogo del Copiloto
+    if (showCopilotDialog) {
+        CopilotDialog(
+            onDismiss = { showCopilotDialog = false },
+            copilotoViewModel = copilotoViewModel,
+            chunks = chunks,
+            isLoading = loadingCopilot,
+            error = errorCopilot,
+            isDark = isDark
+        )
+    }
+}
+
+@Composable
+fun CopilotDialog(
+    onDismiss: () -> Unit,
+    copilotoViewModel: CopilotoAiViewModel,
+    chunks: List<ChunkResponseDto>,
+    isLoading: Boolean,
+    error: String?,
+    isDark: Boolean
+) {
+    var question by remember { mutableStateOf("") }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .fillMaxHeight(0.8f)
+                .shadow(24.dp, RoundedCornerShape(24.dp)),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isDark) Color(0xFF1E1E1E) else Color.White
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.QuestionAnswer,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Asistente IA - Copiloto",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider(color = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Gray.copy(alpha = 0.2f))
+
+                // Área de respuestas
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 12.dp)
+                ) {
+                    when {
+                        isLoading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(40.dp),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Buscando información...",
+                                        fontSize = 14.sp,
+                                        color = if (isDark) Color.White.copy(alpha = 0.7f) else Color.Gray
+                                    )
+                                }
+                            }
+                        }
+                        error != null -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        Icons.Default.Error,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(48.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = error,
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.error,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Button(
+                                        onClick = { copilotoViewModel.clearError() },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) {
+                                        Text("Reintentar")
+                                    }
+                                }
+                            }
+                        }
+                        chunks.isNotEmpty() -> {
+                            LazyColumn(
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                // Agrupar chunks por documento
+                                val chunksByDocument = chunks.groupBy { it.nombreDocumento ?: "Información general" }
+
+                                chunksByDocument.forEach { (documentName, documentChunks) ->
+                                    item {
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = if (isDark) Color(0xFF252525) else Color(0xFFF0F0F0)
+                                            )
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(12.dp)
+                                            ) {
+                                                Text(
+                                                    text = "📄 $documentName",
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (isDark) Color.White else MaterialTheme.colorScheme.primary
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+
+                                                documentChunks.sortedBy { it.chunkIndex }.forEach { chunk ->
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(vertical = 8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = chunk.contenido,
+                                                            fontSize = 14.sp,
+                                                            lineHeight = 20.sp,
+                                                            color = if (isDark) Color.White.copy(alpha = 0.9f) else Color.Black
+                                                        )
+                                                        if (chunk != documentChunks.last()) {
+                                                            Spacer(modifier = Modifier.height(8.dp))
+                                                            Divider(
+                                                                color = if (isDark) Color.White.copy(alpha = 0.1f)
+                                                                else Color.Gray.copy(alpha = 0.2f)
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        Icons.Default.Psychology,
+                                        contentDescription = null,
+                                        tint = if (isDark) Color.White.copy(alpha = 0.3f) else Color.Gray.copy(alpha = 0.5f),
+                                        modifier = Modifier.size(64.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = "Hazme una pregunta sobre salud mental, terapias o bienestar emocional",
+                                        fontSize = 14.sp,
+                                        color = if (isDark) Color.White.copy(alpha = 0.5f) else Color.Gray,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Divider(color = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Gray.copy(alpha = 0.2f))
+
+                // Campo de pregunta
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    OutlinedTextField(
+                        value = question,
+                        onValueChange = { question = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = {
+                            Text(
+                                text = "Escribe tu pregunta...",
+                                fontSize = 14.sp
+                            )
+                        },
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 14.sp,
+                            color = if (isDark) Color.White else Color.Black
+                        ),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = if (isDark) Color(0xFF2D2D2D) else Color(0xFFF5F5F5),
+                            unfocusedContainerColor = if (isDark) Color(0xFF2D2D2D) else Color(0xFFF5F5F5),
+                            focusedTextColor = if (isDark) Color.White else Color.Black,
+                            unfocusedTextColor = if (isDark) Color.White else Color.Black,
+                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
+
+                    Button(
+                        onClick = {
+                            if (question.isNotBlank()) {
+                                copilotoViewModel.ask(question)
+                                question = ""
+                            }
+                        },
+                        enabled = question.isNotBlank() && !isLoading,
+                        shape = CircleShape,
+                        modifier = Modifier.size(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = if (isDark) Color(0xFF3D3D3D) else Color(0xFFE0E0E0)
+                        )
+                    ) {
+                        Icon(
+                            Icons.Default.Send,
+                            contentDescription = "Enviar",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+@Composable
+fun ChunkMessage(
+    chunk: ChunkResponseDto,
+    isDark: Boolean
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDark) Color(0xFF2D2D2D) else Color(0xFFF5F5F5)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "${chunk.chunkIndex + 1}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = chunk.nombreDocumento ?: "Fragmento ${chunk.chunkIndex + 1}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = if (isDark) Color.White.copy(alpha = 0.7f) else Color.Gray
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = chunk.contenido,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                color = if (isDark) Color.White else Color.Black
+            )
+        }
+    }
+}
 @Composable
 fun GreetingCard(
     nombrePaciente: String,
