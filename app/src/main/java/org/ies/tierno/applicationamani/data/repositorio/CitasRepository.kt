@@ -286,6 +286,26 @@ class CitasRepository(
             Result.failure(e)
         }
 
+    suspend fun cambiarEstadoPagoCita(
+        idCita: Long,
+        estadoPago: org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago,
+    ): Result<Unit> =
+        try {
+            val request =
+                mapOf(
+                    "estadoPago" to estadoPago.name.lowercase(),
+                )
+            val response = citasApi.cambiarEstadoPagoCita(idCita, request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Error ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+
     /**
      * Crea un nuevo tipo de terapia en el sistema.
      *

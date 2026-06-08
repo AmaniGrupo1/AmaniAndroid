@@ -63,13 +63,15 @@ fun RegistrarPacientePsicologoScreen(
     val screenColors = getScreenColors()
     val cardColors = getCardColors()
 
-    // Colores dinámicos según el tema
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else Color(0xFF6C63FF)
-    val backgroundColor = if (isDark) screenColors.background else Color(0xFFCCC0E4)
-    val surfaceColor = if (isDark) cardColors.cardBackground else Color.White
-    val textColor = if (isDark) cardColors.cardContent else Color.Black
-    val textFieldBorderColor = if (isDark) Color.White else Color.Gray
-    val tutorCardColor = if (isDark) cardColors.cardBackground.copy(alpha = 0.8f) else Color(0xFFFFF3E0)
+    // Colores dinámicos según el tema Amani
+    val colorScheme = MaterialTheme.colorScheme
+    val primaryColor = colorScheme.primary
+    val backgroundColor = screenColors.background
+    val surfaceColor = cardColors.cardBackground
+    val textColor = cardColors.cardContent
+    val textFieldBorderColor = colorScheme.outline
+    val tutorCardColor = colorScheme.tertiaryContainer
+    val tutorHighlightColor = colorScheme.tertiary
 
     val snackbarHostState = remember { SnackbarHostState() }
     val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
@@ -157,7 +159,6 @@ fun RegistrarPacientePsicologoScreen(
                 title = {
                     Text(
                         stringResource(R.string.registrar_paciente),
-                        color = if (isDark) Color.Black else Color.White,
                         fontFamily = roboto
                     )
                 },
@@ -170,8 +171,7 @@ fun RegistrarPacientePsicologoScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.volver),
-                            tint = if (isDark) Color.Black else Color.White
+                            contentDescription = stringResource(R.string.volver)
                         )
                     }
                 }
@@ -562,20 +562,20 @@ fun RegistrarPacientePsicologoScreen(
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
-                                tint = Color(0xFFE67E22)
+                                tint = tutorHighlightColor
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.datos_tutor),
                                 style = MaterialTheme.typography.titleLarge,
-                                color = Color(0xFFE67E22),
+                                color = tutorHighlightColor,
                                 fontFamily = roboto
                             )
                         }
                         Text(
                             stringResource(R.string.obligatorio_menor),
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFE67E22),
+                            color = tutorHighlightColor,
                             fontFamily = roboto
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -590,9 +590,9 @@ fun RegistrarPacientePsicologoScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = Color(0xFFE67E22),
+                                focusedBorderColor = tutorHighlightColor,
                                 unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
+                                focusedLabelColor = tutorHighlightColor,
                                 unfocusedLabelColor = textColor
                             )
                         )
@@ -614,9 +614,9 @@ fun RegistrarPacientePsicologoScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = if (tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else Color(0xFFE67E22),
+                                focusedBorderColor = if (tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else tutorHighlightColor,
                                 unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
+                                focusedLabelColor = tutorHighlightColor,
                                 unfocusedLabelColor = textColor
                             ),
                             supportingText = {
@@ -662,9 +662,9 @@ fun RegistrarPacientePsicologoScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = if (tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) ErrorColor else Color(0xFFE67E22),
+                                focusedBorderColor = if (tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) ErrorColor else tutorHighlightColor,
                                 unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
+                                focusedLabelColor = tutorHighlightColor,
                                 unfocusedLabelColor = textColor
                             ),
                             supportingText = {
@@ -711,9 +711,9 @@ fun RegistrarPacientePsicologoScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = textColor,
                                 unfocusedTextColor = textColor,
-                                focusedBorderColor = if (tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) ErrorColor else Color(0xFFE67E22),
+                                focusedBorderColor = if (tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) ErrorColor else tutorHighlightColor,
                                 unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
+                                focusedLabelColor = tutorHighlightColor,
                                 unfocusedLabelColor = textColor
                             ),
                             supportingText = {
@@ -763,9 +763,9 @@ fun RegistrarPacientePsicologoScreen(
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = textColor,
                                     unfocusedTextColor = textColor,
-                                    focusedBorderColor = Color(0xFFE67E22),
+                                    focusedBorderColor = tutorHighlightColor,
                                     unfocusedBorderColor = textFieldBorderColor,
-                                    focusedLabelColor = Color(0xFFE67E22),
+                                    focusedLabelColor = tutorHighlightColor,
                                     unfocusedLabelColor = textColor
                                 )
                             )
@@ -1135,15 +1135,15 @@ fun RegistrarPacientePsicologoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = androidx.compose.foundation.shape.CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                 enabled = formularioCompletoValido && isDateValid
             ) {
                 Text(
                     text = stringResource(R.string.boton_registrar_paciente),
-                    color = Color.White,
+                    color = colorScheme.onPrimary,
                     fontFamily = roboto,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 

@@ -297,7 +297,7 @@ fun LoginScreenContent(
                                 style = typography.bodyMedium,
                             )
                         },
-                        isError = emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
+                        isError = emailTouched && username.isNotBlank() && !loginViewModel.isValidEmailForm(username),
                         supportingText = {
                             when {
                                 !emailTouched && username.isBlank() -> {
@@ -307,14 +307,14 @@ fun LoginScreenContent(
                                         color = colorScheme.onSurfaceVariant,
                                     )
                                 }
-                                emailTouched && username.isNotBlank() && !username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                emailTouched && username.isNotBlank() && !loginViewModel.isValidEmailForm(username) -> {
                                     Text(
                                         text = stringResource(R.string.auto__formato_de_correo),
                                         style = typography.bodySmall,
                                         color = colorScheme.error,
                                     )
                                 }
-                                emailTouched && username.isNotBlank() && username.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+                                emailTouched && username.isNotBlank() && loginViewModel.isValidEmailForm(username) -> {
                                     Text(
                                         text = stringResource(R.string.auto__correo_valido),
                                         style = typography.bodySmall,
@@ -353,7 +353,7 @@ fun LoginScreenContent(
                         },
                         placeholder = {
                             Text(
-                                "••••••••",
+                                stringResource(R.string.auto_placeholder_password),
                                 style = typography.bodyMedium,
                             )
                         },
@@ -391,7 +391,7 @@ fun LoginScreenContent(
                             ) {
                                 Icon(
                                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                    contentDescription = if (isPasswordVisible) stringResource(R.string.auto_ocultar_password) else stringResource(R.string.auto_mostrar_password),
                                     tint = colorScheme.primary,
                                 )
                             }
@@ -419,7 +419,7 @@ fun LoginScreenContent(
                     // Botón de inicio de sesión
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = CircleShape,
+                        shape = shapes.medium,
                         onClick = onLogin,
                         enabled = isLoginEnabled && !isLoggingIn,
                         colors =

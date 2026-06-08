@@ -456,176 +456,224 @@ fun CitasScreen(
                                         pressedElevation = 4.dp
                                     )
                                 ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        // Información principal de la cita
-                                        Column(
-                                            modifier = Modifier.weight(1f),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    // Columna que agrupa el Row de info+acciones y el botón de pago
+                                    Column {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            // Hora y duración
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            // Información principal de la cita
+                                            Column(
+                                                modifier = Modifier.weight(1f),
+                                                verticalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                Icon(
-                                                    Icons.Default.AccessTime,
-                                                    contentDescription = stringResource(R.string.auto_hora),
-                                                    modifier = Modifier.size(18.dp),
-                                                    tint = colors.primary
-                                                )
-                                                Text(
-                                                    text = "${
-                                                        cita.horaInicio.format(
-                                                            DateTimeFormatter.ofPattern("HH:mm")
-                                                        )
-                                                    } - ${
-                                                        cita.horaFin.format(
-                                                            DateTimeFormatter.ofPattern(
-                                                                "HH:mm"
+                                                // Hora y duración
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.AccessTime,
+                                                        contentDescription = stringResource(R.string.auto_hora),
+                                                        modifier = Modifier.size(18.dp),
+                                                        tint = colors.primary
+                                                    )
+                                                    Text(
+                                                        text = "${
+                                                            cita.horaInicio.format(
+                                                                DateTimeFormatter.ofPattern("HH:mm")
                                                             )
-                                                        )
-                                                    }",
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 15.sp,
-                                                    color = colors.textPrimary,
-                                                    fontFamily = roboto
-                                                )
+                                                        } - ${
+                                                            cita.horaFin.format(
+                                                                DateTimeFormatter.ofPattern(
+                                                                    "HH:mm"
+                                                                )
+                                                            )
+                                                        }",
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 15.sp,
+                                                        color = colors.textPrimary,
+                                                        fontFamily = roboto
+                                                    )
 
-                                                // Duración
+                                                    // Duración
+                                                    Surface(
+                                                        shape = RoundedCornerShape(12.dp),
+                                                        color = colors.primary.copy(alpha = 0.1f),
+                                                        modifier = Modifier.padding(start = 4.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = "${cita.duracionMinutos ?: 60} min",
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.Medium,
+                                                            color = colors.primary,
+                                                            modifier = Modifier.padding(
+                                                                horizontal = 8.dp,
+                                                                vertical = 3.dp
+                                                            ),
+                                                            fontFamily = roboto
+                                                        )
+                                                    }
+                                                }
+
+                                                // Motivo de la cita (si existe)
+                                                if (!cita.motivo.isNullOrBlank()) {
+                                                    Text(
+                                                        text = cita.motivo,
+                                                        fontSize = 13.sp,
+                                                        color = colors.textSecondary,
+                                                        fontFamily = roboto,
+                                                        maxLines = 2,
+                                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                    )
+                                                }
+
+                                                // Estado de la cita
                                                 Surface(
                                                     shape = RoundedCornerShape(12.dp),
-                                                    color = colors.primary.copy(alpha = 0.1f),
-                                                    modifier = Modifier.padding(start = 4.dp)
+                                                    color = when (cita.estado?.lowercase()) {
+                                                        "confirmada" -> colors.success.copy(alpha = 0.15f)
+                                                        "cancelada" -> colors.error.copy(alpha = 0.15f)
+                                                        else -> colors.primaryLight.copy(alpha = 0.15f)
+                                                    }
                                                 ) {
                                                     Text(
-                                                        text = "${cita.duracionMinutos ?: 60} min",
+                                                        text = when (cita.estado?.lowercase()) {
+                                                            "confirmada" -> "✓ Confirmada"
+                                                            "cancelada" -> "✗ Cancelada"
+                                                            "pendiente" -> "⏳ Pendiente"
+                                                            else -> cita.estado?.replaceFirstChar { it.uppercase() }
+                                                                ?: "Pendiente"
+                                                        },
                                                         fontSize = 11.sp,
                                                         fontWeight = FontWeight.Medium,
-                                                        color = colors.primary,
+                                                        color = when (cita.estado?.lowercase()) {
+                                                            "confirmada" -> colors.success
+                                                            "cancelada" -> colors.error
+                                                            else -> colors.primary
+                                                        },
                                                         modifier = Modifier.padding(
-                                                            horizontal = 8.dp,
-                                                            vertical = 3.dp
+                                                            horizontal = 10.dp,
+                                                            vertical = 4.dp
                                                         ),
                                                         fontFamily = roboto
                                                     )
                                                 }
                                             }
 
-                                            // Motivo de la cita (si existe)
-                                            if (!cita.motivo.isNullOrBlank()) {
-                                                Text(
-                                                    text = cita.motivo,
-                                                    fontSize = 13.sp,
-                                                    color = colors.textSecondary,
-                                                    fontFamily = roboto,
-                                                    maxLines = 2,
-                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                                )
-                                            }
+                                            Spacer(modifier = Modifier.width(12.dp))
 
-                                            // Estado de la cita
-                                            Surface(
-                                                shape = RoundedCornerShape(12.dp),
-                                                color = when (cita.estado?.lowercase()) {
-                                                    "confirmada" -> colors.success.copy(alpha = 0.15f)
-                                                    "cancelada" -> colors.error.copy(alpha = 0.15f)
-                                                    else -> colors.primaryLight.copy(alpha = 0.15f)
-                                                }
+                                            // Botones de acción (Llamada y Calendario)
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                Text(
-                                                    text = when (cita.estado?.lowercase()) {
-                                                        "confirmada" -> "✓ Confirmada"
-                                                        "cancelada" -> "✗ Cancelada"
-                                                        "pendiente" -> "⏳ Pendiente"
-                                                        else -> cita.estado?.replaceFirstChar { it.uppercase() }
-                                                            ?: "Pendiente"
-                                                    },
-                                                    fontSize = 11.sp,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = when (cita.estado?.lowercase()) {
-                                                        "confirmada" -> colors.success
-                                                        "cancelada" -> colors.error
-                                                        else -> colors.primary
-                                                    },
-                                                    modifier = Modifier.padding(
-                                                        horizontal = 10.dp,
-                                                        vertical = 4.dp
-                                                    ),
-                                                    fontFamily = roboto
-                                                )
-                                            }
-                                        }
+                                                if (cita.modalidad == ModalidadCita.LLAMADA) {
+                                                    Column(
+                                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                                        verticalArrangement = Arrangement.Center
+                                                    ) {
+                                                        IconButton(
+                                                            onClick = {
+                                                                val roomName = "AmaniSession_${cita.id}"
+                                                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                                                    try {
+                                                                        val result = citasRepository.getJitsiToken(roomName)
+                                                                        val jwtToken = result.getOrNull()
+                                                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                                            val options = JitsiMeetConferenceOptions.Builder()
+                                                                                .setServerURL(java.net.URL("https://jitsi.amanipsicologia.org/"))
+                                                                                .setRoom(roomName)
+                                                                                .setFeatureFlag("welcomepage.enabled", false)
+                                                                                .setFeatureFlag("prejoinpage.enabled", false)
+                                                                                .setFeatureFlag("invite.enabled", false)
+                                                                                .apply {
+                                                                                    if (!jwtToken.isNullOrEmpty()) {
+                                                                                        setToken(jwtToken)
+                                                                                    }
+                                                                                }
+                                                                                .build()
+                                                                            JitsiMeetActivity.launch(context, options)
+                                                                        }
+                                                                    } catch (e: Exception) {
+                                                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                                                            android.widget.Toast.makeText(
+                                                                                context,
+                                                                                "Error al iniciar videollamada: ${e.message}",
+                                                                                android.widget.Toast.LENGTH_SHORT
+                                                                            ).show()
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            modifier = Modifier
+                                                                .size(44.dp)
+                                                                .background(
+                                                                    brush = Brush.linearGradient(
+                                                                        colors = listOf(colors.primary, colors.primaryLight)
+                                                                    ),
+                                                                    shape = RoundedCornerShape(12.dp)
+                                                                )
+                                                        ) {
+                                                            Icon(
+                                                                Icons.Default.VideoCall,
+                                                                contentDescription = "Iniciar Videollamada Jitsi",
+                                                                tint = if (isDark) Color.Black else Color.White,
+                                                                modifier = Modifier.size(26.dp)
+                                                            )
+                                                        }
 
-                                        Spacer(modifier = Modifier.width(12.dp))
+                                                        Text(
+                                                            text = "Llamada",
+                                                            fontSize = 10.sp,
+                                                            color = colors.textSecondary,
+                                                            fontFamily = roboto,
+                                                            modifier = Modifier.padding(top = 4.dp)
+                                                        )
+                                                    }
+                                                }
 
-                                        // Botones de acción (Llamada y Calendario)
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            if (cita.modalidad == ModalidadCita.LLAMADA) {
+                                                // Botón para agregar al calendario
                                                 Column(
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     verticalArrangement = Arrangement.Center
                                                 ) {
                                                     IconButton(
                                                         onClick = {
-                                                            val roomName = "AmaniSession_${cita.id}"
-                                                            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                                                try {
-                                                                    val result = citasRepository.getJitsiToken(roomName)
-                                                                    val jwtToken = result.getOrNull()
-                                                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                                        val options = JitsiMeetConferenceOptions.Builder()
-                                                                            .setServerURL(java.net.URL("https://jitsi.amanipsicologia.org/"))
-                                                                            .setRoom(roomName)
-                                                                            .setFeatureFlag("welcomepage.enabled", false)
-                                                                            .setFeatureFlag("prejoinpage.enabled", false)
-                                                                            .setFeatureFlag("invite.enabled", false)
-                                                                            .apply {
-                                                                                if (!jwtToken.isNullOrEmpty()) {
-                                                                                    setToken(jwtToken)
-                                                                                }
-                                                                            }
-                                                                            .build()
-                                                                        JitsiMeetActivity.launch(context, options)
-                                                                    }
-                                                                } catch (e: Exception) {
-                                                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                                                        android.widget.Toast.makeText(
-                                                                            context,
-                                                                            "Error al iniciar videollamada: ${e.message}",
-                                                                            android.widget.Toast.LENGTH_SHORT
-                                                                        ).show()
-                                                                    }
-                                                                }
-                                                            }
+                                                            enviarCitaAlCalendario(
+                                                                context = context,
+                                                                titulo = "Cita en Amani",
+                                                                descripcion = cita.motivo ?: "Cita psicológica",
+                                                                fecha = cita.fecha,
+                                                                hora = cita.horaInicio,
+                                                                duracionMinutos = cita.duracionMinutos ?: 60
+                                                            )
                                                         },
                                                         modifier = Modifier
                                                             .size(44.dp)
                                                             .background(
                                                                 brush = Brush.linearGradient(
-                                                                    colors = listOf(colors.primary, colors.primaryLight)
+                                                                    colors = listOf(
+                                                                        colors.primary,
+                                                                        colors.primaryLight
+                                                                    )
                                                                 ),
                                                                 shape = RoundedCornerShape(12.dp)
                                                             )
                                                     ) {
                                                         Icon(
-                                                            Icons.Default.VideoCall,
-                                                            contentDescription = "Iniciar Videollamada Jitsi",
+                                                            Icons.Default.CalendarMonth,
+                                                            contentDescription = stringResource(R.string.auto_agregar_a_calendario),
                                                             tint = if (isDark) Color.Black else Color.White,
-                                                            modifier = Modifier.size(26.dp)
+                                                            modifier = Modifier.size(22.dp)
                                                         )
                                                     }
 
                                                     Text(
-                                                        text = "Llamada",
+                                                        text = stringResource(R.string.auto_calendario),
                                                         fontSize = 10.sp,
                                                         color = colors.textSecondary,
                                                         fontFamily = roboto,
@@ -633,53 +681,67 @@ fun CitasScreen(
                                                     )
                                                 }
                                             }
+                                        }
 
-                                            // Botón para agregar al calendario
-                                            Column(
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.Center
-                                            ) {
-                                                IconButton(
-                                                    onClick = {
-                                                        enviarCitaAlCalendario(
-                                                            context = context,
-                                                            titulo = "Cita en Amani",
-                                                            descripcion = cita.motivo ?: "Cita psicológica",
-                                                            fecha = cita.fecha,
-                                                            hora = cita.horaInicio,
-                                                            duracionMinutos = cita.duracionMinutos ?: 60
+                                        // Botón de pago: fuera del Row, ocupa todo el ancho de la card
+                                        if (cita.estadoPago == EstadoPago.PENDIENTE) {
+                                            val fechaFormateada = cita.fecha.format(
+                                                DateTimeFormatter.ofPattern("d 'de' MMMM yyyy", Locale("es", "ES"))
+                                            )
+                                            HorizontalDivider(
+                                                color = colors.primary.copy(alpha = 0.12f),
+                                                thickness = 1.dp,
+                                                modifier = Modifier.padding(horizontal = 16.dp)
+                                            )
+                                            Button(
+                                                onClick = {
+                                                    navController.navigate(
+                                                        Screens.paymentScreen.createRoute(
+                                                            citaId = cita.id,
+                                                            psicologoName = cita.nombrePsicologo ?: "Psicólogo",
+                                                            fecha = fechaFormateada,
+                                                            monto = "Consulta psicológica"
                                                         )
-                                                    },
-                                                    modifier = Modifier
-                                                        .size(44.dp)
-                                                        .background(
-                                                            brush = Brush.linearGradient(
-                                                                colors = listOf(
-                                                                    colors.primary,
-                                                                    colors.primaryLight
-                                                                )
-                                                            ),
-                                                            shape = RoundedCornerShape(12.dp)
-                                                        )
-                                                ) {
-                                                    Icon(
-                                                        Icons.Default.CalendarMonth,
-                                                        contentDescription = stringResource(R.string.auto_agregar_a_calendario),
-                                                        tint = if (isDark) Color.Black else Color.White,
-                                                        modifier = Modifier.size(22.dp)
                                                     )
-                                                }
-
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = Color.Transparent,
+                                                    contentColor = if (isDark) Color.White else colors.primary
+                                                ),
+                                                shape = RoundedCornerShape(
+                                                    topStart = 0.dp, topEnd = 0.dp,
+                                                    bottomStart = 16.dp, bottomEnd = 16.dp
+                                                ),
+                                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(
+                                                        brush = Brush.horizontalGradient(
+                                                            colors = listOf(
+                                                                colors.primary.copy(alpha = if (isDark) 0.25f else 0.1f),
+                                                                colors.primaryLight.copy(alpha = if (isDark) 0.15f else 0.07f)
+                                                            )
+                                                        ),
+                                                        shape = RoundedCornerShape(
+                                                            topStart = 0.dp, topEnd = 0.dp,
+                                                            bottomStart = 16.dp, bottomEnd = 16.dp
+                                                        )
+                                                    )
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Payment,
+                                                    contentDescription = "Pagar consulta",
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
                                                 Text(
-                                                    text = stringResource(R.string.auto_calendario),
-                                                    fontSize = 10.sp,
-                                                    color = colors.textSecondary,
-                                                    fontFamily = roboto,
-                                                    modifier = Modifier.padding(top = 4.dp)
+                                                    text = "Pagar consulta",
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    fontFamily = roboto
                                                 )
                                             }
                                         }
-
                                     }
                                 }
                             }

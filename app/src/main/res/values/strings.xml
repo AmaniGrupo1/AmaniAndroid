@@ -1082,4 +1082,7 @@
     <string name="titulo_del_documento">Titulo del documento</string>
     <string name="vista">Vista</string>
     <string name="volver_al_inicio">Volver al inicio</string>
+    <string name="auto_placeholder_password">••••••••</string>
+    <string name="auto_ocultar_password">Ocultar contraseña</string>
+    <string name="auto_mostrar_password">Mostrar contraseña</string>
 </resources>

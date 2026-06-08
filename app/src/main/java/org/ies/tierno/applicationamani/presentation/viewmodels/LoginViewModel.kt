@@ -62,6 +62,8 @@ class LoginViewModel(
 
     fun isValidPassword(password: String): Boolean = PASSWORD_REGEX.matches(password)
 
+    fun isValidEmailForm(email: String): Boolean = Regex("^[A-Za-z0-9+_.-]+@(.+)$").matches(email)
+
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
@@ -94,7 +96,7 @@ class LoginViewModel(
                 _loginError.value = "El correo electrónico es obligatorio"
                 return
             }
-            !usernameValue.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
+            !isValidEmailForm(usernameValue) -> {
                 _loginError.value = "Introduce un correo electrónico válido"
                 return
             }
@@ -208,7 +210,7 @@ class LoginViewModel(
 
     fun isLoginFormValid(): Boolean =
         _username.value.isNotBlank() &&
-            _username.value.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) &&
+            isValidEmailForm(_username.value) &&
             _password.value.isNotBlank() &&
             isValidPassword(_password.value)
 

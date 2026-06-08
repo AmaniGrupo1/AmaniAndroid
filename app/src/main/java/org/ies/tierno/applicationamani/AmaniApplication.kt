@@ -62,10 +62,10 @@ class AmaniApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Inicializar Stripe con clave pública de prueba
+        // Inicializar Stripe con la clave pública leída desde GCP Secret Manager (via BuildConfig)
         com.stripe.android.PaymentConfiguration.init(
             applicationContext,
-            "pk_test_TYooMQauvdEDq54NiTphI7jx" // Reemplaza con tu clave de Stripe
+            BuildConfig.STRIPE_PUBLISHABLE_KEY
         )
 
         // Inicializar Firebase y configurar Crashlytics

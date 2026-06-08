@@ -65,8 +65,11 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.soporte.NuevoTicke
 import org.ies.tierno.applicationamani.presentation.ui.screens.admin.ViewAdminPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screens.psicologo.ViewPsicologoPrincipal
 import org.ies.tierno.applicationamani.presentation.ui.screen.tickets.TicketScreen
+import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
@@ -371,13 +374,19 @@ fun NavGraph(
                 val monto = Uri.decode(backStackEntry.arguments?.getString("monto") ?: "")
 
                 val viewModel: PaymentViewModel = koinViewModel()
+                val citasViewModel: CitasViewModel = koinViewModel()
+                val listarCitasViewModel: ListarCitasViewModel = koinViewModel()
                 PaymentScreen(
                     citaId = citaId,
                     psicologoName = psicologoName,
                     fecha = fecha,
                     monto = monto,
                     viewModel = viewModel,
-                    onPaymentSuccess = { navController.popBackStack() },
+                    onPaymentSuccess = {
+                        citasViewModel.marcarCitaComoPagada(citaId)
+                        listarCitasViewModel.actualizarEstadoPagoLocal(citaId, org.ies.tierno.applicationamani.domain.models.enumm.EstadoPago.PAGADO)
+                        navController.popBackStack()
+                    },
                     onPaymentCanceled = { navController.popBackStack() },
                 )
             }

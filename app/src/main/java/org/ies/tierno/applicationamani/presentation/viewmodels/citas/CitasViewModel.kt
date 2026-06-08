@@ -241,4 +241,26 @@ class CitasViewModel(
             _isLoading.value = false
         }
     }
+
+    /**
+     * Marca una cita como pagada, actualizando el estado de pago en el backend.
+     *
+     * Al finalizar con éxito, se recargan las citas para que la UI refleje el cambio.
+     *
+     * @param idCita Identificador de la cita pagada.
+     */
+    fun marcarCitaComoPagada(idCita: Long) {
+        viewModelScope.launch {
+            citasRepository.cambiarEstadoPagoCita(idCita, EstadoPago.PAGADO)
+                .onSuccess {
+                    // Refrescar los datos usando la fecha actual o simplemente recargar la agenda
+                    refrescarDatosTrasCambio(LocalDate.now())
+                }
+                .onFailure { e ->
+                    crashReporter.log("marcarCitaComoPagada failed for idCita=$idCita")
+                    crashReporter.setCustomKey("cita_id", idCita.toString())
+                    crashReporter.recordException(e)
+                }
+        }
+    }
 }

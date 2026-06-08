@@ -116,6 +116,13 @@ class ListarCitasViewModel(
         }
     }
 
+    fun actualizarEstadoPagoLocal(idCita: Long, estadoPago: EstadoPago) {
+        val index = citas.indexOfFirst { it.idCita == idCita }
+        if (index != -1) {
+            citas[index] = citas[index].copy(estadoPago = estadoPago)
+        }
+    }
+
     fun cargarHistorialCitas() {
         viewModelScope.launch {
             try {

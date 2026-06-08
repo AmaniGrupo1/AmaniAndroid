@@ -127,6 +127,12 @@ interface CitasApi {
         @Body request: Map<String, String>,
     ): Response<Unit>
 
+    @PATCH("/api/citas/cambio/{id}/estado-pago")
+    suspend fun cambiarEstadoPagoCita(
+        @Path("id") idCita: Long,
+        @Body request: Map<String, String>,
+    ): Response<Unit>
+
     @GET("/api/citas/mis-citas")
     suspend fun getMisCitas(): List<CitaPacienteViewResponseDTO>
 

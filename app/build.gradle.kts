@@ -26,6 +26,17 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // Stripe publishable key: leída de local.properties (inyectada por CI desde GCP Secret Manager)
+        val localProperties = Properties().apply {
+            val f = rootProject.file("local.properties")
+            if (f.exists()) load(f.inputStream())
+        }
+        buildConfigField(
+            "String",
+            "STRIPE_PUBLISHABLE_KEY",
+            "\"${localProperties.getProperty("STRIPE_PUBLISHABLE_KEY", "")}\""
+        )
+
         // ✅ Soporte para ARM y Emuladores (x86)
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")

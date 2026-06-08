@@ -72,13 +72,33 @@ jobs:
           fi
           echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
-      # 7. Compilar el APK de Debug
+      # 7. Autenticar con GCP usando la Service Account almacenada en GitHub Secrets
+      - name: 🔑 Autenticar en Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 8. Leer STRIPE_PUBLISHABLE_KEY desde GCP Secret Manager e inyectarla en local.properties
+      #    Gradle la leerá automáticamente y la expondrá como BuildConfig.STRIPE_PUBLISHABLE_KEY
+      - name: 💳 Obtener clave pública de Stripe desde Secret Manager
+        run: |
+          STRIPE_KEY=$(gcloud secrets versions access latest \
+            --secret="STRIPE_PUBLISHABLE_KEY" \
+            --project="amani-160bf")
+          if [ -z "$STRIPE_KEY" ]; then
+            echo "::error title=Secreto faltante::No se pudo leer STRIPE_PUBLISHABLE_KEY desde Secret Manager."
+            exit 1
+          fi
+          echo "STRIPE_PUBLISHABLE_KEY=$STRIPE_KEY" >> local.properties
+          echo "✅ Clave pública de Stripe inyectada en local.properties"
+
+      # 9. Compilar el APK de Debug
       - name: 🔨 Compilar APK de Debug
         run: ./gradlew assembleDebug --stacktrace
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx4g -Dorg.gradle.parallel=false"
 
-      # 8. Renombrar el APK con el nombre de rama y número de build para identificarlo fácilmente
+      # 10. Renombrar el APK con el nombre de rama y número de build para identificarlo fácilmente
       - name: 🏷️ Renombrar APK
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
@@ -90,7 +110,7 @@ jobs:
           echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
           echo "✅ APK renombrado a: $APK_NAME"
 
-      # 9. Subir el APK como artefacto de GitHub Actions (descargable por 7 días)
+      # 11. Subir el APK como artefacto de GitHub Actions (descargable por 7 días)
       - name: 📤 Subir APK como artefacto
         uses: actions/upload-artifact@v4
         with:
@@ -99,7 +119,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-      # 10. Mostrar resumen del build en el panel de GitHub Actions
+      # 12. Mostrar resumen del build en el panel de GitHub Actions
       - name: 📊 Resumen del build
         if: always()
         run: |
