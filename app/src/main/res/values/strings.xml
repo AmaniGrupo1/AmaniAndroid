@@ -1085,4 +1085,9 @@
     <string name="auto_placeholder_password">••••••••</string>
     <string name="auto_ocultar_password">Ocultar contraseña</string>
     <string name="auto_mostrar_password">Mostrar contraseña</string>
+    <string name="nav_juego">Juego</string>
+    <string name="entretenimiento">Entretenimiento</string>
+    <string name="back">Atrás</string>
+    <string name="select_game">Selecciona un juego</string>
+    <string name="slither">Slither.io</string>
 </resources>

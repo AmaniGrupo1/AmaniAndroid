@@ -13,6 +13,7 @@ import org.ies.tierno.applicationamani.data.local.LanguageManager
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.di.appModule
 import org.ies.tierno.applicationamani.di.chatModule
+import org.ies.tierno.applicationamani.di.gameModule
 import org.ies.tierno.applicationamani.di.retrofitModule
 import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
 import org.ies.tierno.applicationamani.utils.FileLoggingTree
@@ -84,6 +85,7 @@ class AmaniApplication : Application() {
                 retrofitModule,
                 org.ies.tierno.applicationamani.di.crashModule,
                 chatModule,
+                gameModule
             )
         }
 
