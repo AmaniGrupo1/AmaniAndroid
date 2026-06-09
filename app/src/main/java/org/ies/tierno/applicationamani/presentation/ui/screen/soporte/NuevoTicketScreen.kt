@@ -1,7 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.soporte
 
-import org.ies.tierno.applicationamani.R
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -58,12 +56,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens

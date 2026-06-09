@@ -1,11 +1,23 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.citas
 
+/**
+ * ViewModel que gestiona la visualización y reserva de citas desde la perspectiva del paciente.
+ *
+ * Obtiene el psicólogo asignado, carga la agenda mensual y la disponibilidad diaria,
+ * y permite reservar y cancelar citas. Reacciona a eventos de actualización de horario
+ * para refrescar la disponibilidad en tiempo real.
+ *
+ * @param citasRepository Repositorio para operaciones de citas y disponibilidad.
+ * @param profileRepository Repositorio para consultar el psicólogo asignado al paciente.
+ * @param userSessionDataStore Almacén local de la sesión del paciente autenticado.
+ */
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.data.repositorio.CitasRepository
@@ -24,19 +36,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-
-/**
- * ViewModel que gestiona la visualización y reserva de citas desde la perspectiva del paciente.
- *
- * Obtiene el psicólogo asignado, carga la agenda mensual y la disponibilidad diaria,
- * y permite reservar y cancelar citas. Reacciona a eventos de actualización de horario
- * para refrescar la disponibilidad en tiempo real.
- *
- * @param citasRepository Repositorio para operaciones de citas y disponibilidad.
- * @param profileRepository Repositorio para consultar el psicólogo asignado al paciente.
- * @param userSessionDataStore Almacén local de la sesión del paciente autenticado.
- */
-import org.ies.tierno.applicationamani.core.crash.CrashReporter
 
 class CitasViewModel(
     private val citasRepository: CitasRepository,

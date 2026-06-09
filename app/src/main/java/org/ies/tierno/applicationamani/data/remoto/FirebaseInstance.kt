@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.data.remoto
 
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import org.ies.tierno.applicationamani.data.remoto.FirebaseInstance.USE_EMULATOR
 
 /**
  * Singleton que centraliza la inicialización y acceso a las instancias de Firebase.

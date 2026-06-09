@@ -1,6 +1,4 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
-import org.ies.tierno.applicationamani.R
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -74,6 +73,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.TipoDocumentoLegal
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO

@@ -1,5 +1,18 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels
 
+/**
+ * ViewModel que gestiona el flujo de autenticación (inicio de sesión y registro).
+ *
+ * Centraliza los estados de login, registro de paciente y registro de psicólogo,
+ * incluyendo validaciones locales de contraseña y formulario. También maneja la
+ * creación de pacientes desde el perfil de psicólogo.
+ *
+ * @param loginUseCase Caso de uso para la operación de inicio de sesión.
+ * @param asignarPacienteAlPsicologoUseCase Caso de uso para asignar paciente a psicólogo tras registro.
+ * @param userSessionDataStore Almacén local de la sesión del usuario autenticado.
+ * @param tokenDataStore Almacén local seguro del token JWT.
+ * @param tokenHolder Contenedor en memoria del token JWT para inyección en interceptores.
+ */
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSession
@@ -29,21 +43,6 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.Period
-
-/**
- * ViewModel que gestiona el flujo de autenticación (inicio de sesión y registro).
- *
- * Centraliza los estados de login, registro de paciente y registro de psicólogo,
- * incluyendo validaciones locales de contraseña y formulario. También maneja la
- * creación de pacientes desde el perfil de psicólogo.
- *
- * @param loginUseCase Caso de uso para la operación de inicio de sesión.
- * @param asignarPacienteAlPsicologoUseCase Caso de uso para asignar paciente a psicólogo tras registro.
- * @param userSessionDataStore Almacén local de la sesión del usuario autenticado.
- * @param tokenDataStore Almacén local seguro del token JWT.
- * @param tokenHolder Contenedor en memoria del token JWT para inyección en interceptores.
- */
-import org.ies.tierno.applicationamani.core.crash.CrashReporter
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,

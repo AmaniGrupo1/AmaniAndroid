@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.domain.events
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import org.ies.tierno.applicationamani.domain.events.HorarioEvents.horarioActualizado
 
 /**
  * Bus de eventos de dominio para propagar cambios en la configuración horaria

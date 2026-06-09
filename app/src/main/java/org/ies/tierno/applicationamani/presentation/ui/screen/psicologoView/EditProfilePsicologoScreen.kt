@@ -1,8 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
-import org.ies.tierno.applicationamani.R
-import androidx.compose.ui.res.stringResource
-import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -53,12 +50,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import org.koin.androidx.compose.koinViewModel
 
 /**

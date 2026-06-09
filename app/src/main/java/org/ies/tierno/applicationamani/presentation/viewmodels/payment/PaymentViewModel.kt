@@ -1,13 +1,5 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.payment
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentIntentUseCase
-
 /**
  * ViewModel que orquesta el flujo completo del pago de una cita mediante Stripe.
  *
@@ -21,7 +13,14 @@ import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentInte
  * @see PaymentUiState
  * @see CreatePaymentIntentUseCase
  */
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.core.crash.CrashReporter
+import org.ies.tierno.applicationamani.domain.usecases.payment.CreatePaymentIntentUseCase
 
 class PaymentViewModel(
     private val createPaymentIntentUseCase: CreatePaymentIntentUseCase,

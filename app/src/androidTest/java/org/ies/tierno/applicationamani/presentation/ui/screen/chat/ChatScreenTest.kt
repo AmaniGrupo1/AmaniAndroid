@@ -10,7 +10,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.ies.tierno.applicationamani.domain.models.Message
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
-import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.junit.Before
 import org.junit.Rule

@@ -22,18 +22,15 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,10 +43,9 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,21 +59,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.collectLatest
 import org.ies.tierno.applicationamani.domain.models.ChatMessage
 import org.ies.tierno.applicationamani.domain.models.MessageContent
-import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.Image
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatEvent
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiStateV2
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.UploadState
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.StatusIcon
-import androidx.compose.foundation.layout.wrapContentWidth
 import org.ies.tierno.applicationamani.domain.models.MessageStatus
 import org.ies.tierno.applicationamani.domain.repository.MediaType
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
@@ -86,8 +75,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import androidx.compose.material3.SuggestionChip
-import androidx.compose.ui.unit.sp
 
 sealed class ChatV2ListItem {
     data class MessageItem(val msg: ChatMessage) : ChatV2ListItem()

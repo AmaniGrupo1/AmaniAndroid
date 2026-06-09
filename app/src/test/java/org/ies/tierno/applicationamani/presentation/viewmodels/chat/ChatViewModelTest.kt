@@ -34,7 +34,6 @@ import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOn
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 

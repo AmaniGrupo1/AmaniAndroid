@@ -1,5 +1,16 @@
 package org.ies.tierno.applicationamani.data
 
+/**
+ * Repositorio encargado de la gestión de autenticación y usuarios.
+ *
+ * Administra el acceso al backend para login, registro y gestión de perfiles de pacientes,
+ * psicólogos y administradores. También gestiona la persistencia local de tokens y sesiones.
+ *
+ * @property api Interfaz de acceso a la API de autenticación.
+ * @property tokenDataStore Almacenamiento local para el token de acceso.
+ * @property userSessionDataStore Almacenamiento local para los datos de la sesión de usuario.
+ * @property tokenHolder Contenedor en memoria para acceso inmediato al token JWT.
+ */
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -7,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
 import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.UserSession
@@ -26,19 +38,6 @@ import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.PacienteRequest
 import retrofit2.HttpException
 import timber.log.Timber
-
-/**
- * Repositorio encargado de la gestión de autenticación y usuarios.
- *
- * Administra el acceso al backend para login, registro y gestión de perfiles de pacientes,
- * psicólogos y administradores. También gestiona la persistencia local de tokens y sesiones.
- *
- * @property api Interfaz de acceso a la API de autenticación.
- * @property tokenDataStore Almacenamiento local para el token de acceso.
- * @property userSessionDataStore Almacenamiento local para los datos de la sesión de usuario.
- * @property tokenHolder Contenedor en memoria para acceso inmediato al token JWT.
- */
-import org.ies.tierno.applicationamani.core.crash.CrashReporter
 
 class AuthRepository(
     private val api: AuthApi,

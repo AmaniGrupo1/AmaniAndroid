@@ -1,6 +1,4 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
-import org.ies.tierno.applicationamani.R
-import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -60,13 +58,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.admin.PacienteBasicoResponseDTO
 import org.ies.tierno.applicationamani.dto.requestPaciente.DireccionResponseDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO

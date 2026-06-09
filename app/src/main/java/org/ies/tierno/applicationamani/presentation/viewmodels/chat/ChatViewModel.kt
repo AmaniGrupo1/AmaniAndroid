@@ -1,7 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.chat
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,9 +35,9 @@ import org.ies.tierno.applicationamani.domain.usecases.generalizado.StartTypingU
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.StopTypingUseCase
 import org.ies.tierno.applicationamani.domain.usecases.generalizado.UpdateUserOnlineUseCase
 import org.ies.tierno.applicationamani.domain.usecases.profileUseCase.ProfileUseCaseGeneral
+import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState
 import timber.log.Timber
 import java.io.File
-import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState
 
 /**
  * Define los posibles estados de la reproducción de audio en el chat.

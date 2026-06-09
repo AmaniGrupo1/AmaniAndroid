@@ -3,10 +3,10 @@ package org.ies.tierno.applicationamani
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.firstOrNull
@@ -15,8 +15,6 @@ import org.ies.tierno.applicationamani.data.local.LanguageManager
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
 import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
-
-import androidx.appcompat.app.AppCompatActivity
 
 /**
  * Actividad principal de la aplicación Amani.

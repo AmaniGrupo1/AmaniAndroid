@@ -10,7 +10,6 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.ies.tierno.applicationamani.MainActivity
 import org.ies.tierno.applicationamani.R
-import org.ies.tierno.applicationamani.AmaniApplication
 import timber.log.Timber
 
 class AmaniFirebaseMessagingService : FirebaseMessagingService() {

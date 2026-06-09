@@ -17,7 +17,6 @@ import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * Generador de documentos PDF para el historial clínico del paciente.

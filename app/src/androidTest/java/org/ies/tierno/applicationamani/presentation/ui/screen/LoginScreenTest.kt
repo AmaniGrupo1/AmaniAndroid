@@ -4,14 +4,14 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.context.stopKoin
-import org.junit.After
-import io.mockk.mockk
-import io.mockk.every
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class LoginScreenTest {
 

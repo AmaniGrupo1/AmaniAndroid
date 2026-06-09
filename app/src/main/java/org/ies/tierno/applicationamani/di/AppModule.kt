@@ -1,10 +1,12 @@
 package org.ies.tierno.applicationamani.di
 
-import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import androidx.room.Room
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.SituacionRepository
 import org.ies.tierno.applicationamani.data.local.AuthEventChannel
+import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
@@ -23,6 +25,7 @@ import org.ies.tierno.applicationamani.data.repositorio.ProfileRepository
 import org.ies.tierno.applicationamani.data.repositorio.SoporteTicketRepository
 import org.ies.tierno.applicationamani.data.repositorio.TestRepositoryApi
 import org.ies.tierno.applicationamani.data.repositorio.TicketsRepository
+import org.ies.tierno.applicationamani.data.repositorio.copiloto.CopilotoAi
 import org.ies.tierno.applicationamani.data.repositorio.role.AdminRepository
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.AsignarPacienteAlPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.CrearPreguntaUseCase
@@ -31,9 +34,10 @@ import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetAllClient
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.GetPacientesSinPsicologoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.ListarPsicologoAdminUseCase
 import org.ies.tierno.applicationamani.domain.usecases.adminUseCase.TodosLosPacientesUseCase
+import org.ies.tierno.applicationamani.domain.usecases.copiloto.CopilotoAiUseCase
 import org.ies.tierno.applicationamani.domain.usecases.documentoLegal.DocumentoLegalUseCase
-import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.historialCita.HistorialCitaUseCase
+import org.ies.tierno.applicationamani.domain.usecases.historialClinico.HistorialClinicoUseCase
 import org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase.IdiomaUseCase
 import org.ies.tierno.applicationamani.domain.usecases.login.LoginUseCase
 import org.ies.tierno.applicationamani.domain.usecases.notificacion.NotificacionUseCase
@@ -61,6 +65,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesVi
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.CitasViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.copiloto.CopilotoAiViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario.CuestionarioViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
@@ -68,6 +73,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.notificacion.NotificacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
+import org.ies.tierno.applicationamani.presentation.viewmodels.profile.EditProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin.ProfileAdminViewModel
@@ -84,12 +90,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
-import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
-import org.ies.tierno.applicationamani.data.repositorio.copiloto.CopilotoAi
-import org.ies.tierno.applicationamani.domain.usecases.copiloto.CopilotoAiUseCase
-import org.ies.tierno.applicationamani.presentation.viewmodels.copiloto.CopilotoAiViewModel
 
 /**
  * Módulo principal de inyección de dependencias con Koin.

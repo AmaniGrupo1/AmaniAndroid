@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -30,6 +28,7 @@ import org.ies.tierno.applicationamani.domain.models.MessageStatus
 import org.ies.tierno.applicationamani.domain.repository.ChatRepository
 import org.ies.tierno.applicationamani.domain.repository.ChatResult
 import org.ies.tierno.applicationamani.domain.repository.MediaType
+import java.util.concurrent.ConcurrentHashMap
 
 /*
  * ESTRUCTURA FIREBASE RTDB (PLANA Y OPTIMIZADA)
