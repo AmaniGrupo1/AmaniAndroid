@@ -112,7 +112,7 @@ android {
 }
 
 dependencies {
-
+    implementation("org.jitsi.react:jitsi-meet-sdk:8.2.2")
 
     // Para usar LiveData en Compose
     implementation("androidx.compose.runtime:runtime-livedata")

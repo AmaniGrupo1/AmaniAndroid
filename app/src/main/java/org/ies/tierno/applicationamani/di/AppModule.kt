@@ -79,7 +79,6 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserVie
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
-import org.ies.tierno.applicationamani.data.remoto.ProfileApi
 import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
@@ -88,6 +87,9 @@ import org.koin.dsl.module
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import org.ies.tierno.applicationamani.data.local.FirebaseAuthManager
+import org.ies.tierno.applicationamani.data.repositorio.copiloto.CopilotoAi
+import org.ies.tierno.applicationamani.domain.usecases.copiloto.CopilotoAiUseCase
+import org.ies.tierno.applicationamani.presentation.viewmodels.copiloto.CopilotoAiViewModel
 
 /**
  * Módulo principal de inyección de dependencias con Koin.
@@ -135,6 +137,7 @@ val appModule = module {
     single { DocumentoLegalRepository(get()) }
     single { AdminRepository(get()) }
     single { TicketsRepository(get()) }
+    single { CopilotoAi(get()) }
 
 
 
@@ -154,6 +157,7 @@ val appModule = module {
     factory { ListarPacientesByPsicologo(get()) }
     factory { HistorialClinicoUseCase(get()) }
     factory { DocumentoLegalUseCase(get()) }
+    factory { CopilotoAiUseCase(get()) }
 
     factory { ListarCitasUseCase(get()) }
     factory { IdiomaUseCase(get()) }
@@ -205,4 +209,5 @@ val appModule = module {
     viewModel { ProfilePacienteViewModel(get()) }
     viewModel { HistorialClinicoPacienteViewModel(get()) }
     viewModel { DocumentoLegalViewModel(get()) }
+    viewModel { CopilotoAiViewModel(get()) }
 }
