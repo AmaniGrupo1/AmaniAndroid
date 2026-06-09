@@ -64,3 +64,32 @@ val AmaniOnErrorContainer = Color(0xFF410002)
 
 /** Tinte de superficie (basado en el color primario). */
 val AmaniSurfaceTint = AmaniPurple
+
+// ── Colores para el juego Snake (AÑADIDOS SIN QUITAR NADA) ─────
+
+/** Color del cuerpo de la serpiente - usa el lila principal de Amani. */
+val SnakeBodyColor = AmaniPurple
+
+/** Color de la cabeza de la serpiente - usa la variante oscura del lila. */
+val SnakeHeadColor = AmaniPurpleDark
+
+/** Color de la comida - usa el rojo de error de Amani. */
+val SnakeFoodColor = AmaniError
+
+/** Color del fondo del juego - negro suave para contraste. */
+val SnakeBackgroundColor = Color(0xFF1A1A1A)
+
+/** Color del grid del juego - lila principal con 30% de opacidad. */
+val SnakeGridColor = AmaniPurple.copy(alpha = 0.3f)
+
+/** Color del texto de Game Over - rojo error de Amani. */
+val SnakeGameOverColor = AmaniError
+
+/** Color del texto de Pausa - lila principal de Amani. */
+val SnakePausedColor = AmaniPurple
+
+/** Color del marcador de puntuación - lila claro. */
+val SnakeScoreColor = AmaniPurple
+
+/** Color del borde de la serpiente - lila más oscuro para contraste. */
+val SnakeBorderColor = AmaniPurpleDark.copy(alpha = 0.8f)

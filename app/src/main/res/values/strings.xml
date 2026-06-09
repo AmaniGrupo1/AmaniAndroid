@@ -1081,4 +1081,11 @@
     <string name="titulo_del_documento">Titulo del documento</string>
     <string name="vista">Vista</string>
     <string name="volver_al_inicio">Volver al inicio</string>
+
+    <string name="nav_juego">Juego</string>
+
+    <string name="entretenimiento">Entretenimiento</string>
+    <string name="back">Atrás</string>
+    <string name="select_game">Selecciona un juego</string>
+    <string name="slither">Slither.io</string>
 </resources>

@@ -45,6 +45,8 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.admin.ListadoPacie
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatListScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.diario.DiarioEmocionalScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.juegos.EntretenimientoScreen
+import org.ies.tierno.applicationamani.presentation.ui.screen.juegos.SnakeScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.AgendaCitaScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.CitasScreen
 import org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView.EditarCitaScreen
@@ -472,6 +474,18 @@ fun NavGraph(
 
             composable(Screens.reportarProblema.route){
                 TicketScreen(navController = navController)
+            }
+
+            composable(Screens.juegoSnake.route) {
+                SnakeScreen(
+                    onBackPressed = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screens.entretenimiento.route) {
+                EntretenimientoScreen(
+                    navController = navController
+                )
             }
         }
     }

@@ -153,4 +153,8 @@ sealed class Screens(
     object crearHistorialClinico : Screens("crearHistorialClinico/{pacienteId}") {
         fun createRoute(pacienteId: Long?) = "crearHistorialClinico/$pacienteId"
     }
+
+    object juegoSnake : Screens("juegoSnake")
+
+    object entretenimiento : Screens("entretenimiento")
 }

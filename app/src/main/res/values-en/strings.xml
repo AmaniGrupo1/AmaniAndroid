@@ -1079,4 +1079,12 @@
     <string name="titulo_del_documento">Document title</string>
     <string name="vista">View</string>
     <string name="volver_al_inicio">Back to home</string>
+
+
+    <string name="nav_juego">Game</string>
+
+    <string name="entretenimiento">Entertainment</string>
+    <string name="back">Back</string>
+    <string name="select_game">Select a game</string>
+    <string name="slither">Slither.io</string>
 </resources>
