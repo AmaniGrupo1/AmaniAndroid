@@ -92,6 +92,12 @@ private fun pacienteItems() =
             unselectedIcon = Icons.AutoMirrored.Outlined.Chat,
         ),
         AmaniBottomBarItem(
+            route = Screens.entretenimiento.route,
+            labelRes = R.string.nav_juego,
+            selectedIcon = Icons.Filled.Psychology,
+            unselectedIcon = Icons.Outlined.Psychology,
+        ),
+        AmaniBottomBarItem(
             route = Screens.diarioEmocional.route,
             labelRes = R.string.nav_diario,
             selectedIcon = Icons.Filled.Book,
