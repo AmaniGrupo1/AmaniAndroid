@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -82,6 +84,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.getKoin
+import org.ies.tierno.applicationamani.core.crash.CrashReporter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -117,6 +120,24 @@ fun NavGraph(
             "psicologo", "psicóloga", "psicologa" -> BottomBarConfig.Psicologo
             else -> BottomBarConfig.Paciente
         }
+
+    val crashReporter: CrashReporter = getKoin().get()
+
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, arguments ->
+            val screenName = destination.route ?: "Unknown_Screen"
+            val safeArgs = arguments?.keySet()?.associateWith { key ->
+                if (key.contains("password", true) || key.contains("token", true)) "***"
+                else arguments.get(key).toString()
+            }
+            crashReporter.logNavigationEvent(screenName, safeArgs)
+            crashReporter.logBreadcrumb("Navigated to \$screenName")
+        }
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
 
     Scaffold(
         bottomBar = {

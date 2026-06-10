@@ -1,0 +1,12 @@
+--- app/src/main/java/org/ies/tierno/applicationamani/presentation/ui/screen/pacienteView/CitasScreen.kt
++++ app/src/main/java/org/ies/tierno/applicationamani/presentation/ui/screen/pacienteView/CitasScreen.kt
+@@ -646,6 +646,14 @@
+                                                                     try {
+                                                                         val result = citasRepository.getJitsiToken(roomName)
++                                                                        if (result.isFailure) {
++                                                                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
++                                                                                android.widget.Toast.makeText(context, "Error al obtener el token: ${result.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_LONG).show()
++                                                                            }
++                                                                            return@launch
++                                                                        }
+                                                                         val jwtToken = result.getOrNull()

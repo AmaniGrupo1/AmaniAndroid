@@ -9,8 +9,8 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.google.firebase.perf)
     alias(libs.plugins.kover)
-    // alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -167,6 +167,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation(libs.firebase.perf)
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
