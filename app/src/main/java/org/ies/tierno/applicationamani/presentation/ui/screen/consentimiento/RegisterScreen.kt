@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -60,14 +59,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -78,18 +73,10 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
-
-// Colores para validaciones
-private val SuccessColor = Color(0xFF81C784)
-private val ErrorColor = Color(0xFFE57373)
-private val WarningColor = Color(0xFFFF9800)
 
 /**
  * Pantalla de registro de un nuevo paciente en la plataforma Amani.
@@ -112,31 +99,13 @@ fun RegisterScreen(
     loginViewModel: LoginViewModel = koinViewModel(),
     situacionViewModel: SituacionViewModel = koinViewModel()
 ) {
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
-    // Colores dinámicos según el tema
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else Color(0xFF6C63FF)
-    val backgroundColor = if (isDark) screenColors.background else Color(0xFFCCC0E4)
-    val surfaceColor = if (isDark) cardColors.cardBackground else Color.White
-    val textColor = if (isDark) cardColors.cardContent else Color.Black
-    val textFieldBorderColor = if (isDark) Color.White else Color.Gray
-    val tutorCardColor = if (isDark) cardColors.cardBackground.copy(alpha = 0.8f) else Color(0xFFFFF3E0)
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // Fuente Roboto
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
-    )
-
-    val scope = rememberCoroutineScope()
-    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
@@ -212,15 +181,21 @@ fun RegisterScreen(
     val listaGeneros = listOf("Masculino", "Femenino", "Otro", "Prefiero no decirlo")
     val listaTiposTutor = listOf("Padre", "Madre", "Tutor legal", "Abuelo", "Otro")
 
+    // Color de acento para la sección del tutor (naranja cálido, accesible en ambos temas)
+    val tutorAccentColor = MaterialTheme.colorScheme.tertiary
+
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = primaryColor,
+                color = colorScheme.primary,
                 shadowElevation = 4.dp,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                shape = shapes.large.copy(
+                    topStart = androidx.compose.foundation.shape.CornerSize(0.dp),
+                    topEnd = androidx.compose.foundation.shape.CornerSize(0.dp)
+                )
             ) {
                 Row(
                     modifier = Modifier
@@ -238,17 +213,17 @@ fun RegisterScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
-                            tint = Color.White
+                            tint = colorScheme.onPrimary
                         )
                     }
 
                     Text(
                         text = stringResource(R.string.auto_registrar_paciente),
-                        color = Color.White,
-                        fontFamily = roboto,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
+                        color = colorScheme.onPrimary,
+                        style = typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
@@ -267,23 +242,21 @@ fun RegisterScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val textFieldShape = RoundedCornerShape(12.dp)
-
             // ==================== SECCIÓN 1: DATOS PERSONALES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+                shape = shapes.large,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Person, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.Default.Person, contentDescription = null, tint = colorScheme.primary)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.auto_datos_personales),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto
+                        Text(
+                            stringResource(R.string.auto_datos_personales),
+                            style = typography.titleLarge,
+                            color = colorScheme.primary
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -292,16 +265,18 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { loginViewModel.setNombre(it) },
-                        label = { Text(stringResource(R.string.auto_nombre_), fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_nombre_)) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         )
                     )
 
@@ -311,16 +286,18 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = apellido,
                         onValueChange = { loginViewModel.setApellido(it) },
-                        label = { Text(stringResource(R.string.auto_apellido_), fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_apellido_)) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         )
                     )
 
@@ -333,40 +310,43 @@ fun RegisterScreen(
                             loginViewModel.setDni(it.uppercase())
                             dniTouched = true
                         },
-                        label = { Text(stringResource(R.string.auto_dni_), fontFamily = roboto, color = textColor) },
-                        placeholder = { Text(stringResource(R.string.auto_12345678a), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.auto_dni_)) },
+                        placeholder = { Text(stringResource(R.string.auto_12345678a), style = typography.bodyMedium) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         isError = dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            errorBorderColor = colorScheme.error,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         ),
                         supportingText = {
                             when {
                                 !dniTouched && dni.isBlank() -> {
-                                    Text(stringResource(R.string.auto__introduce_el_dni_1),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
+                                    Text(
+                                        stringResource(R.string.auto__introduce_el_dni_1),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
                                     )
                                 }
                                 dniTouched && dni.isNotBlank() && !dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                    Text(stringResource(R.string.auto__formato_invalido_8),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = ErrorColor
+                                    Text(
+                                        stringResource(R.string.auto__formato_invalido_8),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
                                     )
                                 }
                                 dniTouched && dni.isNotBlank() && dni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                    Text(stringResource(R.string.auto__dni_valido),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = SuccessColor
+                                    Text(
+                                        stringResource(R.string.auto__dni_valido),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary
                                     )
                                 }
                             }
@@ -382,39 +362,42 @@ fun RegisterScreen(
                             loginViewModel.setEmail(it)
                             emailTouched = true
                         },
-                        label = { Text(stringResource(R.string.auto_email_), fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_email_)) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         isError = emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            errorBorderColor = colorScheme.error,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         ),
                         supportingText = {
                             when {
                                 !emailTouched && email.isBlank() -> {
-                                    Text(stringResource(R.string.auto__introduce_el_correo),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
+                                    Text(
+                                        stringResource(R.string.auto__introduce_el_correo),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
                                     )
                                 }
                                 emailTouched && email.isNotBlank() && !email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                    Text(stringResource(R.string.auto__formato_de_correo),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = ErrorColor
+                                    Text(
+                                        stringResource(R.string.auto__formato_de_correo),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
                                     )
                                 }
                                 emailTouched && email.isNotBlank() && email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                    Text(stringResource(R.string.auto__correo_valido),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = SuccessColor
+                                    Text(
+                                        stringResource(R.string.auto__correo_valido),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary
                                     )
                                 }
                             }
@@ -423,54 +406,57 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Contraseña con validación mejorada
+                    // Contraseña con validación
                     OutlinedTextField(
                         value = regPassword,
                         onValueChange = {
                             loginViewModel.setRegPassword(it)
                             passwordTouched = true
                         },
-                        label = { Text(stringResource(R.string.auto_contrasena_), fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_contrasena_)) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         isError = passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = if (passwordTouched && regPassword.isNotBlank() && (!loginViewModel.isValidPassword(regPassword) || regPassword.length < 8)) ErrorColor else primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            errorBorderColor = colorScheme.error,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         ),
                         supportingText = {
                             when {
                                 !passwordTouched && regPassword.isBlank() -> {
-                                    Text(stringResource(R.string.auto__introduce_una_contrasena),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
+                                    Text(
+                                        stringResource(R.string.auto__introduce_una_contrasena),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && regPassword.length < 8 -> {
-                                    Text(stringResource(R.string.auto__la_contrasena_debe_1),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = WarningColor
+                                    Text(
+                                        stringResource(R.string.auto__la_contrasena_debe_1),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && !loginViewModel.isValidPassword(regPassword) -> {
-                                    Text(stringResource(R.string.auto__la_contrasena_debe_2),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = ErrorColor
+                                    Text(
+                                        stringResource(R.string.auto__la_contrasena_debe_2),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
                                     )
                                 }
                                 passwordTouched && regPassword.isNotBlank() && loginViewModel.isValidPassword(regPassword) -> {
-                                    Text(stringResource(R.string.auto__contrasena_valida),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = SuccessColor
+                                    Text(
+                                        stringResource(R.string.auto__contrasena_valida),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary
                                     )
                                 }
                             }
@@ -486,40 +472,43 @@ fun RegisterScreen(
                             loginViewModel.setTelefono(it)
                             telefonoTouched = true
                         },
-                        label = { Text(stringResource(R.string.auto_telefono_), fontFamily = roboto, color = textColor) },
-                        placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.auto_telefono_)) },
+                        placeholder = { Text("123456789", style = typography.bodyMedium) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         isError = telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = if (telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            errorBorderColor = colorScheme.error,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         ),
                         supportingText = {
                             when {
                                 !telefonoTouched && telefono.isBlank() -> {
-                                    Text(stringResource(R.string.auto__introduce_el_numero),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
+                                    Text(
+                                        stringResource(R.string.auto__introduce_el_numero),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
                                     )
                                 }
                                 telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")) -> {
-                                    Text(stringResource(R.string.auto__debe_tener_9),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = ErrorColor
+                                    Text(
+                                        stringResource(R.string.auto__debe_tener_9),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
                                     )
                                 }
                                 telefonoTouched && telefono.isNotBlank() && telefono.matches(Regex("^[0-9]{9}$")) -> {
-                                    Text(stringResource(R.string.auto__telefono_valido),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = SuccessColor
+                                    Text(
+                                        stringResource(R.string.auto__telefono_valido),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary
                                     )
                                 }
                             }
@@ -537,30 +526,33 @@ fun RegisterScreen(
                             value = genero,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text(stringResource(R.string.auto_genero_), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_genero_)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenero) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             isError = genero.isBlank(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = if (genero.isBlank()) ErrorColor else primaryColor,
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = primaryColor,
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
                         ExposedDropdownMenu(
                             expanded = expandedGenero,
                             onDismissRequest = { expandedGenero = false },
-                            containerColor = surfaceColor
+                            containerColor = colorScheme.surface
                         ) {
                             listaGeneros.forEach { opcion ->
                                 DropdownMenuItem(
-                                    text = { Text(opcion, fontFamily = roboto, color = textColor) },
+                                    text = { Text(opcion, color = colorScheme.onSurface) },
                                     onClick = {
                                         loginViewModel.setGenero(opcion)
                                         expandedGenero = false
@@ -572,57 +564,59 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // ==================== FECHA DE NACIMIENTO CON DATEPICKER ====================
+                    // ==================== FECHA DE NACIMIENTO ====================
                     OutlinedTextField(
                         value = selectedDate?.format(dateFormatter) ?: "",
                         onValueChange = {},
-                        label = { Text(stringResource(R.string.auto_fecha_de_nacimiento_), fontFamily = roboto, color = textColor) },
-                        placeholder = { Text(stringResource(R.string.auto_ddmmaaaa), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.auto_fecha_de_nacimiento_)) },
+                        placeholder = { Text(stringResource(R.string.auto_ddmmaaaa), style = typography.bodyMedium) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showDatePicker = true },
                         readOnly = true,
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         trailingIcon = {
                             IconButton(onClick = { showDatePicker = true }) {
                                 Icon(
                                     Icons.Default.CalendarToday,
                                     contentDescription = stringResource(R.string.auto_seleccionar_fecha),
-                                    tint = textColor
+                                    tint = colorScheme.onSurfaceVariant
                                 )
                             }
                         },
                         isError = dateError != null,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = if (dateError != null) ErrorColor else primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = if (dateError != null) ErrorColor else primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            errorBorderColor = colorScheme.error,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         ),
                         supportingText = {
                             when {
                                 dateError != null -> {
                                     Text(
                                         "❌ $dateError",
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = ErrorColor
+                                        style = typography.bodySmall,
+                                        color = colorScheme.error
                                     )
                                 }
                                 selectedDate != null -> {
-                                    Text(stringResource(R.string.auto__fecha_valida),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = SuccessColor
+                                    Text(
+                                        stringResource(R.string.auto__fecha_valida),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.primary
                                     )
                                 }
                                 else -> {
-                                    Text(stringResource(R.string.auto__selecciona_tu_fecha),
-                                        fontSize = 11.sp,
-                                        fontFamily = roboto,
-                                        color = textColor.copy(alpha = 0.6f)
+                                    Text(
+                                        stringResource(R.string.auto__selecciona_tu_fecha),
+                                        style = typography.bodySmall,
+                                        color = colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
@@ -635,8 +629,10 @@ fun RegisterScreen(
             if (esMenor && selectedDate != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = tutorCardColor),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = colorScheme.tertiaryContainer
+                    ),
+                    shape = shapes.large,
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -644,19 +640,19 @@ fun RegisterScreen(
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
-                                tint = Color(0xFFE67E22)
+                                tint = tutorAccentColor
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.auto_datos_del_tutor),
-                                style = MaterialTheme.typography.titleLarge,
-                                color = Color(0xFFE67E22),
-                                fontFamily = roboto
+                            Text(
+                                stringResource(R.string.auto_datos_del_tutor),
+                                style = typography.titleLarge,
+                                color = tutorAccentColor
                             )
                         }
-                        Text(stringResource(R.string.auto_obligatorio_por_ser_menor),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFE67E22),
-                            fontFamily = roboto
+                        Text(
+                            stringResource(R.string.auto_obligatorio_por_ser_menor),
+                            style = typography.bodySmall,
+                            color = tutorAccentColor
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -664,16 +660,18 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = tutorNombre,
                             onValueChange = { loginViewModel.setTutorNombre(it) },
-                            label = { Text(stringResource(R.string.auto_nombre_completo_), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_nombre_completo_)) },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = Color(0xFFE67E22),
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = tutorAccentColor,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = tutorAccentColor,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedContainerColor = colorScheme.tertiaryContainer,
+                                unfocusedContainerColor = colorScheme.tertiaryContainer
                             )
                         )
 
@@ -686,40 +684,43 @@ fun RegisterScreen(
                                 loginViewModel.setTutorTelefono(it)
                                 tutorTelefonoTouched = true
                             },
-                            label = { Text(stringResource(R.string.auto_telefono_), fontFamily = roboto, color = textColor) },
-                            placeholder = { Text("123456789", fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                            label = { Text(stringResource(R.string.auto_telefono_)) },
+                            placeholder = { Text("123456789", style = typography.bodyMedium) },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             isError = tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = if (tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$"))) ErrorColor else Color(0xFFE67E22),
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = tutorAccentColor,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = tutorAccentColor,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.tertiaryContainer,
+                                unfocusedContainerColor = colorScheme.tertiaryContainer
                             ),
                             supportingText = {
                                 when {
                                     !tutorTelefonoTouched && tutorTelefono.isBlank() -> {
-                                        Text(stringResource(R.string.auto__introduce_el_telefono),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = textColor.copy(alpha = 0.6f)
+                                        Text(
+                                            stringResource(R.string.auto__introduce_el_telefono),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.onSurfaceVariant
                                         )
                                     }
                                     tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
-                                        Text(stringResource(R.string.auto__debe_tener_9),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = ErrorColor
+                                        Text(
+                                            stringResource(R.string.auto__debe_tener_9),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.error
                                         )
                                     }
                                     tutorTelefonoTouched && tutorTelefono.isNotBlank() && tutorTelefono.matches(Regex("^[0-9]{9}$")) -> {
-                                        Text(stringResource(R.string.auto__telefono_valido),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = SuccessColor
+                                        Text(
+                                            stringResource(R.string.auto__telefono_valido),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.primary
                                         )
                                     }
                                 }
@@ -735,39 +736,42 @@ fun RegisterScreen(
                                 loginViewModel.setTutorEmail(it)
                                 tutorEmailTouched = true
                             },
-                            label = { Text(stringResource(R.string.auto_email_), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_email_)) },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             isError = tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = if (tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))) ErrorColor else Color(0xFFE67E22),
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = tutorAccentColor,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = tutorAccentColor,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.tertiaryContainer,
+                                unfocusedContainerColor = colorScheme.tertiaryContainer
                             ),
                             supportingText = {
                                 when {
                                     !tutorEmailTouched && tutorEmail.isBlank() -> {
-                                        Text(stringResource(R.string.auto__introduce_el_email),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = textColor.copy(alpha = 0.6f)
+                                        Text(
+                                            stringResource(R.string.auto__introduce_el_email),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.onSurfaceVariant
                                         )
                                     }
                                     tutorEmailTouched && tutorEmail.isNotBlank() && !tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                        Text(stringResource(R.string.auto__formato_de_email),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = ErrorColor
+                                        Text(
+                                            stringResource(R.string.auto__formato_de_email),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.error
                                         )
                                     }
                                     tutorEmailTouched && tutorEmail.isNotBlank() && tutorEmail.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$")) -> {
-                                        Text(stringResource(R.string.auto__email_valido),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = SuccessColor
+                                        Text(
+                                            stringResource(R.string.auto__email_valido),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.primary
                                         )
                                     }
                                 }
@@ -783,40 +787,43 @@ fun RegisterScreen(
                                 loginViewModel.setTutorDni(it.uppercase())
                                 tutorDniTouched = true
                             },
-                            label = { Text(stringResource(R.string.auto_dni_), fontFamily = roboto, color = textColor) },
-                            placeholder = { Text(stringResource(R.string.auto_12345678a), fontFamily = roboto, color = textColor.copy(alpha = 0.5f)) },
+                            label = { Text(stringResource(R.string.auto_dni_)) },
+                            placeholder = { Text(stringResource(R.string.auto_12345678a), style = typography.bodyMedium) },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             isError = tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = if (tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$"))) ErrorColor else Color(0xFFE67E22),
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = Color(0xFFE67E22),
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = tutorAccentColor,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = tutorAccentColor,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.tertiaryContainer,
+                                unfocusedContainerColor = colorScheme.tertiaryContainer
                             ),
                             supportingText = {
                                 when {
                                     !tutorDniTouched && tutorDni.isBlank() -> {
-                                        Text(stringResource(R.string.auto__introduce_el_dni),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = textColor.copy(alpha = 0.6f)
+                                        Text(
+                                            stringResource(R.string.auto__introduce_el_dni),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.onSurfaceVariant
                                         )
                                     }
                                     tutorDniTouched && tutorDni.isNotBlank() && !tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                        Text(stringResource(R.string.auto__formato_invalido_8),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = ErrorColor
+                                        Text(
+                                            stringResource(R.string.auto__formato_invalido_8),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.error
                                         )
                                     }
                                     tutorDniTouched && tutorDni.isNotBlank() && tutorDni.matches(Regex("^[0-9]{8}[A-Za-z]$")) -> {
-                                        Text(stringResource(R.string.auto__dni_valido),
-                                            fontSize = 11.sp,
-                                            fontFamily = roboto,
-                                            color = SuccessColor
+                                        Text(
+                                            stringResource(R.string.auto__dni_valido),
+                                            style = typography.bodySmall,
+                                            color = colorScheme.primary
                                         )
                                     }
                                 }
@@ -834,30 +841,33 @@ fun RegisterScreen(
                                 value = tutorTipo,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text(stringResource(R.string.auto_parentesco_), fontFamily = roboto, color = textColor) },
+                                label = { Text(stringResource(R.string.auto_parentesco_)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipoTutor) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
-                                shape = textFieldShape,
+                                shape = shapes.medium,
                                 isError = tutorTipo.isBlank(),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = textColor,
-                                    unfocusedTextColor = textColor,
-                                    focusedBorderColor = if (tutorTipo.isBlank()) ErrorColor else Color(0xFFE67E22),
-                                    unfocusedBorderColor = textFieldBorderColor,
-                                    focusedLabelColor = Color(0xFFE67E22),
-                                    unfocusedLabelColor = textColor
+                                    focusedTextColor = colorScheme.onSurface,
+                                    unfocusedTextColor = colorScheme.onSurface,
+                                    focusedBorderColor = tutorAccentColor,
+                                    unfocusedBorderColor = colorScheme.outline,
+                                    focusedLabelColor = tutorAccentColor,
+                                    unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                    errorBorderColor = colorScheme.error,
+                                    focusedContainerColor = colorScheme.tertiaryContainer,
+                                    unfocusedContainerColor = colorScheme.tertiaryContainer
                                 )
                             )
                             ExposedDropdownMenu(
                                 expanded = expandedTipoTutor,
                                 onDismissRequest = { expandedTipoTutor = false },
-                                containerColor = surfaceColor
+                                containerColor = colorScheme.surface
                             ) {
                                 listaTiposTutor.forEach { tipo ->
                                     DropdownMenuItem(
-                                        text = { Text(tipo, fontFamily = roboto, color = textColor) },
+                                        text = { Text(tipo, color = colorScheme.onSurface) },
                                         onClick = {
                                             loginViewModel.setTutorTipo(tipo)
                                             expandedTipoTutor = false
@@ -873,8 +883,8 @@ fun RegisterScreen(
             // ==================== SECCIÓN 3: DIRECCIÓN ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+                shape = shapes.large,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -882,13 +892,13 @@ fun RegisterScreen(
                         Icon(
                             Icons.Default.LocationOn,
                             contentDescription = null,
-                            tint = primaryColor
+                            tint = colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.auto_direccion),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto
+                        Text(
+                            stringResource(R.string.auto_direccion),
+                            style = typography.titleLarge,
+                            color = colorScheme.primary
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -897,16 +907,18 @@ fun RegisterScreen(
                     OutlinedTextField(
                         value = calle,
                         onValueChange = { loginViewModel.setCalle(it) },
-                        label = { Text(stringResource(R.string.auto_calle_y_numero_), fontFamily = roboto, color = textColor) },
+                        label = { Text(stringResource(R.string.auto_calle_y_numero_)) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = textFieldShape,
+                        shape = shapes.medium,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            focusedBorderColor = primaryColor,
-                            unfocusedBorderColor = textFieldBorderColor,
-                            focusedLabelColor = primaryColor,
-                            unfocusedLabelColor = textColor
+                            focusedTextColor = colorScheme.onSurface,
+                            unfocusedTextColor = colorScheme.onSurface,
+                            focusedBorderColor = colorScheme.primary,
+                            unfocusedBorderColor = colorScheme.outline,
+                            focusedLabelColor = colorScheme.primary,
+                            unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                            focusedContainerColor = colorScheme.surface,
+                            unfocusedContainerColor = colorScheme.surface
                         )
                     )
 
@@ -919,31 +931,35 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = ciudad,
                             onValueChange = { loginViewModel.setCiudad(it) },
-                            label = { Text(stringResource(R.string.auto_ciudad), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_ciudad)) },
                             modifier = Modifier.weight(1f),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = primaryColor,
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
                         OutlinedTextField(
                             value = provincia,
                             onValueChange = { loginViewModel.setProvincia(it) },
-                            label = { Text(stringResource(R.string.auto_provincia), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_provincia)) },
                             modifier = Modifier.weight(1f),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = primaryColor,
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
                     }
@@ -957,31 +973,35 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = codigoPostal,
                             onValueChange = { loginViewModel.setCodigoPostal(it) },
-                            label = { Text(stringResource(R.string.auto_codigo_postal), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_codigo_postal)) },
                             modifier = Modifier.weight(1f),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = primaryColor,
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
                         OutlinedTextField(
                             value = pais,
                             onValueChange = { loginViewModel.setPais(it) },
-                            label = { Text(stringResource(R.string.auto_pais), fontFamily = roboto, color = textColor) },
+                            label = { Text(stringResource(R.string.auto_pais)) },
                             modifier = Modifier.weight(1f),
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = primaryColor,
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
                     }
@@ -991,24 +1011,24 @@ fun RegisterScreen(
             // ==================== SECCIÓN 4: SITUACIONES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+                shape = shapes.large,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = primaryColor)
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = colorScheme.primary)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.auto_situaciones_1),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto
+                        Text(
+                            stringResource(R.string.auto_situaciones_1),
+                            style = typography.titleLarge,
+                            color = colorScheme.primary
                         )
                     }
-                    Text(stringResource(R.string.auto_seleccione_una_o_mas),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = roboto,
-                        color = textColor.copy(alpha = 0.7f)
+                    Text(
+                        stringResource(R.string.auto_seleccione_una_o_mas),
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -1024,22 +1044,25 @@ fun RegisterScreen(
                                     Icon(
                                         if (expandedSituacion) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                                         contentDescription = null,
-                                        tint = textColor
+                                        tint = colorScheme.onSurfaceVariant
                                     )
                                 }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { expandedSituacion = !expandedSituacion },
-                            shape = textFieldShape,
+                            shape = shapes.medium,
                             isError = situacionesIds.isEmpty(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor,
-                                focusedBorderColor = if (situacionesIds.isEmpty()) ErrorColor else primaryColor,
-                                unfocusedBorderColor = textFieldBorderColor,
-                                focusedLabelColor = primaryColor,
-                                unfocusedLabelColor = textColor
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outline,
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onSurfaceVariant,
+                                errorBorderColor = colorScheme.error,
+                                focusedContainerColor = colorScheme.surface,
+                                unfocusedContainerColor = colorScheme.surface
                             )
                         )
 
@@ -1049,14 +1072,14 @@ fun RegisterScreen(
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
                                 .heightIn(max = 400.dp),
-                            containerColor = surfaceColor
+                            containerColor = colorScheme.surface
                         ) {
                             if (listaSituaciones.isEmpty()) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(stringResource(R.string.auto_no_hay_situaciones_disponibles),
-                                            fontFamily = roboto,
-                                            color = textColor
+                                        Text(
+                                            stringResource(R.string.auto_no_hay_situaciones_disponibles),
+                                            color = colorScheme.onSurface
                                         )
                                     },
                                     onClick = { expandedSituacion = false },
@@ -1084,13 +1107,12 @@ fun RegisterScreen(
                                                         expandedSituacion = false
                                                     },
                                                     modifier = Modifier.size(24.dp),
-                                                    colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                                                    colors = CheckboxDefaults.colors(checkedColor = colorScheme.primary)
                                                 )
                                                 Spacer(modifier = Modifier.width(12.dp))
                                                 Text(
                                                     situacion.nombre,
-                                                    fontFamily = roboto,
-                                                    color = textColor,
+                                                    color = colorScheme.onSurface,
                                                     modifier = Modifier.weight(1f)
                                                 )
                                             }
@@ -1107,8 +1129,8 @@ fun RegisterScreen(
             // ==================== SECCIÓN 5: CONSENTIMIENTOS ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+                shape = shapes.large,
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -1116,13 +1138,13 @@ fun RegisterScreen(
                         Icon(
                             Icons.Default.DocumentScanner,
                             contentDescription = null,
-                            tint = primaryColor
+                            tint = colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.auto_consentimientos),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = primaryColor,
-                            fontFamily = roboto
+                        Text(
+                            stringResource(R.string.auto_consentimientos),
+                            style = typography.titleLarge,
+                            color = colorScheme.primary
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -1134,11 +1156,12 @@ fun RegisterScreen(
                         Checkbox(
                             checked = aceptaTerminos,
                             onCheckedChange = { loginViewModel.aceptaTerminos.value = it },
-                            colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                            colors = CheckboxDefaults.colors(checkedColor = colorScheme.primary)
                         )
-                        Text(stringResource(R.string.auto_acepto_los_terminos_y),
-                            fontFamily = roboto,
-                            color = textColor,
+                        Text(
+                            stringResource(R.string.auto_acepto_los_terminos_y),
+                            style = typography.bodyMedium,
+                            color = colorScheme.onSurface,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaTerminos.value = !aceptaTerminos
                             }
@@ -1152,14 +1175,14 @@ fun RegisterScreen(
                         Checkbox(
                             checked = aceptaVideoconferencia,
                             onCheckedChange = { loginViewModel.aceptaVideoconferencia.value = it },
-                            colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                            colors = CheckboxDefaults.colors(checkedColor = colorScheme.primary)
                         )
-                        Text(stringResource(R.string.auto_acepto_videoconferencia),
-                            fontFamily = roboto,
-                            color = textColor,
+                        Text(
+                            stringResource(R.string.auto_acepto_videoconferencia),
+                            style = typography.bodyMedium,
+                            color = colorScheme.onSurface,
                             modifier = Modifier.clickable {
-                                loginViewModel.aceptaVideoconferencia.value =
-                                    !aceptaVideoconferencia
+                                loginViewModel.aceptaVideoconferencia.value = !aceptaVideoconferencia
                             }
                         )
                     }
@@ -1171,11 +1194,12 @@ fun RegisterScreen(
                         Checkbox(
                             checked = aceptaComunicacion,
                             onCheckedChange = { loginViewModel.aceptaComunicacion.value = it },
-                            colors = CheckboxDefaults.colors(checkedColor = primaryColor)
+                            colors = CheckboxDefaults.colors(checkedColor = colorScheme.primary)
                         )
-                        Text(stringResource(R.string.auto_acepto_comunicaciones),
-                            fontFamily = roboto,
-                            color = textColor,
+                        Text(
+                            stringResource(R.string.auto_acepto_comunicaciones),
+                            style = typography.bodyMedium,
+                            color = colorScheme.onSurface,
                             modifier = Modifier.clickable {
                                 loginViewModel.aceptaComunicacion.value = !aceptaComunicacion
                             }
@@ -1190,7 +1214,6 @@ fun RegisterScreen(
             val registerSuccess by loginViewModel.registerSuccess.collectAsStateWithLifecycle()
             val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
 
-            // Validar que la fecha sea válida y mayor de edad
             val isDateValid = selectedDate != null && dateError == null
 
             Button(
@@ -1210,15 +1233,19 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                shape = shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary,
+                    disabledContainerColor = colorScheme.primary.copy(alpha = 0.5f),
+                    disabledContentColor = colorScheme.onPrimary.copy(alpha = 0.7f)
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 enabled = formularioCompletoValido && isDateValid
             ) {
                 Text(
                     text = stringResource(R.string.auto__registrar_paciente),
-                    color = Color.White,
-                    fontFamily = roboto,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                    style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
             }
 
@@ -1238,7 +1265,6 @@ fun RegisterScreen(
 
     // ==================== DATEPICKER DIALOG ====================
     if (showDatePicker) {
-        // Crear el estado con la fecha inicial si existe
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = selectedDate?.let {
                 it.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -1260,7 +1286,6 @@ fun RegisterScreen(
                             val age = Period.between(newSelectedDate, LocalDate.now()).years
 
                             if (age >= 18) {
-                                // Actualizar la fecha en formato String para el ViewModel
                                 loginViewModel.setFechaNacimiento(newSelectedDate.toString())
                                 dateError = null
                                 showDatePicker = false
@@ -1274,20 +1299,16 @@ fun RegisterScreen(
                         }
                     }
                 ) {
-                    Text(stringResource(R.string.auto_aceptar), fontFamily = roboto, color = primaryColor)
+                    Text(stringResource(R.string.auto_aceptar))
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showDatePicker = false }
-                ) {
-                    Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = textColor)
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.auto_cancelar))
                 }
             }
         ) {
-            DatePicker(
-                state = datePickerState
-            )
+            DatePicker(state = datePickerState)
         }
     }
 
@@ -1302,21 +1323,22 @@ fun RegisterScreen(
                 Icon(
                     Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = Color(0xFF4CAF50),
+                    tint = colorScheme.primary,
                     modifier = Modifier.size(48.dp)
                 )
             },
             title = {
-                Text(stringResource(R.string.auto_registro_exitoso),
-                    fontFamily = roboto,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
+                Text(
+                    stringResource(R.string.auto_registro_exitoso),
+                    style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = colorScheme.onSurface
                 )
             },
             text = {
-                Text(stringResource(R.string.auto_el_paciente_ha_sido),
-                    fontFamily = roboto,
-                    color = textColor.copy(alpha = 0.8f)
+                Text(
+                    stringResource(R.string.auto_el_paciente_ha_sido),
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
@@ -1326,11 +1348,11 @@ fun RegisterScreen(
                         navController.navigateUp()
                     }
                 ) {
-                    Text(stringResource(R.string.auto_aceptar), color = primaryColor, fontFamily = roboto)
+                    Text(stringResource(R.string.auto_aceptar))
                 }
             },
-            shape = RoundedCornerShape(16.dp),
-            containerColor = surfaceColor
+            shape = shapes.extraLarge,
+            containerColor = colorScheme.surface
         )
     }
 
@@ -1342,33 +1364,31 @@ fun RegisterScreen(
                 Icon(
                     Icons.Default.Error,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
+                    tint = colorScheme.error,
                     modifier = Modifier.size(48.dp)
                 )
             },
             title = {
-                Text(stringResource(R.string.auto_error_en_el_registro),
-                    fontFamily = roboto,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
+                Text(
+                    stringResource(R.string.auto_error_en_el_registro),
+                    style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = colorScheme.onSurface
                 )
             },
             text = {
                 Text(
                     text = errorMessage.ifBlank { "Ocurrió un error al registrar el paciente. Por favor, inténtalo de nuevo." },
-                    fontFamily = roboto,
-                    color = textColor.copy(alpha = 0.8f)
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
-                TextButton(
-                    onClick = { showErrorDialog = false }
-                ) {
-                    Text(stringResource(R.string.auto_aceptar), color = primaryColor, fontFamily = roboto)
+                TextButton(onClick = { showErrorDialog = false }) {
+                    Text(stringResource(R.string.auto_aceptar))
                 }
             },
-            shape = RoundedCornerShape(16.dp),
-            containerColor = surfaceColor
+            shape = shapes.extraLarge,
+            containerColor = colorScheme.surface
         )
     }
 }

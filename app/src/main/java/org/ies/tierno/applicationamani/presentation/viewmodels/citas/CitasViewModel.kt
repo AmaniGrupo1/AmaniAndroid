@@ -11,7 +11,7 @@ package org.ies.tierno.applicationamani.presentation.viewmodels.citas
  * @param profileRepository Repositorio para consultar el psicólogo asignado al paciente.
  * @param userSessionDataStore Almacén local de la sesión del paciente autenticado.
  */
-import androidx.lifecycle.ViewModel
+import org.ies.tierno.applicationamani.core.viewmodel.BaseViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,8 +41,8 @@ class CitasViewModel(
     private val citasRepository: CitasRepository,
     private val profileRepository: ProfileRepository,
     private val userSessionDataStore: UserSessionDataStore,
-    private val crashReporter: CrashReporter,
-) : ViewModel() {
+    crashReporter: CrashReporter,
+) : BaseViewModel(crashReporter) {
     /** Sesión del usuario autenticado. */
     private val _userSession = MutableStateFlow<UserSession?>(null)
     val userSession: StateFlow<UserSession?> = _userSession.asStateFlow()
@@ -68,7 +68,7 @@ class CitasViewModel(
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        safeLaunch {
             userSessionDataStore.sessionFlow.collect { session ->
                 _userSession.value = session
                 if (session?.idPsicologo != null) {
@@ -80,7 +80,7 @@ class CitasViewModel(
         }
         // Re-fetcha disponibilidad si el psicólogo actualiza su horario
         // mientras el paciente tiene una fecha seleccionada en pantalla
-        viewModelScope.launch {
+        safeLaunch {
             HorarioEvents.horarioActualizado.collect {
                 _disponibilidadDia.value?.fecha?.let { fecha ->
                     cargarDisponibilidad(fecha)
@@ -90,7 +90,7 @@ class CitasViewModel(
     }
 
     private fun cargarPsicologoAsignado(idPaciente: Long) {
-        viewModelScope.launch {
+        safeLaunch {
             profileRepository
                 .obtenerPsicologoAsignado(idPaciente)
                 .onSuccess { psicologo ->
@@ -119,7 +119,7 @@ class CitasViewModel(
 
         val idPaciente = session.idPaciente ?: session.idUsuario
 
-        viewModelScope.launch {
+        safeLaunch {
             _isLoading.value = true
 
             citasRepository
@@ -146,7 +146,7 @@ class CitasViewModel(
     fun cargarDisponibilidad(fecha: LocalDate) {
         val idPsicologo = _psicologoId.value ?: _userSession.value?.idPsicologo ?: return
 
-        viewModelScope.launch {
+        safeLaunch {
             _isLoading.value = true
             citasRepository
                 .getDisponibilidadDia(idPsicologo, fecha.toString(), 60)
@@ -225,7 +225,7 @@ class CitasViewModel(
      * @param idCita Identificador de la cita a cancelar.
      */
     fun cancelarCita(idCita: Long) {
-        viewModelScope.launch {
+        safeLaunch {
             _isLoading.value = true
             citasRepository
                 .cancelarCita(idCita)
@@ -249,7 +249,7 @@ class CitasViewModel(
      * @param idCita Identificador de la cita pagada.
      */
     fun marcarCitaComoPagada(idCita: Long) {
-        viewModelScope.launch {
+        safeLaunch {
             citasRepository.cambiarEstadoPagoCita(idCita, EstadoPago.PAGADO)
                 .onSuccess {
                     // Refrescar los datos usando la fecha actual o simplemente recargar la agenda

@@ -13,7 +13,8 @@ package org.ies.tierno.applicationamani.presentation.viewmodels
  * @param tokenDataStore Almacén local seguro del token JWT.
  * @param tokenHolder Contenedor en memoria del token JWT para inyección en interceptores.
  */
-import androidx.lifecycle.ViewModel
+import org.ies.tierno.applicationamani.core.viewmodel.BaseViewModel
+import com.google.firebase.perf.FirebasePerformance
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,8 +51,8 @@ class LoginViewModel(
     private val userSessionDataStore: UserSessionDataStore,
     private val tokenDataStore: TokenDataStore,
     private val tokenHolder: TokenHolder,
-    private val crashReporter: CrashReporter,
-) : ViewModel() {
+    crashReporter: CrashReporter,
+) : BaseViewModel(crashReporter) {
     // ==================== VALIDACIONES DE CONTRASEÑA ====================
 
     companion object {
@@ -113,7 +114,9 @@ class LoginViewModel(
         _loginError.value = null
         _loginResult.value = null
 
-        viewModelScope.launch {
+        safeLaunch {
+            val trace = FirebasePerformance.getInstance().newTrace("login_trace")
+            trace.start()
             try {
                 val request =
                     LoginRequestDTO(
@@ -158,6 +161,7 @@ class LoginViewModel(
                 _loginError.value = e.message ?: "Error inesperado al iniciar sesión"
                 _loginResult.value = Result.failure(e)
             } finally {
+                trace.stop()
                 _isLoggingIn.value = false
             }
         }

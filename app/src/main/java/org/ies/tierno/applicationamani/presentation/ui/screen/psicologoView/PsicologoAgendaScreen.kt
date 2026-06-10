@@ -1099,6 +1099,12 @@ fun TarjetaCitaMejorada(
                             scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                 try {
                                     val result = citasRepository.getJitsiToken(roomName)
+                                    if (result.isFailure) {
+                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                            android.widget.Toast.makeText(context, "Fallo al obtener token: ${result.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_LONG).show()
+                                        }
+                                        return@launch
+                                    }
                                     val jwtToken = result.getOrNull()
                                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                                         val options = JitsiMeetConferenceOptions.Builder()

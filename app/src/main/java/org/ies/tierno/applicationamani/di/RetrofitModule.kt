@@ -24,6 +24,7 @@ import org.ies.tierno.applicationamani.data.remoto.SituacionApi
 import org.ies.tierno.applicationamani.data.remoto.SoporteTicketApi
 import org.ies.tierno.applicationamani.data.remoto.TestApi
 import org.ies.tierno.applicationamani.data.remoto.TokenRefreshInterceptor
+import org.ies.tierno.applicationamani.data.remoto.CrashlyticsInterceptor
 import org.ies.tierno.applicationamani.data.remoto.copiloto.CopilotoAi
 import org.ies.tierno.applicationamani.data.remoto.role.AdminApiService
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
@@ -46,6 +47,8 @@ val retrofitModule =
 
         single { TokenRefreshInterceptor(get()) }
 
+        single { CrashlyticsInterceptor(get()) }
+
         single<okhttp3.OkHttpClient> {
             val builder =
                 okhttp3.OkHttpClient
@@ -55,6 +58,7 @@ val retrofitModule =
                     .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                     .addInterceptor(get<AuthInterceptor>())
                     .addInterceptor(get<TokenRefreshInterceptor>())
+                    .addInterceptor(get<CrashlyticsInterceptor>())
 
             if (AppBuildConfig.DEBUG) {
                 val logging =
@@ -146,8 +150,8 @@ val retrofitModule =
 
             Retrofit
                 .Builder()
-                .baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
-                //.baseUrl("https://amani-api-560473593904.europe-west1.run.app/")
+                //.baseUrl("http://10.0.2.2:8080/") // Para emulador Android Studio
+                .baseUrl("https://amani-api-560473593904.europe-west1.run.app/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(get<okhttp3.OkHttpClient>())
                 .build()
