@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.firstOrNull
@@ -13,6 +14,7 @@ import org.ies.tierno.applicationamani.data.local.LanguageManager
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.di.appModule
 import org.ies.tierno.applicationamani.di.chatModule
+import org.ies.tierno.applicationamani.di.crashModule
 import org.ies.tierno.applicationamani.di.gameModule
 import org.ies.tierno.applicationamani.di.retrofitModule
 import org.ies.tierno.applicationamani.utils.CitaNotificationWorker
@@ -64,10 +66,15 @@ class AmaniApplication : Application() {
         super.onCreate()
 
         // Inicializar Stripe con la clave pública leída desde GCP Secret Manager (via BuildConfig)
-        com.stripe.android.PaymentConfiguration.init(
-            applicationContext,
-            BuildConfig.STRIPE_PUBLISHABLE_KEY
-        )
+        println("Stripe Publishable Key: ${BuildConfig.STRIPE_PUBLISHABLE_KEY.takeIf { it.isNotBlank() } ?: "NO CONFIGURADA"}")
+        if(BuildConfig.STRIPE_PUBLISHABLE_KEY.isNotBlank()) {
+            com.stripe.android.PaymentConfiguration.init(
+                applicationContext,
+                BuildConfig.STRIPE_PUBLISHABLE_KEY
+            )
+        }
+
+
 
         // Inicializar Firebase y configurar Crashlytics
         FirebaseApp.initializeApp(this)
@@ -83,7 +90,7 @@ class AmaniApplication : Application() {
             modules(
                 appModule,
                 retrofitModule,
-                org.ies.tierno.applicationamani.di.crashModule,
+                crashModule,
                 chatModule,
                 gameModule
             )
@@ -117,7 +124,7 @@ class AmaniApplication : Application() {
                 }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channelCitas)
-            
+
             // Canal para el Chat
             val channelChat =
                 NotificationChannel(
