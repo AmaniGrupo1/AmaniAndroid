@@ -1,7 +1,7 @@
     [versions]
     #9.1.0
     agp = "9.2.1"
-    bcprovJdk15to18 = "1.79"
+    bcprovJdk15to18 = "1.84"
     cameraView = "1.4.0"
     coilCompose = "2.7.0"
     converterGson = "3.0.0"
