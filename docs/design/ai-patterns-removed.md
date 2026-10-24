@@ -131,3 +131,15 @@ Registro estructurado (**Antes / Después**) de los patrones visuales genéricos
 #### `ListadoPacientesScreen.kt`, `ListarPacienteSinPsicologos.kt`, `AdminUserManagementScreen.kt`, `TerapiasScreen.kt`, `SituacionAdminScreen.kt`, `TestScreen.kt`, `AgregarAdministrador.kt`, `DocumentoLegalDetailScreen.kt` y `GestionPoliticasScreen.kt`
 - **Antes:** chips de rol con emojis (`"👑"`, `"🧠"`, `"👤"`) y colores hardcodeados (`0xFFE53935`, `0xFF43A047`, `0xFF1E88E5`, `0xFFFFEE58`, `0xFFEF5350`, `0xFF66BB6A`, `0xFFFFA726`, `0xFFCCC0E4`), `Brush.verticalGradient`, `.shadow(...)`, `Icons.Default.Psychology`, tamaños `sp` y `dp` mágicos y `collectAsState()`.
 - **Después:** chips e indicadores con tokens M3 (`primaryContainer`, `secondaryContainer`, `tertiaryContainer`, `AmaniTheme.colors.successContainer`, `warningContainer`) e iconos vectoriales (`AdminPanelSettings`, `MedicalServices`, `Person`, `SelfImprovement`), superficies planas sin gradientes ni `.shadow`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+---
+
+### Lote 7 — Pantallas de Chat y Soporte (`chat/`, `soporte/`, `tickets/`)
+
+#### `TicketSoporte.kt`, `MisTicketsScreen.kt`, `NuevoTicketScreen.kt` y `TicketScreen.kt`
+- **Antes:** 6 colores hexadecimales hardcodeados en el modelo de dominio `EstadoTicket` (`0xFFDBEAFE`, `0xFF1E40AF`, `0xFFDCFCE7`, `0xFF166534`, `0xFFF3F4F6`, `0xFF6B7280`), 2 colores hexadecimales en `MisTicketsScreen.kt` (`0xFFFEF2F2`, `0xFF991B1B`), `Icons.Default.Lightbulb` en `NuevoTicketScreen.kt`, y 38 colores hardcodeados en `TicketScreen.kt` (`0xFF6B4E71`, `0xFF212121`, `0xFFF5F5F5`, `0xFF333333`, `0xFF2E7D32`, `0xFFE8F5E9`, `0xFF81C784`, `0xFFFFF3E0`, `0xFFE65100`, `0xFFE3F2FD`, `0xFF1565C0`, `0xFFE0E0E0`, `0xFF616161`, `Color.White`, `Color.Black`, `Color.Gray`, `Color.LightGray`, `Color.DarkGray`) con bifurcaciones manuales `if (isDark)`.
+- **Después:** propiedades `@Composable` en `EstadoTicket` basadas en `MaterialTheme.colorScheme` y `AmaniTheme.colors.successContainer` / `warningContainer`, `Icons.Default.Info` en lugar de `Lightbulb`, eliminación completa de `if (isDark) Color(...)` en `TicketScreen.kt`, textos en `strings.xml` (ES/EN/CA), escala `Spacing` / `Dimensions` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `ChatListScreen.kt`, `ChatScreen.kt`, `ChatScreenV2.kt`, `ChatInputBar.kt`, `MessageBubble.kt`, `ImageMessage.kt`, `AudioBubble.kt` y `AudioBubbleV2.kt`
+- **Antes:** `collectAsState()` sin ciclo de vida en `ChatListScreen.kt`, `Color.Black.copy(alpha = 0.4f / 0.5f)` y `Color.White` hardcodeados en `ChatScreenV2.kt`, `ChatInputBar.kt` y `MessageBubble.kt`, emojis (`"⚠"`, `"📸"`, `"📄"`, `"🎙️"`) en estados y placeholders, tamaños mágicos `10.sp`, `11.sp`, `14.sp`, `16.sp` y `dp` sueltos.
+- **Después:** `collectAsStateWithLifecycle()`, `MaterialTheme.colorScheme.scrim` e `inverseOnSurface` para overlays sobre imágenes, tipografía `MaterialTheme.typography.*`, `Spacing.*` y `Dimensions.*`, textos externalizados a `strings.xml` y `@Preview` en Light, Dark y `fontScale = 1.5f`.

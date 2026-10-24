@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,8 +45,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Barra de entrada de texto para el chat, con soporte para adjuntos y notas de voz.
@@ -63,7 +67,8 @@ import org.ies.tierno.applicationamani.R
  * @param onStopRecording Callback invocado al detener la grabación.
  * @param isRecording Indica si se está grabando una nota de voz.
  * @param recordingSeconds Segundos transcurridos de la grabación actual.
- * @param isOtherTyping Indica si el interlocutor está escribiendo.
+ * @param pendingAttachmentUri URI del adjunto pendiente de envío.
+ * @param onClearAttachment Callback invocado al descartar el adjunto pendiente.
  * @param modifier Modificador de diseño opcional.
  */
 @Composable
@@ -83,30 +88,35 @@ fun ChatInputBar(
     Column(modifier = modifier.fillMaxWidth()) {
         if (pendingAttachmentUri != null) {
             Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                modifier =
+                    Modifier
+                        .padding(horizontal = Spacing.m, vertical = Spacing.s)
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 coil.compose.AsyncImage(
                     model = pendingAttachmentUri,
-                    contentDescription = "Preview adjunto",
-                    modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp)),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    contentDescription = stringResource(R.string.chat_preview_adjunto),
+                    modifier =
+                        Modifier
+                            .size(Dimensions.chatAttachmentThumb)
+                            .clip(MaterialTheme.shapes.medium),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                 )
                 IconButton(
                     onClick = onClearAttachment,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(4.dp)
-                        .size(24.dp)
-                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f), CircleShape)
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(Spacing.xs)
+                            .size(Dimensions.iconDefault)
+                            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f), CircleShape),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Eliminar",
-                        tint = androidx.compose.ui.graphics.Color.White,
-                        modifier = Modifier.size(16.dp)
+                        contentDescription = stringResource(R.string.auto_eliminar),
+                        tint = MaterialTheme.colorScheme.inverseOnSurface,
+                        modifier = Modifier.size(Dimensions.iconSmall),
                     )
                 }
             }
@@ -118,22 +128,20 @@ fun ChatInputBar(
                 onStopClick = onStopRecording,
             )
         } else {
-            // Input con padding adecuado para estilo mensajería
             Surface(
                 shape = MaterialTheme.shapes.large,
-                shadowElevation = 4.dp,
-                tonalElevation = 2.dp,
+                shadowElevation = Elevation.level2,
+                tonalElevation = Elevation.level1,
                 color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = Spacing.s),
             ) {
                 Row(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                            .padding(horizontal = Spacing.s, vertical = Spacing.s),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // Botón de archivo siempre visible
                     IconButton(onClick = onAttachFile) {
                         Icon(
                             imageVector = Icons.Default.AttachFile,
@@ -142,7 +150,6 @@ fun ChatInputBar(
                         )
                     }
 
-                    // Botón de micrófono siempre visible (si no se está grabando)
                     if (!isRecording) {
                         IconButton(onClick = onMicClick) {
                             Icon(
@@ -160,7 +167,7 @@ fun ChatInputBar(
                         modifier = Modifier.weight(1f),
                     )
 
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(Spacing.xs))
 
                     val sendScale by animateFloatAsState(
                         targetValue = if (text.isNotBlank() || pendingAttachmentUri != null) 1f else 0.85f,
@@ -180,7 +187,7 @@ fun ChatInputBar(
                             ),
                         modifier =
                             Modifier
-                                .size(44.dp)
+                                .size(Dimensions.buttonHeight)
                                 .graphicsLayer {
                                     scaleX = sendScale
                                     scaleY = sendScale
@@ -197,7 +204,6 @@ fun ChatInputBar(
     }
 }
 
-
 @Composable
 private fun PillTextField(
     text: String,
@@ -212,8 +218,8 @@ private fun PillTextField(
             modifier
                 .background(
                     MaterialTheme.colorScheme.surfaceVariant,
-                    RoundedCornerShape(28.dp),
-                ).padding(horizontal = 12.dp, vertical = 8.dp),
+                    MaterialTheme.shapes.extraLarge,
+                ).padding(horizontal = Spacing.sm, vertical = Spacing.s),
         textStyle =
             TextStyle(
                 color = MaterialTheme.colorScheme.onSurface,
@@ -262,26 +268,26 @@ private fun RecordingBar(
 
     Surface(
         shape = MaterialTheme.shapes.large,
-        shadowElevation = 4.dp,
-        tonalElevation = 2.dp,
+        shadowElevation = Elevation.level2,
+        tonalElevation = Elevation.level1,
         color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+        modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xs),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = Spacing.sm, vertical = Spacing.s),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(10.dp)
+                        .size(Dimensions.dotIndicator)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.error.copy(alpha = pulseAlpha)),
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Spacing.sm))
             Text(
                 text = formatDuration(recordingSeconds),
                 style = MaterialTheme.typography.titleMedium,
@@ -289,20 +295,39 @@ private fun RecordingBar(
             )
             Spacer(modifier = Modifier.weight(1f))
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
                 onClick = onStopClick,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(Dimensions.avatarSmall),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Stop,
                         contentDescription = stringResource(R.string.auto_detener_grabacion),
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(Dimensions.iconMedium),
                     )
                 }
             }
         }
+    }
+}
+
+@Preview(name = "ChatInputBar Light", showBackground = true)
+@Preview(name = "ChatInputBar Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "ChatInputBar FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun ChatInputBarPreview() {
+    AppTheme {
+        ChatInputBar(
+            text = "Hola, tengo una consulta",
+            onTextChange = {},
+            onSend = {},
+            onMicClick = {},
+            onAttachFile = {},
+            onStopRecording = {},
+            isRecording = false,
+            recordingSeconds = 0,
+        )
     }
 }

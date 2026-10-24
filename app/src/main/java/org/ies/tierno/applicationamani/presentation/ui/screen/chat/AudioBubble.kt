@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -30,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.Message
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackStatus
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
-@Composable
 /**
  * Componente visual que representa un mensaje de audio en el chat.
  *
@@ -49,6 +48,7 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybac
  * @param audioUiState Estado actual de la reproducción de audio.
  * @param onPlayPause Callback que recibe el ID del mensaje y la URL del audio.
  */
+@Composable
 fun AudioBubble(
     message: Message,
     isOwn: Boolean,
@@ -69,47 +69,52 @@ fun AudioBubble(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = Spacing.xs),
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(32.dp),
-                strokeWidth = 2.dp,
+                modifier = Modifier.size(Dimensions.iconLarge),
+                strokeWidth = Dimensions.borderMedium,
                 color = contentColor,
             )
         } else {
             Surface(
                 shape = CircleShape,
                 color = contentColor.copy(alpha = 0.15f),
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(Dimensions.avatarSmall),
             ) {
                 IconButton(
                     onClick = {
                         val url = message.attachmentUrl ?: return@IconButton
                         onPlayPause(message.id, url)
                     },
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(Dimensions.avatarSmall),
                 ) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = if (isPlaying) "Pausar" else "Reproducir",
+                        contentDescription =
+                            if (isPlaying) {
+                                stringResource(R.string.chat_audio_pausar)
+                            } else {
+                                stringResource(R.string.chat_audio_reproducir)
+                            },
                         tint = if (isError) MaterialTheme.colorScheme.error else contentColor,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(Dimensions.iconMedium),
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(Spacing.s))
 
         if (isError && audioUiState.errorMessage != null) {
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = stringResource(R.string.auto_reintentar),
                 tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(Dimensions.iconMedium),
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(Spacing.xs))
             Text(
                 text = audioUiState.errorMessage,
                 style = MaterialTheme.typography.labelSmall,
@@ -131,7 +136,7 @@ fun AudioBubble(
             )
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(Spacing.s))
 
         val timeText =
             if (isCurrentMessage && audioUiState.status != AudioPlaybackStatus.IDLE) {
@@ -153,7 +158,6 @@ fun AudioBubble(
     }
 }
 
-@Composable
 /**
  * Barra de progreso redondeada para visualizar el avance de reproducción de audio.
  *
@@ -162,6 +166,7 @@ fun AudioBubble(
  * @param trackColor Color de fondo de la barra.
  * @param modifier Modificador opcional aplicado al contenedor de la barra.
  */
+@Composable
 private fun RoundedAudioProgressBar(
     progress: Float,
     color: Color,
@@ -177,8 +182,8 @@ private fun RoundedAudioProgressBar(
     Row(
         modifier =
             modifier
-                .height(6.dp)
-                .clip(RoundedCornerShape(3.dp))
+                .height(Dimensions.colorStripWidth)
+                .clip(MaterialTheme.shapes.extraSmall)
                 .background(trackColor),
         verticalAlignment = Alignment.CenterVertically,
     ) {

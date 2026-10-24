@@ -1,7 +1,10 @@
 package org.ies.tierno.applicationamani.domain.models.soporte
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
 
 /**
  * Modelo de dominio que representa un ticket de soporte enviado por un usuario.
@@ -32,27 +35,21 @@ data class TicketSoporte(
 /**
  * Estados posibles de un ticket de soporte a lo largo de su ciclo de vida.
  *
- * Cada estado incluye metadatos visuales para su representación en la interfaz
- * mediante chips de color.
+ * Cada estado incluye metadatos para su serialización y visualización
+ * mediante los tokens semánticos de Material 3 y [AmaniTheme].
  *
  * @property nombreVisual Texto mostrado en la interfaz de usuario para el chip de estado.
  * @property backend Valor enviado y recibido del backend para serialización.
- * @property colorContenedor Color de fondo del chip de estado.
- * @property colorContenido Color del texto e icono del chip.
  */
 enum class EstadoTicket(
     val nombreVisual: String,
     val backend: String,
-    val colorContenedor: Color,
-    val colorContenido: Color,
 ) {
     /** Ticket recién creado, pendiente de revisión. */
     @SerializedName("abierto")
     ABIERTO(
         nombreVisual = "ABIERTO",
         backend = "abierto",
-        colorContenedor = Color(0xFFDBEAFE),
-        colorContenido = Color(0xFF1E40AF),
     ),
 
     /** Ticket en proceso de resolución por parte del equipo de soporte. */
@@ -60,8 +57,6 @@ enum class EstadoTicket(
     EN_PROCESO(
         nombreVisual = "EN PROCESO",
         backend = "en_progreso",
-        colorContenedor = Color(0xFFDCFCE7),
-        colorContenido = Color(0xFF166534),
     ),
 
     /** Ticket resuelto y cerrado. */
@@ -69,9 +64,28 @@ enum class EstadoTicket(
     CERRADO(
         nombreVisual = "CERRADO",
         backend = "cerrado",
-        colorContenedor = Color(0xFFF3F4F6),
-        colorContenido = Color(0xFF6B7280),
     ),
+    ;
+
+    /** Color de fondo del chip de estado adaptado al tema claro/oscuro. */
+    val colorContenedor: Color
+        @Composable
+        get() =
+            when (this) {
+                ABIERTO -> MaterialTheme.colorScheme.secondaryContainer
+                EN_PROCESO -> AmaniTheme.colors.successContainer
+                CERRADO -> MaterialTheme.colorScheme.surfaceContainerHighest
+            }
+
+    /** Color del texto e icono del chip adaptado al tema claro/oscuro. */
+    val colorContenido: Color
+        @Composable
+        get() =
+            when (this) {
+                ABIERTO -> MaterialTheme.colorScheme.onSecondaryContainer
+                EN_PROCESO -> AmaniTheme.colors.onSuccessContainer
+                CERRADO -> MaterialTheme.colorScheme.onSurfaceVariant
+            }
 }
 
 /**

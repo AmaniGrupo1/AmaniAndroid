@@ -230,7 +230,7 @@ private fun CeldaDia(
             esBloqueado -> colors.errorContainer.copy(alpha = 0.5f)
             esNoLaborable -> colors.surfaceVariant.copy(alpha = 0.5f)
             esHoy && !esSeleccionada -> colors.primaryContainer
-            else -> Color.Transparent
+            else -> colors.surface.copy(alpha = 0f)
         }
 
     // Determinar color del texto según el estado

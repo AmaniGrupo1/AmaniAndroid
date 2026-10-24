@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 @Composable
 fun MessageInput(
@@ -23,9 +23,8 @@ fun MessageInput(
     onClearAttachment: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    // Keyboard-aware padding handling
     val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    val bottomPadding = if (isImeVisible) 8.dp else 16.dp
+    val bottomPadding = if (isImeVisible) Spacing.s else Spacing.m
 
     ChatInputBar(
         text = text,
@@ -38,8 +37,9 @@ fun MessageInput(
         recordingSeconds = recordingSeconds,
         pendingAttachmentUri = pendingAttachmentUri,
         onClearAttachment = onClearAttachment,
-        modifier = modifier
-            .navigationBarsPadding() // Handled by Compose Insets
-            .padding(bottom = bottomPadding)
+        modifier =
+            modifier
+                .navigationBarsPadding()
+                .padding(bottom = bottomPadding),
     )
 }

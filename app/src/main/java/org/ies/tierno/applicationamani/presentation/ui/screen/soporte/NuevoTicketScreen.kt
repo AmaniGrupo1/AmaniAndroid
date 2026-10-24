@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.soporte
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,7 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material3.Button
@@ -53,13 +53,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
@@ -68,6 +66,9 @@ import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -89,13 +90,12 @@ fun NuevoTicketScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scrollState = rememberScrollState()
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
     val context = LocalContext.current
+    val desconocidaStr = stringResource(R.string.soporte_version_desconocida)
+    val ticketEnviadoMsg = stringResource(R.string.soporte_ticket_enviado_exito)
 
     val versionApp =
-        remember {
+        remember(desconocidaStr) {
             try {
                 val info = context.packageManager.getPackageInfo(context.packageName, 0)
                 val versionCode =
@@ -103,7 +103,7 @@ fun NuevoTicketScreen(
                         .getLongVersionCode(info)
                 "${info.versionName} ($versionCode)"
             } catch (_: Exception) {
-                "Desconocida"
+                desconocidaStr
             }
         }
 
@@ -115,13 +115,52 @@ fun NuevoTicketScreen(
 
     LaunchedEffect(uiState.mostrarToastExito) {
         if (uiState.mostrarToastExito) {
-            snackbarHostState.showSnackbar("Ticket enviado correctamente")
+            snackbarHostState.showSnackbar(ticketEnviadoMsg)
             viewModel.dismissToast()
             navController.navigate(Screens.misTickets.route) {
                 popUpTo(Screens.nuevoTicket.route) { inclusive = false }
             }
         }
     }
+
+    NuevoTicketContent(
+        tipoTicket = uiState.tipoTicket,
+        categoria = uiState.categoria,
+        titulo = uiState.titulo,
+        descripcion = uiState.descripcion,
+        isLoading = uiState.isLoading,
+        versionApp = versionApp,
+        snackbarHostState = snackbarHostState,
+        onBackClick = { navController.popBackStack() },
+        onTipoChange = { viewModel.seleccionarTipo(it) },
+        onCategoriaChange = { viewModel.onCategoriaChange(it) },
+        onTituloChange = { viewModel.onTituloChange(it) },
+        onDescripcionChange = { viewModel.onDescripcionChange(it) },
+        onEnviarClick = { viewModel.enviarTicket() },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NuevoTicketContent(
+    tipoTicket: TipoTicket,
+    categoria: CategoriaTicket,
+    titulo: String,
+    descripcion: String,
+    isLoading: Boolean,
+    versionApp: String,
+    snackbarHostState: SnackbarHostState,
+    onBackClick: () -> Unit,
+    onTipoChange: (TipoTicket) -> Unit,
+    onCategoriaChange: (CategoriaTicket) -> Unit,
+    onTituloChange: (String) -> Unit,
+    onDescripcionChange: (String) -> Unit,
+    onEnviarClick: () -> Unit,
+) {
+    val scrollState = rememberScrollState()
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     Scaffold(
         topBar = {
@@ -139,7 +178,7 @@ fun NuevoTicketScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_atru00e1s),
@@ -148,9 +187,9 @@ fun NuevoTicketScreen(
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colors.surface,
+                        titleContentColor = colors.onSurface,
+                        navigationIconContentColor = colors.onSurface,
                     ),
             )
         },
@@ -163,42 +202,40 @@ fun NuevoTicketScreen(
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(padding)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+                    .padding(horizontal = Spacing.m, vertical = Spacing.sm),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            // Selector de tipo (3 opciones)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                EtiquetaFormulario("Tipo")
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                EtiquetaFormulario(stringResource(R.string.soporte_tipo_label))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                 ) {
                     BotonTipoTicket(
-                        texto = "Problema",
+                        texto = stringResource(R.string.soporte_tipo_problema),
                         icono = Icons.Default.ReportProblem,
-                        seleccionado = uiState.tipoTicket == TipoTicket.PROBLEMA,
-                        onClick = { viewModel.seleccionarTipo(TipoTicket.PROBLEMA) },
+                        seleccionado = tipoTicket == TipoTicket.PROBLEMA,
+                        onClick = { onTipoChange(TipoTicket.PROBLEMA) },
                         modifier = Modifier.weight(1f),
                     )
                     BotonTipoTicket(
-                        texto = "Pregunta",
+                        texto = stringResource(R.string.soporte_tipo_pregunta),
                         icono = Icons.AutoMirrored.Filled.Help,
-                        seleccionado = uiState.tipoTicket == TipoTicket.PREGUNTA,
-                        onClick = { viewModel.seleccionarTipo(TipoTicket.PREGUNTA) },
+                        seleccionado = tipoTicket == TipoTicket.PREGUNTA,
+                        onClick = { onTipoChange(TipoTicket.PREGUNTA) },
                         modifier = Modifier.weight(1f),
                     )
                     BotonTipoTicket(
-                        texto = "Sugerencia",
-                        icono = Icons.Default.Lightbulb,
-                        seleccionado = uiState.tipoTicket == TipoTicket.SUGERENCIA,
-                        onClick = { viewModel.seleccionarTipo(TipoTicket.SUGERENCIA) },
+                        texto = stringResource(R.string.soporte_tipo_sugerencia),
+                        icono = Icons.Default.Info,
+                        seleccionado = tipoTicket == TipoTicket.SUGERENCIA,
+                        onClick = { onTipoChange(TipoTicket.SUGERENCIA) },
                         modifier = Modifier.weight(1f),
                     )
                 }
             }
 
-            // Categoría
-            EtiquetaFormulario("Categor\u00eda")
+            EtiquetaFormulario(stringResource(R.string.categoria))
             var categoriaExpanded by remember { mutableStateOf(false) }
             val categorias = CategoriaTicket.todas
             ExposedDropdownMenuBox(
@@ -206,7 +243,7 @@ fun NuevoTicketScreen(
                 onExpandedChange = { categoriaExpanded = it },
             ) {
                 OutlinedTextField(
-                    value = uiState.categoria.display,
+                    value = categoria.display,
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoriaExpanded) },
@@ -214,7 +251,7 @@ fun NuevoTicketScreen(
                         Modifier
                             .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                             .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = shapes.medium,
                     colors =
                         OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = colors.primary,
@@ -229,7 +266,7 @@ fun NuevoTicketScreen(
                         DropdownMenuItem(
                             text = { Text(cat.display) },
                             onClick = {
-                                viewModel.onCategoriaChange(cat)
+                                onCategoriaChange(cat)
                                 categoriaExpanded = false
                             },
                         )
@@ -237,14 +274,13 @@ fun NuevoTicketScreen(
                 }
             }
 
-            // Título
-            EtiquetaFormulario("Título")
+            EtiquetaFormulario(stringResource(R.string.titulo))
             OutlinedTextField(
-                value = uiState.titulo,
-                onValueChange = { viewModel.onTituloChange(it) },
+                value = titulo,
+                onValueChange = onTituloChange,
                 placeholder = { Text(stringResource(R.string.auto_ej_la_app_se), color = colors.onSurfaceVariant) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = shapes.medium,
                 singleLine = true,
                 colors =
                     OutlinedTextFieldDefaults.colors(
@@ -253,18 +289,17 @@ fun NuevoTicketScreen(
                     ),
             )
 
-            // Descripción
-            EtiquetaFormulario("Descripción")
+            EtiquetaFormulario(stringResource(R.string.descripcion))
             Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
-                    value = uiState.descripcion,
-                    onValueChange = { viewModel.onDescripcionChange(it) },
+                    value = descripcion,
+                    onValueChange = onDescripcionChange,
                     placeholder = { Text(stringResource(R.string.auto_describe_el_problema_con), color = colors.onSurfaceVariant) },
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 140.dp),
-                    shape = RoundedCornerShape(12.dp),
+                            .heightIn(min = Dimensions.textAreaMinHeight),
+                    shape = shapes.medium,
                     maxLines = 6,
                     colors =
                         OutlinedTextFieldDefaults.colors(
@@ -273,70 +308,76 @@ fun NuevoTicketScreen(
                         ),
                 )
                 Text(
-                    text = "${uiState.descripcion.length}/1000",
+                    text = stringResource(R.string.soporte_contador_caracteres, descripcion.length),
                     style = typography.bodySmall.copy(color = colors.onSurfaceVariant),
                     modifier =
                         Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(12.dp),
+                            .padding(Spacing.sm),
                 )
             }
 
-            // Información del dispositivo
-            EtiquetaFormulario("Información del dispositivo")
+            EtiquetaFormulario(stringResource(R.string.soporte_info_dispositivo_titulo))
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                        .padding(vertical = Spacing.xs),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
                 FilaInfoDispositivo(
                     icono = Icons.Default.Smartphone,
-                    etiqueta = "Dispositivo",
+                    etiqueta = stringResource(R.string.soporte_dispositivo_label),
                     valor = android.os.Build.MODEL,
                 )
                 FilaInfoDispositivo(
                     icono = Icons.Default.Android,
-                    etiqueta = "Versión Android",
-                    valor = "Android ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT})",
+                    etiqueta = stringResource(R.string.soporte_version_android_label),
+                    valor =
+                        stringResource(
+                            R.string.soporte_version_android_formato,
+                            android.os.Build.VERSION.RELEASE,
+                            android.os.Build.VERSION.SDK_INT,
+                        ),
                 )
                 FilaInfoDispositivo(
                     icono = Icons.Default.Apps,
-                    etiqueta = "Versión de la app",
+                    etiqueta = stringResource(R.string.soporte_version_app_label),
                     valor = versionApp,
                 )
             }
 
-            // Enviar
             Button(
-                onClick = { viewModel.enviarTicket() },
+                onClick = onEnviarClick,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                        .height(Dimensions.buttonHeight),
+                shape = shapes.medium,
                 colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
-                enabled = !uiState.isLoading,
+                enabled = !isLoading,
             ) {
-                if (uiState.isLoading) {
+                if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(Dimensions.iconMedium),
                         color = colors.onPrimary,
-                        strokeWidth = 2.dp,
+                        strokeWidth = Dimensions.borderMedium,
                     )
                 } else {
-                    Text(stringResource(R.string.auto_enviar_ticket), fontWeight = FontWeight.Medium, fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        stringResource(R.string.auto_enviar_ticket),
+                        style = typography.labelLarge,
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(Dimensions.iconButton),
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(Dimensions.bottomContentSpacer))
         }
     }
 }
@@ -352,25 +393,23 @@ private fun BotonTipoTicket(
     val colors = MaterialTheme.colorScheme
     val bgColor = if (seleccionado) colors.primaryContainer else colors.surfaceVariant
     val textColor = if (seleccionado) colors.onPrimaryContainer else colors.onSurfaceVariant
-    val borderColor = if (seleccionado) colors.primary else Color.Transparent
 
     Row(
         modifier =
             modifier
-                .height(48.dp)
-                .background(bgColor, RoundedCornerShape(12.dp))
+                .height(Dimensions.buttonHeight)
+                .background(bgColor, MaterialTheme.shapes.medium)
                 .clickable(onClick = onClick)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = Spacing.s),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
-        Icon(icono, contentDescription = null, tint = textColor, modifier = Modifier.size(18.dp))
-        Spacer(modifier = Modifier.width(4.dp))
+        Icon(icono, contentDescription = null, tint = textColor, modifier = Modifier.size(Dimensions.iconButton))
+        Spacer(modifier = Modifier.width(Spacing.xs))
         Text(
             texto,
             color = textColor,
-            fontWeight = FontWeight.Medium,
-            fontSize = 13.sp,
+            style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
         )
     }
@@ -399,13 +438,13 @@ private fun FilaInfoDispositivo(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.s),
         ) {
             Icon(
                 icono,
                 contentDescription = null,
                 tint = colors.onSurfaceVariant,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(Dimensions.iconButton),
             )
             Text(etiqueta, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
@@ -413,6 +452,30 @@ private fun FilaInfoDispositivo(
             valor,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
             color = colors.onSurface,
+        )
+    }
+}
+
+@Preview(name = "NuevoTicket Light", showBackground = true)
+@Preview(name = "NuevoTicket Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "NuevoTicket FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun NuevoTicketScreenPreview() {
+    AppTheme {
+        NuevoTicketContent(
+            tipoTicket = TipoTicket.SUGERENCIA,
+            categoria = CategoriaTicket.BUG_APP,
+            titulo = "Mejora en recordatorios de citas",
+            descripcion = "Sería útil poder configurar dos recordatorios antes de la sesión.",
+            isLoading = false,
+            versionApp = "1.0.0 (1)",
+            snackbarHostState = remember { SnackbarHostState() },
+            onBackClick = {},
+            onTipoChange = {},
+            onCategoriaChange = {},
+            onTituloChange = {},
+            onDescripcionChange = {},
+            onEnviarClick = {},
         )
     }
 }

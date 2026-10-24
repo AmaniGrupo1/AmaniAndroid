@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.soporte
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -37,18 +37,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.domain.models.soporte.CategoriaTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.FiltroTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TicketSoporte
+import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -69,14 +73,40 @@ fun MisTicketsScreen(
     viewModel: SoporteTicketViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-
     val tickets = viewModel.ticketsFiltrados
 
     LaunchedEffect(Unit) {
         viewModel.cargarTickets()
     }
+
+    MisTicketsContent(
+        tickets = tickets,
+        filtroSeleccionado = uiState.filtroSeleccionado,
+        isLoading = uiState.isLoading,
+        error = uiState.error,
+        onBackClick = { navController.popBackStack() },
+        onFiltroClick = { viewModel.seleccionarFiltro(it) },
+        onRetryClick = {
+            viewModel.clearError()
+            viewModel.cargarTickets()
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MisTicketsContent(
+    tickets: List<TicketSoporte>,
+    filtroSeleccionado: FiltroTicket,
+    isLoading: Boolean,
+    error: String?,
+    onBackClick: () -> Unit,
+    onFiltroClick: (FiltroTicket) -> Unit,
+    onRetryClick: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     Scaffold(
         topBar = {
@@ -88,7 +118,7 @@ fun MisTicketsScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_atru00e1s),
@@ -96,21 +126,21 @@ fun MisTicketsScreen(
                     }
                 },
                 actions = {
-                    if (uiState.isLoading) {
+                    if (isLoading) {
                         CircularProgressIndicator(
                             modifier =
                                 Modifier
-                                    .padding(end = 16.dp)
-                                    .size(20.dp),
-                            strokeWidth = 2.dp,
+                                    .padding(end = Spacing.m)
+                                    .size(Dimensions.iconMedium),
+                            strokeWidth = Dimensions.borderMedium,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colors.surface,
+                        titleContentColor = colors.onSurface,
+                        navigationIconContentColor = colors.onSurface,
                     ),
             )
         },
@@ -121,96 +151,92 @@ fun MisTicketsScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = Spacing.m, vertical = Spacing.sm),
         ) {
-            // Filtros
             Row(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .background(colors.surfaceVariant, RoundedCornerShape(12.dp))
-                        .padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        .background(colors.surfaceVariant, shapes.medium)
+                        .padding(Spacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 FiltroTab(
-                    texto = "Todos",
-                    seleccionado = uiState.filtroSeleccionado == FiltroTicket.TODOS,
-                    onClick = { viewModel.seleccionarFiltro(FiltroTicket.TODOS) },
+                    texto = stringResource(R.string.soporte_filtro_todos),
+                    seleccionado = filtroSeleccionado == FiltroTicket.TODOS,
+                    onClick = { onFiltroClick(FiltroTicket.TODOS) },
                     modifier = Modifier.weight(1f),
                 )
                 FiltroTab(
-                    texto = "Abiertos",
-                    seleccionado = uiState.filtroSeleccionado == FiltroTicket.ABIERTOS,
-                    onClick = { viewModel.seleccionarFiltro(FiltroTicket.ABIERTOS) },
+                    texto = stringResource(R.string.soporte_filtro_abiertos),
+                    seleccionado = filtroSeleccionado == FiltroTicket.ABIERTOS,
+                    onClick = { onFiltroClick(FiltroTicket.ABIERTOS) },
                     modifier = Modifier.weight(1f),
                 )
                 FiltroTab(
-                    texto = "Cerrados",
-                    seleccionado = uiState.filtroSeleccionado == FiltroTicket.CERRADOS,
-                    onClick = { viewModel.seleccionarFiltro(FiltroTicket.CERRADOS) },
+                    texto = stringResource(R.string.soporte_filtro_cerrados),
+                    seleccionado = filtroSeleccionado == FiltroTicket.CERRADOS,
+                    onClick = { onFiltroClick(FiltroTicket.CERRADOS) },
                     modifier = Modifier.weight(1f),
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
 
-            // Lista
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
-                uiState.error?.let { msg ->
+                error?.let { msg ->
                     Box(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .background(Color(0xFFFEF2F2), RoundedCornerShape(12.dp))
-                                .padding(16.dp),
+                                .background(colors.errorContainer, shapes.medium)
+                                .padding(Spacing.m),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.s),
                         ) {
                             Text(
                                 text = msg,
-                                color = Color(0xFF991B1B),
+                                color = colors.onErrorContainer,
                                 style = typography.bodyMedium,
                             )
                             Text(
                                 text = stringResource(R.string.auto_tocar_para_reintentar),
-                                color = MaterialTheme.colorScheme.primary,
+                                color = colors.primary,
                                 style = typography.bodySmall.copy(fontWeight = FontWeight.Medium),
-                                modifier =
-                                    Modifier.clickable {
-                                        viewModel.clearError()
-                                        viewModel.cargarTickets()
-                                    },
+                                modifier = Modifier.clickable { onRetryClick() },
                             )
                         }
                     }
                 }
 
-                if (!uiState.isLoading && tickets.isEmpty() && uiState.error == null) {
+                if (!isLoading && tickets.isEmpty() && error == null) {
                     Box(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 48.dp),
+                                .padding(vertical = Spacing.xxl),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.s),
                         ) {
-                            Text(stringResource(R.string.auto_no_hay_tickets),
+                            Text(
+                                stringResource(R.string.auto_no_hay_tickets),
                                 style = typography.titleMedium,
                                 color = colors.onSurfaceVariant,
                             )
-                            Text(stringResource(R.string.auto_crea_uno_nuevo_desde),
+                            Text(
+                                stringResource(R.string.auto_crea_uno_nuevo_desde),
                                 style = typography.bodySmall,
                                 color = colors.onSurfaceVariant,
                             )
@@ -221,7 +247,7 @@ fun MisTicketsScreen(
                         TicketCard(ticket)
                     }
                 }
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(Dimensions.bottomContentSpacer))
             }
         }
     }
@@ -235,22 +261,21 @@ private fun FiltroTab(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
-    val bgColor = if (seleccionado) colors.primaryContainer else Color.Transparent
+    val bgColor = if (seleccionado) colors.primaryContainer else colors.surfaceVariant
     val textColor = if (seleccionado) colors.onPrimaryContainer else colors.onSurfaceVariant
 
     Box(
         modifier =
             modifier
-                .height(36.dp)
-                .background(bgColor, RoundedCornerShape(10.dp))
+                .height(Dimensions.avatarSmall)
+                .background(bgColor, MaterialTheme.shapes.small)
                 .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         Text(
             texto,
             color = textColor,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 }
@@ -259,14 +284,15 @@ private fun FiltroTab(
 private fun TicketCard(ticket: TicketSoporte) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = shapes.large,
+        colors = CardDefaults.cardColors(containerColor = colors.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Spacing.m)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -274,50 +300,45 @@ private fun TicketCard(ticket: TicketSoporte) {
             ) {
                 Surface(
                     color = ticket.estado.colorContenedor,
-                    shape = RoundedCornerShape(6.dp),
+                    shape = shapes.extraSmall,
                 ) {
                     Text(
                         ticket.estado.nombreVisual,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style =
-                            typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.5.sp,
-                            ),
+                        modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xs),
+                        style = typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                         color = ticket.estado.colorContenido,
                     )
                 }
                 Text(
-                    "#${ticket.id}",
+                    stringResource(R.string.soporte_ticket_id_formato, ticket.id),
                     style = typography.bodySmall,
                     color = colors.onSurfaceVariant,
                     fontWeight = FontWeight.Medium,
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(
                 ticket.titulo,
-                style =
-                    typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 15.sp,
-                    ),
+                style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = colors.onSurface,
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(Spacing.xs))
             Text(ticket.fecha, style = typography.bodySmall, color = colors.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
 
             Row(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .background(ticket.estado.colorContenedor, RoundedCornerShape(10.dp))
-                        .border(1.dp, ticket.estado.colorContenedor.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .background(ticket.estado.colorContenedor, shapes.small)
+                        .border(
+                            Dimensions.borderThin,
+                            ticket.estado.colorContenedor.copy(alpha = 0.5f),
+                            shapes.small,
+                        ).padding(horizontal = Spacing.sm, vertical = Spacing.s),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.s),
             ) {
                 EstadoIcono(ticket.estado)
                 Text(
@@ -339,12 +360,12 @@ private fun EstadoIcono(estado: EstadoTicket) {
                 Icons.Default.Schedule,
                 contentDescription = null,
                 tint = color,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(Dimensions.iconSmall),
             )
         EstadoTicket.EN_PROCESO ->
             CircularProgressIndicator(
-                modifier = Modifier.size(14.dp),
-                strokeWidth = 2.dp,
+                modifier = Modifier.size(Dimensions.iconSmall),
+                strokeWidth = Dimensions.borderMedium,
                 color = color,
             )
         EstadoTicket.CERRADO ->
@@ -352,7 +373,47 @@ private fun EstadoIcono(estado: EstadoTicket) {
                 Icons.Default.CheckCircle,
                 contentDescription = null,
                 tint = color,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(Dimensions.iconSmall),
             )
+    }
+}
+
+@Preview(name = "MisTickets Light", showBackground = true)
+@Preview(name = "MisTickets Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "MisTickets FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun MisTicketsScreenPreview() {
+    AppTheme {
+        MisTicketsContent(
+            tickets =
+                listOf(
+                    TicketSoporte(
+                        id = 104L,
+                        titulo = "Error al sincronizar el calendario",
+                        descripcion = "Las citas del martes no se reflejan.",
+                        fecha = "24 oct 2026",
+                        estado = EstadoTicket.EN_PROCESO,
+                        etiquetaEstado = "En revisión por soporte técnico",
+                        tipo = TipoTicket.PROBLEMA,
+                        categoria = CategoriaTicket.BUG_APP,
+                    ),
+                    TicketSoporte(
+                        id = 101L,
+                        titulo = "Consulta sobre recibo de pago",
+                        descripcion = "¿Cómo descargo el justificante?",
+                        fecha = "18 oct 2026",
+                        estado = EstadoTicket.CERRADO,
+                        etiquetaEstado = "Resuelto",
+                        tipo = TipoTicket.PREGUNTA,
+                        categoria = CategoriaTicket.PAGO,
+                    ),
+                ),
+            filtroSeleccionado = FiltroTicket.TODOS,
+            isLoading = false,
+            error = null,
+            onBackClick = {},
+            onFiltroClick = {},
+            onRetryClick = {},
+        )
     }
 }

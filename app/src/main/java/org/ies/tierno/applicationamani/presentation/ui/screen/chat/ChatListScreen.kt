@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,10 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +41,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
-import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatPartner
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla que lista las conversaciones disponibles para el usuario actual.
@@ -64,28 +69,72 @@ fun ChatListScreen(
     navController: NavController,
     viewModel: ChatListViewModel,
 ) {
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-    val amaniColors = LocalAmaniColors.current
-    val currentUserId by viewModel.currentUserId.collectAsState()
-    val currentUserRol by viewModel.currentUserRol.collectAsState()
+    val currentUserId by viewModel.currentUserId.collectAsStateWithLifecycle()
+    val currentUserRol by viewModel.currentUserRol.collectAsStateWithLifecycle()
+    val partners by viewModel.partners.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
+
     val normalizedRol =
         currentUserRol
             .lowercase()
             .trim()
             .replace("ó", "o")
             .replace("á", "a")
-    val partners by viewModel.partners.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+
+    val tuPsicologoDefault = stringResource(R.string.chat_tu_psicologo_default)
+    val tuPacienteDefault = stringResource(R.string.chat_tu_paciente_default)
+
+    ChatListContent(
+        currentUserId = currentUserId,
+        currentUserRol = currentUserRol,
+        normalizedRol = normalizedRol,
+        partners = partners,
+        isLoading = isLoading,
+        error = error,
+        onBackClick = { navController.popBackStack() },
+        onRetryClick = viewModel::retry,
+        onPartnerClick = { partner ->
+            currentUserId?.let { currentId ->
+                val safePartnerName =
+                    partner.nombre.ifBlank {
+                        if (normalizedRol == "paciente") tuPsicologoDefault else tuPacienteDefault
+                    }
+                navController.navigate(
+                    Screens.chat.createRoute(
+                        currentId,
+                        partner.id,
+                        safePartnerName,
+                    ),
+                )
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatListContent(
+    currentUserId: Long?,
+    currentUserRol: String,
+    normalizedRol: String,
+    partners: List<ChatPartner>,
+    isLoading: Boolean,
+    error: String?,
+    onBackClick: () -> Unit,
+    onRetryClick: () -> Unit,
+    onPartnerClick: (ChatPartner) -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
 
     Scaffold(
-        containerColor = amaniColors.screenBackground,
+        containerColor = colors.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.auto_mensajes)) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
@@ -94,9 +143,9 @@ fun ChatListScreen(
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colors.surface,
+                        titleContentColor = colors.onSurface,
+                        navigationIconContentColor = colors.onSurface,
                     ),
             )
         },
@@ -118,21 +167,21 @@ fun ChatListScreen(
                         modifier =
                             Modifier
                                 .align(Alignment.Center)
-                                .padding(24.dp),
+                                .padding(Spacing.l),
                         shape = MaterialTheme.shapes.large,
-                        color = colors.surface,
-                        tonalElevation = 2.dp,
+                        color = colors.surfaceContainerLow,
+                        tonalElevation = Elevation.level1,
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
+                        Column(modifier = Modifier.padding(Spacing.l)) {
                             Text(
-                                text = error ?: "No se pudo abrir el chat",
+                                text = error,
                                 style = typography.bodyLarge,
                                 textAlign = TextAlign.Center,
                                 color = colors.onSurfaceVariant,
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            androidx.compose.material3.Button(
-                                onClick = viewModel::retry,
+                            Spacer(modifier = Modifier.height(Spacing.sm))
+                            Button(
+                                onClick = onRetryClick,
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                             ) {
                                 Text(stringResource(R.string.auto_reintentar))
@@ -145,22 +194,22 @@ fun ChatListScreen(
                         modifier =
                             Modifier
                                 .align(Alignment.Center)
-                                .padding(24.dp),
+                                .padding(Spacing.l),
                         shape = MaterialTheme.shapes.large,
-                        color = colors.surface,
-                        tonalElevation = 2.dp,
+                        color = colors.surfaceContainerLow,
+                        tonalElevation = Elevation.level1,
                     ) {
                         Text(
                             text =
                                 if (normalizedRol == "psicologo" || normalizedRol == "psicologa") {
-                                    "No tienes pacientes asignados aún"
+                                    stringResource(R.string.chat_sin_pacientes_asignados)
                                 } else {
-                                    "No tienes psicólogo asignado aún"
+                                    stringResource(R.string.chat_sin_psicologo_asignado)
                                 },
                             style = typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             color = colors.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp),
+                            modifier = Modifier.padding(horizontal = Spacing.l, vertical = Spacing.l),
                         )
                     }
                 }
@@ -169,19 +218,19 @@ fun ChatListScreen(
                         modifier =
                             Modifier
                                 .fillMaxSize()
-                                .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                                .padding(Spacing.m),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                     ) {
                         Text(
                             text = stringResource(R.string.auto_tu_conversacion),
                             style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = colors.onSurface,
-                            modifier = Modifier.padding(bottom = 4.dp),
+                            modifier = Modifier.padding(bottom = Spacing.xs),
                         )
 
                         LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                         ) {
                             items(
                                 items = partners,
@@ -190,21 +239,7 @@ fun ChatListScreen(
                                 ChatPartnerCard(
                                     partnerName = partner.nombre,
                                     currentUserRol = currentUserRol,
-                                    onClick = {
-                                        currentUserId?.let { currentId ->
-                                            val safePartnerName =
-                                                partner.nombre.ifBlank {
-                                                    if (normalizedRol == "paciente") "Tu Psicólogo" else "Tu Paciente"
-                                                }
-                                            navController.navigate(
-                                                Screens.chat.createRoute(
-                                                    currentId,
-                                                    partner.id,
-                                                    safePartnerName,
-                                                ),
-                                            )
-                                        }
-                                    },
+                                    onClick = { onPartnerClick(partner) },
                                 )
                             }
                         }
@@ -226,24 +261,24 @@ private fun ChatPartnerCard(
             Modifier
                 .fillMaxWidth()
                 .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         colors =
             CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(Spacing.m),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(48.dp)
+                        .size(Dimensions.avatarMedium)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center,
@@ -255,7 +290,7 @@ private fun ChatPartnerCard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(Spacing.m))
 
             Column(
                 modifier = Modifier.weight(1f),
@@ -266,18 +301,45 @@ private fun ChatPartnerCard(
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(Spacing.xs))
                 Text(
                     text =
                         if (currentUserRol == "paciente") {
-                            "Tu psicólogo asignado"
+                            stringResource(R.string.chat_subtitulo_psicologo_asignado)
                         } else {
-                            "Tu paciente"
+                            stringResource(R.string.chat_subtitulo_paciente_asignado)
                         },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
+    }
+}
+
+@Preview(name = "ChatList Light", showBackground = true)
+@Preview(name = "ChatList Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "ChatList FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun ChatListScreenPreview() {
+    AppTheme {
+        ChatListContent(
+            currentUserId = 10L,
+            currentUserRol = "paciente",
+            normalizedRol = "paciente",
+            partners =
+                listOf(
+                    ChatPartner(
+                        id = 2L,
+                        nombre = "Dra. Laura Fernández",
+                        rol = "psicologo",
+                    ),
+                ),
+            isLoading = false,
+            error = null,
+            onBackClick = {},
+            onRetryClick = {},
+            onPartnerClick = {},
+        )
     }
 }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -30,12 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.ChatMessage
 import org.ies.tierno.applicationamani.domain.models.MessageContent
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackStatus
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 @Composable
 fun AudioBubbleV2(
@@ -49,55 +49,61 @@ fun AudioBubbleV2(
     val isLoading = isCurrentMessage && audioUiState.status == AudioPlaybackStatus.LOADING
     val isError = isCurrentMessage && audioUiState.status == AudioPlaybackStatus.ERROR
 
-    val contentColor = if (isOwn) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val contentColor =
+        if (isOwn) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = Spacing.xs),
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(32.dp),
-                strokeWidth = 2.dp,
+                modifier = Modifier.size(Dimensions.iconLarge),
+                strokeWidth = Dimensions.borderMedium,
                 color = contentColor,
             )
         } else {
             Surface(
                 shape = CircleShape,
                 color = contentColor.copy(alpha = 0.15f),
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(Dimensions.avatarSmall),
             ) {
                 IconButton(
                     onClick = {
                         val content = message.content as? MessageContent.Audio ?: return@IconButton
                         onPlayPause(message.id, content.storageRef)
                     },
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(Dimensions.avatarSmall),
                 ) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = if (isPlaying) "Pausar" else "Reproducir",
+                        contentDescription =
+                            if (isPlaying) {
+                                stringResource(R.string.chat_audio_pausar)
+                            } else {
+                                stringResource(R.string.chat_audio_reproducir)
+                            },
                         tint = if (isError) MaterialTheme.colorScheme.error else contentColor,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(Dimensions.iconMedium),
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(Spacing.s))
 
         if (isError && audioUiState.errorMessage != null) {
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = stringResource(R.string.auto_reintentar),
                 tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(Dimensions.iconMedium),
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(Spacing.xs))
             Text(
                 text = audioUiState.errorMessage,
                 style = MaterialTheme.typography.labelSmall,
@@ -106,30 +112,32 @@ fun AudioBubbleV2(
             )
         } else {
             RoundedAudioProgressBarV2(
-                progress = if (isCurrentMessage && audioUiState.durationMs > 0) {
-                    (audioUiState.positionMs.toFloat() / audioUiState.durationMs.toFloat()).coerceIn(0f, 1f)
-                } else {
-                    0f
-                },
+                progress =
+                    if (isCurrentMessage && audioUiState.durationMs > 0) {
+                        (audioUiState.positionMs.toFloat() / audioUiState.durationMs.toFloat()).coerceIn(0f, 1f)
+                    } else {
+                        0f
+                    },
                 color = contentColor,
                 trackColor = contentColor.copy(alpha = 0.2f),
                 modifier = Modifier.weight(1f),
             )
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(Spacing.s))
 
-        val timeText = if (isCurrentMessage && audioUiState.status != AudioPlaybackStatus.IDLE) {
-            val pos = (audioUiState.positionMs / 1000).toInt()
-            if (audioUiState.durationMs > 0) {
-                val dur = (audioUiState.durationMs / 1000).toInt()
-                "${formatDurationV2(pos)} / ${formatDurationV2(dur)}"
+        val timeText =
+            if (isCurrentMessage && audioUiState.status != AudioPlaybackStatus.IDLE) {
+                val pos = (audioUiState.positionMs / 1000).toInt()
+                if (audioUiState.durationMs > 0) {
+                    val dur = (audioUiState.durationMs / 1000).toInt()
+                    "${formatDurationV2(pos)} / ${formatDurationV2(dur)}"
+                } else {
+                    formatDurationV2(pos)
+                }
             } else {
-                formatDurationV2(pos)
+                formatDurationV2(0)
             }
-        } else {
-            formatDurationV2(0)
-        }
         Text(
             text = timeText,
             style = MaterialTheme.typography.labelSmall,
@@ -152,18 +160,20 @@ private fun RoundedAudioProgressBarV2(
     )
 
     Row(
-        modifier = modifier
-            .height(6.dp)
-            .clip(RoundedCornerShape(3.dp))
-            .background(trackColor),
+        modifier =
+            modifier
+                .height(Dimensions.colorStripWidth)
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(trackColor),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (animatedProgress > 0.001f) {
             Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(animatedProgress)
-                    .background(color),
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(animatedProgress)
+                        .background(color),
             )
         }
         if (animatedProgress < 0.999f) {

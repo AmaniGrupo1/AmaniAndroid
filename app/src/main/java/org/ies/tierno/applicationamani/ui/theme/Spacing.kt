@@ -95,5 +95,8 @@ object Dimensions {
     val chartCardHeight = 350.dp
     val colorStripWidth = 6.dp
     val bottomContentSpacer = 80.dp
+    val chatAttachmentThumb = 100.dp
+    val textAreaMinHeight = 140.dp
+    val chatImageMax = 240.dp
+    val chatBubbleMax = 280.dp
 }
-

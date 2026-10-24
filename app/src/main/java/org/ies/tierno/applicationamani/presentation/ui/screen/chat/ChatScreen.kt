@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -54,15 +55,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.PsychologistInfo
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla principal del chat individual entre un paciente y un psicólogo (o viceversa).
@@ -95,8 +98,7 @@ fun ChatScreen(
         onDispose { audioHandler.release() }
     }
 
-    // Extracción segura del estado Success
-    val successState = uiStateWrapper as? org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Success
+    val successState = uiStateWrapper as? ChatUiState.Success
     val messages = successState?.messages ?: emptyList()
     val currentUserId = successState?.currentUserId ?: ""
     val psychologistInfo = successState?.assignedPsychologist
@@ -130,7 +132,7 @@ fun ChatScreen(
 
     LaunchedEffect(chatItems.size) {
         val grew = chatItems.size > previousSize.intValue
-        val isAtBottom = !listState.canScrollBackward // reverseLayout: "backward" = toward bottom
+        val isAtBottom = !listState.canScrollBackward
 
         if (grew && (isAtBottom || previousSize.intValue == 0)) {
             listState.animateScrollToItem(0)
@@ -138,8 +140,7 @@ fun ChatScreen(
         previousSize.intValue = chatItems.size
     }
 
-    // Solo se re-ejecuta cuando hay un mensaje de error nuevo (no en cada cambio de mensajes)
-    val errorMessage = (uiStateWrapper as? org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Error)?.message
+    val errorMessage = (uiStateWrapper as? ChatUiState.Error)?.message
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
             snackbarHostState.showSnackbar(it)
@@ -186,7 +187,7 @@ fun ChatScreen(
                 isRecording = isRecording,
                 recordingSeconds = recordingSeconds,
                 pendingAttachmentUri = pendingAttachmentUri,
-                onClearAttachment = { viewModel.setPendingAttachment(null) }
+                onClearAttachment = { viewModel.setPendingAttachment(null) },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -200,7 +201,7 @@ fun ChatScreen(
                     .consumeWindowInsets(paddingValues),
         ) {
             when (uiStateWrapper) {
-                is org.ies.tierno.applicationamani.presentation.ui.screen.chat.ChatUiState.Loading -> {
+                is ChatUiState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
@@ -219,10 +220,10 @@ fun ChatScreen(
                             Icon(
                                 imageVector = Icons.Outlined.ChatBubbleOutline,
                                 contentDescription = null,
-                                modifier = Modifier.size(64.dp),
+                                modifier = Modifier.size(Dimensions.iconHero),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                             )
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(Spacing.l))
                             Text(
                                 text = stringResource(R.string.auto_aun_no_hay_mensajes),
                                 style = MaterialTheme.typography.bodyMedium,
@@ -234,7 +235,7 @@ fun ChatScreen(
                             modifier = Modifier.fillMaxSize(),
                             state = listState,
                             reverseLayout = true,
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
+                            contentPadding = PaddingValues(horizontal = Spacing.s, vertical = Spacing.m),
                         ) {
                             items(
                                 items = chatItems,
@@ -273,22 +274,31 @@ fun ChatScreen(
     }
 }
 
-private fun openAttachment(context: android.content.Context, url: String) {
+private fun openAttachment(
+    context: android.content.Context,
+    url: String,
+) {
     runCatching {
         val lowerUrl = url.lowercase()
-        val extension = lowerUrl.substringAfterLast('.', missingDelimiterValue = "")
-            .substringBefore('?')
-            .substringBefore('&')
+        val extension =
+            lowerUrl
+                .substringAfterLast('.', missingDelimiterValue = "")
+                .substringBefore('?')
+                .substringBefore('&')
         val mimeType =
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension).orEmpty().ifBlank {
-                when {
-                    lowerUrl.contains(".pdf") -> "application/pdf"
-                    lowerUrl.contains(".jpg") || lowerUrl.contains(".jpeg") -> "image/jpeg"
-                    lowerUrl.contains(".png") -> "image/png"
-                    lowerUrl.contains(".webp") -> "image/webp"
-                    else -> "*/*"
+            MimeTypeMap
+                .getSingleton()
+                .getMimeTypeFromExtension(extension)
+                .orEmpty()
+                .ifBlank {
+                    when {
+                        lowerUrl.contains(".pdf") -> "application/pdf"
+                        lowerUrl.contains(".jpg") || lowerUrl.contains(".jpeg") -> "image/jpeg"
+                        lowerUrl.contains(".png") -> "image/png"
+                        lowerUrl.contains(".webp") -> "image/webp"
+                        else -> "*/*"
+                    }
                 }
-            }
 
         val intent =
             Intent(Intent.ACTION_VIEW).apply {
@@ -322,19 +332,19 @@ private fun ChatTopBar(
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier.clickable { },
                 ) {
-                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = 28.dp)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    PsychologistAvatar(psychologistInfo = psychologistInfo, size = Dimensions.iconLarge)
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Column {
                         Text(
                             text = psychologistInfo.name,
-                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (!isOtherTyping) {
                                 Box(
                                     modifier =
                                         Modifier
-                                            .size(6.dp)
+                                            .size(Dimensions.colorStripWidth)
                                             .clip(CircleShape)
                                             .background(
                                                 if (psychologistInfo.isOnline) {
@@ -344,27 +354,29 @@ private fun ChatTopBar(
                                                 },
                                             ),
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(Spacing.xs))
                             }
                             Text(
-                                text = when {
-                                    isOtherTyping -> "escribiendo..."
-                                    psychologistInfo.isOnline -> "En línea"
-                                    else -> "Desconectado"
-                                },
+                                text =
+                                    when {
+                                        isOtherTyping -> stringResource(R.string.chat_escribiendo)
+                                        psychologistInfo.isOnline -> stringResource(R.string.chat_en_linea)
+                                        else -> stringResource(R.string.chat_desconectado)
+                                    },
                                 style = MaterialTheme.typography.labelSmall,
-                                color = when {
-                                    isOtherTyping -> amaniColors.citaLibre
-                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                                color =
+                                    when {
+                                        isOtherTyping -> amaniColors.citaLibre
+                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
                             )
                         }
                     }
                 }
             } else {
                 Text(
-                    text = otherUserName.ifEmpty { "Psicólogo" },
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                    text = otherUserName.ifEmpty { stringResource(R.string.admin_rol_psicologo) },
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
@@ -373,16 +385,16 @@ private fun ChatTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.auto_volver),
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(Dimensions.iconMedium),
                 )
             }
         },
         colors =
             TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
         windowInsets = WindowInsets(0, 0, 0, 0),
     )
 }
@@ -396,7 +408,7 @@ private fun DateSeparatorChip(label: String) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = Spacing.s),
         horizontalArrangement = Arrangement.Center,
     ) {
         SuggestionChip(
@@ -409,5 +421,28 @@ private fun DateSeparatorChip(label: String) {
                 )
             },
         )
+    }
+}
+
+@Preview(name = "ChatTopBar Light", showBackground = true)
+@Preview(name = "ChatTopBar Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "ChatTopBar FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun ChatScreenPreview() {
+    AppTheme {
+        Column {
+            ChatTopBar(
+                psychologistInfo =
+                    PsychologistInfo(
+                        id = "2",
+                        name = "Dra. Laura Fernández",
+                        avatarUrl = null,
+                        isOnline = true,
+                    ),
+                onNavigateBack = {},
+                isOtherTyping = false,
+            )
+            DateSeparatorChip(label = "Hoy")
+        }
     }
 }
