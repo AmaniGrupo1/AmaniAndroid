@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.payment
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,13 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import com.stripe.android.paymentsheet.rememberPaymentSheet
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.payment.PaymentViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla de pago de una cita mediante la integración con Stripe.
@@ -90,17 +95,42 @@ fun PaymentScreen(
                 paymentSheet.presentWithPaymentIntent(state.clientSecret)
             }
             is PaymentUiState.Success -> {
-                Toast.makeText(context, "Pago realizado con éxito", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.auto_pago_completado_correctamente), Toast.LENGTH_LONG).show()
                 onPaymentSuccess()
             }
             is PaymentUiState.Error -> {
-                Toast.makeText(context, (uiState as PaymentUiState.Error).message, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
             }
             else -> {}
         }
     }
 
+    PaymentScreenContent(
+        psicologoName = psicologoName,
+        fecha = fecha,
+        monto = monto,
+        uiState = uiState,
+        onRetry = { viewModel.preparePayment(citaId) },
+        onCancel = onPaymentCanceled,
+        onContinue = onPaymentSuccess,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PaymentScreenContent(
+    psicologoName: String,
+    fecha: String,
+    monto: String,
+    uiState: PaymentUiState,
+    onRetry: () -> Unit,
+    onCancel: () -> Unit,
+    onContinue: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.auto_pago_de_sesion)) },
@@ -112,25 +142,40 @@ fun PaymentScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(Spacing.m),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.s),
                 ) {
                     Text(
                         text = stringResource(R.string.auto_resumen_de_la_cita),
                         style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
-                    Text(text = "Psicólogo: $psicologoName")
-                    Text(text = "Fecha: $fecha")
-                    Text(text = "Importe: $monto")
+                    Text(
+                        text = stringResource(R.string.pago_psicologo_formato, psicologoName),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = stringResource(R.string.pago_fecha_formato, fecha),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = stringResource(R.string.pago_importe_formato, monto),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             }
 
@@ -139,40 +184,82 @@ fun PaymentScreen(
                 is PaymentUiState.Loading,
                 -> {
                     CircularProgressIndicator()
-                    Text(text = stringResource(R.string.auto_preparando_pago_seguro))
+                    Text(
+                        text = stringResource(R.string.auto_preparando_pago_seguro),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
                 is PaymentUiState.PaymentReady -> {
                     Text(
                         text = stringResource(R.string.auto_procesando_pago_seguro_con),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
                 }
                 is PaymentUiState.Error -> {
-                    val errorMessage = (uiState as PaymentUiState.Error).message
+                    val errorMessage = uiState.message
                     Text(
-                        text = "Error: $errorMessage",
+                        text = stringResource(R.string.pago_error_formato, errorMessage),
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.preparePayment(citaId) }) {
+                    Spacer(modifier = Modifier.height(Spacing.s))
+                    Button(onClick = onRetry) {
                         Text(stringResource(R.string.auto_reintentar))
                     }
-                    Button(onClick = onPaymentCanceled) {
+                    Button(onClick = onCancel) {
                         Text(stringResource(R.string.auto_volver))
                     }
                 }
                 is PaymentUiState.Success -> {
                     Text(
                         text = stringResource(R.string.auto_pago_completado_correctamente),
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center,
                     )
-                    Button(onClick = onPaymentSuccess) {
+                    Button(onClick = onContinue) {
                         Text(stringResource(R.string.auto_continuar))
                     }
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "PaymentScreen - Light (Loading)")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "PaymentScreen - Dark (Loading)")
+@Preview(showBackground = true, fontScale = 1.5f, name = "PaymentScreen - FontScale 1.5x")
+@Composable
+private fun PaymentScreenPreview() {
+    AppTheme {
+        PaymentScreenContent(
+            psicologoName = "Dra. Elena Martínez",
+            fecha = "25/10/2026 - 10:00",
+            monto = "50.00 €",
+            uiState = PaymentUiState.Loading,
+            onRetry = {},
+            onCancel = {},
+            onContinue = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "PaymentScreen - Error")
+@Composable
+private fun PaymentScreenErrorPreview() {
+    AppTheme {
+        PaymentScreenContent(
+            psicologoName = "Dra. Elena Martínez",
+            fecha = "25/10/2026 - 10:00",
+            monto = "50.00 €",
+            uiState = PaymentUiState.Error("No se pudo conectar con la pasarela de pago"),
+            onRetry = {},
+            onCancel = {},
+            onContinue = {},
+        )
     }
 }

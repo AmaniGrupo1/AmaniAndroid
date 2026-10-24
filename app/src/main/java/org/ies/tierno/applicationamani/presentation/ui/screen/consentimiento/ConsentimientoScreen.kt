@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla de consentimiento informado durante el proceso de registro.
@@ -40,59 +44,52 @@ fun ConsentimientoScreen(
     var aceptaVideo by remember { mutableStateOf(false) }
     var aceptaComunicacion by remember { mutableStateOf(false) }
 
-    Scaffold { padding ->
+    ConsentimientoScreenContent(
+        onContinuarClick = {},
+    )
+}
 
+@Composable
+fun ConsentimientoScreenContent(
+    onContinuarClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { padding ->
         Column(
             modifier =
                 Modifier
                     .padding(padding)
-                    .padding(20.dp)
+                    .padding(Spacing.l)
                     .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
             Text(
                 text = stringResource(R.string.auto_consentimiento_informado),
                 style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                Checkbox(
-//                    checked = aceptaVideo,
-//                    onCheckedChange = {
-//                        aceptaVideo = it
-//                        loginViewModel.setAceptaVideo(it)
-//                    }
-//                )
-//                Text(stringResource(R.string.auto_acepto_videoconferencia))
-//            }
-//
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                Checkbox(
-//                    checked = aceptaComunicacion,
-//                    onCheckedChange = {
-//                        aceptaComunicacion = it
-//                        loginViewModel.setAceptaComunicacion(it)
-//                    }
-//                )
-//                Text(stringResource(R.string.auto_acepto_comunicacion))
-//            }
-
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(Spacing.l))
 
             Button(
-                onClick = {
-//                    if (aceptaVideo || aceptaComunicacion) {
-//
-//                        navController.navigate(
-//                            Screens.opcionPago.createRoute()
-//                        )
-//
-//                    }
-                },
+                onClick = onContinuarClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.auto_continuar))
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "ConsentimientoScreen - Light")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "ConsentimientoScreen - Dark")
+@Preview(showBackground = true, fontScale = 1.5f, name = "ConsentimientoScreen - FontScale 1.5x")
+@Composable
+private fun ConsentimientoScreenPreview() {
+    AppTheme {
+        ConsentimientoScreenContent(onContinuarClick = {})
     }
 }

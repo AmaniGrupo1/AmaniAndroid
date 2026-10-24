@@ -1,8 +1,9 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,19 +37,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.ui.componente.MenuPrincipal
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 // Colores corporativos AMANI Psicología
 // Función para obtener las frases según el idioma actual
@@ -114,14 +118,11 @@ fun Principal(
     navController: NavController,
     userSessionDataStore: UserSessionDataStore,
 ) {
-    val typography = MaterialTheme.typography
     val context = LocalContext.current
 
-    // ✅ Obtener el idioma desde la sesión (igual que en SettingsAdminScreen)
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
     val currentLanguage = session?.idioma ?: "es"
 
-    // ✅ Forzar recomposición cuando cambia el idioma
     val frasesMotivacionales =
         remember(currentLanguage) {
             getFrasesMotivacionales(context)
@@ -135,7 +136,6 @@ fun Principal(
     var consejoActual by remember { mutableStateOf("") }
     var fraseActual by remember { mutableStateOf(frasesMotivacionales[0]) }
 
-    // ✅ Actualizar cuando cambia el idioma
     LaunchedEffect(currentLanguage) {
         val nuevasFrases = getFrasesMotivacionales(context)
         fraseActual = nuevasFrases[0]
@@ -165,168 +165,198 @@ fun Principal(
         topBar = {
             MenuPrincipal(navController)
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
-        Column(
+        PrincipalContent(
+            fraseActual = fraseActual,
+            consejoActual = consejoActual,
+            mostrarConsejo = mostrarConsejo,
+            onCambiarFrase = ::cambiarFrase,
+            onSolicitarConsejo = {
+                consejoActual = consejosLista.random()
+                mostrarConsejo = true
+            },
+            onCerrarConsejo = { mostrarConsejo = false },
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
+}
+
+@Composable
+fun PrincipalContent(
+    fraseActual: String,
+    consejoActual: String,
+    mostrarConsejo: Boolean,
+    onCambiarFrase: () -> Unit,
+    onSolicitarConsejo: () -> Unit,
+    onCerrarConsejo: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(Spacing.l),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.amani),
+            style = MaterialTheme.typography.displayLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = Spacing.m),
+        )
+
+        Text(
+            text = stringResource(R.string.psicologia_bienestar),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = Spacing.xl),
+        )
+
+        Card(
             modifier =
                 Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(
-                        brush =
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        MaterialTheme.colorScheme.surfaceContainerLow,
-                                        MaterialTheme.colorScheme.surface,
-                                    ),
-                            ),
-                    ).padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+                    .fillMaxWidth()
+                    .padding(vertical = Spacing.m),
+            shape = MaterialTheme.shapes.medium,
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                ),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
         ) {
-            Text(
-                text = stringResource(R.string.amani),
-                style =
-                    MaterialTheme.typography.displayLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 4.sp,
-                    ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
+            Column(
+                modifier = Modifier.padding(Spacing.l),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SelfImprovement,
+                    contentDescription = stringResource(R.string.auto_cambiar_frase),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier =
+                        Modifier
+                            .size(Dimensions.iconExtraLarge)
+                            .clickable(onClick = onCambiarFrase),
+                )
+                Spacer(modifier = Modifier.height(Spacing.m))
 
-            Text(
-                text = stringResource(R.string.psicologia_bienestar),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary, // M3: Secondary for subtitles
-                modifier = Modifier.padding(bottom = 32.dp),
-            )
+                Text(
+                    text = fraseActual,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
 
+                Spacer(modifier = Modifier.height(Spacing.m))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.auto_cambiar_frase),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier =
+                            Modifier
+                                .size(Dimensions.iconSmall)
+                                .clickable(onClick = onCambiarFrase),
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.s))
+                    Text(
+                        text = stringResource(R.string.tap_nueva_frase),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.s))
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(Dimensions.iconSmall),
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(Spacing.l))
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            shape = CircleShape,
+            onClick = onSolicitarConsejo,
+            colors = ButtonDefaults.buttonColors(),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = null,
+                modifier = Modifier.size(Dimensions.iconButton),
+            )
+            Spacer(modifier = Modifier.width(Spacing.s))
+            Text(
+                text = stringResource(R.string.recibir_consejo),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+
+        if (mostrarConsejo) {
+            Spacer(modifier = Modifier.height(Spacing.l))
             Card(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                shape = MaterialTheme.shapes.medium, // M3: Medium for cards
+                        .clickable(onClick = onCerrarConsejo),
+                shape = MaterialTheme.shapes.medium,
                 colors =
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     ),
-                elevation = CardDefaults.cardElevation(), // M3: Default elevation
+                border = BorderStroke(Dimensions.borderThin, MaterialTheme.colorScheme.outlineVariant),
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier.padding(Spacing.l),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.SelfImprovement,
-                        contentDescription = stringResource(R.string.auto_cambiar_frase),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier =
-                            Modifier
-                                .size(48.dp) // Large icon is fine for illustration
-                                .clickable { cambiarFrase() },
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     Text(
-                        text = fraseActual,
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        text = stringResource(R.string.consejo_dia),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "🔄",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.clickable { cambiarFrase() },
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.tap_nueva_frase),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "⏱️",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                shape = CircleShape, // M3: Pill shape
-                onClick = {
-                    consejoActual = consejosLista.random()
-                    mostrarConsejo = true
-                },
-                colors = ButtonDefaults.buttonColors(), // M3: No hardcoded colors
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp), // M3: 18dp for icons in buttons
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.recibir_consejo),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-
-            if (mostrarConsejo) {
-                Spacer(modifier = Modifier.height(24.dp))
-                Card(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable { mostrarConsejo = false },
-                    shape = MaterialTheme.shapes.medium, // M3: Medium for cards
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
-                        ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.consejo_dia),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = consejoActual,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.tap_cerrar),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(Spacing.m))
+                    Text(
+                        text = consejoActual,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.m))
+                    Text(
+                        text = stringResource(R.string.tap_cerrar),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Principal - Light")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Principal - Dark")
+@Preview(showBackground = true, fontScale = 1.5f, name = "Principal - FontScale 1.5x")
+@Composable
+private fun PrincipalPreview() {
+    AppTheme {
+        PrincipalContent(
+            fraseActual = "Cuidar tu mente es cuidar tu vida.",
+            consejoActual = "Dedica diez minutos hoy a respirar profundamente.",
+            mostrarConsejo = true,
+            onCambiarFrase = {},
+            onSolicitarConsejo = {},
+            onCerrarConsejo = {},
+        )
     }
 }

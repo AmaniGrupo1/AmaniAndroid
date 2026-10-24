@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla de selección del método de pago durante el registro.
@@ -34,50 +38,71 @@ import org.ies.tierno.applicationamani.R
 fun OpcionPagoScreen(navController: NavController) {
     var metodoPago by remember { mutableStateOf("") }
 
-    Scaffold { padding ->
+    OpcionPagoScreenContent(
+        onMetodoSelected = { metodoPago = it },
+        onContinuarClick = {},
+    )
+}
 
+@Composable
+fun OpcionPagoScreenContent(
+    onMetodoSelected: (String) -> Unit,
+    onContinuarClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { padding ->
         Column(
             modifier =
                 Modifier
                     .padding(padding)
-                    .padding(20.dp)
+                    .padding(Spacing.l)
                     .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            Text(stringResource(R.string.auto_selecciona_metodo_de_pago),
+            Text(
+                stringResource(R.string.auto_selecciona_metodo_de_pago),
                 style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Button(
-                onClick = { metodoPago = "PRESENCIAL" },
+                onClick = { onMetodoSelected("PRESENCIAL") },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.auto_pago_presencial))
             }
 
             Button(
-                onClick = { metodoPago = "ONLINE" },
+                onClick = { onMetodoSelected("ONLINE") },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.auto_pago_online))
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(Spacing.l))
 
             Button(
-                onClick = {
-                    if (metodoPago.isNotEmpty()) {
-                        // aquí podrías guardar el método de pago si quieres
-
-//                        navController.navigate(
-//                        //    Screens.opcionPago.route
-//                        )
-                    }
-                },
+                onClick = onContinuarClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.auto_continuar))
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "OpcionPagoScreen - Light")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "OpcionPagoScreen - Dark")
+@Preview(showBackground = true, fontScale = 1.5f, name = "OpcionPagoScreen - FontScale 1.5x")
+@Composable
+private fun OpcionPagoScreenPreview() {
+    AppTheme {
+        OpcionPagoScreenContent(
+            onMetodoSelected = {},
+            onContinuarClick = {},
+        )
     }
 }

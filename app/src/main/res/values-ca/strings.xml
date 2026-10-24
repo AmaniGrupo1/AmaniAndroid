@@ -1096,4 +1096,22 @@
     <string name="rol_administrador">Administrador</string>
     <string name="rol_admin">Admin</string>
     <string name="rol_psicologo">Psicòleg</string>
+    <string name="genero_masculino">Masculí</string>
+    <string name="genero_femenino">Femení</string>
+    <string name="genero_otro">Altre</string>
+    <string name="genero_prefiero_no_decirlo">Prefereixo no dir-ho</string>
+    <string name="parentesco_padre">Pare</string>
+    <string name="parentesco_madre">Mare</string>
+    <string name="parentesco_tutor_legal">Tutor legal</string>
+    <string name="parentesco_abuelo">Avi/Àvia</string>
+    <string name="parentesco_otro">Altre</string>
+    <string name="situaciones_seleccionadas_count">%1$d situació(ns) seleccionada(es)</string>
+    <string name="error_mayor_18">Has de ser major de 18 anys</string>
+    <string name="error_selecciona_fecha_nacimiento">Selecciona una data de naixement</string>
+    <string name="error_selecciona_fecha_valida">Selecciona una data vàlida</string>
+    <string name="error_registro_generico">S\'ha produït un error en registrar el pacient. Si us plau, torna-ho a provar.</string>
+    <string name="pago_psicologo_formato">Psicòleg: %1$s</string>
+    <string name="pago_fecha_formato">Data: %1$s</string>
+    <string name="pago_importe_formato">Import: %1$s</string>
+    <string name="pago_error_formato">Error: %1$s</string>
 </resources>

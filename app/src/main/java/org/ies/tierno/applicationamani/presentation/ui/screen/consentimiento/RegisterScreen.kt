@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -66,13 +69,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.Period
@@ -107,7 +113,6 @@ fun RegisterScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Estados del LoginViewModel
     val nombre by loginViewModel.nombre.collectAsStateWithLifecycle()
     val apellido by loginViewModel.apellido.collectAsStateWithLifecycle()
     val dni by loginViewModel.dni.collectAsStateWithLifecycle()
@@ -122,27 +127,22 @@ fun RegisterScreen(
     val esMenor by loginViewModel.esMenor.collectAsStateWithLifecycle()
     val formularioCompletoValido by loginViewModel.formularioCompletoValido.collectAsStateWithLifecycle()
 
-    // Estados del tutor
     val tutorNombre by loginViewModel.tutorNombre.collectAsStateWithLifecycle()
     val tutorTelefono by loginViewModel.tutorTelefono.collectAsStateWithLifecycle()
     val tutorEmail by loginViewModel.tutorEmail.collectAsStateWithLifecycle()
     val tutorDni by loginViewModel.tutorDni.collectAsStateWithLifecycle()
     val tutorTipo by loginViewModel.tutorTipo.collectAsStateWithLifecycle()
 
-    // Estados de dirección
     val calle by loginViewModel.calle.collectAsStateWithLifecycle()
     val ciudad by loginViewModel.ciudad.collectAsStateWithLifecycle()
     val provincia by loginViewModel.provincia.collectAsStateWithLifecycle()
     val codigoPostal by loginViewModel.codigoPostal.collectAsStateWithLifecycle()
     val pais by loginViewModel.pais.collectAsStateWithLifecycle()
 
-    // Estados de situaciones
     val situacionesIds by loginViewModel.situacionesIds.collectAsStateWithLifecycle()
 
-    // Estados del SituacionViewModel
     val listaSituaciones by situacionViewModel.situaciones.collectAsStateWithLifecycle(emptyList())
 
-    // Estados para UI local (campos tocados)
     var emailTouched by remember { mutableStateOf(false) }
     var passwordTouched by remember { mutableStateOf(false) }
     var telefonoTouched by remember { mutableStateOf(false) }
@@ -151,15 +151,12 @@ fun RegisterScreen(
     var tutorTelefonoTouched by remember { mutableStateOf(false) }
     var tutorDniTouched by remember { mutableStateOf(false) }
 
-    // Estados para UI local (expansiones)
     var expandedGenero by remember { mutableStateOf(false) }
     var expandedSituacion by remember { mutableStateOf(false) }
     var expandedTipoTutor by remember { mutableStateOf(false) }
 
-    // Estado para el DatePicker
     var showDatePicker by remember { mutableStateOf(false) }
 
-    // Convertir fechaNacimiento String a LocalDate para el DatePicker
     val selectedDate = remember(fechaNacimiento) {
         try {
             if (fechaNacimiento.isNotBlank()) {
@@ -170,18 +167,29 @@ fun RegisterScreen(
         }
     }
 
-    // Estado para error de fecha
     var dateError by remember { mutableStateOf<String?>(null) }
 
-    // Estado para el diálogo de alerta
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    val listaGeneros = listOf("Masculino", "Femenino", "Otro", "Prefiero no decirlo")
-    val listaTiposTutor = listOf("Padre", "Madre", "Tutor legal", "Abuelo", "Otro")
+    val listaGeneros = listOf(
+        stringResource(R.string.genero_masculino),
+        stringResource(R.string.genero_femenino),
+        stringResource(R.string.genero_otro),
+        stringResource(R.string.genero_prefiero_no_decirlo),
+    )
+    val listaTiposTutor = listOf(
+        stringResource(R.string.parentesco_padre),
+        stringResource(R.string.parentesco_madre),
+        stringResource(R.string.parentesco_tutor_legal),
+        stringResource(R.string.parentesco_abuelo),
+        stringResource(R.string.parentesco_otro),
+    )
+    val errorMayor18Text = stringResource(R.string.error_mayor_18)
+    val errorSeleccionaFechaNacimientoText = stringResource(R.string.error_selecciona_fecha_nacimiento)
+    val errorSeleccionaFechaValidaText = stringResource(R.string.error_selecciona_fecha_valida)
 
-    // Color de acento para la sección del tutor (naranja cálido, accesible en ambos temas)
     val tutorAccentColor = MaterialTheme.colorScheme.tertiary
 
     Scaffold(
@@ -191,16 +199,16 @@ fun RegisterScreen(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = colorScheme.primary,
-                shadowElevation = 4.dp,
+                shadowElevation = Elevation.level2,
                 shape = shapes.large.copy(
-                    topStart = androidx.compose.foundation.shape.CornerSize(0.dp),
-                    topEnd = androidx.compose.foundation.shape.CornerSize(0.dp)
+                    topStart = CornerSize(Spacing.none),
+                    topEnd = CornerSize(Spacing.none)
                 )
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = Spacing.m, vertical = Spacing.sm),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -222,14 +230,13 @@ fun RegisterScreen(
                         color = colorScheme.onPrimary,
                         style = typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
 
-                    Spacer(modifier = Modifier.width(48.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.touchTarget))
                 }
             }
         }
@@ -238,30 +245,28 @@ fun RegisterScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(Spacing.m)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing.m)
         ) {
-            // ==================== SECCIÓN 1: DATOS PERSONALES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                 shape = shapes.large,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(Spacing.m)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Person, contentDescription = null, tint = colorScheme.primary)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(
                             stringResource(R.string.auto_datos_personales),
                             style = typography.titleLarge,
                             color = colorScheme.primary
                         )
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
-                    // Nombre
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { loginViewModel.setNombre(it) },
@@ -280,9 +285,8 @@ fun RegisterScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // Apellido
                     OutlinedTextField(
                         value = apellido,
                         onValueChange = { loginViewModel.setApellido(it) },
@@ -301,9 +305,8 @@ fun RegisterScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // DNI con validación
                     OutlinedTextField(
                         value = dni,
                         onValueChange = {
@@ -353,9 +356,8 @@ fun RegisterScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // Email con validación
                     OutlinedTextField(
                         value = email,
                         onValueChange = {
@@ -404,9 +406,8 @@ fun RegisterScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // Contraseña con validación
                     OutlinedTextField(
                         value = regPassword,
                         onValueChange = {
@@ -463,9 +464,8 @@ fun RegisterScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // Teléfono con validación
                     OutlinedTextField(
                         value = telefono,
                         onValueChange = {
@@ -473,7 +473,7 @@ fun RegisterScreen(
                             telefonoTouched = true
                         },
                         label = { Text(stringResource(R.string.auto_telefono_)) },
-                        placeholder = { Text("123456789", style = typography.bodyMedium) },
+                        placeholder = { Text(stringResource(R.string.placeholder_telefono), style = typography.bodyMedium) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = shapes.medium,
                         isError = telefonoTouched && telefono.isNotBlank() && !telefono.matches(Regex("^[0-9]{9}$")),
@@ -515,9 +515,8 @@ fun RegisterScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // Dropdown Género
                     ExposedDropdownMenuBox(
                         expanded = expandedGenero,
                         onExpandedChange = { expandedGenero = it }
@@ -562,9 +561,8 @@ fun RegisterScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
-                    // ==================== FECHA DE NACIMIENTO ====================
                     OutlinedTextField(
                         value = selectedDate?.format(dateFormatter) ?: "",
                         onValueChange = {},
@@ -600,7 +598,7 @@ fun RegisterScreen(
                             when {
                                 dateError != null -> {
                                     Text(
-                                        "❌ $dateError",
+                                        dateError ?: "",
                                         style = typography.bodySmall,
                                         color = colorScheme.error
                                     )
@@ -625,7 +623,6 @@ fun RegisterScreen(
                 }
             }
 
-            // ==================== SECCIÓN 2: DATOS DEL TUTOR (SOLO SI ES MENOR) ====================
             if (esMenor && selectedDate != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -633,16 +630,16 @@ fun RegisterScreen(
                         containerColor = colorScheme.tertiaryContainer
                     ),
                     shape = shapes.large,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(Spacing.m)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
                                 tint = tutorAccentColor
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(Spacing.s))
                             Text(
                                 stringResource(R.string.auto_datos_del_tutor),
                                 style = typography.titleLarge,
@@ -654,9 +651,8 @@ fun RegisterScreen(
                             style = typography.bodySmall,
                             color = tutorAccentColor
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Spacing.m))
 
-                        // Nombre del tutor
                         OutlinedTextField(
                             value = tutorNombre,
                             onValueChange = { loginViewModel.setTutorNombre(it) },
@@ -675,9 +671,8 @@ fun RegisterScreen(
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
-                        // Teléfono del tutor
                         OutlinedTextField(
                             value = tutorTelefono,
                             onValueChange = {
@@ -685,7 +680,7 @@ fun RegisterScreen(
                                 tutorTelefonoTouched = true
                             },
                             label = { Text(stringResource(R.string.auto_telefono_)) },
-                            placeholder = { Text("123456789", style = typography.bodyMedium) },
+                            placeholder = { Text(stringResource(R.string.placeholder_telefono), style = typography.bodyMedium) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = shapes.medium,
                             isError = tutorTelefonoTouched && tutorTelefono.isNotBlank() && !tutorTelefono.matches(Regex("^[0-9]{9}$")),
@@ -727,9 +722,8 @@ fun RegisterScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
-                        // Email del tutor
                         OutlinedTextField(
                             value = tutorEmail,
                             onValueChange = {
@@ -778,9 +772,8 @@ fun RegisterScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
-                        // DNI del tutor
                         OutlinedTextField(
                             value = tutorDni,
                             onValueChange = {
@@ -830,9 +823,8 @@ fun RegisterScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
-                        // Dropdown Tipo de Tutor
                         ExposedDropdownMenuBox(
                             expanded = expandedTipoTutor,
                             onExpandedChange = { expandedTipoTutor = it }
@@ -880,30 +872,28 @@ fun RegisterScreen(
                 }
             }
 
-            // ==================== SECCIÓN 3: DIRECCIÓN ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                 shape = shapes.large,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(Spacing.m)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.LocationOn,
                             contentDescription = null,
                             tint = colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(
                             stringResource(R.string.auto_direccion),
                             style = typography.titleLarge,
                             color = colorScheme.primary
                         )
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
-                    // Calle
                     OutlinedTextField(
                         value = calle,
                         onValueChange = { loginViewModel.setCalle(it) },
@@ -922,11 +912,11 @@ fun RegisterScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
                         OutlinedTextField(
                             value = ciudad,
@@ -964,11 +954,11 @@ fun RegisterScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
                         OutlinedTextField(
                             value = codigoPostal,
@@ -1008,17 +998,16 @@ fun RegisterScreen(
                 }
             }
 
-            // ==================== SECCIÓN 4: SITUACIONES ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                 shape = shapes.large,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(Spacing.m)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, tint = colorScheme.primary)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(
                             stringResource(R.string.auto_situaciones_1),
                             style = typography.titleLarge,
@@ -1030,13 +1019,13 @@ fun RegisterScreen(
                         style = typography.bodySmall,
                         color = colorScheme.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
                     Box {
                         OutlinedTextField(
                             value = if (situacionesIds.isEmpty())
-                                "Seleccione situaciones"
-                            else "${situacionesIds.size} situación(es) seleccionada(s)",
+                                stringResource(R.string.seleccione_situaciones)
+                            else stringResource(R.string.situaciones_seleccionadas_count, situacionesIds.size),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = {
@@ -1071,7 +1060,7 @@ fun RegisterScreen(
                             onDismissRequest = { expandedSituacion = false },
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
-                                .heightIn(max = 400.dp),
+                                .heightIn(max = Dimensions.dropdownMaxHeight),
                             containerColor = colorScheme.surface
                         ) {
                             if (listaSituaciones.isEmpty()) {
@@ -1106,10 +1095,10 @@ fun RegisterScreen(
                                                         loginViewModel.situacionesIds.value = currentIds
                                                         expandedSituacion = false
                                                     },
-                                                    modifier = Modifier.size(24.dp),
+                                                    modifier = Modifier.size(Dimensions.iconDefault),
                                                     colors = CheckboxDefaults.colors(checkedColor = colorScheme.primary)
                                                 )
-                                                Spacer(modifier = Modifier.width(12.dp))
+                                                Spacer(modifier = Modifier.width(Spacing.sm))
                                                 Text(
                                                     situacion.nombre,
                                                     color = colorScheme.onSurface,
@@ -1126,28 +1115,27 @@ fun RegisterScreen(
                 }
             }
 
-            // ==================== SECCIÓN 5: CONSENTIMIENTOS ====================
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                 shape = shapes.large,
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(Spacing.m)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.DocumentScanner,
                             contentDescription = null,
                             tint = colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(
                             stringResource(R.string.auto_consentimientos),
                             style = typography.titleLarge,
                             color = colorScheme.primary
                         )
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -1208,9 +1196,8 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
 
-            // ==================== BOTÓN REGISTRAR ====================
             val registerSuccess by loginViewModel.registerSuccess.collectAsStateWithLifecycle()
             val registerError by loginViewModel.registerError.collectAsStateWithLifecycle()
 
@@ -1224,23 +1211,21 @@ fun RegisterScreen(
                             loginViewModel.setFechaNacimiento(selectedDate.toString())
                             loginViewModel.registrarPaciente()
                         } else {
-                            dateError = "Debes ser mayor de 18 años"
+                            dateError = errorMayor18Text
                         }
                     } else {
-                        dateError = "Selecciona una fecha de nacimiento"
+                        dateError = errorSeleccionaFechaNacimientoText
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(Dimensions.buttonHeightLarge),
                 shape = shapes.medium,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onPrimary,
-                    disabledContainerColor = colorScheme.primary.copy(alpha = 0.5f),
-                    disabledContentColor = colorScheme.onPrimary.copy(alpha = 0.7f)
                 ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = Elevation.level2),
                 enabled = formularioCompletoValido && isDateValid
             ) {
                 Text(
@@ -1249,7 +1234,6 @@ fun RegisterScreen(
                 )
             }
 
-            // Mostramos el diálogo según el estado
             LaunchedEffect(registerSuccess, registerError) {
                 if (registerSuccess) {
                     showSuccessDialog = true
@@ -1263,7 +1247,6 @@ fun RegisterScreen(
         }
     }
 
-    // ==================== DATEPICKER DIALOG ====================
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = selectedDate?.let {
@@ -1290,11 +1273,11 @@ fun RegisterScreen(
                                 dateError = null
                                 showDatePicker = false
                             } else {
-                                dateError = "Debes ser mayor de 18 años"
+                                dateError = errorMayor18Text
                                 showDatePicker = false
                             }
                         } else {
-                            dateError = "Selecciona una fecha válida"
+                            dateError = errorSeleccionaFechaValidaText
                             showDatePicker = false
                         }
                     }
@@ -1312,7 +1295,6 @@ fun RegisterScreen(
         }
     }
 
-    // ==================== DIÁLOGO DE ÉXITO ====================
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -1324,7 +1306,7 @@ fun RegisterScreen(
                     Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(Dimensions.iconExtraLarge)
                 )
             },
             title = {
@@ -1356,8 +1338,8 @@ fun RegisterScreen(
         )
     }
 
-    // ==================== DIÁLOGO DE ERROR ====================
     if (showErrorDialog) {
+        val defaultErrorText = stringResource(R.string.error_registro_generico)
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
             icon = {
@@ -1365,7 +1347,7 @@ fun RegisterScreen(
                     Icons.Default.Error,
                     contentDescription = null,
                     tint = colorScheme.error,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(Dimensions.iconExtraLarge)
                 )
             },
             title = {
@@ -1377,7 +1359,7 @@ fun RegisterScreen(
             },
             text = {
                 Text(
-                    text = errorMessage.ifBlank { "Ocurrió un error al registrar el paciente. Por favor, inténtalo de nuevo." },
+                    text = errorMessage.ifBlank { defaultErrorText },
                     style = typography.bodyMedium,
                     color = colorScheme.onSurfaceVariant
                 )
@@ -1390,5 +1372,43 @@ fun RegisterScreen(
             shape = shapes.extraLarge,
             containerColor = colorScheme.surface
         )
+    }
+}
+
+@Preview(showBackground = true, name = "RegisterScreen - Light")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "RegisterScreen - Dark")
+@Preview(showBackground = true, fontScale = 1.5f, name = "RegisterScreen - FontScale 1.5x")
+@Composable
+private fun RegisterScreenPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Spacing.m),
+                verticalArrangement = Arrangement.spacedBy(Spacing.m),
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = MaterialTheme.shapes.large,
+                ) {
+                    Column(modifier = Modifier.padding(Spacing.m)) {
+                        Text(
+                            text = stringResource(R.string.auto_datos_personales),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(modifier = Modifier.height(Spacing.s))
+                        OutlinedTextField(
+                            value = "María",
+                            onValueChange = {},
+                            label = { Text(stringResource(R.string.auto_nombre_)) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+            }
+        }
     }
 }

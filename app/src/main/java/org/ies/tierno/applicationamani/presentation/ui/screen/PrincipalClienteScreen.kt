@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -29,6 +30,9 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.ui.componente.AmaniBottomBar
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomBarConfig
 import org.ies.tierno.applicationamani.presentation.viewmodels.PrincipalClienteViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla principal del cliente autenticado.
@@ -45,112 +49,134 @@ fun PrincipalClienteScreen(
     navController: NavController,
     viewModel: PrincipalClienteViewModel = viewModel(),
 ) {
+    PrincipalClienteScreenContent(
+        especialidades = viewModel.especialidades,
+        bottomBar = {
+            AmaniBottomBar(
+                navController = navController,
+                config = BottomBarConfig.Paciente,
+            )
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PrincipalClienteScreenContent(
+    especialidades: List<String>,
+    bottomBar: @Composable () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     val typography = MaterialTheme.typography
-    val especialidades = viewModel.especialidades
 
     Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.auto_inicio)) },
-                    // M3: TopAppBar without navigationIcon since we removed Drawer
-                    // M3: TopAppBar colors and scroll behavior (pinned by default in Scaffold)
-                    colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            titleContentColor = MaterialTheme.colorScheme.onSurface,
-                            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                )
-            },
-            bottomBar = {
-                // M3: Integrated AmaniBottomBar
-                AmaniBottomBar(
-                    navController = navController,
-                    config = BottomBarConfig.Paciente,
-                )
-            },
-        ) { paddingValues ->
-            Column(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.auto_inicio)) },
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+            )
+        },
+        bottomBar = bottomBar,
+    ) { paddingValues ->
+        Column(
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .padding(Spacing.m)
+                    .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.l),
+        ) {
+            Card(
                 modifier =
                     Modifier
-                        .padding(paddingValues)
-                        .padding(16.dp)
-                        .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(24.dp), // M3: Spacing multiple of 8
+                        .fillMaxWidth()
+                        .height(Dimensions.bannerHeight),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+                shape = MaterialTheme.shapes.medium,
             ) {
-                // M3: Card with surfaceContainerHigh for better depth
-                Card(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
-                    shape = MaterialTheme.shapes.medium,
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.auto_imagen_del_psicologo),
-                            style = typography.bodyLarge,
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.auto_imagen_del_psicologo),
+                        style = typography.bodyLarge,
+                    )
                 }
+            }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    shape = MaterialTheme.shapes.medium,
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                shape = MaterialTheme.shapes.medium,
+            ) {
+                Column(
+                    modifier = Modifier.padding(Spacing.m),
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.auto_n_psico),
-                            style = typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 8.dp),
-                        )
+                    Text(
+                        text = stringResource(R.string.auto_n_psico),
+                        style = typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(bottom = Spacing.s),
+                    )
 
-                        Text(
-                            text = stringResource(R.string.auto_biografia),
-                            style = typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary, // M3: Primary for secondary headers
-                            modifier = Modifier.padding(vertical = 8.dp),
-                        )
+                    Text(
+                        text = stringResource(R.string.auto_biografia),
+                        style = typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(vertical = Spacing.s),
+                    )
 
-                        especialidades.forEach { especialidad ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(vertical = 4.dp),
-                            ) {
-                                Text(
-                                    text = especialidad,
-                                    style = typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
+                    especialidades.forEach { especialidad ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(vertical = Spacing.xs),
+                        ) {
+                            Text(
+                                text = especialidad,
+                                style = typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }
             }
         }
     }
+}
 
 /**
  * Vista previa de [PrincipalClienteScreen] para el panel de diseño de Android Studio.
  */
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "PrincipalClienteScreen - Light")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "PrincipalClienteScreen - Dark")
+@Preview(showBackground = true, fontScale = 1.5f, name = "PrincipalClienteScreen - FontScale 1.5x")
 @Composable
 fun PrincipalClienteScreenPreview() {
-    PrincipalClienteScreen(rememberNavController())
+    AppTheme {
+        PrincipalClienteScreenContent(
+            especialidades = listOf("Terapia Cognitivo-Conductual", "Gestión de Ansiedad", "Mindfulness"),
+            bottomBar = {
+                AmaniBottomBar(
+                    navController = rememberNavController(),
+                    config = BottomBarConfig.Paciente,
+                )
+            },
+        )
+    }
 }

@@ -35,3 +35,24 @@ Registro estructurado (**Antes / Después**) de los patrones visuales genéricos
 #### `MenuAdministrador.kt` y `DarAltaPsicologo.kt`
 - **Antes:** `Modifier.shadow(elevation = 4.dp / 8.dp)`, `Icons.Default.Psychology` repetido en 4 opciones distintas del menú, `fontSize = 20.sp` / `14.sp` / `10.sp` sueltos y `color = colors.onPrimary` sobre `containerColor = colors.surface` (provocando texto blanco invisible sobre barra blanca en modo claro).
 - **Después:** `TopAppBar` sin `.shadow` manual, texto e iconos con `onSurface` sobre `surface` (16.34:1), iconos específicos por acción (`PersonAdd`, `MedicalServices`, `Group`, `AdminPanelSettings`, `Event`, `CalendarMonth`) y tokens de `Spacing` y `Dimensions`.
+
+---
+
+### 2. Flujo público, Autenticación, Registro y Pagos (`presentation/ui/screen/`)
+
+#### `Principal.kt`
+- **Antes:** fondo con `Brush.verticalGradient`, `letterSpacing = 4.sp`, emojis `"🔄"` y `"⏱️"` como iconos clicables y valores mágicos de `dp`.
+- **Después:** superficie plana `MaterialTheme.colorScheme.background`, tarjeta `surfaceContainerLow`, iconos vectoriales `Icons.Default.Refresh` y `Icons.Default.Schedule`, componente stateless `PrincipalContent` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `LoginScreen.kt`
+- **Antes:** usaba `collectAsState()` sin ciclo de vida, fondo `Brush.verticalGradient`, tarjeta con `.shadow(12.dp, shapes.extraLarge)` + `defaultElevation = 0.dp`, `fontSize = 20.sp` y `letterSpacing = 4.sp` sueltos, y emoji `"❌ "` concatenado en errores.
+- **Después:** `collectAsStateWithLifecycle()`, superficie plana `background`, tarjeta `surfaceContainerLow` con `Elevation.level2` y `shapes.large`, tipografía M3 limpia y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `RegisterScreen.kt`, `ConsentimientoScreen.kt`, `OpcionPagoScreen.kt`, `RegistroExitosoScreen.kt`
+- **Antes:** `Color(0xFFCCC0E4)` hardcodeado como `containerColor` en `RegistroExitosoScreen.kt`, `letterSpacing = 1.sp`, textos literales hardcodeados en `RegisterScreen.kt` (géneros, parentescos, errores de mayoría de edad), emoji `"❌ "` concatenado y paddings mágicos (`20.dp`).
+- **Después:** tokens `MaterialTheme.colorScheme.*`, textos extraídos a `strings.xml` (ES/EN/CA), escala `Spacing` / `Dimensions` / `Elevation` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `PaymentScreen.kt`, `QuestionnaireScreen.kt`, `PrincipalClienteScreen.kt`, `Cuestionario.kt`
+- **Antes:** textos interpolados hardcodeados (`"Psicólogo: ..."`, `"Fecha: ..."`, `"Importe: ..."`, `"Error: ..."`), espaciados `15.dp` y `20.dp`, y código muerto comentado con `Color(0xFFF3F1F8)`, `Color(0xFF5E35B1)`, `Color.White`, `Color.Black`, `Color.Gray` y `FontFamily` local en `Cuestionario.kt`.
+- **Después:** componentes stateless (`PaymentScreenContent`, `QuestionnaireScreenContent`, `PrincipalClienteScreenContent`), textos formateados en `strings.xml`, escala `Spacing` / `Dimensions` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+

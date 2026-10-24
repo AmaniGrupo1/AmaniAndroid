@@ -1,5 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,12 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.QuestionnaireViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla del cuestionario de evaluación inicial.
@@ -54,61 +56,93 @@ fun QuestionnaireScreen(
     navController: NavController,
     viewModel: QuestionnaireViewModel = viewModel(),
 ) {
+    val question = viewModel.questions[viewModel.actualQuestion]
+    QuestionnaireScreenContent(
+        actualQuestionIndex = viewModel.actualQuestion,
+        totalQuestions = viewModel.questions.size,
+        questionTitle = question.title,
+        answers = question.answers,
+        selectedAnswers = viewModel.selectedAnswers[viewModel.actualQuestion],
+        onAnswerChange = { index, checked -> viewModel.changeAnswer(index, checked) },
+        onContinueClick = {
+            if (viewModel.actualQuestion < viewModel.questions.size - 1) {
+                viewModel.nextQuestion()
+            }
+        },
+    )
+}
+
+@Composable
+fun QuestionnaireScreenContent(
+    actualQuestionIndex: Int,
+    totalQuestions: Int,
+    questionTitle: String,
+    answers: List<String>,
+    selectedAnswers: List<Boolean>,
+    onAnswerChange: (Int, Boolean) -> Unit,
+    onContinueClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val typography = MaterialTheme.typography
 
-    val question = viewModel.questions[viewModel.actualQuestion]
-    Scaffold { innerPadding ->
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
         Column(
             modifier =
                 Modifier
                     .padding(innerPadding)
-                    .padding(16.dp)
+                    .padding(Spacing.m)
                     .fillMaxSize(),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center,
         ) {
             LinearProgressIndicator(
                 progress = {
-                    (viewModel.actualQuestion + 1).toFloat() /
-                        viewModel.questions.size
+                    (actualQuestionIndex + 1).toFloat() / totalQuestions.coerceAtLeast(1)
                 },
                 modifier = Modifier,
                 color = ProgressIndicatorDefaults.linearColor,
                 trackColor = ProgressIndicatorDefaults.linearTrackColor,
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
-            Text(stringResource(R.string.auto_intenta_marcar_las_respuestas),
+            Text(
+                stringResource(R.string.auto_intenta_marcar_las_respuestas),
                 style = typography.headlineSmall,
-                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(Spacing.m),
             )
-            Text(stringResource(R.string.auto_no_te_preocupes_si),
+            Text(
+                stringResource(R.string.auto_no_te_preocupes_si),
                 style = typography.headlineSmall,
-                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(Spacing.m),
             )
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
 
             Text(
-                text = question.title,
+                text = questionTitle,
                 style = typography.titleMedium,
-                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(Spacing.m),
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(Spacing.l))
 
-            question.answers.forEachIndexed { index, answer ->
-
+            answers.forEachIndexed { index, answer ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
-                        checked =
-                            viewModel.selectedAnswers
-                            [viewModel.actualQuestion][index],
-                        onCheckedChange = {
-                            viewModel.changeAnswer(index, it)
-                        },
+                        checked = selectedAnswers.getOrElse(index) { false },
+                        onCheckedChange = { onAnswerChange(index, it) },
                     )
-                    Text(answer)
+                    Text(
+                        text = answer,
+                        style = typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
                 }
             }
 
@@ -116,16 +150,7 @@ fun QuestionnaireScreen(
 
             Button(
                 modifier = Modifier.align(Alignment.End),
-                onClick = {
-                    if (viewModel.actualQuestion <
-                        viewModel.questions.size - 1
-                    ) {
-                        viewModel.nextQuestion() // Pasa a la siguiente pregunta
-                    } else {
-                        // Cuestionario terminado
-                        // navController.navigate()
-                    }
-                },
+                onClick = onContinueClick,
             ) {
                 Text(stringResource(R.string.auto_continuar))
             }
@@ -136,8 +161,20 @@ fun QuestionnaireScreen(
 /**
  * Vista previa de [QuestionnaireScreen] para el panel de diseño de Android Studio.
  */
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "QuestionnaireScreen - Light")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "QuestionnaireScreen - Dark")
+@Preview(showBackground = true, fontScale = 1.5f, name = "QuestionnaireScreen - FontScale 1.5x")
 @Composable
 fun QuestionnairePreview() {
-    QuestionnaireScreen(rememberNavController())
+    AppTheme {
+        QuestionnaireScreenContent(
+            actualQuestionIndex = 0,
+            totalQuestions = 4,
+            questionTitle = "¿En qué áreas sientes que necesitas apoyo actualmente?",
+            answers = listOf("Ansiedad o estrés", "Estado de ánimo", "Relaciones interpersonales"),
+            selectedAnswers = listOf(true, false, false),
+            onAnswerChange = { _, _ -> },
+            onContinueClick = {},
+        )
+    }
 }

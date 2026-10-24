@@ -59,6 +59,7 @@ object Dimensions {
     val progressStroke = 3.dp
     val dotIndicator = 8.dp
     val iconSmall = 16.dp
+    val iconButton = 18.dp
     val iconMedium = 20.dp
     val iconDefault = 24.dp
     val iconLarge = 32.dp
@@ -73,5 +74,8 @@ object Dimensions {
     val avatarLarge = 72.dp
     val avatarProfile = 96.dp
     val avatarHero = 120.dp
+    val logoHero = 140.dp
+    val bannerHeight = 200.dp
+    val dropdownMaxHeight = 400.dp
     val maxContentWidth = 600.dp
 }

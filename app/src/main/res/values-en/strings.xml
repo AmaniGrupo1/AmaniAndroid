@@ -1098,4 +1098,22 @@
     <string name="rol_administrador">Administrator</string>
     <string name="rol_admin">Admin</string>
     <string name="rol_psicologo">Psychologist</string>
+    <string name="genero_masculino">Male</string>
+    <string name="genero_femenino">Female</string>
+    <string name="genero_otro">Other</string>
+    <string name="genero_prefiero_no_decirlo">Prefer not to say</string>
+    <string name="parentesco_padre">Father</string>
+    <string name="parentesco_madre">Mother</string>
+    <string name="parentesco_tutor_legal">Legal guardian</string>
+    <string name="parentesco_abuelo">Grandparent</string>
+    <string name="parentesco_otro">Other</string>
+    <string name="situaciones_seleccionadas_count">%1$d situation(s) selected</string>
+    <string name="error_mayor_18">You must be over 18 years old</string>
+    <string name="error_selecciona_fecha_nacimiento">Select a birth date</string>
+    <string name="error_selecciona_fecha_valida">Select a valid date</string>
+    <string name="error_registro_generico">An error occurred while registering the patient. Please try again.</string>
+    <string name="pago_psicologo_formato">Psychologist: %1$s</string>
+    <string name="pago_fecha_formato">Date: %1$s</string>
+    <string name="pago_importe_formato">Amount: %1$s</string>
+    <string name="pago_error_formato">Error: %1$s</string>
 </resources>
