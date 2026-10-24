@@ -1083,4 +1083,17 @@
     <string name="vista">Vista</string>
     <string name="volver_al_inicio">Tornar a l\'inici</string>
     <string name="catalan">Català</string>
+    <string name="estado_libre">Lliure</string>
+    <string name="estado_ocupado">Ocupat</string>
+    <string name="estado_disponible">Disponible</string>
+    <string name="dia_lunes_corto">Dl</string>
+    <string name="dia_martes_corto">Dt</string>
+    <string name="dia_miercoles_corto">Dc</string>
+    <string name="dia_jueves_corto">Dj</string>
+    <string name="dia_viernes_corto">Dv</string>
+    <string name="dia_sabado_corto">Ds</string>
+    <string name="dia_domingo_corto">Dg</string>
+    <string name="rol_administrador">Administrador</string>
+    <string name="rol_admin">Admin</string>
+    <string name="rol_psicologo">Psicòleg</string>
 </resources>

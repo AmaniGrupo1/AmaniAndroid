@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -12,11 +13,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Badge
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,18 +34,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Barra superior (TopAppBar) para la pantalla de alta de psicólogo.
@@ -56,6 +57,7 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
  *
  * @param title Título a mostrar en la barra.
  * @param navController Controlador de navegación para transiciones entre pantallas.
+ * @param modifier Modificador externo opcional.
  * @param showBackButton Indica si se debe mostrar el botón de retroceso.
  * @param showLogo Indica si se debe mostrar el logotipo junto al título.
  * @param onLogout Callback opcional invocado al cerrar sesión.
@@ -66,6 +68,7 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 fun DarAltaPsicologo(
     title: String,
     navController: NavController,
+    modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
     showLogo: Boolean = false,
     onLogout: (() -> Unit)? = null,
@@ -75,15 +78,14 @@ fun DarAltaPsicologo(
     val colors = MaterialTheme.colorScheme
 
     TopAppBar(
-        modifier =
-            Modifier
-                .shadow(elevation = 4.dp, shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp)),
+        modifier = modifier,
         colors =
             TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
+                containerColor = colors.surface,
+                titleContentColor = colors.onSurface,
+                navigationIconContentColor = colors.onSurface,
+                actionIconContentColor = colors.onSurface,
+            ),
         title = {
             AnimatedContent(
                 targetState = showLogo to title,
@@ -99,24 +101,23 @@ fun DarAltaPsicologo(
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
                             contentDescription = stringResource(R.string.auto_logo),
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(Dimensions.avatarSmall),
                             tint = Color.Unspecified,
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(
                             text = titleValue,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.onPrimary,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = colors.onSurface,
                             maxLines = 1,
                         )
                     }
                 } else {
                     Text(
                         text = titleValue,
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = colors.onPrimary,
+                        color = colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -131,14 +132,18 @@ fun DarAltaPsicologo(
             ) {
                 Badge(
                     containerColor = colors.error,
-                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp),
+                    contentColor = colors.onError,
+                    modifier = Modifier.offset(x = -Spacing.xs, y = Spacing.xs),
                 ) {
-                    Text("3", fontSize = 10.sp)
+                    Text(
+                        text = "3",
+                        style = MaterialTheme.typography.labelSmall,
+                    )
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = stringResource(R.string.auto_notificaciones),
-                    tint = colors.onPrimary,
+                    tint = colors.onSurface,
                 )
             }
 
@@ -148,37 +153,32 @@ fun DarAltaPsicologo(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = stringResource(R.string.auto_menu_de_navegacion),
-                    tint = colors.onPrimary,
+                    tint = colors.onSurface,
                 )
             }
 
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier =
-                    Modifier
-                        .shadow(elevation = 8.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .width(280.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 DropdownMenuItem(
                     text = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.sMedium),
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Psychology,
+                                imageVector = Icons.Default.PersonAdd,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(Dimensions.iconMedium),
+                                tint = colors.primary,
                             )
                             Text(
                                 text = stringResource(R.string.auto_dar_de_alta_psicologo),
-                                fontSize = 14.sp,
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                color = colors.onSurface,
                             )
                         }
                     },
@@ -191,3 +191,18 @@ fun DarAltaPsicologo(
         },
     )
 }
+
+@Preview(name = "DarAltaPsicologo - Light", showBackground = true)
+@Preview(name = "DarAltaPsicologo - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "DarAltaPsicologo - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun DarAltaPsicologoPreview() {
+    AppTheme {
+        DarAltaPsicologo(
+            title = "Psicólogos",
+            navController = rememberNavController(),
+            showLogo = true,
+        )
+    }
+}
+

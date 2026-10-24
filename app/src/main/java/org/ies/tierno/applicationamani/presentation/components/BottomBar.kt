@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.components
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -20,11 +21,15 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
 /**
  * Representa un destino de navegación en la barra inferior.
@@ -59,9 +64,13 @@ private object Routes {
  * Muestra cinco secciones principales y resalta la activa.
  *
  * @param navController Controlador de navegación para gestionar el cambio entre pantallas.
+ * @param modifier Modificador externo opcional.
  */
 @Composable
-fun BottomBar(navController: NavController) {
+fun BottomBar(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -74,22 +83,20 @@ fun BottomBar(navController: NavController) {
             BottomBarDestination(Routes.SETTINGS, R.string.nav_ajustes, Icons.Default.Settings, Icons.Outlined.Settings),
         )
 
-    // M3: NavigationBar height is handled automatically, containerColor set to surfaceContainer
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: container color should be surfaceContainer
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         destinations.forEach { destination ->
             val isSelected = currentRoute == destination.route
             NavigationBarItem(
                 icon = {
-                    // M3: Use Filled icon for selected and Outlined for unselected
                     Icon(
                         imageVector = if (isSelected) destination.iconFilled else destination.iconOutlined,
                         contentDescription = stringResource(destination.labelRes),
                     )
                 },
                 label = {
-                    // M3: Label uses labelMedium typography
                     Text(
                         text = stringResource(destination.labelRes),
                         style = MaterialTheme.typography.labelMedium,
@@ -107,9 +114,20 @@ fun BottomBar(navController: NavController) {
                         }
                     }
                 },
-                alwaysShowLabel = true, // M3: Recommended for 3-5 items
-                colors = NavigationBarItemDefaults.colors(), // M3: Default colors without override
+                alwaysShowLabel = true,
+                colors = NavigationBarItemDefaults.colors(),
             )
         }
     }
 }
+
+@Preview(name = "BottomBar - Light", showBackground = true)
+@Preview(name = "BottomBar - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "BottomBar - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun BottomBarPreview() {
+    AppTheme {
+        BottomBar(navController = rememberNavController())
+    }
+}
+

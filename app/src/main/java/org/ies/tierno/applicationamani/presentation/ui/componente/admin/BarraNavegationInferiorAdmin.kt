@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
@@ -14,13 +15,17 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Elevation
 
 /**
  * Enumeración de los elementos de navegación disponibles en la barra
@@ -50,12 +55,14 @@ enum class AdminNavItem {
  * @param navController Controlador de navegación para cambiar de pantalla.
  * @param selectedItem Elemento actualmente seleccionado en la barra.
  * @param onItemSelected Callback invocado al seleccionar un nuevo elemento, recibe el [AdminNavItem] pulsado.
+ * @param modifier Modificador externo opcional.
  */
 @Composable
 fun BarraNavegationInferiorAdmin(
     navController: NavController,
     selectedItem: AdminNavItem,
     onItemSelected: (AdminNavItem) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     data class NavDest(
         val item: AdminNavItem,
@@ -84,8 +91,9 @@ fun BarraNavegationInferiorAdmin(
         )
 
     NavigationBar(
-        tonalElevation = 3.dp,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: surfaceContainer per spec
+        modifier = modifier,
+        tonalElevation = Elevation.level2,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         destinations.forEach { dest ->
             NavigationBarItem(
@@ -96,7 +104,12 @@ fun BarraNavegationInferiorAdmin(
                 },
                 icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
                 label = {
-                    Text(stringResource(dest.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        text = stringResource(dest.labelRes),
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 },
                 colors =
                     NavigationBarItemDefaults.colors(
@@ -110,3 +123,18 @@ fun BarraNavegationInferiorAdmin(
         }
     }
 }
+
+@Preview(name = "BarraAdmin - Light", showBackground = true)
+@Preview(name = "BarraAdmin - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "BarraAdmin - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun BarraNavegationInferiorAdminPreview() {
+    AppTheme {
+        BarraNavegationInferiorAdmin(
+            navController = rememberNavController(),
+            selectedItem = AdminNavItem.DOCUMENTOS,
+            onItemSelected = {},
+        )
+    }
+}
+

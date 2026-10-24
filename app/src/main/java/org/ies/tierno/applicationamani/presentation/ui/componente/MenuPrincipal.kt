@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -22,10 +23,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
 
 /**
  * Barra superior (TopAppBar) principal de la aplicación Amani.
@@ -36,19 +40,24 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
  *
  * @param navController Controlador de navegación utilizado para cambiar
  *   de pantalla al seleccionar una opción del menú.
+ * @param modifier Modificador externo opcional.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuPrincipal(navController: NavController) {
+fun MenuPrincipal(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
     var expanded by remember { mutableStateOf(false) }
 
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
 
     TopAppBar(
+        modifier = modifier,
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = colors.surface, // M3: Surface for top bar
+                containerColor = colors.surface,
                 titleContentColor = colors.onSurface,
                 navigationIconContentColor = colors.onSurface,
                 actionIconContentColor = colors.onSurface,
@@ -58,7 +67,7 @@ fun MenuPrincipal(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.logo_original),
                 contentDescription = stringResource(R.string.nav_inicio),
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(Dimensions.avatarMedium),
             )
         },
         title = { }, // vacío porque usamos solo el logo
@@ -119,3 +128,14 @@ fun MenuPrincipal(navController: NavController) {
         },
     )
 }
+
+@Preview(name = "MenuPrincipal - Light", showBackground = true)
+@Preview(name = "MenuPrincipal - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "MenuPrincipal - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun MenuPrincipalPreview() {
+    AppTheme {
+        MenuPrincipal(navController = rememberNavController())
+    }
+}
+

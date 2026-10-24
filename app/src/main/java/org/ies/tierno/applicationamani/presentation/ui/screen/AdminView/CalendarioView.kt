@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
@@ -31,8 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -99,7 +101,7 @@ private fun CalendarioHeader(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 12.dp),
+                .padding(horizontal = Spacing.s, vertical = Spacing.sMedium),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -122,7 +124,16 @@ private fun CalendarioHeader(
  */
 @Composable
 private fun CalendarioDiasSemana() {
-    val dias = listOf("L", "M", "X", "J", "V", "S", "D")
+    val dias =
+        listOf(
+            stringResource(R.string.dia_lunes_corto),
+            stringResource(R.string.dia_martes_corto),
+            stringResource(R.string.dia_miercoles_corto),
+            stringResource(R.string.dia_jueves_corto),
+            stringResource(R.string.dia_viernes_corto),
+            stringResource(R.string.dia_sabado_corto),
+            stringResource(R.string.dia_domingo_corto),
+        )
     Row(modifier = Modifier.fillMaxWidth()) {
         dias.forEach { dia ->
             Text(
@@ -240,8 +251,8 @@ private fun CeldaDia(
         modifier =
             modifier
                 .aspectRatio(1f)
-                .padding(2.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .padding(Spacing.xxs)
+                .clip(MaterialTheme.shapes.small)
                 .background(bgColor)
                 .clickable(enabled = habilitado, onClick = onClick),
         contentAlignment = Alignment.Center,
@@ -256,11 +267,11 @@ private fun CeldaDia(
 
             // Punto indicador para fechas con citas (solo si no está seleccionada o bloqueada)
             if (esDestacada && !esSeleccionada && !esBloqueado) {
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(Spacing.xxs))
                 Box(
                     modifier =
                         Modifier
-                            .size(4.dp)
+                            .size(Spacing.xs)
                             .clip(CircleShape)
                             .background(colors.tertiary),
                 )
@@ -268,3 +279,20 @@ private fun CeldaDia(
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(name = "CalendarioView - Light", showBackground = true)
+@Preview(name = "CalendarioView - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "CalendarioView - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun CalendarioViewPreview() {
+    AppTheme {
+        val mes = YearMonth.of(2026, 10)
+        CalendarioView(
+            mesVisible = mes,
+            fechaSeleccionada = LocalDate.of(2026, 10, 24),
+            fechasDestacadas = setOf(LocalDate.of(2026, 10, 26), LocalDate.of(2026, 10, 28)),
+        )
+    }
+}
+

@@ -1085,5 +1085,17 @@
     <string name="back">Back</string>
     <string name="select_game">Select a game</string>
     <string name="slither">Slither.io</string>
-
+    <string name="estado_libre">Free</string>
+    <string name="estado_ocupado">Busy</string>
+    <string name="estado_disponible">Available</string>
+    <string name="dia_lunes_corto">M</string>
+    <string name="dia_martes_corto">T</string>
+    <string name="dia_miercoles_corto">W</string>
+    <string name="dia_jueves_corto">T</string>
+    <string name="dia_viernes_corto">F</string>
+    <string name="dia_sabado_corto">S</string>
+    <string name="dia_domingo_corto">S</string>
+    <string name="rol_administrador">Administrator</string>
+    <string name="rol_admin">Admin</string>
+    <string name="rol_psicologo">Psychologist</string>
 </resources>

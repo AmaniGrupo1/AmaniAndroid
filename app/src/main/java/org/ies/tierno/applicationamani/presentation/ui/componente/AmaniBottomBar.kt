@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
@@ -11,18 +12,20 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.People
-import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -35,10 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
 /**
  * Representa un elemento de navegación en [AmaniBottomBar].
@@ -94,8 +100,8 @@ private fun pacienteItems() =
         AmaniBottomBarItem(
             route = Screens.entretenimiento.route,
             labelRes = R.string.nav_juego,
-            selectedIcon = Icons.Filled.Psychology,
-            unselectedIcon = Icons.Outlined.Psychology,
+            selectedIcon = Icons.Filled.SportsEsports,
+            unselectedIcon = Icons.Outlined.SportsEsports,
         ),
         AmaniBottomBarItem(
             route = Screens.diarioEmocional.route,
@@ -128,8 +134,8 @@ private fun adminItems() =
         AmaniBottomBarItem(
             route = Screens.listarPsicologoSimple.route,
             labelRes = R.string.nav_psicologos,
-            selectedIcon = Icons.Filled.Psychology,
-            unselectedIcon = Icons.Outlined.Psychology,
+            selectedIcon = Icons.Filled.MedicalServices,
+            unselectedIcon = Icons.Outlined.MedicalServices,
         ),
         AmaniBottomBarItem(
             route = Screens.settingsAdmin.route,
@@ -209,7 +215,7 @@ fun AmaniBottomBar(
 
     NavigationBar(
         modifier = modifier.navigationBarsPadding(),
-        containerColor = MaterialTheme.colorScheme.surfaceContainer, // M3: surfaceContainer per spec
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         items.forEach { item ->
             val isSelected = item.route != null && currentRoute == item.route
@@ -230,14 +236,12 @@ fun AmaniBottomBar(
                     }
                 },
                 icon = {
-                    // M3: Use selected icon (Filled) and unselected icon (Outlined)
                     Icon(
                         imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
                         contentDescription = stringResource(item.labelRes),
                     )
                 },
                 label = {
-                    // M3: label style is labelMedium
                     Text(
                         text = stringResource(item.labelRes),
                         maxLines = 1,
@@ -245,9 +249,23 @@ fun AmaniBottomBar(
                         style = MaterialTheme.typography.labelMedium,
                     )
                 },
-                alwaysShowLabel = true, // M3: Recommended for 3-5 items
-                colors = NavigationBarItemDefaults.colors(), // M3: No hardcoded colors
+                alwaysShowLabel = true,
+                colors = NavigationBarItemDefaults.colors(),
             )
         }
     }
 }
+
+@Preview(name = "AmaniBottomBar - Light", showBackground = true)
+@Preview(name = "AmaniBottomBar - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "AmaniBottomBar - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun AmaniBottomBarPreview() {
+    AppTheme {
+        AmaniBottomBar(
+            navController = rememberNavController(),
+            config = BottomBarConfig.Paciente,
+        )
+    }
+}
+

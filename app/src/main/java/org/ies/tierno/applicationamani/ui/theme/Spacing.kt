@@ -22,6 +22,7 @@ object Spacing {
 
     /** 12.dp — espaciado intermedio para paddings internos de tarjetas compactas y filas. */
     val sm = 12.dp
+    val sMedium = sm
 
     /** 16.dp — margen horizontal de pantalla y padding interno estándar de tarjetas. */
     val m = 16.dp
@@ -53,6 +54,7 @@ object Elevation {
  */
 object Dimensions {
     val borderThin = 1.dp
+    val dividerThickness = borderThin
     val borderMedium = 2.dp
     val progressStroke = 3.dp
     val dotIndicator = 8.dp
@@ -63,6 +65,7 @@ object Dimensions {
     val iconExtraLarge = 48.dp
     val iconHero = 64.dp
     val touchTarget = 48.dp
+    val minTouchTarget = touchTarget
     val buttonHeight = 48.dp
     val buttonHeightLarge = 56.dp
     val avatarSmall = 36.dp

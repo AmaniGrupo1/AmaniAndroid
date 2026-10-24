@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CheckCircle
@@ -36,9 +36,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -69,7 +73,7 @@ data class FranjaHoraria(
  *
  * Presenta una cabecera con la fecha seleccionada, una leyenda de colores
  * y una lista vertical de franjas horarias. Las franjas libres son
- * pulsa bles para que el usuario pueda reservar una cita.
+ * pulsables para que el usuario pueda reservar una cita.
  *
  * Los colores se obtienen de [LocalAmaniColors] (`citaLibre`, `citaOcupada`,
  * `citaOcupadaBg`) y la tipografía de [MaterialTheme.typography].
@@ -91,16 +95,16 @@ fun VistaDiariaHoras(
         // ── Cabecera del día ──
         CabeceraDia(fecha)
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(Spacing.s))
 
         // ── Leyenda ──
         Leyenda()
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(Spacing.sMedium))
 
         // ── Lista de franjas ──
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.s),
         ) {
             franjas.forEach { franja ->
                 TarjetaFranja(
@@ -118,7 +122,7 @@ fun VistaDiariaHoras(
 
 /**
  * Muestra la fecha seleccionada con formato legible en español
- * (ej: "Viérnes, 20 de marzo de 2026").
+ * (ej: "Viernes, 20 de marzo de 2026").
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -141,8 +145,8 @@ private fun CabeceraDia(fecha: LocalDate) {
                 .fillMaxWidth()
                 .background(
                     color = colors.primaryContainer,
-                    shape = RoundedCornerShape(12.dp),
-                ).padding(16.dp),
+                    shape = MaterialTheme.shapes.medium,
+                ).padding(Spacing.m),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -151,7 +155,7 @@ private fun CabeceraDia(fecha: LocalDate) {
             fontWeight = FontWeight.Bold,
             color = colors.onPrimaryContainer,
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(Spacing.xs))
         Text(
             text = fecha.format(formatter),
             style = typography.bodyMedium,
@@ -174,9 +178,9 @@ private fun Leyenda() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IndicadorLeyenda(color = amani.citaLibre, texto = "Libre")
-        Spacer(modifier = Modifier.width(24.dp))
-        IndicadorLeyenda(color = amani.citaOcupada, texto = "Ocupado")
+        IndicadorLeyenda(color = amani.citaLibre, texto = stringResource(R.string.estado_libre))
+        Spacer(modifier = Modifier.width(Spacing.l))
+        IndicadorLeyenda(color = amani.citaOcupada, texto = stringResource(R.string.estado_ocupado))
     }
 }
 
@@ -192,11 +196,11 @@ private fun IndicadorLeyenda(
         Box(
             modifier =
                 Modifier
-                    .size(16.dp)
+                    .size(Dimensions.iconSmall)
                     .clip(CircleShape)
                     .background(color),
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(Spacing.xs))
         Text(
             text = texto,
             style = MaterialTheme.typography.labelMedium,
@@ -210,8 +214,8 @@ private fun IndicadorLeyenda(
 /**
  * Tarjeta que representa una franja horaria individual.
  *
- * - **Libre**: fondo blanco con borde verde, icono de reloj y texto "Disponible".
- * - **Ocupada**: fondo rosa suave con borde rojo, icono de aspa y motivo de la cita.
+ * - **Libre**: fondo de contenedor con borde verde, icono de reloj y texto "Disponible".
+ * - **Ocupada**: fondo de estado ocupado con borde de error, icono de aspa y motivo de la cita.
  *
  * @param franja Datos de la franja.
  * @param onClick Acción al pulsar (solo habilitada si [FranjaHoraria.activo] es `true`).
@@ -239,48 +243,53 @@ private fun TarjetaFranja(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
+                .border(Dimensions.dividerThickness, borderColor, MaterialTheme.shapes.medium)
                 .clickable(enabled = franja.activo, onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = if (franja.activo) 2.dp else 0.dp,
+                defaultElevation = if (franja.activo) Elevation.level1 else Elevation.level0,
             ),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .padding(horizontal = Spacing.m, vertical = Spacing.sMedium),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // ── Hora ──
             Text(
-                text = franja.horaInicio, // ya está en formato "HH:mm"
+                text = franja.horaInicio,
                 style = typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = if (franja.activo) colors.onSurface else colors.onSurfaceVariant,
-                modifier = Modifier.width(56.dp),
+                modifier = Modifier.width(Dimensions.avatarLarge),
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Spacing.sMedium))
 
             // ── Icono de estado ──
             Icon(
                 imageVector = if (franja.activo) Icons.Default.AccessTime else Icons.Default.Close,
-                contentDescription = if (franja.activo) "Hora libre" else "Hora ocupada",
+                contentDescription = null,
                 tint = if (franja.activo) amani.citaLibre else amani.citaOcupada,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(Dimensions.iconMedium),
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Spacing.sMedium))
 
             // ── Texto descriptivo ──
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = if (franja.activo) "Disponible" else "Ocupado",
+                    text =
+                        if (franja.activo) {
+                            stringResource(R.string.estado_disponible)
+                        } else {
+                            stringResource(R.string.estado_ocupado)
+                        },
                     style = typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = if (franja.activo) amani.citaLibre else amani.citaOcupada,
@@ -299,8 +308,8 @@ private fun TarjetaFranja(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = stringResource(R.string.auto_seleccionar),
-                    tint = amani.citaLibre.copy(alpha = 0.5f),
-                    modifier = Modifier.size(20.dp),
+                    tint = amani.citaLibre,
+                    modifier = Modifier.size(Dimensions.iconMedium),
                 )
             }
         }
@@ -326,7 +335,7 @@ fun generarFranjasDia(
     horaInicio: Int = 8,
     horaFin: Int = 20,
     intervaloMinutos: Int = 60,
-    citasOcupadas: Map<LocalTime, String> = emptyMap(), // <-- cambio aquí
+    citasOcupadas: Map<LocalTime, String> = emptyMap(),
 ): List<FranjaHoraria> {
     val franjas = mutableListOf<FranjaHoraria>()
     var hora = LocalTime.of(horaInicio, 0)
@@ -336,7 +345,7 @@ fun generarFranjasDia(
     while (hora.isBefore(fin)) {
         val inicioStr = hora.format(formatter)
         val finStr = hora.plusMinutes(intervaloMinutos.toLong()).format(formatter)
-        val motivo = citasOcupadas[hora] // ahora funciona con LocalTime
+        val motivo = citasOcupadas[hora]
 
         franjas.add(
             FranjaHoraria(
@@ -351,3 +360,23 @@ fun generarFranjasDia(
     }
     return franjas
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(name = "VistaDiariaHoras - Light", showBackground = true)
+@Preview(name = "VistaDiariaHoras - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "VistaDiariaHoras - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun VistaDiariaHorasPreview() {
+    AppTheme {
+        VistaDiariaHoras(
+            fecha = LocalDate.of(2026, 10, 24),
+            franjas =
+                listOf(
+                    FranjaHoraria(1, "09:00", "10:00", activo = true),
+                    FranjaHoraria(1, "10:00", "11:00", activo = false, motivo = "Sesión reservada"),
+                ),
+            modifier = Modifier.padding(Spacing.m),
+        )
+    }
+}
+

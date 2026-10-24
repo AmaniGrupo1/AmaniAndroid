@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.componente.admin
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -10,7 +11,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,18 +25,21 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material3.Badge
 import androidx.compose.material3.DividerDefaults
@@ -68,10 +71,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Modelo de datos que define un elemento del menú de administración.
@@ -97,6 +104,7 @@ data class MenuAdministrador(
  *
  * @param title Título a mostrar en la barra superior
  * @param navController Controlador de navegación
+ * @param modifier Modificador externo opcional
  * @param showBackButton Indica si se debe mostrar el botón de retroceso
  * @param showLogo Indica si se debe mostrar el logo en lugar del título
  * @param onLogout Acción a ejecutar al cerrar sesión
@@ -107,6 +115,7 @@ data class MenuAdministrador(
 fun MenuAdministrador(
     title: String,
     navController: NavController,
+    modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
     showLogo: Boolean = false,
     onLogout: (() -> Unit)? = null,
@@ -120,13 +129,13 @@ fun MenuAdministrador(
         listOf(
             MenuAdministrador(
                 titleRes = R.string.menu_registrar_psicologo,
-                icon = Icons.Default.Psychology,
+                icon = Icons.Default.PersonAdd,
                 route = Screens.agregarPsicologo.route,
                 dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_registrar_paciente,
-                icon = Icons.Default.Psychology,
+                icon = Icons.Default.PersonAddAlt1,
                 route = Screens.registro.route,
                 dividerAfter = true,
             ),
@@ -137,7 +146,7 @@ fun MenuAdministrador(
             ),
             MenuAdministrador(
                 titleRes = R.string.menu_listar_psicologos,
-                icon = Icons.Default.Psychology,
+                icon = Icons.Default.MedicalServices,
                 route = Screens.listarPsicologoSimple.route,
                 dividerAfter = true,
             ),
@@ -149,13 +158,13 @@ fun MenuAdministrador(
             ),
             MenuAdministrador(
                 titleRes = R.string.nav_citas,
-                icon = Icons.Default.AdminPanelSettings,
+                icon = Icons.Default.DateRange,
                 route = Screens.citas.route,
                 dividerAfter = true,
             ),
             MenuAdministrador(
                 titleRes = R.string.nav_calendario,
-                icon = Icons.Default.AdminPanelSettings,
+                icon = Icons.Default.CalendarMonth,
                 route = Screens.psicologoAgenda.route,
                 dividerAfter = true,
             ),
@@ -168,13 +177,14 @@ fun MenuAdministrador(
         )
 
     TopAppBar(
-        modifier = Modifier,
+        modifier = modifier,
         colors =
             TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
+                containerColor = colors.surface,
+                titleContentColor = colors.onSurface,
+                navigationIconContentColor = colors.onSurface,
+                actionIconContentColor = colors.onSurface,
+            ),
         navigationIcon = {
             AnimatedVisibility(
                 visible = showBackButton,
@@ -204,14 +214,14 @@ fun MenuAdministrador(
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
                             contentDescription = stringResource(R.string.auto_logo),
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(Dimensions.avatarSmall),
                             tint = Color.Unspecified,
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(
                             text = titleValue,
                             style = MaterialTheme.typography.titleLarge,
-                            color = colors.onPrimary,
+                            color = colors.onSurface,
                             maxLines = 1,
                         )
                     }
@@ -219,7 +229,7 @@ fun MenuAdministrador(
                     Text(
                         text = titleValue,
                         style = MaterialTheme.typography.titleLarge,
-                        color = colors.onPrimary,
+                        color = colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -236,14 +246,15 @@ fun MenuAdministrador(
             ) {
                 Badge(
                     containerColor = colors.error,
-                    modifier = Modifier.offset(x = (-4).dp, y = 4.dp),
+                    contentColor = colors.onError,
+                    modifier = Modifier.offset(x = -Spacing.xs, y = Spacing.xs),
                 ) {
                     Text("3", style = MaterialTheme.typography.labelSmall)
                 }
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = stringResource(R.string.auto_notificaciones),
-                    tint = colors.onPrimary,
+                    tint = colors.onSurface,
                 )
             }
 
@@ -254,7 +265,7 @@ fun MenuAdministrador(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = stringResource(R.string.menu_admin_titulo),
-                    tint = colors.onPrimary,
+                    tint = colors.onSurface,
                 )
             }
 
@@ -262,10 +273,7 @@ fun MenuAdministrador(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier =
-                    Modifier
-                        .width(280.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 // Header del menú
                 DropdownMenuItem(
@@ -276,12 +284,12 @@ fun MenuAdministrador(
                             Text(
                                 text = stringResource(R.string.menu_admin_titulo),
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = colors.onPrimaryContainer,
                             )
                             Text(
                                 text = stringResource(R.string.menu_selecciona_opcion),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = colors.onPrimaryContainer,
                             )
                         }
                     },
@@ -289,8 +297,8 @@ fun MenuAdministrador(
                     enabled = false,
                     modifier =
                         Modifier
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .clip(RoundedCornerShape(8.dp)),
+                            .background(colors.primaryContainer)
+                            .clip(MaterialTheme.shapes.small),
                 )
 
                 HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
@@ -308,17 +316,17 @@ fun MenuAdministrador(
                         text = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.sMedium),
                             ) {
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(Dimensions.iconMedium),
                                     tint =
                                         if (item.isDanger) {
-                                            MaterialTheme.colorScheme.error
+                                            colors.error
                                         } else {
-                                            MaterialTheme.colorScheme.primary
+                                            colors.primary
                                         },
                                 )
                                 Text(
@@ -326,9 +334,9 @@ fun MenuAdministrador(
                                     style = MaterialTheme.typography.bodyMedium,
                                     color =
                                         if (item.isDanger) {
-                                            MaterialTheme.colorScheme.error
+                                            colors.error
                                         } else {
-                                            MaterialTheme.colorScheme.onSurface
+                                            colors.onSurface
                                         },
                                 )
                             }
@@ -365,6 +373,7 @@ fun MenuAdministrador(
 fun MenuAdministradorSimple(
     title: String,
     navController: NavController,
+    modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
     showLogo: Boolean = false,
     onActionClick: (() -> Unit)? = null,
@@ -372,13 +381,14 @@ fun MenuAdministradorSimple(
     val colors = MaterialTheme.colorScheme
 
     TopAppBar(
-        modifier = Modifier,
+        modifier = modifier,
         colors =
             TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
+                containerColor = colors.surface,
+                titleContentColor = colors.onSurface,
+                navigationIconContentColor = colors.onSurface,
+                actionIconContentColor = colors.onSurface,
+            ),
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = { navController.navigateUp() }) {
@@ -397,21 +407,21 @@ fun MenuAdministradorSimple(
                     Icon(
                         painter = painterResource(id = R.drawable.logo_original),
                         contentDescription = stringResource(R.string.auto_logo),
-                        modifier = Modifier.size(32.dp),
+                        modifier = Modifier.size(Dimensions.avatarSmall),
                         tint = Color.Unspecified,
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
-                        color = colors.onPrimary,
+                        color = colors.onSurface,
                     )
                 }
             } else {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = colors.onPrimary,
+                    color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -446,12 +456,13 @@ fun MenuLateralAdministrador(
     navController: NavController,
     onLogout: () -> Unit,
     currentRoute: String,
+    modifier: Modifier = Modifier,
 ) {
     val menuItems =
         listOf(
             Triple(Icons.Default.Home, R.string.nav_inicio, Screens.adminHome.route),
             Triple(Icons.Default.People, R.string.nav_pacientes, Screens.pacientes.route),
-            Triple(Icons.Default.Psychology, R.string.nav_psicologos, Screens.listarPsicologo.route),
+            Triple(Icons.Default.MedicalServices, R.string.nav_psicologos, Screens.listarPsicologo.route),
             Triple(Icons.Default.Quiz, R.string.nav_tests, Screens.test.route),
             Triple(Icons.Default.Edit, R.string.menu_registrar_psicologo, Screens.test.route),
             Triple(Icons.Default.AdminPanelSettings, R.string.menu_registrar_admin, Screens.agregarAdmin.route),
@@ -459,9 +470,10 @@ fun MenuLateralAdministrador(
         )
 
     ModalNavigationDrawer(
+        modifier = modifier,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 // Header del drawer
                 Box(
@@ -469,16 +481,16 @@ fun MenuLateralAdministrador(
                         Modifier
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.primary)
-                            .padding(24.dp),
+                            .padding(Spacing.l),
                 ) {
                     Column {
                         Icon(
                             painter = painterResource(id = R.drawable.logo_original),
                             contentDescription = stringResource(R.string.auto_logo),
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(Dimensions.avatarMedium),
                             tint = Color.Unspecified,
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(Spacing.s))
                         Text(
                             text = stringResource(R.string.auto_panel_admin),
                             style = MaterialTheme.typography.titleMedium,
@@ -487,7 +499,7 @@ fun MenuLateralAdministrador(
                         Text(
                             text = stringResource(R.string.auto_gestion_de_usuarios),
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }
@@ -499,7 +511,7 @@ fun MenuLateralAdministrador(
                             Icon(
                                 imageVector = icon,
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(Dimensions.iconLarge),
                             )
                         },
                         label = {
@@ -526,7 +538,7 @@ fun MenuLateralAdministrador(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                                 unselectedContainerColor = Color.Transparent,
                             ),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = Spacing.sMedium, vertical = Spacing.xs),
                     )
                 }
             }
@@ -536,3 +548,19 @@ fun MenuLateralAdministrador(
         Box(modifier = Modifier.fillMaxSize())
     }
 }
+
+@Preview(name = "MenuAdministrador - Light", showBackground = true)
+@Preview(name = "MenuAdministrador - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "MenuAdministrador - Large Font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun MenuAdministradorPreview() {
+    AppTheme {
+        MenuAdministrador(
+            title = "Panel Admin",
+            navController = rememberNavController(),
+            showBackButton = true,
+            showLogo = true,
+        )
+    }
+}
+
