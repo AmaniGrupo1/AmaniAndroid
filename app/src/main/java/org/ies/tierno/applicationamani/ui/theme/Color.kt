@@ -186,3 +186,22 @@ const val SNAKE_BODY_COLOR_INT: Int = 0xFFCCC0E4.toInt()
 const val SNAKE_HEAD_COLOR_INT: Int = 0xFF635A79.toInt()
 const val SNAKE_FOOD_COLOR_INT: Int = 0xFFBA1A1A.toInt()
 const val SNAKE_BG_COLOR_INT: Int = 0xFF0F0E10.toInt()
+const val SNAKE_GRID_COLOR_INT: Int = 0x4DCCC0E4
+
+// ── Rueda emocional de Plutchik (Diario Emocional) ─────────────────
+
+val PlutchikJoy = Color(0xFFFFEB3B)
+val PlutchikTrust = Color(0xFF8BC34A)
+val PlutchikAnger = Color(0xFFF44336)
+val PlutchikSadness = Color(0xFF2196F3)
+val PlutchikDisgust = Color(0xFF4CAF50)
+val PlutchikFear = Color(0xFF9C27B0)
+val PlutchikSurprise = Color(0xFF00BCD4)
+val PlutchikAnticipation = Color(0xFFFF9800)
+
+val PlutchikWarmTint = Color(0xFFFFA726).copy(alpha = 0.25f)
+val PlutchikColdTint = Color(0xFF42A5F5).copy(alpha = 0.25f)
+val PlutchikWheelCanvasBg = LightSurfaceContainerLowest
+val PlutchikWheelStroke = LightSurfaceContainerLowest
+const val PLUTCHIK_TEXT_COLOR_INT: Int = 0xFFFFFFFF.toInt()
+const val PLUTCHIK_SHADOW_COLOR_INT: Int = 0xFF000000.toInt()

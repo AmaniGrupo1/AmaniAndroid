@@ -1,9 +1,11 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
 
-// Imports para el Copiloto
 import android.content.Context
+import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -32,7 +34,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Send
@@ -44,18 +46,19 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,17 +69,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -88,15 +89,20 @@ import org.ies.tierno.applicationamani.data.local.TokenHolder
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.copiloto.ChunkResponseDto
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UsuarioProfileResponseDTO
 import org.ies.tierno.applicationamani.dto.tickets.TicketModel
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.copiloto.CopilotoAiViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.PacienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel.TicketsViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 import org.ies.tierno.applicationamani.ui.theme.CardColors
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
@@ -111,15 +117,15 @@ fun ViewPacientePrincipalScreen(
     pacienteViewModel: PacienteViewModel = koinViewModel(),
     ticketsViewModel: TicketsViewModel = koinViewModel(),
     copilotoViewModel: CopilotoAiViewModel = koinViewModel(),
-    userSessionDataStore: UserSessionDataStore = getKoin().get()
+    userSessionDataStore: UserSessionDataStore = getKoin().get(),
 ) {
     val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
     val cardColors = getCardColors()
+    val tokenHolder = koinInject<TokenHolder>()
+    val token = tokenHolder.getToken()
 
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    val pacienteInfo by profilePsicologoViewModel.perfil.collectAsStateWithLifecycle()
     val isLoadingPaciente by profilePsicologoViewModel.isLoading.collectAsStateWithLifecycle()
 
     val psicologo by pacienteViewModel.psicologoAsignado.collectAsStateWithLifecycle()
@@ -134,6 +140,9 @@ fun ViewPacientePrincipalScreen(
     val loadingCopilot by copilotoViewModel.loading.collectAsStateWithLifecycle()
     val errorCopilot by copilotoViewModel.error.collectAsStateWithLifecycle()
 
+    val ticketsState by ticketsViewModel.tickets.observeAsState(emptyList())
+    val latestTicket = ticketsState.firstOrNull()
+
     LaunchedEffect(session) {
         val idPaciente = session?.idPaciente ?: return@LaunchedEffect
         pacienteViewModel.cargarPsicologoAsignado(idPaciente)
@@ -143,31 +152,35 @@ fun ViewPacientePrincipalScreen(
     val isLoading = isLoadingPaciente || isLoadingPsicologo
     val error = errorPsicologo
 
-    val nombrePaciente = psicologo?.usuario?.nombre?.split(" ")?.firstOrNull()
-        ?: session?.nombre?.split(" ")?.firstOrNull()
-        ?: "Paciente"
+    val nombrePaciente =
+        psicologo?.usuario?.nombre?.split(" ")?.firstOrNull()
+            ?: session?.nombre?.split(" ")?.firstOrNull()
+            ?: stringResource(R.string.rol_paciente_default)
 
     val hora = LocalDateTime.now().hour
-    val saludo = when {
-        hora < 12 -> "🌅 Buenos días"
-        hora < 18 -> "☀️ Buenas tardes"
-        else -> "🌙 Buenas noches"
-    }
+    val saludo =
+        when {
+            hora < 12 -> stringResource(R.string.saludo_buenos_dias)
+            hora < 18 -> stringResource(R.string.saludo_buenas_tardes)
+            else -> stringResource(R.string.saludo_buenas_noches)
+        }
 
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
             title = {
                 Text(
-                    text = "Cerrar Sesión",
+                    text = stringResource(R.string.auto_cerrar_sesion_1),
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             },
             text = {
                 Text(
-                    text = "¿Estás seguro de que deseas cerrar sesión?",
-                    color = if (isDark) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    text = stringResource(R.string.auto_estas_seguro_de_que),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             confirmButton = {
@@ -178,56 +191,115 @@ fun ViewPacientePrincipalScreen(
                             popUpTo(0) { inclusive = true }
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError,
+                        ),
                 ) {
-                    Text("Cerrar Sesión", color = Color.White)
+                    Text(stringResource(R.string.auto_cerrar_sesion_1))
                 }
             },
             dismissButton = {
-                Button(
+                TextButton(
                     onClick = { showLogoutDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.auto_cancelar))
                 }
             },
-            containerColor = if (isDark) Color(0xFF2D2D2D) else MaterialTheme.colorScheme.surface,
-            titleContentColor = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface,
-            textContentColor = if (isDark) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 
-    Scaffold { paddingValues ->
+    ViewPacientePrincipalContent(
+        nombrePaciente = nombrePaciente,
+        saludo = saludo,
+        isLoading = isLoading,
+        psicologo = psicologo,
+        error = error,
+        latestTicket = latestTicket,
+        isDark = isDark,
+        cardColors = cardColors,
+        token = token,
+        onLogoutClick = { showLogoutDialog = true },
+        onOpenCopilotClick = { showCopilotDialog = true },
+        onRetry = {
+            val idPaciente = session?.idPaciente ?: return@ViewPacientePrincipalContent
+            pacienteViewModel.cargarPsicologoAsignado(idPaciente)
+            profilePsicologoViewModel.fetchProfile(idPaciente)
+        },
+        onBackClick = { navController.navigateUp() },
+        onViewCitasClick = { navController.navigate(Screens.citas.route) },
+    )
+
+    // Diálogo del Copiloto
+    if (showCopilotDialog) {
+        CopilotDialog(
+            onDismiss = { showCopilotDialog = false },
+            onAsk = { copilotoViewModel.ask(it) },
+            onClearError = { copilotoViewModel.clearError() },
+            chunks = chunks,
+            isLoading = loadingCopilot,
+            error = errorCopilot,
+            isDark = isDark,
+        )
+    }
+}
+
+@Composable
+fun ViewPacientePrincipalContent(
+    nombrePaciente: String,
+    saludo: String,
+    isLoading: Boolean,
+    psicologo: PsicologoProfileResponseDTO?,
+    error: String?,
+    latestTicket: TicketModel?,
+    isDark: Boolean,
+    cardColors: CardColors,
+    token: String?,
+    onLogoutClick: () -> Unit,
+    onOpenCopilotClick: () -> Unit,
+    onRetry: () -> Unit,
+    onBackClick: () -> Unit,
+    onViewCitasClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
+    Scaffold(
+        modifier = modifier,
+        containerColor = colorScheme.background,
+    ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(if (isDark) Color.Black else screenColors.background)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(colorScheme.background),
         ) {
             when {
                 isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                color = MaterialTheme.colorScheme.primary,
-                                strokeWidth = 3.dp
+                                modifier = Modifier.size(Dimensions.iconExtraLarge),
+                                color = colorScheme.primary,
+                                strokeWidth = Dimensions.progressStroke,
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(Spacing.m))
                             Text(
-                                stringResource(R.string.auto_cargando_tu_informacion),
-                                fontSize = 14.sp,
-                                color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
+                                text = stringResource(R.string.auto_cargando_tu_informacion),
+                                style = typography.bodyMedium,
+                                color = colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -235,26 +307,25 @@ fun ViewPacientePrincipalScreen(
 
                 psicologo != null -> {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
                     ) {
                         GreetingCard(
                             nombrePaciente = nombrePaciente,
                             saludo = saludo,
                             isDark = isDark,
-                            onLogoutClick = { showLogoutDialog = true }
+                            onLogoutClick = onLogoutClick,
                         )
 
-                        val ticketsState by ticketsViewModel.tickets.observeAsState(emptyList())
-                        val latestTicket = ticketsState.firstOrNull()
-
-                        PsicologoContent(
-                            psicologo = psicologo!!,
-                            navController = navController,
+                        PsicologoBodyContent(
+                            psicologo = psicologo,
                             isDark = isDark,
                             cardColors = cardColors,
-                            latestTicket = latestTicket
+                            latestTicket = latestTicket,
+                            token = token,
+                            onViewCitasClick = onViewCitasClick,
                         )
                     }
                 }
@@ -262,49 +333,37 @@ fun ViewPacientePrincipalScreen(
                 error != null -> {
                     ErrorState(
                         error = error,
-                        onRetry = {
-                            val idPaciente = session?.idPaciente ?: return@ErrorState
-                            pacienteViewModel.cargarPsicologoAsignado(idPaciente)
-                            profilePsicologoViewModel.fetchProfile(idPaciente)
-                        },
-                        isDark = isDark
+                        onRetry = onRetry,
+                        isDark = isDark,
                     )
                 }
 
                 else -> {
-                    NoPsicologoAssignedState(navController, isDark)
+                    NoPsicologoAssignedState(
+                        onBackClick = onBackClick,
+                        isDark = isDark,
+                    )
                 }
             }
 
             // Botón flotante del Copiloto
             FloatingActionButton(
-                onClick = { showCopilotDialog = true },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                onClick = onOpenCopilotClick,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(Spacing.m),
+                containerColor = colorScheme.primary,
+                contentColor = colorScheme.onPrimary,
+                elevation = FloatingActionButtonDefaults.elevation(Elevation.level3),
             ) {
                 Icon(
                     Icons.Default.QuestionAnswer,
-                    contentDescription = "Asistente IA",
-                    modifier = Modifier.size(24.dp)
+                    contentDescription = stringResource(R.string.copiloto_asistente_ia),
+                    modifier = Modifier.size(Dimensions.iconDefault),
                 )
             }
         }
-    }
-
-    // Diálogo del Copiloto
-    if (showCopilotDialog) {
-        CopilotDialog(
-            onDismiss = { showCopilotDialog = false },
-            copilotoViewModel = copilotoViewModel,
-            chunks = chunks,
-            isLoading = loadingCopilot,
-            error = errorCopilot,
-            isDark = isDark
-        )
     }
 }
 
@@ -315,87 +374,115 @@ fun CopilotDialog(
     chunks: List<ChunkResponseDto>,
     isLoading: Boolean,
     error: String?,
-    isDark: Boolean
+    isDark: Boolean,
+) {
+    CopilotDialog(
+        onDismiss = onDismiss,
+        onAsk = { copilotoViewModel.ask(it) },
+        onClearError = { copilotoViewModel.clearError() },
+        chunks = chunks,
+        isLoading = isLoading,
+        error = error,
+        isDark = isDark,
+    )
+}
+
+@Composable
+fun CopilotDialog(
+    onDismiss: () -> Unit,
+    onAsk: (String) -> Unit,
+    onClearError: () -> Unit,
+    chunks: List<ChunkResponseDto>,
+    isLoading: Boolean,
+    error: String?,
+    isDark: Boolean,
 ) {
     var question by remember { mutableStateOf("") }
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
-        )
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false,
+            ),
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .fillMaxHeight(0.8f)
-                .shadow(24.dp, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isDark) Color(0xFF1E1E1E) else Color.White
-            )
+            modifier =
+                Modifier
+                    .fillMaxWidth(0.95f)
+                    .fillMaxHeight(0.8f),
+            shape = MaterialTheme.shapes.extraLarge,
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level4),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = colorScheme.surface,
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(Spacing.m),
             ) {
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.QuestionAnswer,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(28.dp)
+                            tint = colorScheme.primary,
+                            modifier = Modifier.size(Dimensions.iconDefault),
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(Spacing.sm))
                         Text(
-                            text = "Asistente IA - Copiloto",
-                            fontSize = 20.sp,
+                            text = stringResource(R.string.copiloto_titulo),
+                            style = typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                            color = colorScheme.onSurface,
                         )
                     }
                     IconButton(onClick = onDismiss) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
-                            tint = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                            contentDescription = stringResource(R.string.auto_cerrar),
+                            tint = colorScheme.onSurfaceVariant,
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-                Divider(color = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Gray.copy(alpha = 0.2f))
+                Spacer(modifier = Modifier.height(Spacing.s))
+                HorizontalDivider(color = colorScheme.outlineVariant)
 
                 // Área de respuestas
                 Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(vertical = 12.dp)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(vertical = Spacing.sm),
                 ) {
                     when {
                         isLoading -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(40.dp),
-                                        color = MaterialTheme.colorScheme.primary
+                                        modifier = Modifier.size(Dimensions.avatarSmall),
+                                        color = colorScheme.primary,
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(Spacing.s))
                                     Text(
-                                        text = "Buscando información...",
-                                        fontSize = 14.sp,
-                                        color = if (isDark) Color.White.copy(alpha = 0.7f) else Color.Gray
+                                        text = stringResource(R.string.copiloto_buscando_info),
+                                        style = typography.bodyMedium,
+                                        color = colorScheme.onSurfaceVariant,
                                     )
                                 }
                             }
@@ -403,79 +490,78 @@ fun CopilotDialog(
                         error != null -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(
                                         Icons.Default.Error,
                                         contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(48.dp)
+                                        tint = colorScheme.error,
+                                        modifier = Modifier.size(Dimensions.iconExtraLarge),
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(Spacing.s))
                                     Text(
                                         text = error,
-                                        fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.error,
-                                        textAlign = TextAlign.Center
+                                        style = typography.bodyMedium,
+                                        color = colorScheme.error,
+                                        textAlign = TextAlign.Center,
                                     )
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(Spacing.m))
                                     Button(
-                                        onClick = { copilotoViewModel.clearError() },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary
-                                        )
+                                        onClick = onClearError,
+                                        colors =
+                                            ButtonDefaults.buttonColors(
+                                                containerColor = colorScheme.primary,
+                                            ),
                                     ) {
-                                        Text("Reintentar")
+                                        Text(stringResource(R.string.auto_reintentar))
                                     }
                                 }
                             }
                         }
                         chunks.isNotEmpty() -> {
+                            val defaultDocName = stringResource(R.string.copiloto_info_general)
                             LazyColumn(
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(Spacing.m),
                             ) {
-                                // Agrupar chunks por documento
-                                val chunksByDocument = chunks.groupBy { it.nombreDocumento ?: "Información general" }
+                                val chunksByDocument = chunks.groupBy { it.nombreDocumento ?: defaultDocName }
 
                                 chunksByDocument.forEach { (documentName, documentChunks) ->
-                                    item {
+                                    item(key = documentName) {
                                         Card(
                                             modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(12.dp),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = if (isDark) Color(0xFF252525) else Color(0xFFF0F0F0)
-                                            )
+                                            shape = MaterialTheme.shapes.medium,
+                                            colors =
+                                                CardDefaults.cardColors(
+                                                    containerColor = colorScheme.surfaceContainerLow,
+                                                ),
                                         ) {
                                             Column(
-                                                modifier = Modifier.padding(12.dp)
+                                                modifier = Modifier.padding(Spacing.sm),
                                             ) {
                                                 Text(
-                                                    text = "📄 $documentName",
-                                                    fontSize = 14.sp,
+                                                    text = documentName,
+                                                    style = typography.titleSmall,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = if (isDark) Color.White else MaterialTheme.colorScheme.primary
+                                                    color = colorScheme.primary,
                                                 )
-                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Spacer(modifier = Modifier.height(Spacing.s))
 
                                                 documentChunks.sortedBy { it.chunkIndex }.forEach { chunk ->
                                                     Column(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(vertical = 8.dp)
+                                                        modifier =
+                                                            Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(vertical = Spacing.s),
                                                     ) {
                                                         Text(
                                                             text = chunk.contenido,
-                                                            fontSize = 14.sp,
-                                                            lineHeight = 20.sp,
-                                                            color = if (isDark) Color.White.copy(alpha = 0.9f) else Color.Black
+                                                            style = typography.bodyMedium,
+                                                            color = colorScheme.onSurface,
                                                         )
                                                         if (chunk != documentChunks.last()) {
-                                                            Spacer(modifier = Modifier.height(8.dp))
-                                                            Divider(
-                                                                color = if (isDark) Color.White.copy(alpha = 0.1f)
-                                                                else Color.Gray.copy(alpha = 0.2f)
-                                                            )
+                                                            Spacer(modifier = Modifier.height(Spacing.s))
+                                                            HorizontalDivider(color = colorScheme.outlineVariant)
                                                         }
                                                     }
                                                 }
@@ -488,21 +574,21 @@ fun CopilotDialog(
                         else -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(
-                                        Icons.Default.Psychology,
+                                        Icons.Default.QuestionAnswer,
                                         contentDescription = null,
-                                        tint = if (isDark) Color.White.copy(alpha = 0.3f) else Color.Gray.copy(alpha = 0.5f),
-                                        modifier = Modifier.size(64.dp)
+                                        tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                        modifier = Modifier.size(Dimensions.iconHero),
                                     )
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(Spacing.m))
                                     Text(
-                                        text = "Hazme una pregunta sobre salud mental, terapias o bienestar emocional",
-                                        fontSize = 14.sp,
-                                        color = if (isDark) Color.White.copy(alpha = 0.5f) else Color.Gray,
-                                        textAlign = TextAlign.Center
+                                        text = stringResource(R.string.copiloto_prompt_inicial),
+                                        style = typography.bodyMedium,
+                                        color = colorScheme.onSurfaceVariant,
+                                        textAlign = TextAlign.Center,
                                     )
                                 }
                             }
@@ -510,15 +596,16 @@ fun CopilotDialog(
                     }
                 }
 
-                Divider(color = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Gray.copy(alpha = 0.2f))
+                HorizontalDivider(color = colorScheme.outlineVariant)
 
                 // Campo de pregunta
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.Bottom
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = Spacing.s),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+                    verticalAlignment = Alignment.Bottom,
                 ) {
                     OutlinedTextField(
                         value = question,
@@ -526,46 +613,46 @@ fun CopilotDialog(
                         modifier = Modifier.weight(1f),
                         placeholder = {
                             Text(
-                                text = "Escribe tu pregunta...",
-                                fontSize = 14.sp
+                                text = stringResource(R.string.copiloto_escribe_pregunta),
+                                style = typography.bodyMedium,
                             )
                         },
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            fontSize = 14.sp,
-                            color = if (isDark) Color.White else Color.Black
-                        ),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = if (isDark) Color(0xFF2D2D2D) else Color(0xFFF5F5F5),
-                            unfocusedContainerColor = if (isDark) Color(0xFF2D2D2D) else Color(0xFFF5F5F5),
-                            focusedTextColor = if (isDark) Color.White else Color.Black,
-                            unfocusedTextColor = if (isDark) Color.White else Color.Black,
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        singleLine = true
+                        textStyle = typography.bodyMedium,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = colorScheme.surfaceContainerLow,
+                                unfocusedContainerColor = colorScheme.surfaceContainerLow,
+                                focusedTextColor = colorScheme.onSurface,
+                                unfocusedTextColor = colorScheme.onSurface,
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.outlineVariant,
+                            ),
+                        singleLine = true,
                     )
 
                     Button(
                         onClick = {
                             if (question.isNotBlank()) {
-                                copilotoViewModel.ask(question)
+                                onAsk(question)
                                 question = ""
                             }
                         },
                         enabled = question.isNotBlank() && !isLoading,
                         shape = CircleShape,
-                        modifier = Modifier.size(48.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            disabledContainerColor = if (isDark) Color(0xFF3D3D3D) else Color(0xFFE0E0E0)
-                        )
+                        modifier = Modifier.size(Dimensions.touchTarget),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.primary,
+                                contentColor = colorScheme.onPrimary,
+                                disabledContainerColor = colorScheme.surfaceVariant,
+                                disabledContentColor = colorScheme.onSurfaceVariant,
+                            ),
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Enviar",
-                            tint = Color.Black,
-                            modifier = Modifier.size(20.dp)
+                            contentDescription = stringResource(R.string.auto_enviar),
+                            modifier = Modifier.size(Dimensions.iconMedium),
                         )
                     }
                 }
@@ -577,108 +664,120 @@ fun CopilotDialog(
 @Composable
 fun ChunkMessage(
     chunk: ChunkResponseDto,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isDark) Color(0xFF2D2D2D) else Color(0xFFF5F5F5)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = MaterialTheme.shapes.medium,
+        colors =
+            CardDefaults.cardColors(
+                containerColor = colorScheme.surfaceContainerLow,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(Spacing.sm),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    modifier = Modifier.size(28.dp)
+                    color = colorScheme.primaryContainer,
+                    modifier = Modifier.size(Dimensions.iconDefault),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(
                             text = "${chunk.chunkIndex + 1}",
-                            fontSize = 12.sp,
+                            style = typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = colorScheme.onPrimaryContainer,
                         )
                     }
                 }
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
-                    text = chunk.nombreDocumento ?: "Fragmento ${chunk.chunkIndex + 1}",
-                    fontSize = 12.sp,
+                    text = chunk.nombreDocumento ?: stringResource(R.string.copiloto_fragmento_num, chunk.chunkIndex + 1),
+                    style = typography.labelMedium,
                     fontWeight = FontWeight.Medium,
-                    color = if (isDark) Color.White.copy(alpha = 0.7f) else Color.Gray
+                    color = colorScheme.onSurfaceVariant,
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(
                 text = chunk.contenido,
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
-                color = if (isDark) Color.White else Color.Black
+                style = typography.bodyMedium,
+                color = colorScheme.onSurface,
             )
         }
     }
 }
+
 @Composable
 fun GreetingCard(
     nombrePaciente: String,
     saludo: String,
     isDark: Boolean,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val headerBg = if (isDark) colorScheme.surfaceContainerHigh else colorScheme.primary
+    val headerContent = if (isDark) colorScheme.onSurface else colorScheme.onPrimary
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-        color = if (isDark) Color.Black else MaterialTheme.colorScheme.primary
+        shape =
+            MaterialTheme.shapes.extraLarge.copy(
+                topStart = CornerSize(Spacing.none),
+                topEnd = CornerSize(Spacing.none),
+            ),
+        color = headerBg,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                "Cerrar sesión",
-                fontSize = 14.sp,
-                color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .clickable{
-                        onLogoutClick()
-                    }
-            )
-        }
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.l, vertical = Spacing.m),
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+            ) {
+                Text(
+                    text = stringResource(R.string.auto_cerrar_sesion_1),
+                    style = typography.labelLarge,
+                    color = headerContent.copy(alpha = 0.85f),
+                    fontWeight = FontWeight.Bold,
+                    modifier =
+                        Modifier
+                            .clickable(onClick = onLogoutClick)
+                            .padding(vertical = Spacing.xs),
+                )
+            }
             Text(
                 text = saludo,
-                fontSize = 14.sp,
-                color = if (isDark) Color.White.copy(alpha = 0.9f) else Color.White.copy(alpha = 0.9f),
-                fontWeight = FontWeight.Medium
+                style = typography.bodyMedium,
+                color = headerContent.copy(alpha = 0.9f),
+                fontWeight = FontWeight.Medium,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(
-                text = "$nombrePaciente 👋",
-                fontSize = 28.sp,
+                text = nombrePaciente,
+                style = typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = if (isDark) Color.White else Color.White
+                color = headerContent,
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(Spacing.xs))
             Text(
                 text = stringResource(R.string.auto_tu_bienestar_es_nuestra),
-                fontSize = 14.sp,
-                color = if (isDark) Color.White.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.8f)
+                style = typography.bodyMedium,
+                color = headerContent.copy(alpha = 0.85f),
             )
         }
     }
@@ -688,44 +787,50 @@ fun GreetingCard(
 fun ErrorState(
     error: String?,
     onRetry: () -> Unit,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(Spacing.l),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             Icons.Default.Error,
             contentDescription = stringResource(R.string.auto_error),
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.error
+            modifier = Modifier.size(Dimensions.avatarLarge),
+            tint = colorScheme.error,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
         Text(
             text = stringResource(R.string.auto_error_al_cargar_los),
-            fontSize = 20.sp,
+            style = typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = if (isDark) Color.White else MaterialTheme.colorScheme.error
+            color = colorScheme.error,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(Spacing.s))
         Text(
-            text = error ?: "Error desconocido",
-            fontSize = 14.sp,
-            color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            text = error ?: stringResource(R.string.error_desconocido),
+            style = typography.bodyMedium,
+            color = colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            ),
-            shape = RoundedCornerShape(12.dp)
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary,
+                ),
+            shape = MaterialTheme.shapes.medium,
         ) {
-            Text(stringResource(R.string.auto_reintentar), color = Color.White)
+            Text(stringResource(R.string.auto_reintentar))
         }
     }
 }
@@ -733,95 +838,109 @@ fun ErrorState(
 @Composable
 fun NoPsicologoAssignedState(
     navController: NavController,
-    isDark: Boolean
+    isDark: Boolean,
 ) {
+    NoPsicologoAssignedState(
+        onBackClick = { navController.navigateUp() },
+        isDark = isDark,
+    )
+}
+
+@Composable
+fun NoPsicologoAssignedState(
+    onBackClick: () -> Unit,
+    isDark: Boolean,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(Spacing.l),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Surface(
-            modifier = Modifier.size(120.dp),
+            modifier = Modifier.size(Dimensions.avatarHero),
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            color = colorScheme.primaryContainer.copy(alpha = 0.4f),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    Icons.Default.Psychology,
+                    Icons.Default.MedicalServices,
                     contentDescription = stringResource(R.string.auto_sin_psicologo),
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    modifier = Modifier.size(Dimensions.iconHero),
+                    tint = colorScheme.primary,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
 
         Text(
             text = stringResource(R.string.auto_aun_no_tienes_un),
-            fontSize = 22.sp,
+            style = typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center
+            color = colorScheme.onSurface,
+            textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(Spacing.sm))
 
         Text(
             text = stringResource(R.string.auto_un_administrador_te_asignara),
-            fontSize = 14.sp,
-            color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.bodyMedium,
+            color = colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = Spacing.m),
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(Spacing.xl))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isDark) Color(0xFF2D2D2D) else MaterialTheme.colorScheme.surfaceVariant.copy(
-                    alpha = 0.5f
-                )
-            )
+            shape = MaterialTheme.shapes.large,
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = colorScheme.surfaceContainerLow,
+                ),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(Spacing.m),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(R.string.auto__que_puedes_hacer),
-                    fontSize = 14.sp,
+                    style = typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+                    color = colorScheme.onSurface,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
                 Text(
                     text = stringResource(R.string.auto__explora_nuestros_recursos),
-                    fontSize = 12.sp,
-                    color = if (isDark) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 18.sp
+                    style = typography.bodySmall,
+                    color = colorScheme.onSurfaceVariant,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
 
         Button(
-            onClick = { navController.navigateUp() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
+            onClick = onBackClick,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary,
+                ),
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
                 stringResource(R.string.auto_volver_al_inicio),
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = Spacing.xs),
             )
         }
     }
@@ -845,169 +964,189 @@ fun PsicologoContent(
     navController: NavController,
     isDark: Boolean,
     cardColors: CardColors,
-    latestTicket: TicketModel?
+    latestTicket: TicketModel?,
 ) {
+    val tokenHolder = koinInject<TokenHolder>()
+    PsicologoBodyContent(
+        psicologo = psicologo,
+        isDark = isDark,
+        cardColors = cardColors,
+        latestTicket = latestTicket,
+        token = tokenHolder.getToken(),
+        onViewCitasClick = { navController.navigate(Screens.citas.route) },
+    )
+}
+
+@Composable
+fun PsicologoBodyContent(
+    psicologo: PsicologoProfileResponseDTO,
+    isDark: Boolean,
+    cardColors: CardColors,
+    latestTicket: TicketModel?,
+    token: String?,
+    onViewCitasClick: () -> Unit,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val amaniColors = AmaniTheme.colors
     val cardBackgroundColor = cardColors.cardBackground
     val cardContentColor = cardColors.cardContent
     val cardContentSecondaryColor = cardColors.cardContent.copy(alpha = 0.7f)
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 24.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = Spacing.m)
+                .padding(bottom = Spacing.l),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = cardBackgroundColor
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            shape = MaterialTheme.shapes.large,
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = cardBackgroundColor,
+                ),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(Spacing.l),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                )
-                            ),
-                            shape = CircleShape
-                        )
-                        .padding(3.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
+                    modifier =
+                        Modifier
+                            .size(Dimensions.avatarHero)
                             .clip(CircleShape)
-                            .background(if (isDark) Color(0xFF2D2D2D) else Color.White)
-                    ) {
-                        val fotoUrl = buildFullImageUrl(psicologo.usuario?.fotoPerfilUrl)
+                            .border(
+                                BorderStroke(Dimensions.progressStroke, colorScheme.primary),
+                                CircleShape,
+                            )
+                            .background(colorScheme.surfaceContainerLow),
+                ) {
+                    val fotoUrl = buildFullImageUrl(psicologo.usuario?.fotoPerfilUrl)
+                    val context = LocalContext.current
 
-                        val context = LocalContext.current
-                        val tokenHolder = koinInject<TokenHolder>()
-                        val token = tokenHolder.getToken()
-
-                        val request = remember(fotoUrl, token) {
-                            ImageRequest.Builder(context)
+                    val request =
+                        remember(fotoUrl, token) {
+                            ImageRequest
+                                .Builder(context)
                                 .data(fotoUrl)
-                                .addHeader("Authorization", "Bearer $token")
+                                .apply {
+                                    if (!token.isNullOrBlank()) {
+                                        addHeader("Authorization", "Bearer $token")
+                                    }
+                                }
                                 .crossfade(true)
                                 .placeholder(R.drawable.ic_default_avatar)
                                 .error(R.drawable.ic_default_avatar)
                                 .build()
                         }
-                        if (!fotoUrl.isNullOrBlank()) {
-                            Image(
-                                painter = rememberAsyncImagePainter(model = request),
-                                contentDescription = stringResource(R.string.auto_foto_de_perfil),
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(R.drawable.ic_default_avatar),
-                                contentDescription = stringResource(R.string.auto_foto_por_defecto),
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "${psicologo.usuario?.nombre ?: ""} ${psicologo.usuario?.apellido ?: ""}".trim(),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = cardContentColor
-                )
-
-                if (!psicologo.especialidad.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.25f else 0.15f)
-                    ) {
-                        Text(
-                            text = psicologo.especialidad ?: "",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isDark) Color.White else MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    if (fotoUrl.isNotBlank()) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = request),
+                            contentDescription = stringResource(R.string.auto_foto_de_perfil),
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(R.drawable.ic_default_avatar),
+                            contentDescription = stringResource(R.string.auto_foto_por_defecto),
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.m))
+
+                Text(
+                    text = "${psicologo.usuario?.nombre ?: ""} ${psicologo.usuario?.apellido ?: ""}".trim(),
+                    style = typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = cardContentColor,
+                )
+
+                if (!psicologo.especialidad.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(Spacing.s))
+                    Surface(
+                        shape = MaterialTheme.shapes.large,
+                        color = colorScheme.primaryContainer,
+                    ) {
+                        Text(
+                            text = psicologo.especialidad,
+                            style = typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(horizontal = Spacing.m, vertical = Spacing.xs),
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(Spacing.m))
 
                 if (!psicologo.usuario?.email.isNullOrBlank()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        modifier = Modifier.padding(vertical = Spacing.xs),
                     ) {
                         Icon(
                             Icons.Default.Email,
                             contentDescription = stringResource(R.string.auto_email),
-                            modifier = Modifier.size(18.dp),
-                            tint = cardContentSecondaryColor
+                            modifier = Modifier.size(Dimensions.iconButton),
+                            tint = cardContentSecondaryColor,
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(Spacing.sm))
                         Text(
                             text = psicologo.usuario?.email ?: "",
-                            fontSize = 14.sp,
-                            color = cardContentSecondaryColor
+                            style = typography.bodyMedium,
+                            color = cardContentSecondaryColor,
                         )
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = cardBackgroundColor
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            shape = MaterialTheme.shapes.large,
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = cardBackgroundColor,
+                ),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(Spacing.m),
             ) {
                 Text(
                     text = stringResource(R.string.auto__informacion_profesional),
-                    fontSize = 18.sp,
+                    style = typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = cardContentColor
+                    color = cardContentColor,
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.m))
 
                 if (psicologo.experiencia != null && psicologo.experiencia > 0) {
                     ProfessionalInfoRow(
                         icon = Icons.Default.School,
                         label = stringResource(R.string.auto_anos_de_experiencia),
-                        value = "${psicologo.experiencia} años",
-                        iconColor = MaterialTheme.colorScheme.primary,
+                        value = stringResource(R.string.psicologo_anos_exp_valor, psicologo.experiencia),
+                        iconColor = colorScheme.primary,
                         labelColor = cardContentSecondaryColor,
-                        valueColor = cardContentColor
+                        valueColor = cardContentColor,
                     )
                 }
 
@@ -1015,287 +1154,298 @@ fun PsicologoContent(
                     ProfessionalInfoRow(
                         icon = Icons.Default.Badge,
                         label = stringResource(R.string.auto_numero_de_colegiado),
-                        value = psicologo.licencia ?: "",
-                        iconColor = MaterialTheme.colorScheme.primary,
+                        value = psicologo.licencia,
+                        iconColor = colorScheme.primary,
                         labelColor = cardContentSecondaryColor,
-                        valueColor = cardContentColor
+                        valueColor = cardContentColor,
                     )
                 }
 
                 ProfessionalInfoRow(
                     icon = Icons.Outlined.AccessTime,
                     label = stringResource(R.string.auto_horario_de_atencion),
-                    value = "Lunes a Viernes: 9:00 - 20:00",
-                    iconColor = MaterialTheme.colorScheme.primary,
+                    value = stringResource(R.string.psicologo_horario_default),
+                    iconColor = colorScheme.primary,
                     labelColor = cardContentSecondaryColor,
-                    valueColor = cardContentColor
+                    valueColor = cardContentColor,
                 )
 
                 ProfessionalInfoRow(
                     icon = Icons.Outlined.LocationOn,
                     label = stringResource(R.string.auto_modalidad),
-                    value = "Presencial y Online",
-                    iconColor = MaterialTheme.colorScheme.primary,
+                    value = stringResource(R.string.psicologo_modalidad_default),
+                    iconColor = colorScheme.primary,
                     labelColor = cardContentSecondaryColor,
-                    valueColor = cardContentColor
+                    valueColor = cardContentColor,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
 
         if (!psicologo.descripcion.isNullOrBlank()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = cardBackgroundColor
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = MaterialTheme.shapes.large,
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = cardBackgroundColor,
+                    ),
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(Spacing.m),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = stringResource(R.string.auto__sobre_mi),
-                            fontSize = 18.sp,
+                            style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = cardContentColor,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         )
                         Icon(
-                            Icons.Default.Psychology,
+                            Icons.Default.MedicalServices,
                             contentDescription = stringResource(R.string.auto_psicologia),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            modifier = Modifier.size(24.dp)
+                            tint = colorScheme.primary,
+                            modifier = Modifier.size(Dimensions.iconDefault),
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
                     Text(
-                        text = psicologo.descripcion ?: "",
-                        fontSize = 14.sp,
-                        lineHeight = 22.sp,
-                        color = cardContentSecondaryColor
+                        text = psicologo.descripcion,
+                        style = typography.bodyMedium,
+                        color = cardContentSecondaryColor,
                     )
                 }
             }
         }
 
         val context = LocalContext.current
-        val showReportCard = remember(latestTicket) {
-            if (latestTicket == null) {
-                false
-            } else {
-                val status = latestTicket.estado.lowercase()
-                if (status !in listOf("resuelto", "cerrado")) {
-                    true
+        val showReportCard =
+            remember(latestTicket) {
+                if (latestTicket == null) {
+                    false
                 } else {
-                    val prefs =
-                        context.getSharedPreferences("ticket_cierre_prefs", Context.MODE_PRIVATE)
-                    val key = "cierre_${latestTicket.id}"
-                    var timestamp = prefs.getLong(key, 0L)
-                    if (timestamp == 0L) {
-                        timestamp = System.currentTimeMillis()
-                        prefs.edit().putLong(key, timestamp).apply()
+                    val status = latestTicket.estado.lowercase()
+                    if (status !in listOf("resuelto", "cerrado")) {
+                        true
+                    } else {
+                        val prefs =
+                            context.getSharedPreferences("ticket_cierre_prefs", Context.MODE_PRIVATE)
+                        val key = "cierre_${latestTicket.id}"
+                        var timestamp = prefs.getLong(key, 0L)
+                        if (timestamp == 0L) {
+                            timestamp = System.currentTimeMillis()
+                            prefs.edit().putLong(key, timestamp).apply()
+                        }
+                        System.currentTimeMillis() - timestamp < 12 * 60 * 60 * 1000L
                     }
-                    System.currentTimeMillis() - timestamp < 12 * 60 * 60 * 1000L
                 }
             }
-        }
 
         if (showReportCard && latestTicket != null) {
             val status = latestTicket.estado.lowercase()
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = cardBackgroundColor
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = MaterialTheme.shapes.large,
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = cardBackgroundColor,
+                    ),
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(Spacing.m),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = stringResource(R.string.auto_informacion_de_reportes),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
+                            tint = colorScheme.primary,
+                            modifier = Modifier.size(Dimensions.iconDefault),
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(Spacing.sm))
                         Text(
                             text = stringResource(R.string.auto_seguimiento_de_tu_reporte),
-                            fontSize = 18.sp,
+                            style = typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = cardContentColor
+                            color = cardContentColor,
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
                     Text(
-                        text = "Queremos garantizar tu tranquilidad y hemos comenzado a trabajar en el ticket \"${latestTicket.titulo}\":",
-                        fontSize = 13.sp,
-                        lineHeight = 19.sp,
-                        color = cardContentSecondaryColor
+                        text = stringResource(R.string.reporte_intro_ticket, latestTicket.titulo),
+                        style = typography.bodySmall,
+                        color = cardContentSecondaryColor,
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
                     val isStep1Completed = status in listOf("en-proceso", "resuelto", "cerrado")
                     val isStep1Active = status == "abierto"
                     ReportStepRow(
                         stepNumber = "1",
-                        title = "Envío y Registro",
-                        description = "El problema se ha registrado y nuestro equipo técnico ha sido notificado.",
-                        icon = Icons.Filled.Send,
-                        iconColor = MaterialTheme.colorScheme.primary,
+                        title = stringResource(R.string.reporte_paso1_titulo),
+                        description = stringResource(R.string.reporte_paso1_desc),
+                        icon = Icons.AutoMirrored.Filled.Send,
+                        iconColor = colorScheme.primary,
                         isCompleted = isStep1Completed,
                         isActive = isStep1Active,
                         contentColor = cardContentColor,
-                        secondaryColor = cardContentSecondaryColor
+                        secondaryColor = cardContentSecondaryColor,
                     )
 
                     val isStep2Completed = status in listOf("resuelto", "cerrado")
                     val isStep2Active = status == "en-proceso"
                     ReportStepRow(
                         stepNumber = "2",
-                        title = "Revisión y Proceso",
-                        description = "El equipo de soporte técnico está analizando y resolviendo la incidencia.",
+                        title = stringResource(R.string.reporte_paso2_titulo),
+                        description = stringResource(R.string.reporte_paso2_desc),
                         icon = Icons.Default.HourglassEmpty,
-                        iconColor = Color(0xFFF2A104),
+                        iconColor = amaniColors.warning,
                         isCompleted = isStep2Completed,
                         isActive = isStep2Active,
                         contentColor = cardContentColor,
-                        secondaryColor = cardContentSecondaryColor
+                        secondaryColor = cardContentSecondaryColor,
                     )
 
                     val isStep3Completed = status in listOf("resuelto", "cerrado")
                     val isStep3Active = status in listOf("resuelto", "cerrado")
                     ReportStepRow(
                         stepNumber = "3",
-                        title = if (status == "cerrado") "Cerrado" else "Resolución con Éxito",
-                        description = if (latestTicket.respuestaAdmin.isNotBlank()) {
-                            "Solución: ${latestTicket.respuestaAdmin}"
-                        } else {
-                            "El ticket ha sido marcado como resuelto. La solución se aplicará a la brevedad."
-                        },
+                        title =
+                            if (status == "cerrado") {
+                                stringResource(R.string.reporte_paso3_cerrado)
+                            } else {
+                                stringResource(R.string.reporte_paso3_resuelto)
+                            },
+                        description =
+                            if (latestTicket.respuestaAdmin.isNotBlank()) {
+                                stringResource(R.string.reporte_paso3_solucion, latestTicket.respuestaAdmin)
+                            } else {
+                                stringResource(R.string.reporte_paso3_pendiente_aplicar)
+                            },
                         icon = Icons.Default.CheckCircle,
-                        iconColor = Color(0xFF2E7D32),
+                        iconColor = amaniColors.success,
                         isCompleted = isStep3Completed,
                         isActive = isStep3Active,
                         contentColor = cardContentColor,
-                        secondaryColor = cardContentSecondaryColor
+                        secondaryColor = cardContentSecondaryColor,
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.15f else 0.08f),
-                        modifier = Modifier.fillMaxWidth()
+                        shape = MaterialTheme.shapes.medium,
+                        color = colorScheme.primaryContainer.copy(alpha = 0.4f),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = if (status in listOf("resuelto", "cerrado")) {
-                                "Este seguimiento desaparecerá automáticamente en unas horas ya que el reporte ha finalizado."
-                            } else {
-                                "Puedes ver el historial completo de tus reportes en cualquier momento en Ajustes -> Reportar problema -> Mis reportes."
-                            },
-                            fontSize = 12.sp,
-                            lineHeight = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isDark) Color.White.copy(alpha = 0.9f) else MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(12.dp)
+                            text =
+                                if (status in listOf("resuelto", "cerrado")) {
+                                    stringResource(R.string.reporte_aviso_finalizado)
+                                } else {
+                                    stringResource(R.string.reporte_aviso_ajustes)
+                                },
+                            style = typography.labelMedium,
+                            color = colorScheme.onSurface,
+                            modifier = Modifier.padding(Spacing.sm),
                         )
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
 
         Button(
-            onClick = { navController.navigate(Screens.citas.route) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            onClick = onViewCitasClick,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.buttonHeightLarge),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary,
+                ),
+            shape = MaterialTheme.shapes.medium,
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = Elevation.level2),
         ) {
             Icon(
                 Icons.Default.CalendarMonth,
                 contentDescription = stringResource(R.string.auto_citas),
-                modifier = Modifier.size(20.dp),
-                tint = Color.White
+                modifier = Modifier.size(Dimensions.iconMedium),
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Spacing.sm))
             Text(
                 stringResource(R.string.auto_ver_mis_citas),
-                modifier = Modifier.padding(vertical = 4.dp),
-                fontSize = 16.sp,
+                modifier = Modifier.padding(vertical = Spacing.xs),
+                style = typography.labelLarge,
                 fontWeight = FontWeight.Medium,
-                color = Color.White
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(Spacing.xl))
     }
 }
 
 @Composable
 fun ProfessionalInfoRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     value: String,
     iconColor: Color,
     labelColor: Color,
-    valueColor: Color
+    valueColor: Color,
 ) {
+    val typography = MaterialTheme.typography
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.s),
+        verticalAlignment = Alignment.Top,
     ) {
         Icon(
             icon,
             contentDescription = label,
-            modifier = Modifier.size(20.dp),
-            tint = iconColor
+            modifier = Modifier.size(Dimensions.iconMedium),
+            tint = iconColor,
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(Spacing.sm))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
-                fontSize = 12.sp,
-                color = labelColor
+                style = typography.labelMedium,
+                color = labelColor,
             )
             Text(
                 text = value,
-                fontSize = 14.sp,
+                style = typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = valueColor
+                color = valueColor,
             )
         }
     }
@@ -1306,56 +1456,161 @@ fun ReportStepRow(
     stepNumber: String,
     title: String,
     description: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     iconColor: Color,
     isCompleted: Boolean,
     isActive: Boolean,
     contentColor: Color,
-    secondaryColor: Color
+    secondaryColor: Color,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val amaniColors = AmaniTheme.colors
+
     val tintColor =
-        if (isCompleted) Color(0xFF2E7D32) else if (isActive) iconColor else Color.Gray.copy(alpha = 0.5f)
+        when {
+            isCompleted -> amaniColors.success
+            isActive -> iconColor
+            else -> colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        }
     val bgColor =
-        if (isCompleted) Color(0xFFE8F5E9) else if (isActive) iconColor.copy(alpha = 0.15f) else Color.Gray.copy(
-            alpha = 0.08f
-        )
+        when {
+            isCompleted -> amaniColors.successContainer
+            isActive -> iconColor.copy(alpha = 0.15f)
+            else -> colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        }
     val displayIcon = if (isCompleted) Icons.Default.CheckCircle else icon
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.s),
+        verticalAlignment = Alignment.Top,
     ) {
         Box(
-            modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(bgColor),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(Dimensions.iconDefault)
+                    .clip(CircleShape)
+                    .background(bgColor),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = displayIcon,
                 contentDescription = null,
                 tint = tintColor,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(Dimensions.iconSmall),
             )
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(Spacing.m))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = "$stepNumber. $title",
-                fontSize = 14.sp,
+                style = typography.bodyMedium,
                 fontWeight = if (isActive || isCompleted) FontWeight.Bold else FontWeight.Medium,
-                color = if (isActive || isCompleted) contentColor else contentColor.copy(alpha = 0.5f)
+                color = if (isActive || isCompleted) contentColor else contentColor.copy(alpha = 0.5f),
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(Spacing.xxs))
             Text(
                 text = description,
-                fontSize = 13.sp,
-                lineHeight = 18.sp,
-                color = if (isActive || isCompleted) secondaryColor else secondaryColor.copy(alpha = 0.5f)
+                style = typography.bodySmall,
+                color = if (isActive || isCompleted) secondaryColor else secondaryColor.copy(alpha = 0.5f),
             )
         }
+    }
+}
+
+private val previewPsicologoAsignado =
+    PsicologoProfileResponseDTO(
+        idPsicologo = 7L,
+        especialidad = "Psicología Clínica y Cognitivo-Conductual",
+        experiencia = 8,
+        descripcion = "Especialista en trastornos de ansiedad, regulación emocional y terapia cognitivo-conductual basada en evidencia.",
+        licencia = "M-34812",
+        usuario =
+            UsuarioProfileResponseDTO(
+                idUsuario = 7L,
+                nombre = "Elena",
+                apellido = "Martínez",
+                email = "elena.martinez@amani.org",
+                fotoPerfilUrl = null,
+            ),
+    )
+
+@Preview(showBackground = true, name = "ViewPacientePrincipal - Light")
+@Composable
+private fun ViewPacientePrincipalLightPreview() {
+    AppTheme(darkTheme = false) {
+        ViewPacientePrincipalContent(
+            nombrePaciente = "Laura",
+            saludo = "Buenos días",
+            isLoading = false,
+            psicologo = previewPsicologoAsignado,
+            error = null,
+            latestTicket = null,
+            isDark = false,
+            cardColors = getCardColors(),
+            token = null,
+            onLogoutClick = {},
+            onOpenCopilotClick = {},
+            onRetry = {},
+            onBackClick = {},
+            onViewCitasClick = {},
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "ViewPacientePrincipal - Dark",
+)
+@Composable
+private fun ViewPacientePrincipalDarkPreview() {
+    AppTheme(darkTheme = true) {
+        ViewPacientePrincipalContent(
+            nombrePaciente = "Laura",
+            saludo = "Buenas noches",
+            isLoading = false,
+            psicologo = previewPsicologoAsignado,
+            error = null,
+            latestTicket = null,
+            isDark = true,
+            cardColors = getCardColors(),
+            token = null,
+            onLogoutClick = {},
+            onOpenCopilotClick = {},
+            onRetry = {},
+            onBackClick = {},
+            onViewCitasClick = {},
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    fontScale = 1.5f,
+    name = "ViewPacientePrincipal - FontScale 1.5x (Sin Psicólogo)",
+)
+@Composable
+private fun ViewPacientePrincipalFontScalePreview() {
+    AppTheme(darkTheme = false) {
+        ViewPacientePrincipalContent(
+            nombrePaciente = "Laura",
+            saludo = "Buenas tardes",
+            isLoading = false,
+            psicologo = null,
+            error = null,
+            latestTicket = null,
+            isDark = false,
+            cardColors = getCardColors(),
+            token = null,
+            onLogoutClick = {},
+            onOpenCopilotClick = {},
+            onRetry = {},
+            onBackClick = {},
+            onViewCitasClick = {},
+        )
     }
 }

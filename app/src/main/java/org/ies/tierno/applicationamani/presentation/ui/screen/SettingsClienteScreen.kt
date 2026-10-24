@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen
 
+import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
@@ -57,7 +57,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,14 +68,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.ui.components.ThemeModeSelector
 import org.ies.tierno.applicationamani.presentation.viewmodels.SettingsClienteViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
 import org.ies.tierno.applicationamani.ui.theme.LocalAmaniColors
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -93,20 +97,26 @@ import org.koin.androidx.compose.koinViewModel
  * @param viewModel ViewModel que gestiona el estado del perfil del cliente.
  * @param idiomaViewModel ViewModel que gestiona el cambio de idioma y tema.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsClienteScreen(
     navController: NavController,
     onNavigateToSupport: () -> Unit = {},
     viewModel: SettingsClienteViewModel = koinViewModel(),
     idiomaViewModel: IdiomaViewModel = koinViewModel(),
+    modifier: Modifier = Modifier,
 ) {
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-    val amaniColors = LocalAmaniColors.current
-
-    var genderExpanded by remember { mutableStateOf(false) }
-    val genderOptions = listOf("Hombre", "Mujer", "No Binario")
+    val context = LocalContext.current
+    val userSessionDataStore: UserSessionDataStore =
+        remember {
+            try {
+                org.koin.java.KoinJavaComponent
+                    .getKoin()
+                    .get()
+            } catch (_: Exception) {
+                UserSessionDataStore(context)
+            }
+        }
+    val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val consentimientoLauncher =
         rememberLauncherForActivityResult(
@@ -121,7 +131,77 @@ fun SettingsClienteScreen(
         viewModel.cargarUsuario()
     }
 
+    SettingsClienteContent(
+        isLoading = viewModel.isLoading,
+        nombre = viewModel.nombre,
+        onNombreChange = { viewModel.nombre = it },
+        apellidos = viewModel.apellidos,
+        onApellidosChange = { viewModel.apellidos = it },
+        genero = viewModel.genero,
+        onGeneroChange = { viewModel.genero = it },
+        telefono = viewModel.telefono,
+        onTelefonoChange = { viewModel.telefono = it },
+        direccion = viewModel.direccion,
+        onDireccionChange = { viewModel.direccion = it },
+        codigoPostal = viewModel.codigoPostal,
+        onCodigoPostalChange = { viewModel.codigoPostal = it },
+        errorMessage = viewModel.errorMessage,
+        onUploadConsentimiento = { consentimientoLauncher.launch("application/pdf") },
+        onUploadProteccionDatos = { proteccionDatosLauncher.launch("application/pdf") },
+        onGuardar = viewModel::guardarUsuario,
+        onNavigateToSupport = onNavigateToSupport,
+        onBorrarCuenta = viewModel::borrarCuenta,
+        modifier = modifier,
+        themeSelectorSlot = {
+            ThemeModeSelector(
+                currentTema = session?.tema ?: false,
+                userSessionDataStore = userSessionDataStore,
+                session = session,
+                idiomaViewModel = idiomaViewModel,
+            )
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsClienteContent(
+    isLoading: Boolean,
+    nombre: String,
+    onNombreChange: (String) -> Unit,
+    apellidos: String,
+    onApellidosChange: (String) -> Unit,
+    genero: String,
+    onGeneroChange: (String) -> Unit,
+    telefono: String,
+    onTelefonoChange: (String) -> Unit,
+    direccion: String,
+    onDireccionChange: (String) -> Unit,
+    codigoPostal: String,
+    onCodigoPostalChange: (String) -> Unit,
+    errorMessage: String?,
+    onUploadConsentimiento: () -> Unit,
+    onUploadProteccionDatos: () -> Unit,
+    onGuardar: () -> Unit,
+    onNavigateToSupport: () -> Unit,
+    onBorrarCuenta: () -> Unit,
+    modifier: Modifier = Modifier,
+    themeSelectorSlot: @Composable () -> Unit = {},
+) {
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val amaniColors = LocalAmaniColors.current
+
+    var genderExpanded by remember { mutableStateOf(false) }
+    val genderOptions =
+        listOf(
+            stringResource(R.string.genero_hombre),
+            stringResource(R.string.genero_mujer),
+            stringResource(R.string.genero_no_binario),
+        )
+
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.auto_mi_configuracion), style = typography.titleLarge) },
@@ -135,7 +215,7 @@ fun SettingsClienteScreen(
         },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-            if (viewModel.isLoading) {
+            if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(
@@ -143,87 +223,87 @@ fun SettingsClienteScreen(
                         Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                            .padding(Spacing.m),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.l),
                 ) {
-                    // Sección de Perfil / Foto
                     Box(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = Spacing.s),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Box(
                                 modifier =
                                     Modifier
-                                        .size(100.dp)
+                                        .size(Dimensions.avatarProfile)
                                         .clip(CircleShape)
                                         .background(colors.surfaceContainerHigh)
-                                        .border(2.dp, colors.primary, CircleShape),
+                                        .border(Dimensions.borderMedium, colors.primary, CircleShape),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     Icons.Default.Person,
                                     contentDescription = null,
-                                    modifier = Modifier.size(60.dp),
+                                    modifier = Modifier.size(Dimensions.iconHero),
                                     tint = colors.primary,
                                 )
                                 Box(
                                     modifier =
                                         Modifier
                                             .align(Alignment.BottomEnd)
-                                            .size(32.dp)
+                                            .size(Dimensions.iconLarge)
                                             .clip(CircleShape)
                                             .background(colors.primary)
-                                            .padding(6.dp),
+                                            .padding(Spacing.xs),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(Icons.Default.CameraAlt, contentDescription = null, tint = colors.onPrimary)
                                 }
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(Spacing.m))
                             Text(
-                                text = "${viewModel.nombre} ${viewModel.apellidos}",
+                                text = "$nombre $apellidos",
                                 style = typography.titleLarge,
                             )
                         }
                     }
 
-                    // Sección: Información Personal
-                    SettingsSection(title = "Información Personal", icon = Icons.Default.Badge) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    SettingsSection(
+                        title = stringResource(R.string.auto_informacion_personal),
+                        icon = Icons.Default.Badge,
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.m)) {
                             TextFieldCustom(
-                                "Nombre",
-                                viewModel.nombre,
-                                { viewModel.nombre = it },
+                                stringResource(R.string.auto_nombre),
+                                nombre,
+                                onNombreChange,
                                 Icons.Default.Person,
                                 Modifier.weight(1f),
                             )
                             TextFieldCustom(
-                                "Apellidos",
-                                viewModel.apellidos,
-                                { viewModel.apellidos = it },
+                                stringResource(R.string.settings_apellidos),
+                                apellidos,
+                                onApellidosChange,
                                 Icons.Default.Person,
                                 Modifier.weight(1f),
                             )
                         }
 
-                        // Selector de Género
                         Column {
                             Text(
                                 text = stringResource(R.string.auto_genero),
                                 style = typography.labelMedium,
                                 color = colors.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+                                modifier = Modifier.padding(start = Spacing.xs, bottom = Spacing.xs),
                             )
                             ExposedDropdownMenuBox(
                                 expanded = genderExpanded,
                                 onExpandedChange = { genderExpanded = it },
                             ) {
                                 OutlinedTextField(
-                                    value = viewModel.genero,
+                                    value = genero,
                                     onValueChange = {},
                                     readOnly = true,
                                     modifier =
@@ -242,7 +322,7 @@ fun SettingsClienteScreen(
                                         DropdownMenuItem(
                                             text = { Text(option) },
                                             onClick = {
-                                                viewModel.genero = option
+                                                onGeneroChange(option)
                                                 genderExpanded = false
                                             },
                                         )
@@ -252,36 +332,40 @@ fun SettingsClienteScreen(
                         }
                     }
 
-                    // Sección: Contacto
-                    SettingsSection(title = "Contacto y Ubicación", icon = Icons.Default.ContactPage) {
+                    SettingsSection(
+                        title = stringResource(R.string.settings_contacto_ubicacion),
+                        icon = Icons.Default.ContactPage,
+                    ) {
                         TextFieldCustom(
-                            "Teléfono",
-                            viewModel.telefono,
-                            { viewModel.telefono = it },
+                            stringResource(R.string.auto_telefono),
+                            telefono,
+                            onTelefonoChange,
                             Icons.Default.Phone,
                             Modifier.fillMaxWidth(),
                         )
                         TextFieldCustom(
-                            "Dirección",
-                            viewModel.direccion,
-                            { viewModel.direccion = it },
+                            stringResource(R.string.settings_direccion),
+                            direccion,
+                            onDireccionChange,
                             Icons.Default.Home,
                             Modifier.fillMaxWidth(),
                         )
                         TextFieldCustom(
-                            "Código Postal",
-                            viewModel.codigoPostal,
-                            { viewModel.codigoPostal = it },
+                            stringResource(R.string.settings_codigo_postal),
+                            codigoPostal,
+                            onCodigoPostalChange,
                             Icons.Default.MarkunreadMailbox,
                             Modifier.fillMaxWidth(),
                         )
                     }
 
-                    // Sección: Documentación
-                    SettingsSection(title = "Documentación Legal", icon = Icons.Default.Description) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    SettingsSection(
+                        title = stringResource(R.string.settings_documentacion_legal),
+                        icon = Icons.Default.Description,
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.m)) {
                             OutlinedButton(
-                                onClick = { consentimientoLauncher.launch("application/pdf") },
+                                onClick = onUploadConsentimiento,
                                 modifier = Modifier.weight(1f),
                                 shape = CircleShape,
                             ) {
@@ -291,7 +375,7 @@ fun SettingsClienteScreen(
                                 }
                             }
                             OutlinedButton(
-                                onClick = { proteccionDatosLauncher.launch("application/pdf") },
+                                onClick = onUploadProteccionDatos,
                                 modifier = Modifier.weight(1f),
                                 shape = CircleShape,
                             ) {
@@ -303,42 +387,29 @@ fun SettingsClienteScreen(
                         }
                     }
 
-                    // Botón Guardar
                     Button(
-                        onClick = { viewModel.guardarUsuario() },
+                        onClick = onGuardar,
                         modifier = Modifier.fillMaxWidth(),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(),
                     ) {
-                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(Dimensions.iconButton))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(stringResource(R.string.auto_guardar_cambios), style = typography.labelLarge)
                     }
-
-                    // Theme selector
-                    val userSessionDataStore: UserSessionDataStore =
-                        try {
-                            org.koin.java.KoinJavaComponent
-                                .getKoin()
-                                .get()
-                        } catch (e: Exception) {
-                            UserSessionDataStore(LocalContext.current)
-                        }
-                    val sessionState = userSessionDataStore.sessionFlow.collectAsState(initial = null)
-                    val session = sessionState.value
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(containerColor = amaniColors.cardBackground),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2),
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(modifier = Modifier.padding(Spacing.m)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                                 Text(stringResource(R.string.auto_apariencia), style = typography.titleMedium, color = colors.onSurface)
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(Spacing.s))
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -350,30 +421,25 @@ fun SettingsClienteScreen(
                                     style = typography.bodyLarge,
                                     color = colors.onSurface,
                                 )
-                                ThemeModeSelector(
-                                    currentTema = session?.tema ?: false,
-                                    userSessionDataStore = userSessionDataStore,
-                                    session = session,
-                                    idiomaViewModel = idiomaViewModel,
-                                )
+                                themeSelectorSlot()
                             }
                         }
                     }
 
-                    // Sección: Soporte
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium,
                         colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.4f)),
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(Spacing.m),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.s),
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ContactSupport, contentDescription = null, tint = colors.secondary)
                             Text(stringResource(R.string.auto_necesitas_ayuda), style = typography.titleMedium)
-                            Text(stringResource(R.string.auto_reporta_un_bug_o),
+                            Text(
+                                stringResource(R.string.auto_reporta_un_bug_o),
                                 style = typography.bodySmall,
                                 textAlign = TextAlign.Center,
                             )
@@ -388,28 +454,26 @@ fun SettingsClienteScreen(
                         }
                     }
 
-                    // Eliminar cuenta
                     TextButton(
-                        onClick = { viewModel.borrarCuenta() },
+                        onClick = onBorrarCuenta,
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
                         Icon(Icons.Default.DeleteForever, contentDescription = null, tint = colors.error)
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(Spacing.xs))
                         Text(stringResource(R.string.auto_eliminar_mi_cuenta), color = colors.error, style = typography.labelLarge)
                     }
 
-                    // Mensaje de Error
-                    viewModel.errorMessage?.let { error ->
+                    errorMessage?.let { error ->
                         Text(
                             text = error,
                             color = colors.error,
                             style = typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.m),
                             textAlign = TextAlign.Center,
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
                 }
             }
         }
@@ -418,27 +482,29 @@ fun SettingsClienteScreen(
 
 /**
  * Sección agrupada de ajustes con título, icono y contenido.
- *
- * Renderiza una cabecera con el icono y el título, seguida de una [Card]
- * que envuelve el contenido personalizado proporcionado por el caller.
- *
- * @param title Título descriptivo de la sección.
- * @param icon Icono vectorial que identifica la sección.
- * @param content Contenido composable a mostrar dentro de la tarjeta.
  */
 @Composable
 fun SettingsSection(
     title: String,
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(Spacing.m),
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(start = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+            modifier = Modifier.padding(start = Spacing.xs),
         ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(Dimensions.iconDefault),
+            )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
@@ -452,8 +518,8 @@ fun SettingsSection(
             elevation = CardDefaults.cardElevation(),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier.padding(Spacing.m),
+                verticalArrangement = Arrangement.spacedBy(Spacing.l),
                 content = content,
             )
         }
@@ -462,16 +528,6 @@ fun SettingsSection(
 
 /**
  * Campo de texto personalizado con etiqueta externa e icono.
- *
- * Envuelve un [OutlinedTextField] con una etiqueta superior y un icono
- * a la izquierda, utilizando los colores del tema Material 3. Ideal para
- * formularios de edición de perfil.
- *
- * @param label Etiqueta descriptiva mostrada sobre el campo.
- * @param value Valor actual del campo de texto.
- * @param onValueChange Callback invocado al modificar el texto.
- * @param icon Icono vectorial a la izquierda del campo.
- * @param modifier Modificador de diseño opcional.
  */
 @Composable
 fun TextFieldCustom(
@@ -487,15 +543,15 @@ fun TextFieldCustom(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = Spacing.xs, bottom = Spacing.xs),
         )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp)) },
-            shape = RoundedCornerShape(12.dp),
+            leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(Dimensions.iconDefault)) },
+            shape = MaterialTheme.shapes.medium,
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedTextColor = colors.onSurface,
@@ -507,6 +563,36 @@ fun TextFieldCustom(
                     focusedLabelColor = colors.primary,
                     unfocusedLabelColor = colors.onSurfaceVariant,
                 ),
+        )
+    }
+}
+
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "FontScale 1.5x", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun SettingsClienteScreenPreview() {
+    AppTheme {
+        SettingsClienteContent(
+            isLoading = false,
+            nombre = "Laura",
+            onNombreChange = {},
+            apellidos = "Gómez",
+            onApellidosChange = {},
+            genero = "Mujer",
+            onGeneroChange = {},
+            telefono = "612345678",
+            onTelefonoChange = {},
+            direccion = "Calle Mayor 10",
+            onDireccionChange = {},
+            codigoPostal = "28013",
+            onCodigoPostalChange = {},
+            errorMessage = null,
+            onUploadConsentimiento = {},
+            onUploadProteccionDatos = {},
+            onGuardar = {},
+            onNavigateToSupport = {},
+            onBorrarCuenta = {},
         )
     }
 }

@@ -56,3 +56,35 @@ Registro estructurado (**Antes / Después**) de los patrones visuales genéricos
 - **Antes:** textos interpolados hardcodeados (`"Psicólogo: ..."`, `"Fecha: ..."`, `"Importe: ..."`, `"Error: ..."`), espaciados `15.dp` y `20.dp`, y código muerto comentado con `Color(0xFFF3F1F8)`, `Color(0xFF5E35B1)`, `Color.White`, `Color.Black`, `Color.Gray` y `FontFamily` local en `Cuestionario.kt`.
 - **Después:** componentes stateless (`PaymentScreenContent`, `QuestionnaireScreenContent`, `PrincipalClienteScreenContent`), textos formateados en `strings.xml`, escala `Spacing` / `Dimensions` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
 
+---
+
+### 3. Pantallas de Paciente, Citas, Diario Emocional y Juegos (`pacienteView/`, `diario/`, `juegos/`)
+
+#### `SnakeView.kt`, `SnakeScreen.kt` y `EntretenimientoScreen.kt`
+- **Antes:** `Color.parseColor("#FAF0E6")`, `Color.parseColor("#FF7F50")`, `Color.parseColor("#4CAF50")` y `Color.BLACK` hardcodeados en `SnakeView.kt`, `Color.Black.copy(alpha = 0.5f)` y `Color.White` en `SnakeScreen.kt`, emojis `"🐍"` y `"❌"` como iconos de UI y espaciados `10.dp`, `20.dp`, `22.sp`.
+- **Después:** constantes centralizadas en `ui/theme/Color.kt` (`SNAKE_BG_COLOR_INT`, `SNAKE_FOOD_COLOR_INT`, `SNAKE_BODY_COLOR_INT`, `SNAKE_BORDER_COLOR_INT`), `scrim` y `surfaceContainerHigh` en el overlay de inicio de partida, iconos vectoriales M3 (`SportsEsports`, `Refresh`, `ArrowBack`), textos en `strings.xml` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `TestPacienteScreen.kt`
+- **Antes:** 7 colores hexadecimales hardcodeados (`0xFFF2ECF9`, `0xFFCCC0E4`, `0xFF212121`, `0xFF7B61FF`, `0xFFEAE2F8`, `0xFFF5F5F5`, `0xFF555555`), `Icons.Default.Psychology` como icono de resultado, radios `20.dp` / `28.dp` y `fontSize = 15.sp..22.sp` sueltos.
+- **Después:** tokens `MaterialTheme.colorScheme.*`, `Icons.Default.SelfImprovement`, `MaterialTheme.shapes.large`, tipografía M3 (`headlineSmall`, `titleMedium`, `bodyLarge`, `labelLarge`) y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `DiarioEmocionalScreen.kt`
+- **Antes:** 20+ colores hexadecimales sueltos en el archivo (`0xFFFDE68A`, `0xFF4CAF50`, `0xFF2196F3`, `0xFFE53935`, `0xFFFFCA28`, `0xFFAB47BC`, `0xFF5C6BC0`, `0xFFEF5350`, `0xFFFF7043`, `0xFFF48FB1`, `0xFF26A69A` y `Color(0xFF424242)` / `Color.White` en el `Canvas`), `RoundedCornerShape(10.dp..20.dp)` y tamaños `10.sp..22.sp` con `fontFamily = roboto`.
+- **Después:** paleta cromática de la Rueda de Plutchik centralizada y documentada en `ui/theme/Color.kt` (`PlutchikJoy`, `PlutchikTrust`, `PlutchikFear`, `PlutchikSurprise`, `PlutchikSadness`, `PlutchikDisgust`, `PlutchikAnger`, `PlutchikAnticipation`, `PlutchikWheelStroke`, `PlutchikWheelLabelDark`), resto de la pantalla con tokens M3 (`colorScheme`, `typography`, `shapes`, `Spacing`) y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `SettingsClienteScreen.kt` y `SettingsOptionPaciente.kt`
+- **Antes:** `Brush.verticalGradient` en el fondo de la pantalla, `Color.Gray`, `Color.Red`, `Color.White`, `Color.Transparent`, `RoundedCornerShape(20.dp / 24.dp)`, textos literales en las etiquetas de edición y sin `collectAsStateWithLifecycle()`.
+- **Después:** superficie plana `MaterialTheme.colorScheme.background`, `AmaniTopBar`, `collectAsStateWithLifecycle()`, tokens M3 (`error`, `onSurfaceVariant`, `surfaceContainerLow`), textos en `strings.xml` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `HistorialCitasScreen.kt`, `HistorialClinicoScreen.kt` y `PacienteProfileScreen.kt`
+- **Antes:** fondos `Brush.verticalGradient`, tarjetas con `.shadow(4.dp, RoundedCornerShape(20.dp))`, `Color.Black`, `Color.Gray`, `Color.Red`, `Color.White`, `Icons.Default.Psychology` para el psicólogo asignado, emojis `"❌ "` en errores y `collectAsState()` sin ciclo de vida.
+- **Después:** `collectAsStateWithLifecycle()`, superficies planas M3, `Card` con `Elevation.level1` y `MaterialTheme.shapes.large`, `Icons.Default.MedicalServices`, chips semánticos (`AmaniTheme.colors.successContainer` / `warningContainer` / `errorContainer`) y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `ViewPacientePrincipalScreen.kt`
+- **Antes:** cabeceras con `Brush.horizontalGradient` y `Brush.verticalGradient`, 15+ colores hardcodeados (`0xFFFF9800`, `0xFFE65100`, `0xFFFFB74D`, `0xFFFFF3E0`, `0xFF4CAF50`, `0xFF2196F3`, `0xFF9E9E9E`), `Icons.Default.Psychology` en la tarjeta del copiloto y en el banner de bienestar, microcopy hype (`"Asistente IA • RAG"`, `"Copiloto Clínico IA"`), tarjetas anidadas y `collectAsState()`.
+- **Después:** superficies planas M3 (`primaryContainer`, `secondaryContainer`, `surfaceContainerLow`), tokens semánticos `AmaniTheme.colors.warning*` y `success*` para el seguimiento de incidencias, iconos concretos (`SupportAgent`, `SelfImprovement`, `MedicalServices`), microcopy sobrio y directo (`"Asistente de consultas"`), `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `EditarCitaScreen.kt`, `AgendaCitaScreen.kt` y `CitasScreen.kt`
+- **Antes:** `Color(0xFF4CAF50)`, `Color(0xFFFF9800)`, `Color(0xFFF44336)`, `Color(0xFF2196F3)`, `Color(0xFFE8F5E9)`, `Color(0xFF2E7D32)` hardcodeados para estados de cita, pagos y calendario, cabeceras con `Brush.horizontalGradient`, `.shadow(4.dp / 6.dp)`, `Icons.Default.Psychology` para el psicólogo y la terapia, y decenas de literales hardcodeados.
+- **Después:** funciones `@Composable` con tokens `AmaniTheme.colors.success*`, `warning*`, `error*` y `MaterialTheme.colorScheme.*`, superficies planas sin gradientes ni `.shadow` manuales, iconos concretos (`MedicalServices`, `Person`), textos en `strings.xml` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+

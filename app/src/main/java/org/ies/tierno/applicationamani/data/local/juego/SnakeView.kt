@@ -1,10 +1,14 @@
 package org.ies.tierno.applicationamani.data.local.juego
 
 import org.ies.tierno.applicationamani.domain.models.enumm.Direction
+import org.ies.tierno.applicationamani.ui.theme.SNAKE_BG_COLOR_INT
+import org.ies.tierno.applicationamani.ui.theme.SNAKE_BODY_COLOR_INT
+import org.ies.tierno.applicationamani.ui.theme.SNAKE_FOOD_COLOR_INT
+import org.ies.tierno.applicationamani.ui.theme.SNAKE_GRID_COLOR_INT
+import org.ies.tierno.applicationamani.ui.theme.SNAKE_HEAD_COLOR_INT
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.util.AttributeSet
@@ -26,15 +30,12 @@ class SnakeView @JvmOverloads constructor(
     private val gameEngine = SnakeGameEngine()
     private var gameJob: Job? = null
 
-    // Definir colores directamente usando Color.parseColor (NO necesitan R.color)
-    private val snakeColor = Color.parseColor("#CCC0E4")  // AmaniPurple
-    private val headColor = Color.parseColor("#9B8CBF")   // AmaniPurpleDark
-    private val foodColor = Color.parseColor("#BA1A1A")   // AmaniError
-    private val backgroundColor = Color.parseColor("#1A1A1A") // Fondo oscuro
-    private val gridColor = Color.parseColor("#CCC0E4").let {
-        // Versión con 30% de opacidad
-        Color.argb(77, Color.red(it), Color.green(it), Color.blue(it))
-    }
+    private val snakeColor = SNAKE_BODY_COLOR_INT
+    private val headColor = SNAKE_HEAD_COLOR_INT
+    private val foodColor = SNAKE_FOOD_COLOR_INT
+    private val backgroundColor = SNAKE_BG_COLOR_INT
+    private val gridColor = SNAKE_GRID_COLOR_INT
+
 
     // Paints
     private val snakePaint = Paint().apply {

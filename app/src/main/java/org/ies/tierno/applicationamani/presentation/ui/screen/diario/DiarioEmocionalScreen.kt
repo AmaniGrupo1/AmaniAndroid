@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.diario
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -27,7 +28,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -74,11 +74,30 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.domain.models.diario.EntradaDiario
+import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.diario.DiarioEmocionalViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.PLUTCHIK_SHADOW_COLOR_INT
+import org.ies.tierno.applicationamani.ui.theme.PLUTCHIK_TEXT_COLOR_INT
+import org.ies.tierno.applicationamani.ui.theme.PlutchikAnger
+import org.ies.tierno.applicationamani.ui.theme.PlutchikAnticipation
+import org.ies.tierno.applicationamani.ui.theme.PlutchikColdTint
+import org.ies.tierno.applicationamani.ui.theme.PlutchikDisgust
+import org.ies.tierno.applicationamani.ui.theme.PlutchikFear
+import org.ies.tierno.applicationamani.ui.theme.PlutchikJoy
+import org.ies.tierno.applicationamani.ui.theme.PlutchikSadness
+import org.ies.tierno.applicationamani.ui.theme.PlutchikSurprise
+import org.ies.tierno.applicationamani.ui.theme.PlutchikTrust
+import org.ies.tierno.applicationamani.ui.theme.PlutchikWarmTint
+import org.ies.tierno.applicationamani.ui.theme.PlutchikWheelCanvasBg
+import org.ies.tierno.applicationamani.ui.theme.PlutchikWheelStroke
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.time.ZoneId
@@ -100,11 +119,11 @@ sealed class Valence {
 }
 
 /**
- * Emoción según el modelo de la rueda de Plutchik, con color, emoji y variantes.
+ * Emoción según el modelo de la rueda de Plutchik, con color, símbolo y variantes.
  *
  * @property label Etiqueta descriptiva de la emoción.
  * @property color Color asociado a la emoción en la rueda.
- * @property emoji Emoji representativo.
+ * @property emoji Símbolo representativo en la rueda de Plutchik.
  * @property variants Variantes de intensidad de la emoción.
  * @property valence Valencia emocional (cálida, fría o neutra).
  */
@@ -117,38 +136,38 @@ enum class PlutchikEmotion(
 ) {
     ALEGRIA(
         "Alegría",
-        Color(0xFFFFEB3B),
+        PlutchikJoy,
         "😊",
         listOf("Éxtasis", "Alegría", "Serenidad"),
         Valence.Warm,
     ),
     CONFIANZA(
         "Confianza",
-        Color(0xFF8BC34A),
+        PlutchikTrust,
         "🤝",
         listOf("Admiración", "Confianza", "Aceptación"),
         Valence.Neutral,
     ),
-    IRA("Ira", Color(0xFFF44336), "😡", listOf("Furia", "Ira", "Irritación"), Valence.Warm),
+    IRA("Ira", PlutchikAnger, "😡", listOf("Furia", "Ira", "Irritación"), Valence.Warm),
     TRISTEZA(
         "Tristeza",
-        Color(0xFF2196F3),
+        PlutchikSadness,
         "😢",
         listOf("Congoja", "Tristeza", "Melancolía"),
         Valence.Cold,
     ),
-    ASCO("Asco", Color(0xFF4CAF50), "🤢", listOf("Repulsión", "Asco", "Aburrimiento"), Valence.Cold),
-    MIEDO("Miedo", Color(0xFF9C27B0), "😨", listOf("Terror", "Miedo", "Aprensión"), Valence.Cold),
+    ASCO("Asco", PlutchikDisgust, "🤢", listOf("Repulsión", "Asco", "Aburrimiento"), Valence.Cold),
+    MIEDO("Miedo", PlutchikFear, "😨", listOf("Terror", "Miedo", "Aprensión"), Valence.Cold),
     SORPRESA(
         "Sorpresa",
-        Color(0xFF00BCD4),
+        PlutchikSurprise,
         "😲",
         listOf("Asombro", "Sorpresa", "Distracción"),
         Valence.Neutral,
     ),
     ANTICIPACION(
         "Anticipación",
-        Color(0xFFFF9800),
+        PlutchikAnticipation,
         "⏳",
         listOf("Vigilancia", "Anticipación", "Interés"),
         Valence.Warm,
@@ -164,9 +183,6 @@ private fun resolvePrimaryEmotion(emocion: String): String {
 
 /**
  * Indicador visual de pasos para el flujo de creación de una entrada del diario.
- *
- * @param currentStep Paso actual (1-based).
- * @param steps Lista de etiquetas de cada paso.
  */
 @Composable
 fun StepIndicator(
@@ -176,7 +192,7 @@ fun StepIndicator(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(totalSteps) { step ->
@@ -186,14 +202,14 @@ fun StepIndicator(
                 label = stringResource(R.string.auto_color),
             )
             val width by animateDpAsState(
-                targetValue = if (isSelected) 32.dp else 8.dp,
+                targetValue = if (isSelected) Spacing.xl else Dimensions.dotIndicator,
                 label = stringResource(R.string.auto_width),
             )
 
             Box(
                 modifier =
                     Modifier
-                        .height(8.dp)
+                        .height(Dimensions.dotIndicator)
                         .width(width)
                         .clip(CircleShape)
                         .background(color),
@@ -204,13 +220,6 @@ fun StepIndicator(
 
 /**
  * Rueda de emociones interactiva basada en el modelo de Plutchik.
- *
- * Permite al usuario seleccionar una emoción principal pulsando sobre
- * los sectores de la rueda. Cada sector tiene un color y emoji asociado.
- *
- * @param emotions Lista de emociones a mostrar en la rueda.
- * @param selectedIndex Índice de la emoción seleccionada, o `null` si ninguna.
- * @param onEmotionSelected Callback invocado al seleccionar una emoción, recibe el índice.
  */
 @Composable
 fun EmotionWheel(
@@ -226,21 +235,21 @@ fun EmotionWheel(
     val accessibilityLabel =
         when {
             primaryLabel.isBlank() ->
-                "Rueda de emociones. Toca un segmento para seleccionar tu emoción."
+                stringResource(R.string.diario_rueda_accesibilidad_vacia)
 
             selectedSubEmotion.isNotBlank() ->
-                "Emoción: $primaryLabel – $selectedSubEmotion"
+                stringResource(R.string.diario_rueda_accesibilidad_sub, primaryLabel, selectedSubEmotion)
 
             else ->
-                "Emoción seleccionada: $primaryLabel. Toca otro segmento para cambiar."
+                stringResource(R.string.diario_rueda_accesibilidad_seleccionada, primaryLabel)
         }
 
     Box(
         modifier =
             modifier
-                .size(300.dp)
+                .size(Dimensions.wheelSize)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(PlutchikWheelCanvasBg)
                 .semantics { contentDescription = accessibilityLabel }
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
@@ -260,7 +269,7 @@ fun EmotionWheel(
                 },
         contentAlignment = Alignment.Center,
     ) {
-        androidx.compose.foundation.Canvas(modifier = Modifier.size(300.dp)) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.size(Dimensions.wheelSize)) {
             val radius = min(size.width, size.height) / 2f
             val center = Offset(size.width / 2f, size.height / 2f)
             val arcSize = Size(radius * 2, radius * 2)
@@ -272,11 +281,11 @@ fun EmotionWheel(
 
                 val tintColor =
                     when (emotion.valence) {
-                        is Valence.Warm -> Color(0xFFFFA726).copy(alpha = 0.25f)
-                        is Valence.Cold -> Color(0xFF42A5F5).copy(alpha = 0.25f)
-                        is Valence.Neutral -> Color.Transparent
+                        is Valence.Warm -> PlutchikWarmTint
+                        is Valence.Cold -> PlutchikColdTint
+                        is Valence.Neutral -> null
                     }
-                if (tintColor != Color.Transparent) {
+                if (tintColor != null) {
                     drawArc(
                         color = tintColor,
                         startAngle = startAngle,
@@ -298,7 +307,7 @@ fun EmotionWheel(
 
                 if (isSelected) {
                     drawArc(
-                        color = Color.White,
+                        color = PlutchikWheelStroke,
                         startAngle = startAngle,
                         sweepAngle = angleStep,
                         useCenter = true,
@@ -316,11 +325,11 @@ fun EmotionWheel(
                 drawContext.canvas.nativeCanvas.apply {
                     val paint =
                         android.graphics.Paint().apply {
-                            color = android.graphics.Color.WHITE
+                            color = PLUTCHIK_TEXT_COLOR_INT
                             textSize = 32f
                             textAlign = android.graphics.Paint.Align.CENTER
                             isFakeBoldText = isSelected
-                            setShadowLayer(4f, 1f, 1f, android.graphics.Color.BLACK)
+                            setShadowLayer(4f, 1f, 1f, PLUTCHIK_SHADOW_COLOR_INT)
                         }
                     drawText(emotion.emoji, textX, textY - 14f, paint)
                     paint.textSize = 24f
@@ -331,7 +340,7 @@ fun EmotionWheel(
             emotions.forEachIndexed { index, _ ->
                 val lineAngleRad = Math.toRadians((index * angleStep - 90.0))
                 drawLine(
-                    color = Color.White.copy(alpha = 0.4f),
+                    color = PlutchikWheelStroke.copy(alpha = 0.4f),
                     start = center,
                     end =
                         Offset(
@@ -343,7 +352,7 @@ fun EmotionWheel(
             }
 
             drawCircle(
-                color = Color.White,
+                color = PlutchikWheelCanvasBg,
                 radius = radius * 0.2f,
                 center = center,
             )
@@ -351,14 +360,10 @@ fun EmotionWheel(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 /**
  * Chips de sub-emociones para refinar la emoción seleccionada en la rueda.
- *
- * @param emotion Emoción principal seleccionada.
- * @param selectedSubEmotion Sub-emoción actualmente seleccionada.
- * @param onSubEmotionSelected Callback invocado al seleccionar una sub-emoción.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubEmotionChips(
     variants: List<String>,
@@ -371,18 +376,19 @@ fun SubEmotionChips(
             modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                .padding(vertical = Spacing.s),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.s, Alignment.CenterHorizontally),
     ) {
         variants.forEach { variant ->
+            val subEmotionDesc = stringResource(R.string.diario_sub_emocion_desc, variant)
             FilterChip(
                 selected = variant == selectedSubEmotion,
                 onClick = { onSubEmotionSelected(variant) },
                 label = { Text(variant) },
                 modifier =
                     Modifier
-                        .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
-                        .semantics { contentDescription = "Sub-emoción: $variant" },
+                        .defaultMinSize(minWidth = Dimensions.minTouchTarget, minHeight = Dimensions.minTouchTarget)
+                        .semantics { contentDescription = subEmotionDesc },
             )
         }
     }
@@ -402,16 +408,16 @@ private fun StepEmocion(
     val selectedPrimary = PlutchikEmotion.entries.find { it.label == primaryEmotion }
 
     Column(
-        modifier = modifier.padding(horizontal = 8.dp),
+        modifier = modifier.padding(horizontal = Spacing.s),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.m),
     ) {
         OutlinedTextField(
             value = titulo,
             onValueChange = onTituloChange,
             label = { Text(stringResource(R.string.auto_titulo_de_la_entrada)) },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.medium,
             leadingIcon = { Icon(Icons.Default.Mood, contentDescription = null) },
         )
 
@@ -433,7 +439,7 @@ private fun StepEmocion(
             selectedEmotion = emocion,
             onEmotionSelected = onEmocionChange,
             selectedSubEmotion = subEmocion,
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(vertical = Spacing.s),
         )
 
         if (selectedPrimary != null && selectedPrimary.variants.isNotEmpty()) {
@@ -450,7 +456,7 @@ private fun StepEmocion(
                 )
             }
         } else {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(Dimensions.buttonHeightLarge))
         }
     }
 }
@@ -462,26 +468,26 @@ private fun StepIntensidad(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.padding(24.dp),
+        modifier = modifier.padding(Spacing.l),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Surface(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(120.dp),
+            modifier = Modifier.size(Dimensions.avatarHero),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = intensidad.toInt().toString(),
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
 
         Text(
             text = stringResource(R.string.auto_que_tan_fuerte_es),
@@ -490,7 +496,7 @@ private fun StepIntensidad(
             textAlign = TextAlign.Center,
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(Spacing.xl))
 
         Slider(
             value = intensidad,
@@ -521,9 +527,9 @@ private fun StepContexto(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.padding(horizontal = 8.dp),
+        modifier = modifier.padding(horizontal = Spacing.s),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.m),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -547,7 +553,7 @@ private fun StepContexto(
                 Modifier
                     .fillMaxWidth()
                     .weight(1f),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.large,
             minLines = 5,
         )
 
@@ -565,32 +571,37 @@ private fun StepContexto(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             if (isEditing) {
                 OutlinedButton(
                     onClick = onCancelar,
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.weight(1f).height(Dimensions.buttonHeightLarge),
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Text(stringResource(R.string.auto_cancelar))
                 }
             }
             Button(
                 onClick = onGuardar,
-                modifier = Modifier.weight(if (isEditing) 1.5f else 1f).height(56.dp),
-                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.weight(if (isEditing) 1.5f else 1f).height(Dimensions.buttonHeightLarge),
+                shape = MaterialTheme.shapes.medium,
                 elevation = ButtonDefaults.buttonColors().let { ButtonDefaults.elevatedButtonElevation() },
             ) {
                 Icon(if (isEditing) Icons.Default.Edit else Icons.Default.Add, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(if (isEditing) "Actualizar" else "Guardar entrada")
+                Spacer(modifier = Modifier.width(Spacing.s))
+                Text(
+                    if (isEditing) {
+                        stringResource(R.string.diario_actualizar_entrada)
+                    } else {
+                        stringResource(R.string.diario_guardar_entrada)
+                    },
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 /**
  * Pantalla del diario emocional del paciente.
  *
@@ -603,15 +614,12 @@ private fun StepContexto(
  * @param viewModel ViewModel que gestiona el estado del diario emocional.
  */
 @Composable
-fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel()) {
+fun DiarioEmocionalScreen(
+    viewModel: DiarioEmocionalViewModel = koinViewModel(),
+    modifier: Modifier = Modifier,
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val snackbarHostState = remember { SnackbarHostState() }
-    val pagerState = rememberPagerState(pageCount = { 3 })
-
-    LaunchedEffect(state.currentStep) {
-        pagerState.animateScrollToPage(state.currentStep)
-    }
 
     LaunchedEffect(Unit) {
         viewModel.snackbarMessage.collect { message ->
@@ -619,7 +627,53 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
         }
     }
 
+    DiarioEmocionalContent(
+        state = state,
+        snackbarHostState = snackbarHostState,
+        onSincronizar = viewModel::forzarSincronizacion,
+        onTituloChange = viewModel::onTituloChange,
+        onEmocionChange = viewModel::onEmocionChange,
+        onSubEmocionChange = viewModel::onSubEmocionChange,
+        onIntensidadChange = viewModel::onIntensidadChange,
+        onContenidoChange = viewModel::onContenidoChange,
+        onGuardar = viewModel::guardarEntrada,
+        onCancelarEdicion = viewModel::cancelarEdicion,
+        onPreviousStep = viewModel::onPreviousStep,
+        onNextStep = viewModel::onNextStep,
+        onEditarEntrada = viewModel::editarEntrada,
+        onEliminarEntrada = viewModel::eliminarEntrada,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun DiarioEmocionalContent(
+    state: DiarioEmocionalUiState,
+    snackbarHostState: SnackbarHostState,
+    onSincronizar: () -> Unit,
+    onTituloChange: (String) -> Unit,
+    onEmocionChange: (String) -> Unit,
+    onSubEmocionChange: (String) -> Unit,
+    onIntensidadChange: (Float) -> Unit,
+    onContenidoChange: (String) -> Unit,
+    onGuardar: () -> Unit,
+    onCancelarEdicion: () -> Unit,
+    onPreviousStep: () -> Unit,
+    onNextStep: () -> Unit,
+    onEditarEntrada: (EntradaDiario) -> Unit,
+    onEliminarEntrada: (EntradaDiario) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val formatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm") }
+    val pagerState = rememberPagerState(pageCount = { 3 })
+
+    LaunchedEffect(state.currentStep) {
+        pagerState.animateScrollToPage(state.currentStep)
+    }
+
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.auto_mi_diario_emocional), fontWeight = FontWeight.Bold) },
@@ -628,10 +682,15 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                         containerColor = MaterialTheme.colorScheme.surface,
                         titleContentColor = MaterialTheme.colorScheme.onSurface,
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        actionIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 actions = {
-                    IconButton(onClick = { viewModel.forzarSincronizacion() }) {
-                        Icon(Icons.Default.Info, contentDescription = stringResource(R.string.auto_sincronizar), tint = Color.White)
+                    IconButton(onClick = onSincronizar) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = stringResource(R.string.auto_sincronizar),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 },
             )
@@ -643,20 +702,20 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            contentPadding = PaddingValues(Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.l),
         ) {
-            item(key = "indicator_pager") {
+            item(key = "indicator_pager", contentType = "pager") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
+                    shape = MaterialTheme.shapes.extraLarge,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2),
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(Spacing.m),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.m),
                     ) {
                         StepIndicator(
                             currentStep = state.currentStep,
@@ -666,34 +725,41 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                         HorizontalPager(
                             state = pagerState,
                             userScrollEnabled = false,
-                            modifier = Modifier.height(if (state.currentStep == 1) 320.dp else 520.dp),
+                            modifier =
+                                Modifier.height(
+                                    if (state.currentStep == 1) {
+                                        Dimensions.pagerHeightCompact
+                                    } else {
+                                        Dimensions.pagerHeightExpanded
+                                    },
+                                ),
                         ) { page ->
                             when (page) {
                                 0 ->
                                     StepEmocion(
                                         titulo = state.titulo,
-                                        onTituloChange = viewModel::onTituloChange,
+                                        onTituloChange = onTituloChange,
                                         emocion = state.emocion,
-                                        onEmocionChange = viewModel::onEmocionChange,
+                                        onEmocionChange = onEmocionChange,
                                         subEmocion = state.subEmocion,
-                                        onSubEmocionChange = viewModel::onSubEmocionChange,
+                                        onSubEmocionChange = onSubEmocionChange,
                                         modifier = Modifier.fillMaxSize(),
                                     )
 
                                 1 ->
                                     StepIntensidad(
                                         intensidad = state.intensidad,
-                                        onIntensidadChange = viewModel::onIntensidadChange,
+                                        onIntensidadChange = onIntensidadChange,
                                         modifier = Modifier.fillMaxSize(),
                                     )
 
                                 2 ->
                                     StepContexto(
                                         contenido = state.contenido,
-                                        onContenidoChange = viewModel::onContenidoChange,
+                                        onContenidoChange = onContenidoChange,
                                         isEditing = state.editandoId != null,
-                                        onGuardar = viewModel::guardarEntrada,
-                                        onCancelar = viewModel::cancelarEdicion,
+                                        onGuardar = onGuardar,
+                                        onCancelar = onCancelarEdicion,
                                         modifier = Modifier.fillMaxSize(),
                                     )
                             }
@@ -702,21 +768,21 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                         if (state.currentStep < 2) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                             ) {
                                 if (state.currentStep > 0) {
                                     OutlinedButton(
-                                        onClick = viewModel::onPreviousStep,
-                                        modifier = Modifier.weight(1f).height(48.dp),
-                                        shape = RoundedCornerShape(12.dp),
+                                        onClick = onPreviousStep,
+                                        modifier = Modifier.weight(1f).height(Dimensions.buttonHeight),
+                                        shape = MaterialTheme.shapes.medium,
                                     ) {
                                         Text(stringResource(R.string.auto_anterior))
                                     }
                                 }
                                 Button(
-                                    onClick = viewModel::onNextStep,
-                                    modifier = Modifier.weight(1f).height(48.dp),
-                                    shape = RoundedCornerShape(12.dp),
+                                    onClick = onNextStep,
+                                    modifier = Modifier.weight(1f).height(Dimensions.buttonHeight),
+                                    shape = MaterialTheme.shapes.medium,
                                     enabled = if (state.currentStep == 0) state.emocion.isNotBlank() else true,
                                 ) {
                                     Text(stringResource(R.string.auto_siguiente))
@@ -728,18 +794,18 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
             }
 
             if (!state.mensajeError.isNullOrBlank()) {
-                item(key = "error_message") {
+                item(key = "error_message", contentType = "error") {
                     Surface(
                         color = MaterialTheme.colorScheme.errorContainer,
-                        shape = RoundedCornerShape(8.dp),
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.padding(Spacing.sm),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(Spacing.s))
                             Text(
                                 text = state.mensajeError ?: "",
                                 color = MaterialTheme.colorScheme.onErrorContainer,
@@ -750,13 +816,13 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                 }
             }
 
-            item(key = "history_header") {
+            item(key = "history_header", contentType = "header") {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = Spacing.s),
                 ) {
                     Icon(Icons.Default.History, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Text(
                         text = stringResource(R.string.auto_historial_de_bienestar),
                         style = MaterialTheme.typography.titleLarge,
@@ -766,9 +832,9 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
             }
 
             if (state.entradas.isEmpty()) {
-                item(key = "empty_history") {
+                item(key = "empty_history", contentType = "empty") {
                     Box(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.xl),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -780,11 +846,15 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
                     }
                 }
             } else {
-                items(state.entradas, key = { it.id }) { entrada ->
+                items(
+                    items = state.entradas,
+                    key = { it.id },
+                    contentType = { "entry" },
+                ) { entrada ->
                     HistoryEntryCard(
                         entrada = entrada,
-                        onEdit = { viewModel.editarEntrada(entrada) },
-                        onDelete = { viewModel.eliminarEntrada(entrada) },
+                        onEdit = { onEditarEntrada(entrada) },
+                        onDelete = { onEliminarEntrada(entrada) },
                         formatter = formatter,
                     )
                 }
@@ -795,44 +865,39 @@ fun DiarioEmocionalScreen(viewModel: DiarioEmocionalViewModel = koinViewModel())
 
 /**
  * Tarjeta que muestra una entrada del historial del diario emocional.
- *
- * @param entrada Datos de la entrada del diario.
- * @param emotionEntry Emoción de Plutchik asociada, o `null`.
- * @param onEdit Callback invocado al pulsar el botón de editar.
- * @param onDelete Callback invocado al pulsar el botón de eliminar.
  */
 @Composable
 fun HistoryEntryCard(
-    entrada: org.ies.tierno.applicationamani.domain.models.diario.EntradaDiario,
+    entrada: EntradaDiario,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     formatter: DateTimeFormatter,
+    modifier: Modifier = Modifier,
 ) {
     val emotionEntry =
         PlutchikEmotion.entries.find { it.label == entrada.emocion }
             ?: PlutchikEmotion.entries.find { it.variants.contains(entrada.emocion) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
         ) {
-            // Indicador de color lateral
             Box(
                 modifier =
                     Modifier
                         .fillMaxHeight()
-                        .width(6.dp)
+                        .width(Dimensions.colorStripWidth)
                         .background(emotionEntry?.color ?: MaterialTheme.colorScheme.outline),
             )
 
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(Spacing.m),
+                verticalArrangement = Arrangement.spacedBy(Spacing.s),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -861,18 +926,27 @@ fun HistoryEntryCard(
                     }
 
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.medium,
                         color = (emotionEntry?.color ?: MaterialTheme.colorScheme.primary).copy(alpha = 0.1f),
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xs),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(
-                                text = emotionEntry?.emoji ?: "✨",
-                                fontSize = 14.sp,
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            if (emotionEntry != null) {
+                                Text(
+                                    text = emotionEntry.emoji,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Mood,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(Dimensions.iconSmall),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(Spacing.xs))
                             Text(
                                 text = entrada.emocion,
                                 style = MaterialTheme.typography.labelMedium,
@@ -892,9 +966,9 @@ fun HistoryEntryCard(
                 )
 
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    thickness = 0.5.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    modifier = Modifier.padding(vertical = Spacing.xs),
+                    thickness = Dimensions.dividerThickness,
+                    color = MaterialTheme.colorScheme.outlineVariant,
                 )
 
                 Row(
@@ -908,13 +982,13 @@ fun HistoryEntryCard(
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(Spacing.xs))
                         repeat(10) { index ->
                             Box(
                                 modifier =
                                     Modifier
-                                        .size(8.dp)
-                                        .padding(1.dp)
+                                        .size(Dimensions.dotIndicator)
+                                        .padding(Dimensions.borderThin)
                                         .clip(CircleShape)
                                         .background(
                                             if (index < entrada.intensidad) {
@@ -928,19 +1002,19 @@ fun HistoryEntryCard(
                     }
 
                     Row {
-                        IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
+                        IconButton(onClick = onEdit, modifier = Modifier.size(Dimensions.minTouchTarget)) {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.auto_editar),
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(Dimensions.iconButton),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
-                        IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                        IconButton(onClick = onDelete, modifier = Modifier.size(Dimensions.minTouchTarget)) {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = stringResource(R.string.auto_eliminar),
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(Dimensions.iconButton),
                                 tint = MaterialTheme.colorScheme.error,
                             )
                         }
@@ -948,5 +1022,37 @@ fun HistoryEntryCard(
                 }
             }
         }
+    }
+}
+
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "FontScale 1.5x", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun DiarioEmocionalPreview() {
+    AppTheme {
+        DiarioEmocionalContent(
+            state =
+                DiarioEmocionalUiState(
+                    titulo = "Día tranquilo",
+                    emocion = "Alegría",
+                    subEmocion = "Serenidad",
+                    intensidad = 7f,
+                    currentStep = 1,
+                ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onSincronizar = {},
+            onTituloChange = {},
+            onEmocionChange = {},
+            onSubEmocionChange = {},
+            onIntensidadChange = {},
+            onContenidoChange = {},
+            onGuardar = {},
+            onCancelarEdicion = {},
+            onPreviousStep = {},
+            onNextStep = {},
+            onEditarEntrada = {},
+            onEliminarEntrada = {},
+        )
     }
 }

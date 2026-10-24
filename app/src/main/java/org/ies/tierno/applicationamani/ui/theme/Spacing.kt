@@ -76,6 +76,14 @@ object Dimensions {
     val avatarHero = 120.dp
     val logoHero = 140.dp
     val bannerHeight = 200.dp
+    val gameCardSize = 200.dp
+    val wheelSize = 300.dp
+    val pagerHeightCompact = 320.dp
+    val pagerHeightExpanded = 520.dp
     val dropdownMaxHeight = 400.dp
+    val dialogMaxHeight = 550.dp
     val maxContentWidth = 600.dp
+    val colorStripWidth = 6.dp
+    val bottomContentSpacer = 80.dp
 }
+

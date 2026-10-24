@@ -1,4 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView
+
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,11 +31,11 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.PersonOutline
-import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -68,26 +70,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSession
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.idioma.IdiomaViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 
 private const val TAG = "SettingsPaciente"
 
-// Función auxiliar para obtener el subtítulo del tema actual
-private fun getCurrentThemeSubtitle(currentTheme: Boolean): String = if (currentTheme) "Oscuro" else "Claro"
+@Composable
+private fun getCurrentThemeSubtitle(currentTheme: Boolean): String =
+    if (currentTheme) stringResource(R.string.auto_oscuro) else stringResource(R.string.auto_claro)
 
-// Definir SettingsOption localmente para paciente
 /**
  * Modelo de datos para una opción de configuración en la pantalla de ajustes del paciente.
  *
@@ -120,27 +126,20 @@ fun SettingsPacienteScreen(
     navController: NavController,
     userSessionDataStore: UserSessionDataStore,
     idiomaViewModel: IdiomaViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    // Usar MaterialTheme directamente
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val isDark = isDarkTheme()
 
-    // Obtener el tema actual del ViewModel (Boolean: false=claro, true=oscuro)
     val currentTema by idiomaViewModel.tema.collectAsStateWithLifecycle()
-
-    // Obtener el idioma actual del ViewModel
     val currentLanguage by idiomaViewModel.idioma.collectAsStateWithLifecycle()
-
-    // También necesitamos la sesión completa para otros datos
     val session by userSessionDataStore.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    Log.d(TAG, "🔍 [Recomposición] Idioma actual: $currentLanguage")
+    Log.d(TAG, "[Recomposición] Idioma actual: $currentLanguage")
 
     Scaffold(
+        modifier = modifier,
         containerColor = colorScheme.background,
         topBar = {
             TopAppBar(
@@ -149,7 +148,7 @@ fun SettingsPacienteScreen(
                         text = stringResource(R.string.configuracion),
                         style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
+                        color = colorScheme.onSurface,
                     )
                 },
                 navigationIcon = {
@@ -157,7 +156,7 @@ fun SettingsPacienteScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
-                            tint = Color.White,
+                            tint = colorScheme.onSurface,
                         )
                     }
                 },
@@ -176,18 +175,10 @@ fun SettingsPacienteScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .background(colorScheme.background),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            // DEV ONLY — remove before prod release
-            // item {
-            //     androidx.compose.material3.Button(onClick = { throw RuntimeException("Crashlytics test crash") }) {
-            //         Text("Test Crash")
-            //     }
-            // }
-
-            // ==================== PERFIL (Paciente) ====================
-            item {
+            item(key = "perfil") {
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.perfil),
                     icon = Icons.Outlined.Person,
@@ -212,7 +203,7 @@ fun SettingsPacienteScreen(
                                 id = "mi_psicologo",
                                 title = stringResource(R.string.mi_psicologo),
                                 subtitle = stringResource(R.string.ver_info_psicologo),
-                                icon = Icons.Default.Psychology,
+                                icon = Icons.Default.MedicalServices,
                             ),
                             SettingsOptionPaciente(
                                 id = "historial",
@@ -224,8 +215,7 @@ fun SettingsPacienteScreen(
                 )
             }
 
-            // ==================== PREFERENCIAS ====================
-            item {
+            item(key = "preferencias") {
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.preferencias),
                     icon = Icons.Outlined.Settings,
@@ -273,8 +263,7 @@ fun SettingsPacienteScreen(
                 )
             }
 
-            // ==================== CITAS ====================
-            item {
+            item(key = "citas") {
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.mis_citas),
                     icon = Icons.Outlined.CalendarMonth,
@@ -311,8 +300,7 @@ fun SettingsPacienteScreen(
                 )
             }
 
-            // ==================== FACTURACIÓN ====================
-            item {
+            item(key = "facturacion") {
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.facturacion),
                     icon = Icons.Outlined.Receipt,
@@ -349,8 +337,7 @@ fun SettingsPacienteScreen(
                 )
             }
 
-            // ==================== SOPORTE ====================
-            item {
+            item(key = "soporte") {
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.soporte),
                     icon = Icons.Outlined.SupportAgent,
@@ -387,8 +374,7 @@ fun SettingsPacienteScreen(
                 )
             }
 
-            // ==================== SISTEMA ====================
-            item {
+            item(key = "sistema") {
                 SettingsCategoryCardPaciente(
                     title = stringResource(R.string.sistema),
                     icon = Icons.Outlined.Storage,
@@ -444,28 +430,29 @@ fun SettingsCategoryCardPaciente(
     session: UserSession?,
     currentLanguage: String,
     currentTema: Boolean,
-    idiomaViewModel: IdiomaViewModel,
+    idiomaViewModel: IdiomaViewModel?,
     colorScheme: ColorScheme,
     typography: androidx.compose.material3.Typography,
     isDark: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.m),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 12.dp),
+                modifier = Modifier.padding(bottom = Spacing.sm),
             ) {
                 Box(
                     modifier =
                         Modifier
-                            .size(36.dp)
+                            .size(Dimensions.avatarSmall)
                             .clip(MaterialTheme.shapes.small)
                             .background(iconColor.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center,
@@ -474,10 +461,10 @@ fun SettingsCategoryCardPaciente(
                         icon,
                         contentDescription = null,
                         tint = iconColor,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(Dimensions.iconMedium),
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(Spacing.sm))
                 Text(
                     text = title,
                     style = typography.titleMedium,
@@ -489,7 +476,7 @@ fun SettingsCategoryCardPaciente(
             options.forEachIndexed { index, option ->
                 if (index > 0) {
                     HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier.padding(vertical = Spacing.s),
                         thickness = DividerDefaults.Thickness,
                         color = colorScheme.outlineVariant,
                     )
@@ -518,10 +505,11 @@ fun SettingsOptionRowPaciente(
     session: UserSession?,
     currentLanguage: String,
     currentTema: Boolean,
-    idiomaViewModel: IdiomaViewModel,
+    idiomaViewModel: IdiomaViewModel?,
     colorScheme: ColorScheme,
     typography: androidx.compose.material3.Typography,
     isDark: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
     var expandedIdioma by remember { mutableStateOf(false) }
@@ -529,7 +517,7 @@ fun SettingsOptionRowPaciente(
 
     Row(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clickable {
                     when (option.id) {
@@ -546,52 +534,52 @@ fun SettingsOptionRowPaciente(
                         }
 
                         "mi_psicologo" -> {
-                            Log.d(TAG, "👨‍⚕️ Navegar a información del psicólogo")
+                            Log.d(TAG, "Navegar a información del psicólogo")
                         }
 
                         "historial" -> {
                             val pacienteId = session?.idPaciente
-                            Log.d(TAG, "📌 CLICK HISTORIAL CLÍNICO")
+                            Log.d(TAG, "CLICK HISTORIAL CLÍNICO")
 
                             if (pacienteId != null && pacienteId > 0L) {
                                 navController.navigate(
                                     Screens.historialClinico.createRoute(pacienteId),
                                 )
                             } else {
-                                Log.e(TAG, "❌ ERROR: idPaciente es NULL o inválido")
+                                Log.e(TAG, "ERROR: idPaciente es NULL o inválido")
                             }
                         }
 
                         "notificaciones" -> {
-                            Log.d(TAG, "🔔 Navegar a notificaciones")
+                            Log.d(TAG, "Navegar a notificaciones")
                         }
 
                         "recordatorios" -> {
-                            Log.d(TAG, "⏰ Navegar a recordatorios")
+                            Log.d(TAG, "Navegar a recordatorios")
                         }
 
                         "proximas_citas" -> {
-                            Log.d(TAG, "📅 Navegar a próximas citas")
+                            Log.d(TAG, "Navegar a próximas citas")
                         }
 
                         "historial_citas" -> {
-                            Log.d(TAG, "📋 Navegar a historial de citas")
+                            Log.d(TAG, "Navegar a historial de citas")
                         }
 
                         "metodos_pago" -> {
-                            Log.d(TAG, "💳 Navegar a métodos de pago")
+                            Log.d(TAG, "Navegar a métodos de pago")
                         }
 
                         "historial_pagos" -> {
-                            Log.d(TAG, "💰 Navegar a historial de pagos")
+                            Log.d(TAG, "Navegar a historial de pagos")
                         }
 
                         "ayuda" -> {
-                            Log.d(TAG, "❓ Navegar a ayuda")
+                            Log.d(TAG, "Navegar a ayuda")
                         }
 
                         "contacto" -> {
-                            Log.d(TAG, "📧 Navegar a contacto")
+                            Log.d(TAG, "Navegar a contacto")
                         }
 
                         "terminos" -> {
@@ -611,7 +599,7 @@ fun SettingsOptionRowPaciente(
                         }
                     }
                 }
-            .padding(vertical = 8.dp),
+                .padding(vertical = Spacing.s),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -623,9 +611,9 @@ fun SettingsOptionRowPaciente(
                 option.icon,
                 contentDescription = null,
                 tint = colorScheme.primary,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(Dimensions.iconDefault),
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(Spacing.m))
 
             Column {
                 Text(
@@ -637,11 +625,12 @@ fun SettingsOptionRowPaciente(
 
                 val displaySubtitle =
                     when (option.id) {
-                        "language" -> when(currentLanguage) {
-                             "en" -> stringResource(R.string.ingles)
-                             "ca" -> stringResource(R.string.catalan)
-                             else -> stringResource(R.string.espanol)
-                        }
+                        "language" ->
+                            when (currentLanguage) {
+                                "en" -> stringResource(R.string.ingles)
+                                "ca" -> stringResource(R.string.catalan)
+                                else -> stringResource(R.string.espanol)
+                            }
                         "tema" -> getCurrentThemeSubtitle(currentTema)
                         else -> option.subtitle
                     }
@@ -668,7 +657,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text(stringResource(R.string.espanol), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarIdioma("es")
+                                    idiomaViewModel?.cambiarIdioma("es")
                                 }
                                 expandedIdioma = false
                             },
@@ -678,7 +667,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text(stringResource(R.string.ingles), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarIdioma("en")
+                                    idiomaViewModel?.cambiarIdioma("en")
                                 }
                                 expandedIdioma = false
                             },
@@ -688,7 +677,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text(stringResource(R.string.catalan), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarIdioma("ca")
+                                    idiomaViewModel?.cambiarIdioma("ca")
                                 }
                                 expandedIdioma = false
                             },
@@ -709,7 +698,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text(stringResource(R.string.auto_claro), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(false) // false = claro
+                                    idiomaViewModel?.cambiarTema(false)
                                 }
                                 expandedTema = false
                             },
@@ -718,7 +707,7 @@ fun SettingsOptionRowPaciente(
                             text = { Text(stringResource(R.string.auto_oscuro), style = typography.bodyMedium) },
                             onClick = {
                                 scope.launch {
-                                    idiomaViewModel.cambiarTema(true) // true = oscuro
+                                    idiomaViewModel?.cambiarTema(true)
                                 }
                                 expandedTema = false
                             },
@@ -731,9 +720,46 @@ fun SettingsOptionRowPaciente(
                     Icons.Default.ChevronRight,
                     contentDescription = stringResource(R.string.auto_ir),
                     tint = colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(Dimensions.iconMedium),
                 )
             }
         }
+    }
+}
+
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "FontScale 1.5x", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun SettingsCategoryCardPacientePreview() {
+    AppTheme {
+        SettingsCategoryCardPaciente(
+            title = "Perfil",
+            icon = Icons.Outlined.Person,
+            iconColor = MaterialTheme.colorScheme.primary,
+            options =
+                listOf(
+                    SettingsOptionPaciente(
+                        id = "mi_perfil",
+                        title = "Mi perfil",
+                        subtitle = "Editar datos personales",
+                        icon = Icons.Default.PersonOutline,
+                    ),
+                    SettingsOptionPaciente(
+                        id = "mi_psicologo",
+                        title = "Mi psicólogo",
+                        subtitle = "Ver información del psicólogo",
+                        icon = Icons.Default.MedicalServices,
+                    ),
+                ),
+            navController = rememberNavController(),
+            session = null,
+            currentLanguage = "es",
+            currentTema = false,
+            idiomaViewModel = null,
+            colorScheme = MaterialTheme.colorScheme,
+            typography = MaterialTheme.typography,
+            isDark = isDarkTheme(),
+        )
     }
 }
