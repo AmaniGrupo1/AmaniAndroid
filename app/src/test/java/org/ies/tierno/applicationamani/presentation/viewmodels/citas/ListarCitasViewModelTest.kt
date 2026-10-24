@@ -83,7 +83,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -98,7 +98,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } throws Exception("Error de red")
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -113,7 +113,7 @@ class ListarCitasViewModelTest {
             val deferred = kotlinx.coroutines.CompletableDeferred<List<CitaPacienteViewResponseDTO>>()
             coEvery { listarCitasUseCase() } coAnswers { deferred.await() }
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             assertTrue(viewModel.isLoading.value)
 
@@ -127,7 +127,7 @@ class ListarCitasViewModelTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
             coEvery { citasRepository.cancelarCita(1L) } returns Result.success(testAgendaItem)
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -145,7 +145,7 @@ class ListarCitasViewModelTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
             coEvery { citasRepository.cancelarCita(1L) } returns Result.failure(Exception("No se puede cancelar"))
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -161,7 +161,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } returns listOf(testCita)
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             advanceUntilIdle()
 
@@ -177,7 +177,7 @@ class ListarCitasViewModelTest {
         runTest {
             coEvery { listarCitasUseCase() } throws Exception("fail")
 
-            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase)
+            val viewModel = ListarCitasViewModel(listarCitasUseCase, citasRepository, historialCitaUseCase, mockk(relaxed = true))
             viewModel.cargarCitas()
             advanceUntilIdle()
 

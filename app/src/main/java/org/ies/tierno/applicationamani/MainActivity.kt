@@ -15,7 +15,7 @@ import kotlinx.coroutines.runBlocking
 import org.ies.tierno.applicationamani.data.local.LanguageManager
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph
-import org.ies.tierno.applicationamani.ui.theme.ApplicationAmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
 
 /**
  * Actividad principal de la aplicación Amani.
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
      * Configura la interfaz de usuario principal tras la creación de la actividad.
      *
      * Habilita el renderizado edge-to-edge y establece el contenido raíz con
-     * el tema [ApplicationAmaniTheme] y el grafo de navegación [NavGraph].
+     * el tema [AppTheme] y el grafo de navegación [NavGraph].
      *
      * @param savedInstanceState Estado previamente guardado de la actividad, o {@code null}.
      */
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            ApplicationAmaniTheme {
+            AppTheme {
                 val navController = rememberNavController()
                 NavGraph(navController = navController)
             }

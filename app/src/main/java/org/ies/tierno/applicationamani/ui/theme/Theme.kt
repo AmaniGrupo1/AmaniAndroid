@@ -1,228 +1,254 @@
-// M3: Complete Material 3 theme with surfaceContainer tokens + dynamic color support
 package org.ies.tierno.applicationamani.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.koin.java.KoinJavaComponent
 
-// ── Material 3 color scheme: light ─────────────────────────────────
+// ── Material 3 ColorScheme: Light ──────────────────────────────────
 
-private val LightColorScheme =
+val AmaniLightColorScheme =
     lightColorScheme(
-        primary = AmaniPurple,
-        onPrimary = AmaniBlack,
-        primaryContainer = AmaniPurple,
-        onPrimaryContainer = AmaniBlack,
-        secondary = AmaniPurpleDark,
-        onSecondary = AmaniWhite,
-        tertiary = AmaniFuchsia,
-        onTertiary = AmaniOnFuchsia,
-        tertiaryContainer = AmaniFuchsiaContainer,
-        onTertiaryContainer = AmaniOnFuchsiaContainer,
-        error = AmaniError,
-        onError = AmaniOnError,
-        errorContainer = AmaniErrorContainer,
-        onErrorContainer = AmaniOnErrorContainer,
-        background = AmaniSurface,
-        onBackground = AmaniOnSurface,
-        surface = AmaniSurface,
-        onSurface = AmaniOnSurface,
-        surfaceVariant = AmaniWhite,
-        surfaceContainerLowest = Color(0xFFFFFFFF),
-        surfaceContainerLow = Color(0xFFF7F2FA),
-        surfaceContainer = Color(0xFFF3EDF7),
-        surfaceContainerHigh = Color(0xFFEDE8F2),
-        surfaceContainerHighest = Color(0xFFE7E2EC),
-        outline = AmaniBlack,
-        outlineVariant = AmaniBlack.copy(alpha = 0.38f),
-        surfaceTint = AmaniSurfaceTint,
+        primary = LightPrimary,
+        onPrimary = LightOnPrimary,
+        primaryContainer = LightPrimaryContainer,
+        onPrimaryContainer = LightOnPrimaryContainer,
+        inversePrimary = LightInversePrimary,
+        secondary = LightSecondary,
+        onSecondary = LightOnSecondary,
+        secondaryContainer = LightSecondaryContainer,
+        onSecondaryContainer = LightOnSecondaryContainer,
+        tertiary = LightTertiary,
+        onTertiary = LightOnTertiary,
+        tertiaryContainer = LightTertiaryContainer,
+        onTertiaryContainer = LightOnTertiaryContainer,
+        error = LightError,
+        onError = LightOnError,
+        errorContainer = LightErrorContainer,
+        onErrorContainer = LightOnErrorContainer,
+        background = LightBackground,
+        onBackground = LightOnBackground,
+        surface = LightSurface,
+        onSurface = LightOnSurface,
+        surfaceVariant = LightSurfaceVariant,
+        onSurfaceVariant = LightOnSurfaceVariant,
+        surfaceTint = LightSurfaceTint,
+        inverseSurface = LightInverseSurface,
+        inverseOnSurface = LightInverseOnSurface,
+        outline = LightOutline,
+        outlineVariant = LightOutlineVariant,
+        scrim = LightScrim,
+        surfaceBright = LightSurfaceBright,
+        surfaceDim = LightSurfaceDim,
+        surfaceContainer = LightSurfaceContainer,
+        surfaceContainerHigh = LightSurfaceContainerHigh,
+        surfaceContainerHighest = LightSurfaceContainerHighest,
+        surfaceContainerLow = LightSurfaceContainerLow,
+        surfaceContainerLowest = LightSurfaceContainerLowest,
     )
 
-// ── Material 3 color scheme: dark ──────────────────────────────────
+// ── Material 3 ColorScheme: Dark ───────────────────────────────────
 
-private val DarkColorScheme =
+val AmaniDarkColorScheme =
     darkColorScheme(
-        primary = AmaniPurpleDark,
-        onPrimary = AmaniWhite,
-        primaryContainer = AmaniPurpleDark,
-        onPrimaryContainer = AmaniWhite,
-        secondary = AmaniPurple,
-        onSecondary = AmaniBlack,
-        tertiary = AmaniFuchsiaContainer,
-        onTertiary = AmaniOnFuchsiaContainer,
-        tertiaryContainer = AmaniFuchsia,
-        onTertiaryContainer = AmaniOnFuchsia,
-        error = AmaniErrorContainer,
-        onError = AmaniOnErrorContainer,
-        errorContainer = AmaniError,
-        onErrorContainer = AmaniOnError,
-        background = AmaniBlack,
-        onBackground = AmaniWhite,
-        surface = AmaniBlack,
-        onSurface = AmaniWhite,
-        surfaceVariant = Color(0xFF49454F),
-        surfaceContainerLowest = Color(0xFF0E0E12),
-        surfaceContainerLow = Color(0xFF1A1A1F),
-        surfaceContainer = Color(0xFF1E1E23),
-        surfaceContainerHigh = Color(0xFF29282E),
-        surfaceContainerHighest = Color(0xFF343339),
-        outline = AmaniWhite,
-        outlineVariant = AmaniWhite.copy(alpha = 0.38f),
-        surfaceTint = AmaniSurfaceTint,
+        primary = DarkPrimary,
+        onPrimary = DarkOnPrimary,
+        primaryContainer = DarkPrimaryContainer,
+        onPrimaryContainer = DarkOnPrimaryContainer,
+        inversePrimary = DarkInversePrimary,
+        secondary = DarkSecondary,
+        onSecondary = DarkOnSecondary,
+        secondaryContainer = DarkSecondaryContainer,
+        onSecondaryContainer = DarkOnSecondaryContainer,
+        tertiary = DarkTertiary,
+        onTertiary = DarkOnTertiary,
+        tertiaryContainer = DarkTertiaryContainer,
+        onTertiaryContainer = DarkOnTertiaryContainer,
+        error = DarkError,
+        onError = DarkOnError,
+        errorContainer = DarkErrorContainer,
+        onErrorContainer = DarkOnErrorContainer,
+        background = DarkBackground,
+        onBackground = DarkOnBackground,
+        surface = DarkSurface,
+        onSurface = DarkOnSurface,
+        surfaceVariant = DarkSurfaceVariant,
+        onSurfaceVariant = DarkOnSurfaceVariant,
+        surfaceTint = DarkSurfaceTint,
+        inverseSurface = DarkInverseSurface,
+        inverseOnSurface = DarkInverseOnSurface,
+        outline = DarkOutline,
+        outlineVariant = DarkOutlineVariant,
+        scrim = DarkScrim,
+        surfaceBright = DarkSurfaceBright,
+        surfaceDim = DarkSurfaceDim,
+        surfaceContainer = DarkSurfaceContainer,
+        surfaceContainerHigh = DarkSurfaceContainerHigh,
+        surfaceContainerHighest = DarkSurfaceContainerHighest,
+        surfaceContainerLow = DarkSurfaceContainerLow,
+        surfaceContainerLowest = DarkSurfaceContainerLowest,
     )
 
-// ── Amani extra colors ─────────────────────────────────────────────
+// ── Tokens semánticos extendidos de Amani ──────────────────────────
 
 @Immutable
 data class AmaniExtraColors(
-    val screenBackground: Color = AmaniBackground,
-    val textFieldContainer: Color = AmaniWhite,
-    val buttonBorder: Color = AmaniBlack,
-    val cardBackground: Color = AmaniWhite,
-    val cardContent: Color = AmaniOnSurface,
-    val cardBorder: Color = AmaniBlack,
-    val citaLibre: Color = AmaniCitaLibre,
-    val citaLibreBg: Color = AmaniCalendarioBg,
-    val citaOcupada: Color = AmaniCitaOcupada,
-    val citaOcupadaBg: Color = AmaniCitaOcupadaBg,
-    val citaConfirmada: Color = AmaniCitaConfirmada,
-    val citaConfirmadaBg: Color = AmaniCalendarioBg,
-    val citaPendiente: Color = AmaniCitaPendiente,
-    val citaPendienteBg: Color = AmaniCalendarioBg,
-    val citaCancelada: Color = AmaniCitaCancelada,
-    val citaCanceladaBg: Color = AmaniCitaOcupadaBg,
-    val calendarioBg: Color = AmaniCalendarioBg,
+    val isDark: Boolean = false,
+    val success: Color = LightSuccess,
+    val onSuccess: Color = LightOnSuccess,
+    val successContainer: Color = LightSuccessContainer,
+    val onSuccessContainer: Color = LightOnSuccessContainer,
+    val warning: Color = LightWarning,
+    val onWarning: Color = LightOnWarning,
+    val warningContainer: Color = LightWarningContainer,
+    val onWarningContainer: Color = LightOnWarningContainer,
+    val screenBackground: Color = LightBackground,
+    val textFieldContainer: Color = LightSurfaceContainerLowest,
+    val buttonBorder: Color = LightOutline,
+    val cardBackground: Color = LightSurfaceContainerLowest,
+    val cardContent: Color = LightOnSurface,
+    val cardBorder: Color = LightOutlineVariant,
+    val citaLibre: Color = LightSuccess,
+    val citaLibreBg: Color = LightSuccessContainer,
+    val citaOcupada: Color = LightError,
+    val citaOcupadaBg: Color = LightErrorContainer,
+    val citaConfirmada: Color = LightSuccess,
+    val citaConfirmadaBg: Color = LightSuccessContainer,
+    val citaPendiente: Color = LightWarning,
+    val citaPendienteBg: Color = LightWarningContainer,
+    val citaCancelada: Color = LightError,
+    val citaCanceladaBg: Color = LightErrorContainer,
+    val calendarioBg: Color = LightSurfaceContainerLow,
 )
 
-val LocalAmaniColors = staticCompositionLocalOf { AmaniExtraColors() }
-
-// ── Material 3 shapes ──────────────────────────────────────────────
-// M3: ShapeDefaults values per spec: xs=4, sm=8, md=12, lg=16, xl=28
-
-private val AmaniShapes =
-    Shapes(
-        extraSmall = RoundedCornerShape(4.dp),
-        small = RoundedCornerShape(8.dp),
-        medium = RoundedCornerShape(12.dp),
-        large = RoundedCornerShape(16.dp),
-        extraLarge = RoundedCornerShape(28.dp),
+private val LightExtraColors =
+    AmaniExtraColors(
+        isDark = false,
+        success = LightSuccess,
+        onSuccess = LightOnSuccess,
+        successContainer = LightSuccessContainer,
+        onSuccessContainer = LightOnSuccessContainer,
+        warning = LightWarning,
+        onWarning = LightOnWarning,
+        warningContainer = LightWarningContainer,
+        onWarningContainer = LightOnWarningContainer,
+        screenBackground = LightBackground,
+        textFieldContainer = LightSurfaceContainerLowest,
+        buttonBorder = LightOutline,
+        cardBackground = LightSurfaceContainerLowest,
+        cardContent = LightOnSurface,
+        cardBorder = LightOutlineVariant,
+        citaLibre = LightSuccess,
+        citaLibreBg = LightSuccessContainer,
+        citaOcupada = LightError,
+        citaOcupadaBg = LightErrorContainer,
+        citaConfirmada = LightSuccess,
+        citaConfirmadaBg = LightSuccessContainer,
+        citaPendiente = LightWarning,
+        citaPendienteBg = LightWarningContainer,
+        citaCancelada = LightError,
+        citaCanceladaBg = LightErrorContainer,
+        calendarioBg = LightSurfaceContainerLow,
     )
 
-// ── Theme composable ───────────────────────────────────────────────
+private val DarkExtraColors =
+    AmaniExtraColors(
+        isDark = true,
+        success = DarkSuccess,
+        onSuccess = DarkOnSuccess,
+        successContainer = DarkSuccessContainer,
+        onSuccessContainer = DarkOnSuccessContainer,
+        warning = DarkWarning,
+        onWarning = DarkOnWarning,
+        warningContainer = DarkWarningContainer,
+        onWarningContainer = DarkOnWarningContainer,
+        screenBackground = DarkBackground,
+        textFieldContainer = DarkSurfaceContainerHigh,
+        buttonBorder = DarkOutline,
+        cardBackground = DarkSurfaceContainerLow,
+        cardContent = DarkOnSurface,
+        cardBorder = DarkOutlineVariant,
+        citaLibre = DarkSuccess,
+        citaLibreBg = DarkSuccessContainer,
+        citaOcupada = DarkError,
+        citaOcupadaBg = DarkErrorContainer,
+        citaConfirmada = DarkSuccess,
+        citaConfirmadaBg = DarkSuccessContainer,
+        citaPendiente = DarkWarning,
+        citaPendienteBg = DarkWarningContainer,
+        citaCancelada = DarkError,
+        citaCanceladaBg = DarkErrorContainer,
+        calendarioBg = DarkSurfaceContainer,
+    )
+
+val LocalAmaniColors = staticCompositionLocalOf { LightExtraColors }
 
 /**
- * Tema principal de la aplicación Amani.
+ * Acceso tipado a los tokens extendidos del sistema de diseño de Amani.
+ */
+object AmaniTheme {
+    val colors: AmaniExtraColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAmaniColors.current
+}
+
+// ── Punto de entrada único del tema: AppTheme ──────────────────────
+
+/**
+ * Punto de entrada único del sistema de diseño de Amani basado en Material Design 3.
  *
- * Soporta Material 3 dynamic color en Android 12+ y permite al usuario
- * seleccionar un tema fijo (LIGHT, DARK) o SYSTEM a través de [TemaApp].
+ * Envuelve [MaterialTheme] proporcionando `colorScheme`, `typography`, `shapes` y
+ * los tokens semánticos extendidos ([LocalAmaniColors]).
+ * Dynamic color está desactivado por decisión de diseño (DEC-02) para preservar la
+ * identidad de marca de Amani y garantizar el contraste WCAG 2.1 AA en todos los pares.
  *
- * @param darkTheme Define si se usa tema oscuro cuando [TemaApp] es SYSTEM o null.
- * @param dynamicColor Habilita colores dinámicos en Android 12+ cuando [TemaApp] es SYSTEM o null.
- * @param content Contenido de la UI.
+ * @param darkTheme Define si se utiliza el esquema oscuro. En modo preview usa directamente
+ *   este parámetro; en ejecución respeta la preferencia guardada en sesión si existe.
+ * @param content Contenido composable de la interfaz.
  */
 @Composable
-fun ApplicationAmaniTheme(
+fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
+    val isInPreview = LocalInspectionMode.current
     val context = LocalContext.current
 
-    // Leer preferencia de tema desde la sesión
-    val store =
-        try {
-            KoinJavaComponent.getKoin().get<UserSessionDataStore>()
-        } catch (e: Exception) {
-            UserSessionDataStore(context)
-        }
-    val session by store.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
-
     val effectiveDarkTheme =
-        when (session?.tema) {
-            true -> true
-            false -> false
-            else -> darkTheme
-        }
-
-    // Dynamic color solo cuando el usuario no ha fijado el tema (o si asumiéramos null como system)
-    val useDynamicColor = dynamicColor && (session?.tema == null)
-
-    val colorScheme =
-        when {
-            useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                if (effectiveDarkTheme) {
-                    dynamicDarkColorScheme(context)
-                } else {
-                    dynamicLightColorScheme(context)
-                }
-            }
-            effectiveDarkTheme -> DarkColorScheme
-            else -> LightColorScheme
-        }
-
-    // Derivar colores extra desde el esquema activo
-    val extraColors =
-        if (effectiveDarkTheme) {
-            AmaniExtraColors(
-                screenBackground = colorScheme.background,
-                textFieldContainer = colorScheme.surfaceVariant,
-                buttonBorder = colorScheme.outline,
-                cardBackground = colorScheme.surface,
-                cardContent = colorScheme.onSurface,
-                cardBorder = colorScheme.outline,
-                citaLibre = colorScheme.primary,
-                citaLibreBg = colorScheme.primaryContainer,
-                citaOcupada = colorScheme.tertiary,
-                citaOcupadaBg = colorScheme.tertiaryContainer,
-                citaConfirmada = colorScheme.secondary,
-                citaConfirmadaBg = colorScheme.secondaryContainer,
-                citaPendiente = colorScheme.secondaryContainer,
-                citaPendienteBg = colorScheme.secondaryContainer,
-                citaCancelada = colorScheme.error,
-                citaCanceladaBg = colorScheme.errorContainer,
-                calendarioBg = colorScheme.surfaceVariant,
-            )
+        if (isInPreview) {
+            darkTheme
         } else {
-            // Modo CLARO/DEFECTO: colores originales de Amani
-            AmaniExtraColors(
-                screenBackground = AmaniBackground,
-                textFieldContainer = AmaniWhite,
-                buttonBorder = AmaniBlack,
-                cardBackground = AmaniWhite,
-                cardContent = AmaniOnSurface,
-                cardBorder = AmaniBlack,
-                citaLibre = colorScheme.primary,
-                citaLibreBg = colorScheme.primaryContainer,
-                citaOcupada = colorScheme.tertiary,
-                citaOcupadaBg = colorScheme.tertiaryContainer,
-                citaConfirmada = colorScheme.secondary,
-                citaConfirmadaBg = colorScheme.secondaryContainer,
-                citaPendiente = colorScheme.secondaryContainer,
-                citaPendienteBg = colorScheme.secondaryContainer,
-                citaCancelada = colorScheme.error,
-                citaCanceladaBg = colorScheme.errorContainer,
-                calendarioBg = colorScheme.surfaceVariant,
-            )
+            val store =
+                try {
+                    KoinJavaComponent.getKoin().get<UserSessionDataStore>()
+                } catch (_: Exception) {
+                    UserSessionDataStore(context)
+                }
+            val session by store.sessionFlow.collectAsStateWithLifecycle(initialValue = null)
+            when (session?.tema) {
+                true -> true
+                false -> false
+                else -> darkTheme
+            }
         }
 
-    androidx.compose.runtime.CompositionLocalProvider(
+    val colorScheme = if (effectiveDarkTheme) AmaniDarkColorScheme else AmaniLightColorScheme
+    val extraColors = if (effectiveDarkTheme) DarkExtraColors else LightExtraColors
+
+    CompositionLocalProvider(
         LocalAmaniColors provides extraColors,
     ) {
         MaterialTheme(
@@ -234,17 +260,29 @@ fun ApplicationAmaniTheme(
     }
 }
 
-// ── Helpers para consumir colores ─────────────────────────────
+/**
+ * Alias de compatibilidad que delega en [AppTheme].
+ */
+@Composable
+fun ApplicationAmaniTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    AppTheme(
+        darkTheme = darkTheme,
+        content = content,
+    )
+}
+
+// ── Helpers de tema ────────────────────────────────────────────────
 
 @Composable
 @ReadOnlyComposable
-fun isDarkTheme(): Boolean {
-    val background = MaterialTheme.colorScheme.background
-    // En Amani, el fondo oscuro es AmaniBlack (0xFF1C1B1F) o Color.Black
-    return background == AmaniBlack || background == Color(0xFF1C1B1F) || background == Color.Black
-}
+fun isDarkTheme(): Boolean = LocalAmaniColors.current.isDark
 
 @Composable
+@ReadOnlyComposable
 fun getCardColors(): CardColors {
     val amaniColors = LocalAmaniColors.current
     return CardColors(
@@ -254,6 +292,7 @@ fun getCardColors(): CardColors {
     )
 }
 
+@Immutable
 data class CardColors(
     val cardBackground: Color,
     val cardContent: Color,
@@ -261,6 +300,7 @@ data class CardColors(
 )
 
 @Composable
+@ReadOnlyComposable
 fun getScreenColors(): ScreenColors {
     val amaniColors = LocalAmaniColors.current
     val materialColors = MaterialTheme.colorScheme
@@ -274,6 +314,7 @@ fun getScreenColors(): ScreenColors {
     )
 }
 
+@Immutable
 data class ScreenColors(
     val background: Color,
     val surface: Color,

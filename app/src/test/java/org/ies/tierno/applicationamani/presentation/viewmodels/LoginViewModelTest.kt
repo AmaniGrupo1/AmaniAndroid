@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.presentation.viewmodels
 
 import android.util.Log
 import app.cash.turbine.test
+import com.google.firebase.perf.FirebasePerformance
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -46,8 +47,10 @@ class LoginViewModelTest {
 
         mockkStatic(Log::class)
         every { Log.e(any<String>(), any<String>()) } returns 0
+        mockkStatic(FirebasePerformance::class)
+        every { FirebasePerformance.getInstance() } returns mockk(relaxed = true)
 
-        viewModel = LoginViewModel(loginUseCase, asignarPacienteAlPsicologoUseCase, userSessionDataStore, tokenDataStore, tokenHolder)
+        viewModel = LoginViewModel(loginUseCase, asignarPacienteAlPsicologoUseCase, userSessionDataStore, tokenDataStore, tokenHolder, mockk(relaxed = true))
     }
 
     @After

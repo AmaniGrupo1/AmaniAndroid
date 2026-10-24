@@ -71,6 +71,7 @@ class IdiomaViewModelTest {
             val session = UserSession(1L, "Test", "USER", tema = false)
             every { dataStore.sessionFlow } returns flowOf(session)
             coEvery { dataStore.getSession() } returns session
+            coEvery { useCase.actualizarTema(true) } returns Result.success(mockk(relaxed = true))
 
             viewModel = IdiomaViewModel(useCase, dataStore, citasRepository)
             advanceUntilIdle()

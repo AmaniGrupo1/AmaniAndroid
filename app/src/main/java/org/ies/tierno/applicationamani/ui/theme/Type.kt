@@ -1,4 +1,3 @@
-// M3: Complete M3 typography scale — all 15 slots mapped
 package org.ies.tierno.applicationamani.ui.theme
 
 import androidx.compose.material3.Typography
@@ -9,10 +8,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import org.ies.tierno.applicationamani.R
 
-// ── Font families ──────────────────────────────────────────────────
+// ── Familias tipográficas (máximo 2 familias: Nunito + Roboto) ──────
 
 /**
- * Familia tipográfica Roboto, utilizada como fuente principal para el texto del cuerpo.
+ * Familia tipográfica Roboto, utilizada como fuente principal para cuerpo de texto,
+ * subtítulos y etiquetas de controles.
  */
 val Roboto =
     FontFamily(
@@ -20,34 +20,30 @@ val Roboto =
     )
 
 /**
- * Familia tipográfica Nunito, empleada en títulos de marca y encabezados destacados.
+ * Familia tipográfica Nunito, empleada en títulos de marca, encabezados de pantalla
+ * y títulos de sección principales (`display*`, `headline*`, `titleLarge`).
  */
 val Nunito =
     FontFamily(
         Font(R.font.nunito_variablefont_wght),
     )
 
-/**
- * Familia tipográfica Barlow Condensed, reservada para encabezados de pantalla.
- */
-val BarlowCondensed =
-    FontFamily(
-        Font(R.font.barlow_condensed_black),
-    )
-
-// ── M3 Typography — all 15 slots ───────────────────────────────────
+// ── Escala tipográfica Material 3 completa (15 slots en sp) ────────
 
 /**
- * Escala tipográfica completa de Material 3 (15 slots) configurada con las fuentes
- * corporativas Roboto, Nunito y Barlow Condensed.
+ * Escala tipográfica de Material Design 3 para Amani.
+ *
+ * Usa únicamente dos familias (`Nunito` para jerarquía superior y `Roboto` para lectura
+ * y controles) y tres pesos (`Normal`, `Medium`, `SemiBold`), evitando que todo el texto
+ * compita en negrita.
  */
 val Typography =
     Typography(
-        // Display — brand titles ("AMANI")
+        // Display — títulos de marca y bienvenida
         displayLarge =
             TextStyle(
                 fontFamily = Nunito,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 57.sp,
                 lineHeight = 64.sp,
                 letterSpacing = (-0.25).sp,
@@ -55,46 +51,52 @@ val Typography =
         displayMedium =
             TextStyle(
                 fontFamily = Nunito,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 45.sp,
                 lineHeight = 52.sp,
+                letterSpacing = 0.sp,
             ),
         displaySmall =
             TextStyle(
                 fontFamily = Nunito,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 36.sp,
                 lineHeight = 44.sp,
+                letterSpacing = 0.sp,
             ),
-        // Headline — screen headers
+        // Headline — encabezados de pantalla y métricas principales
         headlineLarge =
             TextStyle(
-                fontFamily = BarlowCondensed,
-                fontWeight = FontWeight.Normal,
+                fontFamily = Nunito,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 32.sp,
                 lineHeight = 40.sp,
+                letterSpacing = 0.sp,
             ),
         headlineMedium =
             TextStyle(
-                fontFamily = BarlowCondensed,
-                fontWeight = FontWeight.Normal,
+                fontFamily = Nunito,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 28.sp,
                 lineHeight = 36.sp,
+                letterSpacing = 0.sp,
             ),
         headlineSmall =
             TextStyle(
-                fontFamily = Roboto,
-                fontWeight = FontWeight.Normal,
+                fontFamily = Nunito,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 24.sp,
                 lineHeight = 32.sp,
+                letterSpacing = 0.sp,
             ),
-        // Title — section titles
+        // Title — barras superiores, títulos de sección y cabeceras de tarjeta
         titleLarge =
             TextStyle(
                 fontFamily = Nunito,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 lineHeight = 28.sp,
+                letterSpacing = 0.sp,
             ),
         titleMedium =
             TextStyle(
@@ -112,7 +114,7 @@ val Typography =
                 lineHeight = 20.sp,
                 letterSpacing = 0.1.sp,
             ),
-        // Body — primary reading text
+        // Body — lectura principal y secundaria
         bodyLarge =
             TextStyle(
                 fontFamily = Roboto,
@@ -137,13 +139,14 @@ val Typography =
                 lineHeight = 16.sp,
                 letterSpacing = 0.4.sp,
             ),
-        // Label — buttons, chips, navigation
+        // Label — botones, chips, badges y barra de navegación
         labelLarge =
             TextStyle(
                 fontFamily = Roboto,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
+                letterSpacing = 0.1.sp,
             ),
         labelMedium =
             TextStyle(

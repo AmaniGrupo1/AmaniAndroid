@@ -46,24 +46,24 @@ class ChatListViewModelTest {
                 idPaciente = 5L,
             )
         every { listarPacientesByPsicologo() } returns flowOf(emptyList())
-        coEvery { profileUseCaseGeneral.getPsicologoById(any()) } returns
-            Result.success(
-                PsicologoProfileResponseDTO(
-                    idPsicologo = 10L,
-                    especialidad = "Clínica",
-                    experiencia = 5,
-                    descripcion = "Test",
-                    licencia = "123",
-                    usuario =
-                        UsuarioProfileResponseDTO(
-                            idUsuario = 10L,
-                            nombre = "Dr. García",
-                            apellido = "López",
-                            email = null,
-                            fotoPerfilUrl = null,
-                        ),
-                ),
+        val psicologoResponse =
+            PsicologoProfileResponseDTO(
+                idPsicologo = 10L,
+                especialidad = "Clínica",
+                experiencia = 5,
+                descripcion = "Test",
+                licencia = "123",
+                usuario =
+                    UsuarioProfileResponseDTO(
+                        idUsuario = 10L,
+                        nombre = "Dr. García",
+                        apellido = "López",
+                        email = null,
+                        fotoPerfilUrl = null,
+                    ),
             )
+        coEvery { profileUseCaseGeneral.getPsicologoById(any()) } returns Result.success(psicologoResponse)
+        coEvery { profileUseCaseGeneral.obtenerPsicologoAsignado(any()) } returns Result.success(psicologoResponse)
     }
 
     @After

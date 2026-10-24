@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta principal de Amani -->
+    <!-- Paleta principal de Amani (M3 SchemeContent seed #CCC0E4) -->
     <color name="amani_purple">#FFCCC0E4</color>
-    <color name="amani_purple_dark">#FF9B8CBF</color>
-    <color name="amani_black">#FF1C1B1F</color>
+    <color name="amani_primary">#FF635A79</color>
+    <color name="amani_primary_dark">#FFCDC1E5</color>
+    <color name="amani_on_primary_container">#FF1F1732</color>
+    <color name="amani_black">#FF1C1B1D</color>
     <color name="amani_white">#FFFFFFFF</color>
-    <color name="amani_surface">#FFFFFBFE</color>
+    <color name="amani_surface">#FFFDF8FB</color>
+    <color name="amani_surface_dark">#FF141315</color>
+    <color name="amani_on_surface_variant">#FF49454D</color>
 
-    <!-- Colores semánticos de citas -->
-    <color name="amani_cita_libre">#FF4CAF50</color>
-    <color name="amani_cita_ocupada">#FFE57373</color>
+    <!-- Colores semánticos de citas (WCAG AA) -->
+    <color name="amani_cita_libre">#FF006D43</color>
+    <color name="amani_cita_ocupada">#FFBA1A1A</color>
 
-    <!-- Básicos (usados internamente por el sistema) -->
+    <!-- Básicos del sistema -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

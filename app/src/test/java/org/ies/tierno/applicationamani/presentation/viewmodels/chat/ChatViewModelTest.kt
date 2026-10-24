@@ -122,6 +122,8 @@ class ChatViewModelTest {
             updateUserOnlineUseCase,
             profileUseCaseGeneral,
             authRepository,
+            mockk(relaxed = true),
+            mockk(relaxed = true),
             context,
         )
 

@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal
 
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +28,7 @@ class DocumentoLegalViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         useCase = mockk(relaxed = true)
+        coEvery { useCase.getAllDocumentos() } returns Result.success(emptyList())
         viewModel = DocumentoLegalViewModel(useCase)
     }
 
@@ -57,7 +59,7 @@ class DocumentoLegalViewModelTest {
             viewModel.crearDocumento(mockk())
             advanceUntilIdle()
 
-            coEvery { useCase.getAllDocumentos() }
+            coVerify { useCase.getAllDocumentos() }
         }
 
     @Test

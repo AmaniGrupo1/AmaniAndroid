@@ -96,7 +96,7 @@ class CitasViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(): CitasViewModel = CitasViewModel(citasRepository, profileRepository, userSessionDataStore)
+    private fun createViewModel(): CitasViewModel = CitasViewModel(citasRepository, profileRepository, userSessionDataStore, mockk(relaxed = true))
 
     // 1. Initial state - no session, empty agenda, no error
     @Test

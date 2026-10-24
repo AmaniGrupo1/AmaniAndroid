@@ -28,7 +28,7 @@ class PaymentViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         createPaymentIntentUseCase = mockk()
-        viewModel = PaymentViewModel(createPaymentIntentUseCase)
+        viewModel = PaymentViewModel(createPaymentIntentUseCase, mockk(relaxed = true))
     }
 
     @After

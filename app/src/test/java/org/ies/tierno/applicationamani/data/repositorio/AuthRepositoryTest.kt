@@ -56,7 +56,7 @@ class AuthRepositoryTest {
         tokenHolder = mockk(relaxed = true)
         userSessionDataStore = mockk(relaxed = true)
         firebaseAuthManager = mockk(relaxed = true)
-        repository = AuthRepository(api, tokenDataStore, tokenHolder, userSessionDataStore, firebaseAuthManager)
+        repository = AuthRepository(api, tokenDataStore, tokenHolder, userSessionDataStore, firebaseAuthManager, mockk(relaxed = true))
     }
 
     @After

@@ -3,10 +3,6 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/barlow_condensed_black" />
-    <font
-        android:fontStyle="normal"
-        android:fontWeight="400"
         android:font="@font/nunito_variablefont_wght" />
     <font
         android:fontStyle="normal"

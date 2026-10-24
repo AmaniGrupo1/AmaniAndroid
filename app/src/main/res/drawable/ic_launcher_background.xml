@@ -4,8 +4,8 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Fondo sólido lila de la marca Amani (#CCC0E4) -->
+    <!-- Fondo sólido lila de la marca Amani (@color/amani_purple) -->
     <path
-        android:fillColor="#CCC0E4"
+        android:fillColor="@color/amani_purple"
         android:pathData="M0,0h108v108h-108z"/>
 </vector>

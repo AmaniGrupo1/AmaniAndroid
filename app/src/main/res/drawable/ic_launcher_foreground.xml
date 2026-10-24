@@ -3,8 +3,8 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Letra A estilizada de Amani — centrada en la safe zone (72dp) -->
+    <!-- Letra A estilizada de Amani en tono onPrimaryContainer (#1F1732) sobre #CCC0E4 (9.97:1) -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="@color/amani_on_primary_container"
         android:pathData="M54,24L30,84h10l4.5,-11.5h19L68,84h10L54,24zM47,65L54,45l7,20z"/>
 </vector>

@@ -2,94 +2,187 @@ package org.ies.tierno.applicationamani.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Paleta principal de Amani (Modo DEFECTO/SYSTEM) ───────────
+// ── Semilla de marca Amani (#CCC0E4, HCT: H300 C22 T80) ────────────
 
-/** Color marca principal de Amani (lila claro). */
+/** Color de marca original de Amani (lila suave, usado como primaryContainer en modo claro). */
 val AmaniPurple = Color(0xFFCCC0E4)
 
-/** Variante oscura de la marca, utilizada en el tema oscuro. */
-val AmaniPurpleDark = Color(0xFF9B8CBF)
+/** Variante oscura de la marca. */
+val AmaniPurpleDark = Color(0xFFCDC1E5)
 
-/** Negro de la app — textos e iconos sobre fondos claros. */
-val AmaniBlack = Color(0xFF1C1B1F)
+/** Tono oscuro neutro de superficies e iconos sobre fondos claros. */
+val AmaniBlack = Color(0xFF1C1B1D)
 
-/** Blanco de la app — superficies, campos de texto y botones. */
+/** Blanco puro para superficies de nivel más bajo y contraste sobre acentos. */
 val AmaniWhite = Color(0xFFFFFFFF)
 
-/** Fondo de las pantallas de autenticación (login / registro). */
+/** Fondo de pantallas destacadas (login / bienvenida). */
 val AmaniBackground = Color(0xFFCCC0E4)
 
-/** Superficie general (cards, scaffolds). */
-val AmaniSurface = Color(0xFFFFFBFE)
+/** Superficie general en modo claro. */
+val AmaniSurface = Color(0xFFFDF8FB)
 
-/** Color de texto sobre superficies generales. */
-val AmaniOnSurface = Color(0xFF1C1B1F)
+/** Color de texto principal sobre superficies claras. */
+val AmaniOnSurface = Color(0xFF1C1B1D)
 
-// ── Colores semánticos de citas ────────────────────────────────
+// ── Tokens Material 3 — Modo Claro (SchemeContent seed #CCC0E4) ────
 
-/** Verde para franjas horarias libres. */
-val AmaniCitaLibre = Color(0xFF4CAF50)
+internal val LightPrimary = Color(0xFF635A79)
+internal val LightOnPrimary = Color(0xFFFFFFFF)
+internal val LightPrimaryContainer = Color(0xFFCCC0E4)
+internal val LightOnPrimaryContainer = Color(0xFF1F1732)
+internal val LightInversePrimary = Color(0xFFCDC1E5)
 
-/** Rojo suave para franjas horarias ocupadas. */
-val AmaniCitaOcupada = Color(0xFFE57373)
+internal val LightSecondary = Color(0xFF615C6A)
+internal val LightOnSecondary = Color(0xFFFFFFFF)
+internal val LightSecondaryContainer = Color(0xFFE7DFF0)
+internal val LightOnSecondaryContainer = Color(0xFF1D1A25)
 
-/** Fondo de una tarjeta de franja ocupada. */
-val AmaniCitaOcupadaBg = Color(0xFFFCE4EC)
+internal val LightTertiary = Color(0xFF785465)
+internal val LightOnTertiary = Color(0xFFFFFFFF)
+internal val LightTertiaryContainer = Color(0xFFFFD8E8)
+internal val LightOnTertiaryContainer = Color(0xFF2E1221)
 
-/** Verde profundo para citas confirmadas. */
-val AmaniCitaConfirmada = Color(0xFF2E7D32)
+internal val LightError = Color(0xFFBA1A1A)
+internal val LightOnError = Color(0xFFFFFFFF)
+internal val LightErrorContainer = Color(0xFFFFDAD6)
+internal val LightOnErrorContainer = Color(0xFF410002)
 
-/** Naranja para citas pendientes de confirmación. */
-val AmaniCitaPendiente = Color(0xFFE65100)
+internal val LightBackground = Color(0xFFFDF8FB)
+internal val LightOnBackground = Color(0xFF1C1B1D)
+internal val LightSurface = Color(0xFFFDF8FB)
+internal val LightOnSurface = Color(0xFF1C1B1D)
+internal val LightSurfaceVariant = Color(0xFFE7E0EA)
+internal val LightOnSurfaceVariant = Color(0xFF49454D)
 
-/** Rojo profundo para citas canceladas. */
-val AmaniCitaCancelada = Color(0xFFC62828)
+internal val LightSurfaceContainerLowest = Color(0xFFFFFFFF)
+internal val LightSurfaceContainerLow = Color(0xFFF7F2F5)
+internal val LightSurfaceContainer = Color(0xFFF1ECEF)
+internal val LightSurfaceContainerHigh = Color(0xFFECE7EA)
+internal val LightSurfaceContainerHighest = Color(0xFFE6E1E4)
+internal val LightSurfaceDim = Color(0xFFDDD9DC)
+internal val LightSurfaceBright = Color(0xFFFDF8FB)
 
-/** Fondo suave con tinte lila para el calendario. */
-val AmaniCalendarioBg = Color(0xFFF5F0FF)
+internal val LightOutline = Color(0xFF7A757E)
+internal val LightOutlineVariant = Color(0xFFCAC4CD)
+internal val LightInverseSurface = Color(0xFF313032)
+internal val LightInverseOnSurface = Color(0xFFF4EFF2)
+internal val LightScrim = Color(0xFF000000)
+internal val LightSurfaceTint = Color(0xFF635A79)
 
-// ── Colores sugeridos para completar M3 ────────────────────────
+// ── Tokens Material 3 — Modo Oscuro (SchemeContent seed #CCC0E4) ───
 
-/** Color terciario sugerido (fucsia/lila). */
-val AmaniFuchsia = Color(0xFF7B5C9E)
-val AmaniOnFuchsia = Color(0xFFFFFFFF)
-val AmaniFuchsiaContainer = Color(0xFFEADDFF)
-val AmaniOnFuchsiaContainer = Color(0xFF21005D)
+internal val DarkPrimary = Color(0xFFCDC1E5)
+internal val DarkOnPrimary = Color(0xFF342C48)
+internal val DarkPrimaryContainer = Color(0xFF4B4260)
+internal val DarkOnPrimaryContainer = Color(0xFFE9DDFF)
+internal val DarkInversePrimary = Color(0xFF635A79)
 
-/** Colores de error estándar de Material 3. */
-val AmaniError = Color(0xFFBA1A1A)
-val AmaniOnError = Color(0xFFFFFFFF)
-val AmaniErrorContainer = Color(0xFFFFDAD6)
-val AmaniOnErrorContainer = Color(0xFF410002)
+internal val DarkSecondary = Color(0xFFCBC4D4)
+internal val DarkOnSecondary = Color(0xFF322E3B)
+internal val DarkSecondaryContainer = Color(0xFF494552)
+internal val DarkOnSecondaryContainer = Color(0xFFE7DFF0)
 
-/** Tinte de superficie (basado en el color primario). */
-val AmaniSurfaceTint = AmaniPurple
+internal val DarkTertiary = Color(0xFFE8BACE)
+internal val DarkOnTertiary = Color(0xFF462736)
+internal val DarkTertiaryContainer = Color(0xFF5E3D4D)
+internal val DarkOnTertiaryContainer = Color(0xFFFFD8E8)
 
-// ── Colores para el juego Snake (AÑADIDOS SIN QUITAR NADA) ─────
+internal val DarkError = Color(0xFFFFB4AB)
+internal val DarkOnError = Color(0xFF690005)
+internal val DarkErrorContainer = Color(0xFF93000A)
+internal val DarkOnErrorContainer = Color(0xFFFFDAD6)
 
-/** Color del cuerpo de la serpiente - usa el lila principal de Amani. */
+internal val DarkBackground = Color(0xFF141315)
+internal val DarkOnBackground = Color(0xFFE6E1E4)
+internal val DarkSurface = Color(0xFF141315)
+internal val DarkOnSurface = Color(0xFFE6E1E4)
+internal val DarkSurfaceVariant = Color(0xFF49454D)
+internal val DarkOnSurfaceVariant = Color(0xFFCAC4CD)
+
+internal val DarkSurfaceContainerLowest = Color(0xFF0F0E10)
+internal val DarkSurfaceContainerLow = Color(0xFF1C1B1D)
+internal val DarkSurfaceContainer = Color(0xFF201F21)
+internal val DarkSurfaceContainerHigh = Color(0xFF2B292C)
+internal val DarkSurfaceContainerHighest = Color(0xFF363437)
+internal val DarkSurfaceDim = Color(0xFF141315)
+internal val DarkSurfaceBright = Color(0xFF3A393B)
+
+internal val DarkOutline = Color(0xFF948F97)
+internal val DarkOutlineVariant = Color(0xFF49454D)
+internal val DarkInverseSurface = Color(0xFFE6E1E4)
+internal val DarkInverseOnSurface = Color(0xFF313032)
+internal val DarkScrim = Color(0xFF000000)
+internal val DarkSurfaceTint = Color(0xFFCDC1E5)
+
+// ── Tokens semánticos armonizados con primary (citas / estados) ────
+
+internal val LightSuccess = Color(0xFF006D43)
+internal val LightOnSuccess = Color(0xFFFFFFFF)
+internal val LightSuccessContainer = Color(0xFF72FCB4)
+internal val LightOnSuccessContainer = Color(0xFF002111)
+
+internal val DarkSuccess = Color(0xFF52DF9A)
+internal val DarkOnSuccess = Color(0xFF003921)
+internal val DarkSuccessContainer = Color(0xFF005232)
+internal val DarkOnSuccessContainer = Color(0xFF72FCB4)
+
+internal val LightWarning = Color(0xFF994704)
+internal val LightOnWarning = Color(0xFFFFFFFF)
+internal val LightWarningContainer = Color(0xFFFFDBC9)
+internal val LightOnWarningContainer = Color(0xFF321200)
+
+internal val DarkWarning = Color(0xFFFFB68C)
+internal val DarkOnWarning = Color(0xFF532200)
+internal val DarkWarningContainer = Color(0xFF753400)
+internal val DarkOnWarningContainer = Color(0xFFFFDBC9)
+
+// ── Alias semánticos de citas (compatibilidad con LocalAmaniColors) ─
+
+/** Verde accesible para franjas horarias libres y citas confirmadas. */
+val AmaniCitaLibre = LightSuccess
+
+/** Rojo accesible para franjas ocupadas y citas canceladas. */
+val AmaniCitaOcupada = LightError
+
+/** Contenedor de franja ocupada. */
+val AmaniCitaOcupadaBg = LightErrorContainer
+
+/** Verde accesible para citas confirmadas. */
+val AmaniCitaConfirmada = LightSuccess
+
+/** Ámbar accesible para citas pendientes de confirmación. */
+val AmaniCitaPendiente = LightWarning
+
+/** Rojo accesible para citas canceladas. */
+val AmaniCitaCancelada = LightError
+
+/** Superficie suave para contenedores de calendario. */
+val AmaniCalendarioBg = LightSurfaceContainerLow
+
+/** Error estándar M3. */
+val AmaniError = LightError
+val AmaniOnError = LightOnError
+val AmaniErrorContainer = LightErrorContainer
+val AmaniOnErrorContainer = LightOnErrorContainer
+
+/** Tinte de superficie M3. */
+val AmaniSurfaceTint = LightSurfaceTint
+
+// ── Colores para el juego Snake (centralizados en ui/theme) ────────
+
 val SnakeBodyColor = AmaniPurple
-
-/** Color de la cabeza de la serpiente - usa la variante oscura del lila. */
-val SnakeHeadColor = AmaniPurpleDark
-
-/** Color de la comida - usa el rojo de error de Amani. */
-val SnakeFoodColor = AmaniError
-
-/** Color del fondo del juego - negro suave para contraste. */
-val SnakeBackgroundColor = Color(0xFF1A1A1A)
-
-/** Color del grid del juego - lila principal con 30% de opacidad. */
+val SnakeHeadColor = LightPrimary
+val SnakeFoodColor = DarkError
+val SnakeBackgroundColor = DarkSurfaceContainerLowest
 val SnakeGridColor = AmaniPurple.copy(alpha = 0.3f)
-
-/** Color del texto de Game Over - rojo error de Amani. */
-val SnakeGameOverColor = AmaniError
-
-/** Color del texto de Pausa - lila principal de Amani. */
+val SnakeGameOverColor = DarkError
 val SnakePausedColor = AmaniPurple
-
-/** Color del marcador de puntuación - lila claro. */
 val SnakeScoreColor = AmaniPurple
+val SnakeBorderColor = LightPrimary.copy(alpha = 0.8f)
 
-/** Color del borde de la serpiente - lila más oscuro para contraste. */
-val SnakeBorderColor = AmaniPurpleDark.copy(alpha = 0.8f)
+// Constantes Android Color Int para vistas clásicas (SnakeView)
+const val SNAKE_BODY_COLOR_INT: Int = 0xFFCCC0E4.toInt()
+const val SNAKE_HEAD_COLOR_INT: Int = 0xFF635A79.toInt()
+const val SNAKE_FOOD_COLOR_INT: Int = 0xFFBA1A1A.toInt()
+const val SNAKE_BG_COLOR_INT: Int = 0xFF0F0E10.toInt()
