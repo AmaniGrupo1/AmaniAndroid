@@ -143,3 +143,18 @@ Registro estructurado (**Antes / Después**) de los patrones visuales genéricos
 #### `ChatListScreen.kt`, `ChatScreen.kt`, `ChatScreenV2.kt`, `ChatInputBar.kt`, `MessageBubble.kt`, `ImageMessage.kt`, `AudioBubble.kt` y `AudioBubbleV2.kt`
 - **Antes:** `collectAsState()` sin ciclo de vida en `ChatListScreen.kt`, `Color.Black.copy(alpha = 0.4f / 0.5f)` y `Color.White` hardcodeados en `ChatScreenV2.kt`, `ChatInputBar.kt` y `MessageBubble.kt`, emojis (`"⚠"`, `"📸"`, `"📄"`, `"🎙️"`) en estados y placeholders, tamaños mágicos `10.sp`, `11.sp`, `14.sp`, `16.sp` y `dp` sueltos.
 - **Después:** `collectAsStateWithLifecycle()`, `MaterialTheme.colorScheme.scrim` e `inverseOnSurface` para overlays sobre imágenes, tipografía `MaterialTheme.typography.*`, `Spacing.*` y `Dimensions.*`, textos externalizados a `strings.xml` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+---
+
+### Lote 8 — Limpieza Global de Strings, Verificación de Accesibilidad y Cierre
+
+#### Limpieza de Emojis y Textos en Strings (`strings.xml`, `strings-en.xml`, `strings-ca.xml`)
+- **Antes:** 103 emojis decorativos como prefijos en encabezados, botones, etiquetas de formulario y filtros (`💾 `, `🔒 `, `📧 `, `👤 `, `🧠 `, `👑 `, `🗑️ `, `⚠️ `, `📋 `, `📅 `, `🌿 `, `🌸 `, `💜 `, etc.), y textos de botones en mayúsculas arbitrarias (`GUARDAR`, `GUARDAR CAMBIOS`, `SAVE`, `DESAR`). Esto generaba una apariencia de "plantilla generada por IA" y provocaba que lectores de pantalla (TalkBack) leyeran descripciones de emojis literales antes de cada acción.
+- **Después:** eliminación sistemática de los emojis prefijados en las tres localizaciones (español, inglés y catalán), manteniendo la semántica y naturalidad en cada idioma, y normalizando los botones a Title/Sentence case estándar de Material 3 (`Guardar`, `Guardar cambios`, `Save`, `Desar`).
+
+#### Verificación de Código Cero Deuda UI
+- **Colores hardcodeados fuera de `ui/theme`:** **0** encontrados (verificado con `grep` sobre `Color(`, `Color.White`, `Color.Black`, `Color.Red`, `Color.Green`, `Color.Blue`, `Color.Yellow`, `Color.Gray`, etc.).
+- **Tamaños de fuente `sp` fuera de `ui/theme`:** **0** encontrados (todas las pantallas usan exclusivamente la escala `MaterialTheme.typography`).
+- **Pruebas unitarias:** **402 pruebas unitarias pasando al 100%** (`:app:testDebugUnitTest`).
+- **Compilación de la aplicación:** `assembleDebug` completada con éxito (`BUILD SUCCESSFUL`).
+

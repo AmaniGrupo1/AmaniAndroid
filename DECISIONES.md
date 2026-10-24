@@ -97,3 +97,11 @@ Registro de decisiones tomadas ante ambigüedades o restricciones en conflicto d
 
 - **Contexto:** La Fase 4 indica: *"si la app se usa en tablet o plegables, usa WindowSizeClass; si no, no lo añadas"*, y añadir `material3-window-size-class` requeriría una dependencia nueva.
 - **Decisión:** No añadir dependencia nueva salvo que confirmes que la app tiene soporte oficial de tablet/plegables; usamos layouts responsivos con restricciones de ancho máximo (`widthIn(max = 600.dp)`) centrados en pantallas grandes.
+
+---
+
+## DEC-10 · Configuración de keystore de debug en entorno containerizado (`ANDROID_USER_HOME`)
+
+- **Contexto:** Al compilar la tarea `validateSigningDebug` en entornos sandbox o CLI containerizados con Snap, `/home/ivan/.android/debug.keystore.lock` arroja `AccessDeniedException` por permisos del host.
+- **Decisión:** Exportar `ANDROID_USER_HOME=/home/ivan/snap/antigravity-cli/common/.android`, garantizando generación y acceso sin fallos al keystore de depuración estándar de Android.
+
