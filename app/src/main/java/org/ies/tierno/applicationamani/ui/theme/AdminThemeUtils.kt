@@ -1,23 +1,22 @@
 package org.ies.tierno.applicationamani.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 /**
- * @deprecated Usar [getCardColors] y [getScreenColors] en su lugar
- * Este objeto se mantiene por compatibilidad pero delega en las nuevas funciones
+ * Tokens de tema para vistas de administración basados en [MaterialTheme.colorScheme].
  */
 @Composable
 fun rememberAdminThemeTokens(): AdminThemeTokens {
-    val cardColors = getCardColors()
-    val screenColors = getScreenColors()
+    val colorScheme = MaterialTheme.colorScheme
 
     return AdminThemeTokens(
-        primary = screenColors.primary,
-        onPrimary = screenColors.onPrimary,
-        cardBackground = cardColors.cardBackground,
-        cardContent = cardColors.cardContent,
-        screenBackground = screenColors.background,
+        primary = colorScheme.primary,
+        onPrimary = colorScheme.onPrimary,
+        cardBackground = colorScheme.surfaceContainerLow,
+        cardContent = colorScheme.onSurface,
+        screenBackground = colorScheme.background,
     )
 }
 

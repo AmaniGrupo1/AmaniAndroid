@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,38 +9,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
@@ -47,23 +48,10 @@ import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.LoginViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-
-// Fuentes profesionales
-val robotoFont =
-    FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold),
-    )
-
-val barlowCondensed =
-    FontFamily(
-        Font(R.font.barlow_condensed_black),
-    )
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla que lista los psicólogos activos con opciones de gestión.
@@ -88,71 +76,71 @@ fun ListadoPsicologosScreen(
     viewModel: ListarPsicologosAdminViewModel,
     listarPacientesViewModel: ListarPacientesViewModel,
 ) {
-    val psicologos by viewModel.psicologos.collectAsState()
+    val context = LocalContext.current
+    val psicologos by viewModel.psicologos.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoBaja by remember { mutableStateOf(false) }
     var isBajaInProgress by remember { mutableStateOf(false) }
 
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
-
-// Colores dinámicos según el tema
-    val backgroundColor = if (isDark) screenColors.background else Color(0xFFF5F5F5)
-    val cardBackgroundColor = if (isDark) cardColors.cardBackground else Color.White
-    val textPrimaryColor = if (isDark) cardColors.cardContent else Color.Black
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else Color(0xFF6B6B6B)
-    val primaryColor = if (isDark) Color.White else Color(0xFF6C63FF)
-    val deleteColor = if (isDark) Color(0xFFEF5350) else Color(0xFFD32F2F)
-    val buttonTextColor = if (isDark) Color.Black else Color.White
-    val topBarTextColor = if (isDark) Color.White else Color.Black
-    val fabTextColor = if (isDark) Color.Black else Color.White
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
 
     // Observar el estado de la baja desde el ViewModel
-    val bajaEstado by listarPacientesViewModel.bajaEstado.collectAsState()
+    val bajaEstado by listarPacientesViewModel.bajaEstado.collectAsStateWithLifecycle()
 
     // Efecto para manejar el resultado de la baja
     LaunchedEffect(bajaEstado) {
         if (bajaEstado != null) {
             if (bajaEstado!!.isSuccess) {
-                snackbarHostState.showSnackbar("Psicólogo dado de baja correctamente")
+                snackbarHostState.showSnackbar(context.getString(R.string.admin_psicologo_baja_exito))
                 mostrarDialogoBaja = false
                 psicologoSeleccionado = null
             } else if (bajaEstado!!.isFailure) {
-                snackbarHostState.showSnackbar("Error: ${bajaEstado!!.exceptionOrNull()?.message ?: "Error desconocido"}")
+                val msgError = bajaEstado!!.exceptionOrNull()?.message ?: context.getString(R.string.error_desconocido)
+                snackbarHostState.showSnackbar(context.getString(R.string.agenda_error_formato, msgError))
             }
             isBajaInProgress = false
         }
     }
 
+    val asignarSuccess by loginViewModel.asignarPacienteSuccess.collectAsStateWithLifecycle()
+    val asignarError by loginViewModel.asignarPacienteError.collectAsStateWithLifecycle()
+    val isAsignando by loginViewModel.isAsignandoPaciente.collectAsStateWithLifecycle()
+
+    LaunchedEffect(asignarSuccess, asignarError) {
+        if (asignarSuccess == true) {
+            snackbarHostState.showSnackbar(context.getString(R.string.admin_psicologo_asignado_exito))
+            loginViewModel.clearAsignarPsicologoResult()
+        } else if (asignarError != null) {
+            snackbarHostState.showSnackbar(context.getString(R.string.agenda_error_formato, asignarError))
+            loginViewModel.clearAsignarPsicologoResult()
+        }
+    }
+
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = colorScheme.background,
         topBar = {
-            Text(stringResource(R.string.auto_listado_de_psicologos),
-                color = topBarTextColor,
-                fontSize = 20.sp,
-                fontFamily = barlowCondensed,
-                modifier = Modifier.padding(16.dp),
+            Text(
+                text = stringResource(R.string.auto_listado_de_psicologos),
+                color = colorScheme.onBackground,
+                style = typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(Spacing.m),
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = { navController.popBackStack() },
-                containerColor = primaryColor,
-                modifier =
-                    Modifier
-                        .width(120.dp)
-                        .padding(8.dp),
-                shape = RoundedCornerShape(24.dp),
+                containerColor = colorScheme.primary,
+                contentColor = colorScheme.onPrimary,
+                shape = MaterialTheme.shapes.large,
             ) {
-                Text(stringResource(R.string.auto_cancelar),
-                    color = fabTextColor,
-                    fontFamily = robotoFont,
-                    fontSize = 14.sp,
+                Text(
+                    text = stringResource(R.string.auto_cancelar),
+                    style = typography.labelLarge,
                 )
             }
         },
@@ -162,190 +150,30 @@ fun ListadoPsicologosScreen(
                 Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                    .padding(Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
-            items(psicologos) { psicologo ->
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        // Nombre
-                        Text(
-                            "👤 ${psicologo.nombre} ${psicologo.apellido}",
-                            color = textPrimaryColor,
-                            fontFamily = robotoFont,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Especialidad
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(stringResource(R.string.auto__especialidad),
-                                color = textSecondaryColor,
-                                fontFamily = robotoFont,
-                                fontSize = 13.sp,
-                                modifier = Modifier.weight(1f),
-                            )
-                            Text(
-                                psicologo.especialidad,
-                                color = textPrimaryColor,
-                                fontFamily = robotoFont,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
+            items(
+                items = psicologos,
+                key = { it.idPsicologo },
+            ) { psicologo ->
+                PsicologoAsignacionCard(
+                    psicologo = psicologo,
+                    isAsignando = isAsignando,
+                    onDarBajaClick = {
+                        psicologoSeleccionado = psicologo
+                        mostrarDialogoBaja = true
+                    },
+                    onEditarClick = {},
+                    onAsignarClick = {
+                        scope.launch {
+                            loginViewModel.asignarPaciente(
+                                pacienteId,
+                                psicologo.idPsicologo,
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        // Descripción
-                        if (!psicologo.descripcion.isNullOrBlank()) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(stringResource(R.string.auto__descripcion),
-                                    color = textSecondaryColor,
-                                    fontFamily = robotoFont,
-                                    fontSize = 13.sp,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                Text(
-                                    psicologo.descripcion!!,
-                                    color = textPrimaryColor,
-                                    fontFamily = robotoFont,
-                                    fontSize = 13.sp,
-                                    maxLines = 2,
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-
-                        // Licencia
-                        if (!psicologo.licencia.isNullOrBlank()) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(stringResource(R.string.auto__licencia),
-                                    color = textSecondaryColor,
-                                    fontFamily = robotoFont,
-                                    fontSize = 13.sp,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                Text(
-                                    psicologo.licencia!!,
-                                    color = textPrimaryColor,
-                                    fontFamily = robotoFont,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium,
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-
-                        // Experiencia
-                        psicologo.experiencia?.let { exp ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(stringResource(R.string.auto__experiencia),
-                                    color = textSecondaryColor,
-                                    fontFamily = robotoFont,
-                                    fontSize = 13.sp,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                Text(
-                                    "$exp años",
-                                    color = textPrimaryColor,
-                                    fontFamily = robotoFont,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium,
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Button(
-                                onClick = {
-                                    psicologoSeleccionado = psicologo
-                                    mostrarDialogoBaja = true
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                Text(stringResource(R.string.auto_dar_de_baja), color = buttonTextColor, fontFamily = robotoFont)
-                            }
-
-                            Button(
-                                onClick = {
-                                    // Aquí podrías navegar a editar psicólogo si agregas id
-                                    // navController.navigate("editarPsicologo/${psicologo.idPsicologo}")
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                Text(stringResource(R.string.auto_editar), color = buttonTextColor, fontFamily = robotoFont)
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-                        val asignarSuccess by loginViewModel.asignarPacienteSuccess.collectAsState()
-                        val asignarError by loginViewModel.asignarPacienteError.collectAsState()
-                        val isAsignando by loginViewModel.isAsignandoPaciente.collectAsState()
-
-                        Button(
-                            onClick = {
-                                scope.launch {
-                                    loginViewModel.asignarPaciente(
-                                        pacienteId,
-                                        psicologo.idPsicologo,
-                                    )
-                                }
-                            },
-                            colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = primaryColor,
-                                    disabledContainerColor = primaryColor.copy(alpha = 0.5f),
-                                ),
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isAsignando,
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            if (isAsignando) {
-                                androidx.compose.material3.CircularProgressIndicator(
-                                    modifier = Modifier.width(20.dp),
-                                    color = buttonTextColor,
-                                    strokeWidth = 2.dp,
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.auto_asignando), color = buttonTextColor, fontFamily = robotoFont)
-                            } else {
-                                Text(stringResource(R.string.auto__asignar_a_paciente), color = buttonTextColor, fontFamily = robotoFont)
-                            }
-                        }
-
-                        LaunchedEffect(asignarSuccess, asignarError) {
-                            if (asignarSuccess == true) {
-                                snackbarHostState.showSnackbar("✅ Psicólogo asignado correctamente")
-                                loginViewModel.clearAsignarPsicologoResult()
-                            } else if (asignarError != null) {
-                                snackbarHostState.showSnackbar("❌ Error: $asignarError")
-                                loginViewModel.clearAsignarPsicologoResult()
-                            }
-                        }
-                    }
-                }
+                    },
+                )
             }
         }
 
@@ -357,20 +185,23 @@ fun ListadoPsicologosScreen(
                         mostrarDialogoBaja = false
                     }
                 },
-                containerColor = cardBackgroundColor,
+                containerColor = colorScheme.surface,
                 title = {
-                    Text(stringResource(R.string.auto_confirmar_baja),
-                        fontFamily = barlowCondensed,
-                        fontSize = 20.sp,
+                    Text(
+                        stringResource(R.string.auto_confirmar_baja),
+                        style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = textPrimaryColor,
+                        color = colorScheme.onSurface,
                     )
                 },
                 text = {
                     Text(
-                        "¿Seguro que deseas dar de baja a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
-                        fontFamily = robotoFont,
-                        color = textSecondaryColor,
+                        stringResource(
+                            R.string.admin_confirmar_baja_psicologo_msg,
+                            "${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}",
+                        ),
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
                     )
                 },
                 confirmButton = {
@@ -380,12 +211,19 @@ fun ListadoPsicologosScreen(
                             listarPacientesViewModel.darBajaPsicologo(psicologoSeleccionado!!.idPsicologo)
                         },
                         enabled = !isBajaInProgress,
-                        colors = ButtonDefaults.buttonColors(containerColor = deleteColor),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.error,
+                                contentColor = colorScheme.onError,
+                            ),
                     ) {
                         Text(
-                            if (isBajaInProgress) "Procesando..." else "Dar de baja",
-                            fontFamily = robotoFont,
-                            color = Color.White,
+                            if (isBajaInProgress) {
+                                stringResource(R.string.admin_procesando)
+                            } else {
+                                stringResource(R.string.auto_dar_de_baja)
+                            },
+                            style = typography.labelLarge,
                         )
                     }
                 },
@@ -397,15 +235,212 @@ fun ListadoPsicologosScreen(
                             }
                         },
                         enabled = !isBajaInProgress,
-                        colors =
-                            ButtonDefaults.outlinedButtonColors(
-                                contentColor = primaryColor,
-                            ),
                     ) {
-                        Text(stringResource(R.string.auto_cancelar), fontFamily = robotoFont, color = textPrimaryColor)
+                        Text(
+                            stringResource(R.string.auto_cancelar),
+                            style = typography.labelLarge,
+                        )
                     }
                 },
             )
+        }
+    }
+}
+
+@Composable
+fun PsicologoAsignacionCard(
+    psicologo: PsicologoSelfResponseDTO,
+    isAsignando: Boolean,
+    onDarBajaClick: () -> Unit,
+    onEditarClick: () -> Unit,
+    onAsignarClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
+    Card(
+        shape = MaterialTheme.shapes.large,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
+    ) {
+        Column(modifier = Modifier.padding(Spacing.m)) {
+            // Nombre
+            Text(
+                text = "${psicologo.nombre} ${psicologo.apellido}",
+                color = colorScheme.onSurface,
+                style = typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(modifier = Modifier.height(Spacing.s))
+
+            // Especialidad
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    stringResource(R.string.auto__especialidad),
+                    color = colorScheme.onSurfaceVariant,
+                    style = typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    psicologo.especialidad,
+                    color = colorScheme.onSurface,
+                    style = typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.xs))
+
+            // Descripción
+            if (!psicologo.descripcion.isNullOrBlank()) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        stringResource(R.string.auto__descripcion),
+                        color = colorScheme.onSurfaceVariant,
+                        style = typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        psicologo.descripcion,
+                        color = colorScheme.onSurface,
+                        style = typography.bodySmall,
+                        maxLines = 2,
+                    )
+                }
+                Spacer(modifier = Modifier.height(Spacing.xs))
+            }
+
+            // Licencia
+            if (!psicologo.licencia.isNullOrBlank()) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        stringResource(R.string.auto__licencia),
+                        color = colorScheme.onSurfaceVariant,
+                        style = typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        psicologo.licencia,
+                        color = colorScheme.onSurface,
+                        style = typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                Spacer(modifier = Modifier.height(Spacing.xs))
+            }
+
+            // Experiencia
+            psicologo.experiencia?.let { exp ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        stringResource(R.string.auto__experiencia),
+                        color = colorScheme.onSurfaceVariant,
+                        style = typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        stringResource(R.string.psicologo_anos_exp_valor, exp),
+                        color = colorScheme.onSurface,
+                        style = typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                Spacer(modifier = Modifier.height(Spacing.xs))
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.sm))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+            ) {
+                Button(
+                    onClick = onDarBajaClick,
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.error,
+                            contentColor = colorScheme.onError,
+                        ),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(stringResource(R.string.auto_dar_de_baja), style = typography.labelLarge)
+                }
+
+                Button(
+                    onClick = onEditarClick,
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                            contentColor = colorScheme.onPrimary,
+                        ),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(stringResource(R.string.auto_editar), style = typography.labelLarge)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.s))
+
+            Button(
+                onClick = onAsignarClick,
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onPrimary,
+                    ),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isAsignando,
+                shape = MaterialTheme.shapes.medium,
+            ) {
+                if (isAsignando) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(Dimensions.iconMedium),
+                        color = colorScheme.onPrimary,
+                        strokeWidth = Dimensions.borderMedium,
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.s))
+                    Text(stringResource(R.string.auto_asignando), style = typography.labelLarge)
+                } else {
+                    Text(stringResource(R.string.auto__asignar_a_paciente), style = typography.labelLarge)
+                }
+            }
+        }
+    }
+}
+
+@Preview(name = "ListadoPsicologos Light", showBackground = true)
+@Preview(
+    name = "ListadoPsicologos Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "ListadoPsicologos Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun ListadoPsicologosScreenPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(modifier = Modifier.padding(Spacing.m)) {
+                PsicologoAsignacionCard(
+                    psicologo =
+                        PsicologoSelfResponseDTO(
+                            idPsicologo = 1L,
+                            nombre = "Carlos",
+                            apellido = "Mendoza",
+                            especialidad = "Psicología Clínica",
+                            experiencia = 8,
+                            descripcion = "Especialista en terapia cognitivo-conductual.",
+                            licencia = "M-12345",
+                            telefono = "600123456",
+                            email = "carlos@amani.es",
+                        ),
+                    isAsignando = false,
+                    onDarBajaClick = {},
+                    onEditarClick = {},
+                    onAsignarClick = {},
+                )
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -42,19 +43,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -68,7 +71,7 @@ import java.time.format.DateTimeFormatter
  * se carga desde [DocumentoLegalViewModel] según el [tipoDocumento].
  *
  * @param navController Controlador de navegación para volver atrás.
- * @param tipoDocumento Tipo de documento a visualizar (\»terminos\» o \»privacidad\»).
+ * @param tipoDocumento Tipo de documento a visualizar ("terminos" o "privacidad").
  * @param viewModel ViewModel que gestiona la carga del documento legal.
  */
 @RequiresApi(Build.VERSION_CODES.O)
@@ -76,10 +79,9 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DocumentoLegalDetailScreen(
     navController: NavController,
-    tipoDocumento: String, // "terminos" o "privacidad"
+    tipoDocumento: String,
     viewModel: DocumentoLegalViewModel = koinViewModel(),
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
@@ -92,9 +94,9 @@ fun DocumentoLegalDetailScreen(
     // Determinar título e icono según el tipo
     val titulo =
         when (tipoDocumento) {
-            "terminos" -> "📜 Términos y Condiciones"
-            "privacidad" -> "🔒 Política de Privacidad"
-            else -> "📄 Documento Legal"
+            "terminos" -> stringResource(R.string.terminos_condiciones)
+            "privacidad" -> stringResource(R.string.politica_privacidad)
+            else -> stringResource(R.string.admin_doc_legal_titulo_default)
         }
 
     val icono =
@@ -118,9 +120,9 @@ fun DocumentoLegalDetailScreen(
                         text = titulo,
                         style = typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = colorScheme.onPrimary,
+                        color = colorScheme.onSurface,
                         maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 },
                 navigationIcon = {
@@ -128,15 +130,15 @@ fun DocumentoLegalDetailScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
-                            tint = colorScheme.onPrimary,
+                            tint = colorScheme.onSurface,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colorScheme.surface,
+                        titleContentColor = colorScheme.onSurface,
+                        navigationIconContentColor = colorScheme.onSurface,
                     ),
             )
         },
@@ -158,16 +160,15 @@ fun DocumentoLegalDetailScreen(
                             verticalArrangement = Arrangement.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
+                                modifier = Modifier.size(Dimensions.iconExtraLarge),
                                 color = colorScheme.primary,
-                                strokeWidth = 3.dp,
+                                strokeWidth = Dimensions.progressStroke,
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(Spacing.m))
                             Text(
                                 text = stringResource(R.string.auto_cargando_documento),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
-                                fontFamily = roboto,
                             )
                         }
                     }
@@ -181,40 +182,38 @@ fun DocumentoLegalDetailScreen(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(24.dp),
+                            modifier = Modifier.padding(Spacing.l),
                         ) {
                             Icon(
                                 Icons.Default.Error,
                                 contentDescription = null,
-                                modifier = Modifier.size(64.dp),
+                                modifier = Modifier.size(Dimensions.iconHero),
                                 tint = colorScheme.error,
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(Spacing.m))
                             Text(
                                 text = stringResource(R.string.auto_error_al_cargar_el_1),
                                 style = typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.onSurface,
-                                fontFamily = roboto,
                                 textAlign = TextAlign.Center,
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(Spacing.s))
                             Text(
-                                text = error ?: "Error desconocido",
+                                text = error ?: stringResource(R.string.error_desconocido),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
-                                fontFamily = roboto,
                                 textAlign = TextAlign.Center,
                             )
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(Spacing.l))
                             Button(
                                 onClick = { viewModel.getDocumentoByTipo(tipoDocumento) },
                                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                                 shape = shapes.medium,
                             ) {
                                 Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.auto_reintentar))
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.auto_reintentar), style = typography.labelLarge, fontFamily = roboto)
+                                Spacer(modifier = Modifier.width(Spacing.s))
+                                Text(stringResource(R.string.auto_reintentar), style = typography.labelLarge)
                             }
                         }
                     }
@@ -228,29 +227,27 @@ fun DocumentoLegalDetailScreen(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(24.dp),
+                            modifier = Modifier.padding(Spacing.l),
                         ) {
                             Icon(
                                 icono,
                                 contentDescription = null,
-                                modifier = Modifier.size(80.dp),
+                                modifier = Modifier.size(Dimensions.avatarLarge),
                                 tint = colorScheme.primary.copy(alpha = 0.4f),
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(Spacing.m))
                             Text(
                                 text = stringResource(R.string.auto_documento_no_disponible),
                                 style = typography.headlineSmall,
                                 fontWeight = FontWeight.Medium,
                                 color = colorScheme.onSurface,
-                                fontFamily = roboto,
                                 textAlign = TextAlign.Center,
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(Spacing.s))
                             Text(
                                 text = stringResource(R.string.auto_el_documento_no_esta),
                                 style = typography.bodyMedium,
                                 color = colorScheme.onSurfaceVariant,
-                                fontFamily = roboto,
                                 textAlign = TextAlign.Center,
                             )
                         }
@@ -258,10 +255,7 @@ fun DocumentoLegalDetailScreen(
                 }
 
                 else -> {
-                    DocumentoContent(
-                        documento = documento!!,
-                        roboto = roboto,
-                    )
+                    DocumentoContent(documento = documento!!)
                 }
             }
         }
@@ -272,44 +266,45 @@ fun DocumentoLegalDetailScreen(
  * Contenido visual del documento legal con título, metadatos y texto completo.
  *
  * @param documento DTO con los datos del documento legal.
- * @param roboto Familia tipográfica Roboto utilizada en los textos.
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DocumentoContent(
     documento: DocumentoLegalResponseDTO,
-    roboto: FontFamily,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
+    val extraColors = AmaniTheme.colors
 
+    val fechaNoDisponible = stringResource(R.string.cita_fecha_no_disponible)
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaCreacion =
         try {
             documento.creadoEn?.let {
                 LocalDateTime.parse(it).format(fechaFormatter)
-            } ?: "Fecha no disponible"
+            } ?: fechaNoDisponible
         } catch (e: Exception) {
-            "Fecha no disponible"
+            fechaNoDisponible
         }
 
     val fechaActualizacion =
         try {
             documento.actualizadoEn?.let {
                 LocalDateTime.parse(it).format(fechaFormatter)
-            } ?: "Fecha no disponible"
+            } ?: fechaNoDisponible
         } catch (e: Exception) {
-            "Fecha no disponible"
+            fechaNoDisponible
         }
 
     Column(
         modifier =
-            Modifier
+            modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .background(colorScheme.surface)
-                .padding(16.dp),
+                .padding(Spacing.m),
     ) {
         // Título
         Text(
@@ -317,8 +312,7 @@ fun DocumentoContent(
             style = typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
-            fontFamily = roboto,
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = Spacing.s),
         )
 
         // Metadatos
@@ -328,71 +322,101 @@ fun DocumentoContent(
             color = colorScheme.surfaceVariant,
         ) {
             Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "📌 Versión: ${documento.version ?: "1.0"}",
+                        text = stringResource(R.string.admin_doc_version_formato, documento.version ?: "1.0"),
                         style = typography.labelSmall,
                         color = colorScheme.onSurfaceVariant,
-                        fontFamily = roboto,
                     )
                     Text(
-                        text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
+                        text =
+                            if (documento.activo) {
+                                stringResource(R.string.settings_estado_activo)
+                            } else {
+                                stringResource(R.string.settings_estado_inactivo)
+                            },
                         style = typography.labelSmall,
-                        color = if (documento.activo) Color(0xFF4CAF50) else colorScheme.error,
-                        fontFamily = roboto,
+                        color = if (documento.activo) extraColors.success else colorScheme.error,
                     )
                 }
                 Text(
-                    text = "📅 Creado: $fechaCreacion",
+                    text = stringResource(R.string.admin_doc_creado_formato, fechaCreacion),
                     style = typography.labelSmall,
                     color = colorScheme.onSurfaceVariant,
-                    fontFamily = roboto,
                 )
                 Text(
-                    text = "🔄 Actualizado: $fechaActualizacion",
+                    text = stringResource(R.string.admin_doc_actualizado_formato, fechaActualizacion),
                     style = typography.labelSmall,
                     color = colorScheme.onSurfaceVariant,
-                    fontFamily = roboto,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
 
-        // Línea decorativa
+        // Línea divisoria
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(2.dp)
+                    .height(Dimensions.borderMedium)
                     .background(colorScheme.primary.copy(alpha = 0.3f)),
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
 
         // Contenido del documento
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = shapes.large,
-            colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
         ) {
             Text(
                 text = documento.contenido,
                 style = typography.bodyMedium,
-                lineHeight = 22.sp,
                 color = colorScheme.onSurface,
-                fontFamily = roboto,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(Spacing.m),
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(name = "DocumentoLegalDetail Light", showBackground = true)
+@Preview(
+    name = "DocumentoLegalDetail Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "DocumentoLegalDetail Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun DocumentoLegalDetailScreenPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            DocumentoContent(
+                documento =
+                    DocumentoLegalResponseDTO(
+                        idDocumento = 1L,
+                        tipo = null,
+                        titulo = "Política de Privacidad",
+                        contenido = "En Amani Psicología garantizamos la confidencialidad y protección de tus datos personales conforme al RGPD.",
+                        icono = "lock",
+                        ordenVisualizacion = 1,
+                        version = "1.2",
+                        activo = true,
+                        creadoEn = "2026-01-15T10:00:00",
+                        actualizadoEn = "2026-06-20T14:30:00",
+                    ),
+            )
+        }
     }
 }

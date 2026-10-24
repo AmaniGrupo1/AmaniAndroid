@@ -1,37 +1,41 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
-import androidx.compose.foundation.background
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.CrearPreguntaViewModel
-import org.ies.tierno.applicationamani.ui.theme.Roboto
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -49,110 +53,150 @@ fun TestScreen(
     navController: NavController,
     crearPreguntaViewModel: CrearPreguntaViewModel = koinViewModel(),
 ) {
-    val colorButton = android.graphics.Color.parseColor("#CCC0E4")
-    val request = crearPreguntaViewModel.request.collectAsState()
-    val roboto = Roboto
-
+    val request by crearPreguntaViewModel.request.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val guardadoExitoso by crearPreguntaViewModel.guardadoExitoso.collectAsState()
+    val guardadoExitoso by crearPreguntaViewModel.guardadoExitoso.collectAsStateWithLifecycle()
+    val msgGuardado = stringResource(R.string.admin_pregunta_guardada)
+
     if (guardadoExitoso) {
         LaunchedEffect(guardadoExitoso) {
-            snackbarHostState.showSnackbar("Pregunta guardada correctamente")
+            snackbarHostState.showSnackbar(msgGuardado)
             navController.popBackStack()
             crearPreguntaViewModel.limpiarEstadoGuardado()
         }
     }
+
+    TestScreenContent(
+        texto = request.texto ?: "",
+        tipo = request.tipo ?: "",
+        opcion1 = request.opciones?.getOrNull(0) ?: "",
+        opcion2 = request.opciones?.getOrNull(1) ?: "",
+        opcion3 = request.opciones?.getOrNull(2) ?: "",
+        opcion4 = request.opciones?.getOrNull(3) ?: "",
+        snackbarHostState = snackbarHostState,
+        onTextoChange = crearPreguntaViewModel::setTexto,
+        onTipoChange = crearPreguntaViewModel::setTipo,
+        onOpcion1Change = crearPreguntaViewModel::setOpcion1,
+        onOpcion2Change = crearPreguntaViewModel::setOpcion2,
+        onOpcion3Change = crearPreguntaViewModel::setOpcion3,
+        onOpcion4Change = crearPreguntaViewModel::setOpcion4,
+        onGuardarClick = crearPreguntaViewModel::guardarPregunta,
+    )
+}
+
+@Composable
+fun TestScreenContent(
+    texto: String,
+    tipo: String,
+    opcion1: String,
+    opcion2: String,
+    opcion3: String,
+    opcion4: String,
+    snackbarHostState: SnackbarHostState,
+    onTextoChange: (String) -> Unit,
+    onTipoChange: (String) -> Unit,
+    onOpcion1Change: (String) -> Unit,
+    onOpcion2Change: (String) -> Unit,
+    onOpcion3Change: (String) -> Unit,
+    onOpcion4Change: (String) -> Unit,
+    onGuardarClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
     Scaffold(
-        containerColor = Color(colorButton),
+        modifier = modifier,
+        containerColor = colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
-
         Column(
             modifier =
                 Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = Spacing.l),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = stringResource(R.string.auto_crear_pregunta),
-                fontSize = 26.sp,
-                fontFamily = roboto,
-                color = Color.Black,
+                style = typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.onBackground,
             )
 
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Color.White,
-                            shape = RoundedCornerShape(20.dp),
-                        ).padding(20.dp),
+            Spacer(modifier = Modifier.height(Spacing.m))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
             ) {
-                CampoPregunta(
-                    value = request.value.texto ?: "",
-                    placeholder = "Pregunta",
-                    onChange = { crearPreguntaViewModel.setTexto(it) },
-                    roboto = roboto,
-                )
-
-                CampoPregunta(
-                    value = request.value.tipo ?: "",
-                    placeholder = "Tipo de pregunta",
-                    onChange = { crearPreguntaViewModel.setTipo(it) },
-                    roboto = roboto,
-                )
-
-                CampoPregunta(
-                    value = request.value.opciones?.getOrNull(0) ?: "",
-                    placeholder = "Opción 1",
-                    onChange = { crearPreguntaViewModel.setOpcion1(it) },
-                    roboto = roboto,
-                )
-
-                CampoPregunta(
-                    value = request.value.opciones?.getOrNull(1) ?: "",
-                    placeholder = "Opción 2",
-                    onChange = { crearPreguntaViewModel.setOpcion2(it) },
-                    roboto = roboto,
-                )
-
-                CampoPregunta(
-                    value = request.value.opciones?.getOrNull(2) ?: "",
-                    placeholder = "Opción 3",
-                    onChange = { crearPreguntaViewModel.setOpcion3(it) },
-                    roboto = roboto,
-                )
-
-                CampoPregunta(
-                    value = request.value.opciones?.getOrNull(3) ?: "",
-                    placeholder = "Opción 4",
-                    onChange = { crearPreguntaViewModel.setOpcion4(it) },
-                    roboto = roboto,
-                )
-
-                Button(
+                Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(52.dp),
-                    shape = RoundedCornerShape(40.dp),
-                    onClick = {
-                        crearPreguntaViewModel.guardarPregunta()
-                    },
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color(colorButton),
-                            contentColor = Color.Black,
-                        ),
+                            .padding(Spacing.m),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 ) {
-                    Text(stringResource(R.string.auto_guardar_pregunta),
-                        fontSize = 16.sp,
-                        fontFamily = roboto,
+                    CampoPregunta(
+                        value = texto,
+                        placeholder = stringResource(R.string.admin_test_pregunta_placeholder),
+                        onChange = onTextoChange,
                     )
+
+                    CampoPregunta(
+                        value = tipo,
+                        placeholder = stringResource(R.string.admin_test_tipo_placeholder),
+                        onChange = onTipoChange,
+                    )
+
+                    CampoPregunta(
+                        value = opcion1,
+                        placeholder = stringResource(R.string.admin_test_opcion_formato, 1),
+                        onChange = onOpcion1Change,
+                    )
+
+                    CampoPregunta(
+                        value = opcion2,
+                        placeholder = stringResource(R.string.admin_test_opcion_formato, 2),
+                        onChange = onOpcion2Change,
+                    )
+
+                    CampoPregunta(
+                        value = opcion3,
+                        placeholder = stringResource(R.string.admin_test_opcion_formato, 3),
+                        onChange = onOpcion3Change,
+                    )
+
+                    CampoPregunta(
+                        value = opcion4,
+                        placeholder = stringResource(R.string.admin_test_opcion_formato, 4),
+                        onChange = onOpcion4Change,
+                    )
+
+                    Spacer(modifier = Modifier.height(Spacing.xs))
+
+                    Button(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(Dimensions.buttonHeight),
+                        shape = MaterialTheme.shapes.medium,
+                        onClick = onGuardarClick,
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.primary,
+                                contentColor = colorScheme.onPrimary,
+                            ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.auto_guardar_pregunta),
+                            style = typography.labelLarge,
+                        )
+                    }
                 }
             }
         }
@@ -165,36 +209,63 @@ fun TestScreen(
  * @param value Valor actual del campo.
  * @param placeholder Texto indicativo cuando el campo está vacío.
  * @param onChange Callback invocado al cambiar el texto.
- * @param roboto Familia tipográfica Roboto utilizada en el placeholder.
  */
 @Composable
 fun CampoPregunta(
     value: String,
     placeholder: String,
     onChange: (String) -> Unit,
-    roboto: FontFamily,
+    modifier: Modifier = Modifier,
 ) {
-    TextField(
-        modifier =
-            Modifier
-                .fillMaxWidth(),
+    val colorScheme = MaterialTheme.colorScheme
+    OutlinedTextField(
+        modifier = modifier.fillMaxWidth(),
         value = value,
         onValueChange = onChange,
         placeholder = {
             Text(
                 text = placeholder,
-                fontFamily = roboto,
+                style = MaterialTheme.typography.bodyMedium,
             )
         },
         singleLine = true,
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         colors =
-            TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFFF7F7F7),
-                unfocusedContainerColor = Color(0xFFF7F7F7),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.Black,
+            OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = colorScheme.surface,
+                unfocusedContainerColor = colorScheme.surface,
+                focusedBorderColor = colorScheme.primary,
+                unfocusedBorderColor = colorScheme.outlineVariant,
+                cursorColor = colorScheme.primary,
             ),
     )
+}
+
+@Preview(name = "TestScreen Light", showBackground = true)
+@Preview(
+    name = "TestScreen Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "TestScreen Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun TestScreenPreview() {
+    AppTheme {
+        TestScreenContent(
+            texto = "¿Con qué frecuencia sientes ansiedad?",
+            tipo = "Opción múltiple",
+            opcion1 = "Nunca",
+            opcion2 = "A veces",
+            opcion3 = "Frecuentemente",
+            opcion4 = "Siempre",
+            snackbarHostState = remember { SnackbarHostState() },
+            onTextoChange = {},
+            onTipoChange = {},
+            onOpcion1Change = {},
+            onOpcion2Change = {},
+            onOpcion3Change = {},
+            onOpcion4Change = {},
+            onGuardarClick = {},
+        )
+    }
 }

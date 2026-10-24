@@ -112,4 +112,22 @@ Registro estructurado (**Antes / Después**) de los patrones visuales genéricos
 - **Antes:** extensiones `ColorScheme.success = Color(0xFF4CAF50)` y `ColorScheme.warning = Color(0xFFFF9800)`, `Color.Black.copy(alpha = 0.4f)`, `.shadow(4.dp / 8.dp, RoundedCornerShape(16.dp / 24.dp))`, `RoundedCornerShape(28.dp)` manual en diálogos y 15+ emojis como iconos de UI (`📅`, `⏳`, `✅`, `🏁`, `❌`, `🚫`, `✏️`, `🏢`, `📞`, `💳`, `💰`, `💾`, `🗑️`).
 - **Después:** tokens `AmaniTheme.colors.success` y `warning`, `colors.scrim.copy(alpha = 0.4f)`, `CardDefaults.cardElevation(defaultElevation = Elevation.level1 / level2)`, `MaterialTheme.shapes.*`, eliminación de todos los emojis de UI en favor de iconos Material y textos limpios en `strings.xml`, y `@Preview` en Light, Dark y `fontScale = 1.5f`.
 
+---
 
+### Lote 6 — Pantallas de Administrador (`AdminView/`)
+
+#### `AdminThemeUtils.kt`
+- **Antes:** `adminBackgroundGradient()` devolvía un `Brush.verticalGradient` decorativo usado en todas las pantallas de administración; `adminCardColors()` y `adminTextFieldColors()` fijaban opacidades arbitrarias y `Color.Transparent`.
+- **Después:** `adminBackgroundGradient()` usa un `SolidColor(MaterialTheme.colorScheme.background)` plano coherente con Material 3; las funciones utilitarias delegan en tokens semánticos (`surfaceContainerLow`, `onSurface`, `outlineVariant`).
+
+#### `ViewAdminPrincipal.kt`, `AdminProfileScreen.kt` y `SettingsAdminScreen.kt`
+- **Antes:** fondos `Brush.verticalGradient`, tarjetas con `.shadow(4.dp..10.dp, RoundedCornerShape(20.dp / 24.dp))`, colores sueltos (`Color.White`, `Color.Gray`, `Color.Red`, `Color(0xFF4CAF50)`, `Color(0xFFFF9800)`, `Color(0xFF9C27B0)`, `Color(0xFF2196F3)`), `Icons.Default.Psychology` para acciones de psicólogos y terapias, y `collectAsState()`.
+- **Después:** superficies M3 planas (`surfaceContainerLow`, `primaryContainer`, `secondaryContainer`), iconos semánticos (`Icons.Default.MedicalServices`, `SelfImprovement`), tokens `AmaniTheme.colors.success` / `warning`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `ListadoPsicologosScreen.kt`, `ListadoPsicologosBajaScreen.kt`, `ListadoPsicologosSimpleScreen.kt`, `AgregaPsicologoScreen.kt` y `EditarPsicologoAdminScreen.kt`
+- **Antes:** fondos con `Brush.verticalGradient`, `Color(0xFFE53935)`, `Color(0xFF43A047)`, `Color(0xFF1E88E5)`, `Color.White`, `Color.Gray`, `.shadow(4.dp..8.dp)`, `Icons.Default.Psychology` para especialidades y psicólogos, literales hardcodeados en diálogos y `collectAsState()`.
+- **Después:** tokens `MaterialTheme.colorScheme.*` y `AmaniTheme.colors.success*`, `Icons.Default.MedicalServices`, textos externalizados a `strings.xml` (ES/EN/CA), `Spacing.*`, `Dimensions.*`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `ListadoPacientesScreen.kt`, `ListarPacienteSinPsicologos.kt`, `AdminUserManagementScreen.kt`, `TerapiasScreen.kt`, `SituacionAdminScreen.kt`, `TestScreen.kt`, `AgregarAdministrador.kt`, `DocumentoLegalDetailScreen.kt` y `GestionPoliticasScreen.kt`
+- **Antes:** chips de rol con emojis (`"👑"`, `"🧠"`, `"👤"`) y colores hardcodeados (`0xFFE53935`, `0xFF43A047`, `0xFF1E88E5`, `0xFFFFEE58`, `0xFFEF5350`, `0xFF66BB6A`, `0xFFFFA726`, `0xFFCCC0E4`), `Brush.verticalGradient`, `.shadow(...)`, `Icons.Default.Psychology`, tamaños `sp` y `dp` mágicos y `collectAsState()`.
+- **Después:** chips e indicadores con tokens M3 (`primaryContainer`, `secondaryContainer`, `tertiaryContainer`, `AmaniTheme.colors.successContainer`, `warningContainer`) e iconos vectoriales (`AdminPanelSettings`, `MedicalServices`, `Person`, `SelfImprovement`), superficies planas sin gradientes ni `.shadow`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.

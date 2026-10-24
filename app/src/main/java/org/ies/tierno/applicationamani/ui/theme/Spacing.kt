@@ -23,6 +23,7 @@ object Spacing {
     /** 12.dp — espaciado intermedio para paddings internos de tarjetas compactas y filas. */
     val sm = 12.dp
     val sMedium = sm
+    val md = sm
 
     /** 16.dp — margen horizontal de pantalla y padding interno estándar de tarjetas. */
     val m = 16.dp
@@ -35,6 +36,14 @@ object Spacing {
 
     /** 48.dp — tamaño mínimo de objetivo táctil accesible (WCAG / Android Accessibility). */
     val xxl = 48.dp
+
+    val dividerThickness = 1.dp
+    val iconSmall = 16.dp
+    val iconMedium = 24.dp
+    val avatarSmall = 36.dp
+    val avatarMedium = 48.dp
+    val avatarLarge = 72.dp
+    val minTouchTarget = 48.dp
 }
 
 /**

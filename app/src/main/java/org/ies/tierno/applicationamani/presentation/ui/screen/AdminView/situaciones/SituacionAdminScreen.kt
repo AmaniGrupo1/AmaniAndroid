@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.situacion
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
@@ -34,7 +34,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,7 +42,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,31 +49,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-
-// Colores originales para el modo DEFECTO (Amani)
-private val AmaniDefaultPrimary = Color(0xFF9B87F5)
-private val AmaniDefaultBackground = Color(0xFFFDF8FF)
-private val AmaniDefaultCardBackground = Color.White
-private val AmaniDefaultTextPrimary = Color(0xFF2D2D35)
-private val AmaniDefaultTextSecondary = Color(0xFF6B6B7A)
-private val AmaniDefaultDivider = Color(0xFFE8E2F3)
-private val AmaniDefaultError = Color(0xFFE57373)
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla de gestión de situaciones desde el panel de administración.
@@ -95,144 +81,47 @@ fun SituacionAdminScreen(
     navController: NavController,
     viewModel: SituacionViewModel,
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val situaciones by viewModel.situaciones.collectAsState()
+    val situaciones by viewModel.situaciones.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
     var situacionEditando by remember { mutableStateOf<SituacionDTO?>(null) }
     var situacionAEliminar by remember { mutableStateOf<SituacionDTO?>(null) }
 
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
-
-    // Determinar colores segun el tema
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else AmaniDefaultPrimary
-    val backgroundColor = if (isDark) screenColors.background else AmaniDefaultBackground
-    val cardBackgroundColor = if (isDark) cardColors.cardBackground else AmaniDefaultCardBackground
-    val textPrimaryColor = if (isDark) cardColors.cardContent else AmaniDefaultTextPrimary
-    val textSecondaryColor = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AmaniDefaultTextSecondary
-    val dividerColor = if (isDark) cardColors.cardContent.copy(alpha = 0.2f) else AmaniDefaultDivider
-    val errorColor = AmaniDefaultError
-
-    Scaffold(
-        containerColor = backgroundColor,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.gestion_situaciones),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
-                        fontFamily = roboto,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.auto_volver),
-                            tint = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
-                        )
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-            )
+    SituacionAdminContent(
+        situaciones = situaciones,
+        snackbarHostState = snackbarHostState,
+        onBackClick = { navController.navigateUp() },
+        onAddClick = {
+            situacionEditando = null
+            showDialog = true
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    situacionEditando = null
-                    showDialog = true
-                },
-                containerColor = primaryColor,
-                contentColor = if (isDark) MaterialTheme.colorScheme.onPrimary else Color.White,
-            ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_situacion))
-            }
+        onEditClick = { situacion ->
+            situacionEditando = situacion
+            showDialog = true
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { paddingValues ->
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-        ) {
-            when {
-                situaciones.isEmpty() -> {
-                    EmptySituacionesScreen(
-                        onAddClick = {
-                            situacionEditando = null
-                            showDialog = true
-                        },
-                        primaryColor = primaryColor,
-                        textPrimaryColor = textPrimaryColor,
-                        textSecondaryColor = textSecondaryColor,
-                        roboto = roboto,
-                        isDark = isDark,
-                    )
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(
-                            items = situaciones,
-                            key = { it.idSituacion },
-                        ) { situacion ->
-                            TarjetaSituacion(
-                                situacion = situacion,
-                                onEditClick = {
-                                    situacionEditando = situacion
-                                    showDialog = true
-                                },
-                                onDeleteClick = { situacionAEliminar = situacion },
-                                primaryColor = primaryColor,
-                                cardBackgroundColor = cardBackgroundColor,
-                                textPrimaryColor = textPrimaryColor,
-                                textSecondaryColor = textSecondaryColor,
-                                dividerColor = dividerColor,
-                                errorColor = errorColor,
-                                roboto = roboto,
-                                isDark = isDark,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
+        onDeleteClick = { situacionAEliminar = it },
+    )
 
-    // Dialogo de confirmacion para eliminar
     if (situacionAEliminar != null) {
         AlertDialog(
             onDismissRequest = { situacionAEliminar = null },
-            containerColor = cardBackgroundColor,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             title = {
                 Text(
                     text = stringResource(R.string.auto_confirmar_eliminacion),
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = textPrimaryColor,
-                    fontFamily = roboto,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             },
             text = {
                 Text(
-                    text = "¿Estás seguro de que quieres eliminar la situación \"${situacionAEliminar!!.nombre}\"?\n\nEsta acción no se puede deshacer.",
-                    color = textSecondaryColor,
-                    fontFamily = roboto,
+                    text = stringResource(R.string.admin_situacion_confirmar_eliminar_msg, situacionAEliminar!!.nombre),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             confirmButton = {
@@ -241,34 +130,39 @@ fun SituacionAdminScreen(
                         viewModel.eliminarSituacion(
                             id = situacionAEliminar!!.idSituacion,
                             onResult = { success, _ ->
-                                if (success) {
-                                    scope.launch { snackbarHostState.showSnackbar("Situacion eliminada correctamente") }
-                                } else {
-                                    scope.launch { snackbarHostState.showSnackbar("Error al eliminar la situacion") }
-                                }
+                                val msg =
+                                    if (success) {
+                                        context.getString(R.string.admin_situacion_eliminada_exito)
+                                    } else {
+                                        context.getString(R.string.admin_situacion_error_eliminar)
+                                    }
+                                scope.launch { snackbarHostState.showSnackbar(msg) }
                             },
                         )
                         situacionAEliminar = null
                     },
                     colors =
                         ButtonDefaults.buttonColors(
-                            containerColor = errorColor,
-                            contentColor = Color.White,
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError,
                         ),
+                    shape = MaterialTheme.shapes.small,
                 ) {
-                    Text(stringResource(R.string.auto_eliminar), fontFamily = roboto)
+                    Text(stringResource(R.string.auto_eliminar))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { situacionAEliminar = null }) {
-                    Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = primaryColor)
+                    Text(
+                        text = stringResource(R.string.auto_cancelar),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                 }
             },
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.large,
         )
     }
 
-    // Dialogo para crear/editar situacion
     if (showDialog) {
         SituacionDialog(
             situacion = situacionEditando,
@@ -289,7 +183,12 @@ fun SituacionAdminScreen(
                     viewModel.crearSituacion(
                         request = request,
                         onResult = { success, _ ->
-                            val msg = if (success) "Situacion creada correctamente" else "Error al crear la situacion"
+                            val msg =
+                                if (success) {
+                                    context.getString(R.string.admin_situacion_creada_exito)
+                                } else {
+                                    context.getString(R.string.admin_situacion_error_crear)
+                                }
                             scope.launch { snackbarHostState.showSnackbar(msg) }
                         },
                     )
@@ -298,7 +197,12 @@ fun SituacionAdminScreen(
                         id = situacionEditando!!.idSituacion,
                         request = request,
                         onResult = { success, _ ->
-                            val msg = if (success) "Situacion actualizada correctamente" else "Error al actualizar la situacion"
+                            val msg =
+                                if (success) {
+                                    context.getString(R.string.admin_situacion_actualizada_exito)
+                                } else {
+                                    context.getString(R.string.admin_situacion_error_actualizar)
+                                }
                             scope.launch { snackbarHostState.showSnackbar(msg) }
                         },
                     )
@@ -306,13 +210,87 @@ fun SituacionAdminScreen(
                 showDialog = false
                 situacionEditando = null
             },
-            primaryColor = primaryColor,
-            cardBackgroundColor = cardBackgroundColor,
-            textPrimaryColor = textPrimaryColor,
-            textSecondaryColor = textSecondaryColor,
-            roboto = roboto,
-            isDark = isDark,
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SituacionAdminContent(
+    situaciones: List<SituacionDTO>,
+    snackbarHostState: SnackbarHostState,
+    onBackClick: () -> Unit,
+    onAddClick: () -> Unit,
+    onEditClick: (SituacionDTO) -> Unit,
+    onDeleteClick: (SituacionDTO) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.gestion_situaciones),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.auto_volver),
+                        )
+                    }
+                },
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddClick,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ) {
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agregar_situacion))
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { paddingValues ->
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+        ) {
+            if (situaciones.isEmpty()) {
+                EmptySituacionesScreen(onAddClick = onAddClick)
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = Spacing.m, vertical = Spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                ) {
+                    items(
+                        items = situaciones,
+                        key = { it.idSituacion },
+                    ) { situacion ->
+                        TarjetaSituacion(
+                            situacion = situacion,
+                            onEditClick = { onEditClick(situacion) },
+                            onDeleteClick = { onDeleteClick(situacion) },
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -321,22 +299,15 @@ fun TarjetaSituacion(
     situacion: SituacionDTO,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    primaryColor: Color,
-    cardBackgroundColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    dividerColor: Color,
-    errorColor: Color,
-    roboto: FontFamily,
-    isDark: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xxs),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxWidth().padding(Spacing.m)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -344,52 +315,60 @@ fun TarjetaSituacion(
             ) {
                 Text(
                     text = situacion.nombre,
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = primaryColor,
-                    fontFamily = roboto,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    IconButton(onClick = onEditClick, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.auto_editar), tint = primaryColor)
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    IconButton(onClick = onEditClick) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.auto_editar),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
                     }
-                    IconButton(onClick = onDeleteClick, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.auto_eliminar), tint = errorColor)
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.auto_eliminar),
+                            tint = MaterialTheme.colorScheme.error,
+                        )
                     }
                 }
             }
 
-            // Mostrar categoria si existe
             if (!situacion.categoria.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(Spacing.xs))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.Category,
                         contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = textSecondaryColor,
+                        modifier = Modifier.size(Spacing.iconSmall),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(Spacing.xs))
                     Text(
                         text = situacion.categoria,
-                        fontSize = 12.sp,
-                        color = primaryColor,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
-                        fontFamily = roboto,
                     )
                 }
             }
 
             if (!situacion.descripcion.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(thickness = 1.dp, color = dividerColor)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
+                HorizontalDivider(
+                    thickness = Spacing.dividerThickness,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+                Spacer(modifier = Modifier.height(Spacing.s))
                 Text(
                     text = situacion.descripcion,
-                    fontSize = 14.sp,
-                    color = textSecondaryColor,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 3,
-                    fontFamily = roboto,
                 )
             }
         }
@@ -399,47 +378,41 @@ fun TarjetaSituacion(
 @Composable
 fun EmptySituacionesScreen(
     onAddClick: () -> Unit,
-    primaryColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    roboto: FontFamily,
-    isDark: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             Icons.AutoMirrored.Filled.List,
             contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = primaryColor.copy(alpha = 0.4f),
+            modifier = Modifier.size(Spacing.avatarLarge),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
         Text(
             text = stringResource(R.string.auto_no_hay_situaciones_disponibles),
-            fontSize = 18.sp,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
-            color = textPrimaryColor,
-            fontFamily = roboto,
+            color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(Spacing.s))
         Text(
             text = stringResource(R.string.auto_presiona_el_boton_para_1),
-            fontSize = 14.sp,
-            color = textSecondaryColor,
-            fontFamily = roboto,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
         Button(
             onClick = onAddClick,
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+            shape = MaterialTheme.shapes.medium,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.auto_agregar_situacion), fontFamily = roboto)
+            Spacer(modifier = Modifier.width(Spacing.s))
+            Text(stringResource(R.string.auto_agregar_situacion))
         }
     }
 }
@@ -454,12 +427,6 @@ fun EmptySituacionesScreen(
  * @param situacion Situación a editar, o `null` para crear una nueva.
  * @param onDismiss Callback invocado al cerrar el diálogo sin guardar.
  * @param onConfirm Callback invocado al confirmar, recibe nombre, categoría y descripción.
- * @param primaryColor Color primario para los elementos del diálogo.
- * @param cardBackgroundColor Color de fondo de la tarjeta del diálogo.
- * @param textPrimaryColor Color del texto principal.
- * @param textSecondaryColor Color del texto secundario.
- * @param roboto Familia tipográfica Roboto.
- * @param isDark Indica si el tema oscuro está activo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -467,83 +434,65 @@ fun SituacionDialog(
     situacion: SituacionDTO?,
     onDismiss: () -> Unit,
     onConfirm: (nombre: String, categoria: String, descripcion: String) -> Unit,
-    primaryColor: Color,
-    cardBackgroundColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    roboto: FontFamily,
-    isDark: Boolean,
 ) {
     var nombre by remember(situacion) { mutableStateOf(situacion?.nombre ?: "") }
     var categoria by remember(situacion) { mutableStateOf(situacion?.categoria ?: "") }
     var descripcion by remember(situacion) { mutableStateOf(situacion?.descripcion ?: "") }
 
     val isEditando = situacion != null
-    val titulo = if (isEditando) "Editar Situacion" else "Nueva Situacion"
-    val botonTexto = if (isEditando) "Actualizar" else "Crear"
+    val titulo =
+        if (isEditando) {
+            stringResource(R.string.admin_situacion_editar_titulo)
+        } else {
+            stringResource(R.string.admin_situacion_nueva_titulo)
+        }
+    val botonTexto =
+        if (isEditando) {
+            stringResource(R.string.actualizar)
+        } else {
+            stringResource(R.string.crear)
+        }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = cardBackgroundColor,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         title = {
             Text(
                 text = titulo,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = primaryColor,
-                fontSize = 20.sp,
-                fontFamily = roboto,
+                color = MaterialTheme.colorScheme.primary,
             )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.m)) {
                 OutlinedTextField(
                     value = nombre,
                     onValueChange = { nombre = it },
-                    label = { Text(stringResource(R.string.auto_nombre_de_la_situacion), fontFamily = roboto) },
+                    label = { Text(stringResource(R.string.auto_nombre_de_la_situacion)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors =
-                        OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            focusedLabelColor = primaryColor,
-                            focusedTextColor = textPrimaryColor,
-                            unfocusedTextColor = textPrimaryColor,
-                        ),
                 )
                 OutlinedTextField(
                     value = categoria,
                     onValueChange = { categoria = it },
-                    label = { Text(stringResource(R.string.auto_categoria), fontFamily = roboto) },
+                    label = { Text(stringResource(R.string.auto_categoria)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    colors =
-                        OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            focusedLabelColor = primaryColor,
-                            focusedTextColor = textPrimaryColor,
-                            unfocusedTextColor = textPrimaryColor,
-                        ),
                     placeholder = {
-                        Text(stringResource(R.string.auto_ej_personal_laboral_social),
-                            color = textSecondaryColor.copy(alpha = 0.5f),
-                            fontFamily = roboto,
+                        Text(
+                            text = stringResource(R.string.auto_ej_personal_laboral_social),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
                 )
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { descripcion = it },
-                    label = { Text(stringResource(R.string.auto_descripcion_opcional), fontFamily = roboto) },
+                    label = { Text(stringResource(R.string.auto_descripcion_opcional)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4,
-                    colors =
-                        OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryColor,
-                            focusedLabelColor = primaryColor,
-                            focusedTextColor = textPrimaryColor,
-                            unfocusedTextColor = textPrimaryColor,
-                        ),
                 )
             }
         },
@@ -555,17 +504,45 @@ fun SituacionDialog(
                     }
                 },
                 enabled = nombre.isNotBlank() && categoria.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                shape = MaterialTheme.shapes.small,
             ) {
-                Text(botonTexto, fontFamily = roboto, color = if (isDark) Color.Black else Color.White)
+                Text(botonTexto)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.auto_cancelar), fontFamily = roboto, color = primaryColor)
+                Text(
+                    text = stringResource(R.string.auto_cancelar),
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
         },
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
     )
+}
+
+@Preview(name = "SituacionAdmin Light", showBackground = true)
+@Preview(name = "SituacionAdmin Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "SituacionAdmin FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun SituacionAdminScreenPreview() {
+    org.ies.tierno.applicationamani.ui.theme.AppTheme {
+        SituacionAdminContent(
+            situaciones =
+                listOf(
+                    SituacionDTO(
+                        idSituacion = 1L,
+                        nombre = "Estrés laboral",
+                        categoria = "Laboral",
+                        descripcion = "Sobrecarga y agotamiento en el entorno de trabajo.",
+                    ),
+                ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onBackClick = {},
+            onAddClick = {},
+            onEditClick = {},
+            onDeleteClick = {},
+        )
+    }
 }

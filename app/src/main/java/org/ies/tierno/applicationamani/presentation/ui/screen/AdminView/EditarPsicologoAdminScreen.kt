@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,6 +35,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,14 +46,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -59,9 +57,10 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoRequestDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla de edición de los datos de un psicólogo desde el panel de administración.
@@ -80,36 +79,21 @@ import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
 fun EditarPsicologoAdminScreen(
     navController: NavController,
     viewModel: ListarPsicologosAdminViewModel,
-    psicologoId: Long
+    psicologoId: Long,
 ) {
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val roboto = FontFamily(
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Normal),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Bold),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.Medium),
-        Font(R.font.roboto_variablefont_wdth_wght, FontWeight.SemiBold)
-    )
-
-    // Colores dinámicos
-    val primaryColor = if (isDark) MaterialTheme.colorScheme.primary else Color(0xFF6C63FF)
-    val backgroundColor = if (isDark) screenColors.background else Color(0xFFF8F9FA)
-    val surfaceColor = if (isDark) cardColors.cardBackground else Color.White
-    val textPrimary = if (isDark) cardColors.cardContent else Color(0xFF2C3E50)
-    val textSecondary = if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else Color(0xFF7F8C8D)
 
     // Obtener la lista de psicólogos
     val psicologos by viewModel.psicologos.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     // Buscar el psicólogo por ID
-    val psicologo = remember(psicologos, psicologoId) {
-        psicologos.find { it.idPsicologo == psicologoId }
-    }
+    val psicologo =
+        remember(psicologos, psicologoId) {
+            psicologos.find { it.idPsicologo == psicologoId }
+        }
 
     // Estados para el formulario
     var nombre by remember { mutableStateOf("") }
@@ -137,181 +121,218 @@ fun EditarPsicologoAdminScreen(
         }
     }
 
-    // Validar formulario
-    val isFormValid = nombre.isNotBlank() &&
+    val isFormValid =
+        nombre.isNotBlank() &&
             apellido.isNotBlank() &&
             especialidad.isNotBlank()
 
+    EditarPsicologoAdminContent(
+        nombre = nombre,
+        apellido = apellido,
+        email = email,
+        especialidad = especialidad,
+        experiencia = experiencia,
+        licencia = licencia,
+        telefono = telefono,
+        descripcion = descripcion,
+        isLoading = isLoading && psicologo == null,
+        isSaving = isSaving,
+        isFormValid = isFormValid,
+        snackbarHostState = snackbarHostState,
+        onNombreChange = { nombre = it },
+        onApellidoChange = { apellido = it },
+        onEspecialidadChange = { especialidad = it },
+        onExperienciaChange = { experiencia = it },
+        onLicenciaChange = { licencia = it },
+        onTelefonoChange = { telefono = it },
+        onDescripcionChange = { descripcion = it },
+        onBackClick = { navController.popBackStack() },
+        onSaveClick = {
+            val experienciaInt =
+                if (experiencia.isNotBlank()) experiencia.toIntOrNull() else null
+
+            val request =
+                PsicologoRequestDTO(
+                    nombrePsicologo = nombre,
+                    apellidoPsicologo = apellido,
+                    email = email,
+                    password = "",
+                    especialidad = especialidad,
+                    experiencia = experienciaInt,
+                    descripcion = descripcion.ifBlank { null },
+                    licencia = licencia.ifBlank { null },
+                    telefono = telefono.ifBlank { null },
+                )
+
+            isSaving = true
+            viewModel.editarPsicologo(psicologoId, request)
+
+            scope.launch {
+                delay(1000)
+                isSaving = false
+                snackbarHostState.showSnackbar(context.getString(R.string.admin_psicologo_actualizado_exito))
+                delay(1000)
+                navController.popBackStack()
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditarPsicologoAdminContent(
+    nombre: String,
+    apellido: String,
+    email: String,
+    especialidad: String,
+    experiencia: String,
+    licencia: String,
+    telefono: String,
+    descripcion: String,
+    isLoading: Boolean,
+    isSaving: Boolean,
+    isFormValid: Boolean,
+    snackbarHostState: SnackbarHostState,
+    onNombreChange: (String) -> Unit,
+    onApellidoChange: (String) -> Unit,
+    onEspecialidadChange: (String) -> Unit,
+    onExperienciaChange: (String) -> Unit,
+    onLicenciaChange: (String) -> Unit,
+    onTelefonoChange: (String) -> Unit,
+    onDescripcionChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+
     Scaffold(
-        containerColor = backgroundColor,
+        modifier = modifier,
+        containerColor = colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.White,
-                shadowElevation = 8.dp,
-                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier.size(40.dp)
-                    ) {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.auto_editar_psicologo),
+                        style = typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
-                            tint = primaryColor,
-                            modifier = Modifier.size(24.dp)
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = stringResource(R.string.auto_editar_psicologo),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = roboto,
-                        color = textPrimary
-                    )
-                }
-            }
-        }
+                },
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.surface,
+                        titleContentColor = colorScheme.onSurface,
+                        navigationIconContentColor = colorScheme.onSurface,
+                    ),
+            )
+        },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFF8F9FA),
-                            Color(0xFFF0F2F5)
-                        )
-                    )
-                )
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = Spacing.m, vertical = Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            if (isLoading && psicologo == null) {
+            if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = primaryColor)
+                    CircularProgressIndicator(color = colorScheme.primary)
                 }
             } else {
-                val textFieldShape = RoundedCornerShape(12.dp)
+                val textFieldShape = MaterialTheme.shapes.medium
+                val textFieldColors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorScheme.primary,
+                        unfocusedBorderColor = colorScheme.outlineVariant,
+                        focusedLabelColor = colorScheme.primary,
+                        cursorColor = colorScheme.primary,
+                    )
 
                 // Card de información personal
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                    shape = RoundedCornerShape(20.dp)
+                    colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+                    shape = MaterialTheme.shapes.large,
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
+                    Column(modifier = Modifier.padding(Spacing.m)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(
-                                        brush = Brush.linearGradient(
-                                            colors = listOf(
-                                                primaryColor,
-                                                primaryColor.copy(alpha = 0.7f)
-                                            )
+                                modifier =
+                                    Modifier
+                                        .size(Dimensions.avatarSmall)
+                                        .background(
+                                            color = colorScheme.primaryContainer,
+                                            shape = MaterialTheme.shapes.medium,
                                         ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     Icons.Default.Person,
                                     contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.size(Dimensions.iconMedium),
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(stringResource(R.string.auto_informacion_personal),
-                                fontSize = 18.sp,
+                            Spacer(modifier = Modifier.width(Spacing.sm))
+                            Text(
+                                stringResource(R.string.auto_informacion_personal),
+                                style = typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = roboto,
-                                color = textPrimary
+                                color = colorScheme.onSurface,
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Spacing.m))
 
                         // Nombre
                         OutlinedTextField(
                             value = nombre,
-                            onValueChange = { nombre = it },
-                            label = {
-                                Text(stringResource(R.string.auto_nombre_),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onNombreChange,
+                            label = { Text(stringResource(R.string.auto_nombre_)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
                         // Apellido
                         OutlinedTextField(
                             value = apellido,
-                            onValueChange = { apellido = it },
-                            label = {
-                                Text(stringResource(R.string.auto_apellido_),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onApellidoChange,
+                            label = { Text(stringResource(R.string.auto_apellido_)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
                         // Email (solo lectura)
                         OutlinedTextField(
                             value = email,
                             onValueChange = {},
-                            label = {
-                                Text(stringResource(R.string.auto_email),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            label = { Text(stringResource(R.string.auto_email)) },
                             modifier = Modifier.fillMaxWidth(),
                             readOnly = true,
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
                     }
                 }
@@ -319,209 +340,175 @@ fun EditarPsicologoAdminScreen(
                 // Card de información profesional
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                    shape = RoundedCornerShape(20.dp)
+                    colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+                    shape = MaterialTheme.shapes.large,
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
+                    Column(modifier = Modifier.padding(Spacing.m)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(
-                                        brush = Brush.linearGradient(
-                                            colors = listOf(
-                                                primaryColor,
-                                                primaryColor.copy(alpha = 0.7f)
-                                            )
+                                modifier =
+                                    Modifier
+                                        .size(Dimensions.avatarSmall)
+                                        .background(
+                                            color = colorScheme.primaryContainer,
+                                            shape = MaterialTheme.shapes.medium,
                                         ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     Icons.Default.MedicalServices,
                                     contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.size(Dimensions.iconMedium),
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(stringResource(R.string.auto_informacion_profesional),
-                                fontSize = 18.sp,
+                            Spacer(modifier = Modifier.width(Spacing.sm))
+                            Text(
+                                stringResource(R.string.auto_informacion_profesional),
+                                style = typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = roboto,
-                                color = textPrimary
+                                color = colorScheme.onSurface,
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Spacing.m))
 
                         // Especialidad
                         OutlinedTextField(
                             value = especialidad,
-                            onValueChange = { especialidad = it },
-                            label = {
-                                Text(stringResource(R.string.auto_especialidad_),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onEspecialidadChange,
+                            label = { Text(stringResource(R.string.auto_especialidad_)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
                         // Experiencia
                         OutlinedTextField(
                             value = experiencia,
-                            onValueChange = { experiencia = it },
-                            label = {
-                                Text(stringResource(R.string.auto_anos_de_experiencia),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onExperienciaChange,
+                            label = { Text(stringResource(R.string.auto_anos_de_experiencia)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
                         // Licencia
                         OutlinedTextField(
                             value = licencia,
-                            onValueChange = { licencia = it },
-                            label = {
-                                Text(stringResource(R.string.auto_numero_de_licencia),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onLicenciaChange,
+                            label = { Text(stringResource(R.string.auto_numero_de_licencia)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
                         // Teléfono
                         OutlinedTextField(
                             value = telefono,
-                            onValueChange = { telefono = it },
-                            label = {
-                                Text(stringResource(R.string.auto_telefono),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onTelefonoChange,
+                            label = { Text(stringResource(R.string.auto_telefono)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
 
                         // Descripción
                         OutlinedTextField(
                             value = descripcion,
-                            onValueChange = { descripcion = it },
-                            label = {
-                                Text(stringResource(R.string.auto_descripcion_profesional),
-                                    fontFamily = roboto,
-                                    color = textSecondary
-                                )
-                            },
+                            onValueChange = onDescripcionChange,
+                            label = { Text(stringResource(R.string.auto_descripcion_profesional)) },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 3,
                             shape = textFieldShape,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = primaryColor,
-                                unfocusedBorderColor = Color(0xFFECF0F1),
-                                focusedLabelColor = primaryColor,
-                                cursorColor = primaryColor
-                            )
+                            colors = textFieldColors,
                         )
                     }
                 }
 
                 // Botón guardar
                 Button(
-                    onClick = {
-                        val experienciaInt =
-                            if (experiencia.isNotBlank()) experiencia.toIntOrNull() else null
-
-                        val request = PsicologoRequestDTO(
-                            nombrePsicologo = nombre,
-                            apellidoPsicologo = apellido,
-                            email = email,
-                            password = "",
-                            especialidad = especialidad,
-                            experiencia = experienciaInt,
-                            descripcion = descripcion.ifBlank { null },
-                            licencia = licencia.ifBlank { null },
-                            telefono = telefono.ifBlank { null }
-                        )
-
-                        isSaving = true
-                        viewModel.editarPsicologo(psicologoId, request)
-
-                        scope.launch {
-                            delay(1000)
-                            isSaving = false
-                            snackbarHostState.showSnackbar("✓ Psicólogo actualizado exitosamente")
-                            delay(1000)
-                            navController.popBackStack()
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
+                    onClick = onSaveClick,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(Dimensions.buttonHeightLarge),
                     enabled = !isSaving && isFormValid,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = primaryColor,
-                        disabledContainerColor = textSecondary.copy(alpha = 0.5f)
-                    ),
-                    shape = RoundedCornerShape(16.dp)
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = colorScheme.primary,
+                            contentColor = colorScheme.onPrimary,
+                        ),
+                    shape = MaterialTheme.shapes.large,
                 ) {
                     if (isSaving) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
+                            modifier = Modifier.size(Dimensions.iconDefault),
+                            color = colorScheme.onPrimary,
+                            strokeWidth = Dimensions.borderMedium,
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(stringResource(R.string.auto_guardando), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(modifier = Modifier.width(Spacing.sm))
+                        Text(
+                            stringResource(R.string.auto_guardando),
+                            style = typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                        )
                     } else {
-                        Text(stringResource(R.string.auto__guardar_cambios),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                        Text(
+                            stringResource(R.string.auto__guardar_cambios),
+                            style = typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview(name = "EditarPsicologoAdmin Light", showBackground = true)
+@Preview(
+    name = "EditarPsicologoAdmin Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "EditarPsicologoAdmin Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun EditarPsicologoAdminScreenPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            EditarPsicologoAdminContent(
+                nombre = "Carlos",
+                apellido = "Mendoza",
+                email = "carlos.mendoza@amani.es",
+                especialidad = "Psicología Clínica",
+                experiencia = "8",
+                licencia = "M-12345",
+                telefono = "600123456",
+                descripcion = "Especialista en terapia cognitivo-conductual.",
+                isLoading = false,
+                isSaving = false,
+                isFormValid = true,
+                snackbarHostState = remember { SnackbarHostState() },
+                onNombreChange = {},
+                onApellidoChange = {},
+                onEspecialidadChange = {},
+                onExperienciaChange = {},
+                onLicenciaChange = {},
+                onTelefonoChange = {},
+                onDescripcionChange = {},
+                onBackClick = {},
+                onSaveClick = {},
+            )
         }
     }
 }

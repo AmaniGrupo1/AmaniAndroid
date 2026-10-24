@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.AlertDialog
@@ -27,45 +27,31 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.psicologo.PsicologoSelfResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPsicologosAdminViewModel
-import org.ies.tierno.applicationamani.ui.theme.getCardColors
-import org.ies.tierno.applicationamani.ui.theme.getScreenColors
-import org.ies.tierno.applicationamani.ui.theme.isDarkTheme
-
-object AdminViewDefaultColors {
-    val Background = Color(0xFFF5F5F5)
-    val Surface = Color.White
-    val Primary = Color(0xFF6C63FF)
-    val Success = Color(0xFF4CAF50)
-    val Accent = Color(0xFFF5F5F5)
-    val TextPrimary = Color.Black
-    val TextSecondary = Color(0xFF6B6B6B)
-}
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
  * Pantalla que lista los psicólogos actualmente dados de baja en el sistema.
@@ -86,46 +72,42 @@ fun ListadoPsicologosBajaScreen(
     viewModel: ListarPsicologosAdminViewModel,
     listarPacienteViewModel: ListarPacientesViewModel,
 ) {
-    val roboto = FontFamily(Font(R.font.roboto_variablefont_wdth_wght))
-    val psicologosBaja by viewModel.psicologosBaja.collectAsState()
-    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val psicologosBaja by viewModel.psicologosBaja.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var psicologoSeleccionado by remember { mutableStateOf<PsicologoSelfResponseDTO?>(null) }
     var mostrarDialogoAlta by remember { mutableStateOf(false) }
     var isAltaInProgress by remember { mutableStateOf(false) }
 
-    // Obtener estado del tema
-    val isDark = isDarkTheme()
-    val screenColors = getScreenColors()
-    val cardColors = getCardColors()
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val extraColors = AmaniTheme.colors
 
     // Observar el estado del alta desde el ViewModel
-    val altaEstado by listarPacienteViewModel.altaEstado.collectAsState()
+    val altaEstado by listarPacienteViewModel.altaEstado.collectAsStateWithLifecycle()
 
     // Efecto para manejar el resultado del alta
     LaunchedEffect(altaEstado) {
         if (altaEstado != null && isAltaInProgress) {
             if (altaEstado!!.isSuccess) {
-                // ELIMINAR DE LA LISTA LOCAL
                 viewModel.actualizarPsicologoAlta(
                     psicologoSeleccionado!!.idPsicologo,
                 )
 
                 snackbarHostState.showSnackbar(
-                    "Psicólogo ${psicologoSeleccionado?.nombre} ${psicologoSeleccionado?.apellido} dado de alta exitosamente",
+                    context.getString(
+                        R.string.admin_psicologo_alta_exito_formato,
+                        "${psicologoSeleccionado?.nombre.orEmpty()} ${psicologoSeleccionado?.apellido.orEmpty()}".trim(),
+                    ),
                 )
 
                 mostrarDialogoAlta = false
-
                 psicologoSeleccionado = null
-
                 listarPacienteViewModel.limpiarAltaEstado()
             } else if (altaEstado!!.isFailure) {
+                val msgError = altaEstado!!.exceptionOrNull()?.message ?: context.getString(R.string.error_desconocido)
                 snackbarHostState.showSnackbar(
-                    "Error al dar de alta: ${
-                        altaEstado!!.exceptionOrNull()?.message
-                            ?: "Error desconocido"
-                    }",
+                    context.getString(R.string.admin_error_dar_alta_formato, msgError),
                 )
             }
 
@@ -133,33 +115,15 @@ fun ListadoPsicologosBajaScreen(
         }
     }
 
-    // Determinar colores según el tema
-    val backgroundColor = if (isDark) screenColors.background else AdminViewDefaultColors.Background
-    val surfaceColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Surface
-    val primaryColor =
-        if (isDark) MaterialTheme.colorScheme.primary else AdminViewDefaultColors.Primary
-    val successColor = AdminViewDefaultColors.Success
-    val accentColor = if (isDark) cardColors.cardBackground else AdminViewDefaultColors.Accent
-    val textPrimaryColor =
-        if (isDark) cardColors.cardContent else AdminViewDefaultColors.TextPrimary
-    val textSecondaryColor =
-        if (isDark) cardColors.cardContent.copy(alpha = 0.7f) else AdminViewDefaultColors.TextSecondary
-
-    val typography = MaterialTheme.typography
-
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = colorScheme.background,
         topBar = {
             Text(
                 text = stringResource(R.string.auto_psicologos_dados_de_baja),
-                style =
-                    typography.headlineMedium?.copy(
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = primaryColor,
-                    ) ?: MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp),
-                fontFamily = roboto,
+                style = typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.primary,
+                modifier = Modifier.padding(Spacing.m),
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -169,53 +133,29 @@ fun ListadoPsicologosBajaScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(
-                        brush =
-                            Brush.verticalGradient(
-                                colors =
-                                    if (isDark) {
-                                        listOf(
-                                            screenColors.background,
-                                            screenColors.background,
-                                        )
-                                    } else {
-                                        listOf(
-                                            accentColor,
-                                            Color.White,
-                                        )
-                                    },
-                            ),
-                    ),
+                    .background(colorScheme.background),
         ) {
             if (psicologosBaja.isEmpty()) {
                 Column(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(32.dp),
+                            .padding(Spacing.xl),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = stringResource(R.string.auto__no_hay_psicologos_1),
-                        style =
-                            typography.titleMedium?.copy(
-                                fontSize = 18.sp,
-                                color = textSecondaryColor,
-                            ) ?: MaterialTheme.typography.titleMedium,
+                        style = typography.titleMedium,
+                        color = colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
-                        fontFamily = roboto,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.s))
                     Text(
                         text = stringResource(R.string.auto_todos_los_psicologos_estan),
-                        style =
-                            typography.bodyMedium?.copy(
-                                fontSize = 14.sp,
-                                color = textSecondaryColor,
-                            ) ?: MaterialTheme.typography.bodyMedium,
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
-                        fontFamily = roboto,
                     )
                 }
             } else {
@@ -223,8 +163,8 @@ fun ListadoPsicologosBajaScreen(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                            .padding(Spacing.m),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 ) {
                     items(
                         items = psicologosBaja,
@@ -236,14 +176,6 @@ fun ListadoPsicologosBajaScreen(
                                 psicologoSeleccionado = psicologo
                                 mostrarDialogoAlta = true
                             },
-                            typography = typography,
-                            isDark = isDark,
-                            primaryColor = primaryColor,
-                            surfaceColor = surfaceColor,
-                            textPrimaryColor = textPrimaryColor,
-                            textSecondaryColor = textSecondaryColor,
-                            successColor = successColor,
-                            roboto = roboto,
                         )
                     }
                 }
@@ -258,28 +190,24 @@ fun ListadoPsicologosBajaScreen(
                         mostrarDialogoAlta = false
                     }
                 },
-                containerColor = surfaceColor,
+                containerColor = colorScheme.surface,
                 title = {
                     Text(
                         text = stringResource(R.string.auto_confirmar_alta),
-                        style =
-                            typography.headlineSmall?.copy(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = textPrimaryColor,
-                            ) ?: MaterialTheme.typography.headlineSmall,
-                        fontFamily = roboto,
+                        style = typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onSurface,
                     )
                 },
                 text = {
                     Text(
-                        text = "¿Seguro que deseas dar de alta a ${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}?",
-                        style =
-                            typography.bodyMedium?.copy(
-                                fontSize = 14.sp,
-                                color = textSecondaryColor,
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto,
+                        text =
+                            stringResource(
+                                R.string.admin_confirmar_alta_psicologo_msg,
+                                "${psicologoSeleccionado!!.nombre} ${psicologoSeleccionado!!.apellido}",
+                            ),
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
                     )
                 },
                 confirmButton = {
@@ -290,20 +218,20 @@ fun ListadoPsicologosBajaScreen(
                         },
                         colors =
                             ButtonDefaults.buttonColors(
-                                containerColor = successColor,
+                                containerColor = extraColors.success,
+                                contentColor = extraColors.onSuccess,
                             ),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.medium,
                         enabled = !isAltaInProgress,
                     ) {
                         Text(
-                            if (isAltaInProgress) "Procesando..." else "Dar de alta",
-                            style =
-                                typography.labelLarge?.copy(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ) ?: MaterialTheme.typography.labelLarge,
-                            color = Color.White,
-                            fontFamily = roboto,
+                            if (isAltaInProgress) {
+                                stringResource(R.string.admin_procesando)
+                            } else {
+                                stringResource(R.string.auto_dar_de_alta)
+                            },
+                            style = typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 },
@@ -314,20 +242,17 @@ fun ListadoPsicologosBajaScreen(
                                 mostrarDialogoAlta = false
                             }
                         },
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.medium,
                         colors =
                             ButtonDefaults.outlinedButtonColors(
-                                contentColor = primaryColor,
+                                contentColor = colorScheme.primary,
                             ),
                         enabled = !isAltaInProgress,
                     ) {
-                        Text(stringResource(R.string.auto_cancelar),
-                            style =
-                                typography.labelLarge?.copy(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ) ?: MaterialTheme.typography.labelLarge,
-                            fontFamily = roboto,
+                        Text(
+                            stringResource(R.string.auto_cancelar),
+                            style = typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 },
@@ -340,66 +265,50 @@ fun ListadoPsicologosBajaScreen(
 fun PsicologoBajaCard(
     psicologo: PsicologoSelfResponseDTO,
     onDarAlta: () -> Unit,
-    typography: androidx.compose.material3.Typography,
-    isDark: Boolean,
-    primaryColor: Color,
-    surfaceColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
-    successColor: Color,
-    roboto: FontFamily,
+    modifier: Modifier = Modifier,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val extraColors = AmaniTheme.colors
+
     Card(
-        shape = RoundedCornerShape(20.dp),
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .shadow(8.dp, RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.large,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(Spacing.m)) {
             // Indicador de estado "Dado de baja"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Nombre completo
                 Text(
                     text = "${psicologo.nombre} ${psicologo.apellido}",
-                    style =
-                        typography.titleLarge?.copy(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = primaryColor,
-                        ) ?: MaterialTheme.typography.titleLarge,
-                    fontFamily = roboto,
+                    style = typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary,
                 )
 
-                // Badge de estado
                 Box(
                     modifier =
                         Modifier
                             .background(
-                                color = Color.Red.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(12.dp),
-                            ).padding(horizontal = 8.dp, vertical = 4.dp),
+                                color = colorScheme.errorContainer,
+                                shape = MaterialTheme.shapes.medium,
+                            ).padding(horizontal = Spacing.s, vertical = Spacing.xs),
                 ) {
                     Text(
                         text = stringResource(R.string.auto_dado_de_baja),
-                        style =
-                            typography.labelSmall?.copy(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red,
-                            ) ?: MaterialTheme.typography.labelSmall,
-                        fontFamily = roboto,
+                        style = typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onErrorContainer,
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
 
             // Especialidad
             Row(
@@ -408,26 +317,18 @@ fun PsicologoBajaCard(
             ) {
                 Text(
                     text = stringResource(R.string.auto_especialidad),
-                    style =
-                        typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium,
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto,
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium,
                 )
                 Text(
                     text = psicologo.especialidad,
-                    style =
-                        typography.bodyMedium?.copy(
-                            fontSize = 13.sp,
-                            color = textPrimaryColor,
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                    fontFamily = roboto,
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurface,
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(Spacing.xs))
 
             // Licencia
             if (!psicologo.licencia.isNullOrBlank()) {
@@ -437,78 +338,90 @@ fun PsicologoBajaCard(
                 ) {
                     Text(
                         text = stringResource(R.string.auto_licencia),
-                        style =
-                            typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textSecondaryColor,
-                                fontWeight = FontWeight.Medium,
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto,
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium,
                     )
                     Text(
                         text = psicologo.licencia,
-                        style =
-                            typography.bodyMedium?.copy(
-                                fontSize = 13.sp,
-                                color = textPrimaryColor,
-                            ) ?: MaterialTheme.typography.bodyMedium,
-                        fontFamily = roboto,
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurface,
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(Spacing.xs))
             }
 
             // Descripción
             if (!psicologo.descripcion.isNullOrBlank()) {
                 Text(
                     text = stringResource(R.string.auto_descripcion),
-                    style =
-                        typography.bodyMedium?.copy(
-                            fontSize = 12.sp,
-                            color = textSecondaryColor,
-                            fontWeight = FontWeight.Medium,
-                        ) ?: MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp),
-                    fontFamily = roboto,
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(top = Spacing.s),
                 )
                 Text(
                     text = psicologo.descripcion,
-                    style =
-                        typography.bodySmall?.copy(
-                            fontSize = 12.sp,
-                            color = textSecondaryColor,
-                        ) ?: MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 2.dp),
-                    fontFamily = roboto,
+                    style = typography.bodySmall,
+                    color = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = Spacing.xxs),
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
 
             // Botón de acción: Dar de alta
             Button(
                 onClick = onDarAlta,
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = successColor,
+                        containerColor = extraColors.success,
+                        contentColor = extraColors.onSuccess,
                     ),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
                     contentDescription = stringResource(R.string.auto_dar_de_alta),
-                    tint = Color.White,
-                    modifier = Modifier.padding(end = 8.dp),
+                    modifier = Modifier.padding(end = Spacing.s),
                 )
-                Text(stringResource(R.string.auto_dar_de_alta),
-                    style =
-                        typography.labelMedium?.copy(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                        ) ?: MaterialTheme.typography.labelMedium,
-                    color = Color.White,
-                    fontFamily = roboto,
+                Text(
+                    stringResource(R.string.auto_dar_de_alta),
+                    style = typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "ListadoPsicologosBaja Light", showBackground = true)
+@Preview(
+    name = "ListadoPsicologosBaja Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "ListadoPsicologosBaja Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun ListadoPsicologosBajaScreenPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(modifier = Modifier.padding(Spacing.m)) {
+                PsicologoBajaCard(
+                    psicologo =
+                        PsicologoSelfResponseDTO(
+                            idPsicologo = 2L,
+                            nombre = "Elena",
+                            apellido = "Martínez",
+                            especialidad = "Terapia Familiar",
+                            experiencia = 5,
+                            descripcion = "Especialista en terapia sistémica.",
+                            licencia = "M-54321",
+                            telefono = "600987654",
+                            email = "elena@amani.es",
+                        ),
+                    onDarAlta = {},
                 )
             }
         }

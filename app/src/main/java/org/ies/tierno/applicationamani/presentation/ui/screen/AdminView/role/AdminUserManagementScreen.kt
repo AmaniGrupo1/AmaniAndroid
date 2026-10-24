@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -47,18 +48,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
@@ -66,6 +65,8 @@ import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomSheetCambiarRol
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "AdminUserScreen"
@@ -89,16 +90,15 @@ fun AdminUserManagementScreen(
     adminRoleViewModel: AdminRoleViewModel = koinViewModel(),
     onNavigateBack: () -> Unit = {},
 ) {
-    val usuarios by adminUserViewModel.usuariosFiltrados.collectAsState()
-    val isLoading by adminUserViewModel.isLoading.collectAsState()
-    val error by adminUserViewModel.error.collectAsState()
+    val usuarios by adminUserViewModel.usuariosFiltrados.collectAsStateWithLifecycle()
+    val isLoading by adminUserViewModel.isLoading.collectAsStateWithLifecycle()
+    val error by adminUserViewModel.error.collectAsStateWithLifecycle()
 
     var selectedRol by remember { mutableStateOf<Rol?>(null) }
     var searchDni by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedUser by remember { mutableStateOf<UsuarioDTO?>(null) }
 
-    // Estado para la alerta de confirmación
     var showConfirmDialog by remember { mutableStateOf(false) }
     var pendingRol by remember { mutableStateOf<Rol?>(null) }
 
@@ -106,77 +106,43 @@ fun AdminUserManagementScreen(
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
 
-    // 📍 LOG: Estado inicial de la pantalla
     LaunchedEffect(Unit) {
         Log.d(TAG, "=== INICIALIZANDO PANTALLA DE ADMIN ===")
-        Log.d(TAG, "ColorScheme: ${colorScheme.primary}")
-        Log.d(TAG, "ViewModel inicializado correctamente")
     }
 
-    // 📍 LOG: Seguimiento de cambios en usuarios filtrados
-    LaunchedEffect(usuarios) {
-        Log.d(TAG, "📊 LISTA ACTUALIZADA - Usuarios filtrados: ${usuarios.size}")
-        usuarios.forEach { user ->
-            Log.d(TAG, "   👤 Usuario: ID=${user.idUsuario}, Nombre=${user.nombre} ${user.apellido}, " +
-                    "Rol=${user.rol}, DNI=${user.dni ?: "null"}, Email=${user.email}")
-        }
-        if (usuarios.isEmpty()) {
-            Log.w(TAG, "⚠️ No hay usuarios en la lista filtrada")
-        }
-    }
-
-    // 📍 LOG: Seguimiento de estado de carga
-    LaunchedEffect(isLoading) {
-        Log.d(TAG, "🔄 Estado de carga: ${if (isLoading) "CARGANDO..." else "COMPLETADO"}")
-    }
-
-    // Manejo de errores con Log
     LaunchedEffect(error) {
         error?.let {
-            Log.e(TAG, "❌ Error en AdminUserViewModel: $it")
+            Log.e(TAG, "Error en AdminUserViewModel: $it")
             adminUserViewModel.clearError()
         }
     }
 
-    // Éxito al cambiar rol - Refresca automáticamente
     LaunchedEffect(adminRoleViewModel.success) {
         adminRoleViewModel.success?.let { message ->
-            Log.d(TAG, "✅ Éxito al cambiar rol: $message")
+            Log.d(TAG, "Exito al cambiar rol: $message")
             adminRoleViewModel.clearMessages()
-            Log.d(TAG, "🔄 Recargando usuarios después de cambio de rol...")
-            // Recargar usuarios después de cambiar rol
             adminUserViewModel.cargarUsuarios()
         }
     }
 
     LaunchedEffect(adminRoleViewModel.error) {
         adminRoleViewModel.error?.let { message ->
-            Log.e(TAG, "❌ Error al cambiar rol: $message")
+            Log.e(TAG, "Error al cambiar rol: $message")
             adminRoleViewModel.clearMessages()
         }
     }
 
-    // 📍 LOG: Seguimiento de filtros aplicados
     LaunchedEffect(selectedRol, searchDni) {
-        Log.d(TAG, "🔍 APLICANDO FILTROS - Rol: ${selectedRol?.name ?: "TODOS"}, " +
-                "Búsqueda: '${searchDni.ifEmpty { "vacío" }}'")
         adminUserViewModel.filtrarUsuarios(rol = selectedRol, dni = searchDni)
     }
 
-    // Carga inicial con log detallado
     LaunchedEffect(Unit) {
-        Log.d(TAG, "🚀 Iniciando carga inicial de usuarios...")
         adminUserViewModel.cargarUsuarios()
-        // Pequeña pausa para permitir que se complete la carga
         delay(500)
-        Log.d(TAG, "📋 Verificación post-carga inicial")
     }
 
-    // Función para confirmar el cambio de rol con logs
     fun confirmRoleChange() {
         pendingRol?.let { nuevoRol ->
-            Log.d(TAG, "🔄 Confirmando cambio de rol para usuario ID=${selectedUser?.idUsuario}, " +
-                    "Nombre=${selectedUser?.nombre}, Nuevo rol=$nuevoRol")
             adminRoleViewModel.cambiarRol(
                 idUsuario = selectedUser!!.idUsuario ?: 0,
                 nuevoRol = nuevoRol,
@@ -188,13 +154,154 @@ fun AdminUserManagementScreen(
         selectedUser = null
     }
 
+    AdminUserManagementContent(
+        usuarios = usuarios,
+        isLoading = isLoading,
+        selectedRol = selectedRol,
+        searchDni = searchDni,
+        onSelectedRolChange = { selectedRol = it },
+        onSearchDniChange = { searchDni = it },
+        onNavigateBack = onNavigateBack,
+        onRefreshClick = { adminUserViewModel.cargarUsuarios() },
+        onCambiarRolClick = { user ->
+            selectedUser = user
+            showBottomSheet = true
+        },
+    )
+
+    if (showConfirmDialog) {
+        val currentRolLabel =
+            when (selectedUser?.rol) {
+                Rol.admin -> stringResource(R.string.admin_rol_administrador)
+                Rol.psicologo -> stringResource(R.string.admin_rol_psicologo)
+                else -> stringResource(R.string.admin_rol_paciente)
+            }
+        val newRolLabel =
+            when (pendingRol) {
+                Rol.admin -> stringResource(R.string.admin_rol_administrador)
+                Rol.psicologo -> stringResource(R.string.admin_rol_psicologo)
+                else -> stringResource(R.string.admin_rol_paciente)
+            }
+
+        AlertDialog(
+            onDismissRequest = {
+                showConfirmDialog = false
+                pendingRol = null
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.auto_confirmar_cambio_de_rol),
+                    style = typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary,
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(R.string.auto_estas_seguro_de_que),
+                        style = typography.bodyMedium,
+                        color = colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.s))
+                    Text(
+                        text = "${selectedUser?.nombre ?: ""} ${selectedUser?.apellido ?: ""}".trim(),
+                        style = typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.xs))
+                    Text(
+                        text = selectedUser?.email ?: "",
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.md))
+                    Text(
+                        text = stringResource(R.string.admin_rol_actual_formato, currentRolLabel),
+                        style = typography.bodySmall,
+                        color = colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = stringResource(R.string.admin_rol_nuevo_formato, newRolLabel),
+                        style = typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color =
+                            when (pendingRol) {
+                                Rol.admin -> colorScheme.error
+                                Rol.psicologo -> colorScheme.secondary
+                                else -> colorScheme.primary
+                            },
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { confirmRoleChange() },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                    shape = shapes.small,
+                ) {
+                    Text(stringResource(R.string.auto_si_cambiar_rol), color = colorScheme.onPrimary)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        pendingRol = null
+                    },
+                    shape = shapes.small,
+                ) {
+                    Text(stringResource(R.string.auto_cancelar))
+                }
+            },
+            containerColor = colorScheme.surfaceContainerHigh,
+            shape = shapes.large,
+        )
+    }
+
+    if (showBottomSheet && selectedUser != null) {
+        BottomSheetCambiarRol(
+            user = selectedUser!!,
+            onDismiss = {
+                showBottomSheet = false
+                selectedUser = null
+            },
+            onConfirm = { nuevoRol ->
+                pendingRol = nuevoRol
+                showConfirmDialog = true
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AdminUserManagementContent(
+    usuarios: List<UsuarioDTO>,
+    isLoading: Boolean,
+    selectedRol: Rol?,
+    searchDni: String,
+    onSelectedRolChange: (Rol?) -> Unit,
+    onSearchDniChange: (String) -> Unit,
+    onNavigateBack: () -> Unit,
+    onRefreshClick: () -> Unit,
+    onCambiarRolClick: (UsuarioDTO) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+
     Scaffold(
+        modifier = modifier,
+        containerColor = colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.auto_gestion_de_usuarios_1),
+                    Text(
+                        text = stringResource(R.string.auto_gestion_de_usuarios_1),
                         style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = colorScheme.onPrimary,
                     )
                 },
                 navigationIcon = {
@@ -202,23 +309,22 @@ fun AdminUserManagementScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
-                            tint = colorScheme.onPrimary,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colorScheme.surface,
+                        titleContentColor = colorScheme.onSurface,
+                        navigationIconContentColor = colorScheme.onSurface,
+                        actionIconContentColor = colorScheme.onSurface,
                     ),
                 actions = {
-                    // Botón de refresco manual
-                    IconButton(onClick = {
-                        Log.d(TAG, "🔄 Refresco manual solicitado por el usuario")
-                        adminUserViewModel.cargarUsuarios()
-                    }) {
-                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.auto_refrescar), tint = colorScheme.onPrimary)
+                    IconButton(onClick = onRefreshClick) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.auto_refrescar),
+                        )
                     }
                 },
             )
@@ -229,45 +335,30 @@ fun AdminUserManagementScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(
-                        brush =
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        colorScheme.surfaceContainer.copy(alpha = 0.3f),
-                                        colorScheme.background,
-                                    ),
-                            ),
-                    ),
+                    .background(colorScheme.background),
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                // Filtros - Estilo profesional
+            Column(modifier = Modifier.fillMaxSize()) {
                 Card(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
-                            .shadow(4.dp, shapes.medium),
+                            .padding(Spacing.m),
                     shape = shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xxs),
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text(stringResource(R.string.auto_filtros),
+                    Column(modifier = Modifier.padding(Spacing.m)) {
+                        Text(
+                            text = stringResource(R.string.auto_filtros),
                             style = typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = colorScheme.primary,
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Spacing.m))
 
                         OutlinedTextField(
                             value = searchDni,
-                            onValueChange = {
-                                Log.d(TAG, "✏️ Cambiando búsqueda a: '$it'")
-                                searchDni = it
-                            },
+                            onValueChange = onSearchDniChange,
                             label = { Text(stringResource(R.string.auto_buscar_por_dni_nombre)) },
                             leadingIcon = {
                                 Icon(
@@ -293,24 +384,22 @@ fun AdminUserManagementScreen(
                                 ),
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Spacing.m))
 
-                        Text(stringResource(R.string.auto_filtrar_por_rol),
+                        Text(
+                            text = stringResource(R.string.auto_filtrar_por_rol),
                             style = typography.labelLarge,
                             color = colorScheme.onSurface,
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.md))
 
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             FilterChip(
                                 selected = selectedRol == null,
-                                onClick = {
-                                    Log.d(TAG, "🎯 Filtro cambiado a: TODOS")
-                                    selectedRol = null
-                                },
+                                onClick = { onSelectedRolChange(null) },
                                 label = { Text(stringResource(R.string.auto_todos)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -323,10 +412,7 @@ fun AdminUserManagementScreen(
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.admin,
-                                onClick = {
-                                    Log.d(TAG, "🎯 Filtro cambiado a: ADMIN")
-                                    selectedRol = Rol.admin
-                                },
+                                onClick = { onSelectedRolChange(Rol.admin) },
                                 label = { Text(stringResource(R.string.auto__admins)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -339,10 +425,7 @@ fun AdminUserManagementScreen(
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.psicologo,
-                                onClick = {
-                                    Log.d(TAG, "🎯 Filtro cambiado a: PSICÓLOGO")
-                                    selectedRol = Rol.psicologo
-                                },
+                                onClick = { onSelectedRolChange(Rol.psicologo) },
                                 label = { Text(stringResource(R.string.auto__psicologos)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -355,10 +438,7 @@ fun AdminUserManagementScreen(
                             )
                             FilterChip(
                                 selected = selectedRol == Rol.paciente,
-                                onClick = {
-                                    Log.d(TAG, "🎯 Filtro cambiado a: PACIENTE")
-                                    selectedRol = Rol.paciente
-                                },
+                                onClick = { onSelectedRolChange(Rol.paciente) },
                                 label = { Text(stringResource(R.string.auto__pacientes)) },
                                 modifier = Modifier.weight(1f),
                                 colors =
@@ -373,39 +453,37 @@ fun AdminUserManagementScreen(
                     }
                 }
 
-                // Lista de usuarios
                 if (isLoading) {
-                    Log.d(TAG, "⏳ Mostrando indicador de carga...")
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = colorScheme.primary)
                     }
                 } else if (usuarios.isEmpty()) {
-                    Log.w(TAG, "📭 No hay usuarios para mostrar - Lista vacía")
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
-                                modifier = Modifier.size(72.dp),
+                                modifier = Modifier.size(Spacing.avatarLarge),
                                 tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(stringResource(R.string.auto_no_se_encontraron_usuarios),
+                            Spacer(modifier = Modifier.height(Spacing.m))
+                            Text(
+                                text = stringResource(R.string.auto_no_se_encontraron_usuarios),
                                 style = typography.titleMedium,
                                 color = colorScheme.onSurfaceVariant,
                             )
-                            Text(stringResource(R.string.auto_prueba_con_otros_filtros),
+                            Text(
+                                text = stringResource(R.string.auto_prueba_con_otros_filtros),
                                 style = typography.bodySmall,
-                                color = colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                                color = colorScheme.onSurfaceVariant,
                             )
                         }
                     }
                 } else {
-                    Log.d(TAG, "📋 Mostrando ${usuarios.size} usuarios en la lista")
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(horizontal = Spacing.m, vertical = Spacing.s),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md),
                     ) {
                         items(
                             items = usuarios,
@@ -413,128 +491,13 @@ fun AdminUserManagementScreen(
                         ) { user ->
                             UserCard(
                                 user = user,
-                                onCambiarRol = {
-                                    Log.d(TAG, "🖱️ Click en cambiar rol para usuario: ${user.nombre} ${user.apellido} (ID: ${user.idUsuario})")
-                                    selectedUser = user
-                                    showBottomSheet = true
-                                },
+                                onCambiarRol = { onCambiarRolClick(user) },
                             )
                         }
                     }
                 }
             }
         }
-    }
-
-    // Diálogo de confirmación
-    if (showConfirmDialog) {
-        Log.d(TAG, "💬 Mostrando diálogo de confirmación para usuario: ${selectedUser?.nombre}")
-        AlertDialog(
-            onDismissRequest = {
-                Log.d(TAG, "❌ Diálogo de confirmación cancelado")
-                showConfirmDialog = false
-                pendingRol = null
-            },
-            title = {
-                Text(stringResource(R.string.auto_confirmar_cambio_de_rol),
-                    style = typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.primary,
-                )
-            },
-            text = {
-                Column {
-                    Text(stringResource(R.string.auto_estas_seguro_de_que),
-                        style = typography.bodyMedium,
-                        color = colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "${selectedUser?.nombre ?: ""} ${selectedUser?.apellido ?: ""}".trim(),
-                        style = typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = colorScheme.primary,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = selectedUser?.email ?: "",
-                        style = typography.bodySmall,
-                        color = colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "Rol actual: ${when (selectedUser?.rol) {
-                            Rol.admin -> "👑 Administrador"
-                            Rol.psicologo -> "🧠 Psicólogo"
-                            else -> "👤 Paciente"
-                        }}",
-                        style = typography.bodySmall,
-                        color = colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = "Nuevo rol: ${when (pendingRol) {
-                            Rol.admin -> "👑 Administrador"
-                            Rol.psicologo -> "🧠 Psicólogo"
-                            else -> "👤 Paciente"
-                        }}",
-                        style = typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color =
-                            when (pendingRol) {
-                                Rol.admin -> colorScheme.error
-                                Rol.psicologo -> colorScheme.secondary
-                                else -> colorScheme.primary
-                            },
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        Log.d(TAG, "✅ Confirmando cambio de rol")
-                        confirmRoleChange()
-                    },
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = colorScheme.primary,
-                        ),
-                    shape = shapes.small,
-                ) {
-                    Text(stringResource(R.string.auto_si_cambiar_rol), color = colorScheme.onPrimary)
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = {
-                        Log.d(TAG, "❌ Cancelando cambio de rol")
-                        showConfirmDialog = false
-                        pendingRol = null
-                    },
-                    shape = shapes.small,
-                ) {
-                    Text(stringResource(R.string.auto_cancelar))
-                }
-            },
-            containerColor = colorScheme.surface,
-            shape = shapes.extraLarge,
-        )
-    }
-
-    if (showBottomSheet && selectedUser != null) {
-        Log.d(TAG, "📱 Mostrando BottomSheet para seleccionar nuevo rol de usuario: ${selectedUser?.nombre}")
-        BottomSheetCambiarRol(
-            user = selectedUser!!,
-            onDismiss = {
-                Log.d(TAG, "❌ BottomSheet cerrado sin selección")
-                showBottomSheet = false
-                selectedUser = null
-            },
-            onConfirm = { nuevoRol ->
-                Log.d(TAG, "🎯 Nuevo rol seleccionado: $nuevoRol para usuario ${selectedUser?.nombre}")
-                pendingRol = nuevoRol
-                showConfirmDialog = true
-            },
-        )
     }
 }
 
@@ -548,18 +511,12 @@ fun AdminUserManagementScreen(
 fun UserCard(
     user: UsuarioDTO,
     onCambiarRol: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
 
-    // Log para depuración de cada tarjeta
-    LaunchedEffect(user) {
-        Log.d(TAG, "🎴 Renderizando tarjeta para: ${user.nombre} ${user.apellido}, " +
-                "Rol: ${user.rol}, DNI: ${user.dni ?: "null"}")
-    }
-
-    // Colores según rol
     val roleColor =
         when (user.rol) {
             Rol.admin -> colorScheme.error
@@ -567,50 +524,58 @@ fun UserCard(
             else -> colorScheme.primary
         }
 
-    val roleBgColor = roleColor.copy(alpha = 0.1f)
+    val roleBgColor =
+        when (user.rol) {
+            Rol.admin -> colorScheme.errorContainer
+            Rol.psicologo -> colorScheme.tertiaryContainer
+            else -> colorScheme.primaryContainer
+        }
+
+    val roleOnBgColor =
+        when (user.rol) {
+            Rol.admin -> colorScheme.onErrorContainer
+            Rol.psicologo -> colorScheme.onTertiaryContainer
+            else -> colorScheme.onPrimaryContainer
+        }
 
     val roleLabel =
         when (user.rol) {
-            Rol.admin -> "👑 Administrador"
-            Rol.psicologo -> "🧠 Psicólogo"
-            else -> "👤 Paciente"
+            Rol.admin -> stringResource(R.string.admin_rol_administrador)
+            Rol.psicologo -> stringResource(R.string.admin_rol_psicologo)
+            else -> stringResource(R.string.admin_rol_paciente)
         }
 
     val roleIcon =
         when (user.rol) {
             Rol.admin -> Icons.Default.AdminPanelSettings
-            Rol.psicologo -> Icons.Default.Psychology
+            Rol.psicologo -> Icons.Default.MedicalServices
             else -> Icons.Default.Person
         }
 
     Card(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .shadow(2.dp, shapes.medium),
+        modifier = modifier.fillMaxWidth(),
         shape = shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xxs),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(Spacing.m),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                // Nombre y rol en una fila
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                 ) {
                     Icon(
                         roleIcon,
                         contentDescription = null,
                         tint = roleColor,
-                        modifier = Modifier.size(28.dp),
+                        modifier = Modifier.size(Spacing.iconMedium),
                     )
                     Text(
                         text = "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
@@ -620,60 +585,84 @@ fun UserCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(Spacing.xs))
 
-                // Email
                 Text(
                     text = user.email ?: "",
                     style = typography.bodySmall,
                     color = colorScheme.onSurfaceVariant,
                 )
 
-                // DNI si existe
                 if (!user.dni.isNullOrEmpty()) {
                     Text(
-                        text = "DNI: ${user.dni}",
+                        text = stringResource(R.string.admin_dni_formato, user.dni),
                         style = typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        color = colorScheme.onSurfaceVariant,
                     )
                 } else {
                     Text(
                         text = stringResource(R.string.auto_dni_no_registrado),
                         style = typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        color = colorScheme.onSurfaceVariant,
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
 
-                // Badge de rol
                 Surface(
                     shape = CircleShape,
                     color = roleBgColor,
-                    modifier = Modifier,
                 ) {
                     Text(
                         text = roleLabel,
                         style = typography.labelSmall,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-                        color = roleColor,
+                        modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
+                        color = roleOnBgColor,
                     )
                 }
             }
 
-            // Botón cambiar rol
             IconButton(
                 onClick = onCambiarRol,
-                modifier = Modifier.size(44.dp),
             ) {
                 Icon(
                     Icons.Default.SwapHoriz,
                     contentDescription = stringResource(R.string.auto_cambiar_rol),
-                    modifier = Modifier.size(24.dp),
-                    tint = colorScheme.primary.copy(alpha = 0.8f),
+                    modifier = Modifier.size(Spacing.iconMedium),
+                    tint = colorScheme.primary,
                 )
             }
         }
+    }
+}
+
+@Preview(name = "AdminUserManagement Light", showBackground = true)
+@Preview(name = "AdminUserManagement Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "AdminUserManagement FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun AdminUserManagementScreenPreview() {
+    org.ies.tierno.applicationamani.ui.theme.AppTheme {
+        AdminUserManagementContent(
+            usuarios =
+                listOf(
+                    UsuarioDTO(
+                        idUsuario = 1,
+                        nombre = "Elena",
+                        apellido = "Martínez",
+                        email = "elena@amani.es",
+                        dni = "11223344B",
+                        rol = Rol.psicologo,
+                    ),
+                ),
+            isLoading = false,
+            selectedRol = null,
+            searchDni = "",
+            onSelectedRolChange = {},
+            onSearchDniChange = {},
+            onNavigateBack = {},
+            onRefreshClick = {},
+            onCambiarRolClick = {},
+        )
     }
 }

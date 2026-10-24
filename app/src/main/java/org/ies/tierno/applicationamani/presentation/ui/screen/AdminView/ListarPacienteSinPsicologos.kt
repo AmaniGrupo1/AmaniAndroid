@@ -1,4 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView
+
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -24,7 +26,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AssignmentInd
@@ -48,6 +49,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,8 +64,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
@@ -72,6 +74,8 @@ import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.PacientesViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -94,59 +98,70 @@ fun ListarPacienteSinPsicologos(
     val pacientes by pacientesViewModel.pacientes.collectAsStateWithLifecycle()
     val loading by pacientesViewModel.loading.collectAsStateWithLifecycle()
 
-    // Expansion de tarjetas
-    var expandedCardId by remember { mutableStateOf<Long?>(null) }
-
-    // Cargar pacientes al entrar en la pantalla
     LaunchedEffect(Unit) {
         pacientesViewModel.cargarPacientesSinPsicologo()
     }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                shadowElevation = 4.dp,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-            ) {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.auto_volver),
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
+    ListarPacienteSinPsicologosContent(
+        pacientes = pacientes,
+        loading = loading,
+        onBackClick = { navController.navigateUp() },
+        onRefreshClick = { pacientesViewModel.cargarPacientesSinPsicologo() },
+        onAsignarClick = { idPaciente ->
+            navController.navigate(Screens.listarPsicologo.createRoute(idPaciente))
+        },
+    )
+}
 
-                    Text(stringResource(R.string.auto_pacientes_sin_psicologo),
-                        color = MaterialTheme.colorScheme.onPrimary,
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ListarPacienteSinPsicologosContent(
+    pacientes: List<PacienteBasicoResponseDTO>,
+    loading: Boolean,
+    onBackClick: () -> Unit,
+    onRefreshClick: () -> Unit,
+    onAsignarClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expandedCardId by remember { mutableStateOf<Long?>(null) }
+
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.auto_pacientes_sin_psicologo),
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false),
                     )
-
-                    IconButton(onClick = {
-                        pacientesViewModel.cargarPacientesSinPsicologo()
-                    }) {
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.auto_volver),
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onRefreshClick) {
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = stringResource(R.string.auto_refrescar),
-                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
-                }
-            }
+                },
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+            )
         },
     ) { padding ->
         Box(
@@ -162,7 +177,7 @@ fun ListarPacienteSinPsicologos(
                         contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(Spacing.avatarMedium),
                         )
                     }
                 }
@@ -173,13 +188,13 @@ fun ListarPacienteSinPsicologos(
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.m),
                         ) {
                             Icon(
                                 Icons.Default.People,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.size(80.dp),
+                                modifier = Modifier.size(Spacing.avatarLarge),
                             )
                             Text(
                                 text = stringResource(R.string.auto_no_hay_pacientes_sin),
@@ -197,8 +212,8 @@ fun ListarPacienteSinPsicologos(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(Spacing.m),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md),
                     ) {
                         items(pacientes, key = { it.idPaciente }) { paciente ->
                             PacienteExpandableCard(
@@ -212,9 +227,7 @@ fun ListarPacienteSinPsicologos(
                                             paciente.idPaciente
                                         }
                                 },
-                                onAsignarClick = {
-                                    navController.navigate(Screens.listarPsicologo.createRoute(paciente.idPaciente))
-                                },
+                                onAsignarClick = { onAsignarClick(paciente.idPaciente) },
                             )
                         }
                     }
@@ -231,12 +244,15 @@ fun PacienteExpandableCard(
     isExpanded: Boolean,
     onExpandClick: () -> Unit,
     onAsignarClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    val noEspecificado = stringResource(R.string.admin_no_especificado)
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xxs),
     ) {
         Column(
             modifier =
@@ -244,13 +260,12 @@ fun PacienteExpandableCard(
                     .fillMaxWidth()
                     .animateContentSize(),
         ) {
-            // Header: Informacion basica (siempre visible)
             Row(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .clickable { onExpandClick() }
-                        .padding(16.dp),
+                        .padding(Spacing.m),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -258,11 +273,10 @@ fun PacienteExpandableCard(
                     modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // Avatar con iniciales
                     Box(
                         modifier =
                             Modifier
-                                .size(48.dp)
+                                .size(Spacing.avatarMedium)
                                 .background(
                                     color = MaterialTheme.colorScheme.primaryContainer,
                                     shape = CircleShape,
@@ -276,25 +290,23 @@ fun PacienteExpandableCard(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(Spacing.md))
 
                     Column {
                         Text(
                             text = "${paciente.nombre} ${paciente.apellido}",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                        Spacer(modifier = Modifier.height(Spacing.xs))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(14.dp),
+                                modifier = Modifier.size(Spacing.iconSmall),
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(Spacing.xs))
                             Text(
                                 text = paciente.email,
                                 style = MaterialTheme.typography.labelSmall,
@@ -304,16 +316,19 @@ fun PacienteExpandableCard(
                     }
                 }
 
-                // Icono de expansion con animacion
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Contraer" else "Expandir",
+                    contentDescription =
+                        if (isExpanded) {
+                            stringResource(R.string.admin_contraer)
+                        } else {
+                            stringResource(R.string.admin_expandir)
+                        },
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(Spacing.iconMedium),
                 )
             }
 
-            // Contenido expandido
             AnimatedVisibility(
                 visible = isExpanded,
                 enter =
@@ -331,89 +346,83 @@ fun PacienteExpandableCard(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 16.dp),
+                            .padding(horizontal = Spacing.m)
+                            .padding(bottom = Spacing.m),
                 ) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = Spacing.s))
 
-                    // Datos Personales
                     SubSection(
-                        title = "Datos Personales",
+                        title = stringResource(R.string.admin_datos_personales),
                         icon = Icons.Default.Person,
                         iconColor = MaterialTheme.colorScheme.primary,
                     ) {
-                        DetailRow("DNI", paciente.dni ?: "No especificado")
-                        DetailRow("Telefono", paciente.telefono ?: "No especificado")
-                        DetailRow("Genero", paciente.genero ?: "No especificado")
-                        DetailRow("Fecha Nacimiento", paciente.fechaNacimiento ?: "No especificado")
+                        DetailRow(stringResource(R.string.admin_dni_label), paciente.dni ?: noEspecificado)
+                        DetailRow(stringResource(R.string.auto_telefono), paciente.telefono ?: noEspecificado)
+                        DetailRow(stringResource(R.string.auto_genero), paciente.genero ?: noEspecificado)
+                        DetailRow(stringResource(R.string.auto_fecha_de_nacimiento), paciente.fechaNacimiento ?: noEspecificado)
                     }
 
-                    // Situaciones
                     if (!paciente.situaciones.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.md))
                         SubSection(
-                            title = "Situaciones",
+                            title = stringResource(R.string.auto_situaciones),
                             icon = Icons.Default.Info,
                             iconColor = MaterialTheme.colorScheme.secondary,
                         ) {
                             paciente.situaciones!!.forEachIndexed { index, situacion ->
-                                if (index > 0) Spacer(modifier = Modifier.height(8.dp))
+                                if (index > 0) Spacer(modifier = Modifier.height(Spacing.s))
                                 SituacionCard(situacion)
                             }
                         }
                     }
 
-                    // Direcciones
                     if (!paciente.direcciones.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.md))
                         SubSection(
-                            title = "Direcciones",
+                            title = stringResource(R.string.auto_direcciones),
                             icon = Icons.Default.LocationOn,
                             iconColor = MaterialTheme.colorScheme.primary,
                         ) {
                             paciente.direcciones!!.forEachIndexed { index, direccion ->
-                                if (index > 0) Spacer(modifier = Modifier.height(8.dp))
+                                if (index > 0) Spacer(modifier = Modifier.height(Spacing.s))
                                 DireccionCard(direccion)
                             }
                         }
                     }
 
-                    // Tutores
                     if (!paciente.tutores.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.md))
                         SubSection(
-                            title = "Tutores",
+                            title = stringResource(R.string.auto_tutores),
                             icon = Icons.Default.People,
                             iconColor = MaterialTheme.colorScheme.tertiary,
                         ) {
                             paciente.tutores!!.forEachIndexed { index, tutor ->
-                                if (index > 0) Spacer(modifier = Modifier.height(8.dp))
+                                if (index > 0) Spacer(modifier = Modifier.height(Spacing.s))
                                 TutorCard(tutor)
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.m))
 
-                    // Boton Asignar Psicologo
                     Button(
                         onClick = onAsignarClick,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .height(48.dp),
+                                .height(Spacing.minTouchTarget),
                         shape = MaterialTheme.shapes.medium,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.AssignmentInd,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp),
+                                modifier = Modifier.size(Spacing.iconSmall),
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.auto_asignar_psicologo),
+                            Spacer(modifier = Modifier.width(Spacing.s))
+                            Text(
+                                text = stringResource(R.string.auto_asignar_psicologo),
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }
@@ -434,15 +443,15 @@ fun SubSection(
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = Spacing.s),
         ) {
             Icon(
                 icon,
                 contentDescription = null,
                 tint = iconColor,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(Spacing.iconSmall),
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Spacing.s))
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
@@ -468,7 +477,7 @@ fun DetailRow(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .padding(vertical = Spacing.xs),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
@@ -497,23 +506,21 @@ fun DireccionCard(direccion: DireccionResponseDTO) {
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-        ) {
+        Column(modifier = Modifier.padding(Spacing.md)) {
             if (!direccion.calle.isNullOrBlank()) {
-                DetailRow("Calle", direccion.calle)
+                DetailRow(stringResource(R.string.admin_calle), direccion.calle)
             }
             if (!direccion.ciudad.isNullOrBlank()) {
-                DetailRow("Ciudad", direccion.ciudad)
+                DetailRow(stringResource(R.string.admin_ciudad), direccion.ciudad)
             }
             if (!direccion.provincia.isNullOrBlank()) {
-                DetailRow("Provincia", direccion.provincia)
+                DetailRow(stringResource(R.string.admin_provincia), direccion.provincia)
             }
             if (!direccion.codigoPostal.isNullOrBlank()) {
-                DetailRow("Codigo Postal", direccion.codigoPostal)
+                DetailRow(stringResource(R.string.admin_codigo_postal), direccion.codigoPostal)
             }
             if (!direccion.pais.isNullOrBlank()) {
-                DetailRow("Pais", direccion.pais)
+                DetailRow(stringResource(R.string.admin_pais), direccion.pais)
             }
         }
     }
@@ -531,23 +538,21 @@ fun TutorCard(tutor: TutorResponseDTO) {
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-        ) {
+        Column(modifier = Modifier.padding(Spacing.md)) {
             if (!tutor.nombre.isNullOrBlank()) {
-                DetailRow("Nombre", tutor.nombre)
+                DetailRow(stringResource(R.string.admin_nombre_label), tutor.nombre)
             }
             if (!tutor.tipo.isNullOrBlank()) {
-                DetailRow("Parentesco", tutor.tipo)
+                DetailRow(stringResource(R.string.admin_parentesco), tutor.tipo)
             }
             if (!tutor.telefono.isNullOrBlank()) {
-                DetailRow("Telefono", tutor.telefono)
+                DetailRow(stringResource(R.string.auto_telefono), tutor.telefono)
             }
             if (!tutor.email.isNullOrBlank()) {
-                DetailRow("Email", tutor.email)
+                DetailRow(stringResource(R.string.auto_email), tutor.email)
             }
             if (!tutor.dni.isNullOrBlank()) {
-                DetailRow("DNI", tutor.dni)
+                DetailRow(stringResource(R.string.admin_dni_label), tutor.dni)
             }
         }
     }
@@ -565,10 +570,7 @@ fun SituacionCard(situacion: SituacionDTO) {
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-        ) {
-            // Nombre de la situacion (siempre visible)
+        Column(modifier = Modifier.padding(Spacing.md)) {
             if (!situacion.nombre.isNullOrBlank()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -590,23 +592,53 @@ fun SituacionCard(situacion: SituacionDTO) {
                                 text = situacion.categoria,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xxs),
                             )
                         }
                     }
                 }
             }
 
-            // Descripcion (si existe)
             if (!situacion.descripcion.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
                 Text(
                     text = situacion.descripcion,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 16.sp,
                 )
             }
         }
+    }
+}
+
+@Preview(name = "ListarPacienteSinPsicologos Light", showBackground = true)
+@Preview(name = "ListarPacienteSinPsicologos Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "ListarPacienteSinPsicologos FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun ListarPacienteSinPsicologosPreview() {
+    org.ies.tierno.applicationamani.ui.theme.AppTheme {
+        ListarPacienteSinPsicologosContent(
+            pacientes =
+                listOf(
+                    PacienteBasicoResponseDTO(
+                        idPaciente = 1L,
+                        idUsuario = 10L,
+                        nombre = "Lucía",
+                        apellido = "Gómez",
+                        email = "lucia.gomez@amani.es",
+                        telefono = "611223344",
+                        dni = "12345678A",
+                        genero = "Femenino",
+                        fechaNacimiento = "1995-04-12",
+                        situaciones = emptyList(),
+                        direcciones = emptyList(),
+                        tutores = emptyList(),
+                    ),
+                ),
+            loading = false,
+            onBackClick = {},
+            onRefreshClick = {},
+            onAsignarClick = {},
+        )
     }
 }

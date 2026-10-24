@@ -1,4 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal
+
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -62,13 +64,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -78,6 +79,10 @@ import org.ies.tierno.applicationamani.domain.models.enumm.TipoDocumentoLegal
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalRequestDTO
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -101,6 +106,7 @@ fun GestionPoliticasScreen(
     val documentos by viewModel.documentos.collectAsStateWithLifecycle()
     val isLoading by viewModel.loading.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     var mostrarDialogoEditar by remember { mutableStateOf(false) }
     var documentoEditando by remember { mutableStateOf<DocumentoLegalResponseDTO?>(null) }
@@ -109,12 +115,10 @@ fun GestionPoliticasScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Cargar documentos al iniciar
     LaunchedEffect(Unit) {
         viewModel.getAllDocumentos()
     }
 
-    // Manejar errores
     LaunchedEffect(error) {
         error?.let {
             scope.launch {
@@ -124,7 +128,62 @@ fun GestionPoliticasScreen(
         }
     }
 
+    GestionPoliticasContent(
+        documentos = documentos,
+        isLoading = isLoading,
+        snackbarHostState = snackbarHostState,
+        onBackClick = { navController.navigateUp() },
+        onEditClick = { documento ->
+            documentoEditando = documento
+            mostrarDialogoEditar = true
+        },
+        onViewClick = { documentoSeleccionado = it },
+    )
+
+    if (mostrarDialogoEditar && documentoEditando != null) {
+        DialogoEditarPolitica(
+            documento = documentoEditando!!,
+            onDismiss = {
+                mostrarDialogoEditar = false
+                documentoEditando = null
+            },
+            onSave = { request ->
+                scope.launch {
+                    viewModel.editarDocumento(documentoEditando!!.idDocumento, request)
+                    snackbarHostState.showSnackbar(context.getString(R.string.admin_doc_actualizado))
+                    mostrarDialogoEditar = false
+                    documentoEditando = null
+                }
+            },
+        )
+    }
+
+    if (documentoSeleccionado != null) {
+        DialogoVerPolitica(
+            documento = documentoSeleccionado!!,
+            onDismiss = { documentoSeleccionado = null },
+            onEdit = {
+                documentoEditando = documentoSeleccionado
+                documentoSeleccionado = null
+                mostrarDialogoEditar = true
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GestionPoliticasContent(
+    documentos: List<DocumentoLegalResponseDTO>,
+    isLoading: Boolean,
+    snackbarHostState: SnackbarHostState,
+    onBackClick: () -> Unit,
+    onEditClick: (DocumentoLegalResponseDTO) -> Unit,
+    onViewClick: (DocumentoLegalResponseDTO) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -134,7 +193,7 @@ fun GestionPoliticasScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.auto_volver),
@@ -143,14 +202,14 @@ fun GestionPoliticasScreen(
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { paddingValues ->
         Box(
             modifier =
@@ -170,55 +229,20 @@ fun GestionPoliticasScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(Spacing.m),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.m),
                     ) {
-                        items(documentos) { documento ->
+                        items(documentos, key = { it.idDocumento }) { documento ->
                             PoliticaCard(
                                 documento = documento,
-                                onEdit = {
-                                    documentoEditando = documento
-                                    mostrarDialogoEditar = true
-                                },
-                                onView = { documentoSeleccionado = documento },
+                                onEdit = { onEditClick(documento) },
+                                onView = { onViewClick(documento) },
                             )
                         }
                     }
                 }
             }
         }
-    }
-
-    // Dialogo Editar Documento
-    if (mostrarDialogoEditar && documentoEditando != null) {
-        DialogoEditarPolitica(
-            documento = documentoEditando!!,
-            onDismiss = {
-                mostrarDialogoEditar = false
-                documentoEditando = null
-            },
-            onSave = { request ->
-                scope.launch {
-                    viewModel.editarDocumento(documentoEditando!!.idDocumento, request)
-                    snackbarHostState.showSnackbar("Documento actualizado exitosamente")
-                    mostrarDialogoEditar = false
-                    documentoEditando = null
-                }
-            },
-        )
-    }
-
-    // Dialogo Ver Detalle del Documento
-    if (documentoSeleccionado != null) {
-        DialogoVerPolitica(
-            documento = documentoSeleccionado!!,
-            onDismiss = { documentoSeleccionado = null },
-            onEdit = {
-                documentoEditando = documentoSeleccionado
-                documentoSeleccionado = null
-                mostrarDialogoEditar = true
-            },
-        )
     }
 }
 
@@ -233,9 +257,9 @@ fun LoadingState() {
             verticalArrangement = Arrangement.Center,
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(Dimensions.avatarMedium),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
             Text(
                 text = stringResource(R.string.auto_cargando_politicas),
                 style = MaterialTheme.typography.bodyMedium,
@@ -254,10 +278,10 @@ fun EmptyPoliticasState() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(Spacing.l),
         ) {
             Surface(
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier.size(Dimensions.avatarProfile),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primaryContainer,
             ) {
@@ -265,13 +289,13 @@ fun EmptyPoliticasState() {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(Dimensions.iconExtraLarge),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Spacing.l))
 
             Text(
                 text = stringResource(R.string.auto_no_hay_politicas_creadas),
@@ -279,7 +303,7 @@ fun EmptyPoliticasState() {
                 color = MaterialTheme.colorScheme.onSurface,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
 
             Text(
                 text = stringResource(R.string.auto_las_politicas_de_privacidad),
@@ -297,21 +321,22 @@ fun PoliticaCard(
     onEdit: () -> Unit,
     onView: () -> Unit,
 ) {
+    val fechaNoDisponible = stringResource(R.string.admin_fecha_no_disponible)
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaTexto =
         try {
             documento.creadoEn?.let {
                 LocalDateTime.parse(it).format(fechaFormatter)
-            } ?: "Fecha no disponible"
+            } ?: fechaNoDisponible
         } catch (e: Exception) {
-            "Fecha no disponible"
+            fechaNoDisponible
         }
 
     val tipoNombre =
         when (documento.tipo) {
-            TipoDocumentoLegal.TERMINOS -> "Terminos y Condiciones"
-            TipoDocumentoLegal.PRIVACIDAD -> "Politica de Privacidad"
-            else -> "Documento Legal"
+            TipoDocumentoLegal.TERMINOS -> stringResource(R.string.terminos_y_condiciones)
+            TipoDocumentoLegal.PRIVACIDAD -> stringResource(R.string.politica_de_privacidad)
+            else -> stringResource(R.string.admin_doc_legal_titulo_default)
         }
 
     val tipoIcono =
@@ -327,19 +352,16 @@ fun PoliticaCard(
                 .fillMaxWidth()
                 .clickable { onView() },
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            // Header
+        Column(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(16.dp),
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(Spacing.m),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -348,77 +370,72 @@ fun PoliticaCard(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                        modifier = Modifier.weight(1f),
                     ) {
                         Surface(
                             shape = MaterialTheme.shapes.small,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
-                            modifier = Modifier.size(48.dp),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                            modifier = Modifier.size(Dimensions.avatarMedium),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     tipoIcono,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onPrimary,
-                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.size(Dimensions.iconDefault),
                                 )
                             }
                         }
 
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = documento.titulo,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Text(
                                 text = tipoNombre,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                     }
 
-                    // Boton Editar
                     IconButton(
                         onClick = onEdit,
                         modifier =
                             Modifier
-                                .size(36.dp)
                                 .clip(MaterialTheme.shapes.small)
-                                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)),
+                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)),
                     ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = stringResource(R.string.auto_editar),
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(Dimensions.iconButton),
                         )
                     }
                 }
             }
 
-            // Contenido
-            Column(
-                modifier = Modifier.padding(16.dp),
-            ) {
-                // Metadatos
+            Column(modifier = Modifier.padding(Spacing.m)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.m),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.Info,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(Spacing.xs))
                         Text(
-                            text = "Version ${documento.version ?: "1.0"}",
+                            text = stringResource(R.string.admin_doc_version_formato, documento.version ?: "1.0"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -428,10 +445,10 @@ fun PoliticaCard(
                         Icon(
                             Icons.Default.CalendarToday,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(Spacing.xs))
                         Text(
                             text = fechaTexto,
                             style = MaterialTheme.typography.labelSmall,
@@ -448,27 +465,24 @@ fun PoliticaCard(
                                 text = stringResource(R.string.auto_inactivo),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xxs),
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
-                // Vista previa del contenido
                 Text(
                     text = documento.contenido.take(120) + if (documento.contenido.length > 120) "..." else "",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 18.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
-                // Indicador de clic para ver mas
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
@@ -483,7 +497,7 @@ fun PoliticaCard(
                     Icon(
                         Icons.Default.ChevronRight,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(Dimensions.iconSmall),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
@@ -504,13 +518,20 @@ fun DialogoEditarPolitica(
     var version by remember { mutableStateOf(documento.version ?: "1.0") }
     var activo by remember { mutableStateOf(documento.activo) }
 
+    val tipoStr =
+        if (documento.tipo == TipoDocumentoLegal.TERMINOS) {
+            stringResource(R.string.terminos_y_condiciones)
+        } else {
+            stringResource(R.string.politica_de_privacidad)
+        }
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = MaterialTheme.shapes.large,
         title = {
             Column {
                 Text(
-                    text = "Editar ${if (documento.tipo == TipoDocumentoLegal.TERMINOS) "Terminos y Condiciones" else "Politica de Privacidad"}",
+                    text = stringResource(R.string.admin_editar_politica_formato, tipoStr),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -526,11 +547,10 @@ fun DialogoEditarPolitica(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 500.dp)
+                        .heightIn(max = Dimensions.dialogMaxHeight)
                         .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.m),
             ) {
-                // Campo Titulo
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
@@ -539,7 +559,6 @@ fun DialogoEditarPolitica(
                     shape = MaterialTheme.shapes.medium,
                 )
 
-                // Campo Version
                 OutlinedTextField(
                     value = version,
                     onValueChange = { version = it },
@@ -549,7 +568,6 @@ fun DialogoEditarPolitica(
                     shape = MaterialTheme.shapes.medium,
                 )
 
-                // Campo Contenido
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = { contenido = it },
@@ -557,19 +575,16 @@ fun DialogoEditarPolitica(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(300.dp),
+                            .height(Dimensions.wheelSize),
                     shape = MaterialTheme.shapes.medium,
                 )
 
-                // Checkbox Activo
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = activo,
                         onCheckedChange = { activo = it },
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Text(
                         text = stringResource(R.string.auto_documento_activo_visible_para),
                         style = MaterialTheme.typography.bodySmall,
@@ -620,30 +635,31 @@ fun DialogoVerPolitica(
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
 ) {
+    val fechaNoDisponible = stringResource(R.string.admin_fecha_no_disponible)
     val fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
     val fechaCreacion =
         try {
             documento.creadoEn?.let {
                 LocalDateTime.parse(it).format(fechaFormatter)
-            } ?: "Fecha no disponible"
+            } ?: fechaNoDisponible
         } catch (e: Exception) {
-            "Fecha no disponible"
+            fechaNoDisponible
         }
 
     val fechaActualizacion =
         try {
             documento.actualizadoEn?.let {
                 LocalDateTime.parse(it).format(fechaFormatter)
-            } ?: "Fecha no disponible"
+            } ?: fechaNoDisponible
         } catch (e: Exception) {
-            "Fecha no disponible"
+            fechaNoDisponible
         }
 
     val tipoNombre =
         when (documento.tipo) {
-            TipoDocumentoLegal.TERMINOS -> "Terminos y Condiciones"
-            TipoDocumentoLegal.PRIVACIDAD -> "Politica de Privacidad"
-            else -> "Documento Legal"
+            TipoDocumentoLegal.TERMINOS -> stringResource(R.string.terminos_y_condiciones)
+            TipoDocumentoLegal.PRIVACIDAD -> stringResource(R.string.politica_de_privacidad)
+            else -> stringResource(R.string.admin_doc_legal_titulo_default)
         }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -652,19 +668,18 @@ fun DialogoVerPolitica(
                 Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f)
-                    .padding(8.dp),
-            shape = MaterialTheme.shapes.extraLarge,
+                    .padding(Spacing.s),
+            shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level3),
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(12.dp),
+                        .padding(Spacing.m),
             ) {
-                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -672,19 +687,19 @@ fun DialogoVerPolitica(
                 ) {
                     Row(
                         modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Surface(
                             shape = MaterialTheme.shapes.small,
                             color = MaterialTheme.colorScheme.primaryContainer,
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier.size(Dimensions.avatarSmall),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     if (documento.tipo == TipoDocumentoLegal.TERMINOS) Icons.Default.Gavel else Icons.Default.Lock,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(Dimensions.iconMedium),
                                 )
                             }
                         }
@@ -705,102 +720,116 @@ fun DialogoVerPolitica(
                     }
 
                     Row {
-                        IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
+                        IconButton(onClick = onEdit) {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.auto_editar),
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(Dimensions.iconButton),
                             )
                         }
-                        IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
+                        IconButton(onClick = onDismiss) {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = stringResource(R.string.auto_cerrar),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(Dimensions.iconButton),
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
 
-                // Metadatos
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                     color = MaterialTheme.colorScheme.surfaceVariant,
                 ) {
                     Column(
-                        modifier = Modifier.padding(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                        modifier = Modifier.padding(Spacing.s),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.xxs),
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                         ) {
                             Text(
-                                text = "📌 Versión: ${documento.version ?: "1.0"}",
+                                text = stringResource(R.string.admin_doc_version_formato, documento.version ?: "1.0"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                text = if (documento.activo) "✅ Activo" else "❌ Inactivo",
+                                text =
+                                    if (documento.activo) {
+                                        stringResource(R.string.activo)
+                                    } else {
+                                        stringResource(R.string.inactivo)
+                                    },
                                 style = MaterialTheme.typography.labelSmall,
-                                color = if (documento.activo) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
+                                color =
+                                    if (documento.activo) {
+                                        AmaniTheme.colors.success
+                                    } else {
+                                        MaterialTheme.colorScheme.error
+                                    },
                             )
                         }
                         Text(
-                            text = "📅 Creado: $fechaCreacion",
+                            text = stringResource(R.string.admin_doc_creado_formato, fechaCreacion),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            text = "🔄 Actualizado: $fechaActualizacion",
+                            text = stringResource(R.string.admin_doc_actualizado_formato, fechaActualizacion),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(vertical = 4.dp))
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    modifier = Modifier.padding(vertical = Spacing.xs),
+                )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
 
-                // Contenido
                 Text(
                     text = documento.contenido,
                     style = MaterialTheme.typography.bodyMedium,
-                    lineHeight = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                 ) {
                     OutlinedButton(
                         onClick = onEdit,
-                        modifier = Modifier.weight(1f).height(36.dp),
+                        modifier = Modifier.weight(1f),
                         colors =
                             ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.primary,
                             ),
                         shape = MaterialTheme.shapes.medium,
                     ) {
-                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.auto_editar), modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.auto_editar),
+                            modifier = Modifier.size(Dimensions.iconSmall),
+                        )
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(stringResource(R.string.auto_editar), style = MaterialTheme.typography.labelLarge)
                     }
 
                     Button(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f).height(36.dp),
+                        modifier = Modifier.weight(1f),
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
@@ -812,5 +841,36 @@ fun DialogoVerPolitica(
                 }
             }
         }
+    }
+}
+
+@Preview(name = "GestionPoliticas Light", showBackground = true)
+@Preview(name = "GestionPoliticas Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "GestionPoliticas FontScale 1.5", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun GestionPoliticasScreenPreview() {
+    org.ies.tierno.applicationamani.ui.theme.AppTheme {
+        GestionPoliticasContent(
+            documentos =
+                listOf(
+                    DocumentoLegalResponseDTO(
+                        idDocumento = 1L,
+                        tipo = TipoDocumentoLegal.PRIVACIDAD,
+                        titulo = "Política de Privacidad RGPD",
+                        contenido = "Tratamiento de datos de carácter personal conforme a la normativa vigente.",
+                        icono = "lock",
+                        ordenVisualizacion = 1,
+                        version = "2.0",
+                        activo = true,
+                        creadoEn = "2026-02-01T12:00:00",
+                        actualizadoEn = "2026-02-01T12:00:00",
+                    ),
+                ),
+            isLoading = false,
+            snackbarHostState = remember { SnackbarHostState() },
+            onBackClick = {},
+            onEditClick = {},
+            onViewClick = {},
+        )
     }
 }
