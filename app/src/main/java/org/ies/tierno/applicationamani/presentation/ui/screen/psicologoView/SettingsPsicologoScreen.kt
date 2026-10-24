@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,8 +25,8 @@ import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.Verified
@@ -49,7 +49,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,18 +56,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -82,17 +85,14 @@ import org.koin.androidx.compose.koinViewModel
  * @param navController Controlador de navegación para transiciones entre pantallas.
  * @param viewModel ViewModel que gestiona el perfil del psicólogo.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPsicologoScreen(
     idPsicologo: Long,
     navController: NavController,
     viewModel: ProfilePsicologoViewModel = koinViewModel(),
 ) {
-    val perfil by viewModel.perfil.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
+    val perfil by viewModel.perfil.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     // Local states for editing (placeholders since there's no update API yet)
     var nombre by remember { mutableStateOf("") }
@@ -117,26 +117,86 @@ fun SettingsPsicologoScreen(
         }
     }
 
+    SettingsPsicologoContent(
+        isLoading = isLoading && perfil == null,
+        fotoPerfilUrl = perfil?.usuario?.fotoPerfilUrl,
+        email = perfil?.usuario?.email ?: "",
+        nombre = nombre,
+        onNombreChange = { nombre = it },
+        apellidos = apellidos,
+        onApellidosChange = { apellidos = it },
+        especialidad = especialidad,
+        onEspecialidadChange = { especialidad = it },
+        experiencia = experiencia,
+        onExperienciaChange = { experiencia = it },
+        licencia = licencia,
+        onLicenciaChange = { licencia = it },
+        descripcion = descripcion,
+        onDescripcionChange = { descripcion = it },
+        onBackClick = { navController.navigateUp() },
+        onSaveClick = { /* Pendiente: ViewModel.updateProfile */ },
+        onSupportClick = { /* Navegar a soporte */ },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsPsicologoContent(
+    isLoading: Boolean,
+    fotoPerfilUrl: String?,
+    email: String,
+    nombre: String,
+    onNombreChange: (String) -> Unit,
+    apellidos: String,
+    onApellidosChange: (String) -> Unit,
+    especialidad: String,
+    onEspecialidadChange: (String) -> Unit,
+    experiencia: String,
+    onExperienciaChange: (String) -> Unit,
+    licencia: String,
+    onLicenciaChange: (String) -> Unit,
+    descripcion: String,
+    onDescripcionChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onSupportClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
+
     Scaffold(
+        modifier = modifier,
+        containerColor = colors.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.auto_ajustes_de_perfil), fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        stringResource(R.string.auto_ajustes_de_perfil),
+                        style = typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.auto_volver))
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.auto_volver),
+                        )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colors.surface,
+                        titleContentColor = colors.onSurface,
+                        navigationIconContentColor = colors.onSurface,
                     ),
             )
         },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-            if (isLoading && perfil == null) {
+            if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(
@@ -144,32 +204,32 @@ fun SettingsPsicologoScreen(
                         Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                            .padding(Spacing.m),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.l),
                 ) {
                     // Foto de Perfil
                     Box(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = Spacing.s),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Box(
                                 modifier =
                                     Modifier
-                                        .size(110.dp)
+                                        .size(Dimensions.avatarHero)
                                         .clip(CircleShape)
                                         .background(colors.primaryContainer)
-                                        .border(3.dp, colors.primary, CircleShape),
+                                        .border(Dimensions.progressStroke, colors.primary, CircleShape),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 AsyncImage(
                                     model =
                                         ImageRequest
                                             .Builder(LocalContext.current)
-                                            .data(perfil?.usuario?.fotoPerfilUrl)
+                                            .data(fotoPerfilUrl)
                                             .crossfade(true)
                                             .error(R.drawable.ic_default_avatar)
                                             .placeholder(R.drawable.ic_default_avatar)
@@ -182,16 +242,20 @@ fun SettingsPsicologoScreen(
                                     modifier =
                                         Modifier
                                             .align(Alignment.BottomEnd)
-                                            .size(34.dp)
+                                            .size(Dimensions.avatarSmall)
                                             .clip(CircleShape)
                                             .background(colors.primary)
-                                            .padding(7.dp),
+                                            .padding(Spacing.s),
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
+                                    Icon(
+                                        Icons.Default.CameraAlt,
+                                        contentDescription = null,
+                                        tint = colors.onPrimary,
+                                    )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(Spacing.sm))
                             Text(
                                 text = stringResource(R.string.auto_psicologo_colegiado),
                                 style = typography.labelLarge,
@@ -202,26 +266,29 @@ fun SettingsPsicologoScreen(
                     }
 
                     // Datos Personales
-                    SettingsSectionPsico(title = "Datos Personales", icon = Icons.Default.Person) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SettingsSectionPsico(
+                        title = stringResource(R.string.auto_datos_personales),
+                        icon = Icons.Default.Person,
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                             TextFieldPsico(
-                                "Nombre",
+                                stringResource(R.string.nombre),
                                 nombre,
-                                { nombre = it },
+                                onNombreChange,
                                 Icons.Default.Badge,
                                 Modifier.weight(1f),
                             )
                             TextFieldPsico(
-                                "Apellidos",
+                                stringResource(R.string.settings_apellidos),
                                 apellidos,
-                                { apellidos = it },
+                                onApellidosChange,
                                 Icons.Default.Badge,
                                 Modifier.weight(1f),
                             )
                         }
                         TextFieldPsico(
-                            "Email (No editable)",
-                            perfil?.usuario?.email ?: "",
+                            stringResource(R.string.psico_email_no_editable),
+                            email,
                             {},
                             Icons.Default.Email,
                             Modifier.fillMaxWidth(),
@@ -230,34 +297,37 @@ fun SettingsPsicologoScreen(
                     }
 
                     // Información Profesional
-                    SettingsSectionPsico(title = "Perfil Profesional", icon = Icons.Default.Work) {
+                    SettingsSectionPsico(
+                        title = stringResource(R.string.psico_perfil_profesional),
+                        icon = Icons.Default.Work,
+                    ) {
                         TextFieldPsico(
-                            "Especialidad",
+                            stringResource(R.string.auto_especialidad_1),
                             especialidad,
-                            { especialidad = it },
-                            Icons.Default.Psychology,
+                            onEspecialidadChange,
+                            Icons.Default.MedicalServices,
                             Modifier.fillMaxWidth(),
                         )
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                             TextFieldPsico(
-                                "Años Exp.",
+                                stringResource(R.string.psico_anos_exp_corto),
                                 experiencia,
-                                { experiencia = it },
+                                onExperienciaChange,
                                 Icons.Default.Timeline,
                                 Modifier.weight(1f),
                             )
                             TextFieldPsico(
-                                "Licencia/Colegiado",
+                                stringResource(R.string.psico_licencia_colegiado),
                                 licencia,
-                                { licencia = it },
+                                onLicenciaChange,
                                 Icons.Default.Verified,
                                 Modifier.weight(1.5f),
                             )
                         }
                         TextFieldPsico(
-                            "Bio / Descripción",
+                            stringResource(R.string.psico_bio_descripcion),
                             descripcion,
-                            { descripcion = it },
+                            onDescripcionChange,
                             Icons.AutoMirrored.Filled.Notes,
                             Modifier.fillMaxWidth(),
                             singleLine = false,
@@ -267,31 +337,31 @@ fun SettingsPsicologoScreen(
 
                     // Botón Guardar
                     Button(
-                        onClick = { /* Pendiente: ViewModel.updateProfile */ },
+                        onClick = onSaveClick,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
+                                .height(Dimensions.buttonHeightLarge),
+                        shape = shapes.large,
                         elevation = ButtonDefaults.elevatedButtonElevation(),
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(stringResource(R.string.auto_guardar_cambios_1), fontWeight = FontWeight.Bold)
                     }
 
                     // Soporte y Ayuda
                     OutlinedButton(
-                        onClick = { /* Navegar a soporte */ },
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        onClick = onSupportClick,
+                        modifier = Modifier.fillMaxWidth().height(Dimensions.buttonHeight),
+                        shape = shapes.medium,
                     ) {
                         Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Spacing.s))
                         Text(stringResource(R.string.auto_centro_de_ayuda_y))
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(Spacing.l))
                 }
             }
         }
@@ -311,13 +381,18 @@ fun SettingsSectionPsico(
     icon: ImageVector,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(start = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+            modifier = Modifier.padding(start = Spacing.xs),
         ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(Dimensions.iconDefault),
+            )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
@@ -327,13 +402,13 @@ fun SettingsSectionPsico(
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
+            shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
         ) {
             Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(18.dp),
+                modifier = Modifier.padding(Spacing.m),
+                verticalArrangement = Arrangement.spacedBy(Spacing.m),
                 content = content,
             )
         }
@@ -368,7 +443,7 @@ fun TextFieldPsico(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = Spacing.xs, bottom = Spacing.xs),
         )
         OutlinedTextField(
             value = value,
@@ -377,8 +452,8 @@ fun TextFieldPsico(
             singleLine = singleLine,
             minLines = minLines,
             readOnly = readOnly,
-            leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp)) },
-            shape = RoundedCornerShape(14.dp),
+            leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(Dimensions.iconMedium)) },
+            shape = MaterialTheme.shapes.medium,
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedContainerColor =
@@ -400,6 +475,39 @@ fun TextFieldPsico(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
                 ),
+        )
+    }
+}
+
+@Preview(name = "SettingsPsicologo Light", showBackground = true)
+@Preview(
+    name = "SettingsPsicologo Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "SettingsPsicologo Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun SettingsPsicologoScreenPreview() {
+    AppTheme {
+        SettingsPsicologoContent(
+            isLoading = false,
+            fotoPerfilUrl = null,
+            email = "carlos.mendoza@amani.es",
+            nombre = "Carlos",
+            onNombreChange = {},
+            apellidos = "Mendoza",
+            onApellidosChange = {},
+            especialidad = "Psicología Clínica",
+            onEspecialidadChange = {},
+            experiencia = "8",
+            onExperienciaChange = {},
+            licencia = "M-12345",
+            onLicenciaChange = {},
+            descripcion = "Especialista en terapia cognitivo-conductual y trastornos de ansiedad.",
+            onDescripcionChange = {},
+            onBackClick = {},
+            onSaveClick = {},
+            onSupportClick = {},
         )
     }
 }

@@ -2,6 +2,7 @@ package org.ies.tierno.applicationamani.presentation.screens.profile
 
 import android.Manifest.permission.CAMERA
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.content.res.Configuration
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -55,7 +55,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -65,24 +64,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.perfil.psicologo.PsicologoProfileResponseDTO
+import org.ies.tierno.applicationamani.dto.perfil.psicologo.UsuarioProfileResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
@@ -115,13 +119,15 @@ fun PsicologoProfileScreen(
     val imageLoader = koinInject<coil.ImageLoader>()
 
     val context = LocalContext.current
-    val perfil by viewModel.perfil.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
-    val uploadStatus by viewModel.uploadStatus.collectAsState()
+    val perfil by viewModel.perfil.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
+    val uploadStatus by viewModel.uploadStatus.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val labelCerrar = stringResource(R.string.auto_cerrar)
+    val msgFotoActualizada = stringResource(R.string.perfil_foto_actualizada)
 
     Log.d(TAG, "PsicologoProfileScreen iniciada con ID: $psicologoId")
 
@@ -145,7 +151,7 @@ fun PsicologoProfileScreen(
             scope.launch {
                 snackbarHostState.showSnackbar(
                     message = errorMessage,
-                    actionLabel = "Cerrar",
+                    actionLabel = labelCerrar,
                     duration = SnackbarDuration.Short,
                 )
             }
@@ -158,8 +164,7 @@ fun PsicologoProfileScreen(
                 Log.d(TAG, "UploadStatus: SUCCESS - Foto subida correctamente")
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        message = "¡Foto de perfil actualizada correctamente!",
-                        actionLabel = "👍",
+                        message = msgFotoActualizada,
                         duration = SnackbarDuration.Short,
                     )
                 }
@@ -170,7 +175,7 @@ fun PsicologoProfileScreen(
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         message = errorMessage,
-                        actionLabel = "Cerrar",
+                        actionLabel = labelCerrar,
                         duration = SnackbarDuration.Long,
                     )
                 }
@@ -180,11 +185,13 @@ fun PsicologoProfileScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = stringResource(R.string.auto_mi_perfil_profesional),
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
                 },
@@ -196,7 +203,11 @@ fun PsicologoProfileScreen(
                     ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.auto_volver), tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.auto_volver),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 },
             )
@@ -204,7 +215,7 @@ fun PsicologoProfileScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(Spacing.m),
             ) { data ->
                 Snackbar(
                     snackbarData = data,
@@ -231,7 +242,7 @@ fun PsicologoProfileScreen(
                 perfil != null -> {
                     Log.d(TAG, "Estado: Mostrando contenido del perfil")
                     ProfileContent(
-                        navController,
+                        navController = navController,
                         perfil = perfil!!,
                         imageLoader = imageLoader,
                         onPhotoUpload = { uri ->
@@ -259,10 +270,13 @@ fun PsicologoProfileScreen(
 fun ProfileContent(
     navController: NavController,
     perfil: PsicologoProfileResponseDTO,
-    imageLoader: coil.ImageLoader,
+    imageLoader: coil.ImageLoader = coil.ImageLoader(LocalContext.current),
     onPhotoUpload: (Uri) -> Unit,
 ) {
     val context = LocalContext.current
+    val colorScheme = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
+    val shapes = MaterialTheme.shapes
     var showOptions by remember { mutableStateOf(false) }
 
     // Variable para forzar refresco de la imagen (Optimizado para evitar autoboxing)
@@ -311,11 +325,13 @@ fun ProfileContent(
         }
     val photoUri =
         remember(photoFile) {
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                photoFile,
-            )
+            runCatching {
+                FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    photoFile,
+                )
+            }.getOrNull() ?: Uri.EMPTY
         }
 
     // ========== CÁMARA CON TAKEPICTURE (RECOMENDADO PARA ALTA RESOLUCIÓN) ==========
@@ -363,38 +379,38 @@ fun ProfileContent(
             Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(Spacing.m),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Card(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    .padding(bottom = Spacing.l),
+            shape = shapes.large,
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = colorScheme.surface,
                 ),
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .padding(Spacing.m),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(R.string.auto_foto_de_perfil_1),
-                    fontSize = 18.sp,
+                    style = typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = colorScheme.primary,
+                    modifier = Modifier.padding(bottom = Spacing.m),
                 )
 
                 Box(
-                    modifier = Modifier.size(120.dp),
+                    modifier = Modifier.size(Dimensions.avatarHero),
                     contentAlignment = Alignment.BottomEnd,
                 ) {
                     val imageUrl: Any? =
@@ -421,10 +437,10 @@ fun ProfileContent(
                                     onStart = { request ->
                                         Log.d(TAG, "AsyncImage - Iniciando carga: ${request.data}")
                                     },
-                                    onSuccess = { request, metadata ->
+                                    onSuccess = { request, _ ->
                                         Log.d(TAG, "AsyncImage - Éxito al cargar imagen: ${request.data}")
                                     },
-                                    onError = { request, throwable ->
+                                    onError = { request, _ ->
                                         Log.e(TAG, "AsyncImage - Error al cargar imagen: ${request.data}")
                                     },
                                 ).build(),
@@ -435,7 +451,7 @@ fun ProfileContent(
                                 .fillMaxSize()
                                 .clip(CircleShape)
                                 .border(
-                                    BorderStroke(3.dp, MaterialTheme.colorScheme.primary),
+                                    BorderStroke(Dimensions.progressStroke, colorScheme.primary),
                                     CircleShape,
                                 ),
                         contentScale = ContentScale.Crop,
@@ -446,101 +462,107 @@ fun ProfileContent(
                             Log.d(TAG, "Botón cámara clickeado - Mostrando opciones")
                             showOptions = true
                         },
-                        modifier = Modifier.size(40.dp),
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White,
+                        modifier = Modifier.size(Dimensions.avatarSmall),
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onPrimary,
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
                             contentDescription = stringResource(R.string.auto_cambiar_foto),
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(Dimensions.iconMedium),
                         )
                     }
                 }
 
                 Text(
                     text = "${perfil.usuario?.nombre} ${perfil.usuario?.apellido}",
-                    fontSize = 20.sp,
+                    style = typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 12.dp),
+                    color = colorScheme.onSurface,
+                    modifier = Modifier.padding(top = Spacing.sm),
                 )
 
                 Text(
-                    text = perfil.usuario?.email ?: "Email no disponible",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
+                    text = perfil.usuario?.email ?: stringResource(R.string.perfil_email_no_disponible),
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
                 )
             }
         }
 
+        val noEspecificada = stringResource(R.string.valor_no_especificado)
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = shapes.large,
+            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = colorScheme.surface,
                 ),
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .padding(Spacing.m),
             ) {
                 Text(
                     text = stringResource(R.string.auto_informacion_profesional),
-                    fontSize = 18.sp,
+                    style = typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = colorScheme.primary,
+                    modifier = Modifier.padding(bottom = Spacing.m),
                 )
 
                 InfoRow(
                     icon = Icons.Default.Work,
                     label = stringResource(R.string.auto_especialidad_1),
-                    value = perfil.especialidad ?: "No especificada",
+                    value = perfil.especialidad ?: noEspecificada,
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 InfoRow(
                     icon = Icons.Default.Timeline,
                     label = stringResource(R.string.auto_experiencia_1),
-                    value = if (perfil.experiencia != null) "${perfil.experiencia} años" else "No especificada",
+                    value =
+                        if (perfil.experiencia != null) {
+                            stringResource(R.string.psicologo_anos_exp_valor, perfil.experiencia)
+                        } else {
+                            noEspecificada
+                        },
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 InfoRow(
                     icon = Icons.Default.Badge,
                     label = stringResource(R.string.auto_numero_de_licencia_1),
-                    value = perfil.licencia ?: "No especificada",
+                    value = perfil.licencia ?: noEspecificada,
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.m))
 
                 Text(
                     text = stringResource(R.string.auto_descripcion_1),
-                    fontSize = 14.sp,
+                    style = typography.labelLarge,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = colorScheme.primary,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
                 Text(
-                    text = perfil.descripcion ?: "Sin descripción disponible",
-                    fontSize = 14.sp,
-                    color = Color.DarkGray,
-                    lineHeight = 20.sp,
+                    text = perfil.descripcion ?: stringResource(R.string.psico_sin_descripcion),
+                    style = typography.bodyMedium,
+                    color = colorScheme.onSurfaceVariant,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             OutlinedButton(
                 onClick = {
@@ -551,10 +573,10 @@ fun ProfileContent(
                     }
                 },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
+                shape = shapes.medium,
             ) {
                 Icon(Icons.Default.Edit, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(stringResource(R.string.auto_editar_perfil))
             }
 
@@ -563,10 +585,10 @@ fun ProfileContent(
                     navController.popBackStack()
                 },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
+                shape = shapes.medium,
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(stringResource(R.string.auto_cancelar))
             }
         }
@@ -635,18 +657,19 @@ fun InfoRow(
             imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(Dimensions.iconDefault),
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(Spacing.sm))
         Column {
             Text(
                 text = label,
-                fontSize = 12.sp,
-                color = Color.Gray,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = value,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -670,40 +693,73 @@ fun ErrorContent(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(Spacing.m),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Default.Error,
             contentDescription = null,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(Dimensions.iconHero),
             tint = MaterialTheme.colorScheme.error,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
         Text(
             text = stringResource(R.string.auto_error_al_cargar_el),
-            fontSize = 18.sp,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(Spacing.s))
         Text(
             text = error,
-            fontSize = 14.sp,
-            color = Color.Gray,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(Spacing.l))
         Button(
             onClick = {
                 Log.d(TAG, "Botón Reintentar clickeado")
                 onRetry()
             },
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.medium,
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Spacing.s))
             Text(stringResource(R.string.auto_reintentar))
         }
+    }
+}
+
+@Preview(name = "PsicologoProfile Light", showBackground = true)
+@Preview(
+    name = "PsicologoProfile Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "PsicologoProfile Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun PsicologoProfileScreenPreview() {
+    AppTheme {
+        ProfileContent(
+            navController = rememberNavController(),
+            perfil =
+                PsicologoProfileResponseDTO(
+                    idPsicologo = 1L,
+                    usuario =
+                        UsuarioProfileResponseDTO(
+                            idUsuario = 10L,
+                            nombre = "Carlos",
+                            apellido = "Mendoza",
+                            email = "carlos.mendoza@amani.es",
+                        ),
+                    especialidad = "Psicología Clínica",
+                    experiencia = 8,
+                    licencia = "M-12345",
+                    descripcion = "Especialista en terapia cognitivo-conductual y bienestar emocional.",
+                ),
+            onPhotoUpload = {},
+        )
     }
 }

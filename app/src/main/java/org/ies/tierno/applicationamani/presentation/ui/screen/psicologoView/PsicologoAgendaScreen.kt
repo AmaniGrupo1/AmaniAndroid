@@ -3,6 +3,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -26,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
@@ -97,14 +97,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -124,6 +123,11 @@ import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
 import org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.CalendarioView
 import org.ies.tierno.applicationamani.presentation.viewmodels.PsicologoAgendaViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.jitsi.meet.sdk.JitsiMeetActivity
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import java.math.BigDecimal
@@ -131,13 +135,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-
-// Extensiones de color
-val ColorScheme.success: Color
-    get() = Color(0xFF4CAF50)
-
-val ColorScheme.warning: Color
-    get() = Color(0xFFFF9800)
 
 /**
  * Pantalla de agenda del psicólogo con vista de calendario mensual.
@@ -171,13 +168,16 @@ fun PsicologoAgendaScreen(
     val horarioActual by viewModel.horarioActual.collectAsStateWithLifecycle()
     val terapias by listarTerapiasViewModel.terapias.collectAsStateWithLifecycle()
 
-    // ✅ MOVIDAS ANTES DEL SCAFFOLD para que estén disponibles
     val userSession by viewModel.userSession.collectAsStateWithLifecycle()
     val idPsicologo = userSession?.idPsicologo
     val isPsicologoReady = idPsicologo != null && idPsicologo > 0L
 
     var fechaSeleccionada by remember { mutableStateOf<LocalDate?>(null) }
     var mesVisible by remember { mutableStateOf(YearMonth.now()) }
+
+    val msgCargandoPsicologo = stringResource(R.string.agenda_cargando_psicologo)
+    val msgSeleccionaFecha = stringResource(R.string.agenda_selecciona_fecha_calendario)
+    val msgSeleccionaDia = stringResource(R.string.agenda_selecciona_dia_calendario)
 
     // Días no laborables (sábados y domingos por defecto)
     val diasNoLaborables = remember(mesVisible) {
@@ -269,11 +269,11 @@ fun PsicologoAgendaScreen(
                         viewModel.cargarDisponibilidadDia(fechaSeleccionada!!, 60)
                     } else if (!isPsicologoReady) {
                         scope.launch {
-                            snackbarHostState.showSnackbar("Cargando datos del psicólogo...")
+                            snackbarHostState.showSnackbar(msgCargandoPsicologo)
                         }
                     } else {
                         scope.launch {
-                            snackbarHostState.showSnackbar("📅 Selecciona primero una fecha en el calendario")
+                            snackbarHostState.showSnackbar(msgSeleccionaFecha)
                         }
                     }
                 },
@@ -281,13 +281,13 @@ fun PsicologoAgendaScreen(
                 contentColor = if (isPsicologoReady) colors.onPrimary else colors.onPrimary.copy(
                     alpha = 0.5f
                 ),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.size(56.dp)
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.size(Dimensions.buttonHeightLarge)
             ) {
                 Icon(
                     Icons.Default.Add,
                     contentDescription = stringResource(R.string.auto_anadir_cita),
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(Dimensions.iconDefault)
                 )
             }
         }
@@ -301,13 +301,13 @@ fun PsicologoAgendaScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = Spacing.m, vertical = Spacing.sm)
             ) {
                 // Header
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = Spacing.m)
                 ) {
                     Column {
                         Text(
@@ -315,7 +315,7 @@ fun PsicologoAgendaScreen(
                             style = typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = colors.primary,
-                            modifier = Modifier.padding(bottom = 4.dp)
+                            modifier = Modifier.padding(bottom = Spacing.xs)
                         )
                         Text(
                             text = stringResource(R.string.auto_gestiona_tus_citas_y),
@@ -328,12 +328,12 @@ fun PsicologoAgendaScreen(
                 // Tarjetas de acciones rápidas
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
                     TarjetaAccionRapidaMejorada(
                         icono = Icons.Default.Schedule,
-                        titulo = "Horario",
-                        subtitulo = "Configurar horario laboral",
+                        titulo = stringResource(R.string.agenda_accion_horario_titulo),
+                        subtitulo = stringResource(R.string.agenda_accion_horario_subtitulo),
                         colorFondo = colors.primaryContainer.copy(alpha = 0.5f),
                         colorIcono = colors.primary,
                         modifier = Modifier.weight(1f),
@@ -341,11 +341,15 @@ fun PsicologoAgendaScreen(
                     )
                     TarjetaAccionRapidaMejorada(
                         icono = Icons.Default.EventBusy,
-                        titulo = if (esDiaNoDisponible) "Día bloqueado" else "Bloquear día",
+                        titulo = if (esDiaNoDisponible) {
+                            stringResource(R.string.agenda_dia_bloqueado)
+                        } else {
+                            stringResource(R.string.agenda_bloquear_dia)
+                        },
                         subtitulo = when {
-                            fechaSeleccionada == null -> "Selecciona un día"
-                            esDiaNoDisponible -> "Habilitar día para citas"
-                            else -> "Marcar como no disponible"
+                            fechaSeleccionada == null -> stringResource(R.string.agenda_selecciona_un_dia)
+                            esDiaNoDisponible -> stringResource(R.string.agenda_habilitar_dia_subtitulo)
+                            else -> stringResource(R.string.agenda_bloquear_dia_subtitulo)
                         },
                         colorFondo = if (esDiaNoDisponible) colors.primaryContainer.copy(alpha = 0.5f) else colors.errorContainer.copy(
                             alpha = 0.3f
@@ -357,24 +361,23 @@ fun PsicologoAgendaScreen(
                                 mostrarDialogoNoDisponible = true
                             } else {
                                 scope.launch {
-                                    snackbarHostState.showSnackbar("📅 Selecciona primero un día en el calendario")
+                                    snackbarHostState.showSnackbar(msgSeleccionaDia)
                                 }
                             }
                         }
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(Spacing.l))
                 LeyendaMejorada()
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.m))
 
                 // Calendario
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(8.dp, RoundedCornerShape(24.dp)),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = colors.surface)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = CardDefaults.cardColors(containerColor = colors.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
                 ) {
                     CalendarioView(
                         modifier = Modifier.fillMaxWidth(),
@@ -390,7 +393,7 @@ fun PsicologoAgendaScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Spacing.l))
 
                 // Sección de citas del día
                 AnimatedVisibility(
@@ -400,15 +403,14 @@ fun PsicologoAgendaScreen(
                 ) {
                     fechaSeleccionada?.let { fecha ->
                         Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .shadow(8.dp, RoundedCornerShape(24.dp)),
-                            shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(containerColor = colors.surface)
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            colors = CardDefaults.cardColors(containerColor = colors.surface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2)
                         ) {
-                            Column(modifier = Modifier.padding(20.dp)) {
+                            Column(modifier = Modifier.padding(Spacing.m)) {
                                 CabeceraDiaMejorada(fecha, esDiaNoDisponible)
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(Spacing.m))
 
                                 when {
                                     esDiaNoDisponible -> DiaNoDisponibleCardMejorado()
@@ -424,21 +426,21 @@ fun PsicologoAgendaScreen(
                                                 fontWeight = FontWeight.Bold
                                             )
                                             Badge(
-                                                modifier = Modifier.clip(RoundedCornerShape(16.dp)),
+                                                modifier = Modifier.clip(MaterialTheme.shapes.large),
                                                 containerColor = colors.primary
                                             ) {
                                                 Text(
                                                     text = "${citasDelDia.size}",
                                                     color = colors.onPrimary,
                                                     modifier = Modifier.padding(
-                                                        horizontal = 10.dp,
-                                                        vertical = 4.dp
+                                                        horizontal = Spacing.s,
+                                                        vertical = Spacing.xs
                                                     ),
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             }
                                         }
-                                        Spacer(modifier = Modifier.height(16.dp))
+                                        Spacer(modifier = Modifier.height(Spacing.m))
                                         citasDelDia.forEachIndexed { index, cita ->
                                             val paciente = pacientesAsignados.find { it.idPaciente == cita.idPaciente }
                                             val telefonoPaciente = paciente?.telefono
@@ -462,7 +464,7 @@ fun PsicologoAgendaScreen(
                                                 }
                                             )
                                             if (index < citasDelDia.size - 1) {
-                                                Spacer(modifier = Modifier.height(12.dp))
+                                                Spacer(modifier = Modifier.height(Spacing.sm))
                                             }
                                         }
                                     }
@@ -470,7 +472,7 @@ fun PsicologoAgendaScreen(
                                     else -> {
                                         Card(
                                             modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(20.dp),
+                                            shape = MaterialTheme.shapes.large,
                                             colors = CardDefaults.cardColors(
                                                 containerColor = colors.primaryContainer.copy(
                                                     alpha = 0.2f
@@ -480,16 +482,16 @@ fun PsicologoAgendaScreen(
                                             Column(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(40.dp),
+                                                    .padding(Spacing.xl),
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Icon(
                                                     Icons.Default.CalendarMonth,
                                                     contentDescription = null,
-                                                    modifier = Modifier.size(56.dp),
+                                                    modifier = Modifier.size(Dimensions.iconExtraLarge),
                                                     tint = colors.primary.copy(alpha = 0.6f)
                                                 )
-                                                Spacer(modifier = Modifier.height(12.dp))
+                                                Spacer(modifier = Modifier.height(Spacing.sm))
                                                 Text(
                                                     text = stringResource(R.string.auto_sin_citas_programadas),
                                                     style = typography.titleMedium,
@@ -509,32 +511,33 @@ fun PsicologoAgendaScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(Dimensions.bottomContentSpacer))
             }
 
             if (isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.4f))
+                        .background(colors.scrim.copy(alpha = 0.4f))
                         .clickable(enabled = false) { },
                     contentAlignment = Alignment.Center
                 ) {
                     Card(
-                        shape = RoundedCornerShape(20.dp),
+                        shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(containerColor = colors.surface),
-                        modifier = Modifier.padding(24.dp)
+                        modifier = Modifier.padding(Spacing.l)
                     ) {
                         Column(
-                            modifier = Modifier.padding(32.dp),
+                            modifier = Modifier.padding(Spacing.xl),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             CircularProgressIndicator(
                                 color = colors.primary,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(Dimensions.iconExtraLarge)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(stringResource(R.string.auto_cargando_agenda),
+                            Spacer(modifier = Modifier.height(Spacing.m))
+                            Text(
+                                stringResource(R.string.auto_cargando_agenda),
                                 style = typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
@@ -568,27 +571,16 @@ fun PsicologoAgendaScreen(
             yaNoDisponible = esDiaNoDisponible,
             onConfirmar = { bloquear, motivo ->
                 scope.launch {
+                    val fechaFormateada = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                     if (bloquear) {
                         viewModel.bloquearDia(fecha, motivo)
                         snackbarHostState.showSnackbar(
-                            "✅ Día ${
-                                fecha.format(
-                                    DateTimeFormatter.ofPattern(
-                                        "dd/MM/yyyy"
-                                    )
-                                )
-                            } bloqueado"
+                            context.getString(R.string.agenda_dia_bloqueado_msg, fechaFormateada)
                         )
                     } else {
                         viewModel.quitarBloqueoDia(fecha)
                         snackbarHostState.showSnackbar(
-                            "✅ Día ${
-                                fecha.format(
-                                    DateTimeFormatter.ofPattern(
-                                        "dd/MM/yyyy"
-                                    )
-                                )
-                            } habilitado"
+                            context.getString(R.string.agenda_dia_habilitado_msg, fechaFormateada)
                         )
                     }
                     viewModel.cargarAgendaMensual(mesVisible)
@@ -634,9 +626,10 @@ fun PsicologoAgendaScreen(
                                 monto = monto,
                                 modalidad = modalidad
                             )
-
                         } catch (e: Exception) {
-                            snackbarHostState.showSnackbar("Error: ${e.message}")
+                            snackbarHostState.showSnackbar(
+                                context.getString(R.string.agenda_error_formato, e.message.orEmpty())
+                            )
                         } finally {
                             mostrarDialogoCrearEditar = false
                             citaParaEditar = null
@@ -663,18 +656,24 @@ fun PsicologoAgendaScreen(
                             if (resultado.isSuccess) {
                                 val paciente =
                                     pacientesAsignados.find { it.idPaciente == idPaciente }
+                                val nombreCompleto = "${paciente?.nombre.orEmpty()} ${paciente?.apellido.orEmpty()}".trim()
                                 snackbarHostState.showSnackbar(
-                                    "✅ Cita creada: ${paciente?.nombre} ${paciente?.apellido} - ${
-                                        fecha.format(
-                                            DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                                        )
-                                    } a las $hora"
+                                    context.getString(
+                                        R.string.agenda_cita_creada_msg,
+                                        nombreCompleto,
+                                        fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                        hora.toString()
+                                    )
                                 )
                             } else {
-                                snackbarHostState.showSnackbar("❌ Error al crear la cita")
+                                snackbarHostState.showSnackbar(
+                                    context.getString(R.string.agenda_error_crear_cita)
+                                )
                             }
                         } catch (e: Exception) {
-                            snackbarHostState.showSnackbar("Error: ${e.message}")
+                            snackbarHostState.showSnackbar(
+                                context.getString(R.string.agenda_error_formato, e.message.orEmpty())
+                            )
                         } finally {
                             mostrarDialogoCrearEditar = false
                             citaParaEditar = null
@@ -703,7 +702,9 @@ fun PsicologoAgendaScreen(
                     duracionMinutos = citaParaCancelar!!.duracionMinutos ?: 60
                 )
                 scope.launch {
-                    snackbarHostState.showSnackbar("🗑️ Cita cancelada correctamente")
+                    snackbarHostState.showSnackbar(
+                        context.getString(R.string.agenda_cita_cancelada_msg)
+                    )
                 }
                 citaParaCancelar = null
             },
@@ -725,30 +726,29 @@ fun TarjetaAccionRapidaMejorada(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier
-            .clickable { onClick() }
-            .shadow(4.dp, RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = colorFondo)
+        modifier = modifier.clickable { onClick() },
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = colorFondo),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.m),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .background(colorIcono.copy(alpha = 0.15f), RoundedCornerShape(14.dp)),
+                    .size(Dimensions.avatarMedium)
+                    .background(colorIcono.copy(alpha = 0.15f), MaterialTheme.shapes.medium),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icono,
                     contentDescription = titulo,
                     tint = colorIcono,
-                    modifier = Modifier.size(26.dp)
+                    modifier = Modifier.size(Dimensions.iconDefault)
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(titulo, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Text(
                 subtitulo,
@@ -766,24 +766,25 @@ fun LeyendaMejorada() {
     val colors = MaterialTheme.colorScheme
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.3f))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(Spacing.sm),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(14.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .size(Dimensions.iconSmall)
+                        .clip(MaterialTheme.shapes.extraSmall)
                         .background(colors.primary)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.auto_seleccionado),
+                Spacer(modifier = Modifier.width(Spacing.s))
+                Text(
+                    stringResource(R.string.auto_seleccionado),
                     style = MaterialTheme.typography.labelSmall,
                     color = colors.onSurfaceVariant
                 )
@@ -791,12 +792,13 @@ fun LeyendaMejorada() {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(14.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .size(Dimensions.iconSmall)
+                        .clip(MaterialTheme.shapes.extraSmall)
                         .background(colors.tertiary)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.auto_con_citas),
+                Spacer(modifier = Modifier.width(Spacing.s))
+                Text(
+                    stringResource(R.string.auto_con_citas),
                     style = MaterialTheme.typography.labelSmall,
                     color = colors.onSurfaceVariant
                 )
@@ -809,22 +811,25 @@ fun LeyendaMejorada() {
 @Composable
 fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
+    val formatterFecha = DateTimeFormatter.ofPattern(
+        "EEEE, d 'de' MMMM",
+        java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
+    )
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
         color = if (esDiaNoDisponible) colors.errorContainer.copy(alpha = 0.3f) else colors.primaryContainer.copy(
             alpha = 0.3f
         )
     ) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.padding(Spacing.m), verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = if (esDiaNoDisponible) Icons.Default.EventBusy else Icons.Default.CalendarToday,
                 contentDescription = null,
                 tint = if (esDiaNoDisponible) colors.error else colors.primary,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(Dimensions.iconLarge)
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(Spacing.m))
             Column {
                 Text(
                     text = fecha.format(formatterFecha).replaceFirstChar { it.uppercase() },
@@ -833,12 +838,14 @@ fun CabeceraDiaMejorada(fecha: LocalDate, esDiaNoDisponible: Boolean) {
                     color = if (esDiaNoDisponible) colors.error else colors.onSurface
                 )
                 if (esDiaNoDisponible) {
-                    Text(stringResource(R.string.auto__dia_no_disponible),
+                    Text(
+                        stringResource(R.string.auto__dia_no_disponible),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.error
                     )
                 } else {
-                    Text(stringResource(R.string.auto_horario_disponible_segun_configuracion),
+                    Text(
+                        stringResource(R.string.auto_horario_disponible_segun_configuracion),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant
                     )
@@ -859,6 +866,7 @@ fun TarjetaCitaMejorada(
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
+    val extraColors = AmaniTheme.colors
     val scope = rememberCoroutineScope()
     val citasRepository: org.ies.tierno.applicationamani.data.repositorio.CitasRepository = org.koin.compose.koinInject()
     val formatterHora = DateTimeFormatter.ofPattern("HH:mm")
@@ -866,19 +874,19 @@ fun TarjetaCitaMejorada(
     var isUpdating by remember { mutableStateOf(false) }
 
     val estadosDisponibles = listOf(
-        EstadoCita.PENDIENTE to "⏳ Pendiente",
-        EstadoCita.CONFIRMADA to "✅ Confirmada",
-        EstadoCita.COMPLETADA to "🏁 Completada",
-        EstadoCita.CANCELADA to "❌ Cancelada"
+        EstadoCita.PENDIENTE to stringResource(R.string.agenda_estado_pendiente),
+        EstadoCita.CONFIRMADA to stringResource(R.string.agenda_estado_confirmada),
+        EstadoCita.COMPLETADA to stringResource(R.string.agenda_estado_completada),
+        EstadoCita.CANCELADA to stringResource(R.string.agenda_estado_cancelada)
     )
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = colors.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Spacing.m)) {
             // Cabecera: Icono + Nombre del paciente
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -888,24 +896,24 @@ fun TarjetaCitaMejorada(
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
-                            .background(colors.primary.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
+                            .size(Dimensions.avatarSmall)
+                            .background(colors.primary.copy(alpha = 0.15f), MaterialTheme.shapes.medium),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.Person,
                             contentDescription = null,
                             tint = colors.primary,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(Dimensions.iconMedium)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(Spacing.sm))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s)
                     ) {
                         Text(
-                            cita.nombrePaciente ?: "Paciente",
+                            cita.nombrePaciente ?: stringResource(R.string.auto_paciente),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -913,17 +921,17 @@ fun TarjetaCitaMejorada(
                             IconButton(
                                 onClick = {
                                     val intent = Intent(Intent.ACTION_DIAL).apply {
-                                        data = Uri.parse("tel:${pacienteTelefono}")
+                                        data = Uri.parse("tel:$pacienteTelefono")
                                     }
                                     context.startActivity(intent)
                                 },
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(Dimensions.iconLarge)
                             ) {
                                 Icon(
                                     Icons.Default.Phone,
-                                    contentDescription = "Llamar al paciente",
+                                    contentDescription = stringResource(R.string.agenda_llamar_paciente),
                                     tint = colors.primary,
-                                    modifier = Modifier.size(18.dp)
+                                    modifier = Modifier.size(Dimensions.iconButton)
                                 )
                             }
                         }
@@ -932,31 +940,31 @@ fun TarjetaCitaMejorada(
 
                 // Indicador visual del estado actual
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.medium,
                     color = when (cita.estado?.uppercase()) {
                         "CONFIRMADA" -> colors.primary.copy(alpha = 0.15f)
                         "CANCELADA" -> colors.error.copy(alpha = 0.15f)
-                        "COMPLETADA" -> colors.success.copy(alpha = 0.15f)
+                        "COMPLETADA" -> extraColors.success.copy(alpha = 0.15f)
                         else -> colors.tertiary.copy(alpha = 0.15f)
                     },
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(Dimensions.iconLarge)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         if (isUpdating) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(Dimensions.iconMedium),
+                                strokeWidth = Dimensions.borderMedium,
                                 color = when (cita.estado?.uppercase()) {
                                     "CONFIRMADA" -> colors.primary
                                     "CANCELADA" -> colors.error
-                                    "COMPLETADA" -> colors.success
+                                    "COMPLETADA" -> extraColors.success
                                     else -> colors.tertiary
                                 }
                             )
                         } else {
                             IconButton(
                                 onClick = { menuExpanded = true },
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(Dimensions.iconLarge)
                             ) {
                                 Icon(
                                     when (cita.estado?.uppercase()) {
@@ -966,11 +974,11 @@ fun TarjetaCitaMejorada(
                                         else -> Icons.Default.Schedule
                                     },
                                     contentDescription = stringResource(R.string.auto_cambiar_estado),
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(Dimensions.iconMedium),
                                     tint = when (cita.estado?.uppercase()) {
                                         "CONFIRMADA" -> colors.primary
                                         "CANCELADA" -> colors.error
-                                        "COMPLETADA" -> colors.success
+                                        "COMPLETADA" -> extraColors.success
                                         else -> colors.tertiary
                                     }
                                 )
@@ -995,15 +1003,15 @@ fun TarjetaCitaMejorada(
                                             else -> Icons.Default.Schedule
                                         },
                                         contentDescription = null,
-                                        modifier = Modifier.size(18.dp),
+                                        modifier = Modifier.size(Dimensions.iconButton),
                                         tint = when (estado) {
                                             EstadoCita.CONFIRMADA -> colors.primary
                                             EstadoCita.CANCELADA -> colors.error
-                                            EstadoCita.COMPLETADA -> colors.success
+                                            EstadoCita.COMPLETADA -> extraColors.success
                                             else -> colors.tertiary
                                         }
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width(Spacing.s))
                                     Text(label)
                                 }
                             },
@@ -1025,17 +1033,17 @@ fun TarjetaCitaMejorada(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
 
             // Horario
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     Icons.Default.AccessTime,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(Dimensions.iconButton),
                     tint = colors.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
                     "${cita.horaInicio.format(formatterHora)} - ${cita.horaFin.format(formatterHora)}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -1043,52 +1051,50 @@ fun TarjetaCitaMejorada(
                 )
             }
 
-            // ✅ Duración de la terapia
-            Spacer(modifier = Modifier.height(6.dp))
+            // Duración de la terapia
+            Spacer(modifier = Modifier.height(Spacing.xs))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     Icons.Default.Timer,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(Dimensions.iconSmall),
                     tint = colors.primary
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
-                    "Duración: ${cita.duracionMinutos ?: 60} min",
+                    stringResource(R.string.agenda_duracion_min_formato, cita.duracionMinutos ?: 60),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.primary,
                     fontWeight = FontWeight.Medium
                 )
             }
 
-            // ✅ Modalidad de la cita
-            Spacer(modifier = Modifier.height(4.dp))
+            // Modalidad de la cita
+            Spacer(modifier = Modifier.height(Spacing.xs))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(Spacing.s)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Icon(
                         when (cita.modalidad) {
                             ModalidadCita.PRESENCIAL -> Icons.Default.LocationOn
                             ModalidadCita.LLAMADA -> Icons.Default.Phone
-                            null -> Icons.Default.Info
                         },
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(Dimensions.iconSmall),
                         tint = colors.primary
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Text(
                         text = when (cita.modalidad) {
-                            ModalidadCita.PRESENCIAL -> "Presencial"
-                            ModalidadCita.LLAMADA -> "Llamada"
-                            null -> "Modalidad no especificada"
+                            ModalidadCita.PRESENCIAL -> stringResource(R.string.auto_presencial)
+                            ModalidadCita.LLAMADA -> stringResource(R.string.auto_llamada)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.primary,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
@@ -1101,7 +1107,11 @@ fun TarjetaCitaMejorada(
                                     val result = citasRepository.getJitsiToken(roomName)
                                     if (result.isFailure) {
                                         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                            android.widget.Toast.makeText(context, "Fallo al obtener token: ${result.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_LONG).show()
+                                            android.widget.Toast.makeText(
+                                                context,
+                                                "Fallo al obtener token: ${result.exceptionOrNull()?.message}",
+                                                android.widget.Toast.LENGTH_LONG
+                                            ).show()
                                         }
                                         return@launch
                                     }
@@ -1132,20 +1142,20 @@ fun TarjetaCitaMejorada(
                                 }
                             }
                         },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(Dimensions.iconLarge)
                     ) {
                         Icon(
                             Icons.Default.VideoCall,
-                            contentDescription = "Iniciar Videollamada Jitsi",
+                            contentDescription = stringResource(R.string.agenda_iniciar_videollamada),
                             tint = colors.primary,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(Dimensions.iconDefault)
                         )
                     }
                 }
             }
 
-            // ✅ Método de pago
-            Spacer(modifier = Modifier.height(4.dp))
+            // Método de pago
+            Spacer(modifier = Modifier.height(Spacing.xs))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     when (cita.metodoPago) {
@@ -1154,15 +1164,15 @@ fun TarjetaCitaMejorada(
                         else -> Icons.Default.Info
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(Dimensions.iconSmall),
                     tint = colors.primary
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
                     text = when (cita.metodoPago) {
-                        MetodoPago.EFECTIVO -> "Pago en efectivo"
-                        MetodoPago.TARJETA -> "Pago con tarjeta"
-                        else -> "Método de pago no especificado"
+                        MetodoPago.EFECTIVO -> stringResource(R.string.agenda_pago_efectivo)
+                        MetodoPago.TARJETA -> stringResource(R.string.agenda_pago_tarjeta)
+                        else -> stringResource(R.string.agenda_metodo_pago_no_especificado)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.primary,
@@ -1172,15 +1182,15 @@ fun TarjetaCitaMejorada(
 
             // Motivo
             if (!cita.motivo.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
                 Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
                     Icon(
                         Icons.Default.Description,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(Dimensions.iconButton),
                         tint = colors.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.s))
                     Text(
                         cita.motivo,
                         style = MaterialTheme.typography.bodySmall,
@@ -1191,17 +1201,17 @@ fun TarjetaCitaMejorada(
             }
 
             // Tipo de terapia
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     Icons.Default.MedicalServices,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(Dimensions.iconButton),
                     tint = colors.primary
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
-                    cita.terapia?.nombre ?: "Terapia no especificada",
+                    cita.terapia?.nombre ?: stringResource(R.string.agenda_terapia_no_especificada),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.primary,
                     fontWeight = FontWeight.Medium
@@ -1209,7 +1219,7 @@ fun TarjetaCitaMejorada(
             }
 
             // Estado de Pago
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     when (cita.estadoPago) {
@@ -1220,28 +1230,28 @@ fun TarjetaCitaMejorada(
                         null -> Icons.Default.Info
                     },
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(Dimensions.iconButton),
                     tint = when (cita.estadoPago) {
-                        EstadoPago.PAGADO -> colors.success
-                        EstadoPago.PENDIENTE -> colors.warning
+                        EstadoPago.PAGADO -> extraColors.success
+                        EstadoPago.PENDIENTE -> extraColors.warning
                         EstadoPago.FALLIDO -> colors.error
                         EstadoPago.REEMBOLSADO -> colors.primary
                         null -> colors.onSurfaceVariant
                     }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
                     text = when (cita.estadoPago) {
-                        EstadoPago.PAGADO -> "Pagado"
-                        EstadoPago.PENDIENTE -> "Pendiente"
-                        EstadoPago.FALLIDO -> "Fallido"
-                        EstadoPago.REEMBOLSADO -> "Reembolsado"
-                        null -> "Sin información"
+                        EstadoPago.PAGADO -> stringResource(R.string.agenda_pago_estado_pagado)
+                        EstadoPago.PENDIENTE -> stringResource(R.string.agenda_pago_estado_pendiente)
+                        EstadoPago.FALLIDO -> stringResource(R.string.agenda_pago_estado_fallido)
+                        EstadoPago.REEMBOLSADO -> stringResource(R.string.agenda_pago_estado_reembolsado)
+                        null -> stringResource(R.string.agenda_sin_informacion)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = when (cita.estadoPago) {
-                        EstadoPago.PAGADO -> colors.success
-                        EstadoPago.PENDIENTE -> colors.warning
+                        EstadoPago.PAGADO -> extraColors.success
+                        EstadoPago.PENDIENTE -> extraColors.warning
                         EstadoPago.FALLIDO -> colors.error
                         EstadoPago.REEMBOLSADO -> colors.primary
                         null -> colors.onSurfaceVariant
@@ -1249,9 +1259,9 @@ fun TarjetaCitaMejorada(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
             Divider(color = colors.outline.copy(alpha = 0.3f))
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
 
             // Botones de acción
             Row(
@@ -1264,58 +1274,61 @@ fun TarjetaCitaMejorada(
                     colors = ButtonDefaults.textButtonColors(contentColor = colors.primary),
                     enabled = !isUpdating
                 ) {
-                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(Dimensions.iconButton))
+                    Spacer(modifier = Modifier.width(Spacing.xs))
                     Text(stringResource(R.string.auto_editar), style = MaterialTheme.typography.labelMedium)
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 TextButton(
                     onClick = onCancel,
                     colors = ButtonDefaults.textButtonColors(contentColor = colors.error),
                     enabled = !isUpdating
                 ) {
-                    Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(Dimensions.iconButton))
+                    Spacer(modifier = Modifier.width(Spacing.xs))
                     Text(stringResource(R.string.auto_cancelar), style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
     }
 }
+
 @Composable
 fun DiaNoDisponibleCardMejorado() {
     val colors = MaterialTheme.colorScheme
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = colors.errorContainer.copy(alpha = 0.2f))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(32.dp),
+                .padding(Spacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .background(colors.error.copy(alpha = 0.15f), RoundedCornerShape(20.dp)),
+                    .size(Dimensions.iconHero)
+                    .background(colors.error.copy(alpha = 0.15f), MaterialTheme.shapes.large),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Default.EventBusy,
                     contentDescription = null,
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(Dimensions.iconLarge),
                     tint = colors.error
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(stringResource(R.string.auto_dia_no_disponible),
+            Spacer(modifier = Modifier.height(Spacing.m))
+            Text(
+                stringResource(R.string.auto_dia_no_disponible),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = colors.error
             )
-            Text(stringResource(R.string.auto_no_se_pueden_agendar),
+            Text(
+                stringResource(R.string.auto_no_se_pueden_agendar),
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -1338,8 +1351,13 @@ fun DialogoModificarHorarioMejorado(
     val horario by horarioActual.collectAsStateWithLifecycle()
 
     val diasSemana = listOf(
-        "Lunes" to 0, "Martes" to 1, "Miércoles" to 2, "Jueves" to 3,
-        "Viernes" to 4, "Sábado" to 5, "Domingo" to 6
+        stringResource(R.string.dia_lunes) to 0,
+        stringResource(R.string.dia_martes) to 1,
+        stringResource(R.string.dia_miercoles) to 2,
+        stringResource(R.string.dia_jueves) to 3,
+        stringResource(R.string.dia_viernes) to 4,
+        stringResource(R.string.dia_sabado) to 5,
+        stringResource(R.string.dia_domingo) to 6
     )
 
     val franjasEditables = remember { mutableStateListOf<MutableState<FranjaHorarioDTO>>() }
@@ -1366,15 +1384,17 @@ fun DialogoModificarHorarioMejorado(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
-        shape = RoundedCornerShape(28.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         title = {
             Column {
-                Text(stringResource(R.string.auto__configurar_horario),
+                Text(
+                    stringResource(R.string.auto__configurar_horario),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.primary
                 )
-                Text(stringResource(R.string.auto_define_tus_dias_y),
+                Text(
+                    stringResource(R.string.auto_define_tus_dias_y),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.onSurfaceVariant
                 )
@@ -1384,9 +1404,9 @@ fun DialogoModificarHorarioMejorado(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 500.dp)
+                    .heightIn(max = Dimensions.dialogMaxHeight)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm)
             ) {
                 franjasEditables.forEachIndexed { index, state ->
                     val franja = state.value
@@ -1394,14 +1414,14 @@ fun DialogoModificarHorarioMejorado(
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
                             containerColor = if (franja.activo) colors.primaryContainer.copy(alpha = 0.15f) else colors.surfaceVariant.copy(
                                 alpha = 0.3f
                             )
                         )
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(Spacing.m)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -1433,12 +1453,12 @@ fun DialogoModificarHorarioMejorado(
 
                             AnimatedVisibility(visible = franja.activo) {
                                 Column {
-                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Spacer(modifier = Modifier.height(Spacing.sm))
                                     Divider()
-                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Spacer(modifier = Modifier.height(Spacing.sm))
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(stringResource(R.string.auto_hora_inicio))
@@ -1458,7 +1478,8 @@ fun DialogoModificarHorarioMejorado(
                                     val fin =
                                         runCatching { LocalTime.parse(franja.horaFin) }.getOrNull()
                                     if (inicio != null && fin != null && !inicio.isBefore(fin)) {
-                                        Text(stringResource(R.string.auto__la_hora_de),
+                                        Text(
+                                            stringResource(R.string.auto__la_hora_de),
                                             color = colors.error,
                                             style = MaterialTheme.typography.labelSmall
                                         )
@@ -1519,13 +1540,16 @@ fun DialogoNoDisponibleMejorado(
     onDismiss: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    val formatterFecha = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", java.util.Locale.Builder().setLanguage("es").setRegion("ES").build())
+    val formatterFecha = DateTimeFormatter.ofPattern(
+        "EEEE, d 'de' MMMM",
+        java.util.Locale.Builder().setLanguage("es").setRegion("ES").build()
+    )
     var motivoBloqueo by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
-        shape = RoundedCornerShape(28.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -1533,16 +1557,20 @@ fun DialogoNoDisponibleMejorado(
                     contentDescription = null,
                     tint = if (yaNoDisponible) colors.primary else colors.error
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(Spacing.sm))
                 Text(
-                    if (yaNoDisponible) "Habilitar día" else "Bloquear día",
+                    if (yaNoDisponible) {
+                        stringResource(R.string.agenda_habilitar_dia)
+                    } else {
+                        stringResource(R.string.agenda_bloquear_dia)
+                    },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
             }
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 Text(
                     fecha.format(formatterFecha).replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.titleMedium,
@@ -1550,44 +1578,47 @@ fun DialogoNoDisponibleMejorado(
                     color = colors.primary
                 )
                 if (yaNoDisponible) {
-                    Text(stringResource(R.string.auto_deseas_habilitar_este_dia),
+                    Text(
+                        stringResource(R.string.auto_deseas_habilitar_este_dia),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 } else {
-                    Text(stringResource(R.string.auto_deseas_bloquear_este_dia),
+                    Text(
+                        stringResource(R.string.auto_deseas_bloquear_este_dia),
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.s))
                     OutlinedTextField(
                         value = motivoBloqueo,
                         onValueChange = { motivoBloqueo = it },
                         label = { Text(stringResource(R.string.auto_motivo_opcional)) },
                         placeholder = { Text(stringResource(R.string.auto_ej_formacion_vacaciones_etc)) },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = MaterialTheme.shapes.medium,
                         minLines = 2,
                         maxLines = 3
                     )
                 }
                 if (!yaNoDisponible) {
                     Card(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.medium,
                         colors = CardDefaults.cardColors(
                             containerColor = colors.surfaceContainerLow.copy(alpha = 0.3f)
                         )
                     ) {
                         Row(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.padding(Spacing.sm),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Default.Info,
-                                contentDescription = "",
+                                contentDescription = null,
                                 tint = colors.onSurfaceVariant,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(Dimensions.iconMedium)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.auto_las_citas_existentes_no),
+                            Spacer(modifier = Modifier.width(Spacing.s))
+                            Text(
+                                stringResource(R.string.auto_las_citas_existentes_no),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.onSurfaceVariant
                             )
@@ -1604,19 +1635,23 @@ fun DialogoNoDisponibleMejorado(
                     onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = if (yaNoDisponible) colors.primary else colors.error),
-                shape = RoundedCornerShape(14.dp),
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    if (yaNoDisponible) "✅ Habilitar día" else "🚫 Bloquear día",
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    if (yaNoDisponible) {
+                        stringResource(R.string.agenda_habilitar_dia)
+                    } else {
+                        stringResource(R.string.agenda_bloquear_dia)
+                    },
+                    modifier = Modifier.padding(vertical = Spacing.xs)
                 )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = { motivoBloqueo = ""; onDismiss() },
-                shape = RoundedCornerShape(14.dp)
+                shape = MaterialTheme.shapes.medium
             ) { Text(stringResource(R.string.auto_cancelar)) }
         }
     )
@@ -1697,17 +1732,25 @@ fun DialogoCrearEditarCitaMejorado(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
-        shape = RoundedCornerShape(28.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         title = {
             Column {
                 Text(
-                    if (esEdicion) "✏️ Editar cita" else "📅 Nueva cita",
+                    if (esEdicion) {
+                        stringResource(R.string.agenda_editar_cita_titulo)
+                    } else {
+                        stringResource(R.string.agenda_nueva_cita_titulo)
+                    },
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = colors.primary
                 )
                 Text(
-                    if (esEdicion) "Modifica los datos de la cita" else "Completa la información para agendar",
+                    if (esEdicion) {
+                        stringResource(R.string.agenda_editar_cita_subtitulo)
+                    } else {
+                        stringResource(R.string.agenda_nueva_cita_subtitulo)
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.onSurfaceVariant
                 )
@@ -1717,9 +1760,9 @@ fun DialogoCrearEditarCitaMejorado(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 600.dp)
+                    .heightIn(max = Dimensions.dialogMaxHeight)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(Spacing.m)
             ) {
                 // Paciente
                 CampoSeleccionConIcono(
@@ -1736,20 +1779,24 @@ fun DialogoCrearEditarCitaMejorado(
                                 Row {
                                     Icon(
                                         Icons.Default.Error,
-                                        contentDescription = "",
+                                        contentDescription = null,
                                         tint = colors.error
-                                    ); Spacer(modifier = Modifier.width(8.dp)); Column {
-                                    Text(stringResource(R.string.auto_error_al_cargar_pacientes),
-                                        color = colors.error
-                                    ); Text(
-                                    pacientesError!!,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                                }
+                                    )
+                                    Spacer(modifier = Modifier.width(Spacing.s))
+                                    Column {
+                                        Text(
+                                            stringResource(R.string.auto_error_al_cargar_pacientes),
+                                            color = colors.error
+                                        )
+                                        Text(
+                                            pacientesError,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
                                 }
                             },
                             onClick = { onRecargarPacientes() },
-                            leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = "") }
+                            leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = null) }
                         )
 
                         pacientes.isEmpty() -> DropdownMenuItem(
@@ -1765,16 +1812,17 @@ fun DialogoCrearEditarCitaMejorado(
                                         Text(
                                             "${paciente.nombre ?: ""} ${paciente.apellido ?: ""}",
                                             fontWeight = FontWeight.Medium
-                                        ); Text(
-                                        paciente.email ?: "",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = colors.onSurfaceVariant
-                                    )
+                                        )
+                                        Text(
+                                            paciente.email ?: "",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = colors.onSurfaceVariant
+                                        )
                                     }
                                 },
                                 onClick = {
-                                    pacienteSeleccionado = paciente; pacienteDropdownExpanded =
-                                    false
+                                    pacienteSeleccionado = paciente
+                                    pacienteDropdownExpanded = false
                                 }
                             )
                         }
@@ -1802,20 +1850,25 @@ fun DialogoCrearEditarCitaMejorado(
                                     Text(
                                         terapia.nombre,
                                         fontWeight = FontWeight.Medium
-                                    ); Text(
-                                    "Duración: ${terapia.duracionMinutos} min | Precio: ${terapia.precio} €",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = colors.onSurfaceVariant
-                                )
+                                    )
+                                    Text(
+                                        stringResource(
+                                            R.string.agenda_terapia_duracion_precio_formato,
+                                            terapia.duracionMinutos,
+                                            terapia.precio.toString()
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = colors.onSurfaceVariant
+                                    )
                                 }
                             },
                             onClick = {
-                                terapiaSeleccionada = terapia; terapiaDropdownExpanded = false
+                                terapiaSeleccionada = terapia
+                                terapiaDropdownExpanded = false
                             }
                         )
                     }
                 }
-
 
                 // Fecha
                 CampoFecha(fechaSeleccionada, onFechaChange, colors, formatterFecha)
@@ -1824,7 +1877,8 @@ fun DialogoCrearEditarCitaMejorado(
                 CampoSeleccionConIcono(
                     label = stringResource(R.string.auto_hora_de_inicio),
                     icono = Icons.Default.Schedule,
-                    valor = horaSeleccionada?.format(formatterHora) ?: "Sin horarios disponibles",
+                    valor = horaSeleccionada?.format(formatterHora)
+                        ?: stringResource(R.string.agenda_sin_horarios_disponibles),
                     expanded = horaDropdownExpanded,
                     onExpandedChange = { horaDropdownExpanded = it },
                     error = horasDisponibles.isEmpty() && !esEdicion
@@ -1832,11 +1886,14 @@ fun DialogoCrearEditarCitaMejorado(
                     if (horasDisponibles.isEmpty() && !esEdicion) {
                         DropdownMenuItem(text = {
                             Column {
-                                Text(stringResource(R.string.auto__no_hay_horarios),
+                                Text(
+                                    stringResource(R.string.auto__no_hay_horarios),
                                     color = colors.error
-                                ); Text(stringResource(R.string.auto_prueba_con_otra_fecha),
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                                )
+                                Text(
+                                    stringResource(R.string.auto_prueba_con_otra_fecha),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                             }
                         }, onClick = { horaDropdownExpanded = false }, enabled = false)
                     } else {
@@ -1846,18 +1903,21 @@ fun DialogoCrearEditarCitaMejorado(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
                                             Icons.Default.AccessTime,
-                                            contentDescription = "",
-                                            modifier = Modifier.size(18.dp),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(Dimensions.iconButton),
                                             tint = colors.primary
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Spacer(modifier = Modifier.width(Spacing.s))
                                         Column {
                                             Text(
                                                 hora.format(formatterHora),
                                                 fontWeight = FontWeight.Medium
                                             )
                                             Text(
-                                                "Duración: $duracionMinutos min",
+                                                stringResource(
+                                                    R.string.agenda_duracion_min_formato,
+                                                    duracionMinutos
+                                                ),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = colors.onSurfaceVariant
                                             )
@@ -1873,32 +1933,40 @@ fun DialogoCrearEditarCitaMejorado(
                 // Duración
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(
                         containerColor = colors.primaryContainer.copy(alpha = 0.2f)
                     )
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(Spacing.m),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
                             Text(
-                                if (terapiaSeleccionada != null) "Duración de la terapia" else "Duración",
+                                if (terapiaSeleccionada != null) {
+                                    stringResource(R.string.agenda_duracion_terapia)
+                                } else {
+                                    stringResource(R.string.agenda_duracion)
+                                },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = colors.primary
-                            ); Text(
-                            "$duracionMinutos minutos",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
+                            )
+                            Text(
+                                stringResource(
+                                    R.string.agenda_duracion_minutos_formato,
+                                    duracionMinutos
+                                ),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                         Icon(
                             Icons.Default.Timer,
-                            contentDescription = "",
+                            contentDescription = null,
                             tint = colors.primary,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(Dimensions.iconDefault)
                         )
                     }
                 }
@@ -1911,22 +1979,24 @@ fun DialogoCrearEditarCitaMejorado(
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 3,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = MaterialTheme.shapes.large
                 )
 
                 // Modalidad
-                Text(stringResource(R.string.auto_modalidad_de_la_cita),
+                Text(
+                    stringResource(R.string.auto_modalidad_de_la_cita),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(Spacing.xs))
                 ExposedDropdownMenuBox(
                     expanded = modalidadDropdownExpanded,
                     onExpandedChange = { modalidadDropdownExpanded = it }) {
                     OutlinedTextField(
                         value = when (modalidadSeleccionada) {
-                            ModalidadCita.PRESENCIAL -> "🏢 Presencial"; ModalidadCita.LLAMADA -> "📞 Llamada"
+                            ModalidadCita.PRESENCIAL -> stringResource(R.string.auto_presencial)
+                            ModalidadCita.LLAMADA -> stringResource(R.string.auto_llamada)
                         },
                         onValueChange = {},
                         readOnly = true,
@@ -1940,7 +2010,7 @@ fun DialogoCrearEditarCitaMejorado(
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor(),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = MaterialTheme.shapes.medium
                     )
                     ExposedDropdownMenu(
                         expanded = modalidadDropdownExpanded,
@@ -1950,54 +2020,60 @@ fun DialogoCrearEditarCitaMejorado(
                                 Row {
                                     Icon(
                                         Icons.Default.LocationOn,
-                                        contentDescription = "",
-                                        modifier = Modifier.size(20.dp)
-                                    ); Spacer(modifier = Modifier.width(8.dp)); Text(stringResource(R.string.auto_presencial))
+                                        contentDescription = null,
+                                        modifier = Modifier.size(Dimensions.iconMedium)
+                                    )
+                                    Spacer(modifier = Modifier.width(Spacing.s))
+                                    Text(stringResource(R.string.auto_presencial))
                                 }
                             },
                             onClick = {
-                                modalidadSeleccionada =
-                                    ModalidadCita.PRESENCIAL; modalidadDropdownExpanded = false
+                                modalidadSeleccionada = ModalidadCita.PRESENCIAL
+                                modalidadDropdownExpanded = false
                             })
                         DropdownMenuItem(
                             text = {
                                 Row {
                                     Icon(
                                         Icons.Default.Phone,
-                                        contentDescription = "",
-                                        modifier = Modifier.size(20.dp)
-                                    ); Spacer(modifier = Modifier.width(8.dp)); Text(stringResource(R.string.auto_llamada))
+                                        contentDescription = null,
+                                        modifier = Modifier.size(Dimensions.iconMedium)
+                                    )
+                                    Spacer(modifier = Modifier.width(Spacing.s))
+                                    Text(stringResource(R.string.auto_llamada))
                                 }
                             },
                             onClick = {
-                                modalidadSeleccionada =
-                                    ModalidadCita.LLAMADA; modalidadDropdownExpanded = false
+                                modalidadSeleccionada = ModalidadCita.LLAMADA
+                                modalidadDropdownExpanded = false
                             })
                     }
                 }
 
                 // Información de pago
-                Text(stringResource(R.string.auto_informacion_de_pago),
+                Text(
+                    stringResource(R.string.auto_informacion_de_pago),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface
                 )
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(
                         containerColor = colors.surfaceVariant.copy(alpha = 0.3f)
                     )
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.auto_metodo_de_pago),
+                    Column(modifier = Modifier.padding(Spacing.m)) {
+                        Text(
+                            stringResource(R.string.auto_metodo_de_pago),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(Spacing.s))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(24.dp)
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.l)
                         ) {
                             Row(
                                 modifier = Modifier.weight(1f),
@@ -2019,12 +2095,13 @@ fun DialogoCrearEditarCitaMejorado(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(stringResource(R.string.auto_estado_del_pago),
+                        Spacer(modifier = Modifier.height(Spacing.sm))
+                        Text(
+                            stringResource(R.string.auto_estado_del_pago),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(Spacing.s))
 
                         var estadoPagoExpanded by remember { mutableStateOf(false) }
                         val opcionesEstadoPago =
@@ -2040,7 +2117,7 @@ fun DialogoCrearEditarCitaMejorado(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor(),
-                                shape = RoundedCornerShape(12.dp)
+                                shape = MaterialTheme.shapes.medium
                             )
                             ExposedDropdownMenu(
                                 expanded = estadoPagoExpanded,
@@ -2051,26 +2128,28 @@ fun DialogoCrearEditarCitaMejorado(
                                             Row {
                                                 Icon(
                                                     when (opcion) {
-                                                        "PAGADO" -> Icons.Default.CheckCircle; "PENDIENTE" -> Icons.Default.Schedule; "FALLIDO" -> Icons.Default.Error; else -> Icons.Default.Info
+                                                        "PAGADO" -> Icons.Default.CheckCircle
+                                                        "PENDIENTE" -> Icons.Default.Schedule
+                                                        "FALLIDO" -> Icons.Default.Error
+                                                        else -> Icons.Default.Info
                                                     },
-                                                    contentDescription = "Estado $opcion",
-                                                    modifier = Modifier.size(18.dp)
-                                                ); Spacer(modifier = Modifier.width(8.dp)); Text(
-                                                opcion
-                                            )
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(Dimensions.iconButton)
+                                                )
+                                                Spacer(modifier = Modifier.width(Spacing.s))
+                                                Text(opcion)
                                             }
                                         },
                                         onClick = {
-                                            estadoPagoSeleccionado =
-                                                EstadoPago.valueOf(opcion); estadoPagoExpanded =
-                                            false
+                                            estadoPagoSeleccionado = EstadoPago.valueOf(opcion)
+                                            estadoPagoExpanded = false
                                         }
                                     )
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(Spacing.sm))
                         OutlinedTextField(
                             value = monto,
                             onValueChange = { monto = it; montoError = !validarMonto(it) },
@@ -2078,23 +2157,30 @@ fun DialogoCrearEditarCitaMejorado(
                             placeholder = { Text(stringResource(R.string.auto_ej_5000)) },
                             isError = montoError,
                             supportingText = {
-                                if (montoError) Text(stringResource(R.string.auto_ingresa_un_monto_valido)) else if (terapiaSeleccionada != null && monto.isNotBlank()) Text(
-                                    "Precio sugerido: ${terapiaSeleccionada!!.precio} €",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = colors.primary
-                                )
+                                if (montoError) {
+                                    Text(stringResource(R.string.auto_ingresa_un_monto_valido))
+                                } else if (terapiaSeleccionada != null && monto.isNotBlank()) {
+                                    Text(
+                                        stringResource(
+                                            R.string.agenda_precio_sugerido_formato,
+                                            terapiaSeleccionada!!.precio.toString()
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = colors.primary
+                                    )
+                                }
                             },
                             leadingIcon = { Text(stringResource(R.string.auto_euro_symbol)) },
                             singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.fillMaxWidth()
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(Spacing.xs))
                         Text(
                             when (metodoPagoSeleccionado) {
-                                MetodoPago.TARJETA -> "💳 El pago se procesará online al momento de agendar la cita"
-                                MetodoPago.EFECTIVO -> "💰 El pago se realizará en consulta el día de la cita"
-                                else -> "Método de pago no especificado"
+                                MetodoPago.TARJETA -> stringResource(R.string.agenda_info_pago_tarjeta)
+                                MetodoPago.EFECTIVO -> stringResource(R.string.agenda_info_pago_efectivo)
+                                else -> stringResource(R.string.agenda_metodo_pago_no_especificado)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.onSurfaceVariant
@@ -2130,19 +2216,22 @@ fun DialogoCrearEditarCitaMejorado(
                     }
                 },
                 enabled = habilitado,
-                shape = RoundedCornerShape(14.dp),
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    if (esEdicion) "💾 Guardar cambios" else "✅ Crear cita",
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    if (esEdicion) {
+                        stringResource(R.string.agenda_guardar_cambios)
+                    } else {
+                        stringResource(R.string.agenda_crear_cita)
+                    },
+                    modifier = Modifier.padding(vertical = Spacing.xs)
                 )
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss, shape = RoundedCornerShape(14.dp)) {
-                Text(stringResource(R.string.auto_cancelar)
-                )
+            TextButton(onClick = onDismiss, shape = MaterialTheme.shapes.medium) {
+                Text(stringResource(R.string.auto_cancelar))
             }
         }
     )
@@ -2151,8 +2240,12 @@ fun DialogoCrearEditarCitaMejorado(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CampoSeleccionConIcono(
-    label: String, icono: ImageVector, valor: String, expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit, error: Boolean = false,
+    label: String,
+    icono: ImageVector,
+    valor: String,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    error: Boolean = false,
     content: @Composable ExposedDropdownMenuBoxScope.() -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -2163,22 +2256,26 @@ fun CampoSeleccionConIcono(
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurface
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(Spacing.xs))
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandedChange) {
             OutlinedTextField(
-                value = valor, onValueChange = {}, readOnly = true,
+                value = valor,
+                onValueChange = {},
+                readOnly = true,
                 leadingIcon = {
                     Icon(
                         icono,
                         contentDescription = label,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(Dimensions.iconMedium)
                     )
                 },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                singleLine = true, shape = RoundedCornerShape(14.dp), isError = error,
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium,
+                isError = error,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colors.primary,
                     unfocusedBorderColor = colors.outline
@@ -2187,7 +2284,7 @@ fun CampoSeleccionConIcono(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) },
-                modifier = Modifier.heightIn(max = 300.dp)
+                modifier = Modifier.heightIn(max = Dimensions.dropdownMaxHeight)
             ) { content() }
         }
     }
@@ -2202,21 +2299,22 @@ fun CampoFecha(
     formatterFecha: DateTimeFormatter
 ) {
     Column {
-        Text(stringResource(R.string.auto_fecha),
+        Text(
+            stringResource(R.string.auto_fecha),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurface
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(Spacing.xs))
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant.copy(alpha = 0.3f))
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(Spacing.sm),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -2280,35 +2378,36 @@ fun DialogoConfirmarCancelacionMejorado(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = colors.surface,
-        shape = RoundedCornerShape(28.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.Warning,
-                    contentDescription = " ",
+                    contentDescription = null,
                     tint = colors.error,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(Dimensions.iconDefault)
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(stringResource(R.string.auto_cancelar_cita_1),
+                Spacer(modifier = Modifier.width(Spacing.sm))
+                Text(
+                    stringResource(R.string.auto_cancelar_cita_1),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
             }
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 Text(stringResource(R.string.auto_estas_seguro_de_que_2))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(
                         containerColor = colors.errorContainer.copy(alpha = 0.2f)
                     )
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(Spacing.m)) {
                         Text(
-                            cita.nombrePaciente ?: "Paciente",
+                            cita.nombrePaciente ?: stringResource(R.string.auto_paciente),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium
                         )
@@ -2322,7 +2421,8 @@ fun DialogoConfirmarCancelacionMejorado(
                             color = colors.onSurfaceVariant
                         )
                         if (!cita.motivo.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(8.dp)); Text(
+                            Spacer(modifier = Modifier.height(Spacing.s))
+                            Text(
                                 cita.motivo,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.onSurfaceVariant
@@ -2330,7 +2430,8 @@ fun DialogoConfirmarCancelacionMejorado(
                         }
                     }
                 }
-                Text(stringResource(R.string.auto__esta_accion_no),
+                Text(
+                    stringResource(R.string.auto__esta_accion_no),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.error
                 )
@@ -2340,14 +2441,43 @@ fun DialogoConfirmarCancelacionMejorado(
             Button(
                 onClick = onConfirmar,
                 colors = ButtonDefaults.buttonColors(containerColor = colors.error),
-                shape = RoundedCornerShape(14.dp),
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(R.string.auto__cancelar_cita), modifier = Modifier.padding(vertical = 4.dp))
+                Text(
+                    stringResource(R.string.auto__cancelar_cita),
+                    modifier = Modifier.padding(vertical = Spacing.xs)
+                )
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss, shape = RoundedCornerShape(14.dp)) { Text(stringResource(R.string.auto_volver)) }
+            TextButton(onClick = onDismiss, shape = MaterialTheme.shapes.medium) {
+                Text(stringResource(R.string.auto_volver))
+            }
         }
     )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(name = "PsicologoAgenda - Light", showBackground = true)
+@Preview(
+    name = "PsicologoAgenda - Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true
+)
+@Preview(name = "PsicologoAgenda - Font 1.5x", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun PsicologoAgendaScreenPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(modifier = Modifier.padding(Spacing.m)) {
+                CabeceraDiaMejorada(
+                    fecha = LocalDate.of(2026, 10, 24),
+                    esDiaNoDisponible = false
+                )
+                Spacer(modifier = Modifier.height(Spacing.m))
+                DiaNoDisponibleCardMejorado()
+            }
+        }
+    }
 }

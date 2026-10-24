@@ -1,6 +1,7 @@
 package org.ies.tierno.applicationamani.presentation.ui.screens.psicologo
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
@@ -53,7 +54,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,14 +61,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
@@ -77,6 +78,10 @@ import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.MenuSetting
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -106,7 +111,7 @@ fun ViewPsicologoPrincipal(
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
 
-    val pacientes by viewModel.pacientes.collectAsState()
+    val pacientes by viewModel.pacientes.collectAsStateWithLifecycle()
     var isLoadingData by remember { mutableStateOf(true) }
 
     var idPsicologo by remember { mutableStateOf<Long?>(null) }
@@ -132,9 +137,9 @@ fun ViewPsicologoPrincipal(
     if (isLoadingSession) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(Dimensions.iconExtraLarge),
                 color = colorScheme.primary,
-                strokeWidth = 3.dp,
+                strokeWidth = Dimensions.progressStroke,
             )
         }
         return
@@ -146,23 +151,23 @@ fun ViewPsicologoPrincipal(
                 Icon(
                     imageVector = Icons.Default.Error,
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp),
+                    modifier = Modifier.size(Dimensions.iconHero),
                     tint = colorScheme.error,
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.m))
                 Text(
                     text = stringResource(R.string.error_sesion),
                     style = typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.s))
                 Text(
                     text = stringResource(R.string.no_encontrado_id_psicologo),
                     style = typography.bodyMedium,
                     color = colorScheme.onSurfaceVariant,
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Spacing.l))
                 Button(
                     onClick = { navController.navigate(Screens.login.route) },
                     shape = MaterialTheme.shapes.medium,
@@ -224,17 +229,17 @@ private fun LoadingState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(Dimensions.iconExtraLarge),
                 color = colorScheme.primary,
-                strokeWidth = 3.dp,
+                strokeWidth = Dimensions.progressStroke,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
             Text(
                 text = stringResource(R.string.cargando_pacientes),
                 color = colorScheme.onSurfaceVariant,
                 style = typography.bodyMedium,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(
                 text = stringResource(R.string.puede_tomar_segundos),
                 color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
@@ -251,22 +256,22 @@ private fun EmptyState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(Spacing.l),
         ) {
             Icon(
                 imageVector = Icons.Default.People,
                 contentDescription = null,
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.size(Dimensions.iconHero),
                 tint = colorScheme.primary.copy(alpha = 0.5f),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
             Text(
                 text = stringResource(R.string.no_tienes_pacientes),
                 style = typography.headlineSmall,
                 fontWeight = FontWeight.Medium,
                 color = colorScheme.onSurface,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(
                 text = stringResource(R.string.cuando_asignen_pacientes),
                 style = typography.bodyMedium,
@@ -289,9 +294,9 @@ private fun PacientesList(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .padding(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(horizontal = Spacing.m)
+                .padding(top = Spacing.s),
+        verticalArrangement = Arrangement.spacedBy(Spacing.m),
     ) {
         item(key = "header_stats") {
             HeaderStats(pacientes.size)
@@ -307,7 +312,7 @@ private fun PacientesList(
             )
         }
 
-        item(key = "bottom_spacer") { Spacer(modifier = Modifier.height(16.dp)) }
+        item(key = "bottom_spacer") { Spacer(modifier = Modifier.height(Spacing.m)) }
     }
 }
 
@@ -319,14 +324,14 @@ private fun HeaderStats(totalPacientes: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.large,
-        colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.primaryContainer),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(Spacing.m),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -334,25 +339,25 @@ private fun HeaderStats(totalPacientes: Int) {
                 Text(
                     text = stringResource(R.string.total_pacientes),
                     style = typography.labelLarge,
-                    color = colorScheme.onPrimary.copy(alpha = 0.9f),
+                    color = colorScheme.onPrimaryContainer,
                 )
                 Text(
                     text = "$totalPacientes",
                     style = typography.displayMedium,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onPrimary,
+                    color = colorScheme.onPrimaryContainer,
                 )
                 Text(
                     text = stringResource(R.string.asignados_consulta),
                     style = typography.labelSmall,
-                    color = colorScheme.onPrimary.copy(alpha = 0.8f),
+                    color = colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                 )
             }
             Icon(
                 imageVector = Icons.Default.People,
                 contentDescription = null,
-                tint = colorScheme.onPrimary,
-                modifier = Modifier.size(48.dp),
+                tint = colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(Dimensions.iconExtraLarge),
             )
         }
     }
@@ -378,8 +383,8 @@ fun PacienteCard(
         shape = shapes.medium,
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = 2.dp,
-                pressedElevation = 6.dp,
+                defaultElevation = Elevation.level1,
+                pressedElevation = Elevation.level3,
             ),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
     ) {
@@ -431,38 +436,29 @@ fun PacienteHeader(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(Spacing.m),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Avatar circular con iniciales
+                // Avatar circular con iniciales sobre superficie plana M3
                 Box(
                     modifier =
                         Modifier
-                            .size(56.dp)
+                            .size(Dimensions.buttonHeightLarge)
                             .clip(CircleShape)
-                            .background(
-                                brush =
-                                    Brush.linearGradient(
-                                        colors =
-                                            listOf(
-                                                colorScheme.primary,
-                                                colorScheme.primaryContainer,
-                                            ),
-                                    ),
-                            ),
+                            .background(colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "${paciente.nombre?.take(1) ?: "?"}${paciente.apellido?.take(1) ?: "?"}",
                         style = typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.onPrimary,
+                        color = colorScheme.onPrimaryContainer,
                     )
                 }
 
@@ -471,7 +467,7 @@ fun PacienteHeader(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Text(
                             text = "${paciente.nombre ?: stringResource(R.string.sin_nombre)} ${paciente.apellido ?: ""}".trim(),
@@ -486,14 +482,14 @@ fun PacienteHeader(
                                 color = colorScheme.errorContainer,
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                    modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xxs),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Warning,
                                         contentDescription = stringResource(R.string.menor),
-                                        modifier = Modifier.size(12.dp),
+                                        modifier = Modifier.size(Dimensions.iconSmall),
                                         tint = colorScheme.onErrorContainer,
                                     )
                                     Text(
@@ -507,16 +503,16 @@ fun PacienteHeader(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(Spacing.xs))
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
@@ -530,12 +526,12 @@ fun PacienteHeader(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Phone,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
@@ -556,13 +552,13 @@ fun PacienteHeader(
                         )
                     }
                 },
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(Dimensions.touchTarget),
             ) {
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = stringResource(R.string.crear_historial_clinico),
                     tint = colorScheme.primary,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(Dimensions.iconDefault),
                 )
             }
         }
@@ -582,19 +578,19 @@ fun ExpandedContent(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .background(colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                .padding(16.dp),
+                .background(colorScheme.surfaceContainerLow)
+                .padding(Spacing.m),
     ) {
         Text(
             text = stringResource(R.string.informacion_detallada),
             style = typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
             color = colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(bottom = Spacing.sm),
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             InfoSection(
                 title = stringResource(R.string.datos_personales),
@@ -656,22 +652,22 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.medium,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(Spacing.sm),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.s),
             ) {
                 Icon(
                     imageVector = Icons.Default.People,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(Dimensions.iconButton),
                     tint = colorScheme.secondary,
                 )
                 Text(
@@ -682,14 +678,14 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
 
             tutores.forEachIndexed { index, tutor ->
                 Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = Spacing.s),
                 ) {
                     if (tutores.size > 1) {
                         Text(
@@ -698,17 +694,17 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                             fontWeight = FontWeight.Medium,
                             color = colorScheme.primary,
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(Spacing.xs))
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = colorScheme.onSurfaceVariant,
                         )
                         Column(modifier = Modifier.weight(1f)) {
@@ -726,16 +722,16 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(Spacing.xs))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Phone,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
@@ -747,12 +743,12 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
@@ -764,12 +760,12 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Badge,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(Dimensions.iconSmall),
                             tint = colorScheme.onSurfaceVariant,
                         )
                         Text(
@@ -782,8 +778,8 @@ fun TutorInfoSection(tutores: List<TutorResponseDTO>) {
 
                 if (index != tutores.size - 1) {
                     HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(vertical = Spacing.s),
+                        thickness = Dimensions.dividerThickness,
                         color = colorScheme.outlineVariant,
                     )
                 }
@@ -813,22 +809,22 @@ fun InfoSection(
         modifier = Modifier.fillMaxWidth(),
         shape = shapes.medium,
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(Spacing.sm),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.s),
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(Dimensions.iconButton),
                     tint = colorScheme.primary,
                 )
                 Text(
@@ -839,14 +835,14 @@ fun InfoSection(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
 
             items.forEachIndexed { index, (label, value) ->
                 Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = Spacing.xs),
                 ) {
                     Text(
                         text = label,
@@ -861,8 +857,8 @@ fun InfoSection(
                     )
                     if (index != items.size - 1) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(top = 4.dp),
-                            thickness = 0.5.dp,
+                            modifier = Modifier.padding(top = Spacing.xs),
+                            thickness = Dimensions.dividerThickness,
                             color = colorScheme.outlineVariant,
                         )
                     }
@@ -900,5 +896,38 @@ private fun formatearFechaDesdeString(fechaStr: String?): String {
         fecha.format(formatterOutput)
     } catch (e: Exception) {
         fechaStr
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(name = "ViewPsicologoPrincipal Light", showBackground = true)
+@Preview(
+    name = "ViewPsicologoPrincipal Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "ViewPsicologoPrincipal Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun ViewPsicologoPrincipalPreview() {
+    AppTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PacientesList(
+                pacientes =
+                    listOf(
+                        PacientePsicologoResponseDTO(
+                            idPaciente = 1L,
+                            idUsuario = 10L,
+                            nombre = "Ana",
+                            apellido = "Martínez",
+                            email = "ana.martinez@ejemplo.es",
+                            dni = "12345678A",
+                            telefono = "612345678",
+                            fechaNacimiento = "1998-05-14",
+                        ),
+                    ),
+                listState = rememberLazyListState(),
+                navController = rememberNavController(),
+            )
+        }
     }
 }

@@ -1,5 +1,6 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material3.Card
@@ -38,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,8 +51,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -69,9 +68,16 @@ import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.entryOf
 import org.ies.tierno.applicationamani.R
+import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
+import org.ies.tierno.applicationamani.domain.models.psicologo.EstadisticasEmocionales
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoViewModel
+import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.AppTheme
+import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
+import org.ies.tierno.applicationamani.ui.theme.Spacing
 import org.ies.tierno.applicationamani.utils.DateUtils.toLocalDateSafe
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -89,27 +95,47 @@ import java.util.Locale
  * @param viewModel ViewModel que gestiona el estado de las estadísticas.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EstadisticasPsicologoScreen(viewModel: EstadisticasPsicologoViewModel = koinViewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    EstadisticasPsicologoContent(
+        uiState = uiState,
+        onPacienteChange = viewModel::seleccionarPaciente,
+        onPeriodoChange = viewModel::seleccionarPeriodo,
+        onVistaChange = viewModel::seleccionarVista,
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EstadisticasPsicologoContent(
+    uiState: EstadisticasPsicologoUiState,
+    onPacienteChange: (PacientePsicologoResponseDTO) -> Unit,
+    onPeriodoChange: (String) -> Unit,
+    onVistaChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val colorScheme = MaterialTheme.colorScheme
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(stringResource(R.string.auto_estadisticas_de_bienestar),
+                    Text(
+                        stringResource(R.string.auto_estadisticas_de_bienestar),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.onPrimary,
+                        color = colorScheme.onSurface,
                     )
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = colorScheme.surface,
+                        titleContentColor = colorScheme.onSurface,
+                        navigationIconContentColor = colorScheme.onSurface,
                     ),
             )
         },
@@ -121,8 +147,8 @@ fun EstadisticasPsicologoScreen(viewModel: EstadisticasPsicologoViewModel = koin
                     .fillMaxSize()
                     .padding(padding)
                     .testTag("stats_list"),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
             item(key = "filters") {
                 FiltersSection(
@@ -130,9 +156,9 @@ fun EstadisticasPsicologoScreen(viewModel: EstadisticasPsicologoViewModel = koin
                     pacienteSeleccionado = uiState.pacienteSeleccionado,
                     periodoSeleccionado = uiState.periodoSeleccionado,
                     vistaSeleccionada = uiState.vistaSeleccionada,
-                    onPacienteChange = viewModel::seleccionarPaciente,
-                    onPeriodoChange = viewModel::seleccionarPeriodo,
-                    onVistaChange = viewModel::seleccionarVista,
+                    onPacienteChange = onPacienteChange,
+                    onPeriodoChange = onPeriodoChange,
+                    onVistaChange = onVistaChange,
                 )
             }
 
@@ -169,11 +195,11 @@ fun FiltersSection(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(Spacing.m),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             var expandedPaciente by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
@@ -211,9 +237,22 @@ fun FiltersSection(
                 }
             }
 
+            val periodos =
+                listOf(
+                    stringResource(R.string.stats_periodo_ultimo_mes),
+                    stringResource(R.string.stats_periodo_ultimos_3_meses),
+                    stringResource(R.string.stats_periodo_ultimos_6_meses),
+                    stringResource(R.string.stats_periodo_ultimo_ano),
+                )
+            val vistas =
+                listOf(
+                    stringResource(R.string.stats_vista_linea),
+                    stringResource(R.string.stats_vista_barras),
+                )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
                 var expandedPeriodo by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(
@@ -239,12 +278,7 @@ fun FiltersSection(
                         expanded = expandedPeriodo,
                         onDismissRequest = { expandedPeriodo = false },
                     ) {
-                        listOf(
-                            "Último mes",
-                            "Últimos 3 meses",
-                            "Últimos 6 meses",
-                            "Último año",
-                        ).forEach { p ->
+                        periodos.forEach { p ->
                             DropdownMenuItem(
                                 text = { Text(p) },
                                 onClick = {
@@ -277,7 +311,7 @@ fun FiltersSection(
                         expanded = expandedVista,
                         onDismissRequest = { expandedVista = false },
                     ) {
-                        listOf("Línea", "Barras").forEach { v ->
+                        vistas.forEach { v ->
                             DropdownMenuItem(
                                 text = { Text(v) },
                                 onClick = {
@@ -303,18 +337,19 @@ fun ChartCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .height(350.dp),
+                .height(Dimensions.chartCardHeight),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(stringResource(R.string.auto_evolucion_emocional),
+        Column(modifier = Modifier.padding(Spacing.m)) {
+            Text(
+                stringResource(R.string.auto_evolucion_emocional),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.m))
 
             when {
                 chartData.isEmpty() -> EmptyStateContent()
@@ -344,9 +379,9 @@ private fun EmptyStateContent() {
             imageVector = Icons.Outlined.BarChart,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(Dimensions.iconHero),
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.m))
         Text(
             text = stringResource(R.string.auto_sin_datos_disponibles),
             style = MaterialTheme.typography.titleMedium,
@@ -357,7 +392,7 @@ private fun EmptyStateContent() {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp),
+            modifier = Modifier.padding(horizontal = Spacing.l),
         )
     }
 }
@@ -476,13 +511,13 @@ private fun SinglePointChart(point: Pair<LocalDate, Float>) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(Spacing.s))
         Text(
             text = stringResource(R.string.auto_solo_hay_una_entrada),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp),
+            modifier = Modifier.padding(horizontal = Spacing.l),
         )
     }
 }
@@ -491,53 +526,56 @@ private fun SinglePointChart(point: Pair<LocalDate, Float>) {
 @Composable
 fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
     val stats = uiState.estadisticas
-    val hasData = uiState.chartData.isNotEmpty()
+    val hasData = uiState.chartData.isNotEmpty() || stats != EstadisticasEmocionales()
     val colorScheme = MaterialTheme.colorScheme
+    val successColor = AmaniTheme.colors.success
     val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+    val sinDatos = stringResource(R.string.stats_sin_datos)
+    val naText = stringResource(R.string.stats_na)
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             MetricCard(
-                title = "Promedio periodo",
+                title = stringResource(R.string.stats_promedio_periodo),
                 value = if (hasData) String.format(locale, "%.1f / 10", stats.promedioPeriodo) else "— / 10",
-                subtitle = if (hasData) getEmotionalLevel(stats.promedioPeriodo) else "Sin datos",
+                subtitle = if (hasData) getEmotionalLevel(stats.promedioPeriodo) else sinDatos,
                 icon = Icons.AutoMirrored.Filled.ShowChart,
                 modifier = Modifier.weight(1f),
             )
             MetricCard(
-                title = "Mejor sesión",
+                title = stringResource(R.string.stats_mejor_sesion),
                 value = if (hasData) String.format(locale, "%d / 10", stats.mejorSesion?.intensidad ?: 0) else "— / 10",
                 subtitle =
                     stats.mejorSesion
                         ?.fecha
                         .toLocalDateSafe()
-                        ?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
+                        ?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: naText,
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
-                color = Color(0xFF4CAF50),
+                color = successColor,
                 modifier = Modifier.weight(1f),
             )
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             MetricCard(
-                title = "Peor sesión",
+                title = stringResource(R.string.stats_peor_sesion),
                 value = if (hasData) String.format(locale, "%d / 10", stats.peorSesion?.intensidad ?: 0) else "— / 10",
                 subtitle =
                     stats.peorSesion
                         ?.fecha
                         .toLocalDateSafe()
-                        ?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: "N/A",
+                        ?.format(DateTimeFormatter.ofPattern("d MMM yyyy")) ?: naText,
                 icon = Icons.AutoMirrored.Filled.TrendingDown,
                 color = colorScheme.error,
                 modifier = Modifier.weight(1f),
             )
             MetricCard(
-                title = "Total sesiones",
+                title = stringResource(R.string.stats_total_sesiones),
                 value = if (hasData) stats.totalSesiones.toString() else "0",
                 subtitle = uiState.periodoSeleccionado,
                 icon = Icons.Default.CalendarToday,
@@ -545,20 +583,25 @@ fun MetricsGrid(uiState: EstadisticasPsicologoUiState) {
             )
         }
         MetricCard(
-            title = "Tendencia general",
+            title = stringResource(R.string.stats_tendencia_general),
             value =
                 when {
-                    !hasData -> "N/A"
-                    stats.tendenciaPuntos > 1.0 -> "Mejorando"
-                    stats.tendenciaPuntos < -1.0 -> "Bajando"
-                    else -> "Estable"
+                    !hasData -> naText
+                    stats.tendenciaPuntos > 1.0 -> stringResource(R.string.stats_tendencia_mejorando)
+                    stats.tendenciaPuntos < -1.0 -> stringResource(R.string.stats_tendencia_bajando)
+                    else -> stringResource(R.string.stats_tendencia_estable)
                 },
-            subtitle = if (hasData) String.format(locale, "%+.1f puntos", stats.tendenciaPuntos) else "Sin tendencia",
+            subtitle =
+                if (hasData) {
+                    String.format(locale, "%+.1f puntos", stats.tendenciaPuntos)
+                } else {
+                    stringResource(R.string.stats_sin_tendencia)
+                },
             icon = Icons.Default.Timeline,
             color =
                 when {
                     !hasData -> colorScheme.onSurfaceVariant
-                    stats.tendenciaPuntos > 1.0 -> Color(0xFF4CAF50)
+                    stats.tendenciaPuntos > 1.0 -> successColor
                     stats.tendenciaPuntos < -1.0 -> colorScheme.error
                     else -> colorScheme.onSurfaceVariant
                 },
@@ -586,28 +629,29 @@ fun MetricCard(
     color: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier,
 ) {
+    val successColor = AmaniTheme.colors.success
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Spacing.m)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     icon,
                     contentDescription = null,
                     tint = color,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(Dimensions.iconButton),
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(Spacing.s))
                 Text(
                     title,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.s))
             Text(
                 value,
                 style = MaterialTheme.typography.titleLarge,
@@ -621,7 +665,7 @@ fun MetricCard(
                     if (color != MaterialTheme.colorScheme.primary) {
                         color
                     } else {
-                        Color(0xFF4CAF50)
+                        successColor
                     },
             )
         }
@@ -640,23 +684,24 @@ fun ObservationCard(observacion: String) {
         shape = MaterialTheme.shapes.medium,
         colors =
             CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.2f),
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.25f),
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level0),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.m),
             verticalAlignment = Alignment.Top,
         ) {
             Icon(
-                Icons.Default.Psychology,
+                Icons.AutoMirrored.Filled.ShowChart,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(Dimensions.iconDefault),
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Spacing.sm))
             Column {
-                Text(stringResource(R.string.auto_observacion),
+                Text(
+                    stringResource(R.string.auto_observacion),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -665,7 +710,6 @@ fun ObservationCard(observacion: String) {
                     observacion,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = 18.sp,
                     modifier = Modifier.testTag("observation_text"),
                 )
             }
@@ -679,11 +723,55 @@ fun ObservationCard(observacion: String) {
  * @param promedio Valor promedio de intensidad emocional.
  * @return Etiqueta descriptiva del nivel emocional.
  */
+@Composable
 private fun getEmotionalLevel(promedio: Double): String =
     when {
-        promedio >= 8 -> "Muy positivo"
-        promedio >= 6 -> "Positivo"
-        promedio >= 4 -> "Neutro"
-        promedio >= 2 -> "Negativo"
-        else -> "Muy negativo"
+        promedio >= 8 -> stringResource(R.string.stats_nivel_muy_positivo)
+        promedio >= 6 -> stringResource(R.string.stats_nivel_positivo)
+        promedio >= 4 -> stringResource(R.string.stats_nivel_neutro)
+        promedio >= 2 -> stringResource(R.string.stats_nivel_negativo)
+        else -> stringResource(R.string.stats_nivel_muy_negativo)
     }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(name = "EstadisticasPsicologo Light", showBackground = true)
+@Preview(
+    name = "EstadisticasPsicologo Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(name = "EstadisticasPsicologo Large Font", showBackground = true, fontScale = 1.5f)
+@Composable
+private fun EstadisticasPsicologoScreenPreview() {
+    AppTheme {
+        EstadisticasPsicologoContent(
+            uiState =
+                EstadisticasPsicologoUiState(
+                    pacientes =
+                        listOf(
+                            PacientePsicologoResponseDTO(
+                                idPaciente = 1L,
+                                idUsuario = 10L,
+                                nombre = "Ana",
+                                apellido = "Martínez",
+                                email = "ana@amani.es",
+                                dni = "12345678A",
+                                telefono = "600111222",
+                            ),
+                        ),
+                    estadisticas =
+                        EstadisticasEmocionales(
+                            promedioPeriodo = 7.6,
+                            mejorSesion = DiarioEmocionResponseDTO(1, "2026-04-12", "Calma", "Feliz", 9, ""),
+                            peorSesion = DiarioEmocionResponseDTO(2, "2026-04-02", "Estrés", "Ansioso", 4, ""),
+                            totalSesiones = 8,
+                            tendenciaPuntos = 1.4,
+                            observacion = "La paciente muestra una evolución favorable y sostenida durante el último mes.",
+                        ),
+                ),
+            onPacienteChange = {},
+            onPeriodoChange = {},
+            onVistaChange = {},
+        )
+    }
+}

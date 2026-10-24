@@ -83,6 +83,7 @@ object Dimensions {
     val dropdownMaxHeight = 400.dp
     val dialogMaxHeight = 550.dp
     val maxContentWidth = 600.dp
+    val chartCardHeight = 350.dp
     val colorStripWidth = 6.dp
     val bottomContentSpacer = 80.dp
 }

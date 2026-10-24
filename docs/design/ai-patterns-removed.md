@@ -88,3 +88,28 @@ Registro estructurado (**Antes / Después**) de los patrones visuales genéricos
 - **Antes:** `Color(0xFF4CAF50)`, `Color(0xFFFF9800)`, `Color(0xFFF44336)`, `Color(0xFF2196F3)`, `Color(0xFFE8F5E9)`, `Color(0xFF2E7D32)` hardcodeados para estados de cita, pagos y calendario, cabeceras con `Brush.horizontalGradient`, `.shadow(4.dp / 6.dp)`, `Icons.Default.Psychology` para el psicólogo y la terapia, y decenas de literales hardcodeados.
 - **Después:** funciones `@Composable` con tokens `AmaniTheme.colors.success*`, `warning*`, `error*` y `MaterialTheme.colorScheme.*`, superficies planas sin gradientes ni `.shadow` manuales, iconos concretos (`MedicalServices`, `Person`), textos en `strings.xml` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
 
+---
+
+### Lote 5 — Psicólogo y Estadísticas
+
+#### `CrearHistorialClinicoScreen.kt`
+- **Antes:** objeto local `HistorialClinicoColors` con 10 colores hardcodeados (`Color(0xFFDFD5F5)`, `Color(0xFFFAF8FF)`, `Color(0xFFFFFFFF)`, `Color(0xFF1F1F1F)`, `Color(0xFF7B6C8F)`, `Color(0xFFCCC0E4)`, `Color(0xFF9B7EC4)`, `Color(0xFFE8E2F5)`, `Color(0xFFF5F3FA)`), fondo con `Brush.verticalGradient`, `.shadow(8.dp, RoundedCornerShape(24.dp))` y `collectAsState()`.
+- **Después:** eliminación completa de `HistorialClinicoColors` y del gradiente vertical; uso de `MaterialTheme.colorScheme.*`, `MaterialTheme.shapes.large`, `Elevation.level1`, `Spacing.*`, `Dimensions.*`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `EstadisticasPsicologoScreen.kt`
+- **Antes:** colores hardcodeados para las métricas y niveles emocionales (`Color(0xFF4CAF50)`, `Color(0xFFF44336)`, `Color(0xFFFF9800)`, `Color(0xFF8BC34A)`), tamaños de fuente `12.sp`, `14.sp`, `16.sp`, `18.sp`, `20.sp`, `22.sp`, `26.sp`, radios de esquina uniformes de `16.dp`–`24.dp` y `collectAsState()`.
+- **Después:** tokens semánticos `AmaniTheme.colors.success`, `warning`, `MaterialTheme.colorScheme.error`, `primary` y `tertiary`; escala tipográfica M3 (`MaterialTheme.typography.*`), `Spacing.*`, `Dimensions.chartCardHeight`, `collectAsStateWithLifecycle()`, preservando íntegramente los `testTag` y contratos de `EstadisticasPsicologoScreenTest`, y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `ViewPsicologoPrincipal.kt`, `PsicologoProfileScreen.kt` y `EditProfilePsicologoScreen.kt`
+- **Antes:** fondos `Brush.verticalGradient`, tarjetas con `.shadow(6.dp / 8.dp, RoundedCornerShape(20.dp / 24.dp))`, `Color.Black`, `Color.White`, `Color.Gray`, `Color.Red`, `Color(0xFF4CAF50)`, `Color(0xFFFF9800)`, `Icons.Default.Psychology` para especialidades y `collectAsState()`.
+- **Después:** superficies M3 planas y elevación tonal (`Elevation.level1`), `Icons.Default.MedicalServices`, tokens `AmaniTheme.colors.success*` y `warning*`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `SettingsPsicologoScreen.kt`, `SettingsPsychologistScreen.kt` y `RegistrarPacientePsicologoScreen.kt`
+- **Antes:** `Color.Gray`, `Color.Red`, `Color.White`, `Color.Transparent`, `Color(0xFF4CAF50)`, fondos con `Brush.verticalGradient`, `Icons.Default.Psychology` en la gestión de especialidades, literales de diálogo ("En desarrollo") hardcodeados en composables y valores mágicos de `dp`/`sp`.
+- **Después:** `MaterialTheme.colorScheme.*`, `AmaniTheme.colors.success`, `Icons.Default.MedicalServices`, textos extraídos a `strings.xml` (es/en/ca), `Spacing.*`, `Dimensions.*`, `collectAsStateWithLifecycle()` y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+#### `PsicologoAgendaScreen.kt`
+- **Antes:** extensiones `ColorScheme.success = Color(0xFF4CAF50)` y `ColorScheme.warning = Color(0xFFFF9800)`, `Color.Black.copy(alpha = 0.4f)`, `.shadow(4.dp / 8.dp, RoundedCornerShape(16.dp / 24.dp))`, `RoundedCornerShape(28.dp)` manual en diálogos y 15+ emojis como iconos de UI (`📅`, `⏳`, `✅`, `🏁`, `❌`, `🚫`, `✏️`, `🏢`, `📞`, `💳`, `💰`, `💾`, `🗑️`).
+- **Después:** tokens `AmaniTheme.colors.success` y `warning`, `colors.scrim.copy(alpha = 0.4f)`, `CardDefaults.cardElevation(defaultElevation = Elevation.level1 / level2)`, `MaterialTheme.shapes.*`, eliminación de todos los emojis de UI en favor de iconos Material y textos limpios en `strings.xml`, y `@Preview` en Light, Dark y `fontScale = 1.5f`.
+
+
