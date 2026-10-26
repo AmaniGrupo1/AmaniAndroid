@@ -1,6 +1,6 @@
     [versions]
     #9.1.0
-    agp = "9.2.1"
+    agp = "9.4.1"
     bcprovJdk15to18 = "1.79"
     cameraView = "1.4.0"
     coilCompose = "2.7.0"
@@ -24,8 +24,8 @@
     kotlinxSerializationJson = "1.10.0"
     lifecycleRuntimeKtx = "2.10.0"
     activityCompose = "1.12.4"
-    kotlin = "2.1.0"
-    ksp = "2.1.0-1.0.29"
+    kotlin = "2.2.10"
+    ksp = "2.3.6"
     composeBom = "2026.04.01"
     loggingInterceptor = "4.11.0"
     materialIconsExtended = "1.7.8"

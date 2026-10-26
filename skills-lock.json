@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "2174f783a038a7ca4869c4c18e14726ec13b9c6b705d59253f647d0ca37cb78d"
+    },
     "android-architecture-clean": {
       "source": "krutikJain/android-agent-skills",
       "sourceType": "github",
@@ -16,10 +21,20 @@
       "sourceType": "github",
       "computedHash": "2ac5dbdc76b1375cfcb16793265b5b0eaa0ba8c20c24a00e47cdc1aab678fb4c"
     },
+    "android-di-hilt": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "702ff3dba5cd0fe3b87b458dcc256c56d05a9242948407a4e8d4f0eca26bf1f2"
+    },
     "android-gradle-build-logic": {
       "source": "krutikJain/android-agent-skills",
       "sourceType": "github",
       "computedHash": "5162635b20ca431e1c850192d1a65baab0e62c0962841b76eb742c9e5bec0c86"
+    },
+    "android-kotlin-core": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "0a510e8fc8e64eb8ea1d2042a79a07f92eb10bf9b4f8461deea5cff4b745966a"
     },
     "android-networking-retrofit-okhttp": {
       "source": "krutikJain/android-agent-skills",
@@ -31,6 +46,16 @@
       "sourceType": "github",
       "computedHash": "af15da4211876056aada350e87332a5be51f60fb1eb2423e79a4b8cbde5fbc78"
     },
+    "bash-defensive-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "autoskills-registry",
+      "computedHash": "2c6409224fbb56ceff6655b73cb03a736ea6c89e622734752c568efafd59a964"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "a4e6516a601f72ffd8bcd0d64609e8ba724d2ce92569a059a6890a5caadf072b"
+    },
     "java-coding-standards": {
       "source": "affaan-m/everything-claude-code",
       "sourceType": "github",
@@ -40,6 +65,11 @@
       "source": "github/awesome-copilot",
       "sourceType": "github",
       "computedHash": "76cf49efcd6e99d95031c78e56615dbaf641a756e852acf7e87f9197dfab43e0"
+    },
+    "seo": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "7495da57766c99f787a729d4a21234ecb5d29d90f304a0d9a5996dcdc1eec048"
     }
   }
 }
