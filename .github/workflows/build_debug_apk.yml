@@ -44,6 +44,8 @@ jobs:
       # 3. Configurar el Android SDK
       - name: 🤖 Configurar Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       # 4. Cache de Gradle para acelerar builds futuras
       - name: 📦 Cache de dependencias Gradle
