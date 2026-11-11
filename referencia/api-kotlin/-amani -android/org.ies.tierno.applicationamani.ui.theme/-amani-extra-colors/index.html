@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>AmaniExtraColors</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../../index.html">
+                    Amani Android
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":app/manualMain">Android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":app/manualMain"
+                                       data-filter=":app/manualMain"/>
+                                <span class="checkbox--icon"></span>
+                                Android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Amani Android
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="Amani Android::org.ies.tierno.applicationamani.ui.theme/AmaniExtraColors///PointingToDeclaration//-95443717">
+  <div class="breadcrumbs"><a href="../../../index.html">Amani Android</a><span class="delimiter">/</span><a href="../index.html">org.ies.tierno.applicationamani.ui.theme</a><span class="delimiter">/</span><span class="current">AmaniExtraColors</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Amani</span><wbr></wbr><span>Extra</span><wbr></wbr><span><span>Colors</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">AmaniExtraColors</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>isDark<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>success<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccess<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSuccess<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnSuccess<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>successContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccessContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSuccessContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnSuccessContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>warning<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarning<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onWarning<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnWarning<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>warningContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarningContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onWarningContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnWarningContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>screenBackground<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightBackground<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>textFieldContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSurfaceContainerLowest<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>buttonBorder<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOutline<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cardBackground<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSurfaceContainerLowest<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cardContent<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnSurface<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cardBorder<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOutlineVariant<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaLibre<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccess<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaLibreBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccessContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaOcupada<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightError<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaOcupadaBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightErrorContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaConfirmada<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccess<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaConfirmadaBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccessContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaPendiente<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarning<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaPendienteBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarningContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaCancelada<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightError<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>citaCanceladaBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightErrorContainer<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>calendarioBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSurfaceContainerLow</span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-312282441%2FConstructors%2F-95443717" anchor-label="AmaniExtraColors" id="-312282441%2FConstructors%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amani-extra-colors.html"><span>Amani</span><wbr></wbr><span>Extra</span><wbr></wbr><span><span>Colors</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-312282441%2FConstructors%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">isDark<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">success<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccess<span class="token punctuation">, </span></span><span class="parameter ">onSuccess<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnSuccess<span class="token punctuation">, </span></span><span class="parameter ">successContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccessContainer<span class="token punctuation">, </span></span><span class="parameter ">onSuccessContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnSuccessContainer<span class="token punctuation">, </span></span><span class="parameter ">warning<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarning<span class="token punctuation">, </span></span><span class="parameter ">onWarning<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnWarning<span class="token punctuation">, </span></span><span class="parameter ">warningContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarningContainer<span class="token punctuation">, </span></span><span class="parameter ">onWarningContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnWarningContainer<span class="token punctuation">, </span></span><span class="parameter ">screenBackground<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightBackground<span class="token punctuation">, </span></span><span class="parameter ">textFieldContainer<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSurfaceContainerLowest<span class="token punctuation">, </span></span><span class="parameter ">buttonBorder<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOutline<span class="token punctuation">, </span></span><span class="parameter ">cardBackground<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSurfaceContainerLowest<span class="token punctuation">, </span></span><span class="parameter ">cardContent<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOnSurface<span class="token punctuation">, </span></span><span class="parameter ">cardBorder<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightOutlineVariant<span class="token punctuation">, </span></span><span class="parameter ">citaLibre<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccess<span class="token punctuation">, </span></span><span class="parameter ">citaLibreBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccessContainer<span class="token punctuation">, </span></span><span class="parameter ">citaOcupada<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightError<span class="token punctuation">, </span></span><span class="parameter ">citaOcupadaBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightErrorContainer<span class="token punctuation">, </span></span><span class="parameter ">citaConfirmada<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccess<span class="token punctuation">, </span></span><span class="parameter ">citaConfirmadaBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSuccessContainer<span class="token punctuation">, </span></span><span class="parameter ">citaPendiente<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarning<span class="token punctuation">, </span></span><span class="parameter ">citaPendienteBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightWarningContainer<span class="token punctuation">, </span></span><span class="parameter ">citaCancelada<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightError<span class="token punctuation">, </span></span><span class="parameter ">citaCanceladaBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightErrorContainer<span class="token punctuation">, </span></span><span class="parameter ">calendarioBg<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator"> = </span>LightSurfaceContainerLow</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1732592764%2FProperties%2F-95443717" anchor-label="buttonBorder" id="1732592764%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="button-border.html"><span>button</span><wbr></wbr><span><span>Border</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1732592764%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="button-border.html">buttonBorder</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1335273617%2FProperties%2F-95443717" anchor-label="calendarioBg" id="1335273617%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="calendario-bg.html"><span>calendario</span><wbr></wbr><span><span>Bg</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1335273617%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="calendario-bg.html">calendarioBg</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1539155676%2FProperties%2F-95443717" anchor-label="cardBackground" id="1539155676%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="card-background.html"><span>card</span><wbr></wbr><span><span>Background</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1539155676%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="card-background.html">cardBackground</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1137971230%2FProperties%2F-95443717" anchor-label="cardBorder" id="1137971230%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="card-border.html"><span>card</span><wbr></wbr><span><span>Border</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1137971230%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="card-border.html">cardBorder</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-887487497%2FProperties%2F-95443717" anchor-label="cardContent" id="-887487497%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="card-content.html"><span>card</span><wbr></wbr><span><span>Content</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-887487497%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="card-content.html">cardContent</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1960037295%2FProperties%2F-95443717" anchor-label="citaCancelada" id="1960037295%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-cancelada.html"><span>cita</span><wbr></wbr><span><span>Cancelada</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1960037295%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-cancelada.html">citaCancelada</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="734026346%2FProperties%2F-95443717" anchor-label="citaCanceladaBg" id="734026346%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-cancelada-bg.html"><span>cita</span><wbr></wbr><span>Cancelada</span><wbr></wbr><span><span>Bg</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="734026346%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-cancelada-bg.html">citaCanceladaBg</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1928620809%2FProperties%2F-95443717" anchor-label="citaConfirmada" id="1928620809%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-confirmada.html"><span>cita</span><wbr></wbr><span><span>Confirmada</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1928620809%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-confirmada.html">citaConfirmada</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="607554372%2FProperties%2F-95443717" anchor-label="citaConfirmadaBg" id="607554372%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-confirmada-bg.html"><span>cita</span><wbr></wbr><span>Confirmada</span><wbr></wbr><span><span>Bg</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="607554372%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-confirmada-bg.html">citaConfirmadaBg</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1467691419%2FProperties%2F-95443717" anchor-label="citaLibre" id="1467691419%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-libre.html"><span>cita</span><wbr></wbr><span><span>Libre</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1467691419%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-libre.html">citaLibre</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="36042070%2FProperties%2F-95443717" anchor-label="citaLibreBg" id="36042070%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-libre-bg.html"><span>cita</span><wbr></wbr><span>Libre</span><wbr></wbr><span><span>Bg</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="36042070%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-libre-bg.html">citaLibreBg</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1512365916%2FProperties%2F-95443717" anchor-label="citaOcupada" id="-1512365916%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-ocupada.html"><span>cita</span><wbr></wbr><span><span>Ocupada</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1512365916%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-ocupada.html">citaOcupada</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="944129567%2FProperties%2F-95443717" anchor-label="citaOcupadaBg" id="944129567%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-ocupada-bg.html"><span>cita</span><wbr></wbr><span>Ocupada</span><wbr></wbr><span><span>Bg</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="944129567%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-ocupada-bg.html">citaOcupadaBg</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1414504667%2FProperties%2F-95443717" anchor-label="citaPendiente" id="1414504667%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-pendiente.html"><span>cita</span><wbr></wbr><span><span>Pendiente</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1414504667%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-pendiente.html">citaPendiente</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="463180950%2FProperties%2F-95443717" anchor-label="citaPendienteBg" id="463180950%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cita-pendiente-bg.html"><span>cita</span><wbr></wbr><span>Pendiente</span><wbr></wbr><span><span>Bg</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="463180950%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="cita-pendiente-bg.html">citaPendienteBg</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-95472966%2FProperties%2F-95443717" anchor-label="isDark" id="-95472966%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-dark.html"><span>is</span><wbr></wbr><span><span>Dark</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-95472966%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-dark.html">isDark</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-76465348%2FProperties%2F-95443717" anchor-label="onSuccess" id="-76465348%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-success.html"><span>on</span><wbr></wbr><span><span>Success</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-76465348%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-success.html">onSuccess</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1319264803%2FProperties%2F-95443717" anchor-label="onSuccessContainer" id="-1319264803%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-success-container.html"><span>on</span><wbr></wbr><span>Success</span><wbr></wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1319264803%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-success-container.html">onSuccessContainer</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-653370941%2FProperties%2F-95443717" anchor-label="onWarning" id="-653370941%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-warning.html"><span>on</span><wbr></wbr><span><span>Warning</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-653370941%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-warning.html">onWarning</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1113384758%2FProperties%2F-95443717" anchor-label="onWarningContainer" id="1113384758%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-warning-container.html"><span>on</span><wbr></wbr><span>Warning</span><wbr></wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1113384758%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-warning-container.html">onWarningContainer</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1824655552%2FProperties%2F-95443717" anchor-label="screenBackground" id="1824655552%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="screen-background.html"><span>screen</span><wbr></wbr><span><span>Background</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1824655552%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="screen-background.html">screenBackground</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="538579453%2FProperties%2F-95443717" anchor-label="success" id="538579453%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="success.html"><span><span>success</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="538579453%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="success.html">success</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-643575748%2FProperties%2F-95443717" anchor-label="successContainer" id="-643575748%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="success-container.html"><span>success</span><wbr></wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-643575748%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="success-container.html">successContainer</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="864293446%2FProperties%2F-95443717" anchor-label="textFieldContainer" id="864293446%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="text-field-container.html"><span>text</span><wbr></wbr><span>Field</span><wbr></wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="864293446%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="text-field-container.html">textFieldContainer</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-38326140%2FProperties%2F-95443717" anchor-label="warning" id="-38326140%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="warning.html"><span><span>warning</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-38326140%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="warning.html">warning</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1789073813%2FProperties%2F-95443717" anchor-label="warningContainer" id="1789073813%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="warning-container.html"><span>warning</span><wbr></wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1789073813%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="warning-container.html">warningContainer</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2026 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

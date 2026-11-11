@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>org.ies.tierno.applicationamani.data.remoto</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../index.html">
+                    Amani Android
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":app/manualMain">Android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":app/manualMain"
+                                       data-filter=":app/manualMain"/>
+                                <span class="checkbox--icon"></span>
+                                Android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Amani Android
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageIds="Amani Android::org.ies.tierno.applicationamani.data.remoto////PointingToDeclaration//-95443717">
+  <div class="breadcrumbs"><a href="../../index.html">Amani Android</a><span class="delimiter">/</span><span class="current">org.ies.tierno.applicationamani.data.remoto</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-280232493%2FClasslikes%2F-95443717" anchor-label="AjustesApi" id="-280232493%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ajustes-api/index.html"><span>Ajustes</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-280232493%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-ajustes-api/index.html">AjustesApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para los endpoints de ajustes de usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1877092834%2FClasslikes%2F-95443717" anchor-label="AuthApi" id="-1877092834%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-auth-api/index.html"><span>Auth</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1877092834%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-auth-api/index.html">AuthApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para los endpoints de autenticación y gestión de usuarios.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-595155597%2FClasslikes%2F-95443717" anchor-label="AuthInterceptor" id="-595155597%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-auth-interceptor/index.html"><span>Auth</span><wbr></wbr><span><span>Interceptor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-595155597%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-auth-interceptor/index.html">AuthInterceptor</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tokenHolder<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.local/-token-holder/index.html">TokenHolder</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Interceptor OkHttp que añade el header <code class="lang-kotlin">Authorization: Bearer &lt;token&gt;</code> a cada petición.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1939481550%2FClasslikes%2F-95443717" anchor-label="ChatApi" id="1939481550%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-chat-api/index.html"><span>Chat</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1939481550%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-chat-api/index.html">ChatApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para el envío de mensajes de chat.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-149697734%2FClasslikes%2F-95443717" anchor-label="ChatFirebaseService" id="-149697734%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-chat-firebase-service/index.html"><span>Chat</span><wbr></wbr><span>Firebase</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-149697734%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-chat-firebase-service/index.html">ChatFirebaseService</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">firebaseInstance<span class="token operator">: </span><a href="-firebase-instance/index.html">FirebaseInstance</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Servicio de mensajería en tiempo real mediante Firebase Realtime Database.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1567584216%2FClasslikes%2F-95443717" anchor-label="CitasApi" id="1567584216%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-citas-api/index.html"><span>Citas</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1567584216%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-citas-api/index.html">CitasApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la gestión de citas, horarios y terapias.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1496077946%2FClasslikes%2F-95443717" anchor-label="CrashlyticsInterceptor" id="-1496077946%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-crashlytics-interceptor/index.html"><span>Crashlytics</span><wbr></wbr><span><span>Interceptor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1496077946%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-crashlytics-interceptor/index.html">CrashlyticsInterceptor</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">crashReporter<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.core.crash/-crash-reporter/index.html">CrashReporter</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Interceptor de Retrofit que reporta fallos HTTP (4xx y 5xx) y timeouts automáticamente a Crashlytics, sin exponer PII o payloads sensibles.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2124370386%2FClasslikes%2F-95443717" anchor-label="DiarioApi" id="2124370386%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diario-api/index.html"><span>Diario</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2124370386%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-diario-api/index.html">DiarioApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la gestión remota de entradas del diario emocional.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1117980826%2FClasslikes%2F-95443717" anchor-label="DiarioRemoteRepository" id="-1117980826%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diario-remote-repository/index.html"><span>Diario</span><wbr></wbr><span>Remote</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1117980826%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-diario-remote-repository/index.html">DiarioRemoteRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">api<span class="token operator">: </span><a href="-diario-api/index.html">DiarioApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio remoto para las operaciones CRUD del diario emocional.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1331273894%2FClasslikes%2F-95443717" anchor-label="DiarioSyncManager" id="-1331273894%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diario-sync-manager/index.html"><span>Diario</span><wbr></wbr><span>Sync</span><wbr></wbr><span><span>Manager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1331273894%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-diario-sync-manager/index.html">DiarioSyncManager</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">dao<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.local.diario/-diario-emocional-dao/index.html">DiarioEmocionalDao</a><span class="token punctuation">, </span></span><span class="parameter ">remoteRepository<span class="token operator">: </span><a href="-diario-remote-repository/index.html">DiarioRemoteRepository</a><span class="token punctuation">, </span></span><span class="parameter ">userSessionDataStore<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.local/-user-session-data-store/index.html">UserSessionDataStore</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Gestiona la sincronización bidireccional de entradas del diario emocional entre la base de datos local (Room) y el backend remoto (REST).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1677399909%2FClasslikes%2F-95443717" anchor-label="DocumentoLegalApi" id="-1677399909%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-documento-legal-api/index.html"><span>Documento</span><wbr></wbr><span>Legal</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1677399909%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-documento-legal-api/index.html">DocumentoLegalApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la gestión de documentos legales (consentimientos, términos y condiciones).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2130933308%2FClasslikes%2F-95443717" anchor-label="FileStorageService" id="2130933308%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-storage-service/index.html"><span>File</span><wbr></wbr><span>Storage</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2130933308%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-file-storage-service/index.html">FileStorageService</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">firebaseInstance<span class="token operator">: </span><a href="-firebase-instance/index.html">FirebaseInstance</a><span class="token punctuation">, </span></span><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Servicio de almacenamiento de archivos en Firebase Storage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1558259242%2FClasslikes%2F-95443717" anchor-label="FirebaseInstance" id="-1558259242%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-instance/index.html"><span>Firebase</span><wbr></wbr><span><span>Instance</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1558259242%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-firebase-instance/index.html">FirebaseInstance</a></div><div class="brief "><p class="paragraph">Singleton que centraliza la inicialización y acceso a las instancias de Firebase.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-340633337%2FClasslikes%2F-95443717" anchor-label="HistorialApi" id="-340633337%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-historial-api/index.html"><span>Historial</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-340633337%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-historial-api/index.html">HistorialApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la gestión del historial clínico de los pacientes.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="386548730%2FClasslikes%2F-95443717" anchor-label="HistorialCitaApi" id="386548730%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-historial-cita-api/index.html"><span>Historial</span><wbr></wbr><span>Cita</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="386548730%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-historial-cita-api/index.html">HistorialCitaApi</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="787030546%2FClasslikes%2F-95443717" anchor-label="NotificacionApi" id="787030546%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-notificacion-api/index.html"><span>Notificacion</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="787030546%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-notificacion-api/index.html">NotificacionApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la gestión de notificaciones del usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1967195055%2FClasslikes%2F-95443717" anchor-label="PaymentApiService" id="1967195055%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-payment-api-service/index.html"><span>Payment</span><wbr></wbr><span>Api</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1967195055%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-payment-api-service/index.html">PaymentApiService</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la creación de intenciones de pago a través de Stripe.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-573223871%2FClasslikes%2F-95443717" anchor-label="ProfileApi" id="-573223871%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-profile-api/index.html"><span>Profile</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-573223871%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-profile-api/index.html">ProfileApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la consulta y actualización de perfiles de los tres roles: psicólogo, paciente y administrador.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1547776418%2FClasslikes%2F-95443717" anchor-label="SendMessageRequest" id="1547776418%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-send-message-request/index.html"><span>Send</span><wbr></wbr><span>Message</span><wbr></wbr><span><span>Request</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1547776418%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-send-message-request/index.html">SendMessageRequest</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>idSender<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>idReceiver<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>mensaje<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>idCita<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">DTO para la petición de envío de mensaje.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-480796176%2FClasslikes%2F-95443717" anchor-label="SendMessageResponse" id="-480796176%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-send-message-response/index.html"><span>Send</span><wbr></wbr><span>Message</span><wbr></wbr><span><span>Response</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-480796176%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-send-message-response/index.html">SendMessageResponse</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>idMensaje<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>idSender<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>idReceiver<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>mensaje<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>leido<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">DTO con la respuesta del servidor tras enviar un mensaje.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-414050041%2FClasslikes%2F-95443717" anchor-label="SituacionApi" id="-414050041%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-situacion-api/index.html"><span>Situacion</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-414050041%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-situacion-api/index.html">SituacionApi</a></div><div class="brief "><p class="paragraph">Interfaz Retrofit para la gestión de situaciones administrativas.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="362283948%2FClasslikes%2F-95443717" anchor-label="SoporteTicketApi" id="362283948%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-soporte-ticket-api/index.html"><span>Soporte</span><wbr></wbr><span>Ticket</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="362283948%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-soporte-ticket-api/index.html">SoporteTicketApi</a></div><div class="brief "><p class="paragraph">API de Retrofit para tickets de soporte.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-218209347%2FClasslikes%2F-95443717" anchor-label="SyncDiarioWorker" id="-218209347%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sync-diario-worker/index.html"><span>Sync</span><wbr></wbr><span>Diario</span><wbr></wbr><span><span>Worker</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-218209347%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sync-diario-worker/index.html">SyncDiarioWorker</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">params<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">syncManager<span class="token operator">: </span><a href="-diario-sync-manager/index.html">DiarioSyncManager</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Worker de fondo que ejecuta la sincronización bidireccional del diario emocional.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1278745096%2FClasslikes%2F-95443717" anchor-label="TestApi" id="1278745096%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-test-api/index.html"><span>Test</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1278745096%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-test-api/index.html">TestApi</a></div><div class="brief "><p class="paragraph">Interfaz de la API REST para la gestión de tests y preguntas.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1684022675%2FClasslikes%2F-95443717" anchor-label="TokenRefreshInterceptor" id="-1684022675%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-token-refresh-interceptor/index.html"><span>Token</span><wbr></wbr><span>Refresh</span><wbr></wbr><span><span>Interceptor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1684022675%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-token-refresh-interceptor/index.html">TokenRefreshInterceptor</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">authEventChannel<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.local/-auth-event-channel/index.html">AuthEventChannel</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Interceptor que detecta respuestas HTTP 401 (Unauthorized) y notifica al sistema para que cierre la sesión del usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2026 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

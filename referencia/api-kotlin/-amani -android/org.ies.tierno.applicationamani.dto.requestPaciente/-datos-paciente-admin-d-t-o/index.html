@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>DatosPacienteAdminDTO</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../../index.html">
+                    Amani Android
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":app/manualMain">Android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":app/manualMain"
+                                       data-filter=":app/manualMain"/>
+                                <span class="checkbox--icon"></span>
+                                Android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Amani Android
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="Amani Android::org.ies.tierno.applicationamani.dto.requestPaciente/DatosPacienteAdminDTO///PointingToDeclaration//-95443717">
+  <div class="breadcrumbs"><a href="../../../index.html">Amani Android</a><span class="delimiter">/</span><a href="../index.html">org.ies.tierno.applicationamani.dto.requestPaciente</a><span class="delimiter">/</span><span class="current">DatosPacienteAdminDTO</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Datos</span><wbr></wbr><span>Paciente</span><wbr></wbr><span>Admin</span><wbr></wbr><span><span>DTO</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">DatosPacienteAdminDTO</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>idPaciente<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nombreUsuario<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>apellidoUsuario<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>emailUsuario<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fechaNacimiento<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>genero<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>telefono<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>createdAt<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>updatedAt<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>activo<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>metodoPago<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>estadoPago<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>situaciones<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../org.ies.tierno.applicationamani.dto.situacionDTO/-situacion-d-t-o/index.html">SituacionDTO</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>tutores<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../org.ies.tierno.applicationamani.dto.tutor/-tutor-response-d-t-o/index.html">TutorResponseDTO</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>direccion<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-direccion-response-d-t-o/index.html">DireccionResponseDTO</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>edad<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">DTO con los datos de un paciente para la vista de administración.</p><p class="paragraph">Se recibe del endpoint <code class="lang-kotlin">GET /api/pacientes/admin</code> y contiene toda la información necesaria para listar, editar o dar de baja a un paciente.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="913381214%2FConstructors%2F-95443717" anchor-label="DatosPacienteAdminDTO" id="913381214%2FConstructors%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-datos-paciente-admin-d-t-o.html"><span>Datos</span><wbr></wbr><span>Paciente</span><wbr></wbr><span>Admin</span><wbr></wbr><span><span>DTO</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="913381214%2FConstructors%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">idPaciente<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">nombreUsuario<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">apellidoUsuario<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">emailUsuario<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">fechaNacimiento<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">genero<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">telefono<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">createdAt<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">updatedAt<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">activo<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">metodoPago<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">estadoPago<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">situaciones<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../org.ies.tierno.applicationamani.dto.situacionDTO/-situacion-d-t-o/index.html">SituacionDTO</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">tutores<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../org.ies.tierno.applicationamani.dto.tutor/-tutor-response-d-t-o/index.html">TutorResponseDTO</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">direccion<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-direccion-response-d-t-o/index.html">DireccionResponseDTO</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">edad<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1007330888%2FProperties%2F-95443717" anchor-label="activo" id="-1007330888%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="activo.html"><span><span>activo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1007330888%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="activo.html">activo</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Indica si el paciente está activo (<code class="lang-kotlin">true</code>) o dado de baja (<code class="lang-kotlin">false</code>).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-633199966%2FProperties%2F-95443717" anchor-label="apellidoUsuario" id="-633199966%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="apellido-usuario.html"><span>apellido</span><wbr></wbr><span><span>Usuario</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-633199966%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="apellido-usuario.html">apellidoUsuario</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Apellido del paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1348140023%2FProperties%2F-95443717" anchor-label="createdAt" id="1348140023%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="created-at.html"><span>created</span><wbr></wbr><span><span>At</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1348140023%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="created-at.html">createdAt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Fecha de creación del registro en formato ISO 8601.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-160265822%2FProperties%2F-95443717" anchor-label="direccion" id="-160265822%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="direccion.html"><span><span>direccion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-160265822%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="direccion.html">direccion</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-direccion-response-d-t-o/index.html">DireccionResponseDTO</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lista de direcciones registradas del paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="388884166%2FProperties%2F-95443717" anchor-label="edad" id="388884166%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="edad.html"><span><span>edad</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="388884166%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="edad.html">edad</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Edad calculada del paciente en años.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-19575082%2FProperties%2F-95443717" anchor-label="emailUsuario" id="-19575082%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="email-usuario.html"><span>email</span><wbr></wbr><span><span>Usuario</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-19575082%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="email-usuario.html">emailUsuario</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Correo electrónico del paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="711396617%2FProperties%2F-95443717" anchor-label="estadoPago" id="711396617%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="estado-pago.html"><span>estado</span><wbr></wbr><span><span>Pago</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="711396617%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="estado-pago.html">estadoPago</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Estado del último pago (pendiente, completado, etc.).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-618112164%2FProperties%2F-95443717" anchor-label="fechaNacimiento" id="-618112164%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fecha-nacimiento.html"><span>fecha</span><wbr></wbr><span><span>Nacimiento</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-618112164%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="fecha-nacimiento.html">fechaNacimiento</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Fecha de nacimiento en formato <code class="lang-kotlin">YYYY-MM-DD</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1571051786%2FProperties%2F-95443717" anchor-label="genero" id="-1571051786%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="genero.html"><span><span>genero</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1571051786%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="genero.html">genero</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Género del paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-630322916%2FProperties%2F-95443717" anchor-label="idPaciente" id="-630322916%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="id-paciente.html"><span>id</span><wbr></wbr><span><span>Paciente</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-630322916%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="id-paciente.html">idPaciente</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Identificador único del paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2081673105%2FProperties%2F-95443717" anchor-label="metodoPago" id="2081673105%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="metodo-pago.html"><span>metodo</span><wbr></wbr><span><span>Pago</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2081673105%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="metodo-pago.html">metodoPago</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Método de pago configurado por el paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="57563853%2FProperties%2F-95443717" anchor-label="nombreUsuario" id="57563853%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nombre-usuario.html"><span>nombre</span><wbr></wbr><span><span>Usuario</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="57563853%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="nombre-usuario.html">nombreUsuario</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Nombre del paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1006916203%2FProperties%2F-95443717" anchor-label="situaciones" id="-1006916203%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="situaciones.html"><span><span>situaciones</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1006916203%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="situaciones.html">situaciones</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../org.ies.tierno.applicationamani.dto.situacionDTO/-situacion-d-t-o/index.html">SituacionDTO</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lista de situaciones clínicas o administrativas asociadas.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1239170964%2FProperties%2F-95443717" anchor-label="telefono" id="1239170964%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="telefono.html"><span><span>telefono</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1239170964%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="telefono.html">telefono</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Número de teléfono de contacto.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1552651218%2FProperties%2F-95443717" anchor-label="tutores" id="-1552651218%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tutores.html"><span><span>tutores</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1552651218%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="tutores.html">tutores</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../org.ies.tierno.applicationamani.dto.tutor/-tutor-response-d-t-o/index.html">TutorResponseDTO</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lista de tutores legales asociados al paciente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="414649924%2FProperties%2F-95443717" anchor-label="updatedAt" id="414649924%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="updated-at.html"><span>updated</span><wbr></wbr><span><span>At</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="414649924%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="updated-at.html">updatedAt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Fecha de última actualización en formato ISO 8601.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2026 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

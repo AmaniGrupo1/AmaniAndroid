@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>org.ies.tierno.applicationamani.data.repositorio</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../index.html">
+                    Amani Android
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":app/manualMain">Android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":app/manualMain"
+                                       data-filter=":app/manualMain"/>
+                                <span class="checkbox--icon"></span>
+                                Android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Amani Android
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageIds="Amani Android::org.ies.tierno.applicationamani.data.repositorio////PointingToDeclaration//-95443717">
+  <div class="breadcrumbs"><a href="../../index.html">Amani Android</a><span class="delimiter">/</span><span class="current">org.ies.tierno.applicationamani.data.repositorio</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-440573210%2FClasslikes%2F-95443717" anchor-label="AjustesRepository" id="-440573210%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ajustes-repository/index.html"><span>Ajustes</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-440573210%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-ajustes-repository/index.html">AjustesRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">api<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-ajustes-api/index.html">AjustesApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de ajustes de usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="226485493%2FClasslikes%2F-95443717" anchor-label="ChatRepository" id="226485493%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-chat-repository/index.html"><span>Chat</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="226485493%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-chat-repository/index.html">ChatRepository</a></div><div class="brief "><p class="paragraph">Repositorio para la gestión de mensajería y chat en tiempo real.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1119982773%2FClasslikes%2F-95443717" anchor-label="ChatRepositoryImpl" id="1119982773%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-chat-repository-impl/index.html"><span>Chat</span><wbr></wbr><span>Repository</span><wbr></wbr><span><span>Impl</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1119982773%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-chat-repository-impl/index.html">ChatRepositoryImpl</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">chatFirebaseService<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-chat-firebase-service/index.html">ChatFirebaseService</a><span class="token punctuation">, </span></span><span class="parameter ">chatApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-chat-api/index.html">ChatApi</a></span></span><span class="token punctuation">)</span> : <a href="-chat-repository/index.html">ChatRepository</a></div><div class="brief "><p class="paragraph">Implementación concreta de <a href="-chat-repository/index.html">ChatRepository</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2134408191%2FClasslikes%2F-95443717" anchor-label="CitasRepository" id="-2134408191%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-citas-repository/index.html"><span>Citas</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2134408191%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-citas-repository/index.html">CitasRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">citasApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-citas-api/index.html">CitasApi</a><span class="token punctuation">, </span></span><span class="parameter ">historialCitaApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-historial-cita-api/index.html">HistorialCitaApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de citas, agenda y terapias.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="995377062%2FClasslikes%2F-95443717" anchor-label="DiarioEmocionalRepository" id="995377062%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diario-emocional-repository/index.html"><span>Diario</span><wbr></wbr><span>Emocional</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="995377062%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-diario-emocional-repository/index.html">DiarioEmocionalRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dao<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.local.diario/-diario-emocional-dao/index.html">DiarioEmocionalDao</a><span class="token punctuation">, </span></span><span class="parameter ">syncManager<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-diario-sync-manager/index.html">DiarioSyncManager</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión del diario emocional con sincronización local-remota.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1507272008%2FClasslikes%2F-95443717" anchor-label="DocumentoLegalRepository" id="1507272008%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-documento-legal-repository/index.html"><span>Documento</span><wbr></wbr><span>Legal</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1507272008%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-documento-legal-repository/index.html">DocumentoLegalRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>documentoLegalApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-documento-legal-api/index.html">DocumentoLegalApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de documentos legales.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1320320398%2FClasslikes%2F-95443717" anchor-label="HistorialRepository" id="-1320320398%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-historial-repository/index.html"><span>Historial</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1320320398%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-historial-repository/index.html">HistorialRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">historialApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-historial-api/index.html">HistorialApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la consulta del historial clínico de pacientes.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1059185359%2FClasslikes%2F-95443717" anchor-label="NotificacionRepository" id="-1059185359%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-notificacion-repository/index.html"><span>Notificacion</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1059185359%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-notificacion-repository/index.html">NotificacionRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notificacionApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-notificacion-api/index.html">NotificacionApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de notificaciones push del usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2060087099%2FClasslikes%2F-95443717" anchor-label="PaymentRepository" id="2060087099%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-payment-repository/index.html"><span>Payment</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2060087099%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-payment-repository/index.html">PaymentRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">paymentApiService<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-payment-api-service/index.html">PaymentApiService</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de pagos mediante Stripe.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2038537400%2FClasslikes%2F-95443717" anchor-label="ProfileRepository" id="2038537400%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-profile-repository/index.html"><span>Profile</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2038537400%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-profile-repository/index.html">ProfileRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">api<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-profile-api/index.html">ProfileApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de perfiles de usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="27725485%2FClasslikes%2F-95443717" anchor-label="SoporteTicketRepository" id="27725485%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-soporte-ticket-repository/index.html"><span>Soporte</span><wbr></wbr><span>Ticket</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="27725485%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-soporte-ticket-repository/index.html">SoporteTicketRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">api<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-soporte-ticket-api/index.html">SoporteTicketApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para tickets de soporte.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1706779117%2FClasslikes%2F-95443717" anchor-label="TestRepositoryApi" id="1706779117%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-test-repository-api/index.html"><span>Test</span><wbr></wbr><span>Repository</span><wbr></wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1706779117%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-test-repository-api/index.html">TestRepositoryApi</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">testApi<span class="token operator">: </span><a href="../org.ies.tierno.applicationamani.data.remoto/-test-api/index.html">TestApi</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Repositorio para la gestión de preguntas de test a través de la API REST.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-260327750%2FClasslikes%2F-95443717" anchor-label="TicketsRepository" id="-260327750%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tickets-repository/index.html"><span>Tickets</span><wbr></wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-260327750%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-tickets-repository/index.html">TicketsRepository</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">db<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2026 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

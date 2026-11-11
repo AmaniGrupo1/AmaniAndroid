@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Amani Android</title>
+    <link href="images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script>
+<link href="styles/style.css" rel="Stylesheet">
+<link href="styles/main.css" rel="Stylesheet">
+<link href="styles/prism.css" rel="Stylesheet">
+<link href="styles/logo-styles.css" rel="Stylesheet">
+<link href="styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="index.html">
+                    Amani Android
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":app/manualMain">Android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":app/manualMain"
+                                       data-filter=":app/manualMain"/>
+                                <span class="checkbox--icon"></span>
+                                Android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Amani Android
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" id="content" pageIds="Amani Android::////PointingToDeclaration//-95443717">
+  <div class="breadcrumbs"></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Amani</span></span> <span><span>Android</span></span></h1>
+    <div class="platform-hinted UnderCoverText" data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><p class="paragraph">Aplicación Android de la plataforma <strong>Amani</strong> de salud mental.</p><p class="paragraph">Conecta pacientes con psicólogos ofreciendo gestión de citas, cuestionarios de bienestar emocional y un panel de administración.</p><h2 class="">Arquitectura</h2><p class="paragraph">El proyecto sigue <strong>Clean Architecture</strong> con las siguientes capas:</p><table><thead><tr><th>Capa</th><th>Paquete</th><th>Responsabilidad</th></tr></thead><tbody><tr><td><strong>Data</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">data.remoto</code>, <code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">data.repositorio</code></td><td>Comunicación HTTP con el backend vía Retrofit</td></tr><tr><td><strong>Domain</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">domain.models</code>, <code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">domain.usecases</code></td><td>Modelos de negocio y casos de uso</td></tr><tr><td><strong>DTO</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">dto.opcionAdminDTO</code>, <code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">dto.requestPaciente</code></td><td>Objetos de transferencia de datos</td></tr><tr><td><strong>DI</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">di</code></td><td>Módulos de inyección de dependencias con Koin</td></tr><tr><td><strong>Presentation</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">presentation.viewmodels</code>, <code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">presentation.ui</code></td><td>ViewModels (MVVM) y pantallas Compose</td></tr><tr><td><strong>Navigation</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">presentation.navigation</code></td><td>Grafo de navegación y rutas</td></tr><tr><td><strong>Theme</strong></td><td><code class="org.jetbrains.dokka.pages.commenttable@15bea575 lang-kotlin">ui.theme</code></td><td>Colores, tipografías y tema Material 3</td></tr></tbody></table><h2 class="">Stack tecnológico</h2><ul><li><p class="paragraph">Jetpack Compose + Material 3</p></li><li><p class="paragraph">Kotlin Coroutines & StateFlow</p></li><li><p class="paragraph">Retrofit 3 + Gson</p></li><li><p class="paragraph">Koin (inyección de dependencias)</p></li><li><p class="paragraph">Navigation Compose</p></li></ul></div></div>
+  </div>
+  <h2 class="">Packages</h2>
+  <div class="table"><a data-name="1980548236%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani" id="1980548236%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani/index.html">org.ies.tierno.applicationamani</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1980548236%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="492560062%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.core.crash" id="492560062%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.core.crash/index.html">org.ies.tierno.applicationamani.core.crash</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="492560062%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1404069371%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.core.viewmodel" id="1404069371%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.core.viewmodel/index.html">org.ies.tierno.applicationamani.core.viewmodel</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1404069371%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-2037747120%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data" id="-2037747120%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data/index.html">org.ies.tierno.applicationamani.data</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2037747120%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="2012987789%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.local" id="2012987789%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.local/index.html">org.ies.tierno.applicationamani.data.local</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2012987789%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="2141936161%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.local.diario" id="2141936161%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.local.diario/index.html">org.ies.tierno.applicationamani.data.local.diario</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2141936161%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-175797311%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.local.juego" id="-175797311%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.local.juego/index.html">org.ies.tierno.applicationamani.data.local.juego</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-175797311%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1998592974%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.remoto" id="-1998592974%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.remoto/index.html">org.ies.tierno.applicationamani.data.remoto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1998592974%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="124715683%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.remoto.copiloto" id="124715683%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.remoto.copiloto/index.html">org.ies.tierno.applicationamani.data.remoto.copiloto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="124715683%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-341633994%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.remoto.role" id="-341633994%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.remoto.role/index.html">org.ies.tierno.applicationamani.data.remoto.role</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-341633994%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="226235927%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.repositorio" id="226235927%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.repositorio/index.html">org.ies.tierno.applicationamani.data.repositorio</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="226235927%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-2035539362%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.repositorio.copiloto" id="-2035539362%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.repositorio.copiloto/index.html">org.ies.tierno.applicationamani.data.repositorio.copiloto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2035539362%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="214124913%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.repositorio.role" id="214124913%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.repositorio.role/index.html">org.ies.tierno.applicationamani.data.repositorio.role</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="214124913%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1286349484%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.data.repository" id="1286349484%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.data.repository/index.html">org.ies.tierno.applicationamani.data.repository</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1286349484%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-701520789%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.di" id="-701520789%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.di/index.html">org.ies.tierno.applicationamani.di</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-701520789%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1020476129%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.events" id="1020476129%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.events/index.html">org.ies.tierno.applicationamani.domain.events</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1020476129%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-252456718%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models" id="-252456718%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models/index.html">org.ies.tierno.applicationamani.domain.models</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-252456718%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1542811027%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.admin" id="1542811027%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.admin/index.html">org.ies.tierno.applicationamani.domain.models.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1542811027%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1113763972%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.citas" id="1113763972%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.citas/index.html">org.ies.tierno.applicationamani.domain.models.citas</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1113763972%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1389682916%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.diario" id="-1389682916%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.diario/index.html">org.ies.tierno.applicationamani.domain.models.diario</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1389682916%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1966509168%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.enumm" id="-1966509168%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.enumm/index.html">org.ies.tierno.applicationamani.domain.models.enumm</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1966509168%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1367477549%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.login" id="1367477549%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.login/index.html">org.ies.tierno.applicationamani.domain.models.login</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1367477549%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1474197025%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.psicologo" id="1474197025%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.psicologo/index.html">org.ies.tierno.applicationamani.domain.models.psicologo</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1474197025%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="2097799084%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.soporte" id="2097799084%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.soporte/index.html">org.ies.tierno.applicationamani.domain.models.soporte</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2097799084%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-327763822%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.models.test" id="-327763822%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.models.test/index.html">org.ies.tierno.applicationamani.domain.models.test</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-327763822%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1163237678%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.repository" id="-1163237678%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.repository/index.html">org.ies.tierno.applicationamani.domain.repository</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1163237678%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1430117142%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.adminUseCase" id="1430117142%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.adminUseCase/index.html">org.ies.tierno.applicationamani.domain.usecases.adminUseCase</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1430117142%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1822332303%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.copiloto" id="-1822332303%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.copiloto/index.html">org.ies.tierno.applicationamani.domain.usecases.copiloto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1822332303%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1159208755%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.documentoLegal" id="1159208755%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.documentoLegal/index.html">org.ies.tierno.applicationamani.domain.usecases.documentoLegal</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1159208755%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1151528513%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.generalizado" id="1151528513%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.generalizado/index.html">org.ies.tierno.applicationamani.domain.usecases.generalizado</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1151528513%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-394444712%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.historialCita" id="-394444712%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.historialCita/index.html">org.ies.tierno.applicationamani.domain.usecases.historialCita</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-394444712%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-304486426%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.historialClinico" id="-304486426%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.historialClinico/index.html">org.ies.tierno.applicationamani.domain.usecases.historialClinico</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-304486426%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1167478408%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase" id="-1167478408%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase/index.html">org.ies.tierno.applicationamani.domain.usecases.idiomaUseCase</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1167478408%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1280832673%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.login" id="-1280832673%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.login/index.html">org.ies.tierno.applicationamani.domain.usecases.login</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1280832673%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="37745066%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.notificacion" id="37745066%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.notificacion/index.html">org.ies.tierno.applicationamani.domain.usecases.notificacion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="37745066%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-125366948%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase" id="-125366948%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase/index.html">org.ies.tierno.applicationamani.domain.usecases.pacienteUseCase</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-125366948%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1512001212%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.payment" id="1512001212%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.payment/index.html">org.ies.tierno.applicationamani.domain.usecases.payment</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1512001212%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="879258876%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.profileUseCase" id="879258876%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.profileUseCase/index.html">org.ies.tierno.applicationamani.domain.usecases.profileUseCase</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="879258876%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1090801993%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase" id="-1090801993%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase/index.html">org.ies.tierno.applicationamani.domain.usecases.psicologosUseCase</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1090801993%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1850895612%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.role" id="-1850895612%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.role/index.html">org.ies.tierno.applicationamani.domain.usecases.role</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1850895612%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-552390509%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.situaciones" id="-552390509%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.situaciones/index.html">org.ies.tierno.applicationamani.domain.usecases.situaciones</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-552390509%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1457576098%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.terapia" id="-1457576098%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.terapia/index.html">org.ies.tierno.applicationamani.domain.usecases.terapia</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1457576098%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="264576894%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.domain.usecases.ticketsUseCase" id="264576894%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.domain.usecases.ticketsUseCase/index.html">org.ies.tierno.applicationamani.domain.usecases.ticketsUseCase</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="264576894%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="443847485%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto" id="443847485%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto/index.html">org.ies.tierno.applicationamani.dto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443847485%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1573915550%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.admin" id="1573915550%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.admin/index.html">org.ies.tierno.applicationamani.dto.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1573915550%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-620749886%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.agenda.request" id="-620749886%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.agenda.request/index.html">org.ies.tierno.applicationamani.dto.agenda.request</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-620749886%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1248181875%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.ajuste" id="-1248181875%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.ajuste/index.html">org.ies.tierno.applicationamani.dto.ajuste</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1248181875%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1144868495%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.citas" id="1144868495%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.citas/index.html">org.ies.tierno.applicationamani.dto.citas</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1144868495%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1344860168%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.copiloto" id="-1344860168%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.copiloto/index.html">org.ies.tierno.applicationamani.dto.copiloto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1344860168%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1083751558%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.documentoLegal" id="-1083751558%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.documentoLegal/index.html">org.ies.tierno.applicationamani.dto.documentoLegal</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1083751558%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1496952450%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.historial" id="-1496952450%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.historial/index.html">org.ies.tierno.applicationamani.dto.historial</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1496952450%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="686031071%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.historial.request" id="686031071%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.historial.request/index.html">org.ies.tierno.applicationamani.dto.historial.request</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="686031071%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1364490986%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.idioma" id="1364490986%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.idioma/index.html">org.ies.tierno.applicationamani.dto.idioma</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1364490986%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1398582072%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.login" id="1398582072%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.login/index.html">org.ies.tierno.applicationamani.dto.login</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1398582072%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-121013327%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.notificacion" id="-121013327%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.notificacion/index.html">org.ies.tierno.applicationamani.dto.notificacion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-121013327%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="976704555%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.opcionAdminDTO" id="976704555%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.opcionAdminDTO/index.html">org.ies.tierno.applicationamani.dto.opcionAdminDTO</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="976704555%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-550806443%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.payment" id="-550806443%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.payment/index.html">org.ies.tierno.applicationamani.dto.payment</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-550806443%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1695128865%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.perfil" id="1695128865%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.perfil/index.html">org.ies.tierno.applicationamani.dto.perfil</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1695128865%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-641262974%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.perfil.admin" id="-641262974%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.perfil.admin/index.html">org.ies.tierno.applicationamani.dto.perfil.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-641262974%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-2039539614%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.perfil.paciente" id="-2039539614%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.perfil.paciente/index.html">org.ies.tierno.applicationamani.dto.perfil.paciente</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2039539614%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="170005392%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.perfil.psicologo" id="170005392%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.perfil.psicologo/index.html">org.ies.tierno.applicationamani.dto.perfil.psicologo</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="170005392%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1881860436%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.psicologo" id="-1881860436%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.psicologo/index.html">org.ies.tierno.applicationamani.dto.psicologo</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1881860436%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-454243345%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.requestPaciente" id="-454243345%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.requestPaciente/index.html">org.ies.tierno.applicationamani.dto.requestPaciente</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-454243345%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-378989557%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.role" id="-378989557%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.role/index.html">org.ies.tierno.applicationamani.dto.role</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-378989557%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="617763781%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.situacionDTO" id="617763781%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.situacionDTO/index.html">org.ies.tierno.applicationamani.dto.situacionDTO</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="617763781%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1924474615%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.soporte" id="1924474615%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.soporte/index.html">org.ies.tierno.applicationamani.dto.soporte</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1924474615%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1496335002%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.tema" id="1496335002%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.tema/index.html">org.ies.tierno.applicationamani.dto.tema</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1496335002%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1312032288%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.terapias" id="1312032288%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.terapias/index.html">org.ies.tierno.applicationamani.dto.terapias</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1312032288%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1236870666%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.tickets" id="-1236870666%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.tickets/index.html">org.ies.tierno.applicationamani.dto.tickets</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1236870666%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1578631995%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.dto.tutor" id="-1578631995%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.dto.tutor/index.html">org.ies.tierno.applicationamani.dto.tutor</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1578631995%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-106086904%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.components" id="-106086904%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.components/index.html">org.ies.tierno.applicationamani.presentation.components</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-106086904%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="626123654%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.navigation" id="626123654%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.navigation/index.html">org.ies.tierno.applicationamani.presentation.navigation</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="626123654%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1075904105%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.navigation.navGraph" id="-1075904105%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.navigation.navGraph/index.html">org.ies.tierno.applicationamani.presentation.navigation.navGraph</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1075904105%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-912955560%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.navigation.screen" id="-912955560%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.navigation.screen/index.html">org.ies.tierno.applicationamani.presentation.navigation.screen</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-912955560%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="360014612%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.screens.profile" id="360014612%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.screens.profile/index.html">org.ies.tierno.applicationamani.presentation.screens.profile</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="360014612%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="714900852%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.componente" id="714900852%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.componente/index.html">org.ies.tierno.applicationamani.presentation.ui.componente</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="714900852%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1982937237%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.componente.admin" id="1982937237%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.componente.admin/index.html">org.ies.tierno.applicationamani.presentation.ui.componente.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1982937237%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="156823587%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.componente.psicologo" id="156823587%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.componente.psicologo/index.html">org.ies.tierno.applicationamani.presentation.ui.componente.psicologo</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="156823587%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1292595202%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.components" id="1292595202%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.components/index.html">org.ies.tierno.applicationamani.presentation.ui.components</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1292595202%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-373726504%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen" id="-373726504%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen/index.html">org.ies.tierno.applicationamani.presentation.ui.screen</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-373726504%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-614237447%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.admin" id="-614237447%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.admin/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-614237447%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1405373986%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.AdminView" id="-1405373986%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.AdminView/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.AdminView</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1405373986%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="2071785145%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal" id="2071785145%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.documentoLegal</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2071785145%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1608453622%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role" id="-1608453622%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.AdminView.role</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1608453622%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="532949426%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.chat" id="532949426%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.chat/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.chat</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="532949426%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="842906217%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento" id="842906217%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.consentimiento</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="842906217%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="461291126%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.diario" id="461291126%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.diario/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.diario</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="461291126%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-2057573761%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal" id="-2057573761%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.documentoLegal</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2057573761%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1354908480%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.generacionPDFhISTORIAL" id="1354908480%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.generacionPDFhISTORIAL/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.generacionPDFhISTORIAL</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1354908480%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="234351851%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.juegos" id="234351851%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.juegos/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.juegos</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="234351851%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1349772944%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView" id="1349772944%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.pacienteView</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1349772944%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1168138480%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.payment" id="1168138480%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.payment/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.payment</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1168138480%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-933095284%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView" id="-933095284%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.psicologoView</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-933095284%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-2052841795%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.settings" id="-2052841795%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.settings/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.settings</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2052841795%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="614226777%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.situacion" id="614226777%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.situacion/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.situacion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="614226777%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-651547758%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.soporte" id="-651547758%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.soporte/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.soporte</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-651547758%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="482074257%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screen.tickets" id="482074257%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screen.tickets/index.html">org.ies.tierno.applicationamani.presentation.ui.screen.tickets</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="482074257%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1621742784%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screens.admin" id="-1621742784%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screens.admin/index.html">org.ies.tierno.applicationamani.presentation.ui.screens.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1621742784%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1545508174%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.ui.screens.psicologo" id="1545508174%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.ui.screens.psicologo/index.html">org.ies.tierno.applicationamani.presentation.ui.screens.psicologo</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1545508174%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1028240639%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels" id="-1028240639%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels/index.html">org.ies.tierno.applicationamani.presentation.viewmodels</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1028240639%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="636608610%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.admin" id="636608610%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.admin/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="636608610%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1366363351%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.chat" id="-1366363351%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.chat/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.chat</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1366363351%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="207561555%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.citas" id="207561555%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.citas/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.citas</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="207561555%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1221448884%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.copiloto" id="1221448884%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.copiloto/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.copiloto</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1221448884%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1206871516%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario" id="1206871516%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.cuestionario</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1206871516%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="582813229%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.diario" id="582813229%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.diario/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.diario</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="582813229%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1716423478%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal" id="1716423478%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1716423478%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1692049623%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico" id="-1692049623%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1692049623%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1922220378%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.idioma" id="-1922220378%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.idioma/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.idioma</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1922220378%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-87544267%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.juego" id="-87544267%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.juego/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.juego</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-87544267%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-82345363%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.notificacion" id="-82345363%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.notificacion/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.notificacion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-82345363%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="640356377%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.payment" id="640356377%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.payment/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.payment</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="640356377%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1016311300%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.profile" id="-1016311300%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.profile/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.profile</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1016311300%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1991803107%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin" id="-1991803107%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.profile.admin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1991803107%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-727012889%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente" id="-727012889%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.profile.paciente</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-727012889%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="249995896%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel" id="249995896%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="249995896%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-686319929%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.role" id="-686319929%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.role/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.role</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-686319929%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1541557274%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel" id="-1541557274%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1541557274%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1179329861%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.soporte" id="-1179329861%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.soporte/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.soporte</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1179329861%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1965746363%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.terapia" id="1965746363%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.terapia/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.terapia</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1965746363%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-708556463%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel" id="-708556463%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel/index.html">org.ies.tierno.applicationamani.presentation.viewmodels.ticketsVieModel</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-708556463%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="798070788%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.services" id="798070788%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.services/index.html">org.ies.tierno.applicationamani.services</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="798070788%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="10090069%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.ui.theme" id="10090069%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.ui.theme/index.html">org.ies.tierno.applicationamani.ui.theme</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="10090069%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="76479631%2FPackages%2F-95443717" anchor-label="org.ies.tierno.applicationamani.utils" id="76479631%2FPackages%2F-95443717" data-filterable-set=":app/manualMain"></a>
+    <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-amani -android/org.ies.tierno.applicationamani.utils/index.html">org.ies.tierno.applicationamani.utils</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="76479631%2FPackages%2F-95443717"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">Android</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2026 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

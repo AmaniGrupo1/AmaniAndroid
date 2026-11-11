@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Screens</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+            <a class="library-name--link" href="../../../index.html">
+                    Amani Android
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":app/manualMain">Android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":app/manualMain"
+                                       data-filter=":app/manualMain"/>
+                                <span class="checkbox--icon"></span>
+                                Android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                        data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Amani Android
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="Amani Android::org.ies.tierno.applicationamani.presentation.navigation.screen/Screens///PointingToDeclaration//-95443717">
+  <div class="breadcrumbs"><a href="../../../index.html">Amani Android</a><span class="delimiter">/</span><a href="../index.html">org.ies.tierno.applicationamani.presentation.navigation.screen</a><span class="delimiter">/</span><span class="current">Screens</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Screens</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Screens</a></div><p class="paragraph">Clase sellada que define todas las rutas de navegación de la aplicación.</p><p class="paragraph">Cada objeto hijo representa una pantalla accesible a través del <a href="../../org.ies.tierno.applicationamani.presentation.navigation.navGraph/-nav-graph.html">org.ies.tierno.applicationamani.presentation.navigation.navGraph.NavGraph</a>. El uso de una clase sellada garantiza que las rutas se gestionan de forma segura en tiempo de compilación.</p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.ies.tierno.applicationamani.presentation.navigation.navGraph/-nav-graph.html"><span>Nav</span><wbr></wbr><span><span>Graph</span></span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="login/index.html">login</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="registro/index.html">registro</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="principal/index.html">principal</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="questionnaire/index.html">questionnaire</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="principal-cliente/index.html">principalCliente</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="settings-cliente/index.html">settingsCliente</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="agregar-psicologo/index.html">agregarPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="test/index.html">test</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="pacientes/index.html">pacientes</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="agregar-admin/index.html">agregarAdmin</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="admin-home/index.html">adminHome</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="citas/index.html">citas</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="psicologo-agenda/index.html">psicologoAgenda</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="psicologo-home/index.html">psicologoHome</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="paciente-home/index.html">pacienteHome</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="settings-psicologo/index.html">settingsPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="estadisticas-psicologo/index.html">estadisticasPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="listar-psicologo/index.html">listarPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="documento-legal-detail/index.html">documentoLegalDetail</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="listar-psicologo-simple/index.html">listarPsicologoSimple</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="calendario/index.html">calendario</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="perfil-psicologo/index.html">perfilPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="chat-list/index.html">chatList</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="chat/index.html">chat</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="reportar-problema/index.html">reportarProblema</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="agenda-cita-screen/index.html">agendaCitaScreen</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="editar-cita-screen/index.html">editarCitaScreen</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="registro-paciente-desde-psicologo/index.html">registroPacienteDesdePsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="pacientes-sin-psicologo/index.html">pacientesSinPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="diario-emocional/index.html">diarioEmocional</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="nuevo-ticket/index.html">nuevoTicket</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="payment-screen/index.html">paymentScreen</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="mis-tickets/index.html">misTickets</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="settings-admin/index.html">settingsAdmin</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="cambiar-rol/index.html">cambiarRol</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="edit-profile-psicologo/index.html">editProfilePsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="setting-psicologo/index.html">settingPsicologo</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="terapias/index.html">terapias</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="crear-situaciones/index.html">crearSituaciones</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="politica-privacidad/index.html">politicaPrivacidad</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="listar-psicologos-baja/index.html">listarPsicologosBaja</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="historial-clinico/index.html">historialClinico</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="profile-admin/index.html">profileAdmin</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="perfil-paciente/index.html">perfilPaciente</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="crear-historial-clinico/index.html">crearHistorialClinico</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="juego-snake/index.html">juegoSnake</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="entretenimiento/index.html">entretenimiento</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-364630845%2FClasslikes%2F-95443717" anchor-label="adminHome" id="-364630845%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="admin-home/index.html"><span>admin</span><wbr></wbr><span><span>Home</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-364630845%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="admin-home/index.html">adminHome</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla principal del administrador.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-104777690%2FClasslikes%2F-95443717" anchor-label="agendaCitaScreen" id="-104777690%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="agenda-cita-screen/index.html"><span>agenda</span><wbr></wbr><span>Cita</span><wbr></wbr><span><span>Screen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-104777690%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="agenda-cita-screen/index.html">agendaCitaScreen</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1696873825%2FClasslikes%2F-95443717" anchor-label="agregarAdmin" id="1696873825%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="agregar-admin/index.html"><span>agregar</span><wbr></wbr><span><span>Admin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1696873825%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="agregar-admin/index.html">agregarAdmin</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla para agregar un administrador.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-425459053%2FClasslikes%2F-95443717" anchor-label="agregarPsicologo" id="-425459053%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="agregar-psicologo/index.html"><span>agregar</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-425459053%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="agregar-psicologo/index.html">agregarPsicologo</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla para agregar un psicólogo (vista de administrador).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="865960493%2FClasslikes%2F-95443717" anchor-label="calendario" id="865960493%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="calendario/index.html"><span><span>calendario</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="865960493%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="calendario/index.html">calendario</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1529201079%2FClasslikes%2F-95443717" anchor-label="cambiarRol" id="-1529201079%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cambiar-rol/index.html"><span>cambiar</span><wbr></wbr><span><span>Rol</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1529201079%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="cambiar-rol/index.html">cambiarRol</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-204025287%2FClasslikes%2F-95443717" anchor-label="chat" id="-204025287%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="chat/index.html"><span><span>chat</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-204025287%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="chat/index.html">chat</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1862165701%2FClasslikes%2F-95443717" anchor-label="chatList" id="-1862165701%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="chat-list/index.html"><span>chat</span><wbr></wbr><span><span>List</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1862165701%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="chat-list/index.html">chatList</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1241310289%2FClasslikes%2F-95443717" anchor-label="citas" id="1241310289%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="citas/index.html"><span><span>citas</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1241310289%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="citas/index.html">citas</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de citas del paciente con calendario y horas libres.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-769561038%2FClasslikes%2F-95443717" anchor-label="crearHistorialClinico" id="-769561038%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="crear-historial-clinico/index.html"><span>crear</span><wbr></wbr><span>Historial</span><wbr></wbr><span><span>Clinico</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-769561038%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="crear-historial-clinico/index.html">crearHistorialClinico</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1366543803%2FClasslikes%2F-95443717" anchor-label="crearSituaciones" id="1366543803%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="crear-situaciones/index.html"><span>crear</span><wbr></wbr><span><span>Situaciones</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1366543803%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="crear-situaciones/index.html">crearSituaciones</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="669524662%2FClasslikes%2F-95443717" anchor-label="diarioEmocional" id="669524662%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="diario-emocional/index.html"><span>diario</span><wbr></wbr><span><span>Emocional</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="669524662%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="diario-emocional/index.html">diarioEmocional</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1254253115%2FClasslikes%2F-95443717" anchor-label="documentoLegalDetail" id="1254253115%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="documento-legal-detail/index.html"><span>documento</span><wbr></wbr><span>Legal</span><wbr></wbr><span><span>Detail</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1254253115%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="documento-legal-detail/index.html">documentoLegalDetail</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="269934103%2FClasslikes%2F-95443717" anchor-label="editarCitaScreen" id="269934103%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="editar-cita-screen/index.html"><span>editar</span><wbr></wbr><span>Cita</span><wbr></wbr><span><span>Screen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="269934103%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="editar-cita-screen/index.html">editarCitaScreen</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1447378061%2FClasslikes%2F-95443717" anchor-label="editProfilePsicologo" id="-1447378061%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="edit-profile-psicologo/index.html"><span>edit</span><wbr></wbr><span>Profile</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1447378061%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="edit-profile-psicologo/index.html">editProfilePsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1101218503%2FClasslikes%2F-95443717" anchor-label="entretenimiento" id="1101218503%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="entretenimiento/index.html"><span><span>entretenimiento</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1101218503%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="entretenimiento/index.html">entretenimiento</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2131349761%2FClasslikes%2F-95443717" anchor-label="estadisticasPsicologo" id="2131349761%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="estadisticas-psicologo/index.html"><span>estadisticas</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2131349761%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="estadisticas-psicologo/index.html">estadisticasPsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1987012679%2FClasslikes%2F-95443717" anchor-label="historialClinico" id="-1987012679%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="historial-clinico/index.html"><span>historial</span><wbr></wbr><span><span>Clinico</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1987012679%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="historial-clinico/index.html">historialClinico</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-297545517%2FClasslikes%2F-95443717" anchor-label="juegoSnake" id="-297545517%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="juego-snake/index.html"><span>juego</span><wbr></wbr><span><span>Snake</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-297545517%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="juego-snake/index.html">juegoSnake</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1422859325%2FClasslikes%2F-95443717" anchor-label="listarPsicologo" id="-1422859325%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="listar-psicologo/index.html"><span>listar</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1422859325%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="listar-psicologo/index.html">listarPsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-887181514%2FClasslikes%2F-95443717" anchor-label="listarPsicologosBaja" id="-887181514%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="listar-psicologos-baja/index.html"><span>listar</span><wbr></wbr><span>Psicologos</span><wbr></wbr><span><span>Baja</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-887181514%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="listar-psicologos-baja/index.html">listarPsicologosBaja</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="39100593%2FClasslikes%2F-95443717" anchor-label="listarPsicologoSimple" id="39100593%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="listar-psicologo-simple/index.html"><span>listar</span><wbr></wbr><span>Psicologo</span><wbr></wbr><span><span>Simple</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="39100593%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="listar-psicologo-simple/index.html">listarPsicologoSimple</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-828715384%2FClasslikes%2F-95443717" anchor-label="login" id="-828715384%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="login/index.html"><span><span>login</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-828715384%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="login/index.html">login</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de inicio de sesión.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-34667519%2FClasslikes%2F-95443717" anchor-label="misTickets" id="-34667519%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mis-tickets/index.html"><span>mis</span><wbr></wbr><span><span>Tickets</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-34667519%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="mis-tickets/index.html">misTickets</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1812199054%2FClasslikes%2F-95443717" anchor-label="nuevoTicket" id="1812199054%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nuevo-ticket/index.html"><span>nuevo</span><wbr></wbr><span><span>Ticket</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1812199054%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="nuevo-ticket/index.html">nuevoTicket</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="581764257%2FClasslikes%2F-95443717" anchor-label="pacienteHome" id="581764257%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="paciente-home/index.html"><span>paciente</span><wbr></wbr><span><span>Home</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="581764257%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="paciente-home/index.html">pacienteHome</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-756022033%2FClasslikes%2F-95443717" anchor-label="pacientes" id="-756022033%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pacientes/index.html"><span><span>pacientes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-756022033%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="pacientes/index.html">pacientes</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de listado de pacientes (vista de administrador).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1497897738%2FClasslikes%2F-95443717" anchor-label="pacientesSinPsicologo" id="1497897738%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pacientes-sin-psicologo/index.html"><span>pacientes</span><wbr></wbr><span>Sin</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1497897738%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="pacientes-sin-psicologo/index.html">pacientesSinPsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1290828799%2FClasslikes%2F-95443717" anchor-label="paymentScreen" id="1290828799%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="payment-screen/index.html"><span>payment</span><wbr></wbr><span><span>Screen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1290828799%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="payment-screen/index.html">paymentScreen</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1426196524%2FClasslikes%2F-95443717" anchor-label="perfilPaciente" id="-1426196524%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="perfil-paciente/index.html"><span>perfil</span><wbr></wbr><span><span>Paciente</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1426196524%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="perfil-paciente/index.html">perfilPaciente</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1475747584%2FClasslikes%2F-95443717" anchor-label="perfilPsicologo" id="-1475747584%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="perfil-psicologo/index.html"><span>perfil</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1475747584%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="perfil-psicologo/index.html">perfilPsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1772265107%2FClasslikes%2F-95443717" anchor-label="politicaPrivacidad" id="1772265107%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="politica-privacidad/index.html"><span>politica</span><wbr></wbr><span><span>Privacidad</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1772265107%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="politica-privacidad/index.html">politicaPrivacidad</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1116632419%2FClasslikes%2F-95443717" anchor-label="principal" id="1116632419%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="principal/index.html"><span><span>principal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1116632419%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="principal/index.html">principal</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla principal para usuarios no autenticados.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1498978779%2FClasslikes%2F-95443717" anchor-label="principalCliente" id="-1498978779%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="principal-cliente/index.html"><span>principal</span><wbr></wbr><span><span>Cliente</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1498978779%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="principal-cliente/index.html">principalCliente</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla principal del cliente autenticado con su psicólogo asignado.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1496751659%2FClasslikes%2F-95443717" anchor-label="profileAdmin" id="1496751659%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="profile-admin/index.html"><span>profile</span><wbr></wbr><span><span>Admin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1496751659%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="profile-admin/index.html">profileAdmin</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-966053592%2FClasslikes%2F-95443717" anchor-label="psicologoAgenda" id="-966053592%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="psicologo-agenda/index.html"><span>psicologo</span><wbr></wbr><span><span>Agenda</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-966053592%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="psicologo-agenda/index.html">psicologoAgenda</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de agenda de la psicóloga (horario, pacientes por día, días no disponibles).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="707420277%2FClasslikes%2F-95443717" anchor-label="psicologoHome" id="707420277%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="psicologo-home/index.html"><span>psicologo</span><wbr></wbr><span><span>Home</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="707420277%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="psicologo-home/index.html">psicologoHome</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="463512974%2FClasslikes%2F-95443717" anchor-label="questionnaire" id="463512974%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="questionnaire/index.html"><span><span>questionnaire</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="463512974%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="questionnaire/index.html">questionnaire</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla del cuestionario de evaluación inicial.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="800432574%2FClasslikes%2F-95443717" anchor-label="registro" id="800432574%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="registro/index.html"><span><span>registro</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="800432574%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="registro/index.html">registro</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de registro de nuevo usuario.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-64998173%2FClasslikes%2F-95443717" anchor-label="registroPacienteDesdePsicologo" id="-64998173%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="registro-paciente-desde-psicologo/index.html"><span>registro</span><wbr></wbr><span>Paciente</span><wbr></wbr><span>Desde</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-64998173%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="registro-paciente-desde-psicologo/index.html">registroPacienteDesdePsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-365983926%2FClasslikes%2F-95443717" anchor-label="reportarProblema" id="-365983926%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reportar-problema/index.html"><span>reportar</span><wbr></wbr><span><span>Problema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-365983926%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="reportar-problema/index.html">reportarProblema</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="79268164%2FClasslikes%2F-95443717" anchor-label="settingPsicologo" id="79268164%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="setting-psicologo/index.html"><span>setting</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="79268164%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="setting-psicologo/index.html">settingPsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="64803429%2FClasslikes%2F-95443717" anchor-label="settingsAdmin" id="64803429%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="settings-admin/index.html"><span>settings</span><wbr></wbr><span><span>Admin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="64803429%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="settings-admin/index.html">settingsAdmin</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="341604698%2FClasslikes%2F-95443717" anchor-label="settingsCliente" id="341604698%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="settings-cliente/index.html"><span>settings</span><wbr></wbr><span><span>Cliente</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="341604698%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="settings-cliente/index.html">settingsCliente</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de ajustes del cliente.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1656588905%2FClasslikes%2F-95443717" anchor-label="settingsPsicologo" id="-1656588905%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="settings-psicologo/index.html"><span>settings</span><wbr></wbr><span><span>Psicologo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1656588905%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="settings-psicologo/index.html">settingsPsicologo</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1880656038%2FClasslikes%2F-95443717" anchor-label="terapias" id="1880656038%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="terapias/index.html"><span><span>terapias</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1880656038%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="terapias/index.html">terapias</a> : <a href="index.html">Screens</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-412805569%2FClasslikes%2F-95443717" anchor-label="test" id="-412805569%2FClasslikes%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="test/index.html"><span><span>test</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-412805569%2FClasslikes%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="test/index.html">test</a> : <a href="index.html">Screens</a></div><div class="brief "><p class="paragraph">Pantalla de creación de preguntas de test (vista de administrador).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1463607947%2FProperties%2F-95443717" anchor-label="route" id="-1463607947%2FProperties%2F-95443717" data-filterable-set=":app/manualMain"></a>
+          <div class="table-row" data-filterable-current=":app/manualMain" data-filterable-set=":app/manualMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="route.html"><span><span>route</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1463607947%2FProperties%2F-95443717"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":app/manualMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="route.html">route</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Cadena identificadora única de la ruta de navegación.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2026 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
