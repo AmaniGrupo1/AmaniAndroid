@@ -1,0 +1,11 @@
+gradle.projectsEvaluated {
+    def app = gradle.rootProject.project(":app")
+    def dokka = app.extensions.findByName("dokka")
+    if (dokka != null) {
+        dokka.dokkaSourceSets.register("manualMain") {
+            sourceRoots.from(app.file("src/main/java"))
+            includes.from(app.file("MODULE.md"))
+            displayName.set("Android")
+        }
+    }
+}

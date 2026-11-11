@@ -1,0 +1,84 @@
+site_name: Amani Android
+site_description: Documentación técnica del cliente Android de Amani Psicología
+site_author: Equipo Amani
+site_url: https://amanigrupo1.github.io/AmaniAndroid/
+repo_url: https://github.com/AmaniGrupo1/AmaniAndroid
+repo_name: AmaniGrupo1/AmaniAndroid
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+
+exclude_docs: |
+  /.gitignore
+  /dokka-init.gradle
+  /deployment_info.txt
+  /ERROR_REPORT_PsicologoProfile.md
+  /README-CHAT-DIARIO.md
+  /design.md
+  /design/**
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/weather-night
+        name: Cambiar a modo oscuro
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/weather-sunny
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: es
+  - git-revision-date-localized:
+      type: date
+      enable_creation_date: false
+      fallback_to_build_date: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Inicio: index.md
+  - Demo: demo-y-capturas.md
+  - Arquitectura: arquitectura.md
+  - Puesta en marcha: puesta-en-marcha.md
+  - Referencia:
+      - API y endpoints: referencia/api-endpoints.md
+      - Datos y persistencia: referencia/datos-y-persistencia.md
+      - Configuración: referencia/configuracion.md
+      - Referencia Kotlin: referencia/kotlin.md
+  - Calidad y testing: calidad-y-testing.md
+  - Limitaciones y roadmap: limitaciones-y-roadmap.md
+  - Seguridad: seguridad-y-alcance.md
+  - Despliegue: despliegue.md
+  - Sobre el proyecto: sobre-el-proyecto.md
+  - Contribuir a la documentación: contribuir-documentacion.md
