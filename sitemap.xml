@@ -2,58 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/404/</loc>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/arquitectura/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/calidad-y-testing/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/capa-ui/</loc>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/contribuir-documentacion/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/demo-y-capturas/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/despliegue/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/estructura-proyecto/</loc>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/inyeccion-dependencias/</loc>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/limitaciones-y-roadmap/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/manifest-y-permisos/</loc>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/navegacion/</loc>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/puesta-en-marcha/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/seguridad-y-alcance/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/sobre-el-proyecto/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
+    </url>
+    <url>
+         <loc>https://amanigrupo1.github.io/AmaniAndroid/desarrollo/mantener-documentacion/</loc>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/referencia/api-endpoints/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/referencia/configuracion/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/referencia/datos-y-persistencia/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
     <url>
          <loc>https://amanigrupo1.github.io/AmaniAndroid/referencia/kotlin/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-17</lastmod>
     </url>
 </urlset>
