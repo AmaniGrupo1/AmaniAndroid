@@ -75,6 +75,7 @@ import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
 import org.ies.tierno.applicationamani.dto.tutor.TutorResponseDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.ui.componente.psicologo.MenuSetting
 import org.ies.tierno.applicationamani.presentation.viewmodels.profile.ProfilePsicologoViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.ListarPacientesByPsicologoViewModel
@@ -210,7 +211,12 @@ fun ViewPsicologoPrincipal(
         ) {
             when {
                 isLoading -> LoadingState()
-                pacientes.isEmpty() -> EmptyState()
+                pacientes.isEmpty() ->
+                    AmaniEmptyState(
+                        title = stringResource(R.string.no_tienes_pacientes),
+                        supporting = stringResource(R.string.cuando_asignen_pacientes),
+                        icon = Icons.Default.People,
+                    )
                 else ->
                     PacientesList(
                         pacientes = pacientes,
@@ -249,38 +255,6 @@ private fun LoadingState() {
     }
 }
 
-@Composable
-private fun EmptyState() {
-    val colorScheme = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(Spacing.l),
-        ) {
-            Icon(
-                imageVector = Icons.Default.People,
-                contentDescription = null,
-                modifier = Modifier.size(Dimensions.iconHero),
-                tint = colorScheme.primary.copy(alpha = 0.5f),
-            )
-            Spacer(modifier = Modifier.height(Spacing.m))
-            Text(
-                text = stringResource(R.string.no_tienes_pacientes),
-                style = typography.headlineSmall,
-                fontWeight = FontWeight.Medium,
-                color = colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.height(Spacing.s))
-            Text(
-                text = stringResource(R.string.cuando_asignen_pacientes),
-                style = typography.bodyMedium,
-                color = colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

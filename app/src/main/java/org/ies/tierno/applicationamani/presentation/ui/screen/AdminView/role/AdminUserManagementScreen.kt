@@ -63,6 +63,8 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.enumm.Rol
 import org.ies.tierno.applicationamani.domain.models.login.UsuarioDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.BottomSheetCambiarRol
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniPersonRow
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminRoleViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.role.AdminUserViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
@@ -458,27 +460,11 @@ fun AdminUserManagementContent(
                         CircularProgressIndicator(color = colorScheme.primary)
                     }
                 } else if (usuarios.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                Icons.Default.People,
-                                contentDescription = null,
-                                modifier = Modifier.size(Spacing.avatarLarge),
-                                tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.m))
-                            Text(
-                                text = stringResource(R.string.auto_no_se_encontraron_usuarios),
-                                style = typography.titleMedium,
-                                color = colorScheme.onSurfaceVariant,
-                            )
-                            Text(
-                                text = stringResource(R.string.auto_prueba_con_otros_filtros),
-                                style = typography.bodySmall,
-                                color = colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
+                    AmaniEmptyState(
+                        title = stringResource(R.string.auto_no_se_encontraron_usuarios),
+                        supporting = stringResource(R.string.auto_prueba_con_otros_filtros),
+                        icon = Icons.Default.People,
+                    )
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -517,13 +503,6 @@ fun UserCard(
     val typography = MaterialTheme.typography
     val shapes = MaterialTheme.shapes
 
-    val roleColor =
-        when (user.rol) {
-            Rol.admin -> colorScheme.error
-            Rol.psicologo -> colorScheme.tertiary
-            else -> colorScheme.primary
-        }
-
     val roleBgColor =
         when (user.rol) {
             Rol.admin -> colorScheme.errorContainer
@@ -545,96 +524,38 @@ fun UserCard(
             else -> stringResource(R.string.admin_rol_paciente)
         }
 
-    val roleIcon =
-        when (user.rol) {
-            Rol.admin -> Icons.Default.AdminPanelSettings
-            Rol.psicologo -> Icons.Default.MedicalServices
-            else -> Icons.Default.Person
-        }
-
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xxs),
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(Spacing.m),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.s),
-                ) {
-                    Icon(
-                        roleIcon,
-                        contentDescription = null,
-                        tint = roleColor,
-                        modifier = Modifier.size(Spacing.iconMedium),
-                    )
-                    Text(
-                        text = "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
-                        style = typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = colorScheme.onSurface,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(Spacing.xs))
-
-                Text(
-                    text = user.email ?: "",
-                    style = typography.bodySmall,
-                    color = colorScheme.onSurfaceVariant,
-                )
-
+    val supporting =
+        buildString {
+            append(user.email.orEmpty())
+            if (isNotEmpty()) append(" · ")
+            append(
                 if (!user.dni.isNullOrEmpty()) {
-                    Text(
-                        text = stringResource(R.string.admin_dni_formato, user.dni),
-                        style = typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant,
-                    )
+                    stringResource(R.string.admin_dni_formato, user.dni)
                 } else {
-                    Text(
-                        text = stringResource(R.string.auto_dni_no_registrado),
-                        style = typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant,
-                    )
-                }
+                    stringResource(R.string.auto_dni_no_registrado)
+                },
+            )
+        }
 
-                Spacer(modifier = Modifier.height(Spacing.s))
-
-                Surface(
-                    shape = CircleShape,
-                    color = roleBgColor,
-                ) {
-                    Text(
-                        text = roleLabel,
-                        style = typography.labelSmall,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
-                        color = roleOnBgColor,
-                    )
-                }
-            }
-
-            IconButton(
-                onClick = onCambiarRol,
+    AmaniPersonRow(
+        name = "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
+        supporting = supporting,
+        onClick = onCambiarRol,
+        modifier = modifier,
+        trailing = {
+            Surface(
+                shape = MaterialTheme.shapes.small,
+                color = roleBgColor,
             ) {
-                Icon(
-                    Icons.Default.SwapHoriz,
-                    contentDescription = stringResource(R.string.auto_cambiar_rol),
-                    modifier = Modifier.size(Spacing.iconMedium),
-                    tint = colorScheme.primary,
+                Text(
+                    text = roleLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xs),
+                    color = roleOnBgColor,
                 )
             }
-        }
-    }
+        },
+    )
 }
 
 @Preview(name = "AdminUserManagement Light", showBackground = true)

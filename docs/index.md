@@ -1,49 +1,137 @@
-# Amani Android en 60 segundos
+---
+title: Inicio
+hide:
+  - navigation
+  - toc
+---
 
-Amani es una aplicación Android para apoyar la gestión de consultas psicológicas. Conecta los flujos de pacientes, psicólogos y administración mediante una app nativa; la aplicación cliente consume un backend REST y servicios Firebase.
+<div class="hero" markdown>
 
-## El proyecto de un vistazo
+<img class="hero-logo" src="assets/logo.png" alt="Amani Psicología" width="320" height="120">
 
-| Tema | Estado comprobable |
-|---|---|
-| Problema | Reunir en una app tareas de consulta, seguimiento y comunicación entre los roles de Amani. |
-| Aplicación | Kotlin, una app Gradle (`:app`), Jetpack Compose y Material 3. |
-| Arquitectura | Capas de presentación, dominio y datos con MVVM; dependencias gestionadas con Koin. |
-| Integraciones | Retrofit/OkHttp, Firebase, Room y WorkManager; también hay dependencias de Jitsi y Stripe. |
-| Android | `minSdk 25`, `compileSdk 36` y `targetSdk 36`. |
-| Ejecución local | JDK 17 y Android SDK con API 36; compila con `./gradlew assembleDebug`. |
+# Documentación del cliente Android
 
-## Funcionalidades presentes en el código
+Cliente Android nativo (`v2.4`) para consultas psicológicas, agenda, diario emocional y chat entre pacientes, psicólogos y administración.
 
-- Inicio de sesión y flujos de usuario para administrador, psicólogo y paciente.
-- Gestión de perfiles, agenda/citas, cuestionarios, historial clínico y documentos legales.
-- Chat, notificaciones y diario emocional; el diario dispone de persistencia local y sincronización.
-- Pantallas de soporte, ajustes, estadísticas y pagos.
+[Empezar :material-arrow-right:](puesta-en-marcha.md){ .md-button .md-button--primary }
+[Ver en GitHub :fontawesome-brands-github:](https://github.com/AmaniGrupo1/AmaniAndroid){ .md-button }
 
-La presencia de una pantalla o interfaz cliente no garantiza que todos los flujos estén disponibles en un entorno de prueba. El backend y sus datos no se versionan en este repositorio.
+</div>
 
-## Enlaces rápidos
+<div class="stack" markdown>
+<span>minSdk 25</span>
+<span>targetSdk 36</span>
+<span>Kotlin 2.2.10</span>
+<span>Compose BOM 2026.04.01</span>
+<span>Koin 4.1.1</span>
+<span>43 rutas</span>
+</div>
 
-- [Demo y capturas](demo-y-capturas.md)
-- [Arquitectura y decisiones](arquitectura.md)
-- [Puesta en marcha local](puesta-en-marcha.md)
-- [API consumida por la app](referencia/api-endpoints.md)
-- [Testing y calidad](calidad-y-testing.md)
-- [Limitaciones y roadmap](limitaciones-y-roadmap.md)
-- [Sobre el proyecto](sobre-el-proyecto.md)
-- [Contribuir a la documentación](contribuir-documentacion.md)
+Documentación del módulo `:app` (`org.ies.tierno.applicationamani`). Las versiones salen de [`gradle/libs.versions.toml`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/gradle/libs.versions.toml) y [`app/build.gradle.kts`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/build.gradle.kts).
 
-## Flujo simplificado
+<div class="grid cards" markdown>
+
+-   :material-rocket-launch:{ .lg .middle } **Primeros pasos**
+
+    ---
+
+    JDK 17, Android SDK API 36, secretos locales, compilación y pruebas.
+
+    [:octicons-arrow-right-24: Puesta en marcha](puesta-en-marcha.md)
+
+-   :material-sitemap:{ .lg .middle } **Arquitectura**
+
+    ---
+
+    Clean + MVVM, flujo unidireccional y paquetes del módulo `:app`.
+
+    [:octicons-arrow-right-24: Ver arquitectura](arquitectura.md)
+
+-   :material-cellphone:{ .lg .middle } **UI y navegación**
+
+    ---
+
+    Material 3 (`AppTheme`), pantallas Compose por rol y grafo de 43 rutas.
+
+    [:octicons-arrow-right-24: Ver capa UI](capa-ui.md)
+
+-   :material-database-sync-outline:{ .lg .middle } **Datos, API y DI**
+
+    ---
+
+    Retrofit, diario offline con Room + WorkManager y módulos Koin.
+
+    [:octicons-arrow-right-24: Ver capa de datos](referencia/datos-y-persistencia.md)
+
+-   :material-flask-outline:{ .lg .middle } **Calidad y entrega**
+
+    ---
+
+    Suites unitarias, Test Lab, APK firmado, permisos y tokens.
+
+    [:octicons-arrow-right-24: Ver testing](calidad-y-testing.md)
+
+-   :material-compass-outline:{ .lg .middle } **Decisiones**
+
+    ---
+
+    `DEC-01` a `DEC-10`, limitaciones, roadmap y mantenimiento de docs.
+
+    [:octicons-arrow-right-24: Ver decisiones](limitaciones-y-roadmap.md)
+
+</div>
+
+## Qué cubre cada rol
+
+<div class="grid cards" markdown>
+
+-   :material-account-heart:{ .lg .middle } **Paciente**
+
+    ---
+
+    Cuestionario, citas y pago Stripe, Jitsi, chat con adjuntos, diario offline, historial y tickets.
+
+-   :material-account-tie:{ .lg .middle } **Psicólogo**
+
+    ---
+
+    Agenda, horarios, alta de pacientes, historial clínico, chat, estadísticas Vico y perfil.
+
+-   :material-shield-account:{ .lg .middle } **Administración**
+
+    ---
+
+    Altas, roles, asignación de psicólogo, tests, terapias, situaciones y documentos legales.
+
+</div>
+
+## Flujo de arquitectura
 
 ```mermaid
 flowchart LR
-    U["Roles de usuario"] --> UI["Compose y ViewModels"]
-    UI --> D["Casos de uso y repositorios"]
-    D --> R["Retrofit y backend REST"]
-    D --> F["Servicios Firebase"]
-    D --> L["DataStore y Room"]
+    UI["Pantallas Compose"] --> VM["ViewModels (StateFlow)"]
+    VM --> UC["UseCases (Domain)"]
+    UC --> Repo["Repositories (Data)"]
+    Repo --> API["Retrofit 3.0.0 + OkHttp"]
+    Repo --> FB["Firebase RTDB / Firestore / Storage"]
+    Repo --> Local["Room 2.8.4 + DataStore 1.2.1"]
 ```
+
+!!! note "Alcance del repositorio"
+    Este repositorio es el cliente Android (`:app`). El servidor REST en Cloud Run vive aparte. Tabla de versiones: [Build y configuración](referencia/configuracion.md). Capturas: [Demo y capturas](demo-y-capturas.md).
 
 ## Siguientes pasos
 
-Empieza por la [puesta en marcha](puesta-en-marcha.md), consulta la [arquitectura](arquitectura.md) o revisa [demo y capturas](demo-y-capturas.md).
+- Compila en local con [Puesta en marcha](puesta-en-marcha.md).
+- Recorre paquetes en [Arquitectura](arquitectura.md) y [Estructura del proyecto](estructura-proyecto.md).
+
+*[REST]: Representational State Transfer
+*[MVVM]: Model-View-ViewModel
+*[UDF]: Unidirectional Data Flow (Flujo de datos unidireccional)
+*[DI]: Dependency Injection (Inyección de dependencias)
+*[SDK]: Software Development Kit
+*[JDK]: Java Development Kit
+*[AGP]: Android Gradle Plugin
+*[BOM]: Bill of Materials
+*[RTDB]: Firebase Realtime Database
+*[APK]: Android Package Kit

@@ -1,12 +1,11 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
 import android.content.res.Configuration
+import android.provider.Settings
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,20 +36,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
 import org.ies.tierno.applicationamani.ui.theme.Dimensions
-import org.ies.tierno.applicationamani.ui.theme.Elevation
 import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
@@ -108,15 +109,12 @@ fun ChatInputBar(
                     modifier =
                         Modifier
                             .align(Alignment.TopEnd)
-                            .padding(Spacing.xs)
-                            .size(Dimensions.iconDefault)
                             .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f), CircleShape),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.auto_eliminar),
                         tint = MaterialTheme.colorScheme.inverseOnSurface,
-                        modifier = Modifier.size(Dimensions.iconSmall),
                     )
                 }
             }
@@ -128,18 +126,17 @@ fun ChatInputBar(
                 onStopClick = onStopRecording,
             )
         } else {
+            val canSend = text.isNotBlank() || pendingAttachmentUri != null
             Surface(
-                shape = MaterialTheme.shapes.large,
-                shadowElevation = Elevation.level2,
-                tonalElevation = Elevation.level1,
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.padding(horizontal = Spacing.s),
+                shape = MaterialTheme.shapes.extraLarge,
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                modifier = Modifier.padding(horizontal = Spacing.m),
             ) {
                 Row(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = Spacing.s, vertical = Spacing.s),
+                            .padding(start = Spacing.xs, top = Spacing.xs, end = Spacing.s, bottom = Spacing.xs),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     IconButton(onClick = onAttachFile) {
@@ -148,16 +145,6 @@ fun ChatInputBar(
                             contentDescription = stringResource(R.string.auto_adjuntar_archivo),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                    }
-
-                    if (!isRecording) {
-                        IconButton(onClick = onMicClick) {
-                            Icon(
-                                imageVector = Icons.Default.Mic,
-                                contentDescription = stringResource(R.string.auto_nota_de_voz),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
                     }
 
                     PillTextField(
@@ -169,33 +156,37 @@ fun ChatInputBar(
 
                     Spacer(modifier = Modifier.width(Spacing.xs))
 
-                    val sendScale by animateFloatAsState(
-                        targetValue = if (text.isNotBlank() || pendingAttachmentUri != null) 1f else 0.85f,
-                        animationSpec = spring(dampingRatio = 0.6f),
-                        label = stringResource(R.string.auto_send_scale),
-                    )
-
                     FilledIconButton(
-                        onClick = onSend,
-                        enabled = text.isNotBlank() || pendingAttachmentUri != null,
+                        onClick = if (canSend) onSend else onMicClick,
                         colors =
                             IconButtonDefaults.filledIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
-                                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                                containerColor =
+                                    if (canSend) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.primaryContainer
+                                    },
+                                contentColor =
+                                    if (canSend) {
+                                        MaterialTheme.colorScheme.onPrimary
+                                    } else {
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    },
                             ),
-                        modifier =
-                            Modifier
-                                .size(Dimensions.buttonHeight)
-                                .graphicsLayer {
-                                    scaleX = sendScale
-                                    scaleY = sendScale
-                                },
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = stringResource(R.string.auto_enviar_mensaje),
+                            imageVector =
+                                if (canSend) {
+                                    Icons.AutoMirrored.Filled.Send
+                                } else {
+                                    Icons.Default.Mic
+                                },
+                            contentDescription =
+                                if (canSend) {
+                                    stringResource(R.string.auto_enviar_mensaje)
+                                } else {
+                                    stringResource(R.string.auto_nota_de_voz)
+                                },
                         )
                     }
                 }
@@ -211,20 +202,20 @@ private fun PillTextField(
     onSend: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hint = stringResource(R.string.auto_escribe_un_mensajeu2026)
     BasicTextField(
         value = text,
         onValueChange = onTextChange,
         modifier =
             modifier
-                .background(
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    MaterialTheme.shapes.extraLarge,
-                ).padding(horizontal = Spacing.sm, vertical = Spacing.s),
-        textStyle =
-            TextStyle(
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            ),
+                .heightIn(min = Dimensions.touchTarget)
+                .padding(horizontal = Spacing.xs, vertical = Spacing.s)
+                .semantics {
+                    if (text.isBlank()) {
+                        contentDescription = hint
+                    }
+                },
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         maxLines = 4,
         keyboardOptions =
@@ -239,9 +230,9 @@ private fun PillTextField(
         decorationBox = { innerTextField ->
             if (text.isBlank()) {
                 Text(
-                    text = stringResource(R.string.auto_escribe_un_mensajeu2026),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    text = hint,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             innerTextField()
@@ -254,8 +245,9 @@ private fun RecordingBar(
     recordingSeconds: Int,
     onStopClick: () -> Unit,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = stringResource(R.string.auto_pulse))
-    val pulseAlpha by infiniteTransition.animateFloat(
+    val reduceMotion = rememberReduceMotionEnabled()
+    val infiniteTransition = rememberInfiniteTransition(label = "recording_pulse")
+    val animatedPulse by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
         animationSpec =
@@ -263,15 +255,14 @@ private fun RecordingBar(
                 animation = tween(800),
                 repeatMode = RepeatMode.Reverse,
             ),
-        label = stringResource(R.string.auto_pulse_alpha),
+        label = "recording_pulse_alpha",
     )
+    val pulseAlpha = if (reduceMotion) 1f else animatedPulse
 
     Surface(
-        shape = MaterialTheme.shapes.large,
-        shadowElevation = Elevation.level2,
-        tonalElevation = Elevation.level1,
-        color = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xs),
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.errorContainer,
+        modifier = Modifier.padding(horizontal = Spacing.m, vertical = Spacing.xs),
     ) {
         Row(
             modifier =
@@ -291,25 +282,35 @@ private fun RecordingBar(
             Text(
                 text = formatDuration(recordingSeconds),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onErrorContainer,
             )
             Spacer(modifier = Modifier.weight(1f))
-            Surface(
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
+            FilledIconButton(
                 onClick = onStopClick,
-                modifier = Modifier.size(Dimensions.avatarSmall),
+                colors =
+                    IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
+                    ),
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Stop,
-                        contentDescription = stringResource(R.string.auto_detener_grabacion),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(Dimensions.iconMedium),
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Stop,
+                    contentDescription = stringResource(R.string.auto_detener_grabacion),
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun rememberReduceMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    return remember(context) {
+        Settings.Global.getFloat(
+            context.contentResolver,
+            Settings.Global.ANIMATOR_DURATION_SCALE,
+            1f,
+        ) == 0f
     }
 }
 

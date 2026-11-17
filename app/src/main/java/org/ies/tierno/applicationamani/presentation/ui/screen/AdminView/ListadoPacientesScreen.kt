@@ -59,8 +59,10 @@ import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.requestPaciente.DatosPacienteAdminDTO
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.ListarPacientesViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
+import org.ies.tierno.applicationamani.ui.theme.Elevation
 import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
@@ -156,29 +158,12 @@ fun ListadoPacientesContent(
                         .padding(paddingValues),
                 contentAlignment = Alignment.Center,
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.m),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.People,
-                        contentDescription = stringResource(R.string.auto_sin_pacientes),
-                        modifier = Modifier.size(Spacing.avatarLarge),
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                    )
-                    Text(
-                        text = stringResource(R.string.auto_no_hay_pacientes_registrados),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Button(
-                        onClick = onAddClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                        shape = MaterialTheme.shapes.medium,
-                    ) {
-                        Text(stringResource(R.string.auto_agregar_primer_paciente))
-                    }
-                }
+                AmaniEmptyState(
+                    title = stringResource(R.string.auto_no_hay_pacientes_registrados),
+                    icon = Icons.Default.People,
+                    actionLabel = stringResource(R.string.auto_agregar_primer_paciente),
+                    onAction = onAddClick,
+                )
             }
         } else {
             LazyColumn(
@@ -224,7 +209,7 @@ fun PacienteCard(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xxs),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level0),
     ) {
         Column(
             modifier =

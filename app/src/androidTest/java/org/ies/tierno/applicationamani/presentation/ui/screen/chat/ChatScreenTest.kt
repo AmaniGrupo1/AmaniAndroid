@@ -73,7 +73,7 @@ class ChatScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Escribiendo...").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Escribiendo…").assertIsDisplayed()
     }
 
     @Test

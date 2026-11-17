@@ -233,7 +233,7 @@ fun LoginScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = shapes.large,
                 colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow),
-                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level2),
+                elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level0),
             ) {
                 Column(
                     modifier =
@@ -248,15 +248,12 @@ fun LoginScreenContent(
                     ) {
                         Text(
                             text = stringResource(R.string.auto_bienvenido_de_vuelta),
-                            style =
-                                typography.headlineSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = colorScheme.onSurface,
-                                ),
+                            style = typography.titleLarge,
+                            color = colorScheme.onSurface,
                         )
                         Text(
                             text = stringResource(R.string.auto_accede_a_tu_espacio),
-                            style = typography.bodyMedium,
+                            style = typography.bodyLarge,
                             color = colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
                         )
@@ -405,7 +402,7 @@ fun LoginScreenContent(
                                 containerColor = colorScheme.primary,
                                 contentColor = colorScheme.onPrimary,
                             ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = Elevation.level2),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = Elevation.level0),
                     ) {
                         if (isLoggingIn) {
                             Row(

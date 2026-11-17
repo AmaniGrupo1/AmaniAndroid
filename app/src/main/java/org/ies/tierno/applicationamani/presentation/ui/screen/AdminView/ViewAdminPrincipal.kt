@@ -78,6 +78,7 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.login.ListaPacientesAndPsicologo
 import org.ies.tierno.applicationamani.dto.login.PacientesAsignadoDTO
 import org.ies.tierno.applicationamani.presentation.ui.componente.admin.MenuAdministrador
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.admin.GetAllPacientAndPsicologoVeiwModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.Spacing
@@ -150,7 +151,12 @@ fun ViewAdminPrincipal(
         ) {
             when {
                 showLoading && psicologos.isEmpty() -> LoadingState()
-                psicologos.isEmpty() -> EmptyState()
+                psicologos.isEmpty() ->
+                    AmaniEmptyState(
+                        title = stringResource(R.string.auto_no_hay_psicologos_registrados),
+                        supporting = stringResource(R.string.auto_los_psicologos_apareceran_aqui),
+                        icon = Icons.Default.MedicalServices,
+                    )
                 else ->
                     PsicologosList(
                         psicologos = psicologos,
@@ -205,38 +211,6 @@ private fun LoadingState() {
     }
 }
 
-@Composable
-private fun EmptyState() {
-    val colorScheme = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(Spacing.l),
-        ) {
-            Icon(
-                imageVector = Icons.Default.MedicalServices,
-                contentDescription = null,
-                modifier = Modifier.size(Spacing.avatarLarge),
-                tint = colorScheme.primary.copy(alpha = 0.5f),
-            )
-            Spacer(modifier = Modifier.height(Spacing.m))
-            Text(
-                text = stringResource(R.string.auto_no_hay_psicologos_registrados),
-                style = typography.headlineSmall,
-                fontWeight = FontWeight.Medium,
-                color = colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.height(Spacing.s))
-            Text(
-                text = stringResource(R.string.auto_los_psicologos_apareceran_aqui),
-                style = typography.bodyMedium,
-                color = colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

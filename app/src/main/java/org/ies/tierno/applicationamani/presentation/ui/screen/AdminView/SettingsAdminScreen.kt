@@ -801,14 +801,7 @@ fun SettingsOptionRow(
                     }
                 }
             }
-            else -> {
-                Icon(
-                    Icons.Default.ChevronRight,
-                    contentDescription = stringResource(R.string.auto_ir),
-                    tint = onSurfaceVariant,
-                    modifier = Modifier.size(Dimensions.iconMedium),
-                )
-            }
+            else -> Unit
         }
     }
 }

@@ -89,3 +89,7 @@ Ensure that Java types are documented with Javadoc comments and follow best prac
 - `.claude/skills/java-docs/SKILL.md`
 
 <!-- autoskills:end -->
+
+## Mantenimiento de la documentación MkDocs
+
+- Al modificar `app/src/main/java/`, `app/src/main/AndroidManifest.xml`, `app/src/main/res/`, `app/src/test/`, `app/src/androidTest/`, `app/build.gradle.kts`, `build.gradle.kts`, `gradle/libs.versions.toml`, `.github/workflows/`, `DECISIONES.md` o `PLAN-MEJORA.md`, actualiza la página de docs correspondiente según `docs/desarrollo/mantener-documentacion.md`.

@@ -67,14 +67,13 @@ fun EntretenimientoScreenContent(
                         Text(
                             text = stringResource(R.string.entretenimiento),
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
                         )
                     }
                 },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
                     ),
             )
         },

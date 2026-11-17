@@ -52,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.documentoLegal.DocumentoLegalResponseDTO
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.documentoLegal.DocumentoLegalViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
@@ -220,38 +221,11 @@ fun DocumentoLegalDetailScreen(
                 }
 
                 documento == null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(Spacing.l),
-                        ) {
-                            Icon(
-                                icono,
-                                contentDescription = null,
-                                modifier = Modifier.size(Dimensions.avatarLarge),
-                                tint = colorScheme.primary.copy(alpha = 0.4f),
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.m))
-                            Text(
-                                text = stringResource(R.string.auto_documento_no_disponible),
-                                style = typography.headlineSmall,
-                                fontWeight = FontWeight.Medium,
-                                color = colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.s))
-                            Text(
-                                text = stringResource(R.string.auto_el_documento_no_esta),
-                                style = typography.bodyMedium,
-                                color = colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
+                    AmaniEmptyState(
+                        title = stringResource(R.string.auto_documento_no_disponible),
+                        supporting = stringResource(R.string.auto_el_documento_no_esta),
+                        icon = icono,
+                    )
                 }
 
                 else -> {

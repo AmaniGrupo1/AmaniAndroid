@@ -9,7 +9,6 @@ import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -41,7 +39,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -106,9 +103,11 @@ fun ChatScreen(
     val isOtherTyping = successState?.isOtherTyping ?: false
     val pendingAttachmentUri = successState?.pendingAttachmentUri
 
+    val todayLabel = stringResource(R.string.chat_hoy)
+    val yesterdayLabel = stringResource(R.string.chat_ayer)
     val chatItems =
-        remember(messages) {
-            buildChatItems(messages, currentUserId)
+        remember(messages, currentUserId, todayLabel, yesterdayLabel) {
+            buildChatItems(messages, currentUserId, todayLabel, yesterdayLabel)
         }
 
     val audioPermissionLauncher =
@@ -221,7 +220,7 @@ fun ChatScreen(
                                 imageVector = Icons.Outlined.ChatBubbleOutline,
                                 contentDescription = null,
                                 modifier = Modifier.size(Dimensions.iconHero),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Spacer(modifier = Modifier.height(Spacing.l))
                             Text(
@@ -247,7 +246,7 @@ fun ChatScreen(
                                 },
                             ) { item ->
                                 when (item) {
-                                    is ChatListItem.DateSeparator -> DateSeparatorChip(item.label)
+                                    is ChatListItem.DateSeparator -> ChatDateSeparator(item.label)
                                     is ChatListItem.MessageItem ->
                                         MessageBubble(
                                             message = item.msg,
@@ -330,7 +329,6 @@ private fun ChatTopBar(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.clickable { },
                 ) {
                     PsychologistAvatar(psychologistInfo = psychologistInfo, size = Dimensions.iconLarge)
                     Spacer(modifier = Modifier.width(Spacing.s))
@@ -399,30 +397,6 @@ private fun ChatTopBar(
     )
 }
 
-/**
- * Chip visual que se utiliza para separar mensajes por fecha en el LazyColumn.
- */
-@Composable
-private fun DateSeparatorChip(label: String) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = Spacing.s),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        SuggestionChip(
-            onClick = { },
-            shape = MaterialTheme.shapes.small,
-            label = {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            },
-        )
-    }
-}
 
 @Preview(name = "ChatTopBar Light", showBackground = true)
 @Preview(name = "ChatTopBar Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
@@ -442,7 +416,7 @@ private fun ChatScreenPreview() {
                 onNavigateBack = {},
                 isOtherTyping = false,
             )
-            DateSeparatorChip(label = "Hoy")
+            ChatDateSeparator(label = "Hoy")
         }
     }
 }

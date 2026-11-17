@@ -1,35 +1,28 @@
 package org.ies.tierno.applicationamani.presentation.ui.screen.chat
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,20 +30,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatListViewModel
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatPartner
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
 import org.ies.tierno.applicationamani.ui.theme.Dimensions
-import org.ies.tierno.applicationamani.ui.theme.Elevation
 import org.ies.tierno.applicationamani.ui.theme.Spacing
 
 /**
@@ -129,7 +124,7 @@ fun ChatListContent(
     val typography = MaterialTheme.typography
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.surface,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.auto_mensajes)) },
@@ -163,85 +158,50 @@ fun ChatListContent(
                     )
                 }
                 error != null && partners.isEmpty() -> {
-                    Surface(
+                    Column(
                         modifier =
                             Modifier
                                 .align(Alignment.Center)
                                 .padding(Spacing.l),
-                        shape = MaterialTheme.shapes.large,
-                        color = colors.surfaceContainerLow,
-                        tonalElevation = Elevation.level1,
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Column(modifier = Modifier.padding(Spacing.l)) {
-                            Text(
-                                text = error,
-                                style = typography.bodyLarge,
-                                textAlign = TextAlign.Center,
-                                color = colors.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.sm))
-                            Button(
-                                onClick = onRetryClick,
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
-                            ) {
-                                Text(stringResource(R.string.auto_reintentar))
-                            }
+                        Text(
+                            text = error,
+                            style = typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = colors.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(Spacing.sm))
+                        Button(onClick = onRetryClick) {
+                            Text(stringResource(R.string.auto_reintentar))
                         }
                     }
                 }
                 partners.isEmpty() -> {
-                    Surface(
-                        modifier =
-                            Modifier
-                                .align(Alignment.Center)
-                                .padding(Spacing.l),
-                        shape = MaterialTheme.shapes.large,
-                        color = colors.surfaceContainerLow,
-                        tonalElevation = Elevation.level1,
-                    ) {
-                        Text(
-                            text =
-                                if (normalizedRol == "psicologo" || normalizedRol == "psicologa") {
-                                    stringResource(R.string.chat_sin_pacientes_asignados)
-                                } else {
-                                    stringResource(R.string.chat_sin_psicologo_asignado)
-                                },
-                            style = typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = colors.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = Spacing.l, vertical = Spacing.l),
-                        )
-                    }
+                    AmaniEmptyState(
+                        title =
+                            if (normalizedRol == "psicologo" || normalizedRol == "psicologa") {
+                                stringResource(R.string.chat_sin_pacientes_asignados)
+                            } else {
+                                stringResource(R.string.chat_sin_psicologo_asignado)
+                            },
+                        icon = Icons.Outlined.ChatBubbleOutline,
+                    )
                 }
                 else -> {
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(Spacing.m),
-                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
                     ) {
-                        Text(
-                            text = stringResource(R.string.auto_tu_conversacion),
-                            style = typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.onSurface,
-                            modifier = Modifier.padding(bottom = Spacing.xs),
-                        )
-
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                        ) {
-                            items(
-                                items = partners,
-                                key = { partner -> partner.id },
-                            ) { partner ->
-                                ChatPartnerCard(
-                                    partnerName = partner.nombre,
-                                    currentUserRol = currentUserRol,
-                                    onClick = { onPartnerClick(partner) },
-                                )
-                            }
+                        items(
+                            items = partners,
+                            key = { partner -> partner.id },
+                        ) { partner ->
+                            ChatPartnerCard(
+                                partnerName = partner.nombre,
+                                partnerPhotoUrl = partner.photoUrl,
+                                currentUserRol = currentUserRol,
+                                onClick = { onPartnerClick(partner) },
+                            )
                         }
                     }
                 }
@@ -253,68 +213,46 @@ fun ChatListContent(
 @Composable
 private fun ChatPartnerCard(
     partnerName: String,
+    partnerPhotoUrl: String?,
     currentUserRol: String,
     onClick: () -> Unit,
 ) {
-    Card(
+    ListItem(
+        headlineContent = {
+            Text(
+                text = partnerName,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        supportingContent = {
+            Text(
+                text =
+                    if (currentUserRol.equals("paciente", ignoreCase = true)) {
+                        stringResource(R.string.chat_subtitulo_psicologo_asignado)
+                    } else {
+                        stringResource(R.string.chat_subtitulo_paciente_asignado)
+                    },
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        leadingContent = {
+            ConversationAvatar(
+                name = partnerName,
+                size = Dimensions.avatarMedium,
+                photoUrl = partnerPhotoUrl,
+            )
+        },
+        colors =
+            ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         modifier =
             Modifier
-                .fillMaxWidth()
-                .clickable { onClick() },
-        shape = MaterialTheme.shapes.medium,
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-            ),
-        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(Spacing.m),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(Dimensions.avatarMedium)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            }
-
-            Spacer(modifier = Modifier.width(Spacing.m))
-
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    text = partnerName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.height(Spacing.xs))
-                Text(
-                    text =
-                        if (currentUserRol == "paciente") {
-                            stringResource(R.string.chat_subtitulo_psicologo_asignado)
-                        } else {
-                            stringResource(R.string.chat_subtitulo_paciente_asignado)
-                        },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
+                .clickable(onClick = onClick)
+                .semantics { role = Role.Button },
+    )
 }
 
 @Preview(name = "ChatList Light", showBackground = true)

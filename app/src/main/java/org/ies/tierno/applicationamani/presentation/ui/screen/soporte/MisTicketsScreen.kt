@@ -20,9 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +48,7 @@ import org.ies.tierno.applicationamani.domain.models.soporte.EstadoTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.FiltroTicket
 import org.ies.tierno.applicationamani.domain.models.soporte.TicketSoporte
 import org.ies.tierno.applicationamani.domain.models.soporte.TipoTicket
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.soporte.SoporteTicketViewModel
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
 import org.ies.tierno.applicationamani.ui.theme.Dimensions
@@ -219,29 +220,11 @@ fun MisTicketsContent(
                 }
 
                 if (!isLoading && tickets.isEmpty() && error == null) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = Spacing.xxl),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(Spacing.s),
-                        ) {
-                            Text(
-                                stringResource(R.string.auto_no_hay_tickets),
-                                style = typography.titleMedium,
-                                color = colors.onSurfaceVariant,
-                            )
-                            Text(
-                                stringResource(R.string.auto_crea_uno_nuevo_desde),
-                                style = typography.bodySmall,
-                                color = colors.onSurfaceVariant,
-                            )
-                        }
-                    }
+                    AmaniEmptyState(
+                        title = stringResource(R.string.auto_no_hay_tickets),
+                        supporting = stringResource(R.string.auto_crea_uno_nuevo_desde),
+                        modifier = Modifier.height(Dimensions.pagerHeightCompact),
+                    )
                 } else {
                     tickets.forEach { ticket ->
                         TicketCard(ticket)
@@ -282,73 +265,29 @@ private fun FiltroTab(
 
 @Composable
 private fun TicketCard(ticket: TicketSoporte) {
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-    val shapes = MaterialTheme.shapes
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = shapes.large,
-        colors = CardDefaults.cardColors(containerColor = colors.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
-    ) {
-        Column(modifier = Modifier.padding(Spacing.m)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Surface(
-                    color = ticket.estado.colorContenedor,
-                    shape = shapes.extraSmall,
-                ) {
-                    Text(
-                        ticket.estado.nombreVisual,
-                        modifier = Modifier.padding(horizontal = Spacing.s, vertical = Spacing.xs),
-                        style = typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                        color = ticket.estado.colorContenido,
-                    )
-                }
-                Text(
-                    stringResource(R.string.soporte_ticket_id_formato, ticket.id),
-                    style = typography.bodySmall,
-                    color = colors.onSurfaceVariant,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(Spacing.s))
+    ListItem(
+        headlineContent = {
+            Text(ticket.titulo, maxLines = 2)
+        },
+        supportingContent = {
             Text(
-                ticket.titulo,
-                style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = colors.onSurface,
+                text = "${ticket.fecha} · ${ticket.etiquetaEstado}",
+                maxLines = 1,
             )
-            Spacer(modifier = Modifier.height(Spacing.xs))
-            Text(ticket.fecha, style = typography.bodySmall, color = colors.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(Spacing.s))
-
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(ticket.estado.colorContenedor, shapes.small)
-                        .border(
-                            Dimensions.borderThin,
-                            ticket.estado.colorContenedor.copy(alpha = 0.5f),
-                            shapes.small,
-                        ).padding(horizontal = Spacing.sm, vertical = Spacing.s),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Spacing.s),
-            ) {
-                EstadoIcono(ticket.estado)
-                Text(
-                    ticket.etiquetaEstado,
-                    style = typography.bodySmall.copy(fontWeight = FontWeight.Medium),
-                    color = ticket.estado.colorContenido,
-                )
-            }
-        }
-    }
+        },
+        leadingContent = { EstadoIcono(ticket.estado) },
+        trailingContent = {
+            Text(
+                text = ticket.estado.nombreVisual,
+                style = MaterialTheme.typography.labelSmall,
+                color = ticket.estado.colorContenido,
+            )
+        },
+        colors =
+            ListItemDefaults.colors(
+                containerColor = ticket.estado.colorContenedor,
+            ),
+    )
 }
 
 @Composable

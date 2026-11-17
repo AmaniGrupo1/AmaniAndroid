@@ -32,7 +32,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,9 +44,9 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,6 +60,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -74,16 +77,20 @@ import org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybac
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
 import org.ies.tierno.applicationamani.ui.theme.Dimensions
+import org.ies.tierno.applicationamani.ui.theme.Elevation
 import org.ies.tierno.applicationamani.ui.theme.Spacing
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Locale
 
 sealed class ChatV2ListItem {
     data class MessageItem(
         val msg: ChatMessage,
+        val isFirstInGroup: Boolean,
+        val isLastInGroup: Boolean,
     ) : ChatV2ListItem()
 
     data class DateSeparator(
@@ -121,31 +128,7 @@ fun ChatScreenV2(
 
     val chatItems =
         remember(state.messages, hoyLabel, ayerLabel) {
-            val sortedAsc = state.messages.sortedBy { it.timestamp }
-            val items = mutableListOf<ChatV2ListItem>()
-            var lastDate: LocalDate? = null
-
-            for (msg in sortedAsc) {
-                val messageDate =
-                    Instant
-                        .ofEpochMilli(msg.timestamp)
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate()
-
-                if (lastDate != messageDate) {
-                    lastDate = messageDate
-                    val label =
-                        when {
-                            messageDate == LocalDate.now() -> hoyLabel
-                            messageDate == LocalDate.now().minusDays(1) -> ayerLabel
-                            else -> messageDate.format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("es")))
-                        }
-                    items.add(ChatV2ListItem.DateSeparator(label))
-                }
-
-                items.add(ChatV2ListItem.MessageItem(msg))
-            }
-            items.reversed()
+            buildChatV2Items(state.messages, hoyLabel, ayerLabel)
         }
 
     // ── Trigger de paginación ─────────────────────────────────────────────────
@@ -216,6 +199,7 @@ fun ChatScreenV2(
             Modifier
                 .fillMaxSize()
                 .imePadding(),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         topBar = {
             ChatTopBarV2(
                 title = otherUserName.ifBlank { chatDefaultTitle },
@@ -272,7 +256,6 @@ fun ChatScreenV2(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
                     .padding(paddingValues),
         ) {
             when {
@@ -281,11 +264,8 @@ fun ChatScreenV2(
                 }
 
                 state.messages.isEmpty() -> {
-                    Text(
-                        text = stringResource(R.string.auto_aun_no_hay_mensajes),
+                    ChatEmptyState(
                         modifier = Modifier.align(Alignment.Center),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
@@ -303,8 +283,7 @@ fun ChatScreenV2(
                             modifier = Modifier.fillMaxSize(),
                             state = listState,
                             reverseLayout = true,
-                            contentPadding = PaddingValues(horizontal = Spacing.sm, vertical = Spacing.m),
-                            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                            contentPadding = PaddingValues(horizontal = Spacing.s, vertical = Spacing.m),
                         ) {
                             items(
                                 items = chatItems,
@@ -317,12 +296,15 @@ fun ChatScreenV2(
                             ) { item ->
                                 when (item) {
                                     is ChatV2ListItem.DateSeparator -> {
-                                        DateSeparatorChipV2(item.label)
+                                        ChatDateSeparator(item.label)
                                     }
                                     is ChatV2ListItem.MessageItem -> {
                                         MessageBubbleV2(
                                             message = item.msg,
                                             isOwnMessage = item.msg.senderId == viewModel.currentUserId,
+                                            isFirstInGroup = item.isFirstInGroup,
+                                            isLastInGroup = item.isLastInGroup,
+                                            otherUserName = otherUserName.ifBlank { chatDefaultTitle },
                                             audioUiState = state.audioUiState,
                                             onPlayPause = { messageId, url ->
                                                 viewModel.toggleAudioPlayback(messageId, url)
@@ -347,12 +329,21 @@ private fun ChatTopBarV2(
     title: String,
     onNavigateBack: () -> Unit,
 ) {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ConversationAvatar(
+                    name = title,
+                    size = Dimensions.avatarSmall,
+                )
+                Spacer(modifier = Modifier.width(Spacing.sm))
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = onNavigateBack) {
@@ -365,29 +356,38 @@ private fun ChatTopBarV2(
         colors =
             TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
             ),
         windowInsets = WindowInsets(0, 0, 0, 0),
     )
 }
 
 @Composable
-private fun DateSeparatorChipV2(label: String) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = Spacing.s),
-        horizontalArrangement = Arrangement.Center,
+private fun ChatEmptyState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(horizontal = Spacing.xl),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        SuggestionChip(
-            onClick = { },
-            shape = MaterialTheme.shapes.small,
-            label = {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            },
+        Icon(
+            imageVector = Icons.Outlined.ChatBubbleOutline,
+            contentDescription = null,
+            modifier = Modifier.size(Dimensions.iconHero),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(Spacing.m))
+        Text(
+            text = stringResource(R.string.auto_aun_no_hay_mensajes),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(Spacing.xs))
+        Text(
+            text = stringResource(R.string.chat_empty_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -404,37 +404,64 @@ private fun DateSeparatorChipV2(label: String) {
 private fun MessageBubbleV2(
     message: ChatMessage,
     isOwnMessage: Boolean,
+    isFirstInGroup: Boolean,
+    isLastInGroup: Boolean,
+    otherUserName: String,
     audioUiState: AudioPlaybackUiState,
     onPlayPause: (String, String) -> Unit,
 ) {
-    val alignment = if (isOwnMessage) Alignment.End else Alignment.Start
     val bubbleColor =
         if (isOwnMessage) {
-            MaterialTheme.colorScheme.primary
+            MaterialTheme.colorScheme.primaryContainer
         } else {
-            MaterialTheme.colorScheme.surfaceVariant
+            MaterialTheme.colorScheme.surfaceContainerHighest
         }
     val textColor =
         if (isOwnMessage) {
-            MaterialTheme.colorScheme.onPrimary
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        }
+    val metaColor =
+        if (isOwnMessage) {
+            MaterialTheme.colorScheme.onPrimaryContainer
         } else {
             MaterialTheme.colorScheme.onSurfaceVariant
         }
+    val bottomPadding = if (isLastInGroup) Spacing.s else Spacing.xxs
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = alignment,
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = bottomPadding),
+        horizontalArrangement = if (isOwnMessage) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.Bottom,
     ) {
+        if (!isOwnMessage) {
+            if (isLastInGroup) {
+                ConversationAvatar(
+                    name = otherUserName,
+                    size = Dimensions.iconLarge,
+                )
+                Spacer(modifier = Modifier.width(Spacing.xs))
+            } else {
+                Spacer(modifier = Modifier.width(Dimensions.avatarSmall))
+            }
+        }
+
+        Column(
+            horizontalAlignment = if (isOwnMessage) Alignment.End else Alignment.Start,
+            modifier = Modifier.widthIn(max = Dimensions.chatBubbleMax),
+        ) {
         Surface(
-            shape =
-                RoundedCornerShape(
-                    topStart = Spacing.m,
-                    topEnd = Spacing.m,
-                    bottomStart = if (isOwnMessage) Spacing.m else Spacing.xs,
-                    bottomEnd = if (isOwnMessage) Spacing.xs else Spacing.m,
-                ),
+            shape = chatBubbleShape(isOwnMessage, isFirstInGroup, isLastInGroup),
             color = bubbleColor,
-            modifier = Modifier.wrapContentHeight(),
+            tonalElevation = if (isOwnMessage) Elevation.level1 else Elevation.level0,
+            modifier =
+                Modifier
+                    .wrapContentHeight()
+                    .semantics(mergeDescendants = true) {},
         ) {
             val timeString =
                 remember(message.timestamp) {
@@ -442,7 +469,9 @@ private fun MessageBubbleV2(
                         .ofEpochMilli(message.timestamp)
                         .atZone(ZoneId.systemDefault())
                         .toLocalTime()
-                        .format(DateTimeFormatter.ofPattern("HH:mm"))
+                        .format(
+                            DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault()),
+                        )
                 }
 
             Column {
@@ -460,7 +489,7 @@ private fun MessageBubbleV2(
                             Text(
                                 text = content.body,
                                 color = textColor,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                             if (message.status == MessageStatus.FAILED) {
                                 Text(
@@ -482,14 +511,13 @@ private fun MessageBubbleV2(
                                 Text(
                                     text = timeString,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = textColor.copy(alpha = 0.7f),
+                                    color = metaColor,
                                 )
                                 if (isOwnMessage) {
                                     Spacer(modifier = Modifier.width(Spacing.xs))
                                     StatusIcon(
                                         isRead = message.status == MessageStatus.READ,
                                         isDelivered = message.status == MessageStatus.SENT,
-                                        tint = textColor.copy(alpha = 0.7f),
                                     )
                                 }
                             }
@@ -570,7 +598,7 @@ private fun MessageBubbleV2(
                                     Text(
                                         text = content.caption,
                                         color = textColor,
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         modifier = Modifier.widthIn(max = Dimensions.chatImageMax),
                                     )
                                     Spacer(modifier = Modifier.height(Spacing.xxs))
@@ -582,14 +610,13 @@ private fun MessageBubbleV2(
                                         Text(
                                             text = timeString,
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = textColor.copy(alpha = 0.7f),
+                                            color = metaColor,
                                         )
                                         if (isOwnMessage) {
                                             Spacer(modifier = Modifier.width(Spacing.xs))
                                             StatusIcon(
                                                 isRead = message.status == MessageStatus.READ,
                                                 isDelivered = message.status == MessageStatus.SENT,
-                                                tint = textColor.copy(alpha = 0.7f),
                                             )
                                         }
                                     }
@@ -615,14 +642,13 @@ private fun MessageBubbleV2(
                                 Text(
                                     text = timeString,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = textColor.copy(alpha = 0.7f),
+                                    color = metaColor,
                                 )
                                 if (isOwnMessage) {
                                     Spacer(modifier = Modifier.width(Spacing.xs))
                                     StatusIcon(
                                         isRead = message.status == MessageStatus.READ,
                                         isDelivered = message.status == MessageStatus.SENT,
-                                        tint = textColor.copy(alpha = 0.7f),
                                     )
                                 }
                             }
@@ -640,8 +666,87 @@ private fun MessageBubbleV2(
                 modifier = Modifier.padding(horizontal = Spacing.xs, vertical = Spacing.xxs),
             )
         }
+        }
     }
 }
+
+private fun chatBubbleShape(
+    isOwn: Boolean,
+    isFirstInGroup: Boolean,
+    isLastInGroup: Boolean,
+): RoundedCornerShape {
+    val full = Spacing.m
+    val reduced = Spacing.s
+    val tail = Spacing.xs
+    return if (isOwn) {
+        RoundedCornerShape(
+            topStart = full,
+            topEnd = if (isFirstInGroup) full else reduced,
+            bottomStart = full,
+            bottomEnd = if (isLastInGroup) tail else reduced,
+        )
+    } else {
+        RoundedCornerShape(
+            topStart = if (isFirstInGroup) full else reduced,
+            topEnd = full,
+            bottomStart = if (isLastInGroup) tail else reduced,
+            bottomEnd = full,
+        )
+    }
+}
+
+private fun buildChatV2Items(
+    messages: List<ChatMessage>,
+    hoyLabel: String,
+    ayerLabel: String,
+): List<ChatV2ListItem> {
+    val sortedAsc = messages.sortedBy { it.timestamp }
+    val items = mutableListOf<ChatV2ListItem>()
+    var lastDate: LocalDate? = null
+
+    sortedAsc.forEachIndexed { index, msg ->
+        val messageDate = messageLocalDate(msg.timestamp)
+        if (lastDate != messageDate) {
+            lastDate = messageDate
+            val label =
+                when {
+                    messageDate == LocalDate.now() -> hoyLabel
+                    messageDate == LocalDate.now().minusDays(1) -> ayerLabel
+                    else ->
+                        messageDate.format(
+                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault()),
+                        )
+                }
+            items.add(ChatV2ListItem.DateSeparator(label))
+        }
+
+        val previous = sortedAsc.getOrNull(index - 1)
+        val next = sortedAsc.getOrNull(index + 1)
+        val isFirstInGroup =
+            previous == null ||
+                previous.senderId != msg.senderId ||
+                messageLocalDate(previous.timestamp) != messageDate
+        val isLastInGroup =
+            next == null ||
+                next.senderId != msg.senderId ||
+                messageLocalDate(next.timestamp) != messageDate
+
+        items.add(
+            ChatV2ListItem.MessageItem(
+                msg = msg,
+                isFirstInGroup = isFirstInGroup,
+                isLastInGroup = isLastInGroup,
+            ),
+        )
+    }
+    return items.reversed()
+}
+
+private fun messageLocalDate(timestamp: Long): LocalDate =
+    Instant
+        .ofEpochMilli(timestamp)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
 
 // ─── Indicador de progreso de subida ─────────────────────────────────────────
 
@@ -685,6 +790,24 @@ private fun ChatScreenV2Preview() {
         Column(modifier = Modifier.padding(Spacing.m)) {
             ChatTopBarV2(title = "Dra. Laura Fernández", onNavigateBack = {})
             Spacer(modifier = Modifier.height(Spacing.s))
+            ChatDateSeparator(label = "Hoy")
+            MessageBubbleV2(
+                message =
+                    ChatMessage(
+                        id = "2",
+                        senderId = "2",
+                        receiverId = "1",
+                        timestamp = 1761299940000L,
+                        status = MessageStatus.READ,
+                        content = MessageContent.Text("Hola, ¿cómo te encuentras hoy?"),
+                    ),
+                isOwnMessage = false,
+                isFirstInGroup = true,
+                isLastInGroup = true,
+                otherUserName = "Dra. Laura Fernández",
+                audioUiState = AudioPlaybackUiState(),
+                onPlayPause = { _, _ -> },
+            )
             MessageBubbleV2(
                 message =
                     ChatMessage(
@@ -696,6 +819,9 @@ private fun ChatScreenV2Preview() {
                         content = MessageContent.Text("Hola doctora, quería confirmar nuestra sesión del jueves."),
                     ),
                 isOwnMessage = true,
+                isFirstInGroup = true,
+                isLastInGroup = true,
+                otherUserName = "Dra. Laura Fernández",
                 audioUiState = AudioPlaybackUiState(),
                 onPlayPause = { _, _ -> },
             )

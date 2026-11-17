@@ -71,6 +71,7 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.diario.DiarioEmocionResponseDTO
 import org.ies.tierno.applicationamani.domain.models.psicologo.EstadisticasEmocionales
 import org.ies.tierno.applicationamani.dto.psicologo.PacientePsicologoResponseDTO
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoUiState
 import org.ies.tierno.applicationamani.presentation.viewmodels.psicologoViewModel.EstadisticasPsicologoViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
@@ -367,34 +368,12 @@ fun ChartCard(
 
 @Composable
 private fun EmptyStateContent() {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .testTag("chart_empty_state"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.BarChart,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-            modifier = Modifier.size(Dimensions.iconHero),
-        )
-        Spacer(modifier = Modifier.height(Spacing.m))
-        Text(
-            text = stringResource(R.string.auto_sin_datos_disponibles),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Text(
-            text = stringResource(R.string.auto_este_paciente_no_tiene),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = Spacing.l),
-        )
-    }
+    AmaniEmptyState(
+        title = stringResource(R.string.auto_sin_datos_disponibles),
+        supporting = stringResource(R.string.auto_este_paciente_no_tiene),
+        icon = Icons.Outlined.BarChart,
+        modifier = Modifier.testTag("chart_empty_state"),
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

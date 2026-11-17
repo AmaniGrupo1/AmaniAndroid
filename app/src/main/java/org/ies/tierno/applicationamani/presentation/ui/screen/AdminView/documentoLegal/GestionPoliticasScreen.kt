@@ -492,13 +492,6 @@ fun PoliticaCard(
                         text = stringResource(R.string.auto_ver_detalles_completos),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium,
-                    )
-                    Icon(
-                        Icons.Default.ChevronRight,
-                        contentDescription = null,
-                        modifier = Modifier.size(Dimensions.iconSmall),
-                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
             }

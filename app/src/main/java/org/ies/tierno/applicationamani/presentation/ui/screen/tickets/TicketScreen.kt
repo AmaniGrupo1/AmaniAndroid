@@ -219,7 +219,7 @@ fun TicketScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = shapes.large,
                     colors = CardDefaults.cardColors(containerColor = colors.surfaceContainerLow),
-                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level0),
                 ) {
                     Column(
                         modifier = Modifier.padding(Spacing.m),
@@ -412,7 +412,7 @@ fun TicketScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = shapes.large,
                         colors = CardDefaults.cardColors(containerColor = colors.surfaceContainerLow),
-                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
+                        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level0),
                     ) {
                         Column(
                             modifier =
@@ -480,7 +480,7 @@ fun TicketCard(
                 .padding(vertical = Spacing.xs),
         shape = shapes.large,
         colors = CardDefaults.cardColors(containerColor = colors.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level1),
+        elevation = CardDefaults.cardElevation(defaultElevation = Elevation.level0),
     ) {
         Column(
             modifier =

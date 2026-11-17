@@ -67,6 +67,7 @@ import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.data.local.TokenDataStore
 import org.ies.tierno.applicationamani.data.local.UserSessionDataStore
 import org.ies.tierno.applicationamani.dto.historial.HistorialClinicoResponseDTO
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.ui.screen.generacionPDFhISTORIAL.HistorialPDFGenerator
 import org.ies.tierno.applicationamani.presentation.viewmodels.historialClinico.HistorialClinicoPacienteViewModel
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
@@ -300,38 +301,11 @@ fun HistorialClinicoContent(
                 }
 
                 historial.isEmpty() && !isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(Spacing.l),
-                        ) {
-                            Icon(
-                                Icons.Default.History,
-                                contentDescription = null,
-                                modifier = Modifier.size(Dimensions.avatarLarge),
-                                tint = colorScheme.primary.copy(alpha = 0.3f),
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.m))
-                            Text(
-                                text = stringResource(R.string.auto_no_hay_registros_en),
-                                style = typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.s))
-                            Text(
-                                text = stringResource(R.string.auto_las_consultas_con_tu),
-                                style = typography.bodyMedium,
-                                color = colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
+                    AmaniEmptyState(
+                        title = stringResource(R.string.auto_no_hay_registros_en),
+                        supporting = stringResource(R.string.auto_las_consultas_con_tu),
+                        icon = Icons.Default.History,
+                    )
                 }
 
                 error != null -> {

@@ -1,3 +1,5 @@
-mkdocs==1.6.1
-mkdocs-material==9.6.22
-mkdocs-git-revision-date-localized-plugin==1.4.7
+mkdocs<2
+mkdocs-material[imaging]>=9.7,<9.8
+mkdocs-glightbox
+mkdocs-minify-plugin
+mkdocs-git-revision-date-localized-plugin

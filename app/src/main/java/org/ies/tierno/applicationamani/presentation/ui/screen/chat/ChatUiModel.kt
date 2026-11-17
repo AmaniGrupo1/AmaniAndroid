@@ -5,6 +5,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Locale
 
 /**
@@ -40,6 +41,8 @@ sealed class ChatListItem {
 fun buildChatItems(
     messages: List<Message>,
     currentUserId: String,
+    todayLabel: String,
+    yesterdayLabel: String,
 ): List<ChatListItem> {
     if (messages.isEmpty()) return emptyList()
 
@@ -59,11 +62,11 @@ fun buildChatItems(
             lastDate = messageDate
             val label =
                 when {
-                    messageDate == LocalDate.now() -> "Hoy"
-                    messageDate == LocalDate.now().minusDays(1) -> "Ayer"
+                    messageDate == LocalDate.now() -> todayLabel
+                    messageDate == LocalDate.now().minusDays(1) -> yesterdayLabel
                     else ->
                         messageDate.format(
-                            DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("es")),
+                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault()),
                         )
                 }
             items.add(ChatListItem.DateSeparator(label))
@@ -99,7 +102,9 @@ fun formatTimestamp(timestamp: Long): String {
     if (timestamp == 0L) return ""
     val instant = Instant.ofEpochMilli(timestamp)
     val localTime = instant.atZone(ZoneId.systemDefault()).toLocalTime()
-    return localTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+    return localTime.format(
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault()),
+    )
 }
 
 /**

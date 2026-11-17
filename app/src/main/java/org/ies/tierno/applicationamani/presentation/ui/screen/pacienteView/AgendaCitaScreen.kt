@@ -103,6 +103,7 @@ import org.ies.tierno.applicationamani.dto.CitaPacienteViewResponseDTO
 import org.ies.tierno.applicationamani.dto.ContactoPsicologoDTO
 import org.ies.tierno.applicationamani.dto.citas.DisponibilidadDiaResponse
 import org.ies.tierno.applicationamani.presentation.navigation.screen.Screens
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.citas.ListarCitasViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.AppTheme
@@ -452,35 +453,11 @@ fun AgendaCitaContent(
                 }
 
                 citas.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Icon(
-                                Icons.Default.Event,
-                                contentDescription = null,
-                                modifier = Modifier.size(Dimensions.avatarLarge),
-                                tint = colorScheme.primary.copy(alpha = 0.4f),
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.l))
-                            Text(
-                                text = stringResource(R.string.auto_no_tienes_citas_agendadas),
-                                style = typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = colorScheme.onSurface,
-                            )
-                            Spacer(modifier = Modifier.height(Spacing.s))
-                            Text(
-                                text = stringResource(R.string.auto_presiona_el_boton_para_2),
-                                style = typography.bodyMedium,
-                                color = colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
+                    AmaniEmptyState(
+                        title = stringResource(R.string.auto_no_tienes_citas_agendadas),
+                        supporting = stringResource(R.string.auto_presiona_el_boton_para_2),
+                        icon = Icons.Default.Event,
+                    )
                 }
 
                 else -> {

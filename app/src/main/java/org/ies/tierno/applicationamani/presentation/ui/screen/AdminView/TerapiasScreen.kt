@@ -64,6 +64,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.terapias.TerapiaResponseDTO
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.terapia.ListarTerapiasViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.Spacing
@@ -382,51 +383,14 @@ fun EmptyTerapiasScreen(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            Icons.Default.FitnessCenter,
-            contentDescription = null,
-            modifier = Modifier.size(Spacing.avatarLarge),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.m))
-
-        Text(
-            text = stringResource(R.string.no_hay_terapias),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.s))
-
-        Text(
-            text = stringResource(R.string.presiona_para_agregar),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.l))
-
-        Button(
-            onClick = onAddClick,
-            shape = MaterialTheme.shapes.medium,
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-        ) {
-            Icon(Icons.Default.Add, contentDescription = null)
-            Spacer(modifier = Modifier.width(Spacing.s))
-            Text(stringResource(R.string.agregar_terapia))
-        }
-    }
+    AmaniEmptyState(
+        title = stringResource(R.string.no_hay_terapias),
+        supporting = stringResource(R.string.presiona_para_agregar),
+        icon = Icons.Default.FitnessCenter,
+        actionLabel = stringResource(R.string.agregar_terapia),
+        onAction = onAddClick,
+        modifier = modifier,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

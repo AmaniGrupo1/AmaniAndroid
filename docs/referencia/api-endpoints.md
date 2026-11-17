@@ -1,14 +1,15 @@
 # API y endpoints
 
-Esta referencia se extrae de las anotaciones Retrofit de `app/src/main/java/org/ies/tierno/applicationamani/data/remoto/`. Describe las rutas que el cliente intenta consumir, no constituye un contrato del servidor.
+Esta página documenta las **16 interfaces Retrofit** declaradas en [`app/src/main/java/org/ies/tierno/applicationamani/data/remoto/`](https://github.com/AmaniGrupo1/AmaniAndroid/tree/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto) y registradas en [`di/RetrofitModule.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/di/RetrofitModule.kt).
 
-La URL base activa se configura en `RetrofitModule` como un servicio Cloud Run. Las rutas que empiezan por `/` se muestran tal cual aparecen en el código. Los cuerpos, parámetros, permisos, respuestas y códigos de error dependen del backend y no se infieren aquí.
+!!! note "URL base y contrato del servidor"
+    La URL base activa en [`RetrofitModule.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/di/RetrofitModule.kt) es `https://amani-api-560473593904.europe-west1.run.app/`. Las rutas se listan tal como figuran en las anotaciones `@GET`, `@POST`, `@PUT`, `@PATCH` y `@DELETE` del cliente.
 
-<!-- TODO: enlazar una especificación OpenAPI autoritativa del backend cuando esté disponible -->
+<!-- TODO: confirmar y enlazar la especificación OpenAPI/Swagger del backend REST cuando esté publicada -->
 
-## Autenticación y usuarios
+## Autenticación y usuarios (`AuthApi.kt`)
 
-Fuente: `AuthApi.kt`.
+Fuente: [`AuthApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/AuthApi.kt).
 
 | Método | Ruta |
 |---|---|
@@ -28,9 +29,9 @@ Fuente: `AuthApi.kt`.
 | `GET` | `/api/pacientes/sin-psicologo` |
 | `GET` | `/api/auth/firebase-token` |
 
-## Perfiles
+## Perfiles (`ProfileApi.kt`)
 
-Fuente: `ProfileApi.kt`.
+Fuente: [`ProfileApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/ProfileApi.kt).
 
 | Método | Ruta |
 |---|---|
@@ -49,9 +50,9 @@ Fuente: `ProfileApi.kt`.
 | `POST` | `/api/psicologo/paciente/{id}/foto` |
 | `PUT` | `/api/admin/psicologos/editar/{id}` |
 
-## Agenda, citas y terapias
+## Agenda, citas y terapias (`CitasApi.kt`)
 
-Fuente: `CitasApi.kt`. La ruta comentada para crear una cita desde administración no se incluye como endpoint activo.
+Fuente: [`CitasApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/CitasApi.kt).
 
 | Método | Ruta |
 |---|---|
@@ -79,23 +80,23 @@ Fuente: `CitasApi.kt`. La ruta comentada para crear una cita desde administraci�
 
 ## Cuestionarios, situaciones e historial
 
-| Fuente | Método | Ruta |
+| Interfaz | Método | Ruta |
 |---|---|---|
-| `TestApi.kt` | `POST` | `/api/admin/preguntas` |
-| `TestApi.kt` | `GET` | `/api/paciente/preguntas` |
-| `TestApi.kt` | `POST` | `/api/paciente/preguntas/responder/{idPaciente}` |
-| `SituacionApi.kt` | `GET` | `api/situaciones` |
-| `SituacionApi.kt` | `GET` | `api/situaciones/{id}` |
-| `SituacionApi.kt` | `POST` | `api/situaciones/create` |
-| `SituacionApi.kt` | `PUT` | `api/situaciones/update/{id}` |
-| `SituacionApi.kt` | `DELETE` | `api/situaciones/delete/{id}` |
-| `HistorialApi.kt` | `GET` | `/api/historial-clinico/paciente/{idPaciente}` |
-| `HistorialApi.kt` | `POST` | `/api/historial-clinico` |
-| `HistorialCitaApi.kt` | `GET` | `/api/historial-citas` |
+| [`TestApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/TestApi.kt) | `POST` | `/api/admin/preguntas` |
+| [`TestApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/TestApi.kt) | `GET` | `/api/paciente/preguntas` |
+| [`TestApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/TestApi.kt) | `POST` | `/api/paciente/preguntas/responder/{idPaciente}` |
+| [`SituacionApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/SituacionApi.kt) | `GET` | `api/situaciones` |
+| [`SituacionApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/SituacionApi.kt) | `GET` | `api/situaciones/{id}` |
+| [`SituacionApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/SituacionApi.kt) | `POST` | `api/situaciones/create` |
+| [`SituacionApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/SituacionApi.kt) | `PUT` | `api/situaciones/update/{id}` |
+| [`SituacionApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/SituacionApi.kt) | `DELETE` | `api/situaciones/delete/{id}` |
+| [`HistorialApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/HistorialApi.kt) | `GET` | `/api/historial-clinico/paciente/{idPaciente}` |
+| [`HistorialApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/HistorialApi.kt) | `POST` | `/api/historial-clinico` |
+| [`HistorialCitaApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/HistorialCitaApi.kt) | `GET` | `/api/historial-citas` |
 
-## Diario emocional
+## Diario emocional (`DiarioApi.kt`)
 
-Fuente: `DiarioApi.kt`.
+Fuente: [`DiarioApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/DiarioApi.kt).
 
 | Método | Ruta |
 |---|---|
@@ -106,48 +107,27 @@ Fuente: `DiarioApi.kt`.
 | `PUT` | `/api/diario-emocion/{id}` |
 | `DELETE` | `/api/diario-emocion/{id}` |
 
-## Notificaciones, documentos y soporte
+## Notificaciones, documentos legales, soporte, ajustes, pagos y asistente
 
-| Fuente | Método | Ruta |
+| Interfaz | Método | Ruta |
 |---|---|---|
-| `NotificacionApi.kt` | `GET` | `api/notificaciones/{idUsuario}` |
-| `NotificacionApi.kt` | `PUT` | `api/notificaciones/leer/{id}` |
-| `NotificacionApi.kt` | `PUT` | `api/notificaciones/leer-todas/{idUsuario}` |
-| `NotificacionApi.kt` | `GET` | `api/notificaciones/no-leidas/{idUsuario}` |
-| `NotificacionApi.kt` | `PUT` | `api/notificaciones/configuracion/{idUsuario}/activar` |
-| `NotificacionApi.kt` | `GET` | `api/notificaciones/configuracion/{idUsuario}` |
-| `DocumentoLegalApi.kt` | `GET` | `api/documentos-legales` |
-| `DocumentoLegalApi.kt` | `GET` | `api/documentos-legales/{id}` |
-| `DocumentoLegalApi.kt` | `POST` | `api/documentos-legales/crear` |
-| `DocumentoLegalApi.kt` | `PUT` | `api/documentos-legales/{id}` |
-| `DocumentoLegalApi.kt` | `DELETE` | `api/documentos-legales/delete/{id}` |
-| `DocumentoLegalApi.kt` | `GET` | `api/documentos-legales/tipo/{tipo}` |
-| `SoporteTicketApi.kt` | `GET` | `api/tickets-soporte/` |
-| `SoporteTicketApi.kt` | `GET` | `api/tickets-soporte/{idTicket}` |
-| `SoporteTicketApi.kt` | `POST` | `api/tickets-soporte` |
+| [`NotificacionApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/NotificacionApi.kt) | `GET` / `PUT` | `api/notificaciones/{idUsuario}`, `leer/{id}`, `leer-todas/{idUsuario}`, `no-leidas/{idUsuario}`, `configuracion/{idUsuario}`, `configuracion/{idUsuario}/activar` |
+| [`DocumentoLegalApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/DocumentoLegalApi.kt) | `GET` / `POST` / `PUT` / `DELETE` | `api/documentos-legales`, `/{id}`, `/crear`, `/delete/{id}`, `/tipo/{tipo}` |
+| [`SoporteTicketApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/SoporteTicketApi.kt) | `GET` / `POST` | `api/tickets-soporte/`, `api/tickets-soporte/{idTicket}`, `api/tickets-soporte` |
+| [`AjustesApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/AjustesApi.kt) | `PUT` | `api/ajustes/{idUsuario}/idioma`, `api/ajustes/tema` |
+| [`PaymentApiService.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/PaymentApiService.kt) | `POST` | `/api/payments/create-intent` |
+| [`ChatApi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/ChatApi.kt) | `POST` | `/api/chats/messages` |
+| [`AdminApiService.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/role/AdminApiService.kt) | `PUT` / `GET` | `/api/admin/cambiar-rol`, `/api/admin/listarUsuarios` |
+| [`CopilotoAi.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/data/remoto/copiloto/CopilotoAi.kt) | `POST` | `api/rag/ask`, `api/rag/upload` |
 
-## Ajustes
-
-Fuente: `AjustesApi.kt`.
-
-| Método | Ruta |
-|---|---|
-| `PUT` | `api/ajustes/{idUsuario}/idioma` |
-| `PUT` | `api/ajustes/tema` |
-
-## Pagos, chat, roles y asistente
-
-| Fuente | Método | Ruta |
-|---|---|---|
-| `PaymentApiService.kt` | `POST` | `/api/payments/create-intent` |
-| `ChatApi.kt` | `POST` | `/api/chats/messages` |
-| `AdminApiService.kt` | `PUT` | `/api/admin/cambiar-rol` |
-| `AdminApiService.kt` | `GET` | `/api/admin/listarUsuarios` |
-| `CopilotoAi.kt` | `POST` | `api/rag/ask` |
-| `CopilotoAi.kt` | `POST` | `api/rag/upload` |
-
-`api/rag/upload` y las operaciones de carga de fotos de `ProfileApi.kt` usan solicitudes multipart.
+!!! tip "Solicitudes `Multipart`"
+    Tanto `api/rag/upload` en `CopilotoAi.kt` como los endpoints `.../foto` en `ProfileApi.kt` están anotados con `@Multipart` para enviar archivos mediante `MultipartBody.Part`.
 
 ## Siguientes pasos
 
-Consulta [datos y persistencia](datos-y-persistencia.md) o [referencia Kotlin](kotlin.md) para la documentación generada de código.
+- Consulta [Capa de datos](datos-y-persistencia.md) para ver cómo los repositorios e interceptores procesan estas llamadas.
+- Revisa [Referencia Kotlin](kotlin.md) para navegar por la documentación KDoc generada con Dokka.
+
+*[API]: Application Programming Interface
+*[REST]: Representational State Transfer
+*[URL]: Uniform Resource Locator

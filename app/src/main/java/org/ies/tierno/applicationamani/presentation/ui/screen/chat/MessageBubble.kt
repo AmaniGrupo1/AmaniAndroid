@@ -31,7 +31,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
@@ -442,37 +446,87 @@ private fun messageBubbleShape(
 }
 
 @Composable
-fun PsychologistAvatar(
-    psychologistInfo: PsychologistInfo?,
-    size: Dp,
+fun ConversationAvatar(
+    name: String,
+    modifier: Modifier = Modifier,
+    size: Dp = Dimensions.avatarSmall,
+    photoUrl: String? = null,
 ) {
-    val modifier =
-        Modifier
+    val photoDescription = stringResource(R.string.chat_foto_de_formato, name)
+    val clipModifier =
+        modifier
             .size(size)
             .clip(CircleShape)
 
-    if (psychologistInfo?.avatarUrl != null) {
+    if (!photoUrl.isNullOrBlank()) {
         AsyncImage(
-            model = psychologistInfo.avatarUrl,
-            contentDescription = stringResource(R.string.chat_foto_de_formato, psychologistInfo.name),
-            modifier = modifier,
+            model = photoUrl,
+            contentDescription = photoDescription,
+            contentScale = ContentScale.Crop,
+            modifier = clipModifier,
         )
     } else {
-        val initial = psychologistInfo?.name?.firstOrNull()?.uppercaseChar() ?: '?'
+        val initial = name.trim().firstOrNull()?.uppercaseChar() ?: '?'
         Surface(
-            modifier = modifier,
+            modifier =
+                clipModifier.semantics {
+                    contentDescription = photoDescription
+                },
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer,
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = initial.toString(),
-                    style = MaterialTheme.typography.labelLarge,
+                    style =
+                        if (size <= Dimensions.iconLarge) {
+                            MaterialTheme.typography.labelLarge
+                        } else {
+                            MaterialTheme.typography.titleMedium
+                        },
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }
     }
+}
+
+@Composable
+fun ChatDateSeparator(label: String) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.s),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier =
+                    Modifier
+                        .padding(horizontal = Spacing.sm, vertical = Spacing.xs)
+                        .semantics { heading() },
+            )
+        }
+    }
+}
+
+@Composable
+fun PsychologistAvatar(
+    psychologistInfo: PsychologistInfo?,
+    size: Dp,
+) {
+    ConversationAvatar(
+        name = psychologistInfo?.name.orEmpty(),
+        size = size,
+        photoUrl = psychologistInfo?.avatarUrl,
+    )
 }
 
 @Composable

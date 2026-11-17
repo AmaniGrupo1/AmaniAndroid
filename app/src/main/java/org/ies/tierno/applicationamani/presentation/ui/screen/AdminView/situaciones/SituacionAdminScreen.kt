@@ -59,6 +59,7 @@ import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionDTO
 import org.ies.tierno.applicationamani.dto.situacionDTO.SituacionRequest
+import org.ies.tierno.applicationamani.presentation.ui.components.AmaniEmptyState
 import org.ies.tierno.applicationamani.presentation.viewmodels.situacionViewModel.SituacionViewModel
 import org.ies.tierno.applicationamani.ui.theme.AmaniTheme
 import org.ies.tierno.applicationamani.ui.theme.Spacing
@@ -380,41 +381,14 @@ fun EmptySituacionesScreen(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            Icons.AutoMirrored.Filled.List,
-            contentDescription = null,
-            modifier = Modifier.size(Spacing.avatarLarge),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-        )
-        Spacer(modifier = Modifier.height(Spacing.m))
-        Text(
-            text = stringResource(R.string.auto_no_hay_situaciones_disponibles),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Spacer(modifier = Modifier.height(Spacing.s))
-        Text(
-            text = stringResource(R.string.auto_presiona_el_boton_para_1),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(modifier = Modifier.height(Spacing.l))
-        Button(
-            onClick = onAddClick,
-            shape = MaterialTheme.shapes.medium,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-        ) {
-            Icon(Icons.Default.Add, contentDescription = null)
-            Spacer(modifier = Modifier.width(Spacing.s))
-            Text(stringResource(R.string.auto_agregar_situacion))
-        }
-    }
+    AmaniEmptyState(
+        title = stringResource(R.string.auto_no_hay_situaciones_disponibles),
+        supporting = stringResource(R.string.auto_presiona_el_boton_para_1),
+        icon = Icons.AutoMirrored.Filled.List,
+        actionLabel = stringResource(R.string.auto_agregar_situacion),
+        onAction = onAddClick,
+        modifier = modifier,
+    )
 }
 
 /**

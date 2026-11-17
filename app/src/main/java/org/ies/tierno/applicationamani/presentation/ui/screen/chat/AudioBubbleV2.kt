@@ -11,16 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -67,30 +66,26 @@ fun AudioBubbleV2(
                 color = contentColor,
             )
         } else {
-            Surface(
-                shape = CircleShape,
-                color = contentColor.copy(alpha = 0.15f),
-                modifier = Modifier.size(Dimensions.avatarSmall),
+            FilledTonalIconButton(
+                onClick = {
+                    val content = message.content as? MessageContent.Audio ?: return@FilledTonalIconButton
+                    onPlayPause(message.id, content.storageRef)
+                },
+                colors =
+                    IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = contentColor.copy(alpha = 0.15f),
+                        contentColor = if (isError) MaterialTheme.colorScheme.error else contentColor,
+                    ),
             ) {
-                IconButton(
-                    onClick = {
-                        val content = message.content as? MessageContent.Audio ?: return@IconButton
-                        onPlayPause(message.id, content.storageRef)
-                    },
-                    modifier = Modifier.size(Dimensions.avatarSmall),
-                ) {
-                    Icon(
-                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription =
-                            if (isPlaying) {
-                                stringResource(R.string.chat_audio_pausar)
-                            } else {
-                                stringResource(R.string.chat_audio_reproducir)
-                            },
-                        tint = if (isError) MaterialTheme.colorScheme.error else contentColor,
-                        modifier = Modifier.size(Dimensions.iconMedium),
-                    )
-                }
+                Icon(
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription =
+                        if (isPlaying) {
+                            stringResource(R.string.chat_audio_pausar)
+                        } else {
+                            stringResource(R.string.chat_audio_reproducir)
+                        },
+                )
             }
         }
 
@@ -156,7 +151,7 @@ private fun RoundedAudioProgressBarV2(
     val animatedProgress by animateFloatAsState(
         targetValue = progress.coerceIn(0f, 1f),
         animationSpec = tween(durationMillis = 200),
-        label = stringResource(R.string.auto_audio_progress),
+        label = "audio_progress",
     )
 
     Row(

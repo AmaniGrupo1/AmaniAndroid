@@ -9,77 +9,146 @@ remote_branch: gh-pages
 docs_dir: docs
 site_dir: site
 
+not_in_nav: |
+  404.md
+
 exclude_docs: |
-  /.gitignore
-  /dokka-init.gradle
-  /deployment_info.txt
-  /ERROR_REPORT_PsicologoProfile.md
-  /README-CHAT-DIARIO.md
-  /design.md
-  /design/**
+  .gitignore
+  dokka-init.gradle
+  deployment_info.txt
+  ERROR_REPORT_PsicologoProfile.md
+  README-CHAT-DIARIO.md
+  design.md
+  design/**
 
 theme:
   name: material
   language: es
+  logo: assets/favicon.png
+  favicon: assets/favicon.png
+  font:
+    text: Inter
+    code: JetBrains Mono
   palette:
-    - scheme: default
-      primary: deep purple
-      accent: purple
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-night
         name: Cambiar a modo oscuro
-    - scheme: slate
-      primary: deep purple
-      accent: purple
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-sunny
         name: Cambiar a modo claro
+  icon:
+    repo: fontawesome/brands/github
   features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
+    - navigation.indexes
+    - navigation.path
     - navigation.top
+    - navigation.footer
+    - toc.follow
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+
+copyright: Documentación de Amani Psicología · cliente Android
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/AmaniGrupo1/AmaniAndroid
+      name: Repositorio en GitHub
+
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
-  - search:
-      lang: es
+  - search
+  - glightbox
+  - minify:
+      minify_html: true
   - git-revision-date-localized:
-      type: date
       enable_creation_date: false
       fallback_to_build_date: true
+      enable_git_follow: false
+  # Opcional: tarjetas para redes sociales. Necesita libcairo en el CI.
+  # - social
 
 markdown_extensions:
+  - abbr
   - admonition
   - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
   - tables
   - toc:
       permalink: true
+  - pymdownx.betterem
+  - pymdownx.caret
   - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.tabbed:
-      alternate_style: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
 
 nav:
   - Inicio: index.md
-  - Demo: demo-y-capturas.md
-  - Arquitectura: arquitectura.md
-  - Puesta en marcha: puesta-en-marcha.md
-  - Referencia:
+  - Primeros pasos:
+      - Puesta en marcha: puesta-en-marcha.md
+      - Demo y capturas: demo-y-capturas.md
+  - Arquitectura:
+      - Visión general: arquitectura.md
+      - Estructura del proyecto: estructura-proyecto.md
+  - Guía técnica:
+      - Capa UI: capa-ui.md
+      - Navegación: navegacion.md
+      - Capa de datos: referencia/datos-y-persistencia.md
       - API y endpoints: referencia/api-endpoints.md
-      - Datos y persistencia: referencia/datos-y-persistencia.md
-      - Configuración: referencia/configuracion.md
+      - Inyección de dependencias: inyeccion-dependencias.md
+      - Build y configuración: referencia/configuracion.md
+      - Manifest y permisos: manifest-y-permisos.md
       - Referencia Kotlin: referencia/kotlin.md
-  - Calidad y testing: calidad-y-testing.md
-  - Limitaciones y roadmap: limitaciones-y-roadmap.md
-  - Seguridad: seguridad-y-alcance.md
-  - Despliegue: despliegue.md
-  - Sobre el proyecto: sobre-el-proyecto.md
-  - Contribuir a la documentación: contribuir-documentacion.md
+  - Calidad y entrega:
+      - Testing y calidad: calidad-y-testing.md
+      - CI/CD y publicación: despliegue.md
+      - Seguridad y privacidad: seguridad-y-alcance.md
+  - Proyecto:
+      - Decisiones y roadmap: limitaciones-y-roadmap.md
+      - Sobre el proyecto: sobre-el-proyecto.md
+      - Contribuir a la documentación: contribuir-documentacion.md
+      - Mantener la documentación: desarrollo/mantener-documentacion.md

@@ -756,14 +756,7 @@ fun SettingsOptionRowPsychologist(
                     }
                 }
             }
-            else -> {
-                Icon(
-                    Icons.Default.ChevronRight,
-                    contentDescription = stringResource(R.string.auto_ir),
-                    tint = colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(Dimensions.iconMedium),
-                )
-            }
+            else -> Unit
         }
     }
 }
