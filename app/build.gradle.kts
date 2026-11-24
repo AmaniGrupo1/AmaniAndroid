@@ -57,17 +57,25 @@ android {
     ndkVersion = "26.1.10909125"
 
     signingConfigs {
-        create("release") {
-            val properties = Properties()
-            val propertiesFile = project.rootProject.file("local.properties")
-            if (propertiesFile.exists()) {
-                properties.load(propertiesFile.inputStream())
-            }
+        val properties = Properties()
+        val propertiesFile = project.rootProject.file("local.properties")
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.inputStream())
+        }
 
-            storeFile = file(properties.getProperty("RELEASE_KEYSTORE_FILE") ?: "release.keystore")
-            storePassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
-            keyAlias = properties.getProperty("RELEASE_KEYSTORE_ALIAS")
-            keyPassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+        val keystoreFile = properties.getProperty("RELEASE_KEYSTORE_FILE")
+        val keystorePassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+        val keyAlias = properties.getProperty("RELEASE_KEYSTORE_ALIAS")
+        if (!keystoreFile.isNullOrBlank() &&
+            !keystorePassword.isNullOrBlank() &&
+            !keyAlias.isNullOrBlank()
+        ) {
+            create("release") {
+                storeFile = file(keystoreFile)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                keyPassword = keystorePassword
+            }
         }
     }
 
@@ -76,7 +84,7 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
