@@ -59,16 +59,20 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      # La clave solo alimenta BuildConfig.STRIPE_PUBLISHABLE_KEY (vacía por defecto en
+      # app/build.gradle.kts), así que no es necesaria para tests ni compilación. Si la cuenta de
+      # servicio no tiene secretmanager.versions.access se avisa, pero no se bloquea el CI.
       - name: Obtener clave pública de Stripe desde Secret Manager
         if: env.HAS_GCP == 'true'
         run: |
-          STRIPE_KEY=$(gcloud secrets versions access latest \
-            --secret="STRIPE_PUBLISHABLE_KEY" --project="amani-160bf")
-          if [ -z "$STRIPE_KEY" ]; then
-            echo "::error title=Secreto faltante::No se pudo leer STRIPE_PUBLISHABLE_KEY."
-            exit 1
+          if STRIPE_KEY=$(gcloud secrets versions access latest \
+              --secret="STRIPE_PUBLISHABLE_KEY" --project="amani-160bf" 2>/tmp/stripe.err) \
+              && [ -n "$STRIPE_KEY" ]; then
+            echo "STRIPE_PUBLISHABLE_KEY=$STRIPE_KEY" >> local.properties
+          else
+            echo "::warning title=Stripe::No se pudo leer STRIPE_PUBLISHABLE_KEY (¿falta el rol Secret Manager Secret Accessor en la cuenta de servicio?). Se compila con la clave vacía."
+            head -c 300 /tmp/stripe.err || true
           fi
-          echo "STRIPE_PUBLISHABLE_KEY=$STRIPE_KEY" >> local.properties
 
       - name: Tests unitarios
         run: ./gradlew testDebugUnitTest --stacktrace
