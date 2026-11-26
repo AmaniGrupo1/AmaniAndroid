@@ -134,3 +134,9 @@ Registro de decisiones tomadas ante ambigüedades o restricciones en conflicto d
 - **Decisión:** `setup-gradle@v4` + build cache, caché del NDK 26.1.10909125, una sola invocación de Gradle y firma de `release` condicionada a la existencia del keystore.
 - **Consecuencia:** `assembleRelease` sin secretos produce `app-release-unsigned.apk`; el job `release` lo detecta porque busca `app-release.apk`.
 
+## DEC-16 · Firma condicionada a credenciales, keystore fuera de git y Test Lab opcional
+
+- **Contexto:** CodeQL seguía fallando en `validateSigningRelease` porque `app/release.keystore` estaba versionado (`exists()` era `true`) sin contraseña ni alias; además `file("release.keystore")` se resolvía contra `app/`, no contra la raíz donde `entrega.yml` escribe el keystore del secreto. Firebase Test Lab fallaba por permisos de GCP.
+- **Decisión:** crear y asignar el `signingConfig` solo con keystore + contraseña + alias (de `local.properties` o entorno); dejar de versionar el keystore (`git rm --cached`, `.gitignore`); `test-lab` condicionado a `vars.TEST_LAB_ENABLED`; actions a versiones con runtime Node 24.
+- **Riesgo abierto:** `app/release.keystore` sigue en el historial de git. Si es el de producción debe considerarse expuesto y rotarse (p. ej. restablecer la clave de subida en Play Console). No se reescribe el historial.
+

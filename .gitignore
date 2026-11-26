@@ -21,6 +21,11 @@ gradle-app.setting
 local.properties
 /secrets.properties
 
+# --- Firma (nunca versionar claves) ---
+*.keystore
+*.jks
+keystore.properties
+
 # --- OS Specific ---
 .DS_Store
 Thumbs.db

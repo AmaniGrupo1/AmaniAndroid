@@ -17,7 +17,19 @@ Esta página documenta los dos flujos de trabajo de **GitHub Actions** definidos
 - **Gradle:** `gradle/actions/setup-gradle@v4` cachea dependencias, wrapper y build cache (`org.gradle.caching=true` en `gradle.properties`). Solo `master` escribe la caché; las demás ramas y los PR la leen.
 - **NDK:** `actions/cache` conserva `ndk/26.1.10909125`, la versión fijada en `app/build.gradle.kts` que el runner no incluye.
 - **Una sola invocación de Gradle** por job (`testDebugUnitTest assembleDebug assembleDebugAndroidTest`) y `paths-ignore` para no compilar en cambios solo de documentación.
-- **Release sin keystore:** `release` solo se firma si existe `release.keystore`. Sin él (PR, CodeQL, builds locales) `assemble` genera un APK sin firmar en lugar de fallar en `validateSigningRelease`; el job `release` de `entrega.yml` falla si no encuentra `app-release.apk`, de modo que nunca publica un release sin firmar.
+- **Release sin credenciales:** `release` solo se firma si hay keystore y credenciales completas (`RELEASE_KEYSTORE_FILE/PASSWORD/ALIAS` en `local.properties` o en variables de entorno), siguiendo la guía de Android Developers [«Sign your app»](https://developer.android.com/studio/publish/app-signing). Sin ellas (PR, CodeQL, builds locales) `assemble` genera un APK sin firmar en lugar de fallar en `validateSigningRelease`. El keystore **no se versiona** (`*.keystore`, `*.jks` están en `.gitignore`); el job `release` de `entrega.yml` lo escribe en la raíz y falla si no encuentra `app-release.apk`, de modo que nunca publica un release sin firmar.
+- **Versiones de actions:** `checkout@v6`, `setup-java@v5`, `setup-gradle@v6`, `cache@v5`, `upload-artifact@v6`, `download-artifact@v7`, `google-github-actions/auth@v3` y `setup-gcloud@v3` (runtime Node 24; los `@v4`/`@v2` anteriores generaban avisos de Node 20 obsoleto).
+
+## Firebase Test Lab
+
+El job `test-lab` de `ci.yml` solo se ejecuta si la variable del repositorio `TEST_LAB_ENABLED` vale `true` (Ajustes → Secrets and variables → Actions → Variables). Requisitos en Google Cloud, según la documentación de Firebase Test Lab para CI:
+
+1. Habilitar las APIs **Cloud Testing** y **Cloud Tool Results**.
+2. Cuenta de servicio (`GCP_SA_KEY`) con `roles/editor` sobre el proyecto para usar el bucket por defecto, **o** un bucket propio indicado en la variable `TEST_LAB_RESULTS_BUCKET` (el workflow añade `--results-bucket` y un `--results-dir` único por ejecución) con la cuenta de servicio como `roles/storage.objectAdmin` sobre ese bucket y un rol de Test Lab (`roles/cloudtestservice.testAdmin`).
+3. Sin esto, la subida del APK falla con `403 storage.objects.create`.
+
+!!! warning "Test Lab queda obsoleto"
+    Según Google, Firebase Test Lab se retira el 30 de septiembre de 2027; está pendiente migrar a Gradle Managed Devices o a la Developer Device Platform (ver `PLAN-MEJORA.md`).
 
 ## Generación del APK de release firmado
 

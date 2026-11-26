@@ -37,6 +37,10 @@ local.properties
 
 Las reglas desplegadas (`firebase-database-rules.json`, `storage.rules`, `firestore.rules`) solo exigen `auth != null`: cualquier usuario autenticado podría leer o escribir en cualquier sala. Existe una propuesta (`firebase-database-rules.proposed.json`, `storage.rules.proposed`) que limita cada sala a sus dos participantes y liga `idSender` a `auth.uid`. **No está desplegada** y asume que el UID del custom token es el `idUsuario` numérico, algo aún sin confirmar. Detalle en [Auditoría del chat](chat-auditoria.md). Esto no constituye una auditoría de cumplimiento del RGPD.
 
+## Claves de firma
+
+El keystore de release dejó de versionarse (`*.keystore` y `*.jks` en `.gitignore`) y la firma solo se configura con credenciales externas (`local.properties` o variables de entorno). El archivo `app/release.keystore` sigue presente en el historial de git: si es el de producción, debe tratarse como expuesto y rotarse. Ver [CI/CD y publicación](despliegue.md).
+
 ## Siguientes pasos
 
 - Revisa los permisos declarados en [Manifest y permisos](manifest-y-permisos.md).
