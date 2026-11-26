@@ -20,7 +20,7 @@ class ChatScreenTest {
     val composeTestRule = createComposeRule()
 
     private val viewModel: ChatViewModel = mockk(relaxed = true)
-    private val uiStateFlow = MutableStateFlow(ChatUiState())
+    private val uiStateFlow = MutableStateFlow<ChatUiState>(ChatUiState.Loading)
     private val audioUiStateFlow = MutableStateFlow(AudioPlaybackUiState())
 
     @Before
@@ -33,7 +33,7 @@ class ChatScreenTest {
 
     @Test
     fun whenMessagesAreEmpty_showsEmptyState() {
-        uiStateFlow.value = ChatUiState(messages = emptyList(), isLoading = false)
+        uiStateFlow.value = ChatUiState.Success(messages = emptyList())
 
         composeTestRule.setContent {
             ChatScreen(
@@ -48,7 +48,7 @@ class ChatScreenTest {
 
     @Test
     fun whenIsLoading_showsProgressIndicator() {
-        uiStateFlow.value = ChatUiState(isLoading = true)
+        uiStateFlow.value = ChatUiState.Loading
 
         composeTestRule.setContent {
             ChatScreen(
@@ -63,7 +63,7 @@ class ChatScreenTest {
 
     @Test
     fun whenOtherIsTyping_showsTypingIndicator() {
-        uiStateFlow.value = ChatUiState(isOtherTyping = true)
+        uiStateFlow.value = ChatUiState.Success(isOtherTyping = true)
 
         composeTestRule.setContent {
             ChatScreen(
@@ -82,7 +82,7 @@ class ChatScreenTest {
             listOf(
                 Message(id = "1", content = "Hello", senderId = "2"),
             )
-        uiStateFlow.value = ChatUiState(messages = messages, currentUserId = "1")
+        uiStateFlow.value = ChatUiState.Success(messages = messages, currentUserId = "1")
 
         composeTestRule.setContent {
             ChatScreen(
@@ -99,7 +99,7 @@ class ChatScreenTest {
     fun whenErrorIsPresent_showsSnackbar() {
         // We use a small delay or manual trigger if needed,
         // but here we just check if it eventually shows up.
-        uiStateFlow.value = ChatUiState(error = "Network Error")
+        uiStateFlow.value = ChatUiState.Error("Network Error")
 
         composeTestRule.setContent {
             ChatScreen(
