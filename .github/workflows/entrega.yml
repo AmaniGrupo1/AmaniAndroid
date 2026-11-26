@@ -18,9 +18,6 @@ on:
 permissions:
   contents: read
 
-env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx4g -Dorg.gradle.parallel=false"
-
 jobs:
   docs:
     name: Documentación
@@ -37,7 +34,10 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
 
       - uses: actions/setup-python@v5
         with:
@@ -80,7 +80,10 @@ jobs:
         with:
           java-version: "17"
           distribution: temurin
-          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
 
       - name: Aceptar licencias del Android SDK
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true

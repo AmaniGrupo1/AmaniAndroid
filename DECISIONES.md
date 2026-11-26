@@ -128,3 +128,9 @@ Registro de decisiones tomadas ante ambigüedades o restricciones en conflicto d
 - **Decisión:** `ci.yml` (tests unitarios + `assembleDebug`/`assembleDebugAndroidTest` + Test Lab sobre los APK ya compilados) y `entrega.yml` (docs y release firmado). Se elimina `setup-android` (el runner ya trae el SDK).
 - **Consecuencia:** el CI pasa a fallar si fallan los tests unitarios existentes; cualquier fallo previo oculto aflorará.
 
+## DEC-15 · Caché de Gradle/NDK y release sin firmar cuando falta el keystore
+
+- **Contexto:** CodeQL (`assemble`) caía tras ~11 min en `:app:validateSigningRelease` y el job `build` de `ci.yml` tardaba más de 10 min compilando sin caché.
+- **Decisión:** `setup-gradle@v4` + build cache, caché del NDK 26.1.10909125, una sola invocación de Gradle y firma de `release` condicionada a la existencia del keystore.
+- **Consecuencia:** `assembleRelease` sin secretos produce `app-release-unsigned.apk`; el job `release` lo detecta porque busca `app-release.apk`.
+

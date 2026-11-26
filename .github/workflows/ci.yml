@@ -5,8 +5,20 @@ name: CI
 on:
   push:
     branches: [master, main, develop]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "*.proposed*"
   pull_request:
     branches: [master, main, develop]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "*.proposed*"
   workflow_dispatch:
 
 permissions:
@@ -15,9 +27,6 @@ permissions:
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
-env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Xmx4g -Dorg.gradle.parallel=false"
 
 jobs:
   build:
@@ -35,7 +44,21 @@ jobs:
         with:
           java-version: "17"
           distribution: temurin
-          cache: gradle
+
+      # Caché de dependencias, wrapper y build cache de Gradle. Solo la rama por defecto escribe
+      # la caché; el resto de ramas y PR la leen (evita contaminarla y acelera las ejecuciones).
+      - name: Gradle (caché)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+
+      # app/build.gradle.kts fija ndkVersion 26.1.10909125, que el runner no trae: sin caché AGP
+      # lo descarga en cada ejecución.
+      - name: Caché del NDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/26.1.10909125
+          key: ndk-26.1.10909125-${{ runner.os }}
 
       # El runner ubuntu-latest ya trae el Android SDK (ANDROID_HOME). El paso
       # android-actions/setup-android@v3 fallaba en sdkmanager ("Failed to find package 'tools'")
@@ -74,8 +97,9 @@ jobs:
             head -c 300 /tmp/stripe.err || true
           fi
 
-      - name: Tests unitarios
-        run: ./gradlew testDebugUnitTest --stacktrace
+      # Una sola invocación: configura y compila una vez y reutiliza la salida entre tareas.
+      - name: Tests unitarios y APK de debug e instrumentación
+        run: ./gradlew testDebugUnitTest assembleDebug assembleDebugAndroidTest --stacktrace
 
       - name: Subir informes de tests
         if: always()
@@ -85,9 +109,6 @@ jobs:
           path: app/build/reports/tests/testDebugUnitTest
           retention-days: 7
           if-no-files-found: ignore
-
-      - name: Compilar APK de debug y de instrumentación
-        run: ./gradlew assembleDebug assembleDebugAndroidTest --stacktrace
 
       - name: Subir APK de debug
         uses: actions/upload-artifact@v4

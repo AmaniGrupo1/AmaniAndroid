@@ -12,6 +12,13 @@ Esta página documenta los dos flujos de trabajo de **GitHub Actions** definidos
 !!! note "Android SDK en el runner"
     `ubuntu-latest` ya incluye el Android SDK. Los workflows solo aceptan las licencias con `sdkmanager --licenses`; el paso `android-actions/setup-android@v3` se retiró porque fallaba (`Failed to find package 'tools'`) antes de compilar.
 
+## Caché y tiempos de CI
+
+- **Gradle:** `gradle/actions/setup-gradle@v4` cachea dependencias, wrapper y build cache (`org.gradle.caching=true` en `gradle.properties`). Solo `master` escribe la caché; las demás ramas y los PR la leen.
+- **NDK:** `actions/cache` conserva `ndk/26.1.10909125`, la versión fijada en `app/build.gradle.kts` que el runner no incluye.
+- **Una sola invocación de Gradle** por job (`testDebugUnitTest assembleDebug assembleDebugAndroidTest`) y `paths-ignore` para no compilar en cambios solo de documentación.
+- **Release sin keystore:** `release` solo se firma si existe `release.keystore`. Sin él (PR, CodeQL, builds locales) `assemble` genera un APK sin firmar en lugar de fallar en `validateSigningRelease`; el job `release` de `entrega.yml` falla si no encuentra `app-release.apk`, de modo que nunca publica un release sin firmar.
+
 ## Generación del APK de release firmado
 
 El job `release` de [`entrega.yml`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/.github/workflows/entrega.yml) reconstruye el almacén de claves en tiempo de ejecución a partir de los secretos del repositorio y publica el artefacto con GitHub CLI (`gh release`):

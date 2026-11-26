@@ -76,7 +76,13 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Solo se firma si existe el keystore (lo escribe el job `release` de entrega.yml).
+            // Sin él (CI de PR, CodeQL, builds locales) `assemble` genera un release sin firmar
+            // en vez de fallar en validateSigningRelease.
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile?.exists() == true) {
+                signingConfig = releaseSigning
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
