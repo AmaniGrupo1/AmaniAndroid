@@ -21,7 +21,7 @@ Esta página resume las decisiones de arquitectura e interfaz registradas en [`D
 
 - **URLs base múltiples:** [`RetrofitModule.kt`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/src/main/java/org/ies/tierno/applicationamani/di/RetrofitModule.kt) apunta a Cloud Run, pero `PsicologoProfileScreen.kt`, `ViewPacientePrincipalScreen.kt` y `PacienteProfileScreen.kt` declaran constantes locales `BASE_URL` para construir rutas de imágenes.
 - **Dependencia duplicada de Jitsi Meet:** [`app/build.gradle.kts`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/app/build.gradle.kts) incluye tanto `org.jitsi.react:jitsi-meet-sdk:8.2.2` (línea 115) como `8.6.0` (línea 153).
-- **Linters en modo permisivo:** Detekt y ktlint tienen `ignoreFailures = true` y los workflows de PR (`build_debug_apk.yml`) compilan el APK pero no ejecutan `./gradlew qualityCheck`.
+- **Linters en modo permisivo:** Detekt y ktlint tienen `ignoreFailures = true` y el workflow de PR (`ci.yml`) ejecuta los tests unitarios y compila el APK pero no ejecutan `./gradlew qualityCheck`.
 - **Duplicidad de paquetes:** coexisten `data/repositorio` y `data/repository` (ambos con una clase `ChatRepositoryImpl`), así como `presentation/ui/componente` y `presentation/ui/components`.
 - **Desajustes en `Readme.md`:** el README de la raíz menciona valores antiguos (`minSdk 24`, `targetSdk 34`, `AGP 9.0.1`, `16 rutas`), superados por la configuración real (`minSdk 25`, `targetSdk 36`, `AGP 9.4.1`, `43 rutas`).
 

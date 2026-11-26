@@ -43,7 +43,7 @@ git diff --name-only "$BASE_HASH"..HEAD -- . ':!docs' # (2)!
 - [ ] He ejecutado `mkdocs build --strict` sin errores ni advertencias de enlaces rotos.
 
 !!! tip "Validación automática en CI"
-    El workflow [`.github/workflows/docs.yml`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/.github/workflows/docs.yml) ejecuta Dokka y `mkdocs build --strict` en cada pull request para impedir que se fusionen enlaces rotos.
+    El job `docs` de [`.github/workflows/entrega.yml`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/.github/workflows/entrega.yml) ejecuta Dokka y `mkdocs build --strict` en cada pull request para impedir que se fusionen enlaces rotos.
 
 ## Siguientes pasos
 

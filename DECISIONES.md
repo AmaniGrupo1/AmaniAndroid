@@ -122,3 +122,9 @@ Registro de decisiones tomadas ante ambigüedades o restricciones en conflicto d
 - **Contexto:** las reglas desplegadas no comprueban pertenencia a la sala ni autoría.
 - **Decisión:** se añaden `firebase-database-rules.proposed.json` y `storage.rules.proposed` sin referenciarlas en `firebase.json`. Requieren confirmar el formato del UID y pasar pruebas en emulador.
 
+## DEC-14 · Cuatro workflows fusionados en dos (`ci.yml`, `entrega.yml`)
+
+- **Contexto:** `build_debug_apk.yml` fallaba en `master` en el paso `android-actions/setup-android@v3` (sin llegar a compilar), `firebase_test_lab.yml` recompilaba lo mismo y ningún workflow ejecutaba los tests unitarios.
+- **Decisión:** `ci.yml` (tests unitarios + `assembleDebug`/`assembleDebugAndroidTest` + Test Lab sobre los APK ya compilados) y `entrega.yml` (docs y release firmado). Se elimina `setup-android` (el runner ya trae el SDK).
+- **Consecuencia:** el CI pasa a fallar si fallan los tests unitarios existentes; cualquier fallo previo oculto aflorará.
+

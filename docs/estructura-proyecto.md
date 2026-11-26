@@ -25,7 +25,7 @@ include(":app")
 
 ```text title="Estructura raíz y módulo :app"
 AmaniAndroid/
-├── .github/workflows/          # Pipelines CI/CD (build debug, Firebase Test Lab, release, docs)
+├── .github/workflows/          # Pipelines CI/CD (ci.yml: tests, build y Test Lab; entrega.yml: docs y release)
 ├── config/detekt/detekt.yml    # Reglas de análisis estático Detekt
 ├── database/rules.json         # Reglas de Firebase Realtime Database
 ├── firestore.rules             # Reglas de seguridad de Cloud Firestore
