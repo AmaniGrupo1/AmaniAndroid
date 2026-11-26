@@ -105,3 +105,38 @@ Registro de decisiones tomadas ante ambigüedades o restricciones en conflicto d
 - **Contexto:** Al compilar la tarea `validateSigningDebug` en entornos sandbox o CLI containerizados con Snap, `/home/ivan/.android/debug.keystore.lock` arroja `AccessDeniedException` por permisos del host.
 - **Decisión:** Exportar `ANDROID_USER_HOME=/home/ivan/snap/antigravity-cli/common/.android`, garantizando generación y acceso sin fallos al keystore de depuración estándar de Android.
 
+## DEC-11 · `enviadoEn` numérico y reintento idempotente en el chat V2
+
+- **Contexto:** V2 escribía `enviadoEn` como String; RTDB ordena números y strings por separado, lo que rompía `limitToLast` y `endAt`. Los reintentos generaban claves nuevas.
+- **Opciones:** (a) normalizar a `Long` en escritura y leer de forma tolerante; (b) migrar todo el histórico ya.
+- **Elegida:** (a). La migración del histórico se deja como plan sin ejecutar (ver `docs/chat-auditoria.md`).
+- **Consecuencia:** el id del mensaje es la clave definitiva de Firebase (`ChatRepository.newMessageId`).
+
+## DEC-12 · Stack V1 del chat sin cablear
+
+- **Contexto:** `ChatScreen`, `ChatViewModel`, `data/repositorio/*`, `ChatFirebaseService` y casos de uso no se usan desde `main`.
+- **Decisión pendiente:** retirarlo junto con sus tests y la documentación asociada. No se ha borrado nada.
+
+## DEC-13 · Reglas de Firebase propuestas, no desplegadas
+
+- **Contexto:** las reglas desplegadas no comprueban pertenencia a la sala ni autoría.
+- **Decisión:** se añaden `firebase-database-rules.proposed.json` y `storage.rules.proposed` sin referenciarlas en `firebase.json`. Requieren confirmar el formato del UID y pasar pruebas en emulador.
+
+## DEC-14 · Cuatro workflows fusionados en dos (`ci.yml`, `entrega.yml`)
+
+- **Contexto:** `build_debug_apk.yml` fallaba en `master` en el paso `android-actions/setup-android@v3` (sin llegar a compilar), `firebase_test_lab.yml` recompilaba lo mismo y ningún workflow ejecutaba los tests unitarios.
+- **Decisión:** `ci.yml` (tests unitarios + `assembleDebug`/`assembleDebugAndroidTest` + Test Lab sobre los APK ya compilados) y `entrega.yml` (docs y release firmado). Se elimina `setup-android` (el runner ya trae el SDK).
+- **Consecuencia:** el CI pasa a fallar si fallan los tests unitarios existentes; cualquier fallo previo oculto aflorará.
+
+## DEC-15 · Caché de Gradle/NDK y release sin firmar cuando falta el keystore
+
+- **Contexto:** CodeQL (`assemble`) caía tras ~11 min en `:app:validateSigningRelease` y el job `build` de `ci.yml` tardaba más de 10 min compilando sin caché.
+- **Decisión:** `setup-gradle@v4` + build cache, caché del NDK 26.1.10909125, una sola invocación de Gradle y firma de `release` condicionada a la existencia del keystore.
+- **Consecuencia:** `assembleRelease` sin secretos produce `app-release-unsigned.apk`; el job `release` lo detecta porque busca `app-release.apk`.
+
+## DEC-16 · Firma condicionada a credenciales, keystore fuera de git y Test Lab opcional
+
+- **Contexto:** CodeQL seguía fallando en `validateSigningRelease` porque `app/release.keystore` estaba versionado (`exists()` era `true`) sin contraseña ni alias; además `file("release.keystore")` se resolvía contra `app/`, no contra la raíz donde `entrega.yml` escribe el keystore del secreto. Firebase Test Lab fallaba por permisos de GCP.
+- **Decisión:** crear y asignar el `signingConfig` solo con keystore + contraseña + alias (de `local.properties` o entorno); dejar de versionar el keystore (`git rm --cached`, `.gitignore`); `test-lab` condicionado a `vars.TEST_LAB_ENABLED`; actions a versiones con runtime Node 24.
+- **Riesgo abierto:** `app/release.keystore` sigue en el historial de git. Si es el de producción debe considerarse expuesto y rotarse (p. ej. restablecer la clave de subida en Play Console). No se reescribe el historial.
+

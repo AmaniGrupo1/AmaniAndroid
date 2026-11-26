@@ -110,4 +110,19 @@ interface ChatRepository {
      *         tras los reintentos, o [ChatResult.Loading] durante la operación.
      */
     suspend fun uploadMedia(chatId: String, uri: Uri, type: MediaType): ChatResult<String>
+
+    /**
+     * Genera un identificador de mensaje único sin escribir nada en el servidor.
+     *
+     * Usarlo como [ChatMessage.id] hace idempotentes los reintentos: reenviar el mismo
+     * mensaje sobrescribe la misma clave en lugar de crear un duplicado.
+     */
+    fun newMessageId(chatId: String): String
+
+    /**
+     * Marca como leídos los mensajes indicados (escritura multi-ruta, sin consultar la sala).
+     *
+     * @param messageIds Ids de mensajes del interlocutor aún no leídos.
+     */
+    suspend fun markAsRead(chatId: String, messageIds: List<String>): ChatResult<Unit>
 }

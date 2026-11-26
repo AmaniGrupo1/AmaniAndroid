@@ -1,0 +1,203 @@
+name: CI
+
+# Verificación de cada cambio: tests unitarios, compilación de los APK de debug y de
+# instrumentación, y pruebas en Firebase Test Lab sobre esos mismos APK.
+on:
+  push:
+    branches: [master, main, develop]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "*.proposed*"
+  pull_request:
+    branches: [master, main, develop]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - "*.proposed*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Tests unitarios y APK de debug
+    runs-on: ubuntu-latest
+    env:
+      HAS_GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
+      HAS_GCP: ${{ secrets.GCP_SA_KEY != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: "17"
+          distribution: temurin
+
+      # Caché de dependencias, wrapper y build cache de Gradle. Solo la rama por defecto escribe
+      # la caché; el resto de ramas y PR la leen (evita contaminarla y acelera las ejecuciones).
+      - name: Gradle (caché)
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+
+      # app/build.gradle.kts fija ndkVersion 26.1.10909125, que el runner no trae: sin caché AGP
+      # lo descarga en cada ejecución.
+      - name: Caché del NDK
+        uses: actions/cache@v5
+        with:
+          path: /usr/local/lib/android/sdk/ndk/26.1.10909125
+          key: ndk-26.1.10909125-${{ runner.os }}
+
+      # El runner ubuntu-latest ya trae el Android SDK (ANDROID_HOME). El paso
+      # android-actions/setup-android@v3 fallaba en sdkmanager ("Failed to find package 'tools'")
+      # antes de compilar, así que se elimina y solo se aceptan las licencias.
+      - name: Aceptar licencias del Android SDK
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Permisos para gradlew
+        run: chmod +x gradlew
+
+      # Si el secreto no existe (p. ej. PR desde un fork) se usa el google-services.json versionado.
+      - name: Configurar google-services.json
+        if: env.HAS_GOOGLE_SERVICES == 'true'
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+
+      - name: Autenticar en Google Cloud
+        if: env.HAS_GCP == 'true'
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # La clave solo alimenta BuildConfig.STRIPE_PUBLISHABLE_KEY (vacía por defecto en
+      # app/build.gradle.kts), así que no es necesaria para tests ni compilación. Si la cuenta de
+      # servicio no tiene secretmanager.versions.access se avisa, pero no se bloquea el CI.
+      - name: Obtener clave pública de Stripe desde Secret Manager
+        if: env.HAS_GCP == 'true'
+        run: |
+          if STRIPE_KEY=$(gcloud secrets versions access latest \
+              --secret="STRIPE_PUBLISHABLE_KEY" --project="amani-160bf" 2>/tmp/stripe.err) \
+              && [ -n "$STRIPE_KEY" ]; then
+            echo "STRIPE_PUBLISHABLE_KEY=$STRIPE_KEY" >> local.properties
+          else
+            echo "::warning title=Stripe::No se pudo leer STRIPE_PUBLISHABLE_KEY (¿falta el rol Secret Manager Secret Accessor en la cuenta de servicio?). Se compila con la clave vacía."
+            head -c 300 /tmp/stripe.err || true
+          fi
+
+      # Una sola invocación: configura y compila una vez y reutiliza la salida entre tareas.
+      - name: Tests unitarios y APK de debug e instrumentación
+        run: ./gradlew testDebugUnitTest assembleDebug assembleDebugAndroidTest --stacktrace
+
+      - name: Subir informes de tests
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: informes-tests-unitarios
+          path: app/build/reports/tests/testDebugUnitTest
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Subir APK de debug
+        uses: actions/upload-artifact@v6
+        with:
+          name: amani-debug-${{ github.run_number }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Subir APK de instrumentación
+        uses: actions/upload-artifact@v6
+        with:
+          name: amani-androidtest-${{ github.run_number }}
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Resumen
+        if: always()
+        run: |
+          {
+            echo "## Resumen de CI"
+            echo "| Campo | Valor |"
+            echo "|---|---|"
+            echo "| Rama | \`${{ github.head_ref || github.ref_name }}\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Build | \`${{ github.run_number }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  test-lab:
+    name: Firebase Test Lab
+    needs: build
+    # Requiere configurar Google Cloud (ver docs/despliegue.md): se activa con la variable del
+    # repositorio TEST_LAB_ENABLED=true. Los PR desde forks no tienen acceso a los secretos.
+    if: >-
+      vars.TEST_LAB_ENABLED == 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    env:
+      # Bucket propio (opcional). Sin él, la doc de Test Lab exige roles/editor al principal para
+      # usar el bucket por defecto. --results-dir debe ser único por ejecución.
+      RESULTS_BUCKET: ${{ vars.TEST_LAB_RESULTS_BUCKET }}
+      RESULTS_DIR: amani-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Descargar APK de debug
+        uses: actions/download-artifact@v7
+        with:
+          name: amani-debug-${{ github.run_number }}
+          path: apk
+
+      - name: Descargar APK de instrumentación
+        uses: actions/download-artifact@v7
+        with:
+          name: amani-androidtest-${{ github.run_number }}
+          path: apk
+
+      - name: Autenticar en Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Robo test
+        run: |
+          BUCKET_ARGS=()
+          if [ -n "$RESULTS_BUCKET" ]; then
+            BUCKET_ARGS=(--results-bucket="$RESULTS_BUCKET" --results-dir="$RESULTS_DIR-robo")
+          fi
+          gcloud firebase test android run \
+            --type robo \
+            --app apk/app-debug.apk \
+            --device model=panther,version=33,locale=es,orientation=portrait \
+            --timeout 5m \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            "${BUCKET_ARGS[@]}"
+
+      - name: Tests de instrumentación
+        run: |
+          BUCKET_ARGS=()
+          if [ -n "$RESULTS_BUCKET" ]; then
+            BUCKET_ARGS=(--results-bucket="$RESULTS_BUCKET" --results-dir="$RESULTS_DIR-instrumentation")
+          fi
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app apk/app-debug.apk \
+            --test apk/app-debug-androidTest.apk \
+            --device model=panther,version=33,locale=es,orientation=portrait \
+            --timeout 10m \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            "${BUCKET_ARGS[@]}"

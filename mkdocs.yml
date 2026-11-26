@@ -143,6 +143,7 @@ nav:
       - Build y configuración: referencia/configuracion.md
       - Manifest y permisos: manifest-y-permisos.md
       - Referencia Kotlin: referencia/kotlin.md
+      - Auditoría del chat: chat-auditoria.md
   - Calidad y entrega:
       - Testing y calidad: calidad-y-testing.md
       - CI/CD y publicación: despliegue.md

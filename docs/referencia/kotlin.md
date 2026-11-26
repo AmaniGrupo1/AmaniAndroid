@@ -43,7 +43,7 @@ dokka {
 [Abrir la referencia KDoc generada :material-open-in-new:](api-kotlin/index.html){ .md-button .md-button--primary }
 
 !!! note "Disponibilidad en entorno local y CI"
-    El enlace superior apunta a `docs/referencia/api-kotlin/index.html`, que el workflow [`.github/workflows/docs.yml`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/.github/workflows/docs.yml) construye y copia automáticamente antes de ejecutar `mkdocs build --strict`.
+    El enlace superior apunta a `docs/referencia/api-kotlin/index.html`, que el workflow [`.github/workflows/entrega.yml`](https://github.com/AmaniGrupo1/AmaniAndroid/blob/master/.github/workflows/entrega.yml) construye y copia automáticamente antes de ejecutar `mkdocs build --strict`.
 
 ## Siguientes pasos
 

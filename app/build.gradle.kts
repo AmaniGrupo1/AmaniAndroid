@@ -56,18 +56,35 @@ android {
     // ✅ NDK moderno
     ndkVersion = "26.1.10909125"
 
-    signingConfigs {
-        create("release") {
-            val properties = Properties()
-            val propertiesFile = project.rootProject.file("local.properties")
-            if (propertiesFile.exists()) {
-                properties.load(propertiesFile.inputStream())
-            }
+    // Firma de release. Siguiendo la guía de Android Developers («Sign your app»), las claves y
+    // contraseñas no viven en el control de versiones: se leen de local.properties (que escribe el
+    // job `release` de entrega.yml) o de variables de entorno, y el keystore se busca primero en la
+    // raíz del proyecto. Si faltan credenciales (CI de PR, CodeQL, builds locales) no se crea el
+    // signingConfig y `assembleRelease` genera un APK sin firmar en lugar de fallar en
+    // validateSigningRelease.
+    val signingProperties = Properties().apply {
+        val f = rootProject.file("local.properties")
+        if (f.exists()) f.inputStream().use { load(it) }
+    }
+    fun signingValue(name: String): String? =
+        (signingProperties.getProperty(name) ?: System.getenv(name))?.takeIf { it.isNotBlank() }
 
-            storeFile = file(properties.getProperty("RELEASE_KEYSTORE_FILE") ?: "release.keystore")
-            storePassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
-            keyAlias = properties.getProperty("RELEASE_KEYSTORE_ALIAS")
-            keyPassword = properties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+    val releaseKeystorePath = signingValue("RELEASE_KEYSTORE_FILE") ?: "release.keystore"
+    val releaseKeystore = listOf(rootProject.file(releaseKeystorePath), file(releaseKeystorePath))
+        .firstOrNull { it.exists() }
+    val releaseStorePassword = signingValue("RELEASE_KEYSTORE_PASSWORD")
+    val releaseKeyAlias = signingValue("RELEASE_KEYSTORE_ALIAS")
+    val hasReleaseSigning =
+        releaseKeystore != null && releaseStorePassword != null && releaseKeyAlias != null
+
+    if (hasReleaseSigning) {
+        signingConfigs {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseStorePassword
+            }
         }
     }
 
@@ -76,7 +93,9 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

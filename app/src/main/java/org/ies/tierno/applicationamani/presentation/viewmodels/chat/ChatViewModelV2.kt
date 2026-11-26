@@ -11,6 +11,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -44,15 +44,25 @@ import org.ies.tierno.applicationamani.presentation.ui.screen.chat.UploadState
  * ViewModel para la pantalla de chat refactorizada.
  *
  * Gestiona:
- * - Observación reactiva de mensajes con paginación.
- * - Inserción optimista de mensajes (status=SENDING) con rollback a FAILED si el servidor falla.
- * - Subida de multimedia con retroalimentación de progreso y reintentos transparentes.
+ * - Observación reactiva de la ventana de mensajes más recientes ([liveMessages]) y carga
+ *   de páginas antiguas ([olderMessages]) por separado: una página antigua nunca se pierde
+ *   cuando llega un mensaje nuevo.
+ * - Inserción optimista (SENDING) con paso a FAILED conservado y reintento idempotente: el id
+ *   del mensaje es la clave definitiva de Firebase, así que reenviar sobrescribe, no duplica.
+ * - Marcado de lectura de los mensajes del interlocutor mientras la pantalla está visible.
+ * - Subida de multimedia y reproducción de audio.
  * - Eventos de un solo disparo (scroll, snackbar) mediante SharedFlow.
+ *
+ * Estados de mensaje que la infraestructura puede garantizar:
+ * `SENDING` (aún no vuelto del listener), `SENT` (presente en el listener, es decir, escrito
+ * localmente o confirmado), `READ` (el otro participante puso `leido=true`) y `FAILED`.
+ * `DELIVERED` no se produce: RTDB no ofrece evidencia de entrega al dispositivo destino.
  *
  * @param repo Repositorio de dominio inyectado por Koin.
  * @param chatId Identificador único de la sala de chat (formato: "minId_maxId").
  * @param currentUserId UID del usuario autenticado actualmente.
  * @param otherUserId UID del interlocutor.
+ * @param ensureAuthenticated Garantiza una sesión Firebase válida antes de observar/enviar.
  */
 class ChatViewModelV2(
     appContext: android.content.Context,
@@ -60,11 +70,15 @@ class ChatViewModelV2(
     private val chatId: String,
     internal val currentUserId: String,
     private val otherUserId: String,
+    private val ensureAuthenticated: suspend () -> Unit = {},
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "ChatViewModelV2"
         private const val PAGE_SIZE = 20
+
+        /** Debe coincidir con la validación de `firebase-database-rules.json` (2000). */
+        const val MAX_MESSAGE_LENGTH = 2000
     }
 
     private val _uiState = MutableStateFlow(ChatUiStateV2())
@@ -82,27 +96,55 @@ class ChatViewModelV2(
     /** Flujo de eventos de un solo disparo para la UI. */
     val events: SharedFlow<ChatEvent> = _events.asSharedFlow()
 
+    // Fuentes de la lista: todas se leen/escriben en el hilo principal (viewModelScope).
+    private var liveMessages: List<ChatMessage> = emptyList()
+    private var olderMessages: List<ChatMessage> = emptyList()
+    private val pendingMessages = LinkedHashMap<String, ChatMessage>()
+    private val markedAsRead = HashSet<String>()
+    private var screenResumed = false
+
     init {
         observeMessages()
+    }
+
+    // ─── Composición de la lista visible ──────────────────────────────────────
+
+    /**
+     * Recalcula [ChatUiStateV2.messages] a partir de las tres fuentes.
+     * Prioridad ante el mismo id: servidor (live) > pendiente local > página antigua.
+     */
+    private fun publishMessages() {
+        val liveIds = liveMessages.mapTo(HashSet()) { it.id }
+        pendingMessages.keys.removeAll(liveIds)
+
+        val byId = LinkedHashMap<String, ChatMessage>()
+        olderMessages.forEach { byId[it.id] = it }
+        pendingMessages.values.forEach { byId[it.id] = it }
+        liveMessages.forEach { byId[it.id] = it }
+
+        val merged = byId.values.sortedWith(compareBy<ChatMessage>({ it.timestamp }, { it.id }))
+        _uiState.update { it.copy(messages = merged) }
     }
 
     // ─── Observación reactiva de mensajes ─────────────────────────────────────
 
     /**
      * Inicia la observación del stream de mensajes más recientes.
-     * Se llama automáticamente en el init y no necesita ser llamada desde la UI.
+     * Se llama en el init; la corrutina se cancela con el ViewModel (viewModelScope),
+     * lo que cierra el callbackFlow y retira el listener de Firebase.
      */
     private fun observeMessages() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingInitial = true) }
+            authenticate()
+
             repo.observeMessages(chatId, PAGE_SIZE)
-                .onStart {
-                    _uiState.update { it.copy(isLoadingInitial = true) }
-                }
                 .catch { e ->
                     Log.e(TAG, "Error observando mensajes", e)
                     _uiState.update {
                         it.copy(
                             isLoadingInitial = false,
+                            canSendMessages = false,
                             error = e.message ?: "Error desconocido al cargar mensajes",
                         )
                     }
@@ -110,44 +152,13 @@ class ChatViewModelV2(
                 .collect { result ->
                     when (result) {
                         is ChatResult.Success -> {
-                            val incomingIds = result.data.map { it.id }.toSet()
-
-                            // Merge atómico: todas las lecturas y escrituras sobre _uiState
-                            // ocurren dentro del bloque update{}, que aplica la lambda
-                            // sobre el estado más reciente en el momento de la escritura,
-                            // eliminando la ventana de carrera entre la lectura optimista
-                            // y el update final.
-                            var wasEmpty = false
-                            var shouldScroll = false
-
-                            _uiState.update { currentState ->
-                                wasEmpty = currentState.messages.isEmpty()
-
-                                // Conservar mensajes optimistas (SENDING) que Firebase
-                                // aún no ha confirmado (su id real aún no está en incomingIds)
-                                val optimisticMessages = currentState.messages.filter { local ->
-                                    local.status == MessageStatus.SENDING && local.id !in incomingIds
-                                }
-
-                                val merged = (optimisticMessages + result.data)
-                                    .sortedBy { it.timestamp }
-
-                                // Decidir scroll dentro del bloque para usar el tamaño real
-                                shouldScroll = wasEmpty || result.data.size > currentState.messages.size
-
-                                currentState.copy(
-                                    messages = merged,
-                                    isLoadingInitial = false,
-                                    error = null,
-                                )
+                            liveMessages = result.data
+                            publishMessages()
+                            _uiState.update {
+                                it.copy(isLoadingInitial = false, canSendMessages = true, error = null)
                             }
-
-                            // Scroll al fondo solo en la carga inicial o cuando llega un mensaje nuevo
-                            if (shouldScroll) {
-                                _events.emit(ChatEvent.ScrollToBottom)
-                            }
+                            markIncomingAsRead()
                         }
-
 
                         is ChatResult.Error -> {
                             _uiState.update {
@@ -166,35 +177,44 @@ class ChatViewModelV2(
         }
     }
 
+    /** Refresca la sesión Firebase; un fallo no impide intentar (las reglas dirán la última palabra). */
+    private suspend fun authenticate() {
+        try {
+            ensureAuthenticated()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(TAG, "No se pudo asegurar la sesión Firebase: ${e.message}")
+        }
+    }
+
     // ─── Paginación hacia atrás ────────────────────────────────────────────────
 
     /**
      * Carga mensajes anteriores al mensaje más antiguo actualmente visible.
      *
-     * Guarda con [isLoadingMore] para evitar peticiones simultáneas. Si no hay
-     * más mensajes, desactiva el trigger de paginación con [hasMoreMessages]=false.
+     * Guarda con [ChatUiStateV2.isLoadingMore] para evitar peticiones simultáneas. Si no hay
+     * más mensajes, desactiva el trigger con `hasMoreMessages=false`. Las páginas cargadas se
+     * conservan en [olderMessages] y sobreviven a nuevos mensajes entrantes.
      */
     fun loadOlderMessages() {
         val state = _uiState.value
         if (state.isLoadingMore || !state.hasMoreMessages) return
 
-        val oldestTimestamp = state.messages.firstOrNull()?.timestamp ?: return
+        // Los mensajes legacy sin fecha interpretable tienen timestamp 0: no sirven de ancla.
+        val oldestTimestamp = state.messages.firstOrNull { it.timestamp > 0L }?.timestamp ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMore = true) }
 
             when (val result = repo.loadOlderMessages(chatId, oldestTimestamp, PAGE_SIZE)) {
                 is ChatResult.Success -> {
-                    val older = result.data
-                    if (older.isEmpty()) {
+                    if (result.data.isEmpty()) {
                         _uiState.update { it.copy(isLoadingMore = false, hasMoreMessages = false) }
                     } else {
-                        // Prependemos los mensajes más antiguos al inicio de la lista
-                        val merged = (older + _uiState.value.messages)
-                            .distinctBy { it.id }
-                            .sortedBy { it.timestamp }
-
-                        _uiState.update { it.copy(messages = merged, isLoadingMore = false) }
+                        olderMessages = (result.data + olderMessages).distinctBy { it.id }
+                        publishMessages()
+                        _uiState.update { it.copy(isLoadingMore = false) }
                     }
                 }
 
@@ -208,7 +228,7 @@ class ChatViewModelV2(
                     }
                 }
 
-                ChatResult.Loading -> Unit // No debería ocurrir en una función suspend
+                ChatResult.Loading -> _uiState.update { it.copy(isLoadingMore = false) }
             }
         }
     }
@@ -218,58 +238,100 @@ class ChatViewModelV2(
     /**
      * Envía un mensaje de texto con inserción optimista.
      *
-     * El mensaje aparece INMEDIATAMENTE en la UI con [MessageStatus.SENDING].
-     * Si el servidor confirma, la actualización del listener sustituirá el nodo.
-     * Si falla, el mensaje se marca como [MessageStatus.FAILED] para permitir reenvío.
+     * El mensaje aparece de inmediato con [MessageStatus.SENDING]. El id es la clave
+     * definitiva de Firebase ([ChatRepository.newMessageId]): cuando el listener devuelve
+     * el nodo, sustituye al pendiente sin duplicarlo. Si falla, queda como
+     * [MessageStatus.FAILED] (no desaparece) y puede reenviarse con [retrySend].
      *
      * @param body Texto del mensaje. Se ignora si está en blanco.
      */
     fun sendText(body: String) {
         val trimmed = body.trim()
-        if (trimmed.isBlank()) return
-
-        val tempId = "optimistic_${System.currentTimeMillis()}"
-        val optimisticMessage = ChatMessage(
-            id = tempId,
-            senderId = currentUserId,
-            receiverId = otherUserId,
-            content = MessageContent.Text(trimmed),
-            timestamp = System.currentTimeMillis(),
-            status = MessageStatus.SENDING,
-        )
-
-        // 1. Inserción optimista inmediata
-        _uiState.update { state ->
-            state.copy(messages = state.messages + optimisticMessage)
+        if (trimmed.isEmpty()) return
+        if (trimmed.length > MAX_MESSAGE_LENGTH) {
+            _uiState.update { it.copy(error = "El mensaje supera los $MAX_MESSAGE_LENGTH caracteres") }
+            return
         }
+
+        dispatch(
+            ChatMessage(
+                id = repo.newMessageId(chatId),
+                senderId = currentUserId,
+                receiverId = otherUserId,
+                content = MessageContent.Text(trimmed),
+                timestamp = System.currentTimeMillis(),
+                status = MessageStatus.SENDING,
+            ),
+        )
+    }
+
+    /**
+     * Reenvía un mensaje que quedó en [MessageStatus.FAILED], reutilizando su id
+     * (idempotente: no genera un duplicado si el primer intento llegó a escribirse).
+     */
+    fun retrySend(messageId: String) {
+        val failed = pendingMessages[messageId]?.takeIf { it.status == MessageStatus.FAILED } ?: return
+        dispatch(failed)
+    }
+
+    private fun dispatch(message: ChatMessage) {
+        val outgoing = message.copy(status = MessageStatus.SENDING)
+        pendingMessages[outgoing.id] = outgoing
+        publishMessages()
 
         viewModelScope.launch {
             _events.emit(ChatEvent.ScrollToBottom)
+            authenticate()
 
-            when (val result = repo.sendTextMessage(chatId, optimisticMessage)) {
-                is ChatResult.Success -> {
-                    // El listener de observeMessages recibirá el nodo real y reemplazará el optimista
-                    Log.d(TAG, "sendText confirmado por servidor")
-                }
+            when (val result = repo.sendTextMessage(chatId, outgoing)) {
+                is ChatResult.Success -> Log.d(TAG, "sendText confirmado por servidor")
 
                 is ChatResult.Error -> {
-                    // Revertir el mensaje optimista a FAILED
                     Log.e(TAG, "sendText falló: ${result.exception.message}")
-                    _uiState.update { state ->
-                        val updated = state.messages.map { msg ->
-                            if (msg.id == tempId) msg.copy(status = MessageStatus.FAILED) else msg
-                        }
-                        state.copy(messages = updated, error = "No se pudo enviar el mensaje")
+                    // Si el listener ya devolvió el nodo (escritura local) no se degrada a FAILED.
+                    if (pendingMessages.containsKey(outgoing.id)) {
+                        pendingMessages[outgoing.id] = outgoing.copy(status = MessageStatus.FAILED)
+                        publishMessages()
                     }
                     _events.emit(
                         ChatEvent.ShowSnackbar(
                             message = "Error al enviar. Toca para reintentar.",
                             actionLabel = "Reintentar",
+                            retryMessageId = outgoing.id,
                         ),
                     )
                 }
 
                 ChatResult.Loading -> Unit
+            }
+        }
+    }
+
+    // ─── Lectura ───────────────────────────────────────────────────────────────
+
+    /** La pantalla es visible: marca como leídos los mensajes pendientes del interlocutor. */
+    fun onScreenResumed() {
+        screenResumed = true
+        markIncomingAsRead()
+    }
+
+    /** La pantalla deja de ser visible: no se marca nada como leído y se pausa el audio. */
+    fun onScreenPaused() {
+        screenResumed = false
+        exoPlayer?.pause()
+    }
+
+    private fun markIncomingAsRead() {
+        if (!screenResumed) return
+        val ids = liveMessages
+            .filter { it.senderId == otherUserId && it.status != MessageStatus.READ && it.id !in markedAsRead }
+            .map { it.id }
+        if (ids.isEmpty()) return
+
+        markedAsRead.addAll(ids)
+        viewModelScope.launch {
+            if (repo.markAsRead(chatId, ids) is ChatResult.Error) {
+                markedAsRead.removeAll(ids.toSet()) // se reintentará en la próxima emisión
             }
         }
     }
@@ -287,18 +349,22 @@ class ChatViewModelV2(
      * @param caption Texto opcional que acompaña a la imagen.
      */
     fun sendMedia(uri: Uri, type: MediaType, caption: String = "") {
+        if (_uiState.value.uploadState is UploadState.Uploading) return // evita doble subida
+
         viewModelScope.launch {
             _uiState.update { it.copy(uploadState = UploadState.Uploading(progress = 0f)) }
+            authenticate()
 
             when (val result = repo.uploadMedia(chatId, uri, type)) {
                 is ChatResult.Success -> {
                     val storageRef = result.data
                     val content: MessageContent = when (type) {
-                        MediaType.IMAGE -> MessageContent.Image(storageRef, caption)
+                        MediaType.IMAGE -> MessageContent.Image(storageRef, caption.trim())
                         MediaType.AUDIO -> MessageContent.Audio(storageRef)
                     }
 
                     val message = ChatMessage(
+                        id = repo.newMessageId(chatId),
                         senderId = currentUserId,
                         receiverId = otherUserId,
                         content = content,
@@ -315,10 +381,8 @@ class ChatViewModelV2(
                         is ChatResult.Error -> {
                             val reason = sendResult.exception.message ?: "Error al registrar el archivo"
                             Log.e(TAG, "sendMedia: error guardando mensaje: $reason")
-                            _uiState.update {
-                                it.copy(uploadState = UploadState.Failed(reason))
-                            }
-                            _events.emit(ChatEvent.ShowSnackbar(reason, "Reintentar"))
+                            _uiState.update { it.copy(uploadState = UploadState.Failed(reason)) }
+                            _events.emit(ChatEvent.ShowSnackbar(reason))
                         }
 
                         ChatResult.Loading -> Unit
@@ -329,12 +393,10 @@ class ChatViewModelV2(
                     val reason = result.exception.message ?: "Error al subir el archivo"
                     Log.e(TAG, "sendMedia: uploadMedia falló: $reason")
                     _uiState.update { it.copy(uploadState = UploadState.Failed(reason)) }
-                    _events.emit(ChatEvent.ShowSnackbar(reason, "Reintentar"))
+                    _events.emit(ChatEvent.ShowSnackbar(reason))
                 }
 
-                ChatResult.Loading -> {
-                    // El repositorio emite Loading antes de iniciar; aquí ya se puso Uploading(0f)
-                }
+                ChatResult.Loading -> Unit
             }
         }
     }

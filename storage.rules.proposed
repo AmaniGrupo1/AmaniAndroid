@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// PROPUESTA — no desplegada. Asume auth.uid == idUsuario numérico (pendiente de confirmar
+// con el backend que emite el custom token). Validar con el emulador antes de desplegar.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isParticipant(chatId) {
+      return request.auth != null
+          && chatId.matches('[0-9]+_[0-9]+')
+          && (chatId.matches(request.auth.uid + '_[0-9]+') || chatId.matches('[0-9]+_' + request.auth.uid));
+    }
+
+    // Adjuntos del chat V2: solo los dos participantes.
+    match /chats/{chatId}/{fileName} {
+      allow read: if isParticipant(chatId);
+      allow write: if isParticipant(chatId)
+                   && (request.resource.contentType.matches('image/(jpeg|png|webp)')
+                       || request.resource.contentType.matches('audio/.*'))
+                   && request.resource.size < 10 * 1024 * 1024;
+    }
+  }
+}
