@@ -320,7 +320,15 @@ fun NavGraph(
                 val otherUserName =
                     Uri.decode(backStackEntry.arguments?.getString("otherUserName") ?: "")
 
-                if (currentUserId <= 0L || otherUserId <= 0L) {
+                // El id del usuario actual NO se confía a la ruta: debe coincidir con el de la
+                // sesión autenticada. Evita abrir una sala ajena manipulando el argumento.
+                // (Las reglas de Firebase siguen siendo la barrera real; ver docs/seguridad-y-alcance.md.)
+                val sessionUserId = session?.idUsuario
+                    ?: return@composable // Sesión aún cargando: no se crea el ViewModel.
+
+                if (currentUserId <= 0L || otherUserId <= 0L ||
+                    currentUserId != sessionUserId || currentUserId == otherUserId
+                ) {
                     LaunchedEffect(Unit) {
                         navController.popBackStack()
                     }

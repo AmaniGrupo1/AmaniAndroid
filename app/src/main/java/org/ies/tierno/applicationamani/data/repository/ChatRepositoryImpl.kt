@@ -144,11 +144,17 @@ class ChatRepositoryImpl(
         chatId: String,
         pageSize: Int,
     ): Flow<ChatResult<List<ChatMessage>>> {
-        return flowCache.getOrPut(chatId) {
+        // La clave incluye pageSize: un tamaño distinto debe crear su propio listener.
+        // replayExpirationMillis = 0 descarta el último valor al detener el upstream, de modo
+        // que un collector tardío no recibe una lista obsoleta mientras se reabre el listener.
+        return flowCache.getOrPut("$chatId#$pageSize") {
             rawMessagesFlow(chatId, pageSize)
                 .shareIn(
                     scope = repositoryScope,
-                    started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+                    started = SharingStarted.WhileSubscribed(
+                        stopTimeoutMillis = 5_000L,
+                        replayExpirationMillis = 0L,
+                    ),
                     replay = 1,
                 )
         }
@@ -191,8 +197,11 @@ class ChatRepositoryImpl(
                     val idx = messages.indexOfFirst { it.id == updated.id }
                     if (idx >= 0) {
                         messages[idx] = updated
-                        trySend(ChatResult.Success(messages.toList()))
+                    } else {
+                        messages.add(updated)
                     }
+                    messages.sortBy { it.timestamp }
+                    trySend(ChatResult.Success(messages.toList()))
                 }
             }
 
@@ -229,6 +238,9 @@ class ChatRepositoryImpl(
 
             override fun onCancelled(error: DatabaseError) {
                 Log.w(TAG, "singleValueEvent cancelado: ${error.message}")
+                // Sin cerrar con error la UI se quedaría en estado de carga indefinido
+                // (p. ej. PERMISSION_DENIED por reglas o sesión Firebase caducada).
+                close(error.toException())
             }
         })
 
@@ -237,7 +249,6 @@ class ChatRepositoryImpl(
         awaitClose {
             query.removeEventListener(listener)
             ref.keepSynced(false)
-            flowCache.remove(chatId)  // Limpiar caché para permitir recreación limpia
             Log.d(TAG, "observeMessages: listener eliminado para chatId=$chatId")
         }
     }
@@ -301,7 +312,9 @@ class ChatRepositoryImpl(
                 FIELD_SENDER_ID to (message.senderId.toLongOrNull() ?: 0L),
                 FIELD_RECEIVER_ID to (message.receiverId.toLongOrNull() ?: 0L),
                 FIELD_BODY to body,
-                FIELD_TIMESTAMP to message.timestamp.toString(), // La DB vieja guarda timestamp como String
+                // Siempre numérico: orderByChild ordena números y strings por separado, así que
+                // mezclar tipos rompe limitToLast/endAt (ver parseTimestamp).
+                FIELD_TIMESTAMP to message.timestamp,
                 FIELD_STATUS to false, // leido = false
                 "idMensaje" to message.timestamp // El ID numérico que usa el backend viejo
             )
@@ -327,6 +340,32 @@ class ChatRepositoryImpl(
             ChatResult.Success(Unit)
         }.getOrElse { e ->
             Log.e(TAG, "sendTextMessage error: ${e.message}", e)
+            ChatResult.Error(e)
+        }
+    }
+
+    // ─── 3b. Identificador de mensaje y marcado de lectura ───────────────────
+
+    override fun newMessageId(chatId: String): String =
+        requireNotNull(messagesRef(chatId).push().key) {
+            "Firebase no pudo generar una clave para el mensaje"
+        }
+
+    /**
+     * Marca como leídos los mensajes indicados con una única escritura multi-ruta.
+     * No consulta la sala completa: el llamador aporta los ids ya conocidos.
+     */
+    override suspend fun markAsRead(
+        chatId: String,
+        messageIds: List<String>,
+    ): ChatResult<Unit> = withContext(Dispatchers.IO) {
+        if (messageIds.isEmpty()) return@withContext ChatResult.Success(Unit)
+        runCatching {
+            val updates = messageIds.associate { "$it/$FIELD_STATUS" to (true as Any) }
+            messagesRef(chatId).updateChildren(updates).await()
+            ChatResult.Success(Unit)
+        }.getOrElse { e ->
+            Log.e(TAG, "markAsRead error: ${e.message}", e)
             ChatResult.Error(e)
         }
     }
@@ -408,24 +447,9 @@ class ChatRepositoryImpl(
         val body = child(FIELD_BODY).value?.toString().orEmpty()
         val storageRef = child(FIELD_STORAGE_REF).value?.toString().orEmpty()
         
-        // enviadoEn puede venir como Long o como String (ISO date o unix timestamp en string)
-        val timestamp = try {
-            val tsObj = child(FIELD_TIMESTAMP).value
-            when (tsObj) {
-                is Long -> tsObj
-                is String -> {
-                    if (tsObj.contains("T")) {
-                        // Fecha ISO (ej: 2026-05-26T09:01:38.875604537)
-                        java.time.LocalDateTime.parse(tsObj).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    } else {
-                        tsObj.toLongOrNull() ?: System.currentTimeMillis()
-                    }
-                }
-                else -> System.currentTimeMillis()
-            }
-        } catch (e: Exception) {
-            System.currentTimeMillis()
-        }
+        // enviadoEn puede venir como Long, String numérico o fecha ISO (mensajes legacy).
+        // Si no se puede interpretar se usa 0 para no "teletransportar" el mensaje al presente.
+        val timestamp = parseTimestamp(child(FIELD_TIMESTAMP).value) ?: 0L
 
         val leido = child(FIELD_STATUS).getValue(Boolean::class.java) ?: false
 
@@ -447,3 +471,28 @@ class ChatRepositoryImpl(
         )
     }
 }
+
+/**
+ * Interpreta el valor de `enviadoEn` aceptando los formatos que conviven en la base de datos:
+ * número (Long/Double), String numérico y fecha ISO-8601 con o sin offset.
+ *
+ * @return milisegundos desde epoch, o `null` si el valor no es interpretable.
+ */
+internal fun parseTimestamp(raw: Any?): Long? =
+    when (raw) {
+        is Long -> raw
+        is Int -> raw.toLong()
+        is Double -> raw.toLong()
+        is String -> {
+            val text = raw.trim()
+            text.toLongOrNull()
+                ?: runCatching { java.time.OffsetDateTime.parse(text).toInstant().toEpochMilli() }.getOrNull()
+                ?: runCatching {
+                    java.time.LocalDateTime.parse(text)
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                }.getOrNull()
+        }
+        else -> null
+    }

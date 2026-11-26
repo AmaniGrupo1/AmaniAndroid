@@ -1464,4 +1464,6 @@
     <string name="chat_estado_entregado">Lliurat</string>
     <string name="chat_estado_enviado">Enviat</string>
     <string name="chat_documento_ext_formato">%1$s • Document</string>
+    <string name="chat_reintentar">Reintenta</string>
+    <string name="chat_nuevos_mensajes">Missatges nous</string>
 </resources>

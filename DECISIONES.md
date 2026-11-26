@@ -105,3 +105,20 @@ Registro de decisiones tomadas ante ambigüedades o restricciones en conflicto d
 - **Contexto:** Al compilar la tarea `validateSigningDebug` en entornos sandbox o CLI containerizados con Snap, `/home/ivan/.android/debug.keystore.lock` arroja `AccessDeniedException` por permisos del host.
 - **Decisión:** Exportar `ANDROID_USER_HOME=/home/ivan/snap/antigravity-cli/common/.android`, garantizando generación y acceso sin fallos al keystore de depuración estándar de Android.
 
+## DEC-11 · `enviadoEn` numérico y reintento idempotente en el chat V2
+
+- **Contexto:** V2 escribía `enviadoEn` como String; RTDB ordena números y strings por separado, lo que rompía `limitToLast` y `endAt`. Los reintentos generaban claves nuevas.
+- **Opciones:** (a) normalizar a `Long` en escritura y leer de forma tolerante; (b) migrar todo el histórico ya.
+- **Elegida:** (a). La migración del histórico se deja como plan sin ejecutar (ver `docs/chat-auditoria.md`).
+- **Consecuencia:** el id del mensaje es la clave definitiva de Firebase (`ChatRepository.newMessageId`).
+
+## DEC-12 · Stack V1 del chat sin cablear
+
+- **Contexto:** `ChatScreen`, `ChatViewModel`, `data/repositorio/*`, `ChatFirebaseService` y casos de uso no se usan desde `main`.
+- **Decisión pendiente:** retirarlo junto con sus tests y la documentación asociada. No se ha borrado nada.
+
+## DEC-13 · Reglas de Firebase propuestas, no desplegadas
+
+- **Contexto:** las reglas desplegadas no comprueban pertenencia a la sala ni autoría.
+- **Decisión:** se añaden `firebase-database-rules.proposed.json` y `storage.rules.proposed` sin referenciarlas en `firebase.json`. Requieren confirmar el formato del UID y pasar pruebas en emulador.
+

@@ -66,6 +66,7 @@ sealed class ChatUiState {
  * @property uploadState Estado del ciclo de vida de la última subida de archivo.
  * @property error Mensaje de error a mostrar en el Snackbar. `null` si no hay error.
  * @property hasMoreMessages `false` cuando se ha alcanzado el inicio del historial.
+ * @property canSendMessages `false` si la sesión Firebase no está disponible (no se puede enviar).
  */
 data class ChatUiStateV2(
     val messages: List<ChatMessage> = emptyList(),
@@ -74,6 +75,7 @@ data class ChatUiStateV2(
     val uploadState: UploadState = UploadState.Idle,
     val error: String? = null,
     val hasMoreMessages: Boolean = true,
+    val canSendMessages: Boolean = true,
     val audioUiState: org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState = org.ies.tierno.applicationamani.presentation.viewmodels.chat.AudioPlaybackUiState(),
 )
 
@@ -115,9 +117,11 @@ sealed class ChatEvent {
      * Muestra un Snackbar con el mensaje indicado.
      * @property message Texto a mostrar.
      * @property actionLabel Etiqueta del botón de acción opcional.
+     * @property retryMessageId Si no es nulo, la acción del Snackbar reenvía ese mensaje.
      */
     data class ShowSnackbar(
         val message: String,
         val actionLabel: String? = null,
+        val retryMessageId: String? = null,
     ) : ChatEvent()
 }

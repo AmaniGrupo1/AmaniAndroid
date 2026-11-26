@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "chats": {
+      "$roomId": {
+        ".read": "auth != null && $roomId.matches(/^[0-9]+_[0-9]+$/) && ($roomId.beginsWith(auth.uid + '_') || $roomId.endsWith('_' + auth.uid))",
+        "messages": {
+          ".indexOn": ["enviadoEn", "leido"],
+          "$messageId": {
+            ".write": "auth != null && $roomId.matches(/^[0-9]+_[0-9]+$/) && ($roomId.beginsWith(auth.uid + '_') || $roomId.endsWith('_' + auth.uid)) && (!data.exists() ? (newData.child('idSender').val() + '') == auth.uid : (!newData.exists() ? (data.child('idSender').val() + '') == auth.uid : ((data.child('idSender').val() + '') == auth.uid || ((data.child('idReceiver').val() + '') == auth.uid && newData.child('leido').val() === true && newData.child('idSender').val() === data.child('idSender').val() && newData.child('mensaje').val() === data.child('mensaje').val() && newData.child('enviadoEn').val() === data.child('enviadoEn').val() && newData.child('attachmentUrl').val() === data.child('attachmentUrl').val()))))",
+            ".validate": "newData.hasChildren(['idMensaje', 'idSender', 'idReceiver', 'enviadoEn']) && newData.child('enviadoEn').isNumber() && ((newData.child('idSender').val() + '') != (newData.child('idReceiver').val() + '')) && (($roomId == (newData.child('idSender').val() + '_' + newData.child('idReceiver').val())) || ($roomId == (newData.child('idReceiver').val() + '_' + newData.child('idSender').val()))) && ((newData.hasChild('mensaje') && newData.child('mensaje').isString() && newData.child('mensaje').val().length <= 2000 && (newData.child('mensaje').val().length > 0 || newData.hasChild('attachmentUrl'))) || newData.hasChild('attachmentUrl'))"
+          }
+        }
+      }
+    },
+    "typing": {
+      "$roomId": {
+        ".read": "auth != null && ($roomId.beginsWith(auth.uid + '_') || $roomId.endsWith('_' + auth.uid))",
+        ".write": "auth != null && ($roomId.beginsWith(auth.uid + '_') || $roomId.endsWith('_' + auth.uid))"
+      }
+    },
+    "users": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $userId"
+      }
+    }
+  }
+}

@@ -69,6 +69,10 @@ Por su parte, [`build.gradle.kts`](https://github.com/AmaniGrupo1/AmaniAndroid/b
 !!! note "Umbral configurado frente a cobertura medida"
     El valor `minBound(7)` representa la regla mínima configurada en Gradle; el informe detallado por paquete se genera localmente en `app/build/reports/kover/htmlDebug/index.html` al ejecutar `./gradlew koverHtmlReportDebug`.
 
+## Tests del chat V2
+
+`ChatViewModelV2Test` (con un `FakeChatRepository` en memoria) y `ParseTimestampTest` cubren la lógica del chat activo. Los tests de chat anteriores (`ChatViewModelTest`, `ChatRepositoryImplTest`, casos de uso) ejercitan el stack V1 inactivo. Sigue pendiente el test de reglas con el emulador de Firebase. Ver [Auditoría del chat](chat-auditoria.md).
+
 ## Siguientes pasos
 
 - Consulta [CI/CD y publicación](despliegue.md) para ver cómo se ejecutan los tests Robo e instrumentados en Firebase Test Lab.

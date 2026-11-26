@@ -1466,4 +1466,6 @@
     <string name="chat_estado_entregado">Delivered</string>
     <string name="chat_estado_enviado">Sent</string>
     <string name="chat_documento_ext_formato">%1$s • Document</string>
+    <string name="chat_reintentar">Retry</string>
+    <string name="chat_nuevos_mensajes">New messages</string>
 </resources>

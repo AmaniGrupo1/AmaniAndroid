@@ -33,6 +33,10 @@ local.properties
 <!-- TODO: confirmar la revisión de reglas de seguridad de Firebase y permisos por rol antes de operar con datos reales -->
 <!-- TODO: confirmar la política de privacidad, retención y cifrado local aplicable al despliegue en producción -->
 
+## Reglas de Firebase del chat
+
+Las reglas desplegadas (`firebase-database-rules.json`, `storage.rules`, `firestore.rules`) solo exigen `auth != null`: cualquier usuario autenticado podría leer o escribir en cualquier sala. Existe una propuesta (`firebase-database-rules.proposed.json`, `storage.rules.proposed`) que limita cada sala a sus dos participantes y liga `idSender` a `auth.uid`. **No está desplegada** y asume que el UID del custom token es el `idUsuario` numérico, algo aún sin confirmar. Detalle en [Auditoría del chat](chat-auditoria.md). Esto no constituye una auditoría de cumplimiento del RGPD.
+
 ## Siguientes pasos
 
 - Revisa los permisos declarados en [Manifest y permisos](manifest-y-permisos.md).

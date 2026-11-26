@@ -3,6 +3,7 @@ package org.ies.tierno.applicationamani.di
 
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import org.ies.tierno.applicationamani.data.AuthRepository
 import org.ies.tierno.applicationamani.data.repository.ChatRepositoryImpl
 import org.ies.tierno.applicationamani.domain.repository.ChatRepository
 import org.ies.tierno.applicationamani.presentation.viewmodels.chat.ChatViewModelV2
@@ -66,6 +67,8 @@ val chatModule = module {
             chatId = params[0],
             currentUserId = params[1],
             otherUserId = params[2],
+            // Refresca el token Firebase antes de observar/enviar (evita PERMISSION_DENIED por caducidad).
+            ensureAuthenticated = { get<AuthRepository>().ensureFirebaseAuthenticated() },
         )
     }
 }

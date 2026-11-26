@@ -46,14 +46,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,10 +68,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.ies.tierno.applicationamani.R
 import org.ies.tierno.applicationamani.domain.models.ChatMessage
 import org.ies.tierno.applicationamani.domain.models.MessageContent
@@ -86,6 +93,9 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+private const val LOAD_MORE_THRESHOLD = 3
+private const val NEAR_BOTTOM_THRESHOLD = 1
+
 sealed class ChatV2ListItem {
     data class MessageItem(
         val msg: ChatMessage,
@@ -95,6 +105,7 @@ sealed class ChatV2ListItem {
 
     data class DateSeparator(
         val label: String,
+        val date: LocalDate,
     ) : ChatV2ListItem()
 }
 
@@ -122,6 +133,7 @@ fun ChatScreenV2(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val hoyLabel = stringResource(R.string.chat_hoy)
     val ayerLabel = stringResource(R.string.chat_ayer)
     val chatDefaultTitle = stringResource(R.string.chat_titulo_default)
@@ -132,23 +144,56 @@ fun ChatScreenV2(
         }
 
     // ── Trigger de paginación ─────────────────────────────────────────────────
-    // derivedStateOf evita recomposiciones: solo re-evalúa cuando firstVisibleItemIndex cambia.
+    // Con reverseLayout el índice 0 es el mensaje MÁS NUEVO; los antiguos están al final de la
+    // lista. Se pide la página anterior cuando el último ítem visible está cerca del final.
     val shouldLoadMore by remember {
-        derivedStateOf { listState.firstVisibleItemIndex <= 3 }
+        derivedStateOf {
+            val info = listState.layoutInfo
+            val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: -1
+            info.totalItemsCount > 0 && lastVisible >= info.totalItemsCount - 1 - LOAD_MORE_THRESHOLD
+        }
     }
 
-    LaunchedEffect(shouldLoadMore) {
+    LaunchedEffect(shouldLoadMore, state.hasMoreMessages, state.isLoadingMore) {
         if (shouldLoadMore && state.hasMoreMessages && !state.isLoadingMore) {
             viewModel.loadOlderMessages()
         }
     }
+
+    // ── Política de scroll ────────────────────────────────────────────────────
+    // Cerca del final (índice 0 en reverseLayout) → se sigue a los mensajes nuevos.
+    // Leyendo historial → no se interrumpe y se muestra el chip "Mensajes nuevos".
+    val isNearBottom by remember {
+        derivedStateOf { listState.firstVisibleItemIndex <= NEAR_BOTTOM_THRESHOLD }
+    }
+    var hasNewMessages by remember { mutableStateOf(false) }
+    val newestMessageId = state.messages.lastOrNull()?.id
+    var lastSeenNewestId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(newestMessageId) {
+        val previous = lastSeenNewestId
+        lastSeenNewestId = newestMessageId
+        if (previous == null || newestMessageId == null || previous == newestMessageId) return@LaunchedEffect
+        val isOwn = state.messages.lastOrNull()?.senderId == viewModel.currentUserId
+        if (isOwn || isNearBottom) {
+            listState.animateScrollToItem(0)
+        } else {
+            hasNewMessages = true
+        }
+    }
+    LaunchedEffect(isNearBottom) { if (isNearBottom) hasNewMessages = false }
+
+    // ── Ciclo de vida: lectura solo con la pantalla visible ───────────────────
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onScreenResumed() }
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { viewModel.onScreenPaused() }
 
     // ── Eventos de un solo disparo ────────────────────────────────────────────
     LaunchedEffect(viewModel) {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is ChatEvent.ScrollToBottom -> {
-                    if (state.messages.isNotEmpty()) {
+                    // Solo lo emite el VM al enviar un mensaje propio.
+                    if (listState.layoutInfo.totalItemsCount > 0) {
                         listState.animateScrollToItem(0)
                     }
                 }
@@ -161,10 +206,19 @@ fun ChatScreenV2(
                             duration = SnackbarDuration.Long,
                         )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.resetUploadState()
+                        val retryId = event.retryMessageId
+                        if (retryId != null) viewModel.retrySend(retryId) else viewModel.resetUploadState()
                     }
                 }
             }
+        }
+    }
+
+    // Los errores de estado (carga, permisos, red) también se muestran al usuario.
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+            viewModel.clearError()
         }
     }
 
@@ -180,6 +234,7 @@ fun ChatScreenV2(
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val audioHandler = remember { AudioHandler(context) }
+    DisposableEffect(audioHandler) { onDispose { audioHandler.release() } }
     val isRecording by audioHandler.isRecording.collectAsStateWithLifecycle()
     val recordingSeconds by audioHandler.recordingSeconds.collectAsStateWithLifecycle()
 
@@ -212,7 +267,7 @@ fun ChatScreenV2(
 
                 MessageInput(
                     text = text,
-                    onTextChange = { text = it },
+                    onTextChange = { if (it.length <= ChatViewModelV2.MAX_MESSAGE_LENGTH) text = it },
                     onSend = {
                         if (pendingAttachmentUri != null) {
                             viewModel.sendMedia(pendingAttachmentUri!!, MediaType.IMAGE, text)
@@ -238,7 +293,7 @@ fun ChatScreenV2(
                     onAttachFile = { fileLauncher.launch("image/*") },
                     onStopRecording = {
                         val file = audioHandler.stopRecording()
-                        if (file != null) {
+                        if (file != null && file.length() > 0L) {
                             val uri = Uri.fromFile(file)
                             viewModel.sendMedia(uri, MediaType.AUDIO)
                         }
@@ -290,7 +345,7 @@ fun ChatScreenV2(
                                 key = { item ->
                                     when (item) {
                                         is ChatV2ListItem.MessageItem -> item.msg.id
-                                        is ChatV2ListItem.DateSeparator -> "sep_${item.label}"
+                                        is ChatV2ListItem.DateSeparator -> "sep_${item.date}"
                                     }
                                 },
                             ) { item ->
@@ -309,12 +364,29 @@ fun ChatScreenV2(
                                             onPlayPause = { messageId, url ->
                                                 viewModel.toggleAudioPlayback(messageId, url)
                                             },
+                                            onRetry = { viewModel.retrySend(item.msg.id) },
                                         )
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = hasNewMessages,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(Spacing.s),
+            ) {
+                FilledTonalButton(
+                    onClick = {
+                        hasNewMessages = false
+                        scope.launch { listState.animateScrollToItem(0) }
+                    },
+                ) {
+                    Text(stringResource(R.string.chat_nuevos_mensajes))
                 }
             }
         }
@@ -409,6 +481,7 @@ private fun MessageBubbleV2(
     otherUserName: String,
     audioUiState: AudioPlaybackUiState,
     onPlayPause: (String, String) -> Unit,
+    onRetry: () -> Unit = {},
 ) {
     val bubbleColor =
         if (isOwnMessage) {
@@ -492,11 +565,14 @@ private fun MessageBubbleV2(
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                             if (message.status == MessageStatus.FAILED) {
-                                Text(
-                                    text = stringResource(R.string.chat_no_enviado),
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
+                                TextButton(onClick = onRetry) {
+                                    Text(
+                                        text = stringResource(R.string.chat_no_enviado) + " · " +
+                                            stringResource(R.string.chat_reintentar),
+                                        color = MaterialTheme.colorScheme.error,
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                }
                             }
                             Spacer(modifier = Modifier.height(Spacing.xxs))
                             Row(
@@ -517,7 +593,7 @@ private fun MessageBubbleV2(
                                     Spacer(modifier = Modifier.width(Spacing.xs))
                                     StatusIcon(
                                         isRead = message.status == MessageStatus.READ,
-                                        isDelivered = message.status == MessageStatus.SENT,
+                                        isDelivered = false, // DELIVERED no es verificable con RTDB: solo enviado/leído
                                     )
                                 }
                             }
@@ -578,7 +654,7 @@ private fun MessageBubbleV2(
                                             Spacer(modifier = Modifier.width(Spacing.xs))
                                             StatusIcon(
                                                 isRead = message.status == MessageStatus.READ,
-                                                isDelivered = message.status == MessageStatus.SENT,
+                                                isDelivered = false, // DELIVERED no es verificable con RTDB: solo enviado/leído
                                                 tint = overlayTextColor,
                                             )
                                         }
@@ -616,7 +692,7 @@ private fun MessageBubbleV2(
                                             Spacer(modifier = Modifier.width(Spacing.xs))
                                             StatusIcon(
                                                 isRead = message.status == MessageStatus.READ,
-                                                isDelivered = message.status == MessageStatus.SENT,
+                                                isDelivered = false, // DELIVERED no es verificable con RTDB: solo enviado/leído
                                             )
                                         }
                                     }
@@ -648,7 +724,7 @@ private fun MessageBubbleV2(
                                     Spacer(modifier = Modifier.width(Spacing.xs))
                                     StatusIcon(
                                         isRead = message.status == MessageStatus.READ,
-                                        isDelivered = message.status == MessageStatus.SENT,
+                                        isDelivered = false, // DELIVERED no es verificable con RTDB: solo enviado/leído
                                     )
                                 }
                             }
@@ -717,7 +793,7 @@ private fun buildChatV2Items(
                             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault()),
                         )
                 }
-            items.add(ChatV2ListItem.DateSeparator(label))
+            items.add(ChatV2ListItem.DateSeparator(label, messageDate))
         }
 
         val previous = sortedAsc.getOrNull(index - 1)

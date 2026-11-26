@@ -39,6 +39,10 @@ Esta página resume las decisiones de arquitectura e interfaz registradas en [`D
 <!-- TODO: confirmar qué puntos de PLAN-MEJORA.md están asignados para la siguiente iteración del equipo -->
 <!-- TODO: confirmar la licencia aplicable al proyecto antes de su distribución pública -->
 
+## Pendientes del chat
+
+Desplegar reglas endurecidas, migrar `enviadoEn` legacy, registrar el token FCM y pedir `POST_NOTIFICATIONS`, enriquecer la lista de conversaciones (último mensaje, no leídos, búsqueda) y retirar el stack V1. Ver [Auditoría del chat](chat-auditoria.md).
+
 ## Siguientes pasos
 
 - Consulta [Seguridad y privacidad](seguridad-y-alcance.md) para el detalle de los puntos de la Fase 1.
